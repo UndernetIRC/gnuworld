@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: commLevels.h,v 1.25 2008/08/06 19:36:03 hidden1 Exp $
+ * $Id: commLevels.h,v 1.26 2009/06/09 05:55:55 hidden1 Exp $
  */
 
 #ifndef __COMMANDLEVELS_H
@@ -108,6 +108,7 @@ const unsigned long int flg_UNJUPE     = 0x2000000;
 const unsigned long int flg_SCHANGLINE = 0x4000000;
 const unsigned long int flg_FORCECHANGLINE = 0x8000000;
 const unsigned long int flg_SHELLS = 0x10000000;
+const unsigned long int flg_ANNOUNCE = 0x20000000;
 
 /*
  Default commands that are added upon adding a new oper
@@ -121,7 +122,7 @@ const unsigned long int OPER = flg_HELP | flg_DEAUTH | flg_NEWPASS
 			| flg_MODOP;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
 			| flg_NOTES | flg_USERINFO | flg_SCAN | flg_MAXUSERS
-			| flg_LASTCOM | flg_REOP | flg_UNJUPE;
+			| flg_LASTCOM | flg_REOP | flg_UNJUPE | flg_ANNOUNCE;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
 			| flg_ADDNOP | flg_REMOP | flg_ADDCMD 
 			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND;

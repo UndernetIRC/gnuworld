@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.227 2009/06/06 07:53:34 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.228 2009/06/09 05:55:55 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.227 2009/06/06 07:53:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.228 2009/06/09 05:55:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -199,6 +199,8 @@ checkClones = atoi(conf.Require("check_clones")->second.c_str());
 showCGIpsInLogs = atoi(conf.Require("showCGIpsInLogs")->second.c_str());
 
 dbConnectionTimer = atoi(conf.Require("dbinterval")->second.c_str());
+
+AnnounceNick = conf.Require("AnnounceNick")->second;
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -638,6 +640,15 @@ RegisterCommand( new SHELLSCommand( this, "SHELLS",
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
+RegisterCommand( new ANNOUNCECommand( this, "ANNOUNCE",
+	"<message>",
+	false,
+	commandLevel::flg_ANNOUNCE,
+	false,
+	false,
+	false,
+	operLevel::OPERLEVEL,
+	true ) ) ;
 RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES",
 	"List the ignore list",
 	false,
@@ -1008,6 +1019,7 @@ MyUplink->RegisterEvent( EVT_BURST_CMPLT, this );
 MyUplink->RegisterEvent( EVT_GLINE , this );
 MyUplink->RegisterEvent( EVT_REMGLINE , this );
 MyUplink->RegisterEvent( EVT_NICK , this );
+MyUplink->RegisterEvent( EVT_OPER , this );
 
 MyUplink->RegisterEvent( EVT_NETBREAK, this );
 
@@ -1524,6 +1536,7 @@ switch( theEvent )
 		{
 		inBurst = false;
 		ccServer* curServer;
+		//refreshOpersIPMap();
 		const iServer* curNetServer; 
 		for(serversConstIterator ptr = serversMap_begin();
 		        ptr != serversMap_end() && !inBurst; ++ptr)
@@ -1614,6 +1627,12 @@ switch( theEvent )
 		{
 		iClient* NewUser = static_cast< iClient* >( Data1);
 		handleNewClient(NewUser);
+		break;
+		}
+	case EVT_OPER:
+		{
+		iClient* theUser = static_cast< iClient* >( Data1);
+		isNowAnOper(theUser);
 		break;
 		}
 	} // switch()
@@ -1852,6 +1871,8 @@ stringListType *OthersList;
 
 GlineReason[0] = '\0';
 curUsers++;
+if (NewUser->isOper())
+	isNowAnOper(NewUser);
 if(!inBurst)
 	{
 	checkMaxUsers();
@@ -3575,6 +3596,8 @@ if (getExceptions("*@" + Hostname) > 0)
 	{
 	retMe |= gline::HUH_IS_EXCEPTION;
 	}
+if (isIpOfOper(Hostname))
+	retMe |= gline::HUH_IS_IP_OF_OPER;
 	
 //if(GlineType & (isWildCard & (Len >  gline::MGLINE_WILD_TIME)))
 //	retMe |=  gline::FORCE_NEEDED_WILDTIME;
@@ -6285,6 +6308,11 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		foundException = true;
 		Notice(theClient, "There is an exception for this user: %s!%s@%s", TmpClient->getNickName().c_str(), TmpClient->getUserName().c_str(), curIP.c_str());
 		}
+	if (isIpOfOper(curIP)) 
+		{
+		Notice(theClient, "%s opered globally before and uses the same IP this user uses: %s!%s@%s", getLastNUHOfOperFromIP(curIP).c_str(), TmpClient->getNickName().c_str(), TmpClient->getUserName().c_str(), curIP.c_str());
+		foundException = true;
+		}
 	if ((unidented) && (TmpClient->getUserName().substr(0,1)) != "~")
 		continue;
 	gptr = glineList.find("*@" + curIP);
@@ -6310,7 +6338,7 @@ for (Channel::const_userIterator ptr = theChan->userList_begin();
 		TmpGline->setReason(reason);
 		TmpGline->setAddedOn(::time(0));
 		TmpGline->setLastUpdated(::time(0));
-		(excludeChanWithOper || foundException) ? neededGlines.push_back(TmpGline) : queueGline(TmpGline);
+		neededGlines.push_back(TmpGline);
 		if (showCGIpsInLogs)
 			{
 			count++;
@@ -6344,25 +6372,13 @@ if (foundException)
 		}
 	}
 
-if(excludeChanWithOper || foundException)
+list<ccGline*>::iterator glinesIt = neededGlines.begin();
+for(; glinesIt != neededGlines.end(); ++glinesIt)
 	{
-	list<ccGline*>::iterator glinesIt = neededGlines.begin();
-	for(; glinesIt != neededGlines.end(); ++glinesIt)
-		{
-		TmpGline = *glinesIt;
-		//((excludeChanWithOper && foundOper) || (foundException && !exceptionForce)) ? delete TmpGline : queueGline(TmpGline);
-		if ((excludeChanWithOper && foundOper) || (foundException && !exceptionForce)) 
-			{
-			delete TmpGline;
-			}
-		else 
-			{
-			queueGline(TmpGline);
-			}
-		}
+	TmpGline = *glinesIt;
+	((excludeChanWithOper && foundOper) || (foundException && !exceptionForce)) ? delete TmpGline : queueGline(TmpGline);
 	}
-
-if ((showCGIpsInLogs) && (((!excludeChanWithOper) && (!foundException)) || !((excludeChanWithOper && foundOper) || (foundException && !exceptionForce))))
+if (showCGIpsInLogs && (!excludeChanWithOper || !foundOper) && (!foundException || exceptionForce))
 	{
 	for (list<string>::iterator sItr = ipList.begin(); sItr != ipList.end(); sItr++)
 		{
@@ -6388,6 +6404,86 @@ if ((showCGIpsInLogs) && (((!excludeChanWithOper) && (!foundException)) || !((ex
 	}
 
 return success;
+}
+
+void ccontrol::isNowAnOper (iClient* theUser)
+{
+	string IP = xIP(theUser->getIP()).GetNumericIP();
+	opersIPMap[IP] = theUser->getRealNickUserHost();
+}
+
+bool ccontrol::isIpOfOper (const string& IP)
+{
+	opersIPMapType::iterator oItr;
+	if ((oItr = opersIPMap.find(IP)) != opersIPMap.end())
+        return true;
+	return false;
+}
+
+string ccontrol::getLastNUHOfOperFromIP (const string& IP)
+{
+	if (isIpOfOper(IP))
+		return opersIPMap[IP];
+	return string("error");
+}
+
+void ccontrol::refreshOpersIPMap()
+//That function won't be needed afterall.
+{
+	int count=0;
+	gnuworld::xNetwork::clientIterator cItr = Network->clients_begin();
+	for (; cItr != Network->clients_end(); cItr++) {
+		iClient* theUser = (*cItr).second;
+		if (theUser->isOper()) {
+			opersIPMap[xIP(theUser->getIP()).GetNumericIP()] = theUser->getRealNickUserHost();
+			count++;
+		}
+	}
+    MsgChanLog("Refreshed opers IP list. %d global opers online right now. I have cumulated %d different IPs since I started", count, opersIPMap.size());
+}
+
+void ccontrol::announce(iClient* theClient, const string& text)
+{
+	ccUser* tmpUser = IsAuth(theClient);
+
+	string yyxxx( MyUplink->getCharYY() + "]]]" ) ;
+	if (Network->findNick(AnnounceNick) != NULL) {
+		if (tmpUser && !tmpUser->getLogs())
+			Notice(theClient, "Nick %s is already in use for ANNOUNCE. Will use my own", AnnounceNick.c_str());
+		MsgChanLog("Nick %s is already in use for ANNOUNCE. Will use my own", AnnounceNick.c_str());
+		MyUplink->Write("%s O $* :%s", getCharYYXXX().c_str(), text.c_str());
+		return;
+	}
+
+	iClient* newClient = new iClient(
+		MyUplink->getIntYY(),
+		yyxxx,
+		AnnounceNick,
+		"announce",
+		"AAAAAA",
+		"undernet.org",
+		"undernet.org",
+		"+ok",
+		string(),
+		0,
+		"Announcement Service.",
+		::time( 0 ) ) ;
+	assert( newClient != 0 );
+
+	if(!MyUplink->AttachClient( newClient, this ) ) {
+		if (tmpUser && !tmpUser->getLogs())
+			Notice(theClient, "Nick %s is already in use for ANNOUNCE. Will use my own", AnnounceNick.c_str());
+		MsgChanLog("Error attaching announce client") ;
+	}
+
+	MyUplink->Write("%s O $* :%s", newClient->getCharYYXXX().c_str(), text.c_str());
+
+	stringstream Quit;
+	Quit << "Did what I had to do! (At " << theClient->getNickName() << "'s request)";
+	if( MyUplink->DetachClient( newClient, Quit.str() ) ) {
+		delete newClient ;
+	}
+	
 }
 
 }

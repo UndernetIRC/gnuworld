@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.58 2008/08/06 19:35:58 hidden1 Exp $"
+# "$Id: Makefile.am,v 1.59 2009/06/09 05:55:55 hidden1 Exp $"
 
 lib_LTLIBRARIES = libccontrol.la
 libccontrol_la_SOURCES = ccontrol.cc \
@@ -69,7 +69,8 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	UNSUSPENDCommand.cc \
 	USERINFOCommand.cc \
 	WHOISCommand.cc \
-	SHELLSCommand.cc
+	SHELLSCommand.cc \
+	ANNOUNCECommand.cc
 
 libccontrol_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld

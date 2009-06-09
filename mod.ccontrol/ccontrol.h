@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.109 2009/06/06 07:53:34 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.110 2009/06/09 05:55:55 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.109 2009/06/06 07:53:34 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.110 2009/06/09 05:55:55 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 
@@ -142,6 +142,8 @@ protected:
 	 * Type used to hold the gline list.
 	 */
 	typedef map< string, ccGline* >        glineListType ;
+
+	typedef map< string, string >		opersIPMapType;
 	
 	/**
 	 * Holds the glines
@@ -365,6 +367,16 @@ public:
 	virtual bool removeOperChan( const string& ) ;
 
 	void handleNewClient( iClient* );
+	
+	void isNowAnOper ( iClient* );
+
+	bool isIpOfOper ( const string& );
+
+	void refreshOpersIPMap();
+
+	void announce ( iClient* , const string& );
+
+	string getLastNUHOfOperFromIP ( const string& );
 	
 	void addGlineToUplink( ccGline* );
 	
@@ -857,6 +869,8 @@ public:
 		{ return exceptionList.end(); }
 	
 	clientsIpMapType		clientsIpMap;
+
+	opersIPMapType				opersIPMap;
 	
 	clientsIpIterator clientsIp_begin()
 		{ return clientsIpMap.begin(); }
@@ -1057,6 +1071,8 @@ protected:
 	bool			showCGIpsInLogs;
 
 	time_t			dbConnectionTimer;
+
+	string			AnnounceNick;
 	
 	string			sqlHost;
 	

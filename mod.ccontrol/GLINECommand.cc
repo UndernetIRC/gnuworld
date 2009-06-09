@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: GLINECommand.cc,v 1.63 2009/05/31 21:31:55 hidden1 Exp $
+ * $Id: GLINECommand.cc,v 1.64 2009/06/09 05:55:55 hidden1 Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: GLINECommand.cc,v 1.63 2009/05/31 21:31:55 hidden1 Exp $" ) ;
+RCSTAG( "$Id: GLINECommand.cc,v 1.64 2009/06/09 05:55:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -243,13 +243,23 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 			    gline::MGLINE_WILD_NOID_TIME);
 			Ok = false;
 			}
+		if((gCheck & gline::HUH_IS_IP_OF_OPER) && (Ok))
+			{
+			if (bot->isGlinedException(userName + "@" + hostName) > 0) {
+				bot->Notice(theClient,"There is someone who previously opered from that host. G-line sent (forced)");
+			}
+			else {
+				bot->Notice(theClient,"There is someone who previously opered from that host (%s). Send the gline again to force.", bot->getLastNUHOfOperFromIP(hostName).c_str());
+				bot->addGlinedException(userName + "@" + hostName);
+				Ok = false;
+			}
+			}
 		if((gCheck & gline::HUH_IS_EXCEPTION) && (Ok))
 			{
 			if (bot->isGlinedException(userName + "@" + hostName) > 0) {
 				bot->Notice(theClient,"There is an exception for that host. G-line sent (forced)");
 			}
 			else {
-				//bot->MsgChanLog("%c%s is attempting to gline a host with an exception (%s@%s)%c", 1, theClient->getNickName().c_str(), userName.c_str(), hostName.c_str(), 1);
 				bot->Notice(theClient,"There is an exception for that host. Send the gline again to force.");
 				bot->addGlinedException(userName + "@" + hostName);
 				Ok = false;
