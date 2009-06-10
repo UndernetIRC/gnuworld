@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODINFOCommand.cc,v 1.20 2009/06/09 15:40:29 mrbean_ Exp $
+ * $Id: MODINFOCommand.cc,v 1.21 2009/06/10 18:18:18 mrbean_ Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.20 2009/06/09 15:40:29 mrbean_ Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.21 2009/06/10 18:18:18 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -127,7 +127,7 @@ if(command == "INVITE")
 			bot->getResponse(theUser,
 				language::automode_invite,
 				string("Set INVITE on login %s for channel %s")).c_str(),
-				theChan->getName().c_str(),"ON");
+				"ON", theChan->getName().c_str());
 
 		return false;
 		}
@@ -141,7 +141,7 @@ if(command == "INVITE")
 			bot->getResponse(theUser,
 				language::automode_invite,
 				string("Set INVITE on login %s for channel %s")).c_str(),
-				theChan->getName().c_str(),"OFF");
+				"OFF",theChan->getName().c_str());
 
 		return false;
 		}
