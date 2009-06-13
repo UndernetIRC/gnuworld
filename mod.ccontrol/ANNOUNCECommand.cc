@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ANNOUNCECommand.cc,v 1.1 2009/06/09 05:55:55 hidden1 Exp $
+ * $Id: ANNOUNCECommand.cc,v 1.2 2009/06/13 06:43:34 hidden1 Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include 	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ANNOUNCECommand.cc,v 1.1 2009/06/09 05:55:55 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ANNOUNCECommand.cc,v 1.2 2009/06/13 06:43:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

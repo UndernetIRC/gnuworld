@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.228 2009/06/09 05:55:55 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.229 2009/06/13 06:43:34 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.228 2009/06/09 05:55:55 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.229 2009/06/13 06:43:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4939,11 +4939,21 @@ if (Shellnb == 0) {
 	return false;
 }
 bool status = Shellnb->Delete();
+bool del = false;
 shellnbListType::iterator Itr = shellnbList.begin();
 for (; Itr != shellnbList.end(); Itr++) {
+	if (del)
+		Itr--;
+	del = false;
 	if (*Itr == Shellnb) {
-		shellnbList.erase(Itr);
+		Itr = shellnbList.erase(Itr);
+		del = true;
 	}
+}
+if (del) {
+	Itr--;
+	if (*Itr == Shellnb)
+		shellnbList.erase(Itr);
 }
 shellcoMap[Shellnb->shellco] -= shellnbMap[Shellnb];
 shellnbMap.erase(Shellnb);
@@ -4985,14 +4995,42 @@ if (Shellco == 0) {
 	return false;
 }
 
+bool del = false;
 shellcoListType::iterator Itr = shellcoList.begin();
 for (; Itr != shellcoList.end(); Itr++) {
+	if (del)
+		Itr--;
+	del = false;
 	if (*Itr == Shellco) {
-		shellcoList.erase(Itr);
+		Itr = shellcoList.erase(Itr);
+		del = true;
 	}
 }
+if (del) {
+	Itr--;
+	if (*Itr == Shellco)
+		shellcoList.erase(Itr);
+}
 
-for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
+del = false;
+shellnbIterator ptr = shellnbList.begin();
+for (; ptr != shellnbList.end(); ptr++) {
+	shellnbIterator ptr2;
+	if (del)
+		ptr--;
+	del = false;
+	if ((*ptr)->shellco == Shellco) {
+		ptr2 = ptr;
+		ptr2++;
+		if (!delShellnb(theClient, (*ptr)->getCidr())) {
+			Notice(theClient,"Error while deleting netblock '%s'",(*ptr)->getCidr().c_str());
+		}
+		ptr = ptr2;
+		del = true;
+	}
+}
+if (del) {
+	ptr--;
 	if ((*ptr)->shellco == Shellco) {
 		if (!delShellnb(theClient, (*ptr)->getCidr())) {
 			Notice(theClient,"Error while deleting netblock '%s'",(*ptr)->getCidr().c_str());
@@ -6472,8 +6510,11 @@ void ccontrol::announce(iClient* theClient, const string& text)
 
 	if(!MyUplink->AttachClient( newClient, this ) ) {
 		if (tmpUser && !tmpUser->getLogs())
-			Notice(theClient, "Nick %s is already in use for ANNOUNCE. Will use my own", AnnounceNick.c_str());
-		MsgChanLog("Error attaching announce client") ;
+			Notice(theClient, "Error attaching announce client. Using my own nick for the announce.");
+		MsgChanLog("Error attaching announce client. Using my own nick for the announce.");
+		MyUplink->Write("%s O $* :%s", getCharYYXXX().c_str(), text.c_str());
+		delete newClient;
+		return;
 	}
 
 	MyUplink->Write("%s O $* :%s", newClient->getCharYYXXX().c_str(), text.c_str());
@@ -6481,7 +6522,7 @@ void ccontrol::announce(iClient* theClient, const string& text)
 	stringstream Quit;
 	Quit << "Did what I had to do! (At " << theClient->getNickName() << "'s request)";
 	if( MyUplink->DetachClient( newClient, Quit.str() ) ) {
-		delete newClient ;
+		delete newClient;
 	}
 	
 }

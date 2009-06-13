@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.110 2009/06/09 05:55:55 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.111 2009/06/13 06:43:34 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.110 2009/06/09 05:55:55 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.111 2009/06/13 06:43:34 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD 

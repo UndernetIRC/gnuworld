@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: commLevels.h,v 1.26 2009/06/09 05:55:55 hidden1 Exp $
+ * $Id: commLevels.h,v 1.27 2009/06/13 06:43:34 hidden1 Exp $
  */
 
 #ifndef __COMMANDLEVELS_H

@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.18 2009/06/06 07:53:34 hidden1 Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.19 2009/06/13 06:43:34 hidden1 Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -19,6 +19,7 @@ ADDCOMMAND		3	Syntax: /msg $BOT$ addcommand [-fr] <oper> <command>
 ADDCOMMAND		4	-fr can only be specified by SMT+ to force addition
 ADDCOMMAND		5	<oper> - the oper username you want to give the command to
 ADDCOMMAND		6	<command> - the command you want to add
+ADDCOMMAND		7	CODERS only: you can use /msg $BOT$ addcommand [-fr] <-allopers|-alladmins|-allsmts|-allcoders> <command>
 ADDSERVER		1	****** ADDSERVER COMMAND ******
 ADDSERVER		2	Adds a new server to the bot database
 ADDSERVER		3	Syntax: /msg $BOT$ addserver <server>
@@ -218,6 +219,7 @@ REMCOMMAND		2	Removes an oper's access to a certain command
 REMCOMMAND		3	Syntax: /msg $BOT$ remcommand <command> <username>
 REMCOMMAND		4	<command> - the command to remove access to
 REMCOMMAND		5	<username> - the username of the oper you want to remove the command from
+REMCOMMAND		6	CODERS only: you can use /msg $BOT$ remcommand <-allopers|-alladmins|-allsmts|-allcoders> <command>
 REMGCHAN		1	****** REMGCHAN COMMAND ******
 REMGCHAN		2	Removes a gchan badchannel gline
 REMGCHAN		3	Syntax: /msg $BOT$ remgchan <#channel>
