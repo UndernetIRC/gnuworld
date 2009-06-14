@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.229 2009/06/13 06:43:34 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.230 2009/06/14 01:29:54 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -67,7 +67,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.229 2009/06/13 06:43:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.230 2009/06/14 01:29:54 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -4939,21 +4939,13 @@ if (Shellnb == 0) {
 	return false;
 }
 bool status = Shellnb->Delete();
-bool del = false;
 shellnbListType::iterator Itr = shellnbList.begin();
-for (; Itr != shellnbList.end(); Itr++) {
-	if (del)
-		Itr--;
-	del = false;
+while (Itr != shellnbList.end()) {
 	if (*Itr == Shellnb) {
 		Itr = shellnbList.erase(Itr);
-		del = true;
 	}
-}
-if (del) {
-	Itr--;
-	if (*Itr == Shellnb)
-		shellnbList.erase(Itr);
+	else
+		Itr++;
 }
 shellcoMap[Shellnb->shellco] -= shellnbMap[Shellnb];
 shellnbMap.erase(Shellnb);
@@ -4995,30 +4987,18 @@ if (Shellco == 0) {
 	return false;
 }
 
-bool del = false;
 shellcoListType::iterator Itr = shellcoList.begin();
-for (; Itr != shellcoList.end(); Itr++) {
-	if (del)
-		Itr--;
-	del = false;
+while (Itr != shellcoList.end()) {
 	if (*Itr == Shellco) {
 		Itr = shellcoList.erase(Itr);
-		del = true;
 	}
-}
-if (del) {
-	Itr--;
-	if (*Itr == Shellco)
-		shellcoList.erase(Itr);
+	else
+		Itr++;
 }
 
-del = false;
 shellnbIterator ptr = shellnbList.begin();
-for (; ptr != shellnbList.end(); ptr++) {
+while (ptr != shellnbList.end()) {
 	shellnbIterator ptr2;
-	if (del)
-		ptr--;
-	del = false;
 	if ((*ptr)->shellco == Shellco) {
 		ptr2 = ptr;
 		ptr2++;
@@ -5026,16 +5006,9 @@ for (; ptr != shellnbList.end(); ptr++) {
 			Notice(theClient,"Error while deleting netblock '%s'",(*ptr)->getCidr().c_str());
 		}
 		ptr = ptr2;
-		del = true;
 	}
-}
-if (del) {
-	ptr--;
-	if ((*ptr)->shellco == Shellco) {
-		if (!delShellnb(theClient, (*ptr)->getCidr())) {
-			Notice(theClient,"Error while deleting netblock '%s'",(*ptr)->getCidr().c_str());
-		}
-	}
+	else
+		ptr++;
 }
 bool status = Shellco->Delete();
 shellcoMap.erase(Shellco);

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMGLINECommand.cc,v 1.26 2006/09/26 17:36:00 kewlio Exp $
+ * $Id: REMGLINECommand.cc,v 1.27 2009/06/14 01:29:54 hidden1 Exp $
  */
 
 #include	<string>
@@ -31,7 +31,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMGLINECommand.cc,v 1.26 2006/09/26 17:36:00 kewlio Exp $" ) ;
+RCSTAG( "$Id: REMGLINECommand.cc,v 1.27 2009/06/14 01:29:54 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -61,6 +61,12 @@ if(st[1].substr(0,1) == "#")
 if(st[1].substr(0,1) == "$")
 	{
 	bot->Notice(theClient,"Please use REMSGLINE to remove a realname gline");
+	return false;
+	}
+
+if (st[1].find('@',1) == string::npos)
+	{
+	bot->Notice(theClient, "Invalid G-line. Please specify a user@. i.e: REMGLINE *@ip");
 	return false;
 	}
 
