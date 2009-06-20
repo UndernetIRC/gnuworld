@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.29 2005/01/07 00:10:45 dan_karrels Exp $
+## $Id: Makefile.am,v 1.30 2009/06/20 17:36:52 mrbean_ Exp $
 
 lib_LTLIBRARIES = libgnuworldcore.la
 libgnuworldcore_la_SOURCES = Channel.cc \
@@ -8,6 +8,7 @@ libgnuworldcore_la_SOURCES = Channel.cc \
 	Network.cc \
 	ServerTimerHandlers.cc \
 	UnloadClientTimerHandler.cc \
+	cidr.cc	\
 	client.cc \
 	iClient.cc \
 	iServer.cc \
