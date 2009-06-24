@@ -62,7 +62,8 @@ am_libgnuworldcore_la_OBJECTS = libgnuworldcore_la-Channel.lo \
 	libgnuworldcore_la-UnloadClientTimerHandler.lo \
 	libgnuworldcore_la-cidr.lo libgnuworldcore_la-client.lo \
 	libgnuworldcore_la-iClient.lo libgnuworldcore_la-iServer.lo \
-	libgnuworldcore_la-ip.lo libgnuworldcore_la-server.lo \
+	libgnuworldcore_la-ip.lo libgnuworldcore_la-nickUserCidr.lo \
+	libgnuworldcore_la-server.lo \
 	libgnuworldcore_la-server_connection.lo \
 	libgnuworldcore_la-server_events.lo \
 	libgnuworldcore_la-server_glines.lo \
@@ -226,6 +227,7 @@ libgnuworldcore_la_SOURCES = Channel.cc \
 	iClient.cc \
 	iServer.cc \
 	ip.cc \
+	nickUserCidr.cc \
 	server.cc \
 	server_connection.cc \
 	server_events.cc \
@@ -355,6 +357,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-iClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-iServer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-ip.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-nickUserCidr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server_connection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgnuworldcore_la-server_events.Plo@am__quote@
@@ -458,6 +461,13 @@ libgnuworldcore_la-ip.lo: ip.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ip.cc' object='libgnuworldcore_la-ip.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-ip.lo `test -f 'ip.cc' || echo '$(srcdir)/'`ip.cc
+
+libgnuworldcore_la-nickUserCidr.lo: nickUserCidr.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-nickUserCidr.lo -MD -MP -MF $(DEPDIR)/libgnuworldcore_la-nickUserCidr.Tpo -c -o libgnuworldcore_la-nickUserCidr.lo `test -f 'nickUserCidr.cc' || echo '$(srcdir)/'`nickUserCidr.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libgnuworldcore_la-nickUserCidr.Tpo $(DEPDIR)/libgnuworldcore_la-nickUserCidr.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='nickUserCidr.cc' object='libgnuworldcore_la-nickUserCidr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworldcore_la-nickUserCidr.lo `test -f 'nickUserCidr.cc' || echo '$(srcdir)/'`nickUserCidr.cc
 
 libgnuworldcore_la-server.lo: server.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworldcore_la-server.lo -MD -MP -MF $(DEPDIR)/libgnuworldcore_la-server.Tpo -c -o libgnuworldcore_la-server.lo `test -f 'server.cc' || echo '$(srcdir)/'`server.cc

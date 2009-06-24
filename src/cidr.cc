@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cidr.cc,v 1.1 2009/06/20 17:36:52 mrbean_ Exp $
+ * $Id: cidr.cc,v 1.2 2009/06/24 17:39:44 mrbean_ Exp $
  */
 
 #include	<string>
@@ -40,14 +40,14 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: cidr.cc,v 1.1 2009/06/20 17:36:52 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: cidr.cc,v 1.2 2009/06/24 17:39:44 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
 
 using std::string ;
 
-xCIDR::xCIDR( const std::string& IP ) : prefix(0)
+xCIDR::xCIDR( const std::string& IP ) : str(IP), prefix(0)
 {
 	std::size_t pos = IP.find_first_of("/");
 	if(pos == string::npos || pos == IP.length()) //Failed to find / or its at the end of the string

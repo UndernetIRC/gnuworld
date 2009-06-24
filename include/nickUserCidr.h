@@ -20,11 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cidr.h,v 1.2 2009/06/24 17:39:44 mrbean_ Exp $
+ * $Id: nickUserCidr.h,v 1.1 2009/06/24 17:39:44 mrbean_ Exp $
  */
 
-#ifndef __CIDR_H
-#define __CIDR_H "$Id: cidr.h,v 1.2 2009/06/24 17:39:44 mrbean_ Exp $"
+#ifndef __NICK_USER_CIDR_H
+#define __NICK_USER_CIDR_H "$Id: nickUserCidr.h,v 1.1 2009/06/24 17:39:44 mrbean_ Exp $"
 
 #include	<string>
 #include	<sys/types.h>
@@ -32,7 +32,7 @@
 #include	<netinet/in.h>
 #include	<netdb.h>
 #include	<arpa/inet.h>
-#include	"ip.h"
+#include	"cidr.h"
 
 namespace gnuworld
 {
@@ -41,16 +41,16 @@ namespace gnuworld
  * A utility class that is used to retrieve information about
  * CIDR addresses.
  */
-class xCIDR
+class xNickUserCIDR
 {
 
 public:
 
 	/**
-	 * Construct an xIP instance given an address in std::string
+	 * Construct an xNickUserCIDR instance given an address in std::string
 	 * format.
 	 */
-	xCIDR( const std::string& IP) ;
+	xNickUserCIDR( const std::string& nickUserCIDR) ;
 
 	/**
 	 * Checks whether or not the CIDR is valid.
@@ -62,46 +62,59 @@ public:
 	 * Retrieve the mask of this CIDR (the part after the /).
 	 */
 	inline const unsigned int& GetMask() const 
-		{ return mask; }
+		{ return cidr.GetMask(); }
 
 	/**
 	 * Retrieve the prefix of this CIDR (the part before the /).
 	 */
 	inline const xIP& GetPrefix() const 
-		{ return prefix; }
+		{ return cidr.GetPrefix(); }
 
+	/**
+	 * Retrieve the nick 
+	 */
+	inline const std::string& GetNick() const 
+		{ return nick; }
+
+	/**
+	 * Retrieve the user
+	 */
+	inline const std::string& GetUser() const 
+		{ return user; }
+	
 	inline const std::string& AsString() const
 		{ return str; }
+
 		
 	bool matches(const std::string& IP) ;	
 		
 protected:
 
-	/**
-	 * Wheter this CIDR is valid.
-	 */
-	bool	valid ;
 	
 	/**
-	 * The mask
+	 * CIDR part 
 	 */
-	unsigned int mask ;
+	xCIDR cidr;
 	
 	/**
-	 * The prefix
+	 * The nick
 	 */
-	xIP prefix ;
+	std::string nick ;
 	
-	std::string	str; 
+	/**
+	 * user
+	 */
+	std::string	user ;
 	
+	std::string	str ;
+	
+	bool valid;
 private:
 	
-	bool ExtractMask(const std::string&);
-	
-	bool  ExtractPrefix(const std::string&,const unsigned int&,unsigned int&);
+	bool ExtractNickUser(const std::string&);
 
 } ;
 
 } // namespace gnuworld
 
-#endif // __XCIDR_H
+#endif 
