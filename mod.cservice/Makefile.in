@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.248 2008/04/16 15:25:52 danielaustin Exp $"
+# "$Id: Makefile.in,v 1.249 2009/06/25 19:05:23 mrbean_ Exp $"
 
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
@@ -98,7 +98,9 @@ am_libcservice_la_OBJECTS = libcservice_la-cservice.lo \
 	libcservice_la-TOPICCommand.lo libcservice_la-UNBANCommand.lo \
 	libcservice_la-UNFORCECommand.lo \
 	libcservice_la-UNSUSPENDCommand.lo \
-	libcservice_la-VERIFYCommand.lo libcservice_la-VOICECommand.lo
+	libcservice_la-VERIFYCommand.lo libcservice_la-VOICECommand.lo \
+	libcservice_la-CIDRBanMatcher.lo \
+	libcservice_la-HostBanMatcher.lo
 libcservice_la_OBJECTS = $(am_libcservice_la_OBJECTS)
 libcservice_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -306,9 +308,12 @@ libcservice_la_SOURCES = cservice.cc \
 	UNFORCECommand.cc \
 	UNSUSPENDCommand.cc \
 	VERIFYCommand.cc \
-	VOICECommand.cc
+	VOICECommand.cc \
+	CIDRBanMatcher.cc \
+	HostBanMatcher.cc
 
-EXTRA_DIST = constants.h \
+EXTRA_DIST = banMatcher.h \
+	constants.h \
 	cserviceCommands.h \
 	cservice_config.h \
 	cservice.h \
@@ -399,12 +404,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-BANCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-BANLISTCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-CHANINFOCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-CIDRBanMatcher.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-CLEARMODECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-DEOPCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-DEVOICECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-FORCECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-HELLOCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-HELPCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-HostBanMatcher.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-INVITECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-ISREGCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-JOINCommand.Plo@am__quote@
@@ -910,6 +917,20 @@ libcservice_la-VOICECommand.lo: VOICECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='VOICECommand.cc' object='libcservice_la-VOICECommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o libcservice_la-VOICECommand.lo `test -f 'VOICECommand.cc' || echo '$(srcdir)/'`VOICECommand.cc
+
+libcservice_la-CIDRBanMatcher.lo: CIDRBanMatcher.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT libcservice_la-CIDRBanMatcher.lo -MD -MP -MF $(DEPDIR)/libcservice_la-CIDRBanMatcher.Tpo -c -o libcservice_la-CIDRBanMatcher.lo `test -f 'CIDRBanMatcher.cc' || echo '$(srcdir)/'`CIDRBanMatcher.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libcservice_la-CIDRBanMatcher.Tpo $(DEPDIR)/libcservice_la-CIDRBanMatcher.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='CIDRBanMatcher.cc' object='libcservice_la-CIDRBanMatcher.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o libcservice_la-CIDRBanMatcher.lo `test -f 'CIDRBanMatcher.cc' || echo '$(srcdir)/'`CIDRBanMatcher.cc
+
+libcservice_la-HostBanMatcher.lo: HostBanMatcher.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT libcservice_la-HostBanMatcher.lo -MD -MP -MF $(DEPDIR)/libcservice_la-HostBanMatcher.Tpo -c -o libcservice_la-HostBanMatcher.lo `test -f 'HostBanMatcher.cc' || echo '$(srcdir)/'`HostBanMatcher.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libcservice_la-HostBanMatcher.Tpo $(DEPDIR)/libcservice_la-HostBanMatcher.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='HostBanMatcher.cc' object='libcservice_la-HostBanMatcher.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o libcservice_la-HostBanMatcher.lo `test -f 'HostBanMatcher.cc' || echo '$(srcdir)/'`HostBanMatcher.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

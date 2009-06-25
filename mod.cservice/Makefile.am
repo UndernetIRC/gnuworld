@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# "$Id: Makefile.am,v 1.53 2007/08/28 16:10:10 dan_karrels Exp $"
+# "$Id: Makefile.am,v 1.54 2009/06/25 19:05:23 mrbean_ Exp $"
 
 lib_LTLIBRARIES = libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic -L$(top_builddir)/db \
@@ -68,9 +68,12 @@ libcservice_la_SOURCES = cservice.cc \
 	UNFORCECommand.cc \
 	UNSUSPENDCommand.cc \
 	VERIFYCommand.cc \
-	VOICECommand.cc
+	VOICECommand.cc \
+	CIDRBanMatcher.cc \
+	HostBanMatcher.cc
 
-EXTRA_DIST = constants.h \
+EXTRA_DIST = banMatcher.h \
+	constants.h \
 	cserviceCommands.h \
 	cservice_config.h \
 	cservice.h \

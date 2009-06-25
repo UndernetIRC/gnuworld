@@ -1,4 +1,22 @@
-// $Id: ChangeLog,v 1.167 2009/06/09 15:40:28 mrbean_ Exp $ //
+// $Id: ChangeLog,v 1.168 2009/06/25 19:05:23 mrbean_ Exp $ //
+
+2009-06-25	MrBean
+		* mod.cservice/CIDRBanMatcher.cc
+		* mod.cservice/CIDRBanMatcher.h
+		* mod.cservice/HostBanMatcher.cc
+		* mod.cservice/HostBanMatcher.h
+		* mod.cservice/banMatcher.h
+		* mod.cservice/BANCommand.cc
+		* mod.cservice/Makefile.am
+		* mod.cservice/Makefile.in
+		* mod.cservice/UNBANCommand.cc
+		* mod.cservice/cservice.cc
+		* mod.cservice/sqlBan.cc
+		* mod.cservice/sqlBan.h : First implementation of CIDR
+			ban support for X.
+			Probably still buggy as its not tested fully yet.
+			You will need re-run configure for this to work.
+
 
 2009-06-09	MrBean
 		* mod.cservice/ACCESSCommand.cc:

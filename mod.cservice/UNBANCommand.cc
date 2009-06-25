@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNBANCommand.cc,v 1.21 2007/12/28 00:21:48 kewlio Exp $
+ * $Id: UNBANCommand.cc,v 1.22 2009/06/25 19:05:23 mrbean_ Exp $
  */
 
 #include	<string>
@@ -37,8 +37,9 @@
 #include	"levels.h"
 #include	"responses.h"
 #include	"match.h"
+#include	"cidr.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.21 2007/12/28 00:21:48 kewlio Exp $" ;
+const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.22 2009/06/25 19:05:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -137,7 +138,7 @@ bool isNick = bot->validUserMask( st[2] ) ? false : true ;
 
 /* Try by nickname first, remove any bans that match this users host */
 string banTarget ;
-
+bool isCIDR = false;
 if( isNick )
 	{
 	iClient* aNick = Network->findNick(st[2]);
@@ -157,6 +158,7 @@ if( isNick )
 else
 	{
 	banTarget = st[2];
+	isCIDR = xCIDR(banTarget).GetValid();
 	}
 
 /*
@@ -185,11 +187,15 @@ while (ptr != theChan->banList.end())
 		{
 		comparison = match(theBan->getBanMask(), banTarget);
 		}
-	else
+	else if(!isCIDR)
 		{
 		comparison = match(banTarget, theBan->getBanMask());
 		}
 
+	else 
+		{
+		comparison = 1; //Its a cidr, No match
+		}
 	if ( comparison == 0 )
 		{
 		/* Matches! remove this ban - if we can. */
@@ -259,17 +265,16 @@ while (cPtr != theChannel->banList_end())
 		{
 		comparison = match((*cPtr), banTarget);
 		}
-	else
+	else if (!isCIDR)
 		{
 		comparison = match(banTarget, (*cPtr));
 		}
 
 	if (exactmatch == 1)
-	{
+		{		
 		/* if we matched exactly above, we want to match exactly here too */
-		if (strcasecmp((*cPtr), banTarget))
-			comparison = 1;
-	}
+		comparison = strcasecmp((*cPtr), banTarget);
+		}
 
 	if ( comparison == 0)
 		{

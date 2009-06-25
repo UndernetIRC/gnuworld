@@ -33,7 +33,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: BANCommand.cc,v 1.48 2007/12/28 01:53:38 kewlio Exp $
+ * $Id: BANCommand.cc,v 1.49 2009/06/25 19:05:23 mrbean_ Exp $
  */
 
 #include	<new>
@@ -51,8 +51,9 @@
 #include	"responses.h"
 #include	"match.h"
 #include	"ip.h"
+#include	"cidr.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.48 2007/12/28 01:53:38 kewlio Exp $" ;
+const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.49 2009/06/25 19:05:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -331,6 +332,8 @@ if( isNick )
  *  find overlapping bans.
  */
 
+xCIDR cidr = xCIDR(banTarget);
+
 std::map < int,sqlBan* >::iterator ptr = theChan->banList.begin();
 vector <sqlBan*> oldBans;
 
@@ -347,32 +350,35 @@ while (ptr != theChan->banList.end())
 		return true;
 		}
 
-	/*
-	 * Overlapping ban? We just remove the ban from our internal tables, as
-	 * setting this ban to ircu will cause a default removal of overlapping
-	 * bans.
-	 */
+	if(!cidr.GetValid())
+		{
+		/*
+		 * Overlapping ban? We just remove the ban from our internal tables, as
+		 * setting this ban to ircu will cause a default removal of overlapping
+		 * bans.
+		 */
 
-	// Matched overlapping ban.
-	if(match(banTarget, theBan->getBanMask()) == 0)
-		{
-		// If we have access to remove the overlapper..
-		if (theBan->getLevel() <= level)
+		// Matched overlapping ban.
+		if(match(banTarget, theBan->getBanMask()) == 0)
 			{
-			// Update GNUWorld.
-			oldBans.push_back(theBan);
+			// If we have access to remove the overlapper..
+			if (theBan->getLevel() <= level)
+				{
+				// Update GNUWorld.
+				oldBans.push_back(theBan);
+				}
 			}
-		}
-	// More specific ban?
-	else if ( match(theBan->getBanMask(), banTarget) == 0)
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-			language::ban_covered).c_str(),
-			banTarget.c_str(), theBan->getBanMask().c_str());
-		return true;
-		}
-	// Carry on regardless.
+		// More specific ban?
+		else if ( match(theBan->getBanMask(), banTarget) == 0)
+			{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+				language::ban_covered).c_str(),
+				banTarget.c_str(), theBan->getBanMask().c_str());
+			return true;
+			}
+		// Carry on regardless.
+		} //cidr.GetValid
 	++ptr;
 	} // while()
 /*
@@ -419,8 +425,30 @@ for( ; banIterator != oldBans.end() ; ++banIterator )
 	delete(theBan); theBan = 0 ;
 	}
 
+// TODO: Violation of rule of numbers
+if (banLevel == 42)
+	{
+	// TODO: Perhaps put this into the .conf
+	banReason = "..I'll have a pan-galactic gargleblaster please!";
+ 	}
+
+/*
+ *  Fill out new ban details.
+ */
+
+sqlBan* newBan = new (std::nothrow) sqlBan(bot->SQLDb);
+assert( newBan != 0 ) ;
+
+// TODO: Use a decent constructor for this
+newBan->setChannelID(theChan->getID());
+newBan->setBanMask(banTarget);
+newBan->setSetBy(theUser->getUserName());
+newBan->setSetTS(bot->currentTime());
+newBan->setLevel(banLevel);
+newBan->setExpires(banTime+bot->currentTime());
+newBan->setReason(banReason);
+
 vector< iClient* > clientsToKick ;
-std::string authbanmask;
 
 for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	chanUsers != theChannel->userList_end(); ++chanUsers)
@@ -429,27 +457,8 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	/*
 	 *  Iterate over channel members, find a match and boot them..
 	 */
-
-	if (tmpUser->getClient()->isModeR() && !tmpUser->getClient()->isModeX())
-	{
-		/* User is logged in, but not +x'd - construct a hidden host mask to check against */
-		authbanmask = tmpUser->getClient()->getNickName() + "!" + tmpUser->getClient()->getUserName();
-		authbanmask += "@" + tmpUser->getClient()->getAccount() + tmpUser->getClient()->getHiddenHostSuffix();
-		if ((match(banTarget, authbanmask)) == 0)
-		{
-			/* don't kick channel services (+k users) */
-			if (!tmpUser->getClient()->getMode(iClient::MODE_SERVICES))
-				clientsToKick.push_back(tmpUser->getClient());
-		}
-	}
-
-	/* re-use authbanmask to construct a nick!user@ip mask to match against (below) */
-	authbanmask = tmpUser->getClient()->getNickName() + "!" + tmpUser->getClient()->getUserName();
-	authbanmask += "@" + xIP(tmpUser->getClient()->getIP()).GetNumericIP();
-
-	if( (match(banTarget, tmpUser->getClient()->getNickUserHost()) == 0) ||
-		(match(banTarget, tmpUser->getClient()->getRealNickUserHost()) == 0) ||
-		(match(banTarget, authbanmask) == 0) )
+	
+	if( newBan->getMatcher()->matches(tmpUser->getClient()) )
 		{
 		/* Don't kick +k things */
 		if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
@@ -459,12 +468,6 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin();
 		}
 	} // for()
 
-// TODO: Violation of rule of numbers
-if (banLevel == 42)
-	{
-	// TODO: Perhaps put this into the .conf
-	banReason = "..I'll have a pan-galactic gargleblaster please!";
- 	}
 
 /*
  * If this ban level is < 75, we don't kick the user, we simply don't
@@ -498,21 +501,6 @@ else
 		}
 	}
 
-/*
- *  Fill out new ban details.
- */
-
-sqlBan* newBan = new (std::nothrow) sqlBan(bot->SQLDb);
-assert( newBan != 0 ) ;
-
-// TODO: Use a decent constructor for this
-newBan->setChannelID(theChan->getID());
-newBan->setBanMask(banTarget);
-newBan->setSetBy(theUser->getUserName());
-newBan->setSetTS(bot->currentTime());
-newBan->setLevel(banLevel);
-newBan->setExpires(banTime+bot->currentTime());
-newBan->setReason(banReason);
 
 //theChan->banList[newBan->getID()] = newBan;
 

@@ -16,15 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: sqlBan.h,v 1.7 2007/08/28 16:10:12 dan_karrels Exp $
+ * $Id: sqlBan.h,v 1.8 2009/06/25 19:05:23 mrbean_ Exp $
  */
 
 #ifndef __SQLBAN_H
-#define __SQLBAN_H "$Id: sqlBan.h,v 1.7 2007/08/28 16:10:12 dan_karrels Exp $"
+#define __SQLBAN_H "$Id: sqlBan.h,v 1.8 2009/06/25 19:05:23 mrbean_ Exp $"
 
 #include	<string>
 #include	<ctime>
 #include	"dbHandle.h"
+#include	"banMatcher.h"
  
 using std::string ;
 
@@ -68,7 +69,10 @@ public:
 
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
-	 
+
+	inline banMatcher* getMatcher() const
+		{ return matcher; }
+		
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -77,7 +81,8 @@ public:
 		{ channel_id = _channel_id; } 
  	
 	inline void setBanMask( const string& _banmask )
-		{ banmask = _banmask; } 
+		{ banmask = _banmask; 
+		  initMatcher();} 
 
 	inline void setSetBy( const string& _set_by )
 		{ set_by = _set_by; } 
@@ -92,13 +97,16 @@ public:
 		{ expires = _expires; } 
 
 	inline void setReason( const string& _reason )
-		{ reason = _reason; } 
+		{ reason = _reason; }
+
  
 	bool commit();
 	bool insertRecord();
 	bool deleteRecord();
 
 	void setAllMembers(int);
+	
+	void initMatcher();
 		
 protected:
  
@@ -111,8 +119,9 @@ protected:
 	time_t		expires ;
 	string		reason ; 
 	time_t		last_updated ;
- 
+	
 	dbHandle*	SQLDb;
+	banMatcher*	matcher;
 } ;
 
 } 
