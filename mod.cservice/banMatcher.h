@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: banMatcher.h,v 1.1 2009/06/25 19:05:23 mrbean_ Exp $
+ * $Id: banMatcher.h,v 1.2 2009/06/25 19:42:21 mrbean_ Exp $
  */
 
 #ifndef __BANMATCHER_H
-#define __BANMATCHER_H "$Id: banMatcher.h,v 1.1 2009/06/25 19:05:23 mrbean_ Exp $"
+#define __BANMATCHER_H "$Id: banMatcher.h,v 1.2 2009/06/25 19:42:21 mrbean_ Exp $"
 
 #include	<string>
 #include	<ctime>
@@ -36,6 +36,8 @@ class banMatcher
 
 public:
 	virtual bool matches(iClient*) = 0;
+	
+	virtual ~banMatcher();
 } ;
 
 } 
