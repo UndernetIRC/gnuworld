@@ -1,9 +1,5 @@
 /**
- * ip.h
- * This stuff should probably be moved to a static class.
- * xIP provides mostly utilitarian functionality for IP
- * addresses.
- * This class originally created by Orlando Bassotto.
+ * nickUserCidr.h
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickUserCidr.h,v 1.1 2009/06/24 17:39:44 mrbean_ Exp $
+ * $Id: nickUserCidr.h,v 1.2 2009/06/25 18:18:47 mrbean_ Exp $
  */
 
 #ifndef __NICK_USER_CIDR_H
-#define __NICK_USER_CIDR_H "$Id: nickUserCidr.h,v 1.1 2009/06/24 17:39:44 mrbean_ Exp $"
+#define __NICK_USER_CIDR_H "$Id: nickUserCidr.h,v 1.2 2009/06/25 18:18:47 mrbean_ Exp $"
 
 #include	<string>
 #include	<sys/types.h>
