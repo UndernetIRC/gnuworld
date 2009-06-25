@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickUserCidr.cc,v 1.1 2009/06/24 17:39:44 mrbean_ Exp $
+ * $Id: nickUserCidr.cc,v 1.2 2009/06/25 19:00:40 mrbean_ Exp $
  */
 
 #include	<string>
@@ -41,14 +41,14 @@
 #include	"gnuworld_config.h"
 #include	"match.h"
 
-RCSTAG( "$Id: nickUserCidr.cc,v 1.1 2009/06/24 17:39:44 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: nickUserCidr.cc,v 1.2 2009/06/25 19:00:40 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
 
 using std::string ;
 
-xNickUserCIDR::xNickUserCIDR( const std::string& nickUserCidr ) : str("") , nick("*"),user("*"),cidr("")
+xNickUserCIDR::xNickUserCIDR( const std::string& nickUserCidr ) :  cidr(""), nick("*"),user("*"),str("")
 {
 	StringTokenizer st = StringTokenizer(nickUserCidr,'@');
 	if(st.size() == 1) //No @ , consider everything as a cidr
