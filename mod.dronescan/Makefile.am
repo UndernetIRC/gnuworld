@@ -14,6 +14,7 @@ libdronescan_la_SOURCES = 	\
 	ACCESSCommand.cc	\
 	ADDEXCEPTIONALCHANNELCommand.cc\
 	REMEXCEPTIONALCHANNELCommand.cc\
+	RELOADCommand.cc\
 	ADDUSERCommand.cc	\
 	ANALYSECommand.cc	\
 	CHECKCommand.cc		\

@@ -43,7 +43,8 @@ namespace level {
 	const unsigned short remuser	= 750;
 	const unsigned short addExceptionalChannel = 750;
 	const unsigned short remExceptionalChannel = 750;
-	
+	const unsigned short reload = 750;
+
 	/* Commands at 1000 should really be debug commands only */
 
 	const unsigned short analyse	= 1000;

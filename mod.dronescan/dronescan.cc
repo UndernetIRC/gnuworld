@@ -52,6 +52,7 @@ namespace gnuworld {
 namespace ds {
 
 using std::string ;
+using std::endl;
 
 /*
  * Exported function to be used by moduleLoader to gain an
@@ -86,7 +87,15 @@ assert(dronescanConfig != 0);
 consoleChannel = dronescanConfig->Require("consoleChannel")->second;
 
 /* Set our initial state */
-currentState = BURST;
+//elog << "dronescan.start> getUplink()->getStartTime()) = " << getUplink()->getStartTime() << endl;
+int i = 0;
+for (xNetwork::serverIterator Itr = Network->servers_begin(); Itr != Network->servers_end(); Itr++)
+	{
+	i++;
+	}
+elog << "droneScan.start> i = " << i << endl;
+if (i == 1) //if i == 1, it means i'm not connectd to a hub. If i > 1, it means the RELOAD command was sent
+	currentState = BURST;
 averageEntropy = 0;
 totalNicks = 0;
 
@@ -232,6 +241,20 @@ RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
 RegisterCommand(new REMEXCEPTIONALCHANNELCommand(this, "REMEXCEPTIONALCHANNEL","<channel name>"));
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<user>"));
 RegisterCommand(new STATUSCommand(this, "STATUS", ""));
+RegisterCommand(new RELOADCommand(this, "RELOAD", ""));
+
+// in case RELOAD command is used, have to iterate the userlist to know how many clients per IP are online for the gline count.
+clientsIPMap.clear();
+for( xNetwork::const_clientIterator cItr = Network->clients_begin() ; cItr != Network->clients_end() ; ++cItr )
+	{
+	string IP = xIP(cItr->second->getIP()).GetNumericIP();
+	/* Store usercount per IPs to a map */
+	if (clientsIPMap.find(IP) == clientsIPMap.end())
+		clientsIPMap.insert(std::make_pair(IP, 1));
+	else
+		clientsIPMap[IP]++;
+	}
+
 } // dronescan::dronescan(const string&)
 
 
@@ -437,16 +460,18 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 	}
 
 	if(!theUser) return ;
+	if (!theClient->isOper())
+		return;
 
 	/* We have now seen this user! */
 	theUser->setLastSeen(::time(0));
 	theUser->commit();
 
 	/* If we are currently in BURST, we don't accept commands */
-	if(BURST == currentState) {
+	/*if(BURST == currentState) {
 		Reply(theClient, "Sorry, I do not accept commands during a burst.");
 		return ;
-	}
+	}*/
 
 	StringTokenizer st(Message);
 
@@ -468,13 +493,13 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 		}
 
 /* This is commented out because it doesn't work at the moment */
-	if("RELOAD" == Command)
+/*	if("RELOAD" == Command)
 		{
 		getUplink()->UnloadClient(this, "Reloading...");
 		getUplink()->LoadClient("libdronescan.la", getConfigFileName());
 		return ;
 		}
-
+*/
 	if("STATS" == Command)
 		{
 		Reply(theClient, "Allocated custom data: %d", customDataCounter);
