@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.295 2009/06/25 19:05:23 mrbean_ Exp $
+ * $Id: cservice.cc,v 1.296 2009/07/22 18:49:26 mrbean_ Exp $
  */
 
 #include	<new>
@@ -422,9 +422,15 @@ void cservice::BurstChannels()
 	sqlChannel* theChan = (ptr)->second;
 
 	/* we're now interested in registered channels even if we're not in it... */
+	if(theChan->getName() == "*")
+	{	//Do not do anything for the admins channel
+		++ptr;
+		continue;
+	}
+	
 	MyUplink->RegisterChannelEvent( theChan->getName(), this ) ;
-
-	if ( (theChan->getFlag(sqlChannel::F_AUTOJOIN)) && (theChan->getName() != "*") )
+	
+	if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) 
 		{
 		string tempModes = theChan->getChannelMode();
 		tempModes += 'R';
@@ -450,17 +456,14 @@ void cservice::BurstChannels()
 				}
 			}
 		} else {
-			if (theChan->getName() != "*")
+			/* although AUTOJOIN isn't set, set the channel to +R if
+			 * it exists on the Network.
+			 */
+			tmpChan = Network->findChannel(theChan->getName());
+			if (tmpChan)
 			{
-				/* although AUTOJOIN isn't set, set the channel to +R if
-				 * it exists on the Network.
-				 */
-				tmpChan = Network->findChannel(theChan->getName());
-				if (tmpChan)
-				{
-					string tempModes = "+R";
-					MyUplink->Mode(NULL, tmpChan, tempModes, string() );
-				}
+				string tempModes = "+R";
+				MyUplink->Mode(NULL, tmpChan, tempModes, string() );
 			}
 		}
 	++ptr;
