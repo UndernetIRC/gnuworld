@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.296 2009/07/22 18:49:26 mrbean_ Exp $
+ * $Id: cservice.cc,v 1.297 2009/07/23 18:03:00 mrbean_ Exp $
  */
 
 #include	<new>
@@ -2380,6 +2380,7 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->setAllMembers(i);
 		sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
 		sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
+		MyUplink->RegisterChannelEvent(newChan->getName(),this);
 		logDebugMessage("[DB-UPDATE]: Found new channel: %s", newChan->getName().c_str());
 		newchans++;
 		}
@@ -3481,8 +3482,6 @@ switch( whichEvent )
 		 */
 		if (!reggedChan->getInChan())
 		{
-			xClient::OnChannelEvent( whichEvent, theChan,
-				data1, data2, data3, data4 );
 			break;
 		}
 
