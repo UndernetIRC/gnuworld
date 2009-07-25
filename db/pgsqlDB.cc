@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: pgsqlDB.cc,v 1.4 2008/01/04 04:05:37 buzlip01 Exp $
+ * $Id: pgsqlDB.cc,v 1.5 2009/07/25 16:59:48 mrbean_ Exp $
  */
 
 #include	<sys/types.h>
@@ -33,7 +33,7 @@
 #include	"gnuworldDB.h"
 #include	"pgsqlDB.h"
 
-const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.4 2008/01/04 04:05:37 buzlip01 Exp $" ;
+const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.5 2009/07/25 16:59:48 mrbean_ Exp $" ;
 const char pgsqlDB_h_rcsId[] = __PGSQLDB_H ;
 
 namespace gnuworld
@@ -90,6 +90,7 @@ pgsqlDB::pgsqlDB( const string& connectInfo ) throw( std::exception )
 {
 // TODO
 // Allow exception to be thrown
+lastResult = 0;
 theDB = PQconnectdb( connectInfo.c_str() ) ;
 if( 0 == theDB )
 	{
