@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Constants.h,v 1.16 2009/06/13 06:43:34 hidden1 Exp $
+ * $Id: Constants.h,v 1.17 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #ifndef __CONSTANTS_H_
@@ -46,7 +46,7 @@ static const char Query[] = "SELECT name,lastuplink,lastconnected,"
 namespace User
 {
 const unsigned int MaxName = 32;
-static const char Query[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,notice FROM opers";
+static const char Query[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,notice,GetLag,LastPassChangeTS FROM opers";
 }
 
 namespace gline

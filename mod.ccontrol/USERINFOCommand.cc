@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: USERINFOCommand.cc,v 1.12 2006/09/26 17:36:01 kewlio Exp $
+ * $Id: USERINFOCommand.cc,v 1.13 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #include	<string>
@@ -32,9 +32,10 @@
 #include	"misc.h"
 #include	"match.h"
 #include	"Network.h"
+#include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: USERINFOCommand.cc,v 1.12 2006/09/26 17:36:01 kewlio Exp $" ) ;
+RCSTAG( "$Id: USERINFOCommand.cc,v 1.13 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -65,6 +66,7 @@ string Email;
 string Server;
 bool Suspended;
 char GetLogs[4];
+char GetLag[4];
 char NeedOp[4];
 string SuspendedBy;
 string SuspendReason;
@@ -135,6 +137,15 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 			sprintf(GetLogs,"NO");
 			}
 
+		if(tempUser->getLag())
+			{
+			sprintf(GetLag,"YES");
+			}
+		else
+			{
+			sprintf(GetLag,"NO");
+			}
+
 		if(tempUser->getNeedOp())
 			{
 			sprintf(NeedOp,"YES");
@@ -166,10 +177,11 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 			bot->Notice(theClient,"Reason: %s",SuspendReason.c_str());
 			bot->Notice(theClient,"Level: %s",SLevel.c_str());
 			}
-		bot->Notice(theClient,"User Flags: GetLogs \002%s\002 NeedOp \002%s\002",
-			GetLogs,NeedOp);
+		bot->Notice(theClient,"User Flags: GetLogs \002%s\002 NeedOp \002%s\002 GetLag \002%s\002",
+			GetLogs,NeedOp,GetLag);
 		if ((st.size() > 2) && (!strcasecmp(st[2],"-cl")))
 		{
+			bot->Notice(theClient, "Password last changed: %s ago", (tempUser->getPassChangeTS() == 0) ? "N/A" : Ago(tempUser->getPassChangeTS()));
 			/* commands list requested */
 			bot->Notice(theClient,"Commands available to this user:");
 			string cmdList = "";

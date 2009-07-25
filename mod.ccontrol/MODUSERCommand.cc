@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODUSERCommand.cc,v 1.26 2006/09/26 17:35:59 kewlio Exp $
+ * $Id: MODUSERCommand.cc,v 1.27 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MODUSERCommand.cc,v 1.26 2006/09/26 17:35:59 kewlio Exp $" ) ;
+RCSTAG( "$Id: MODUSERCommand.cc,v 1.27 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -124,6 +124,7 @@ while(pos < st.size())
 				{
 				tmpUser->setPassword(bot->CryptPass(st[pos+1]));
 				tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
+				tmpUser->setPassChangeTS(::time(0));
 				if(tmpUser->Update())
 					{
 					bot->Notice(theClient,"Password for %s has been changed to %s",
@@ -241,7 +242,7 @@ while(pos < st.size())
 		{
 		if((pos + 1) >= st.size())
 			{
-			bot->Notice(theClient,"-gl option must get message type");
+			bot->Notice(theClient,"-mt option must get message type");
 			return false;
 			}
 		if((!strcasecmp(st[pos+1],"N")) || (!strcasecmp(st[pos+1],"NOTICE")))
@@ -257,6 +258,33 @@ while(pos < st.size())
 		else
 			{
 			bot->Notice(theClient,"unknown option %s for -mt must be n/m/notice/message",st[pos+1].c_str());
+			return false;
+			}
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->Update();
+		pos += 2;
+		}	
+
+	else if(!strcasecmp(st[pos],"-glag")) //Trying to toggle the get of lag reports
+		{
+		if((pos + 1) >= st.size())
+			{
+			bot->Notice(theClient,"-glag option must get on/off");
+			return false;
+			}
+		if(!strcasecmp(st[pos+1],"on"))
+			{
+			tmpUser->setLag(true);
+			bot->Notice(theClient,"getLag has been turned on for %s",st[1].c_str());
+			}
+		else if(!strcasecmp(st[pos+1],"off"))
+			{
+			tmpUser->setLag(false);
+			bot->Notice(theClient,"getLag has been turned off for %s",st[1].c_str());
+			}
+		else
+			{
+			bot->Notice(theClient,"unknown option %s for -glag must be on/off",st[pos+1].c_str());
 			return false;
 			}
 		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));

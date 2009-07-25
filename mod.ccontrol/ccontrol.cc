@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.230 2009/06/14 01:29:54 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.231 2009/07/25 18:12:34 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -46,6 +46,7 @@
 #include	<cstring>
 #include	<csignal>
 #include	<cstdio>
+#include	<cerrno>
 
 #include	"client.h"
 #include	"iClient.h"
@@ -67,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.230 2009/06/14 01:29:54 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.231 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1003,6 +1004,8 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
 dbConnectionCheck = MyUplink->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
+rpingCheck = MyUplink->RegisterTimer(::time(0) + 60, this, NULL);
+
 
 #ifndef LOGTOHD
 if(SendReport)
@@ -1196,6 +1199,93 @@ if(st.size() < 2)
 
 //This is kinda lame 
 //TODO : add a server message parser
+	if (!strcasecmp(st[1], "RO")) {
+		if (st.size() < 7) {
+			elog	<< "ccontrol::OnServerMessage> Invalid number "
+				<< "on parameters on RO! :"
+				<< Message
+				<< endl;
+
+		    xClient::OnServerMessage(Server,Message);
+			return;
+		}
+
+		else if (st.size() < 8) {
+			elog	<< "ccontrol::OnServerMessage> Expected 7 "
+				<< "parameters on RO! :"
+				<< Message
+				<< endl;
+
+		    xClient::OnServerMessage(Server,Message);
+			return;
+		}
+
+		ccServer* tmpServer = serversMap[Server->getName()];
+		if (!tmpServer)
+			{
+			serversMap.erase(Server->getName());
+		    xClient::OnServerMessage(Server,Message);
+			return;
+			}
+		timeval now = { 0, 0 } ;
+		if( ::gettimeofday( &now, 0 ) < 0 )
+			{
+			elog	<< "ccontrol(rpingCheck)> gettimeofday() failed: "
+				<< strerror( errno )
+				<< endl ;
+			return;
+			}
+
+
+		time_t lagTime;
+		lagTime = (now.tv_sec - atoi(st[6])) * 1000 + (now.tv_usec - atoi(st[7])) / 1000;
+		tmpServer->setLagTime(lagTime);
+		tmpServer->setLastLagRecv(::time(0));
+		if ((lagTime > LAG_TOO_BIG) && ((::time(0) - tmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)) {
+			tmpServer->setLastLagReport(::time(0));
+			MsgChanLog("%s is %ds lagged", Server->getName().c_str(), (int) (lagTime / 1000));
+		}
+	}
+
+//At 391 BGAAA abuseexploits.undernet.org 1246137209 50 :Saturday June 27 2009 -- 23:12 +02:00
+	if (!strcasecmp(st[1], "391"))
+		{
+		ccServer* tmpServer = serversMap[Server->getName()];
+		if (!tmpServer)
+			{
+			serversMap.erase(Server->getName());
+		    xClient::OnServerMessage(Server,Message);
+			return;
+			}
+		timeval now = { 0, 0 } ;
+		if( ::gettimeofday( &now, 0 ) < 0 )
+			{
+			elog	<< "ccontrol(rpingCheck)> gettimeofday() failed: "
+				<< strerror( errno )
+				<< endl ;
+			return;
+			}
+
+		if (st.size() < 5)
+			{
+			elog	<< "ccontrol::OnServerMessage> Invalid number "
+				<< "on parameters on 391! :"
+				<< Message
+				<< endl;
+
+		    xClient::OnServerMessage(Server,Message);
+			return;
+			}
+		int lagTime = tmpServer->getLagTime();
+		int timeDiff = abs(::time(0) - atoi(st[3]));
+		if ((timeDiff >= MAX_TIME_DIFF) && (lagTime < 5000) && ((::time(0) - timediffServersMap[Server]) > TIMEDIFF_REPORT_INTERVAL))
+			{
+			MsgChanLog("Time diff for %s: %ds", tmpServer->getName().c_str(), timeDiff);
+			timediffServersMap[Server] = ::time(0);
+			}
+		//MsgChanLog("Message: %s", Message.c_str());
+		}
+
 if(!strcasecmp(st[1],"351"))
 	{
 	if(st.size() < 5)
@@ -1698,6 +1788,52 @@ else if(timer_id == glineQueueCheck)
 	{
 	processGlineQueue();
 	glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval,this,NULL);	
+	}
+else if (timer_id == rpingCheck)
+	{
+	timeval now = { 0, 0 } ;
+	if( ::gettimeofday( &now, 0 ) < 0 )
+		{
+		elog	<< "ccontrol(rpingCheck)> gettimeofday() failed: "
+			<< strerror( errno )
+			<< endl ;
+		return;
+		}
+
+	stringstream s;
+	s << now.tv_usec ;
+
+	static int tID = 3;
+	tID++;
+	if (tID == 4)
+		tID = 0;
+
+	ccServer* TmpServer;
+	int counter = -1;
+	for (serversConstIterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
+		{
+		TmpServer = ptr->second;
+		if (TmpServer->getNetServer())
+			{
+			counter++;
+			if ((counter % 4) != tID)
+				continue;
+			if (TmpServer->getLastLagRecv() > 0)
+				{
+				if (((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) > 50) && ((::time(0) - TmpServer->getLastLagReport()) > 300))
+					{
+					TmpServer->setLastLagReport(::time(0));
+					TmpServer->setLagTime((::time(0) - TmpServer->getLastLagRecv() - 60) * 1000);
+					MsgChanLag("%s is >%ds lagged", TmpServer->getName().c_str(), (int) (TmpServer->getLagTime() / 1000));
+					}
+				}
+			Write("%s RI %s %s %d %s :%d %s", getCharYY().c_str(), TmpServer->getNetServer()->getCharYY().c_str(), getCharYYXXX().c_str(), ::time(0), s.str().c_str(), ::time(0), s.str().c_str());
+			Write("%s TI :%s", getCharYYXXX().c_str(), TmpServer->getNetServer()->getCharYY().c_str());
+			TmpServer->setLastLagSent(::time(0));
+			}
+		//BG RI C] BGAAA 1246224483 960943 :1246224474
+		}
+	rpingCheck = MyUplink->RegisterTimer(::time(0) + 15, this, NULL);
 	}
 }
 
@@ -2324,7 +2460,7 @@ return IsAuth(Network->findClient(Numeric));
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT INTO opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice) VALUES ('";
+static const char *Main = "INSERT INTO opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice,GetLag,LastPassChangeTS) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -2354,6 +2490,8 @@ theQuery	<< Main
 		<< "," << (Oper->getLogs() ? "'t'" : "'n'")
 		<< "," << (Oper->getNeedOp() ? "'t'" : "'n'")
 		<< "," << (Oper->getNotice() ? "'t'" : "'n'")
+		<< "," << (Oper->getLag() ? "'t'" : "'n'")
+		<< ",now()::abstime::int4"
 		<< ")"
 		<< ends;
 
@@ -3059,6 +3197,34 @@ for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
 return true;
 }
 
+bool ccontrol::MsgChanLag(const char *Msg, ... ) 
+{
+if(!Network->findChannel(msgChan))
+	{
+	return false;
+	}
+
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start( list, Msg ) ;
+vsprintf( buffer, Msg, list ) ;
+va_end( list ) ;
+
+xClient::Notice((Network->findChannel(msgChan))->getName(),"%s",buffer);
+usersIterator uIterator;
+ccUser* tempUser;
+for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
+        {
+        tempUser = uIterator->second;
+	if((tempUser) && (tempUser->getLag() ) && (tempUser->getClient()))
+                { 
+                Notice(tempUser->getClient(),"%s",buffer);
+                }
+	}
+return true;
+}
+
 #ifndef LOGTOHD
 bool ccontrol::DailyLog(ccUser* Oper, const char *Log, ... )
 {
@@ -3083,6 +3249,14 @@ if(Oper)
 	theClient = Network->findClient(Oper->getNumeric());
 	}
 
+iServer* targetServer = Network->findServer( theClient->getIntYY() ) ;
+if( NULL == targetServer )
+	{
+		elog	<< "ccontrol:> Unable to find server: "
+		<< theClient->getIntYY() << endl ;
+	return false ;
+	}
+
 buffer[ 512 ] = 0 ;
 static const char *Main = "INSERT INTO comlog (ts,oper,command) VALUES (now()::abstime::int4,'";
 StringTokenizer st(buffer);
@@ -3092,7 +3266,7 @@ if(tCommand != command_end())
 	{
 	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
 		{
-		log.assign(string("LOGIN ") + st[1] + string(" *****"));
+		log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
 		}
 	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
 		{
@@ -3192,11 +3366,20 @@ static const char *Main = "INSERT INTO comlog (ts,oper,command) VALUES (now()::a
 StringTokenizer st(buffer);
 commandIterator tCommand = findCommand((string_upper(st[0])));
 string log;
+
+iServer* targetServer = Network->findServer( theClient->getIntYY() ) ;
+if( NULL == targetServer )
+	{
+		elog	<< "ccontrol:> Unable to find server: "
+		<< theClient->getIntYY() << endl ;
+	return false ;
+	}
+
 if(tCommand != command_end())
 	{
 	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
 		{
-		log.assign(string("LOGIN ") + st[1] + string(" *****"));
+		log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
 		}
 	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
 		{
@@ -3276,11 +3459,30 @@ bool ccontrol::DailyLog(ccLog* newLog)
 commandIterator tCommand = findCommand(newLog->CommandName);
 string log;
 StringTokenizer st(newLog->Desc);
+StringTokenizer st2(newLog->Host,'!');
+if (st.size() == 0)
+	return 0;
+iClient* theClient = Network->findNick(st2[0]);
+iServer* targetServer;
+if (theClient != NULL)
+	{
+	targetServer = Network->findServer( theClient->getIntYY() ) ;
+	if( NULL == targetServer )
+		{
+			elog	<< "ccontrol:> Unable to find server: "
+			<< theClient->getIntYY() << endl ;
+		return false ;
+		}
+	}
+
 if(tCommand != command_end())
 	{
 	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
 		{
-		log.assign(string("LOGIN ") + st[1] + string(" *****"));
+		if (theClient != NULL)
+			log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
+		else
+			log.assign(string("LOGIN ") + st[1] + string(" *****"));
 		}
 	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
 		{
@@ -4044,6 +4246,8 @@ for(unsigned int i =0;i<SQLDb->Tuples();++i)
 		{
 		tempUser->setNotice(false);
 		}
+	tempUser->setLag(!strcasecmp(SQLDb->GetValue(i,21),"t"));
+	tempUser->setPassChangeTS(atoi(SQLDb->GetValue(i,22).c_str()));
 	usersMap[tempUser->getUserName()]=tempUser;
 
 	}

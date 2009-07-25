@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccUser.h,v 1.19 2007/08/28 16:10:07 dan_karrels Exp $
+ * $Id: ccUser.h,v 1.20 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.19 2007/08/28 16:10:07 dan_karrels Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.20 2009/07/25 18:12:34 hidden1 Exp $"
 
 #include	<string>
 
@@ -90,6 +90,9 @@ public:
 	inline const time_t&		getSuspendExpires() const
 		    { return SuspendExpires ; }
 
+	inline const time_t&		getPassChangeTS() const
+		    { return PassChangeTS; }
+
 	inline const time_t&		getLastAuthTS() const
 		    { return LastAuthTS; }
 
@@ -138,6 +141,9 @@ public:
 	inline const bool		getLogs() const
 		    { return GetLogs;  }
 
+	inline const bool		getLag() const
+		    { return GetLag;  }
+
 	inline const bool		getNeedOp() const
 		    { return NeedOp;  }
 
@@ -178,6 +184,9 @@ public:
 	inline void			setLastAuthTS(const unsigned int _lastauth)
 		    { LastAuthTS = _lastauth; }
 
+	inline void			setPassChangeTS(const unsigned int _PassChangeTS)
+		    { PassChangeTS = _PassChangeTS; }
+
 	inline void			setLastAuthNumeric(const string& _numeric)
 		    { LastAuthNumeric = _numeric; }
 
@@ -211,7 +220,10 @@ public:
 	
 	inline void			setLogs( const bool _Logs )
 		    { GetLogs = _Logs; }
-	
+
+	inline void			setLag( const bool _Lag )
+		    { GetLag = _Lag; }
+		
 	inline void			setNeedOp( const bool _needOp )
 		    { NeedOp = _needOp; }
 	
@@ -284,11 +296,13 @@ protected:
 	bool IsSmt;
 	bool IsCoder;
 	bool GetLogs;
+	bool GetLag;
 	bool NeedOp;
 	bool Notice;
 	iClient* Client;
 	dbHandle* SQLDb;
 	time_t LastAuthTS;
+	time_t PassChangeTS;
 	string LastAuthNumeric;
 
 } ; // class ccUser

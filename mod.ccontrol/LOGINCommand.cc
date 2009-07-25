@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LOGINCommand.cc,v 1.31 2006/09/26 17:35:59 kewlio Exp $
+ * $Id: LOGINCommand.cc,v 1.32 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #include	<string>
@@ -35,7 +35,7 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LOGINCommand.cc,v 1.31 2006/09/26 17:35:59 kewlio Exp $" ) ;
+RCSTAG( "$Id: LOGINCommand.cc,v 1.32 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -69,13 +69,22 @@ if (theUser)
 	/*
 	 *  Find the user record, confirm authorisation and attach the record to this client. 
 	 */
+iServer* targetServer = Network->findServer( theClient->getIntYY() ) ;
+if( NULL == targetServer )
+	{
+	elog	<< "LOGINCommand> Unable to find server: "
+		<< theClient->getIntYY() << endl ;
+	return false ;
+	}
  
 theUser = bot->GetOper(st[1]);
 if (!theUser) 
 	{
-	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username (%s)\n",
+
+	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username: %s (%s)\n",
 		theClient->getRealNickUserHost().c_str(),
-		st[1].c_str());
+		st[1].c_str(),
+		targetServer->getName().c_str());
 	if(theClient->isOper())
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 	bot->addLogin(theClient);
@@ -131,7 +140,7 @@ else
 
 	if (md5Part != output.str().c_str()) // If the MD5 hash's don't match..
 		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password\n",theClient->getRealNickUserHost().c_str());
+		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password (%s)\n",theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
 		bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient);
 		return false;
@@ -141,9 +150,9 @@ else
 		{
 		const iClient *tClient = theUser->getClient();
 		bot->Notice(tClient,"You have just been deauthenticated");
-		bot->MsgChanLog("Login conflict for user %s from %s and %s\n",
+		bot->MsgChanLog("Login conflict for user %s from %s and %s (%s)\n",
 				st[1].c_str(),theClient->getNickName().c_str(),
-				tClient->getNickName().c_str());
+				tClient->getNickName().c_str(), targetServer->getName().c_str());
 		bot->deAuthUser(theUser);
 		}
 	theUser->setUserName(st[1]);
@@ -158,8 +167,8 @@ else
 				theUser->getUserName().c_str()); 
 	else
 	        bot->Notice(theClient, "Error in authentication as %s",theUser->getUserName().c_str()); 
-        bot->MsgChanLog("(%s) - %s: AUTHENTICATED\n",theUser->getUserName().c_str(),
-                        theClient->getRealNickUserHost().c_str());
+        bot->MsgChanLog("(%s) - %s: AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
+                        theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
 	/* record their connection timestamp + numeric */
 	theUser->setLastAuthTS(theClient->getConnectTime());
 	theUser->setLastAuthNumeric(theClient->getCharYYXXX());

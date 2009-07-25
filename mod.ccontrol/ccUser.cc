@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccUser.cc,v 1.20 2007/08/28 16:10:07 dan_karrels Exp $
+ * $Id: ccUser.cc,v 1.21 2009/07/25 18:12:34 hidden1 Exp $
  */
  
 #include	<sstream>
@@ -33,7 +33,7 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccUser.cc,v 1.20 2007/08/28 16:10:07 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccUser.cc,v 1.21 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -67,6 +67,8 @@ ccUser::ccUser(dbHandle* _SQLDb)
    NeedOp(0),
    Notice(0),
    Client(NULL),
+   PassChangeTS(0),
+   GetLag(0),
    SQLDb( _SQLDb )
 {
 ++numAllocated;
@@ -84,7 +86,7 @@ if(!dbConnected)
 	return false;
 	}
 	
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice FROM opers WHERE lower(user_name) = '";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS FROM opers WHERE lower(user_name) = '";
 
 if(!dbConnected)
 	{
@@ -119,7 +121,7 @@ if(!dbConnected)
 	return false;
 	}
 	
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice FROM opers WHERE user_id = ";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS FROM opers WHERE user_id = ";
 stringstream theQuery;
 
 if(!dbConnected)
@@ -169,6 +171,8 @@ Email = SQLDb->GetValue(0,17);
 SuspendLevel = atoi(SQLDb->GetValue(0,18).c_str());
 SuspendReason = SQLDb->GetValue(0,19);
 Notice = (!strcasecmp(SQLDb->GetValue(0,20),"t") ? 1 : 0 );
+GetLag = (!strcasecmp(SQLDb->GetValue(0,21),"t") ? 1 : 0 );
+PassChangeTS = atoi(SQLDb->GetValue(0,22).c_str());
 }    
 
 bool ccUser::Update()
@@ -215,6 +219,10 @@ theQuery	<< Main
 		<< (IsCoder ? "'t'" : "'n'")
 		<< ",GetLogs = "
 		<< (GetLogs ? "'t'" : "'n'")
+		<< ",GetLag = "
+		<< (GetLag ? "'t'" : "'n'")
+		<<  ",LastPassChangeTS = "
+		<< PassChangeTS
 		<< ",NeedOp = "
 		<< (NeedOp ? "'t'" : "'n'")
 		<< ", Email = '"

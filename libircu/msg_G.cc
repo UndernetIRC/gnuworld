@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_G.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_G.cc,v 1.8 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #include	<sys/time.h>
@@ -37,7 +37,7 @@
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
 
-RCSTAG( "$Id: msg_G.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_G.cc,v 1.8 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -63,6 +63,7 @@ CREATE_HANDLER(msg_G)
 //
 // Reply with:
 // <my_numeric> Z <remote_numeric> !<remotets> <difference> <localts>
+// <my_numeric> Z <my_numeric> <remote_numeric> !<remotets> <difference> <localts>
 // The format of <remotets> = <seconds>.<useconds>
 // 
 bool msg_G::Execute( const xParameters& params )
@@ -97,12 +98,17 @@ else
 //	elog	<< "msg_G> New style ping"
 //		<< endl ;
 
-	// Target server
-	s += params[ 0 ] ;
+	s += theServer->getCharYY();
 	s += " " ;
+	// Target server
+	//s += params[ 0 ] ;
+	//s += " " ;
 
 	// Remote TS, including the '!'
 	s += params[ 1 ] ;
+	s += " " ;
+	string tStr = params[ 1 ];
+	s += tStr.substr(1,string::npos) ;
 	s += " " ;
 
 	double remoteTSDouble = ::atof( params[ 1 ] + 1 ) ;
@@ -122,36 +128,39 @@ else
 		return false ;
 		}
 
+
+	StringTokenizer st(params[1] + 1, '.');
+	if (st.size() != 2) {
+		elog << "msg_G> Error in Remote TS" << endl;
+		return false;
+	}
+	int tsDiff = (now.tv_sec - atoi(st[0])) * 1000 + (now.tv_usec - atoi(st[1])) / 1000;
+	//elog << "msg_G> tsDiff = " << tsDiff << endl;
+
 	stringstream	theStream ;
 	theStream	<< now.tv_sec
 			<< "."
 			<< now.tv_usec ;
 
+	string localTSString = theStream.str();
 	// Obtain localTS as double val
 	double localTSDouble = 0.0 ;
 	theStream >> localTSDouble ;
-
-	// Obtain localTS as std::string
-	theStream.str( string() ) ;
-	theStream	<< now.tv_sec
-			<< "."
-			<< now.tv_usec ;
-
-	string localTSString ;
-	theStream	>> localTSString ;
 
 //	elog	<< "msg_G> localTSString: "
 //		<< localTSString
 //		<< endl ;
 
-	double tsDiffDouble = localTSDouble - remoteTSDouble ;
+	//double tsDiffDouble = localTSDouble - remoteTSDouble ;
+	//double tsDiffD = 1000 * (localTSDouble - remoteTSDouble);
+	//int tsDiff = static_cast<int>(tsDiffD);
 
 //	elog	<< "msg_G> tsDiffDouble: "
 //		<< tsDiffDouble
 //		<< endl ;
 
 	stringstream stream2 ;
-	stream2		<< tsDiffDouble ;
+	stream2		<< tsDiff ;
 
 //	elog	<< "msg_G> stream2: "
 //		<< stream2.str()
@@ -164,6 +173,7 @@ else
 	s += localTSString ;
 	}
 
+//elog << "msg_G> Message: " << s << endl;
 return theServer->Write( s ) ;
 }
 

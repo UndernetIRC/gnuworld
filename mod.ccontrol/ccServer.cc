@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.cc,v 1.16 2007/08/28 16:10:07 dan_karrels Exp $
+ * $Id: ccServer.cc,v 1.17 2009/07/25 18:12:34 hidden1 Exp $
  */
  
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccServer.cc,v 1.16 2007/08/28 16:10:07 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: ccServer.cc,v 1.17 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -62,6 +62,10 @@ ccServer::ccServer(dbHandle* _SQLDb)
    LastUpdated( 0 ),
    NetServer(NULL),
    ReportMissing(true),
+   LagTime(0),
+   LastLagReport(0),
+   LastLagSent(0),
+   LastLagRecv(0),
    SQLDb( _SQLDb )
 {
 ++numAllocated;

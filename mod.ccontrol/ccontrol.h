@@ -16,14 +16,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.111 2009/06/13 06:43:34 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.112 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.111 2009/06/13 06:43:34 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.112 2009/07/25 18:12:34 hidden1 Exp $"
 
 //Undef this if you want to log to the database
-#define LOGTOHD 
+#define LOGTOHD
+
+// If a server is >LAG_TOO_BIG ms lagged, report it to opers who have GetLag=ON set
+#define LAG_TOO_BIG 15000
+// Minimum Interval in seconds between lag reports for those with GetLag=ON
+#define LAG_REPORT_INTERVAL 300
+// Maximum time diff tolerated for a server's clock
+#define MAX_TIME_DIFF 30
+// Minimum Interval in seconds between Time diff reports
+#define TIMEDIFF_REPORT_INTERVAL 43200
+
+
 
 #include	<pthread.h>
 
@@ -204,6 +215,10 @@ protected:
 	typedef map<string , ccBadChannel* , noCaseCompare> badChannelsMapType;
 	
 	typedef badChannelsMapType::iterator badChannelsIterator;
+
+	typedef map<iServer*,int>	timediffServersMapType;
+	
+	timediffServersMapType timediffServersMap;
 	
 public:
 
@@ -518,6 +533,8 @@ public:
 	 * This method logs the bot commands to the message channel
 	 */
 	bool MsgChanLog( const char * , ... ) ;
+
+	bool MsgChanLag( const char * , ... ) ;
 
 	/**
 	 * This method logs the commands to the database 
@@ -960,6 +977,8 @@ public:
 	gnuworld::xServer::timerID dbConnectionCheck;
 	
 	gnuworld::xServer::timerID glineQueueCheck;
+
+	gnuworld::xServer::timerID rpingCheck;
 	
 protected:
 

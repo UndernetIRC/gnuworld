@@ -1,4 +1,4 @@
--- "$Id: ccontrol.sql,v 1.33 2009/01/16 14:28:19 denspike Exp $"
+-- "$Id: ccontrol.sql,v 1.34 2009/07/25 18:12:33 hidden1 Exp $"
 
 -- 2009-01-16 : Spike
 -- Merged ShellCompanies and ShellNetblocks tables in.
@@ -42,10 +42,12 @@ CREATE TABLE opers (
 	isSMT BOOLEAN NOT NULL DEFAULT 'n',
 	isCODER BOOLEAN NOT NULL DEFAULT 'n',
 	getLOGS BOOLEAN NOT NULL DEFAULT 'n',
+	GetLAG BOOLEAN NOT NULL DEFAULT 'n',
 	needOP BOOLEAN NOT NULL DEFAULT 'n',
 	email VARCHAR(128),
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL,
+	LastPassChangeTS INT4 NOT NULL DEFAULT '0',
 	notice BOOLEAN NOT NULL DEFAULT 't',
 	is_deleted BOOLEAN NOT NULL DEFAULT 'n',
 	PRIMARY KEY( user_id )

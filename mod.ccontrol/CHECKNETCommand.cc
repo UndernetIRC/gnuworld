@@ -17,10 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKNETCommand.cc,v 1.18 2006/09/26 17:35:58 kewlio Exp $
+ * $Id: CHECKNETCommand.cc,v 1.19 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #include	<string>
+#include	<sstream>
 
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -29,7 +30,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHECKNETCommand.cc,v 1.18 2006/09/26 17:35:58 kewlio Exp $" ) ;
+RCSTAG( "$Id: CHECKNETCommand.cc,v 1.19 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -48,7 +49,9 @@ bot->MsgChanLog("CHECKNET\n");
 
 ccServer* CurServer = 0;
 string Msg;
-char tNum[512];		    
+char tNum[512];
+std::stringstream s;
+int count = 0;
 
 for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ; 
 	ptr != bot->serversMap_end();++ptr)
@@ -94,6 +97,41 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 		}
 	}
 
+for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ; 
+	ptr != bot->serversMap_end();++ptr)
+	{
+	//For each server on the database check if its connetcted
+	CurServer = ptr->second;
+
+	//If the server isnt connected 
+	if (!CurServer->getReportMissing() || CurServer->getNetServer())
+		{
+		if (s.str().size() > 400)
+			{
+			bot->Notice(theClient, "Server RPINGS: %s", s.str().c_str());
+			s.str("");
+			count = 0;
+			}
+		count++;
+		if (count > 1)
+			s << ", "; 
+		s << CurServer->getName() << " (";
+		if (CurServer->getLagTime() > 10000)
+			{
+			s << "\002" << (int) (CurServer->getLagTime() / 1000) << "seconds\002)";
+			}
+		else if (CurServer->getLagTime() > 5000)
+			{
+			s << "\002" << CurServer->getLagTime() << "ms\002)";
+			}
+		else
+			{
+			s << CurServer->getLagTime() << "ms)";
+			}
+		}
+	}
+
+bot->Notice(theClient, "Server RPINGS: %s", s.str().c_str());
 bot->Notice(theClient,"Finished checking the status of the network.\n");
 bot->Notice(theClient,"Found a total of %d missing servers\n",TServers);
 return true;

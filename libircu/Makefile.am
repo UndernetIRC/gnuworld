@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.9 2004/05/28 15:18:11 jeekay Exp $
+## $Id: Makefile.am,v 1.10 2009/07/25 18:12:34 hidden1 Exp $
 
 lib_LTLIBRARIES = libircu.la
 libircu_la_SOURCES = msg_AC.cc \
@@ -19,6 +19,7 @@ libircu_la_SOURCES = msg_AC.cc \
 	msg_K.cc \
 	msg_L.cc \
 	msg_M351.cc \
+	msg_M391.cc \
 	msg_M.cc \
 	msg_N.cc \
 	msg_NOOP.cc \
@@ -28,6 +29,7 @@ libircu_la_SOURCES = msg_AC.cc \
 	msg_Q.cc \
 	msg_R.cc \
 	msg_RI.cc \
+	msg_RO.cc \
 	msg_S.cc \
 	msg_Server.cc \
 	msg_SQ.cc \

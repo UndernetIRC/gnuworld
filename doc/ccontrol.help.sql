@@ -1,4 +1,4 @@
--- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.19 2009/06/13 06:43:34 hidden1 Exp $"
+-- 2001-03-02 |MrBean| "$Id: ccontrol.help.sql,v 1.20 2009/07/25 18:12:33 hidden1 Exp $"
 -- Created the file and added all help topics to the database
 
 -- 2201-03-11 |MrBean|
@@ -201,6 +201,7 @@ MODUSER		12	[-ua] - resets the user access acording to his flags
 MODUSER		13	[-uf flags] - updates the oper flags to new one (OPER|ADMIN|SMT|CODER)
 MODUSER		14	[-e email] - updates the user's email
 MODUSER		15	[-mt m|n] - change the way the bot communicates to the user (m=message,n=notice)
+MODUSER		16	[-glag on|off] - toggles whether the server lag reports will be messaged to the user
 NEWPASS		1	****** NEWPASS COMMAND ******
 NEWPASS		2	Changes your password for the bot
 NEWPASS		3	Syntax: /msg $BOT$ newpass <newpass>

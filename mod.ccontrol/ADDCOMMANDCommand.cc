@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDCOMMANDCommand.cc,v 1.30 2009/06/13 06:43:34 hidden1 Exp $
+ * $Id: ADDCOMMANDCommand.cc,v 1.31 2009/07/25 18:12:34 hidden1 Exp $
  */
  
 #include	<string>
@@ -28,7 +28,7 @@
 #include        "ccUser.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: ADDCOMMANDCommand.cc,v 1.30 2009/06/13 06:43:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ADDCOMMANDCommand.cc,v 1.31 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -69,6 +69,10 @@ if(!strcasecmp(st[pos],"-fr"))
 	}
 
 bool AllOpers = false;
+bool AllAdmins = false;
+bool AllSmts = false;
+bool AllCoders = false;
+while ((!strcasecmp(st[pos],"-allopers")) || (!strcasecmp(st[pos],"-alladmins")) || (!strcasecmp(st[pos],"-allsmts")) || (!strcasecmp(st[pos],"-allcoders"))) {
 if(!strcasecmp(st[pos],"-allopers"))
 	{
 	if (AClient->getType() < operLevel::CODERLEVEL) 
@@ -84,7 +88,6 @@ if(!strcasecmp(st[pos],"-allopers"))
 		}
 	}
 
-bool AllAdmins = false;
 if(!strcasecmp(st[pos],"-alladmins"))
 	{
 	if (AClient->getType() < operLevel::CODERLEVEL) 
@@ -100,7 +103,6 @@ if(!strcasecmp(st[pos],"-alladmins"))
 		}
 	}
 
-bool AllSmts = false;
 if(!strcasecmp(st[pos],"-allsmts"))
 	{
 	if (AClient->getType() < operLevel::CODERLEVEL) 
@@ -116,7 +118,6 @@ if(!strcasecmp(st[pos],"-allsmts"))
 		}
 	}
 
-bool AllCoders = false;
 if(!strcasecmp(st[pos],"-allcoders"))
 	{
 	if (AClient->getType() < operLevel::CODERLEVEL) 
@@ -131,6 +132,7 @@ if(!strcasecmp(st[pos],"-allcoders"))
 		Usage(theClient);
 		}
 	}
+}
 
 // Fetch the oper record from the db
 ccUser* theUser;

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.h,v 1.9 2007/08/28 16:10:07 dan_karrels Exp $
+ * $Id: ccServer.h,v 1.10 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.9 2007/08/28 16:10:07 dan_karrels Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.10 2009/07/25 18:12:34 hidden1 Exp $"
 
 #include	<string>
 
@@ -59,6 +59,18 @@ public:
 	inline const time_t&	getLastSplitted() const
 		{ return LastSplitted; }
 
+	inline const time_t&	getLagTime() const
+		{ return LagTime; }
+
+	inline const time_t&	getLastLagReport() const
+		{ return LastLagReport; }
+
+	inline const time_t&	getLastLagSent() const
+		{ return LastLagSent; }
+
+	inline const time_t&	getLastLagRecv() const
+		{ return LastLagRecv; }
+
 	inline const string&	getSplitReason() const
 		{ return SplitReason; }
 	
@@ -95,8 +107,20 @@ public:
 	inline void		setLastSplitted( const time_t& _LastSplitted ) 
 		{ LastSplitted = _LastSplitted; }
 
-        inline void		setSplitReason( const string& _Reason)
+    inline void		setSplitReason( const string& _Reason)
 		{ SplitReason = _Reason; }
+
+	inline void		setLagTime( const time_t& _LagTime ) 
+		{ LagTime = _LagTime; }
+
+	inline void		setLastLagReport( const time_t& _LastLagReport ) 
+		{ LastLagReport = _LastLagReport; }
+
+	inline void		setLastLagSent( const time_t& _LastLagSent )
+		{ LastLagSent = _LastLagSent; }
+
+	inline void		setLastLagRecv( const time_t& _LastLagRecv )
+		{ LastLagRecv = _LastLagRecv; }
 
 	inline void		setVersion( const string& _Version )
 		{ Version = _Version; }
@@ -144,6 +168,10 @@ protected:
 	time_t LastUpdated;
 	iServer* NetServer;
 	bool ReportMissing;
+	time_t LagTime;
+	time_t LastLagReport;
+	time_t LastLagSent;
+	time_t LastLagRecv;
 	dbHandle* SQLDb;
 
 }; // class ccServer

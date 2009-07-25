@@ -1,5 +1,5 @@
 
--- "$Id: ccontrol.update.sql,v 1.27 2004/06/05 16:51:31 mrbean_ Exp $"
+-- "$Id: ccontrol.update.sql,v 1.28 2009/07/25 18:12:33 hidden1 Exp $"
 
 -- ccontrol database changes update
 -- this file will add the new features to an old database
@@ -111,15 +111,18 @@
 --   alter table exceptions add Reason VARCHAR(450);
 
 -- 13/03/04 Add is deleted fields
-     alter table opers add is_deleted BOOLEAN NOT NULL DEFAULT 'n';   
+--   alter table opers add is_deleted BOOLEAN NOT NULL DEFAULT 'n';   
 
 -- 25/03/04 Add ReportMissing to servers
 --    alter table servers add ReportMissing boolean not null default 't';
 
 -- 04/06/04 Add UNJUPE command to the opers
-    update opers set saccess = (saccess | 33554432);
+--  update opers set saccess = (saccess | 33554432);
 
 -- 05/06/04 Move MODUSER to the opers
-    update opers set access = (access | 2097152);
-        
-      
+--  update opers set access = (access | 2097152);
+
+-- 2009/07/24 Add GETLAG and LastPassChangeTS to opers
+alter TABLE opers add LastPassChangeTS INT4 NOT NULL DEFAULT '0';
+alter TABLE opers add GetLAG BOOLEAN NOT NULL DEFAULT 'n';
+

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: NEWPASSCommand.cc,v 1.23 2006/09/26 17:36:00 kewlio Exp $
+ * $Id: NEWPASSCommand.cc,v 1.24 2009/07/25 18:12:34 hidden1 Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: NEWPASSCommand.cc,v 1.23 2006/09/26 17:36:00 kewlio Exp $" ) ;
+RCSTAG( "$Id: NEWPASSCommand.cc,v 1.24 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -73,6 +73,7 @@ switch(passRet)
 	case password::PASS_OK:
 		{		
 		theUser->setPassword(bot->CryptPass(st[1]));
+		theUser->setPassChangeTS(::time(0));
 		if(theUser->Update())
 			{
 			bot->Notice(theClient,"Password changed!");
