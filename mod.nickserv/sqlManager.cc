@@ -26,6 +26,7 @@
 #include "ELog.h"
 #include "sqlManager.h"
 #include	"dbHandle.h"
+#include <cstdlib>
 
 using std::endl ;
 
