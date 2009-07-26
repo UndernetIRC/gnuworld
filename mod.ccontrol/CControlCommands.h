@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CControlCommands.h,v 1.33 2006/09/26 17:35:58 kewlio Exp $
+ * $Id: CControlCommands.h,v 1.34 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __CCONTROLCOMMANDS_H
-#define __CCONTROLCOMMANDS_H "$Id: CControlCommands.h,v 1.33 2006/09/26 17:35:58 kewlio Exp $"
+#define __CCONTROLCOMMANDS_H "$Id: CControlCommands.h,v 1.34 2009/07/26 18:30:37 mrbean_ Exp $"
 
 #include	<string>
 
@@ -97,28 +97,28 @@ public:
 	inline const string& getRealName() const
 		{ return commRealName ; }
 	
-	inline const bool needsDB() const
+	inline const bool& needsDB() const
 		{ return needDB ; }
 
 	inline const string& getHelp() const
 		{ return help ; }
 
-        inline const unsigned long getFlags() const
-	        { return flags ; }	
+    inline const unsigned long& getFlags() const
+	    { return flags ; }	
 
-	inline const bool getIsDisabled() const
+	inline const bool& getIsDisabled() const
 		{ return isDisabled ; }
 
-	inline const bool getNeedOp() const
+	inline const bool& getNeedOp() const
 		{ return needOp ; }
 
-	inline const bool getNoLog() const
+	inline const bool& getNoLog() const
 		{ return noLog ; }
 
-	inline const unsigned int getMinLevel() const
+	inline const unsigned int& getMinLevel() const
 		{ return minLevel ; }
 
-	inline const bool getSecondAccess() const
+	inline const bool& getSecondAccess() const
 		{ return secondAccess ; }				
 protected:
 	ccontrol*	bot ;

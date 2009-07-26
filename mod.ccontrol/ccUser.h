@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccUser.h,v 1.20 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: ccUser.h,v 1.21 2009/07/26 18:30:38 mrbean_ Exp $
  */
 
 #ifndef __CCUSER_H
-#define __CCUSER_H "$Id: ccUser.h,v 1.20 2009/07/25 18:12:34 hidden1 Exp $"
+#define __CCUSER_H "$Id: ccUser.h,v 1.21 2009/07/26 18:30:38 mrbean_ Exp $"
 
 #include	<string>
 
@@ -84,7 +84,7 @@ public:
         inline const string&		getEmail() const
 		    { return Email ; }
 		    
-	inline const bool       	getIsSuspended() const
+	inline const bool&       	getIsSuspended() const
 		    { return IsSuspended ; }
 	
 	inline const time_t&		getSuspendExpires() const
@@ -99,7 +99,7 @@ public:
 	inline const string&		getLastAuthNumeric() const
 		    { return LastAuthNumeric; }
 
-	inline const unsigned int	getSuspendLevel() const
+	inline const unsigned int&	getSuspendLevel() const
 		{ return SuspendLevel; }
 		
 	inline const string&		getSuspendedBy() const
@@ -117,37 +117,37 @@ public:
 	inline const unsigned int&	getFlags() const
 		    { return Flags ; }
 	
-	inline const bool    		gotFlag(unsigned int _flag) const
+	inline bool    		gotFlag(unsigned int _flag) const
 		    { return (Flags & _flag ? true : false) ; }
 
 	inline const string&		getServer() const
 		    { return Server; }
 
-	inline const bool		isUhs() const
+	inline const bool&		isUhs() const
 		    { return IsUhs;  }
 
-	inline const bool		isOper() const
+	inline const bool&		isOper() const
 		    { return IsOper;  }
 
-	inline const bool		isAdmin() const
+	inline const bool&		isAdmin() const
 		    { return IsAdmin;  }
 
-	inline const bool		isSmt() const
+	inline const bool&		isSmt() const
 		    { return IsSmt;  }
 
-	inline const bool		isCoder() const
+	inline const bool&		isCoder() const
 		    { return IsCoder;  }
 
-	inline const bool		getLogs() const
+	inline const bool&		getLogs() const
 		    { return GetLogs;  }
 
-	inline const bool		getLag() const
+	inline const bool&		getLag() const
 		    { return GetLag;  }
 
-	inline const bool		getNeedOp() const
+	inline const bool&		getNeedOp() const
 		    { return NeedOp;  }
 
-	inline const bool		getNotice() const
+	inline const bool&		getNotice() const
 		    { return Notice;  }
 
 	inline const iClient*		getClient() const

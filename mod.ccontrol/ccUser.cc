@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccUser.cc,v 1.21 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: ccUser.cc,v 1.22 2009/07/26 18:30:38 mrbean_ Exp $
  */
  
 #include	<sstream>
@@ -33,7 +33,7 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccUser.cc,v 1.21 2009/07/25 18:12:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccUser.cc,v 1.22 2009/07/26 18:30:38 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -64,12 +64,12 @@ ccUser::ccUser(dbHandle* _SQLDb)
    IsSmt(0),
    IsCoder(0),
    GetLogs(0),
+   GetLag(0),
    NeedOp(0),
    Notice(0),
    Client(NULL),
-   PassChangeTS(0),
-   GetLag(0),
-   SQLDb( _SQLDb )
+   SQLDb( _SQLDb ),
+   PassChangeTS(0)
 {
 ++numAllocated;
 }

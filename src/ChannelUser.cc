@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ChannelUser.cc,v 1.9 2005/01/08 23:33:43 dan_karrels Exp $
+ * $Id: ChannelUser.cc,v 1.10 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"iClient.h"
 #include	"ChannelUser.h"
 
-RCSTAG("$Id: ChannelUser.cc,v 1.9 2005/01/08 23:33:43 dan_karrels Exp $" ) ;
+RCSTAG("$Id: ChannelUser.cc,v 1.10 2009/07/26 18:30:37 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -74,17 +74,17 @@ const string ChannelUser::getCharYYXXX() const
 return theClient->getCharYYXXX() ;
 }
 
-const unsigned int ChannelUser::getIntYY() const
+unsigned int ChannelUser::getIntYY() const
 {
 return theClient->getIntYY() ;
 }
 
-const unsigned int ChannelUser::getIntXXX() const
+unsigned int ChannelUser::getIntXXX() const
 {
 return theClient->getIntXXX() ;
 }
 
-const unsigned int ChannelUser::getIntYYXXX() const
+unsigned int ChannelUser::getIntYYXXX() const
 {
 return theClient->getIntYYXXX() ;
 }

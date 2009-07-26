@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.h,v 1.10 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: ccServer.h,v 1.11 2009/07/26 18:30:38 mrbean_ Exp $
  */
 
 #ifndef __CCSERVER_H
-#define __CCSERVER_H "$Id: ccServer.h,v 1.10 2009/07/25 18:12:34 hidden1 Exp $"
+#define __CCSERVER_H "$Id: ccServer.h,v 1.11 2009/07/26 18:30:38 mrbean_ Exp $"
 
 #include	<string>
 
@@ -86,7 +86,7 @@ public:
 	inline const iServer* getNetServer() const
 		{ return NetServer; }
 
-	inline const bool getReportMissing() const
+	inline const bool& getReportMissing() const
 		{ return ReportMissing; }
 				
 		

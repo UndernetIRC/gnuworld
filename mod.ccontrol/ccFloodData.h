@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccFloodData.h,v 1.5 2003/06/28 01:21:19 dan_karrels Exp $
+ * $Id: ccFloodData.h,v 1.6 2009/07/26 18:30:38 mrbean_ Exp $
  */
 
 #ifndef __CCFLOODDATA_H
-#define __CCFLOODDATA_H "$Id: ccFloodData.h,v 1.5 2003/06/28 01:21:19 dan_karrels Exp $"
+#define __CCFLOODDATA_H "$Id: ccFloodData.h,v 1.6 2009/07/26 18:30:38 mrbean_ Exp $"
 
 #define IGNORE_NOT_FOUND -1
 #define IGNORE_REMOVED -2
@@ -48,7 +48,7 @@ public:
 	inline const string 	getNumeric() const
 		{ return Numeric; }
 
-	inline const int 	getLogins() const
+	inline const int& 	getLogins() const
 		{ return Logins; }
 
 	inline time_t	 	getIgnoreExpires() const

@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: nickUserCidr.h,v 1.2 2009/06/25 18:18:47 mrbean_ Exp $
+ * $Id: nickUserCidr.h,v 1.3 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __NICK_USER_CIDR_H
-#define __NICK_USER_CIDR_H "$Id: nickUserCidr.h,v 1.2 2009/06/25 18:18:47 mrbean_ Exp $"
+#define __NICK_USER_CIDR_H "$Id: nickUserCidr.h,v 1.3 2009/07/26 18:30:37 mrbean_ Exp $"
 
 #include	<string>
 #include	<sys/types.h>
@@ -57,7 +57,7 @@ public:
 	/**
 	 * Retrieve the mask of this CIDR (the part after the /).
 	 */
-	inline const unsigned int& GetMask() const 
+	inline int GetMask() const 
 		{ return cidr.GetMask(); }
 
 	/**

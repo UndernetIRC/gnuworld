@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: gnuworldDB.h,v 1.4 2007/08/28 16:09:59 dan_karrels Exp $
+ * $Id: gnuworldDB.h,v 1.5 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __GNUWORLDDB_H
-#define __GNUWORLDDB_H "$Id: gnuworldDB.h,v 1.4 2007/08/28 16:09:59 dan_karrels Exp $"
+#define __GNUWORLDDB_H "$Id: gnuworldDB.h,v 1.5 2009/07/26 18:30:37 mrbean_ Exp $"
 
 #include	<string>
 #include	<sstream>
@@ -98,7 +98,7 @@ public:
 
 	inline const std::string&	getDBHost() const
 		{ return dbHost ; }
-	inline const unsigned short int	getDBPort() const
+	inline const unsigned short int&	getDBPort() const
 		{ return dbPort ; }
 	inline const std::string&	getDBName() const
 		{ return dbName ; }

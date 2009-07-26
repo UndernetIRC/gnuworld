@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.105 2005/09/29 17:40:06 kewlio Exp $
+ * $Id: server.h,v 1.106 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.105 2005/09/29 17:40:06 kewlio Exp $"
+#define __SERVER_H "$Id: server.h,v 1.106 2009/07/26 18:30:37 mrbean_ Exp $"
 
 #include	<string>
 #include	<vector>
@@ -744,7 +744,7 @@ public:
 	 * Return an unsigned int representation of this server's uplink's
 	 * server numeric.
 	 */
-	inline const unsigned int getUplinkIntYY() const
+	inline unsigned int getUplinkIntYY() const
 		{ return Uplink->getIntYY() ; }
 
 	/**

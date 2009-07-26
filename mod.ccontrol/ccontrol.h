@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.112 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.113 2009/07/26 18:30:38 mrbean_ Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.112 2009/07/25 18:12:34 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.113 2009/07/26 18:30:38 mrbean_ Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD
@@ -725,13 +725,13 @@ public:
 	 
 	void checkMaxUsers();
 	
-	const unsigned int getMaxUsers() const
+	const unsigned int& getMaxUsers() const
 	{ return maxUsers; }
 	
-	const unsigned long getDateMax() const
+	const unsigned long& getDateMax() const
 	{ return dateMax; }
 	
-	const unsigned long getCurUsers() const
+	const unsigned long& getCurUsers() const
 	{ return curUsers; }
 	
 	/**

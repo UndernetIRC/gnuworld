@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cidr.cc,v 1.2 2009/06/24 17:39:44 mrbean_ Exp $
+ * $Id: cidr.cc,v 1.3 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #include	<string>
@@ -40,7 +40,7 @@
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: cidr.cc,v 1.2 2009/06/24 17:39:44 mrbean_ Exp $" ) ;
+RCSTAG( "$Id: cidr.cc,v 1.3 2009/07/26 18:30:37 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -98,7 +98,7 @@ bool xCIDR::ExtractPrefix(const std::string& Prefix,const unsigned int& Mask,uns
 	{
 		unsigned int tAddr = htonl(addr.s_addr);
 		int tMask = 0;
-		for(int i=0; i < 32-Mask;i++) { //Build the mask
+		for(unsigned int i=0; i < 32-Mask;i++) { //Build the mask
 			tMask = tMask << 1;
 			tMask = tMask + 1;
 		}

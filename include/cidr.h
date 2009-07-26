@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cidr.h,v 1.3 2009/06/25 18:18:47 mrbean_ Exp $
+ * $Id: cidr.h,v 1.4 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __CIDR_H
-#define __CIDR_H "$Id: cidr.h,v 1.3 2009/06/25 18:18:47 mrbean_ Exp $"
+#define __CIDR_H "$Id: cidr.h,v 1.4 2009/07/26 18:30:37 mrbean_ Exp $"
 
 #include	<string>
 #include	<sys/types.h>
@@ -57,7 +57,7 @@ public:
 	/**
 	 * Retrieve the mask of this CIDR (the part after the /).
 	 */
-	inline const unsigned int& GetMask() const 
+	inline const int& GetMask() const 
 		{ return mask; }
 
 	/**
@@ -81,14 +81,16 @@ protected:
 	/**
 	 * The mask
 	 */
-	unsigned int mask ;
+	int mask ;
+	
+	std::string	str; 
 	
 	/**
 	 * The prefix
 	 */
 	xIP prefix ;
 	
-	std::string	str; 
+	
 	
 private:
 	

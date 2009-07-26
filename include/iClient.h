@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: iClient.h,v 1.48 2007/05/26 09:41:24 mrbean_ Exp $
+ * $Id: iClient.h,v 1.49 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __ICLIENT_H
-#define __ICLIENT_H "$Id: iClient.h,v 1.48 2007/05/26 09:41:24 mrbean_ Exp $"
+#define __ICLIENT_H "$Id: iClient.h,v 1.49 2009/07/26 18:30:37 mrbean_ Exp $"
 
 #include	<string>
 #include	<list>
@@ -219,7 +219,7 @@ public:
 	 *
 	 * @return the timestamp of the account if set, else 0.
 	 */
-	inline const time_t getAccountTS() const
+	inline const time_t& getAccountTS() const
 		{ return account_ts; }
 
 	/**

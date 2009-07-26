@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccException.h,v 1.12 2008/12/27 23:34:31 hidden1 Exp $
+ * $Id: ccException.h,v 1.13 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __CCEXCEPTION_H
-#define __CCEXCEPTION_H "$Id: ccException.h,v 1.12 2008/12/27 23:34:31 hidden1 Exp $"
+#define __CCEXCEPTION_H "$Id: ccException.h,v 1.13 2009/07/26 18:30:37 mrbean_ Exp $"
 
 #include	<string>
 
@@ -51,7 +51,7 @@ public:
 	inline const string& 		getHost() const
 			{ return Host; }
 		
-	inline const int		getConnections() const
+	inline const int&		getConnections() const
 		{ return Connections; }
 	
 	inline const string&		getAddedBy() const
@@ -109,15 +109,15 @@ public:
 	virtual ~ccShellco();
 	
 
-	inline const bool		isActive() const
+	inline bool		isActive() const
 		{ return (active == 1 ? true : false); }
 	inline const string& 		getName() const
 		{ return Name; }
 		
-	inline const int		getID() const
+	inline const int&		getID() const
 		{ return id; }
 
-	inline const int		getLimit() const
+	inline const int&		getLimit() const
 		{ return maxlimit; }
 	
 	inline const string&		getAddedBy() const
@@ -199,10 +199,10 @@ public:
 	inline const string& 		getCidr1() const
 			{ return cidr1; }
 
-	inline const int 		getCompanyID() const
+	inline const int& 		getCompanyID() const
 			{ return companyid; }
 
-	inline const int 		getCidr2() const
+	inline const int& 		getCidr2() const
 			{ return cidr2; }
 	
 	inline const string&		getAddedBy() const

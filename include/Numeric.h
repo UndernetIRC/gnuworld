@@ -19,11 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: Numeric.h,v 1.6 2003/08/09 23:15:33 dan_karrels Exp $
+ * $Id: Numeric.h,v 1.7 2009/07/26 18:30:37 mrbean_ Exp $
  */
 
 #ifndef __NUMERIC_H
-#define __NUMERIC_H "$Id: Numeric.h,v 1.6 2003/08/09 23:15:33 dan_karrels Exp $"
+#define __NUMERIC_H "$Id: Numeric.h,v 1.7 2009/07/26 18:30:37 mrbean_ Exp $"
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -174,7 +174,7 @@ intYY = base64toint( charYYXXX, 2 ) ;
 intXXX = base64toint( &charYYXXX[ 2 ], 3 ) ;
 }
 
-inline const unsigned int combinebase64int( const unsigned int& intYY,
+inline unsigned int combinebase64int( const unsigned int& intYY,
 	const unsigned int& intXXX )
 {
 char charYYXXX[ 6 ] ;
