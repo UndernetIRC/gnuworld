@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.113 2009/07/26 18:30:38 mrbean_ Exp $
+ * $Id: ccontrol.h,v 1.114 2009/07/26 23:55:52 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.113 2009/07/26 18:30:38 mrbean_ Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.114 2009/07/26 23:55:52 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD
 
 // If a server is >LAG_TOO_BIG ms lagged, report it to opers who have GetLag=ON set
-#define LAG_TOO_BIG 15000
+#define LAG_TOO_BIG 45
 // Minimum Interval in seconds between lag reports for those with GetLag=ON
 #define LAG_REPORT_INTERVAL 300
 // Maximum time diff tolerated for a server's clock

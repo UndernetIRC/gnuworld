@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.231 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.232 2009/07/26 23:55:52 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.231 2009/07/25 18:12:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.232 2009/07/26 23:55:52 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1243,7 +1243,7 @@ if(st.size() < 2)
 		tmpServer->setLastLagRecv(::time(0));
 		if ((lagTime > LAG_TOO_BIG) && ((::time(0) - tmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)) {
 			tmpServer->setLastLagReport(::time(0));
-			MsgChanLog("%s is %ds lagged", Server->getName().c_str(), (int) (lagTime / 1000));
+			MsgChanLag("%s is %ds lagged", Server->getName().c_str(), (int) (lagTime / 1000));
 		}
 	}
 
@@ -5630,11 +5630,35 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 	tmpServer = ptr->second;
 	if(tmpServer->getNetServer())
 		{
-		Notice(theClient,"%3s (%4d) Name: %s Version: %s",
+		char buf[512];
+		stringstream s;
+		s << "(";
+		if (tmpServer->getLagTime() > 10000)
+			{
+			s << "\002" << (int) (tmpServer->getLagTime() / 1000) << "seconds\002)";
+			}
+		else if (tmpServer->getLagTime() > 5000)
+			{
+			s << "\002" << tmpServer->getLagTime() << "ms\002)";
+			}
+		else
+			{
+			s << tmpServer->getLagTime() << "ms)";
+			}
+
+		snprintf(buf, sizeof(buf) - 1, "%3s (%4d) Name: %s Version: %s",
 			tmpServer->getLastNumeric().c_str(),
 			base64toint(tmpServer->getLastNumeric().c_str()),
 			tmpServer->getName().c_str(),
 			tmpServer->getVersion().c_str());
+		buf[sizeof(buf)] = '\0'; //Just in case
+		Notice(theClient, "%s %s", buf, s.str().c_str());
+
+		//Notice(theClient,"%3s (%4d) Name: %s Version: %s",
+		//	tmpServer->getLastNumeric().c_str(),
+		//	base64toint(tmpServer->getLastNumeric().c_str()),
+		//	tmpServer->getName().c_str(),
+		//	tmpServer->getVersion().c_str());
 		}
 	else if(tmpServer->getReportMissing())
 		{

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHECKNETCommand.cc,v 1.19 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: CHECKNETCommand.cc,v 1.20 2009/07/26 23:55:52 hidden1 Exp $
  */
 
 #include	<string>
@@ -30,7 +30,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHECKNETCommand.cc,v 1.19 2009/07/25 18:12:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: CHECKNETCommand.cc,v 1.20 2009/07/26 23:55:52 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -97,6 +97,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 		}
 	}
 
+/*
 for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ; 
 	ptr != bot->serversMap_end();++ptr)
 	{
@@ -132,6 +133,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 	}
 
 bot->Notice(theClient, "Server RPINGS: %s", s.str().c_str());
+*/
 bot->Notice(theClient,"Finished checking the status of the network.\n");
 bot->Notice(theClient,"Found a total of %d missing servers\n",TServers);
 return true;
