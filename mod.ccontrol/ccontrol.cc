@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.232 2009/07/26 23:55:52 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.233 2009/07/27 06:47:28 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.232 2009/07/26 23:55:52 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.233 2009/07/27 06:47:28 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1241,10 +1241,10 @@ if(st.size() < 2)
 		lagTime = (now.tv_sec - atoi(st[6])) * 1000 + (now.tv_usec - atoi(st[7])) / 1000;
 		tmpServer->setLagTime(lagTime);
 		tmpServer->setLastLagRecv(::time(0));
-		if ((lagTime > LAG_TOO_BIG) && ((::time(0) - tmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)) {
-			tmpServer->setLastLagReport(::time(0));
-			MsgChanLag("%s is %ds lagged", Server->getName().c_str(), (int) (lagTime / 1000));
-		}
+		//if ((lagTime > LAG_TOO_BIG) && ((::time(0) - tmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)) {
+		//	tmpServer->setLastLagReport(::time(0));
+		//	MsgChanLag("[lag] %s is %ds lagged", Server->getName().c_str(), (int) (lagTime / 1000));
+		//}
 	}
 
 //At 391 BGAAA abuseexploits.undernet.org 1246137209 50 :Saturday June 27 2009 -- 23:12 +02:00
@@ -1594,11 +1594,15 @@ switch( theEvent )
 //		if(!getUplink()->isJuped(NewServer))
 			{
 			ccServer* CheckServer = getServer(NewServer->getName());
-    	                if(CheckServer)
+			if(CheckServer)
 				{
 				CheckServer->setSplitReason(Reason);
 				CheckServer->setLastSplitted(::time(NULL));
 				CheckServer->setNetServer(NULL);
+				CheckServer->setLastLagRecv(0);
+				CheckServer->setLastLagSent(0);
+				CheckServer->setLagTime(0);
+				CheckServer->setLastLagReport(0);
 				if(dbConnected)
 					{
 					CheckServer->Update();
@@ -1816,17 +1820,21 @@ else if (timer_id == rpingCheck)
 		if (TmpServer->getNetServer())
 			{
 			counter++;
-			if ((counter % 4) != tID)
-				continue;
 			if (TmpServer->getLastLagRecv() > 0)
 				{
-				if (((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) > 50) && ((::time(0) - TmpServer->getLastLagReport()) > 300))
+				if (((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) >= LAG_TOO_BIG) && ((::time(0) - TmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL))
 					{
 					TmpServer->setLastLagReport(::time(0));
-					TmpServer->setLagTime((::time(0) - TmpServer->getLastLagRecv() - 60) * 1000);
-					MsgChanLag("%s is >%ds lagged", TmpServer->getName().c_str(), (int) (TmpServer->getLagTime() / 1000));
+					//TmpServer->setLagTime((::time(0) - TmpServer->getLastLagRecv() - 60) * 1000);
+					TmpServer->setLagTime((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) * 1000);
+					MsgChanLag("[lag] %s is >%ds lagged", TmpServer->getName().c_str(), (int) (TmpServer->getLagTime() / 1000));
+					continue;
 					}
 				}
+			if ((counter % 4) != tID)
+				continue;
+			if ((TmpServer->getLastLagRecv() > 0) && ((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) >= LAG_TOO_BIG))
+				continue;
 			Write("%s RI %s %s %d %s :%d %s", getCharYY().c_str(), TmpServer->getNetServer()->getCharYY().c_str(), getCharYYXXX().c_str(), ::time(0), s.str().c_str(), ::time(0), s.str().c_str());
 			Write("%s TI :%s", getCharYYXXX().c_str(), TmpServer->getNetServer()->getCharYY().c_str());
 			TmpServer->setLastLagSent(::time(0));
