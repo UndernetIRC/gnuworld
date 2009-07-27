@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.233 2009/07/27 06:47:28 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.234 2009/07/27 22:33:51 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.233 2009/07/27 06:47:28 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.234 2009/07/27 22:33:51 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1807,9 +1807,9 @@ else if (timer_id == rpingCheck)
 	stringstream s;
 	s << now.tv_usec ;
 
-	static int tID = 3;
+	static int tID = 11;
 	tID++;
-	if (tID == 4)
+	if (tID == 12)
 		tID = 0;
 
 	ccServer* TmpServer;
@@ -1822,18 +1822,19 @@ else if (timer_id == rpingCheck)
 			counter++;
 			if (TmpServer->getLastLagRecv() > 0)
 				{
-				if (((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) >= LAG_TOO_BIG) && ((::time(0) - TmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL))
+				if ((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) >= LAG_TOO_BIG)
 					{
-					TmpServer->setLastLagReport(::time(0));
-					//TmpServer->setLagTime((::time(0) - TmpServer->getLastLagRecv() - 60) * 1000);
-					TmpServer->setLagTime((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) * 1000);
-					MsgChanLag("[lag] %s is >%ds lagged", TmpServer->getName().c_str(), (int) (TmpServer->getLagTime() / 1000));
+					if ((::time(0) - TmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)
+						{
+						TmpServer->setLastLagReport(::time(0));
+						//TmpServer->setLagTime((::time(0) - TmpServer->getLastLagRecv() - 60) * 1000);
+						TmpServer->setLagTime((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) * 1000);
+						MsgChanLag("[lag] %s is >%ds lagged", TmpServer->getName().c_str(), (int) (TmpServer->getLagTime() / 1000));
+						}
 					continue;
 					}
 				}
-			if ((counter % 4) != tID)
-				continue;
-			if ((TmpServer->getLastLagRecv() > 0) && ((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) >= LAG_TOO_BIG))
+			if ((counter % 12) != tID)
 				continue;
 			Write("%s RI %s %s %d %s :%d %s", getCharYY().c_str(), TmpServer->getNetServer()->getCharYY().c_str(), getCharYYXXX().c_str(), ::time(0), s.str().c_str(), ::time(0), s.str().c_str());
 			Write("%s TI :%s", getCharYYXXX().c_str(), TmpServer->getNetServer()->getCharYY().c_str());
@@ -1841,7 +1842,7 @@ else if (timer_id == rpingCheck)
 			}
 		//BG RI C] BGAAA 1246224483 960943 :1246224474
 		}
-	rpingCheck = MyUplink->RegisterTimer(::time(0) + 15, this, NULL);
+	rpingCheck = MyUplink->RegisterTimer(::time(0) + 5, this, NULL);
 	}
 }
 
