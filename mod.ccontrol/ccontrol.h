@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.115 2009/07/27 06:47:28 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.116 2009/07/27 23:06:15 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.115 2009/07/27 06:47:28 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.116 2009/07/27 23:06:15 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD
@@ -979,7 +979,9 @@ public:
 	gnuworld::xServer::timerID glineQueueCheck;
 
 	gnuworld::xServer::timerID rpingCheck;
-	
+
+	gnuworld::xServer::timerID timeCheck;
+
 protected:
 
 	/**

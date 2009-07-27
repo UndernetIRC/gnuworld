@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.234 2009/07/27 22:33:51 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.235 2009/07/27 23:06:15 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.234 2009/07/27 22:33:51 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.235 2009/07/27 23:06:15 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1005,6 +1005,7 @@ expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
 dbConnectionCheck = MyUplink->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
 rpingCheck = MyUplink->RegisterTimer(::time(0) + 60, this, NULL);
+timeCheck = MyUplink->RegisterTimer(::time(0) + 300, this, NULL);
 
 
 #ifndef LOGTOHD
@@ -1793,6 +1794,20 @@ else if(timer_id == glineQueueCheck)
 	processGlineQueue();
 	glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval,this,NULL);	
 	}
+else if (timer_id == timeCheck)
+	{
+	ccServer* TmpServer;
+	int counter = -1;
+	for (serversConstIterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
+		{
+		TmpServer = ptr->second;
+		if (TmpServer->getNetServer())
+			{
+			Write("%s TI :%s", getCharYYXXX().c_str(), TmpServer->getNetServer()->getCharYY().c_str());
+			}
+		}
+	timeCheck = MyUplink->RegisterTimer(::time(0) + 7200, this, NULL);
+	}
 else if (timer_id == rpingCheck)
 	{
 	timeval now = { 0, 0 } ;
@@ -1807,9 +1822,9 @@ else if (timer_id == rpingCheck)
 	stringstream s;
 	s << now.tv_usec ;
 
-	static int tID = 11;
+	static int tID = 19;
 	tID++;
-	if (tID == 12)
+	if (tID == 20)
 		tID = 0;
 
 	ccServer* TmpServer;
@@ -1834,15 +1849,14 @@ else if (timer_id == rpingCheck)
 					continue;
 					}
 				}
-			if ((counter % 12) != tID)
+			if ((counter % 20) != tID)
 				continue;
 			Write("%s RI %s %s %d %s :%d %s", getCharYY().c_str(), TmpServer->getNetServer()->getCharYY().c_str(), getCharYYXXX().c_str(), ::time(0), s.str().c_str(), ::time(0), s.str().c_str());
-			Write("%s TI :%s", getCharYYXXX().c_str(), TmpServer->getNetServer()->getCharYY().c_str());
 			TmpServer->setLastLagSent(::time(0));
 			}
 		//BG RI C] BGAAA 1246224483 960943 :1246224474
 		}
-	rpingCheck = MyUplink->RegisterTimer(::time(0) + 5, this, NULL);
+	rpingCheck = MyUplink->RegisterTimer(::time(0) + 3, this, NULL);
 	}
 }
 
