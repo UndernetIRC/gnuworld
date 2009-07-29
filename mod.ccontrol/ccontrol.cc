@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.236 2009/07/28 09:38:09 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.237 2009/07/29 02:05:04 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.236 2009/07/28 09:38:09 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.237 2009/07/29 02:05:04 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1001,6 +1001,7 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	ptr->second->setServer( MyUplink ) ;
 	}
 
+
 expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
 dbConnectionCheck = MyUplink->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
@@ -1826,8 +1827,12 @@ else if (timer_id == rpingCheck)
 	if (tID == 20)
 		tID = 0;
 
-	static iServer* myHub = Network->findServer(getUplink()->getUplinkCharYY());
-	ccServer* ccHub = getServer(myHub->getName());
+	//iServer* myHub = Network->findServer(getUplink()->getUplinkCharYY());
+	//ccServer* ccHub = getServer(myHub->getName());
+
+	if (ccHub)
+		if ((ccHub->getLastLagSent() > ccHub->getLastLagRecv()) && ((::time(0) - ccHub->getLastLagSent()) >= 2))
+			ccHub->setLagTime((::time(0) - ccHub->getLastLagSent()) * 1000);
 
 	ccServer* TmpServer;
 	int counter = -1;
@@ -1837,22 +1842,23 @@ else if (timer_id == rpingCheck)
 		if (TmpServer->getNetServer())
 			{
 			counter++;
-			if (TmpServer->getLastLagRecv() > 0)
+			if ((TmpServer->getLastLagRecv() > 0) && (TmpServer->getLastLagSent() > TmpServer->getLastLagRecv()))
 				{
-				if ((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) >= LAG_TOO_BIG)
+				if ((::time(0) - TmpServer->getLastLagSent()) >= 2)
+					TmpServer->setLagTime((::time(0) - TmpServer->getLastLagSent()) * 1000);
+				if ((::time(0) - TmpServer->getLastLagSent()) >= LAG_TOO_BIG)
 					{
-					TmpServer->setLagTime((TmpServer->getLastLagSent() - TmpServer->getLastLagRecv()) * 1000);
 					if ((::time(0) - TmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)
 						{
 						// If it's euworld's hub that is lagged, only report euworld's hub, not every servers.
-						if ((ccHub == NULL) || (ccHub->getLagTime() < 15000) || (TmpServer->getNetServer()->getIntYY() == myHub->getIntYY()))
+						if ((ccHub == NULL) || (ccHub->getLagTime() < 14000) || (TmpServer->getNetServer()->getIntYY() == myHub->getIntYY()))
 							{
 							TmpServer->setLastLagReport(::time(0));
 							MsgChanLag("[lag] %s is >%ds lagged", TmpServer->getName().c_str(), (int) (TmpServer->getLagTime() / 1000));
 							}
 						}
-					continue;
 					}
+				continue;
 				}
 			// Send RPING to euworld's hub each 30 seconds instead of each minute.
 			if (((counter % 20) != tID) && (TmpServer->getNetServer()->getIntYY() != myHub->getIntYY()))
@@ -1872,6 +1878,8 @@ void ccontrol::OnConnect()
 {
 iServer* tmpServer = Network->findServer(getUplink()->getUplinkCharYY());
 ccServer* tServer = getServer(tmpServer->getName());
+ccHub = tServer;
+myHub = tmpServer;
 if(tServer)
 	{
 	tServer->setNetServer(tmpServer);

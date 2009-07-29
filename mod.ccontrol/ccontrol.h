@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.h,v 1.116 2009/07/27 23:06:15 hidden1 Exp $
+ * $Id: ccontrol.h,v 1.117 2009/07/29 02:05:04 hidden1 Exp $
  */
 
 #ifndef __CCONTROL_H
-#define __CCONTROL_H "$Id: ccontrol.h,v 1.116 2009/07/27 23:06:15 hidden1 Exp $"
+#define __CCONTROL_H "$Id: ccontrol.h,v 1.117 2009/07/29 02:05:04 hidden1 Exp $"
 
 //Undef this if you want to log to the database
 #define LOGTOHD
@@ -219,6 +219,10 @@ protected:
 	typedef map<iServer*,int>	timediffServersMapType;
 	
 	timediffServersMapType timediffServersMap;
+
+	iServer* myHub;
+
+	ccServer* ccHub;
 	
 public:
 
