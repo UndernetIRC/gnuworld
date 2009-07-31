@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.237 2009/07/29 02:05:04 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.238 2009/07/31 07:44:03 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.237 2009/07/29 02:05:04 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.238 2009/07/31 07:44:03 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -109,6 +109,8 @@ elog << "Initializing ccontrol version "
      << MAJORVER << "." << MINORVER 
      << " please standby... " << endl;
 
+myHub = 0;
+ccHub = 0;
 // Read the config file
 EConfig conf( configFileName ) ;
 
@@ -1005,8 +1007,6 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,this,NULL);
 dbConnectionCheck = MyUplink->RegisterTimer(::time(0) + dbConnectionTimer,this,NULL);
 glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval, this,NULL);
-rpingCheck = MyUplink->RegisterTimer(::time(0) + 60, this, NULL);
-timeCheck = MyUplink->RegisterTimer(::time(0) + 300, this, NULL);
 
 
 #ifndef LOGTOHD
@@ -1810,6 +1810,11 @@ else if (timer_id == timeCheck)
 	}
 else if (timer_id == rpingCheck)
 	{
+	if (myHub == NULL)
+		{
+		return;
+		rpingCheck = MyUplink->RegisterTimer(::time(0) + 60, this, NULL);
+		}
 	timeval now = { 0, 0 } ;
 	if( ::gettimeofday( &now, 0 ) < 0 )
 		{
@@ -1876,10 +1881,15 @@ else if (timer_id == rpingCheck)
 
 void ccontrol::OnConnect()
 {
+rpingCheck = MyUplink->RegisterTimer(::time(0) + 60, this, NULL);
+timeCheck = MyUplink->RegisterTimer(::time(0) + 300, this, NULL);
+
 iServer* tmpServer = Network->findServer(getUplink()->getUplinkCharYY());
 ccServer* tServer = getServer(tmpServer->getName());
+
 ccHub = tServer;
 myHub = tmpServer;
+
 if(tServer)
 	{
 	tServer->setNetServer(tmpServer);
