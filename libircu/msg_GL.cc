@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_GL.cc,v 1.8 2005/03/25 03:07:29 dan_karrels Exp $
+ * $Id: msg_GL.cc,v 1.9 2009/08/01 08:32:21 mrbean_ Exp $
  */
 
 #include	<new>
@@ -33,7 +33,7 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-RCSTAG( "$Id: msg_GL.cc,v 1.8 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_GL.cc,v 1.9 2009/08/01 08:32:21 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -90,8 +90,9 @@ if( Params.size() < 5 )
 Gline* newGline = new (std::nothrow) Gline(
 		Params[ 0 ],
 		Params[ 2 ] + 1,
-		Params[ 4 ],
-		atoi( Params[ 3 ] ) ) ;
+		Params[ 6 ],
+		atoi( Params[ 3 ] ),
+		atoi( Params[ 4 ] )) ;
 assert( newGline != 0 ) ;
 
 // Temporary variable
