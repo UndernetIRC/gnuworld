@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccServer.cc,v 1.17 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: ccServer.cc,v 1.18 2009/08/06 02:59:24 hidden1 Exp $
  */
  
 #include	<sstream>
@@ -35,7 +35,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccServer.cc,v 1.17 2009/07/25 18:12:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccServer.cc,v 1.18 2009/08/06 02:59:24 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -141,7 +141,7 @@ theQuery	<< Main
 		<< LastSplitted
 		<< ", SplitReason = '"
 		<< ccontrol::removeSqlChars(SplitReason) 
-		<< "', Version = ' "
+		<< "', Version = '"
 		<< ccontrol::removeSqlChars(Version)
 		<< "', AddedOn = " 
 		<< AddedOn

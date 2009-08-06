@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.238 2009/07/31 07:44:03 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.239 2009/08/06 02:59:24 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.238 2009/07/31 07:44:03 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.239 2009/08/06 02:59:24 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1235,6 +1235,7 @@ if(st.size() < 2)
 			elog	<< "ccontrol(rpingCheck)> gettimeofday() failed: "
 				<< strerror( errno )
 				<< endl ;
+	        xClient::OnServerMessage(Server,Message);
 			return;
 			}
 
@@ -1265,6 +1266,7 @@ if(st.size() < 2)
 			elog	<< "ccontrol(rpingCheck)> gettimeofday() failed: "
 				<< strerror( errno )
 				<< endl ;
+	        xClient::OnServerMessage(Server,Message);
 			return;
 			}
 
@@ -1297,7 +1299,7 @@ if(!strcasecmp(st[1],"351"))
 			<< Message
 			<< endl;
 
-	        xClient::OnServerMessage(Server,Message);
+		xClient::OnServerMessage(Server,Message);
 		return ;
 		}
 	ccServer* tmpServer = serversMap[Server->getName()];
@@ -1812,8 +1814,8 @@ else if (timer_id == rpingCheck)
 	{
 	if (myHub == NULL)
 		{
-		return;
 		rpingCheck = MyUplink->RegisterTimer(::time(0) + 60, this, NULL);
+		return;
 		}
 	timeval now = { 0, 0 } ;
 	if( ::gettimeofday( &now, 0 ) < 0 )
