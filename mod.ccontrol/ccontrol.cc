@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.239 2009/08/06 02:59:24 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.240 2009/08/13 20:32:25 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.239 2009/08/06 02:59:24 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.240 2009/08/13 20:32:25 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -3317,7 +3317,8 @@ if(tCommand != command_end())
 	{
 	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
 		{
-		log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
+		if (st.size() > 1)
+			log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
 		}
 	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
 		{
@@ -3430,7 +3431,8 @@ if(tCommand != command_end())
 	{
 	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
 		{
-		log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
+		if (st.size() > 1)
+			log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
 		}
 	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
 		{
@@ -3530,10 +3532,13 @@ if(tCommand != command_end())
 	{
 	if(!strcasecmp(tCommand->second->getRealName(),"LOGIN"))
 		{
-		if (theClient != NULL)
-			log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
-		else
-			log.assign(string("LOGIN ") + st[1] + string(" *****"));
+		if (st.size() > 1)
+			{
+			if (theClient != NULL)
+				log.assign(string("LOGIN ") + st[1] + string(" *****") + string(" (") + targetServer->getName() + string(")"));
+			else
+				log.assign(string("LOGIN ") + st[1] + string(" *****"));
+			}
 		}
 	else if(!strcasecmp(tCommand->second->getRealName(),"NEWPASS"))
 		{
