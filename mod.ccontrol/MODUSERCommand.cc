@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODUSERCommand.cc,v 1.27 2009/07/25 18:12:34 hidden1 Exp $
+ * $Id: MODUSERCommand.cc,v 1.28 2009/08/28 18:14:44 hidden1 Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MODUSERCommand.cc,v 1.27 2009/07/25 18:12:34 hidden1 Exp $" ) ;
+RCSTAG( "$Id: MODUSERCommand.cc,v 1.28 2009/08/28 18:14:44 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -216,7 +216,8 @@ while(pos < st.size())
 			}
 		if(!strcasecmp(st[pos+1],"on"))
 			{
-			if(OpFlag < operLevel::ADMINLEVEL)
+			// Only a smt+ can set getlogs to on for an oper
+			if ((OpFlag < operLevel::ADMINLEVEL) && (AdFlag < operLevel::SMTLEVEL))
 				{
 				bot->Notice(theClient,"-gl can only be set for ADMINS+");
 				return false;
