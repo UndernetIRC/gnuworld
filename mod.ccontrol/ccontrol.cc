@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.240 2009/08/13 20:32:25 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.241 2009/09/22 09:46:36 danielaustin Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.240 2009/08/13 20:32:25 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.241 2009/09/22 09:46:36 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1846,7 +1846,8 @@ else if (timer_id == rpingCheck)
 	for (serversConstIterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
 		{
 		TmpServer = ptr->second;
-		if (TmpServer->getNetServer())
+		/* don't bother reporting on juped servers - they dont exist */
+		if (TmpServer && (TmpServer->getNetServer()) && (!TmpServer->getNetServer()->isJupe()))
 			{
 			counter++;
 			if ((TmpServer->getLastLagRecv() > 0) && (TmpServer->getLastLagSent() > TmpServer->getLastLagRecv()))

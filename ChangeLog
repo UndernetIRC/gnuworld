@@ -1,4 +1,8 @@
-// $Id: ChangeLog,v 1.170 2009/09/22 09:45:28 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.171 2009/09/22 09:46:36 danielaustin Exp $ //
+
+2009-09-22	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: add some extra checks to lag detection
+			code.  Don't check lag for JUPEd servers either.
 
 2009-07-25	Hidden
  Modified Files:
