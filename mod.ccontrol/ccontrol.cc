@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.241 2009/09/22 09:46:36 danielaustin Exp $
+ * $Id: ccontrol.cc,v 1.242 2009/12/24 20:19:14 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.241 2009/09/22 09:46:36 danielaustin Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.242 2009/12/24 20:19:14 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1281,7 +1281,7 @@ if(st.size() < 2)
 			return;
 			}
 		int lagTime = tmpServer->getLagTime();
-		int timeDiff = abs(::time(0) - atoi(st[3]));
+		int timeDiff = abs(::time(0) - (atoi(st[3]) - atoi(st[4])));
 		if ((timeDiff >= MAX_TIME_DIFF) && (lagTime < 5000) && ((::time(0) - timediffServersMap[Server]) > TIMEDIFF_REPORT_INTERVAL))
 			{
 			MsgChanLog("Time diff for %s: %ds", tmpServer->getName().c_str(), timeDiff);
