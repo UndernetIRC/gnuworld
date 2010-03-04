@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CANFIXCommand.cc,v 1.1 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: CANFIXCommand.cc,v 1.2 2010/03/04 04:24:11 hidden1 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
 
-RCSTAG("$Id: CANFIXCommand.cc,v 1.1 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: CANFIXCommand.cc,v 1.2 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {
@@ -58,11 +58,11 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
   curOp = *opPtr;
   opCount++;
 
-  if (curOp->getPoints() > maxScore)
-    maxScore = curOp->getPoints();
+  if ((curOp->getPoints() + curOp->getBonus()) > maxScore)
+    maxScore = curOp->getPoints() + curOp->getBonus();
 
   if (!strcasecmp(curOp->getAccount(), theClient->getAccount())) {
-    maxFix = curOp->getPoints();
+    maxFix = curOp->getPoints() + curOp->getBonus();
     if (maxFix < minFix)
       highscore = false;
     else
@@ -134,7 +134,7 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
   firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
   lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
 
-  pScore = curOp->getPoints();
+  pScore = curOp->getPoints() + curOp->getBonus();
   percent = static_cast<int>((static_cast<float>(pScore) / static_cast<float>(maxScore)) * 100);
   /* Config value is within X percent, so we need to minus it from 100 to make sure
      its within the X percent specified in the config */
@@ -150,9 +150,10 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
   wScore = 0;
 }
 
-bot->logAdminMessage("%s (%s) CANFIX %s %s",
+bot->logAdminMessage("%s (%s) CANFIX %s",
 		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str());
+		     theClient->getRealNickUserHost().c_str(),
+		     st[1].c_str());
 
 return;
 }

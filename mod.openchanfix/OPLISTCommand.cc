@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: OPLISTCommand.cc,v 1.7 2008/01/16 02:03:39 buzlip01 Exp $
+ * $Id: OPLISTCommand.cc,v 1.8 2010/03/04 04:24:11 hidden1 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
 
-RCSTAG("$Id: OPLISTCommand.cc,v 1.7 2008/01/16 02:03:39 buzlip01 Exp $");
+RCSTAG("$Id: OPLISTCommand.cc,v 1.8 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {
@@ -164,6 +164,13 @@ std::string firstop;
 std::string lastop;
 std::string nickName;
 std::stringstream dayString;
+time_t oldestTS = bot->currentTime();
+for (chanfix::chanOpsType::iterator chOp = myOps.begin();
+     chOp != myOps.end(); chOp++) {
+     curOp = *chOp;
+    if (curOp->getTimeFirstOpped() < oldestTS)
+      oldestTS = curOp->getTimeFirstOpped();
+}
 for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
      opPtr != myOps.end() && (all || opCount < OPCOUNT); opPtr++) {
   curOp = *opPtr;
@@ -208,7 +215,8 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
   }
 
   bot->SendTo(theClient, "%3d. %4d  %s -- %s / %s%s%s%s%s%s",
-	      opCount, curOp->getPoints(),
+	      opCount, 
+          (curOp->getPoints() + curOp->getBonus()),
 	      curOp->getAccount().c_str(), firstop.c_str(),
 	      lastop.c_str(), inChan ? " / " : "",
 	      inChan ? nickName.c_str() : "",

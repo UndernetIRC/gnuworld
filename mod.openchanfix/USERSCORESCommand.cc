@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: USERSCORESCommand.cc,v 1.2 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: USERSCORESCommand.cc,v 1.3 2010/03/04 04:24:11 hidden1 Exp $
  */
 
 #include <sstream>
@@ -35,7 +35,7 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: USERSCORESCommand.cc,v 1.2 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: USERSCORESCommand.cc,v 1.3 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {
@@ -69,7 +69,7 @@ for (chanfix::sqlChanOpsType::iterator ptr = bot->sqlChanOps.begin();
     firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
     lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
     bot->SendTo(theClient, "%s %d -- %s / %s", ptr->first.c_str(),
-		curOp->getPoints(), firstop.c_str(), lastop.c_str());
+		(curOp->getPoints() + curOp->getBonus()), firstop.c_str(), lastop.c_str());
   }
 }
 

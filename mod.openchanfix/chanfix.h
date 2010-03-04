@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.h,v 1.9 2008/01/16 02:03:39 buzlip01 Exp $
+ * $Id: chanfix.h,v 1.10 2010/03/04 04:24:12 hidden1 Exp $
  */
 
 #ifndef __CHANFIX_H
-#define __CHANFIX_H "$Id: chanfix.h,v 1.9 2008/01/16 02:03:39 buzlip01 Exp $"
+#define __CHANFIX_H "$Id: chanfix.h,v 1.10 2010/03/04 04:24:12 hidden1 Exp $"
 
 #include	<string>
 #include	<vector>
@@ -280,6 +280,9 @@ public:
 
 	void prepareUpdate(bool);
 	void updateDB();
+#ifdef ENABLE_NEWSCORES
+	int getNewScore(sqlChanOp*, time_t);
+#endif
 
 	bool isBeingFixed(Channel*);
 	bool isBeingAutoFixed(Channel*);
@@ -355,6 +358,7 @@ public:
 	typedef std::list <sqlChanOp*> chanOpsType;
 	chanOpsType		getMyOps(Channel*);
 	chanOpsType		getMyOps(const std::string&);
+	chanOpsType     getMyOps(const std::string&, bool);
 	
 	typedef std::map <std::string, time_t, noCaseCompare> tempBlockType;
 	tempBlockType		tempBlockList;

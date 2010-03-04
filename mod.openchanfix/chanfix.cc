@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: chanfix.cc,v 1.15 2009/01/15 08:31:07 denspike Exp $
+ * $Id: chanfix.cc,v 1.16 2010/03/04 04:24:11 hidden1 Exp $
  */
 
 #include	<csignal>
@@ -62,7 +62,7 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.15 2009/01/15 08:31:07 denspike Exp $");
+RCSTAG("$Id: chanfix.cc,v 1.16 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {
@@ -117,6 +117,7 @@ adminLog.open(adminLogFile.c_str(), std::ios::out | std::ios::app);
 debugLog.open(debugLogFile.c_str(), std::ios::out | std::ios::app);
 
 /* Register the commands we want to use */
+#ifdef USERADMON
 RegisterCommand(new ADDFLAGCommand(this, "ADDFLAG",
 	"<username> <flag>",
 	3,
@@ -127,16 +128,19 @@ RegisterCommand(new ADDHOSTCommand(this, "ADDHOST",
 	3,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
+#endif
 RegisterCommand(new ADDNOTECommand(this, "ADDNOTE",
 	"<#channel> <reason>",
 	3,
 	sqlcfUser::F_COMMENT
 	));
+#ifdef USERADMIN
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER",
 	"<username> [host]",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
+#endif
 RegisterCommand(new ALERTCommand(this, "ALERT",
 	"<#channel> <reason>",
 	3,
@@ -169,6 +173,7 @@ RegisterCommand(new DEBUGCommand(this, "DEBUG",
 	sqlcfUser::F_OWNER
 	));
 #endif /* CHANFIX_DEBUG */
+#ifdef USERADMIN
 RegisterCommand(new DELFLAGCommand(this, "DELFLAG",
 	"<username> <flag>",
 	3,
@@ -179,16 +184,19 @@ RegisterCommand(new DELHOSTCommand(this, "DELHOST",
 	3,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
+#endif
 RegisterCommand(new DELNOTECommand(this, "DELNOTE",
 	"<#channel> <note_id>",
 	3,
 	sqlcfUser::F_COMMENT
 	));
+#ifdef USERADMIN
 RegisterCommand(new DELUSERCommand(this, "DELUSER",
 	"<username>",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
+#endif
 RegisterCommand(new HELPCommand(this, "HELP",
 	"[command]",
 	1,
@@ -204,11 +212,13 @@ RegisterCommand(new INFOCommand(this, "INFO",
 	2,
 	0
 	));
+#ifdef USERADMIN
 RegisterCommand(new INVITECommand(this, "INVITE",
 	"",
 	1,
 	sqlcfUser::F_OWNER
 	));
+#endif
 RegisterCommand(new LASTCOMCommand(this, "LASTCOM",
 	"[amount of commands] [days from]",
 	1,
@@ -219,11 +229,13 @@ RegisterCommand(new LISTBLOCKEDCommand(this, "LISTBLOCKED",
 	1,
 	sqlcfUser::F_BLOCK
 	));
+#ifdef USERADMIN
 RegisterCommand(new LISTHOSTSCommand(this, "LISTHOSTS",
 	"[username]",
 	1,
 	sqlcfUser::F_LOGGEDIN
 	));
+#endif
 RegisterCommand(new OPLISTCommand(this, "OPLIST",
 	"<#channel> [-all] [-days]",
 	2,
@@ -241,16 +253,20 @@ RegisterCommand(new QUOTECommand(this, "QUOTE",
 	sqlcfUser::F_OWNER
 	));
 #endif /* ENABLE_QUOTE */
+#ifdef USERADMIN
 RegisterCommand(new REHASHCommand(this, "REHASH",
 	"",
 	1,
 	sqlcfUser::F_OWNER
 	));
+#endif
+#ifdef USERADMIN
 RegisterCommand(new RELOADCommand(this, "RELOAD",
 	"[reason]",
 	1,
 	sqlcfUser::F_OWNER
 	));
+#endif
 RegisterCommand(new REQUESTOPCommand(this, "REQUESTOP",
 	isAllowingTopOpAlert() ? "<#channel> [contact]" : "<#channel>",
 	2,
@@ -266,41 +282,51 @@ RegisterCommand(new SCORECommand(this, "CSCORE",
 	2,
 	0
 	));
+#ifdef USERADMIN
 RegisterCommand(new SAYCommand(this, "SAY",
 	"<#channel> <text>",
 	3,
 	sqlcfUser::F_OWNER
 	));
+#endif
+#ifdef USERADMIN
 RegisterCommand(new SETCommand(this, "SET",
 	"<option> <value>",
 	3,
 	sqlcfUser::F_OWNER
 	));
+#endif
+#ifdef USERADMIN
 RegisterCommand(new SETGROUPCommand(this, "SETGROUP",
 	"<username> <group>",
 	3,
 	sqlcfUser::F_USERMANAGER
 	));
+#endif
 RegisterCommand(new SIMULATECommand(this, "SIMULATE",
 	"<#channel> <auto/manual>",
 	3,
 	sqlcfUser::F_CHANFIX
 	));
+#ifdef USERADMIN
 RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN",
 	"[reason]",
 	1,
 	sqlcfUser::F_OWNER
 	));
+#endif
 RegisterCommand(new STATUSCommand(this, "STATUS",
 	"",
 	1,
 	0
 	));
+#ifdef USERADMIN
 RegisterCommand(new SUSPENDCommand(this, "SUSPEND",
 	"<username>",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
+#endif
 RegisterCommand(new UNALERTCommand(this, "UNALERT",
 	"<#channel>",
 	2,
@@ -311,11 +337,13 @@ RegisterCommand(new UNBLOCKCommand(this, "UNBLOCK",
 	2,
 	sqlcfUser::F_BLOCK
 	));
+#ifdef USERADMIN
 RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND",
 	"<username>",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
+#endif
 RegisterCommand(new USERSCORESCommand(this, "USERSCORES",
 	"<account>",
 	2,
@@ -331,11 +359,13 @@ RegisterCommand(new WHOFLAGCommand(this, "WHOFLAG",
 	2,
 	sqlcfUser::F_LOGGEDIN
 	));
+#ifdef USERADMIN
 RegisterCommand(new WHOGROUPCommand(this, "WHOGROUP",
 	"[group]",
 	1,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
+#endif
 RegisterCommand(new WHOISCommand(this, "WHOIS",
 	"<username|=nick|*> [-modif]",
 	2,
@@ -689,7 +719,7 @@ if (st.size() < commHandler->second->getNumParams()) {
 
 /* If you change this code, remember to change it in HELPCommand.cc */
 sqlcfUser::flagType requiredFlags = commHandler->second->getRequiredFlags();
-if (requiredFlags) {
+if (requiredFlags && 0 /* Disable all flag checks Isomer 2010-03-01 */) {
   if (!theUser) {
     SendTo(theClient,
            getResponse(theUser,
@@ -756,7 +786,7 @@ if (Command == "DCC") {
 } else if (Command == "PING" || Command == "ECHO") {
   DoCTCP(theClient, CTCP, Message);
 } else if (Command == "VERSION") {
-  DoCTCP(theClient, CTCP, "evilnet development - GNUWorld " VERSION " [compiled "__DATE__" "__TIME__"]");
+  DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.0 [compiled "__DATE__" "__TIME__"]");
 } else if (Command == "WHODUNIT?") {
   DoCTCP(theClient, CTCP, "reed, ULtimaTe_, Compy, SiRVulcaN");
 } else if (Command == "SUBVERSION") {
@@ -1283,7 +1313,8 @@ if (localDBHandle->Tuples() && atoi(localDBHandle->GetValue(0, 0))) {
 
 /* Retrieve the list of chanops */
 std::stringstream theQuery;
-theQuery	<< "SELECT channel,account,last_seen_as,ts_firstopped,ts_lastopped,day0,day1,day2,day3,day4,day5,day6,day7,day8,day9,day10,day11,day12,day13 FROM chanOps"
+std::string lastChan = "";
+theQuery	<< "SELECT channel,account,last_seen_as,ts_firstopped,ts_lastopped,day0,day1,day2,day3,day4,day5,day6,day7,day8,day9,day10,day11,day12,day13 FROM chanOps ORDER BY channel ASC, ts_firstopped ASC"
 		;
 
 elog		<< "*** [chanfix::precacheChanOps]: Loading chanOps and their points ..." 
@@ -1295,6 +1326,10 @@ if (localDBHandle->Exec(theQuery.str(),true)) {
      assert( newOp != 0 ) ;
 
      newOp->setAllMembers(localDBHandle, i);
+     if (newOp->getChannel().c_str() != lastChan.c_str()) {
+        lastChan = newOp->getChannel();
+        newOp->setIsOldestOp(true);
+     }
      sqlChanOpsType::iterator ptr = sqlChanOps.find(newOp->getChannel());
      if (ptr != sqlChanOps.end()) {
        ptr->second.insert(sqlChanOpsType::mapped_type::value_type(newOp->getAccount(),newOp));
@@ -1548,29 +1583,59 @@ sqlChanOp* chanfix::newChanOp(Channel* theChan, iClient* theClient)
 return newChanOp(theChan->getName(), theClient->getAccount());
 }
 
-chanfix::chanOpsType chanfix::getMyOps(const std::string &channel)
+chanfix::chanOpsType chanfix::getMyOps(const std::string &channel, bool newScore)
 {
 chanOpsType myOps;
+time_t oldestTS = currentTime();
 
 sqlChanOpsType::iterator ptr = sqlChanOps.find(channel);
+
 if (ptr != sqlChanOps.end()) {
+
+#ifdef ENABLE_NEWSCORES
+  for (sqlChanOpsType::mapped_type::iterator chOp = ptr->second.begin();
+       chOp != ptr->second.end(); chOp++) {
+            if (chOp->second->getTimeFirstOpped() < oldestTS)
+               oldestTS = chOp->second->getTimeFirstOpped();
+  }
+#endif
+     
   for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
        chanOp != ptr->second.end(); chanOp++) {
     /* elog	<< "chanfix::findChanOp> DEBUG: We've got a winner: "
      *	<< chanOp->second->getAccount() << " on " << chanOp->second->getChannel() << "!!" << std::endl;
      */
+#ifdef ENABLE_NEWSCORES
+    if (chanOp->second->getTimeFirstOpped() == oldestTS) {
+       chanOp->second->setIsOldestOp(true);
+    } else {
+       chanOp->second->setIsOldestOp(false);
+    }
+    chanOp->second->setBonus(getNewScore(chanOp->second,oldestTS));
+#endif
+    
     myOps.push_back(chanOp->second);
   }
 }
-
+#ifdef ENABLE_NEWSCORES
+if (newScore)
+  myOps.sort(compare_points_new);
+else
+  myOps.sort(compare_points);
+#else
 myOps.sort(compare_points);
+#endif
 
 return myOps;
 }
 
 chanfix::chanOpsType chanfix::getMyOps(Channel* theChan)
 {
-return getMyOps(theChan->getName());
+return getMyOps(theChan->getName(), true);
+}
+
+chanfix::chanOpsType chanfix::getMyOps(const std::string &channel) {
+    return getMyOps(channel, true);
 }
 
 size_t chanfix::countMyOps(const std::string& channel)
@@ -1891,7 +1956,7 @@ for (xNetwork::channelIterator ptr = Network->channels_begin(); ptr != Network->
        if (!sqlChan) sqlChan = newChannelRecord(thisChan);
 
        if (myOps.begin() != myOps.end())
-	 sqlChan->setMaxScore((*myOps.begin())->getPoints());
+	 sqlChan->setMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
        if ((sqlChan->getMaxScore() > 
 	   static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END)
@@ -2009,7 +2074,7 @@ if (!netChan) return true;
 chanOpsType myOps = getMyOps(netChan);
 
 if (myOps.begin() != myOps.end())
-  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
 int maxScore = sqlChan->getTMaxScore();
 if (maxScore <= FIX_MIN_ABS_SCORE_END * MAX_SCORE)
@@ -2047,7 +2112,7 @@ if (min_score_rel > min_score)
   min_score = min_score_rel;
 
 if (myOps.begin() != myOps.end())
-  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
 if (sqlChan->getTMaxScore() < min_score)
   min_score = sqlChan->getTMaxScore();
@@ -2063,7 +2128,7 @@ bool cntMaxedOut = false;
 for (chanOpsType::iterator opPtr = myOps.begin(); opPtr != myOps.end();
      opPtr++) {
   curOp = *opPtr;
-  if (curOp->getPoints() >= min_score) {
+  if ((curOp->getPoints() + curOp->getBonus()) >= min_score) {
     acctToOp = findAccount(netChan, curOp->getAccount());
     std::vector< iClient* >::const_iterator acctPtr = acctToOp.begin(),
 	end = acctToOp.end();
@@ -2091,6 +2156,25 @@ for (chanOpsType::iterator opPtr = myOps.begin(); opPtr != myOps.end();
       break;
   }
 }
+
+std::stringstream chanStatus;
+std::stringstream chanModes;
+
+if (netChan->getMode(Channel::MODE_I)) chanModes << "i";
+if (netChan->getMode(Channel::MODE_K)) chanModes << "k";
+if (netChan->getMode(Channel::MODE_L)) chanModes << "l";
+if (netChan->getMode(Channel::MODE_R)) chanModes << "r";
+if (netChan->getMode(Channel::MODE_D)) chanModes << "d";
+
+
+chanStatus      << "* Channel Status for "
+		<< netChan->getName() << ": "
+		<< netChan->banList_size()
+                << " bans -- Restrictive Modes: +"
+		<< chanModes
+                ;
+
+SendTo(theClient, chanStatus.str().c_str());
 
 if ((!numClientsToOp || maxScore < min_score) &&
     (!autofix || !(numClientsToOp + currentOps))) {
@@ -2205,7 +2289,7 @@ if (!netChan) return joinchan;
 chanOpsType myOps = getMyOps(netChan);
 
 if (myOps.begin() != myOps.end())
-  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
 maxScore = sqlChan->getTMaxScore();
 
@@ -2246,7 +2330,7 @@ if (min_score_rel > min_score)
   min_score = min_score_rel;
 
 if (myOps.begin() != myOps.end())
-  sqlChan->setTMaxScore((*myOps.begin())->getPoints());
+  sqlChan->setTMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
 if (sqlChan->getTMaxScore() < min_score)
   min_score = sqlChan->getTMaxScore();
@@ -2259,7 +2343,7 @@ bool cntMaxedOut = false;
 for (chanOpsType::iterator opPtr = myOps.begin(); opPtr != myOps.end();
      opPtr++) {
   curOp = *opPtr;
-  if (curOp->getPoints() >= min_score) {
+  if ((curOp->getPoints() + curOp->getBonus()) >= min_score) {
     acctToOp = findAccount(netChan, curOp->getAccount());
     std::vector< iClient* >::const_iterator acctPtr = acctToOp.begin(),
 	end = acctToOp.end();
@@ -2296,7 +2380,7 @@ if (!netChan) return true;
 chanOpsType myOps = getMyOps(netChan);
 
 if (myOps.begin() != myOps.end())
-  sqlChan->setMaxScore((*myOps.begin())->getPoints());
+  sqlChan->setMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
 int maxScore = sqlChan->getMaxScore();
 
@@ -2362,7 +2446,7 @@ if (min_score_rel > min_score)
  * to wait forever for the first op! */
 
 if (myOps.begin() != myOps.end())
-  sqlChan->setMaxScore((*myOps.begin())->getPoints());
+  sqlChan->setMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
 if (sqlChan->getMaxScore() < min_score)
   min_score = sqlChan->getMaxScore();
@@ -2388,7 +2472,7 @@ for (chanOpsType::iterator opPtr = myOps.begin(); opPtr != myOps.end();
   curOp = *opPtr;
 // elog	<< "chanfix::fixChan> DEBUG: "
 //	<< curOp->getPoints() << " >= " << min_score << std::endl;
-  if (curOp->getPoints() >= min_score) {
+  if ((curOp->getPoints() + curOp->getBonus()) >= min_score) {
     acctToOp = findAccount(netChan, curOp->getAccount());
     std::vector< iClient* >::const_iterator acctPtr = acctToOp.begin(),
 	end = acctToOp.end();
@@ -2398,7 +2482,7 @@ for (chanOpsType::iterator opPtr = myOps.begin(); opPtr != myOps.end();
 	elog	<< "chanfix::fixChan> DEBUG: Decided to op: "
 		<< curClient->getNickName() << " on "
 		<< netChan->getName() << ". Client has "
-		<< curOp->getPoints() << " points. ABS_MIN = "
+		<< (curOp->getPoints() + curOp->getBonus()) << " points. ABS_MIN = "
 		<< min_score_abs << " and REL_MIN = " << min_score_rel
 		<< std::endl;
 	modes += "o";
@@ -3409,18 +3493,18 @@ return std::string( "Unable to retrieve response. Please contact a chanfix "
 void chanfix::loadTranslationTable()
 {
 /* Get a connection instance to our backend */
-dbHandle* cacheCon = localDBHandle;
+/* dbHandle* cacheCon = theManager->getConnection(); */
 
 /* Grab the languages table */
 std::stringstream langQuery;
 langQuery	<< "SELECT id,code,name FROM languages"
 		;
 
-if (cacheCon->Exec(langQuery.str(),true))
-  for (unsigned int i = 0; i < cacheCon->Tuples(); i++)
-    languageTable.insert(languageTableType::value_type(cacheCon->GetValue(i, 1),
-			 std::make_pair(atoi(cacheCon->GetValue(i, 0)),
-					cacheCon->GetValue(i, 2))));
+if (localDBHandle->Exec(langQuery.str(),true))
+  for (unsigned int i = 0; i < localDBHandle->Tuples(); i++)
+    languageTable.insert(languageTableType::value_type(localDBHandle->GetValue(i, 1),
+			 std::make_pair(atoi(localDBHandle->GetValue(i, 0)),
+					localDBHandle->GetValue(i, 2))));
 
 elog	<< "*** [chanfix::loadTranslationTable]: Loaded "
 	<< languageTable.size()
@@ -3432,20 +3516,20 @@ std::stringstream transQuery;
 transQuery	<< "SELECT language_id,response_id,text FROM translations"
 		;
 
-if (cacheCon->Exec(transQuery.str(),true)) {
-  for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
+if (localDBHandle->Exec(transQuery.str(),true)) {
+  for (unsigned int i = 0 ; i < localDBHandle->Tuples(); i++) {
     /*
      *  Add to our translations table.
      */
 
-    int lang_id = atoi(cacheCon->GetValue( i, 0 ));
-    int resp_id = atoi(cacheCon->GetValue( i, 1 ));
+    int lang_id = atoi(localDBHandle->GetValue( i, 0 ));
+    int resp_id = atoi(localDBHandle->GetValue( i, 1 ));
 
     std::pair<int, int> thePair( lang_id, resp_id ) ;
 
     translationTable.insert(
 			translationTableType::value_type(
-			thePair, cacheCon->GetValue( i, 2 )) );
+			thePair, localDBHandle->GetValue( i, 2 )) );
   }
 }
 
@@ -3455,7 +3539,7 @@ elog	<< "*** [chanfix::loadTranslationTable]: Loaded "
 	<< std::endl;
 
 /* Dispose of our connection instance */
-theManager->removeConnection(cacheCon);
+/* theManager->removeConnection(cacheCon); */
 
 return;
 }
@@ -3542,6 +3626,37 @@ bot->SendTo(theClient,
             bot->getResponse(theUser,
                              language::syntax,
                              std::string("SYNTAX: ")).c_str() + getInfo() );
+}
+
+/* THIS IS FOR CALCULATING NEW SCORES */
+int chanfix::getNewScore( sqlChanOp* chOp, time_t oldestTS )
+{
+    int daysSinceFirstOpOnChan = (currentTime() - oldestTS) / 86400;
+    int daysSinceFirstOp = (currentTime() - chOp->getTimeFirstOpped()) / 86400;
+    
+    int x = 0;
+    
+    if (daysSinceFirstOpOnChan < 30)
+       x = 100;
+    else
+       x = 3000 / daysSinceFirstOpOnChan;
+    
+    /* GET NEW SCORE */
+    int newScore = (x * daysSinceFirstOp);
+    
+    elog	<< "chanfix::getNewScore> daysSinceFirstOpOnChan: "
+    << daysSinceFirstOpOnChan <<
+    " daysSinceFirstOp: "
+    << daysSinceFirstOp
+    << " x = "
+    << x
+    << " newScore = (x * daysSinceFirstOp) = "
+    << newScore
+    << " oldestTS = "
+    << oldestTS
+	<< std::endl;
+    
+    return newScore;
 }
 
 } // namespace cf

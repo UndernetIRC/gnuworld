@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChanOp.h,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $
+ * $Id: sqlChanOp.h,v 1.6 2010/03/04 04:24:12 hidden1 Exp $
  */
 
 #ifndef __SQLCHANOP_H
-#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.5 2007/08/28 16:10:25 dan_karrels Exp $"
+#define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.6 2010/03/04 04:24:12 hidden1 Exp $"
 
 #include	<string>
 #include	"dbHandle.h"
@@ -53,7 +53,11 @@ public:
 		{ return account ; }
 
 	inline const int&	getPoints() const
-		{ return points ; }		
+		{ return points ; }	
+#ifdef ENABLE_NEWSCORES
+    inline const int&   getBonus() const
+        { return bonus; }
+#endif	
 
 	inline const std::string&	getLastSeenAs() const
 		{ return nickUserHost ; }
@@ -66,6 +70,9 @@ public:
 
 	inline const short&	getDay(int _dayval) const
 		{ return day[_dayval] ; }
+		
+	inline const bool isOldestOp() const
+        { return OldestOp; }
 
 	/*
 	 *  Methods to set data attributes.
@@ -76,6 +83,11 @@ public:
 
 	inline void	setAccount(std::string _account)
 		{ account = _account ; }
+		
+#ifdef ENABLE_NEWSCORES
+    inline void setBonus(int _bonus)
+        { bonus = _bonus; }
+#endif
 
 	inline void	setPoints(short _points)
 		{ day[currentDay] = _points; calcTotalPoints(); }
@@ -94,6 +106,9 @@ public:
 
 	inline void	setDay(int _dayval, short _pointsval)
 		{ day[_dayval] = _pointsval ; }
+		
+	inline void setIsOldestOp( bool _oldestOp )
+	    { OldestOp = _oldestOp; }
 
 	void setAllMembers(dbHandle*, int);
 	void calcTotalPoints();
@@ -104,9 +119,13 @@ private:
 	std::string	account;
 	std::string	nickUserHost;
 	int		points;
+#ifdef ENABLE_NEWSCORES
+	int     bonus;
+#endif
 	time_t		ts_firstopped;
 	time_t		ts_lastopped;
 	short		day[DAYSAMPLES];
+	bool   OldestOp;
 
 	sqlManager*	myManager;
 }; // class

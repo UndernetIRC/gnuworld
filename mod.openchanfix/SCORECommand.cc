@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCORECommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $
+ * $Id: SCORECommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $
  */
 
 #include <sstream>
@@ -37,7 +37,7 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: SCORECommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $");
+RCSTAG("$Id: SCORECommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {
@@ -120,7 +120,7 @@ if (st.size() > 2) {
 	    bot->SendTo(theClient, "~U %s %s %u",
 			st[1].c_str(),
 			curOp->getAccount().c_str(),
-			curOp->getPoints());
+			(curOp->getPoints() + curOp->getBonus()));
 	  } else {
 	    bot->SendTo(theClient,
 			bot->getResponse(theUser,
@@ -129,7 +129,7 @@ if (st.size() > 2) {
 					curClient->getNickName().c_str(),
 					curOp->getAccount().c_str(),
 					st[1].c_str(),
-					curOp->getPoints(),
+					(curOp->getPoints() + curOp->getBonus()),
 					ranking,
 					numMyOps);
 	  }
@@ -171,7 +171,7 @@ if (st.size() > 2) {
 			std::string("Score for account %s in channel %s: %u. (Ranked #%u of %d)")).c_str(),
 				curOp->getAccount().c_str(),
 				st[1].c_str(),
-				curOp->getPoints(),
+				(curOp->getPoints() + curOp->getBonus()),
 				ranking,
 				numMyOps);
 	
@@ -222,7 +222,7 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
       else
 	strScoresDB << ", ";
     }
-    strScoresDB << curOp->getPoints();
+    strScoresDB << (curOp->getPoints() + curOp->getBonus());
   }
   
   if (!netChan)
@@ -242,7 +242,7 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
 	else
 	  strScoresOP << ", ";
       }
-      strScoresOP << curOp->getPoints();
+      strScoresOP << (curOp->getPoints() + curOp->getBonus());
     }
   } else {
     if (!curClient)
@@ -254,7 +254,7 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
 	else
 	  strScoresNOP << ", ";
       }
-      strScoresNOP << curOp->getPoints();
+      strScoresNOP << (curOp->getPoints() + curOp->getBonus());
     }
   }
   acctToShow.clear();

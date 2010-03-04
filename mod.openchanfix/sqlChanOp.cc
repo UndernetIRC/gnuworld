@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: sqlChanOp.cc,v 1.5 2007/08/28 16:10:22 dan_karrels Exp $
+ * $Id: sqlChanOp.cc,v 1.6 2010/03/04 04:24:12 hidden1 Exp $
  */
 
 #include	<sstream>
@@ -48,6 +48,7 @@ sqlChanOp::sqlChanOp(sqlManager* _myManager) :
   day()
 {
   myManager = _myManager;
+  OldestOp = false;
 }
 	
 void sqlChanOp::setAllMembers(dbHandle* theDB, int row)

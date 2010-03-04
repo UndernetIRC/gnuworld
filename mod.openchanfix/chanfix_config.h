@@ -16,13 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: chanfix_config.h,v 1.6 2006/12/22 03:00:02 buzlip01 Exp $
+ * $Id: chanfix_config.h,v 1.7 2010/03/04 04:24:12 hidden1 Exp $
  */
 
 #ifndef __CHANFIX_CONFIG_H
-#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.6 2006/12/22 03:00:02 buzlip01 Exp $"
+#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.7 2010/03/04 04:24:12 hidden1 Exp $"
 
 #define CHANFIX_DEBUG 1
+
+#define CHANFIX_VERSION "1.3"
+
 /**
  * Defines that deal with fixing channels, both manually and
  * automatically. All the below times are in seconds.
@@ -146,8 +149,8 @@
 /**
  * Maximum score a client can obtain.
  */
-#define MAX_SCORE	(static_cast<int>(DAYSAMPLES) * 86400 / POINTS_UPDATE_TIME)
-
+//#define MAX_SCORE	(static_cast<int>(DAYSAMPLES) * 86400 / POINTS_UPDATE_TIME)
+#define MAX_SCORE   7032
 /**
  * The maximum number of days to keep track of per channel -1,
  * e.g. a value of 15 means we track 14.00-14.99 days.
@@ -182,6 +185,12 @@
  * Should the QUOTE command be enabled?
  * This command allows raw P10 traffic to be sent to the network.
  */
-#undef ENABLE_QUOTE
+#define ENABLE_QUOTE
+
+/**
+ * Should new scoring be enabled?
+ * NOTE: New scores weigh the time first opped into users scores
+ */
+#define ENABLE_NEWSCORES
 
 #endif // __CHANFIX_CONFIG_H
