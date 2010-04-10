@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODINFOCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $
+ * $Id: MODINFOCommand.cc,v 1.24 2010/04/10 19:49:57 danielaustin Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.24 2010/04/10 19:49:57 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -92,7 +92,7 @@ if (!theChan)
 	return false;
 	}
 
-int required_level = (st[1] == "*") ? level::modinfo : adminlevel::modinfo;
+int required_level = (st[1] == "*") ? adminlevel::modinfo : level::modinfo;
 if (command == "INVITE")
 	{
 	required_level = level::modinfo_autoinvite;
