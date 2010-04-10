@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: UNSUSPENDCommand.cc,v 1.22 2003/12/29 23:59:37 dan_karrels Exp $
+ * $Id: UNSUSPENDCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $
  */
 
 #include	<iostream>
@@ -36,7 +36,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.22 2003/12/29 23:59:37 dan_karrels Exp $" ;
+const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -139,7 +139,7 @@ if(!theChan)
 
 // Check level.
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-if(level < level::unsuspend)
+if ((level < level::unsuspend) || (( st[1] == "*" ) && (level < adminlevel::unsuspend)))
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,

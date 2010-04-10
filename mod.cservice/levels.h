@@ -21,13 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: levels.h,v 1.31 2009/06/09 15:40:29 mrbean_ Exp $
+ * $Id: levels.h,v 1.32 2010/04/10 18:56:06 danielaustin Exp $
  */
 
 #ifndef __LEVELS_H
-#define __LEVELS_H "$Id: levels.h,v 1.31 2009/06/09 15:40:29 mrbean_ Exp $"
+#define __LEVELS_H "$Id: levels.h,v 1.32 2010/04/10 18:56:06 danielaustin Exp $"
 
 namespace gnuworld {
+
+ namespace adminlevel {
+  const int adduser = 750;
+  const int remuser = 750;
+  const int modinfo = 750;
+  const int suspend = 750;
+  const int unsuspend = 750;
+ }
 
  namespace level {
   const int access = 0;

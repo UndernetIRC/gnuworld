@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: REMUSERCommand.cc,v 1.18 2007/08/28 16:10:11 dan_karrels Exp $
+ * $Id: REMUSERCommand.cc,v 1.19 2010/04/10 18:56:06 danielaustin Exp $
  */
 
 #include	<map>
@@ -39,7 +39,7 @@
 #include	"dbHandle.h"
 #include	"responses.h"
 
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.18 2007/08/28 16:10:11 dan_karrels Exp $" ;
+const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.19 2010/04/10 18:56:06 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -93,7 +93,8 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	sqlUser* targetUser = bot->getUserRecord(st[2]);
 
 	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-	if ((level < level::remuser) && ((targetUser) && targetUser != theUser))
+	if (((level < level::remuser) || ((st[1] == "*") && (level < adminlevel::remuser))) &&
+		((targetUser) && targetUser != theUser))
 	{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,

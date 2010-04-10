@@ -26,7 +26,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.28 2007/08/28 16:10:09 dan_karrels Exp $
+ * $Id: ADDUSERCommand.cc,v 1.29 2010/04/10 18:56:06 danielaustin Exp $
  */
 
 #include	<map>
@@ -42,7 +42,7 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.28 2007/08/28 16:10:09 dan_karrels Exp $" ;
+const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.29 2010/04/10 18:56:06 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -97,7 +97,7 @@ if (!theChan)
  */
 
 int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-if (level < level::adduser)
+if ((level < level::adduser) || (( st[1] == "*" ) && (level < adminlevel::adduser)))
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,

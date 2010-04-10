@@ -1,4 +1,16 @@
-// $Id: ChangeLog,v 1.172 2010/04/10 18:33:49 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.173 2010/04/10 18:56:06 danielaustin Exp $ //
+
+2010-04-10	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/ADDUSERCommand.cc:
+		* mod.cservice/MODINFOCommand.cc:
+		* mod.cservice/REMUSERCommand.cc:
+		* mod.cservice/SUSPENDCommand.cc:
+		* mod.cservice/UNSUSPENDCommand.cc:
+		* mod.cservice/levels.h: specify admin levels for dealing with the
+			"*" channel.  Levels are listed in levels.h - this is not
+			the best way of dealing with it, but will do for now.
+
+			Modified based on patch supplied by LordLuke
 
 2010-04-10	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/MODINFOCommand.cc: add extra checks so that forced
