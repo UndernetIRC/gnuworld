@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: MODINFOCommand.cc,v 1.21 2009/06/10 18:18:18 mrbean_ Exp $
+ * $Id: MODINFOCommand.cc,v 1.22 2010/04/10 18:33:49 danielaustin Exp $
  */
 
 #include	<string>
@@ -38,7 +38,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.21 2009/06/10 18:18:18 mrbean_ Exp $" ;
+const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.22 2010/04/10 18:33:49 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -112,6 +112,15 @@ if (level < required_level)
 
 if(command == "INVITE")
 	{ //Handle modinfo INVITE
+	if (bot->getAccessLevel(theUser,theChan) == 0)
+	{
+		/* forced users cant set their invite status on, as they have no level record for the channel */
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("Sorry, you have insufficient access to perform that command.")));
+		return false;
+	}
 	if(st[1] == "*")
 	{ //Admin channel?
 		bot->Notice(theClient,"It is a mistake to think you can solve any major problems just with potatoes.");

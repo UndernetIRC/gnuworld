@@ -1,4 +1,10 @@
-// $Id: ChangeLog,v 1.171 2009/09/22 09:46:36 danielaustin Exp $ //
+// $Id: ChangeLog,v 1.172 2010/04/10 18:33:49 danielaustin Exp $ //
+
+2010-04-10	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/MODINFOCommand.cc: add extra checks so that forced
+			access users dont cause issues in cservice module.
+
+			Based on a patch supplied by LordLuke - thanks.
 
 2009-09-22	Dan-m00 <daniel@undernet.org>
 		* mod.ccontrol/ccontrol.cc: add some extra checks to lag detection
