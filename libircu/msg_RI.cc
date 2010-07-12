@@ -33,7 +33,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_RI.cc,v 1.3 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_RI.cc,v 1.4 2010/07/12 18:14:47 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -59,8 +59,6 @@ CREATE_HANDLER(msg_RI)
 
 bool msg_RI::Execute( const xParameters& params )
 {
-
-elog << params.assemble(0) << endl;
 
 //return true;
 
