@@ -81,7 +81,8 @@ am_libircu_la_OBJECTS = libircu_la-msg_AC.lo libircu_la-msg_AD.lo \
 	libircu_la-msg_R.lo libircu_la-msg_RI.lo libircu_la-msg_RO.lo \
 	libircu_la-msg_S.lo libircu_la-msg_Server.lo \
 	libircu_la-msg_SQ.lo libircu_la-msg_T.lo libircu_la-msg_V.lo \
-	libircu_la-msg_WA.lo libircu_la-msg_W.lo libircu_la-msg_Y.lo
+	libircu_la-msg_WA.lo libircu_la-msg_W.lo libircu_la-msg_XQ.lo \
+	libircu_la-msg_XR.lo libircu_la-msg_Y.lo
 libircu_la_OBJECTS = $(am_libircu_la_OBJECTS)
 libircu_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libircu_la_CXXFLAGS) \
@@ -269,6 +270,8 @@ libircu_la_SOURCES = msg_AC.cc \
 	msg_V.cc \
 	msg_WA.cc \
 	msg_W.cc \
+	msg_XQ.cc \
+	msg_XR.cc \
 	msg_Y.cc
 
 libircu_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
@@ -382,6 +385,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_V.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_W.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_WA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_XQ.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_XR.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libircu_la-msg_Y.Plo@am__quote@
 
 .cc.o:
@@ -649,6 +654,20 @@ libircu_la-msg_W.lo: msg_W.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_W.cc' object='libircu_la-msg_W.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_W.lo `test -f 'msg_W.cc' || echo '$(srcdir)/'`msg_W.cc
+
+libircu_la-msg_XQ.lo: msg_XQ.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_XQ.lo -MD -MP -MF $(DEPDIR)/libircu_la-msg_XQ.Tpo -c -o libircu_la-msg_XQ.lo `test -f 'msg_XQ.cc' || echo '$(srcdir)/'`msg_XQ.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libircu_la-msg_XQ.Tpo $(DEPDIR)/libircu_la-msg_XQ.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_XQ.cc' object='libircu_la-msg_XQ.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_XQ.lo `test -f 'msg_XQ.cc' || echo '$(srcdir)/'`msg_XQ.cc
+
+libircu_la-msg_XR.lo: msg_XR.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_XR.lo -MD -MP -MF $(DEPDIR)/libircu_la-msg_XR.Tpo -c -o libircu_la-msg_XR.lo `test -f 'msg_XR.cc' || echo '$(srcdir)/'`msg_XR.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libircu_la-msg_XR.Tpo $(DEPDIR)/libircu_la-msg_XR.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='msg_XR.cc' object='libircu_la-msg_XR.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu_la-msg_XR.lo `test -f 'msg_XR.cc' || echo '$(srcdir)/'`msg_XR.cc
 
 libircu_la-msg_Y.lo: msg_Y.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu_la-msg_Y.lo -MD -MP -MF $(DEPDIR)/libircu_la-msg_Y.Tpo -c -o libircu_la-msg_Y.lo `test -f 'msg_Y.cc' || echo '$(srcdir)/'`msg_Y.cc

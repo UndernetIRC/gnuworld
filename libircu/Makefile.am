@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## $Id: Makefile.am,v 1.10 2009/07/25 18:12:34 hidden1 Exp $
+## $Id: Makefile.am,v 1.11 2010/08/31 21:16:45 denspike Exp $
 
 lib_LTLIBRARIES = libircu.la
 libircu_la_SOURCES = msg_AC.cc \
@@ -37,6 +37,8 @@ libircu_la_SOURCES = msg_AC.cc \
 	msg_V.cc \
 	msg_WA.cc \
 	msg_W.cc \
+	msg_XQ.cc \
+	msg_XR.cc \
 	msg_Y.cc
 
 libircu_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld

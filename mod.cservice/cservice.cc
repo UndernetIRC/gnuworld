@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.cc,v 1.297 2009/07/23 18:03:00 mrbean_ Exp $
+ * $Id: cservice.cc,v 1.298 2010/08/31 21:16:46 denspike Exp $
  */
 
 #include	<new>
@@ -184,6 +184,7 @@ MyUplink->RegisterEvent( EVT_QUIT, this );
 MyUplink->RegisterEvent( EVT_NICK, this );
 MyUplink->RegisterEvent( EVT_ACCOUNT, this );
 MyUplink->RegisterEvent( EVT_BURST_ACK, this );
+MyUplink->RegisterEvent( EVT_XQUERY, this );
 
 xClient::OnAttach() ;
 }
@@ -3092,6 +3093,30 @@ void cservice::OnEvent( const eventType& theEvent,
 {
 switch( theEvent )
 	{
+	case EVT_XQUERY:
+		{
+		iServer* theServer = static_cast< iServer* >( data1 );
+		const char* Routing = reinterpret_cast< char* >( data2 );
+		const char* Message = reinterpret_cast< char* >( data3 );
+		elog << "CSERVICE.CC: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
+		//If it ain't us, ignore the message, the message is probably meant for another client here.
+		StringTokenizer st( Message ) ;
+		if( st.size() < 2 )
+        		{
+			//No command or no nick supplied
+        		break;
+       			}
+		if (st[0] == getNickName()) 
+			{
+			string Command = string_upper(st[1]);
+			if (Command == "LOGIN")
+				{
+				doXQLogin(theServer, Routing, Message);		
+				}
+			}
+		break;
+		}
 	case EVT_ACCOUNT:
 		{
 		iClient* tmpUser = static_cast< iClient* >( data1 ) ;
@@ -4800,6 +4825,213 @@ void cservice::loadConfigData()
 		}
 
 }
+
+
+bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string& Message)
+{
+//What's going to be in Message?
+//<ournick> LOGIN <ip> <username> <password>
+StringTokenizer st( Message );
+if( st.size() < 5 )
+        {
+	return false;
+        }
+
+/*
+ *  Are we allowing logins yet?
+ **/
+unsigned int useLoginDelay = getConfigVar("USE_LOGIN_DELAY")->asInt();
+unsigned int loginTime = getUplink()->getStartTime() + loginDelay;
+if ( (useLoginDelay == 1) && (loginTime >= (unsigned int)currentTime()) )
+	{
+	//TODO Send error back
+	return false;
+	}
+
+
+
+sqlUser* theUser = getUserRecord(st[3]);
+if( !theUser )
+        {
+	elog 	<< "doXQLogin: "
+		<< "Couldn't find user data for accountname: "
+		<< st[3]
+		<< endl;
+	//TODO Send error back
+        return false;
+        }
+
+// IPR checks are performed against st[2], the IP passed to us by iauth
+
+stringstream theQuery;
+theQuery        << "SELECT allowmask,allowrange1,allowrange2,added FROM "
+                << "ip_restrict WHERE user_id = "
+                << theUser->getID()
+                << ends;
+#ifdef LOG_SQL
+        elog    << "cservice::checkIPR::sqlQuery> "
+                << theQuery.str().c_str()
+                << endl;
+#endif
+
+if( !SQLDb->Exec(theQuery, true ) )
+        {
+        /* SQL error, fail them */
+        elog    << "cservice::checkIPR> SQL Error: "
+                << SQLDb->ErrorMessage()
+                << endl;
+                return false;
+        }
+
+bool userHasIPR = true;
+if (SQLDb->Tuples() < 1)
+        {
+	userHasIPR = false;
+#ifdef IPR_DEFAULT_REJECT
+        /* no entries, fail them */
+        return false;
+#else
+	/* no entries, allow them to pass through*/
+#endif
+        }
+
+if (userHasIPR) 
+	{
+	/* cycle through results to find a match */
+        bool ipr_match = false;
+        unsigned int ipr_ts = 0;
+        unsigned int tmpIP = xIP(st[2], false).GetLongIP();
+        for (unsigned int i=0; i < SQLDb->Tuples(); i++)
+        {
+                /* get some variables out of the db row */
+                std::string ipr_allowmask = SQLDb->GetValue(i, 0);
+                unsigned int ipr_allowrange1 = atoi(SQLDb->GetValue(i, 1).c_str());
+                unsigned int ipr_allowrange2 = atoi(SQLDb->GetValue(i, 2).c_str());
+                ipr_ts = atoi(SQLDb->GetValue(i, 3).c_str());
+
+                /* is this an IP range? */
+                if (ipr_allowrange2 > 0)
+                {
+                        /* yes it is, is the client IP between range1 and range2? */
+                        if ((tmpIP >= ipr_allowrange1) && (tmpIP <= ipr_allowrange2))
+						                        {
+                                ipr_match = true;
+                                break;
+                        }
+                } else {
+                        /* no, is it a single IP? */
+                        if (ipr_allowrange1 > 0)
+                        {
+                                /* yes it is, does the IP match range1? */
+                                if (tmpIP == ipr_allowrange1)
+                                {
+                                        ipr_match = true;
+                                        break;
+                                }
+                        } 
+                }
+        }
+        /* check if we found a match yet */
+        if (!ipr_match)
+        {
+                /* no match, fail them */
+		//TODO Send error back
+                return false;
+        } else {
+                /* IP restriction check passed */
+        }
+}	
+
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+        {
+        elog    << "doXQLogin: "
+                << "Globally suspended account tried to auth: "
+                << st[3]
+                << endl;
+	//TODO Send error back
+        return false;
+        }
+
+unsigned int max_failed_logins = getConfigVar("FAILED_LOGINS")->asInt();
+unsigned int failed_login_rate = getConfigVar("FAILED_LOGINS_RATE")->asInt();
+
+/* if it's not configured, default to every 15 minutes */
+if (failed_login_rate==0)
+	failed_login_rate = 900;
+
+if (!isPasswordRight(theUser, st.assemble(4)))
+        {
+	theUser->incFailedLogins();
+
+	if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
+		(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
+	{
+		/* we have exceeded our maximum - alert relay channel
+		 * work out a checksum for the password.  Yes, I could have
+  		 * just used a checksum of the original password, but this
+  		 * means it's harder to 'fool' the check digit with a real
+  		 * password - create MD5 from original salt stored */
+		unsigned char	checksum;
+		md5		hash;
+		md5Digest	digest;
+
+		if (theUser->getPassword().size() < 9)
+		{
+			checksum = 0;
+		} else {
+			string salt = theUser->getPassword().substr(0, 8);
+			string guess = salt + st.assemble(2);
+
+			hash.update( (const unsigned char *)guess.c_str(), guess.size() );
+			hash.report( digest );
+
+			checksum = 0;
+			for (size_t i = 0; i < MD5_DIGEST_LENGTH; i++)
+			{
+				/* add ascii value to check digit */
+				checksum += digest[i];
+			}
+		}
+
+		theUser->setLastFailedLoginTS(time(NULL));
+		logPrivAdminMessage("%d failed logins for %s (last attempt from iauth with IP %s), checksum %d).",
+			theUser->getFailedLogins(),
+			theUser->getUserName().c_str(),
+			st[2],
+			checksum);
+	
+	}
+        elog    << "doXQLogin: "
+                << "Wrong password supplied by: "
+                << st[3] << "PASS: "
+		<< st.assemble(4)
+                << endl;
+	//TODO Send error back
+        return false;
+	}
+
+/*
+ * Don't exceed MAXLOGINS.
+ */
+//TODO
+
+/*
+ * If this user account is already authed against, send a notice to the other
+ * users warning them that someone else has logged in too.
+ */
+//TODO
+
+
+
+elog    << "doXQLogin: "
+        << "Succesful auth for "
+        << st[3] 
+	<< endl;
+//TODO Return confirmation
+return true;
+}
+
+
 
 /*
  * Display a summary of channels "theUser" has access on to "theClient".

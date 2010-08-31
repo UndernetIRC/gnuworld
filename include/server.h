@@ -18,11 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.h,v 1.106 2009/07/26 18:30:37 mrbean_ Exp $
+ * $Id: server.h,v 1.107 2010/08/31 21:16:45 denspike Exp $
  */
 
 #ifndef __SERVER_H
-#define __SERVER_H "$Id: server.h,v 1.106 2009/07/26 18:30:37 mrbean_ Exp $"
+#define __SERVER_H "$Id: server.h,v 1.107 2010/08/31 21:16:45 denspike Exp $"
 
 #include	<string>
 #include	<vector>
@@ -484,6 +484,24 @@ public:
 			Channel* theChan ) ;
 
 	/**
+	 * OnXQuery is called when an XQ command
+	 * is received.
+	 */
+        virtual void OnXQuery( iServer* Sender,
+		const std::string& Token,
+                const std::string& Message ) ;
+
+        /**
+	 * OnXReply is called when an XR command
+	 * is received.
+	 */
+        virtual void OnXReply( iServer* Sender,
+                const std::string& Token,
+                const std::string& Message ) ;
+
+
+
+	/**
 	 * Output the information about an xClient to the network.
 	 * (localClient) is true when the xClient is to appear to
 	 * reside on this xServer, false when it is to reside on
@@ -510,6 +528,13 @@ public:
 	 * Sent a notice to a client as the server.
 	 */
 	virtual bool	Notice( iClient*, const std::string& ) ;
+
+	/**
+	 * Sending XQuery and XReply as a server to a server.
+	 */
+        virtual bool    XQuery( iServer*, const std::string&, const std::string& ) ;
+        virtual bool    XReply( iServer*, const std::string&, const std::string& ) ;
+
 
 	/**
 	 * Set modes as the server, update internal tables, and notify

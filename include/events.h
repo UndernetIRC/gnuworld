@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.20 2006/12/22 06:41:41 kewlio Exp $
+ * $Id: events.h,v 1.21 2010/08/31 21:16:45 denspike Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.20 2006/12/22 06:41:41 kewlio Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.21 2010/08/31 21:16:45 denspike Exp $"
 
 #include	<string>
 
@@ -56,6 +56,8 @@ enum
 	EVT_CHNICK,
 	EVT_ACCOUNT,
 	EVT_RAW,
+	EVT_XQUERY,
+	EVT_XREPLY,
 
 	// EVT_NOOP must always be last
 	EVT_NOOP
@@ -115,6 +117,14 @@ typedef int channelEventType ;
  *  1) Gline*
  * EVT_ACCOUNT
  *  1) iClient*
+ * EVT_XQUERY
+ *  1) iServer* source (might add iClient* later)
+ *  2) string* - routing
+ *  3) string* - command  
+ * EVT_XREPLY
+ *  1) iServer* source
+ *  2) string* - routing
+ *  3) string* - command
  *
  * Channel Events
  * --------------

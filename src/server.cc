@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.225 2008/04/16 20:29:39 danielaustin Exp $
+ * $Id: server.cc,v 1.226 2010/08/31 21:16:46 denspike Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.225 2008/04/16 20:29:39 danielaustin Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.226 2010/08/31 21:16:46 denspike Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1450,6 +1450,30 @@ void xServer::OnPartChannel( xClient* theClient, Channel* theChan )
 assert( theClient != 0 ) ;
 assert( theChan != 0 ) ;
 }
+
+void xServer::OnXQuery( iServer* theServer, const string& Routing,
+                const string& Message)
+{
+void *const thisRouting = const_cast<char*>(Routing.c_str());
+void *const thisMessage = const_cast<char*>(Message.c_str());
+PostEvent( EVT_XQUERY,
+	static_cast< void* >( theServer ),
+	reinterpret_cast< void* >( thisRouting ),
+	reinterpret_cast< void* >( thisMessage ) ) ;
+}
+
+void xServer::OnXReply( iServer* theServer, const string& Routing,
+                const string& Message)
+{
+void *const thisRouting = const_cast<char*>(Routing.c_str());
+void *const thisMessage = const_cast<char*>(Message.c_str());
+PostEvent( EVT_XREPLY,
+        static_cast< void* >( theServer ),
+        reinterpret_cast< void* >( thisRouting ),
+        reinterpret_cast< void* >( thisMessage ) ) ;
+}
+
+
 
 bool xServer::JoinChannel( xClient* theClient,
 	const string& chanName,
@@ -3303,4 +3327,45 @@ s	<< getCharYY()
 return Write( s.str() ) ;
 }
 
+bool xServer::XReply (iServer* theServer, const string& Routing,
+	const string& Message)
+{
+assert (theServer != 0 );
+
+if( Message.empty() || !isConnected() )
+        {
+        return false ;
+        }
+stringstream s ;
+s       << getCharYY()
+        << " XR "
+        << theServer->getCharYY()
+        << " "
+	<< Routing
+	<< " :"
+        << Message ;
+return Write( s.str() ) ;
+	
+}
+
+bool xServer::XQuery (iServer* theServer, const string& Routing,
+        const string& Message)
+{
+assert (theServer != 0 );
+
+if( Message.empty() || !isConnected() )
+        {
+        return false ;
+        }
+stringstream s ;
+s       << getCharYY()
+        << " XQ "
+        << theServer->getCharYY()
+        << " "
+        << Routing
+        << " :"
+        << Message ;
+return Write( s.str() ) ;
+
+}
 } // namespace gnuworld

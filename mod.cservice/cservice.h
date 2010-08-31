@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: cservice.h,v 1.115 2007/12/31 20:23:47 kewlio Exp $
+ * $Id: cservice.h,v 1.116 2010/08/31 21:16:46 denspike Exp $
  */
 
 #ifndef __CSERVICE_H
-#define __CSERVICE_H "$Id: cservice.h,v 1.115 2007/12/31 20:23:47 kewlio Exp $"
+#define __CSERVICE_H "$Id: cservice.h,v 1.116 2010/08/31 21:16:46 denspike Exp $"
 
 #include	<iostream>
 #include	<string>
@@ -242,6 +242,8 @@ public:
 	void setOutputTotal(const iClient* theClient, unsigned int count);
 	unsigned int getOutputTotal(const iClient* theClient);
 	bool hasOutputFlooded(iClient*);
+
+	bool doXQLogin(iServer* , const string&, const string&);
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.
