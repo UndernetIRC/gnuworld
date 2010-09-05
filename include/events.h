@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: events.h,v 1.21 2010/08/31 21:16:45 denspike Exp $
+ * $Id: events.h,v 1.22 2010/09/05 17:26:35 denspike Exp $
  */
 
 #ifndef __EVENTS_H
-#define __EVENTS_H "$Id: events.h,v 1.21 2010/08/31 21:16:45 denspike Exp $"
+#define __EVENTS_H "$Id: events.h,v 1.22 2010/09/05 17:26:35 denspike Exp $"
 
 #include	<string>
 
@@ -156,12 +156,14 @@ const std::string eventNames[] = {
 	"Nick Change", /* EVT_CHNICK */
 	"Account Login", /* EVT_ACCOUNT */
 	"Raw", /* EVT_RAW */
+	"XQuery", /* EVT_XQUERY */
+	"XReply", /* EVT_XREPLY */
 	"Channel Join", /* EVT_JOIN */
 	"Channel Part", /* EVT_PART */
+	"Channel Mode By Server", /* EVT_SERVERMODE */
 	"Channel Topic Change", /* EVT_TOPIC */
 	"Channel Kick", /* EVT_KICK */
-	"Channel Create", /* EVT_CREATE */
-	"Channel Mode By Server" /* EVT_SERVERMODE */
+	"Channel Create" /* EVT_CREATE */
 } ;
 
 } // namespace gnuworld
