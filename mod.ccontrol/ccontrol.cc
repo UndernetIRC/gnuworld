@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.242 2009/12/24 20:19:14 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.243 2010/09/12 20:28:24 hidden1 Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.242 2009/12/24 20:19:14 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.243 2010/09/12 20:28:24 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -6757,8 +6757,8 @@ void ccontrol::announce(iClient* theClient, const string& text)
 		AnnounceNick,
 		"announce",
 		"AAAAAA",
-		"undernet.org",
-		"undernet.org",
+		getHostName(),
+		getHostName(),
 		"+ok",
 		string(),
 		0,
