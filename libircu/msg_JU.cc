@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: msg_JU.cc,v 1.8 2007/08/28 16:10:00 dan_karrels Exp $
+ * $Id: msg_JU.cc,v 1.9 2010/09/20 17:36:25 denspike Exp $
  */
 
 #include	<string>
@@ -28,7 +28,7 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_JU.cc,v 1.8 2007/08/28 16:10:00 dan_karrels Exp $" ) ;
+RCSTAG( "$Id: msg_JU.cc,v 1.9 2010/09/20 17:36:25 denspike Exp $" ) ;
 
 namespace gnuworld
 {
@@ -100,6 +100,11 @@ else
 	if(!jupeServer)
 		{
 		elog << "msg_JU> Cant find server for removal" << endl;
+		return false;
+		}
+	if(jupeServer->getCharYY() == theServer->getCharYY())
+		{
+		elog << "msg_JU> Let's not even try to remove ourself" << endl;
 		return false;
 		}
 	// BUG: Nothing here?
