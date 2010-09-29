@@ -1,0 +1,13 @@
+Oper FAQ
+--------------------------------------------------------------------------------------
+
+* How does mod.Chanfix keep track of who is logged in?
+
+Whenever you LOGIN to X you will get an account, mod.Chanfix has a list of all accounts
+with access in its database.
+
+* What happens in case of a netsplit? Or when my connection drops and I reconnect?
+
+IRCu will burst your account in a netsplit, so mod.Chanfix will know you are still logged
+in. However if you reconnect or quit you will be logged out. Thus you will need to relogin
+to X, or whichever service you use to get an account.

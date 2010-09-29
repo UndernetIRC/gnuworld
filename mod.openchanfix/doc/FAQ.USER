@@ -1,0 +1,37 @@
+User FAQ
+--------------------------------------------------------------------------------------
+
+* Is mod.Chanfix like channel registration?
+
+No. Not all all. mod.Chanfix is a neutral entity which can fix a stable channel (this
+means that it has existed for at least several days, and has had a group of stable ops)
+in emergencies. The two emergencies when mod.Chanfix can help are if the channel becomes
+opless, or if the channel is taken over.
+
+* When does my channel qualify for mod.Chanfix?
+
+Every channel with at least 4 clients in it will get points.
+
+* How do I get a score?
+
+Every 5 minutes mod.Chanfix will look at the opped clients in each channel that have
+enough clients. All of the clients that are idented (no ~ in front of their username)
+will get a point. See the examples for more information.
+
+* How many points do I need?
+
+You need at least 163 points (4% of the maximum) for mod.Chanfix to reop you. Below that,
+mod.Chanfix doesn't do anything. This means your channel must be at least 163 / 12 = 13.6
+hours old.
+
+* My channel is opless and I have a score, why isn't mod.Chanfix opping me?
+
+mod.Chanfix can take up to an hour to fix an opless channel. The higher your score, the
+faster you are opped. So be patient. Oh, and if your score is below 163, well, you won't
+be opped.
+
+* After 2 hours, mod.Chanfix has still not been to my channel! What's going on?
+
+The most probable explanation is that you have fewer than 3 clients in your channel. You
+must have at least 4 clients in your opless channel before mod.Chanfix will come to fix it.
+

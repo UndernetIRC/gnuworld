@@ -1,0 +1,61 @@
+<HTML>
+<!-- CMaster Channel Services Website. -->
+<!-- $Id: faq.html,v 1.2 2001/10/22 19:48:00 gte Exp $ -->
+<!-- Here is the FAQ Table Template (Until we do this in a database properly ;) -->
+<!--
+	<P>
+		<TABLE CELLPADDING=0 CELLSPACING=0 WIDTH=100%><TR><TD BGCOLOR=#DDDDDD><FONT FACE="Tahoma, Times New Roman" SIZE=2><B>
+		Q: How the hell does this thing work?!
+		</B></FONT></TD></TR>
+		<TR><TD BGCOLOR=#EEEEEE><FONT FACE="Tahoma, Times New Roman" SIZE=2>
+		dunno
+		</FONT></TD></TR></TABLE>
+	<P>
+-->
+
+<HEAD>
+</HEAD>
+
+<BODY>
+	<FONT FACE="Tahoma, Times New Roman" SIZE=2>
+	<FONT SIZE=+2>Frequenty Asked Questions</FONT>
+	<P>
+		<TABLE CELLPADDING=0 CELLSPACING=0 WIDTH=100%><TR><TD BGCOLOR=#DDDDDD><FONT FACE="Tahoma, Times New Roman" SIZE=2><B>
+		Q: How do I give myself admin access to X?
+		</B></FONT></TD></TR>
+		<TR><TD BGCOLOR=#EEEEEE><FONT FACE="Tahoma, Times New Roman" SIZE=2>
+		A:<BR>Run the cservice.addme.sql script in the doc/ directory.<BR> Eg:<BR>
+		psql &ltdatabasename&gt &ltcservice.addme.sql
+		</FONT></TD></TR></TABLE>
+	<P>
+		<TABLE CELLPADDING=0 CELLSPACING=0 WIDTH=100%><TR><TD BGCOLOR=#DDDDDD><FONT FACE="Tahoma, Times New Roman" SIZE=2><B>
+		Q: Whats the full command to start X?
+		</B></FONT></TD></TR>
+		<TR><TD BGCOLOR=#EEEEEE><FONT FACE="Tahoma, Times New Roman" SIZE=2>
+		A:<BR> After installation, the binary is contained in the gnuworld/bin directory.<BR>
+		If you don't want to see debug output, the best way to run gnuworld is:<P>
+		./gnuworld -c -f GNUWorld.conf >/dev/null 2>1 &
+		</FONT></TD></TR></TABLE>
+	<P>
+		<TABLE CELLPADDING=0 CELLSPACING=0 WIDTH=100%><TR><TD BGCOLOR=#DDDDDD><FONT FACE="Tahoma, Times New Roman" SIZE=2><B>
+		Q: I get this error: PostgreSQL error message: connectDBStart() -- connect() failed: Connection refused
+		</B></FONT></TD></TR>
+		<TR><TD BGCOLOR=#EEEEEE><FONT FACE="Tahoma, Times New Roman" SIZE=2>
+		A: <BR>
+		Make sure you are starting the PostgreSQL server with the -i parameter (To listen on TCP sockets).
+		</FONT></TD></TR></TABLE>
+	<P>
+		<TABLE CELLPADDING=0 CELLSPACING=0 WIDTH=100%><TR><TD BGCOLOR=#DDDDDD><FONT FACE="Tahoma, Times New Roman" SIZE=2><B>
+		Q: I get this error: checking for libpq++.h... configure: error: Unable to find PostGreSQL
+		</B></FONT></TD></TR>
+		<TR><TD BGCOLOR=#EEEEEE><FONT FACE="Tahoma, Times New Roman" SIZE=2>
+		A:<BR>
+		Are you sure you have installed PostgreSQL? It can be downloaded from <A HREF="http://www.postgresql.org">http://www.postgresql.org.</A><BR>
+		Also, ensure you read the PostgreSQL documentation and add the configuration switch --with-CXX to install the PostgreSQL C++ API.
+		</FONT></TD></TR></TABLE>
+	<P>
+	Last Updated: 22/10/2001. [<A HREF="index.html">Back</A>] [<A HREF="mailto:gte@undernet.org">Webmaster</A>]
+	</FONT>
+</BODY>
+
+</HTML>

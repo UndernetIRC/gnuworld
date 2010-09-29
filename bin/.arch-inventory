@@ -1,0 +1,10 @@
+precious ^.*(\.conf)$
+precious ^server_command_map$
+precious ^gnuworld
+
+backup \.log$
+backup ^core$
+
+backup ^gnuworld
+backup \.log$
+backup ^core$

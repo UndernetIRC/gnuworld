@@ -1,0 +1,70 @@
+
+This file is here to recognize the many people who are
+responsible for bringing GNUWorld to the free society.
+
+Orlando Bassatto (nextie) - Orlando is the project's original
+founder.  His insight and talent have brought this project to the
+world.  Orlando is responsible for the original design and
+implementation from which gnuworld is born.
+
+Andrea Cocito (Nemesi) - Andrea is a very gifted and dedicated
+programmer.  He has helped with some of the most difficult
+areas of ircu and gnuworld.  His contributions are immeasurable.
+
+Perry (Isomer) - Lots of great ideas and a calming attitude in
+times of panic.  Perry is the project manager, putting The Man 
+into his place.
+
+Greg (Gte) - Lots of real world testing and development of
+gnuworld and its modules.  Greg is the father of the cservice 
+module, which I (ripper_) continually break.
+
+Tomer (MrBean) - Creator of the ccontrol (oper services) module.
+Tomer has generated a huge amount of code, and withstood the 
+weight of my (ripper_) nitpicking.  Good job on your first major 
+project :)
+
+Jeekay (jeekay@netgamers.org) - Creator of the dronescan module.
+He has provided a wealth of new information, as well as asking
+lots of tough questions.
+
+Stephane (mbuna) - Silently challenging me to do better, plus
+normal type support and feedback :)
+
+Julien (nighty) - Development of the web interface almost
+entirely on his own.  This system looks good, and works even 
+better.  Thanks for all of your tireless hours without tangible 
+rewards!
+
+ZAMBOO (zamboo@under-web.net) Lots of bug reporting and diligent
+efforts to try out all the possibilities.  Thanks :)
+
+OUTSider - Always testing and retesting, looking for bugs...you found 
+some! Also thanks for contributing some code.
+
+Doug (seiki) - Thanks a lot for letting me thrash your machine
+during development and testing of gnuworld.  You really made a 
+lot of sacrifices and had to put up with my complaining :)
+
+Ben (Obike) - Enormous help with the php security issues, and
+the web interface in general.  Your expertise was invaluable.
+
+Keir - Helping with new ideas and finding bugs, testing in the real
+world.  Keir has put forth some excellent ideas on enhancements for
+gnuworld.
+
+Marc Dondlinger (aka HiGhPwR) <highpwr@quake.lu>
+Huge amounts of bug reporting, a loyal user without whom this
+project would never have been ready :)
+
+Kevin Mitchell (Kev) - Helping to fill in the gaps, there are lots!
+
+David Henriksen <david@itwebnet.dk> (Plexus@IRC)
+Real world testing and implementation, bug finding.  Youve helped
+this project with a lot of issues.
+
+Raystonn <raystonn@hotmail.com> - Thanks for helping with some of
+the finer points :)
+
+Maniac <maniac@krushnet.org> - Thanks for lots of bug fixing and
+testing...you really like to pick apart our code!

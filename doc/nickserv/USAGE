@@ -1,0 +1,32 @@
+NickServ is a service to aid users in preventing unauthorised use of their
+chosen nickname.
+
+Having a working service on the network that will authenticate users and
+send out AC tokens IS A MUST. Without this, NickServ WILL NOT WORK.
+
+For a user to interact with NickServ in any way, they must have authed
+to that service and received usermode +r. NickServ will politely decline
+to talk to anyone that is not authed in this manner. If any of this
+doesn't make sense to you, it roughly translates to 'you need to be
+running ircu2.10.11 and a recent version of mod.cservice'.
+
+Enough of that.
+
+For a user to set up autokill on their chosen nick, they must do the
+following:
+
+1) Authenticate with cservice and obtain usermode +r. Their
+authenticated nick is the only nick they will be able to enable NickServ
+services on.
+
+2) Register with NickServ. This is done simply by '/msg NS register'. NS
+will create a new user record for that nickname and inform the user that
+it has done so.
+
+3) Set NickServ to autokill. This is done by '/msg NS set autokill on'.
+NS will reply that AUTOKILL has been set to ON, and from then on the
+nick will be protected.
+
+Should the user wish to disable autokill in the future, they can simply
+'/msg NS set autokill off'.
+

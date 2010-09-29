@@ -1,0 +1,34 @@
+# $Id: snoop.example.conf.in,v 1.2 2003/12/06 22:11:36 dan_karrels Exp $
+# conf file for snoop bot
+username = snoopy
+nickname = snoopy_
+hostname = undernet.org
+userdescription = Inquiring Minds Want to Know
+
+mode = +i
+
+# permit the given user -- by account login name -- to use the
+# module.  You may have as many of these as you like (including none).
+# This is case-insensitive.
+#permit_user = reppir
+#permit_user = Jeekay
+
+# Set this to true if you want to permit opers to use the module,
+# set to false otherwise (will not affect other users who have access)
+allow_opers = true
+
+# The command character (or string) to which the bot will respond
+# in channels.  This can be any length, but can only be one word.
+cmdchar = snoopy
+
+# The channel in which the bot will accept channel commands
+adminchan = #2010
+
+# The channel to which relay information will be sent
+relaychan = #coder-com
+
+# The default quit message for spawned clients
+defaultquitmessage = Exiting
+
+# The maximum nickname length for your network
+maxnicklen = 9

@@ -1,0 +1,7 @@
+.deps
+.libs
+*.la
+*.lo
+Makefile
+gnuworld
+.arch-ids

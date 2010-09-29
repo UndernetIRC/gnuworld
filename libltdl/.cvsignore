@@ -1,0 +1,13 @@
+.deps
+.libs
+*.la
+*.lo
+Makefile
+config.h
+config.log
+config.status
+libtool
+stamp-h*
+autom4te.cache
+configure.lineno
+.arch-ids

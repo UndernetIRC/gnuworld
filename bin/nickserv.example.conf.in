@@ -1,0 +1,43 @@
+# $Id: nickserv.example.conf.in,v 1.5 2003/06/05 01:38:01 dan_karrels Exp $
+nickname = NS
+
+username = nickserv
+hostname = undernet.org
+userdescription = NickServ
+mode = +idk
+
+# Console output for nickserv
+consoleChannel = #ns.console
+consoleChannelModes = +ntsim
+
+# DB connection configuration
+dbHost = 127.0.0.1
+dbPort = 5432
+dbDb = nickserv
+dbUser = nickserv
+dbPass = ""
+
+# The frequency with which to check the queue
+checkFreq = 60
+
+# The initial startup wait.
+# Note this does NOT include checkFreq so make sure to set
+# a value somewhat higher than 0
+startDelay = 60
+
+# How frequently to commit to the database
+# _freq is max time to wait, _count is max entries to wait
+commitFreq = 5
+commitCount = 1
+
+# What level of debug stuff should be sent to the console channel?
+# This is a bitfield, values as follows:
+#  1 - PROTOCOL
+#  2 - SQL
+#  4 - DEBUG
+#  8 - INFO
+# 16 - WARNING
+# 32 - ERROR
+# Simply add the numbers together from the levels you want.
+consoleLevel = 63
+

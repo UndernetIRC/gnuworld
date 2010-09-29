@@ -1,0 +1,34 @@
+2004-02-13 1.0.5 Jeekay
+* Added juping of nicks that have just been autokilled
+* Added RELEASE to allow jupes to be removed
+* Bumped version to 1.0.5
+
+2002-12-10 1.0.4 Jeekay
+* Fixed stupid bug that would cause a crash if a non-authed user entered the
+  console channel.
+* Bumped version to 1.0.4
+
+2002-11-26 1.0.3 Jeekay
+* Added MODUSER to allow admins to change the access levels of other users
+* Added INVITE to allow admins to invite themselves into the console channel
+* Bumped version to 1.0.3
+
+2002-11-25 1.0.2 Jeekay
+* Added SET CONSOLELEVEL to alter the level at which the console is logging.
+* NickServ will now change the topic of the console channel to show the level.
+* Bumped version to 1.0.2
+
+2002-11-25 1.0.1 Jeekay
+*** This version requires a database change. It deprecates the 'logging' table.
+    Please consult Updates for the relevant SQL.
+* Modified CService & documentation to reflect that you can now run
+  NickServ and CService on the same GNUWorld core.
+* Added INFO command that will let an admin see the attributes of
+  a registered user.
+* Added SHUTDOWN command to allow admins to shut down NickServ cleanly.
+* Allowed SET to take non-boolean arguments for certain properties so that
+  an admin can now set their logmask.
+* Added consoleLevel to the config file to determine what level of events
+  the console channel should receive.
+* Prefixed [level] to log messages to indicate at what level they were sent.
+* Bumped version to 1.0.1

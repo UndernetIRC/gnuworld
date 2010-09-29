@@ -1,0 +1,157 @@
+# $Id: dronescan.example.conf.in,v 1.19 2008/11/17 02:54:42 hidden1 Exp $
+# What nickname should the bot use?
+nickname = E
+
+# What username should the bot use?
+username = dronescan
+
+# What hostname should the bot use?
+hostname = undernet.org
+
+# What should the bots real name be?
+userdescription = Drone Scanner
+
+# What user modes should the bot use?
+mode = +idk
+
+# Console channel name and initial modes
+consoleChannel = #ds.console
+consoleChannelModes = +ntsim
+
+# SQL Setup
+sqlHost = 127.0.0.1
+sqlPort = 5432
+sqlDB   = dronescan
+sqlUser = dronescan
+sqlPass = dronescan
+
+# Margins
+# Be careful with these. I wouldn't touch chanMargin too much but I suspect
+# nickMargin will need tweaking from network to network. These defaults were
+# taken from a fairly old burst from a small (2k5 user) network so beware!
+
+# The fraction of users who must be `abnormal' in a channel for the channel
+# to be reported.
+channelMargin = 0.8
+
+# The margin around the average entropy within which a nickname is considered
+# `normal'. Outside this margin is `abnormal'. Note this is the margin *either
+# side* of the center, ie 0.25 would give a 50% spread - from 25% to 75%.
+nickMargin = 0.1
+
+# The channel cutoff is the minimum amount of members a channel must have before
+# it can be considered a drone channel.
+channelCutoff = 10
+
+# The minimum level of information shown in the console channels. Available
+# levels are as follows:
+# 0 - DEBUG	Random debug things that you very probably are not interested in
+# 1 - INFO	Informational things - this is usually worth seeing
+# 2 - WARN	Warnings about drone channels and serious events.
+# 3 - ERROR	DroneScan core errors.
+consoleLevel = 1
+
+# The minimum amount of votes needed for a channel to be considered abnormal
+voteCutoff = 30
+
+# The interval (in seconds) during which a channel won't be reported again
+# This is to stop repeated spamming of the same channel
+dcInterval = 600
+
+# The interval in seconds for how often we should attempt to refresh any
+# caches from the database. The refreshes typically only trigger if any
+# data has actually changed.
+rcInterval = 300
+
+# The level that an opered client without an account should be assumed
+# to have.
+# If you wish this functionality to be disabled, set the level to 0.
+fakeOperLevel = 300
+
+################
+# JOIN COUNTER #
+################
+
+# The interval over which join counter checks for joins. This is in seconds.
+jcInterval = 10
+
+# The trigger level for which join counter warns. Note that the total join
+# count must be OVER this level to trigger.
+jcCutoff = 10
+
+# The minimum time a client needs to join and part within a flood to be reported/glined
+jcMinJoinToGline = 1
+
+# Whether or not to gline join flood clients 
+jcGlineEnable = 0
+
+# The minimum joins during join-floods required for an IP to be glined without a part (Can be on multiple channels)
+jcMinJoinsPerIPToGline = 4
+
+# The time within the joins.
+jcJoinsPerIPTime = 14400
+
+# The number of clients per IP required during *ONE* joinflood to set a gline if there are no parts
+jcMinJoinToGlineJOnly = 2
+
+# The join-flood size required to set a gline with no parts
+jcMinJFJOnlySizeToGline = 25
+
+# The minimum number of flooding clients required to gline
+jcMinJFSizeToGline = 20
+
+# The gline reason to set when glining join flood offenders
+jcGlineReason = Flooding is not tollerated on this network!
+
+# The length in seconds for glines which are issued on join flood offenders
+jcGlineLength = 3600
+
+
+################
+# NICK COUNTER #
+################
+
+# The interval over which nick counter checks for nicks changes. This is in 
+# seconds.
+ncInterval = 10
+
+# The trigger level for which nick counter warns. Note that the total nick
+# change count must be OVER this level to trigger.
+ncCutoff = 10
+
+
+#################
+# CHANNEL RANGE #
+#################
+
+# The total range of entropy in a channel before it is considered abnormal
+channelRange = 0.2
+
+
+############
+# MAXCHANS #
+############
+
+# The minimum channel membership before a client in a channel is considered
+# normal:
+maxChans = 2
+
+
+##############
+# COMMONREAL #
+##############
+
+# The amount of users who must have the same realname before being considered
+# abnormal.
+realCutoff = 4
+
+###############
+# GLINE QUEUE #
+###############
+
+# The number of clients to gline when processing the gline queue
+gbCount = 2
+
+# The interval (in seconds) processing the gline queue
+gbInterval = 1
+

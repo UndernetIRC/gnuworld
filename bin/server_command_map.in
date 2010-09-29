@@ -1,0 +1,55 @@
+# $Id: server_command_map.in,v 1.6 2009/07/25 18:12:33 hidden1 Exp $
+# The mapping from module to message name for server command handlers
+# format: module_file_name module_loader_symbol command_key
+# example: libircu msg_AC AC
+# example: libircu msg_P P
+# example: libircu msg_NOOP Z
+
+libircu msg_AC AC
+libircu msg_AD AD
+libircu msg_B B
+libircu msg_C C
+libircu msg_CM CM
+libircu msg_D D
+libircu msg_NOOP DE
+libircu msg_DS DS
+libircu msg_EA EA
+libircu msg_EB EB
+libircu msg_G G
+libircu msg_GL GL
+libircu msg_I I
+libircu msg_J J
+libircu msg_JU JU
+libircu msg_K K
+libircu msg_L L
+libircu msg_M351 351
+libircu msg_M391 391
+libircu msg_M M
+libircu msg_N N
+libircu msg_NOOP NOOP
+libircu msg_M OM
+libircu msg_PA PA
+libircu msg_PA PASS
+libircu msg_O O
+libircu msg_P P
+libircu msg_Q Q
+libircu msg_R R
+libircu msg_RI RI
+libircu msg_RO RO
+libircu msg_S S
+libircu msg_Server SERVER
+libircu msg_SQ SQ
+libircu msg_T T
+libircu msg_V V
+libircu msg_WA WA
+libircu msg_W W
+libircu msg_Y Y
+libircu msg_Y ERROR
+libircu msg_NOOP Z
+libircu msg_NOOP A
+libircu msg_NOOP U
+libircu msg_NOOP WU
+libircu msg_NOOP MO
+libircu msg_NOOP 482
+libircu msg_NOOP 443
+

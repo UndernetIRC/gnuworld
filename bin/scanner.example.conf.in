@@ -1,0 +1,11 @@
+# $Id: scanner.example.conf.in,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $
+# Config file for the scanner client
+nickname = netscan
+username = netscan
+hostname = undernet.org
+userdescription = Don't be afraid, I won't hurt you...
+
+mode = +iok
+
+# The maximum number of outgoing connections to establish
+max_connects = 1500

@@ -1,0 +1,6 @@
+This file is used to get some information about how zombies work, 
+primarily for looking for cross server kicks and determining which ones
+are actually honored.
+
+Receives a socket.log as input.
+

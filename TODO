@@ -1,0 +1,5 @@
+- ****** DOCUMENTATION!!!! ******
+- Improve how the configure script detects the postgresql installation
+- Remove the link against the pgsql library in modules, if they need the 
+db interface they should just link against the db library
+

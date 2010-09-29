@@ -1,0 +1,70 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------------
+#-- "$Id: movetables,v 1.5 2002/08/30 10:51:20 nighty Exp $"
+#-- WARNING:!!!
+#--                This script shall ONLY be used if you have something else
+#--                than 'exceptions','ips' or 'webcookies' in your local database
+#--                and you want to move all that should be now in 'remote' to its
+#--                destination.
+#--
+#--
+#-- nighty <nighty@undernet.org>
+
+
+#--
+#-- Edit the following 3 variables
+#-- (note: do not put the trailing '/' in PGBINDIR)
+
+PGBINDIR="/usr/local/pgsql/bin"
+SRCDB="local_db@127.0.0.1"
+DSTDB="remote_db@1.2.3.4"
+
+#--
+#--
+
+
+
+
+
+echo "TableUpdate 1.3"
+echo "--"
+
+TABLESTOMOVE="pending_pwreset helpmgr_users pending_mgrchange xatadmins"
+
+if [ "$1" != "-YES" ]; then
+
+	echo "@@ NOTICE: This will MOVE the following tables :"
+	echo "@@         $TABLESTOMOVE"
+	echo "@@    from $SRCDB,"
+	echo "@@      to $DSTDB."
+	echo "@@"
+	echo "?? If you are sure you want this to happen and you have read local_db.sql, then use '`basename $0` -YES'"
+	echo "@@"
+	echo "@@ By default the programm drops the old tables from $SRCDB, if you dont want this to happen,"
+	echo "@@ you should call the programm : '`basename $0` -YES -nodrop'"
+	echo "@@"
+	echo ">> Missing argument."
+	echo " "
+	
+	exit 1
+
+fi
+
+for i in $TABLESTOMOVE; do
+	TMPFILE="/tmp/tmpmovtable.$$"
+	$PGBINDIR/pg_dump -x -t $i $SRCDB > $TMPFILE
+	$PGBINDIR/psql $DSTDB < $TMPFILE
+	if [ "$2" != "-nodrop" ]; then
+		echo "DROP TABLE $i;" > $TMPFILE
+		$PGBINDIR/psql $SRCDB < $TMPFILE
+	fi
+	echo "** moved table '$i' from $SRCDB to $DSTDB."
+	rm -f $TMPFILE
+done
+
+echo ">> Job finished !@#."
+echo " "
+
+exit 0
+

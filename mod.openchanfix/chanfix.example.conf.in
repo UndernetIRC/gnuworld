@@ -1,0 +1,163 @@
+# $Id: chanfix.example.conf.in,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
+# chanfix configuration file
+
+# ---------------------------------------------------------------------
+
+# Nickname of bot
+nickname = C
+
+# Username of bot
+username = chanfix
+
+# Hostname of bot
+hostname = evilnet.development
+
+# Real name (info) of bot
+userdescription = Oooh! Oooh! I can fix it!
+
+# User modes bot should set
+mode = +idk
+
+# ---------------------------------------------------------------------
+# Database specifications
+
+# Host and port of database
+sqlHost = 127.0.0.1
+sqlPort = 5432
+# Name of database
+sqlDB   = chanfix
+# If you don't need user/pass just put "" for option(s) below
+sqlcfUser = evilnet
+sqlPass = ""
+
+# ---------------------------------------------------------------------
+# Channels the bot should join
+
+# Console channel name and initial modes
+consoleChan = #coder-com
+consoleChanModes = +nst
+
+# Should the bot relay admin messages to the console channel?
+# NOTE: This only disables relaying information sent to the
+# adminLog. debugLog information is *always* relayed.
+sendConsoleNotices = true
+
+# Channel(s) that chanfix should join besides consoleChan (can be multiple)
+joinChan = #chanfix
+joinChan = #staff
+
+# Initial modes all joinChans should have
+joinChanModes = +nt
+
+# ---------------------------------------------------------------------
+# Fixing settings
+
+# Should chanfix automatically fix opless channels?
+enableAutoFix = true
+
+# Should chanfix be able to manually fix channels?
+enableChanFix = true
+
+# Can channels be blocked by admins?
+enableChannelBlocking = true
+
+# Should chanfix join the channel its fixing? this avoids the hopping issue
+joinChannels = true
+
+# Should chanfix send notices saying the channel is being fixed for auto
+# fixes. Also a notice after its finished saying its done?
+autoFixNotice = true
+
+# Should chanfix send notices saying the channel is being fixed for manual
+# fixes Also a notice after its finished saying its done?
+manualFixNotice = true
+
+# Should auto fixes stop if an already reopped user ops another user?
+stopAutoFixOnOp = true
+
+# Should manual fixes stop if an already reopped user ops another user?
+stopChanFixOnOp = true
+
+# Should the top ops be allowed to perform fixes on their own channels?
+allowTopOpFix = false
+
+# Should the top op fixes be able to alert the top 10 ops who are not in
+# the channel at the time of the fix automatically? If no/false then the
+# database help entry for REQUESTOP will need to be updated.
+allowTopOpAlert = true
+
+# How much percentage within the top score should the top ops score be
+# before they are allowed to perform fixes. Dont include a %.
+topOpPercent = 10
+
+# Minimum score an op has be before they can issue fixes in their own
+# channel without requiring an oper to do them.
+minFixScore = 1000
+
+# Minimum score an op has to be before they can use the CANFIX command for
+# a channel they are ops in.
+minCanFixScore = 500
+
+# Minimum time required between REQUESTOP fixes. (In seconds). The last
+# fix time is updated at the start of a fix so allow time for the first
+# fix aswell as time for a gap.
+minRequestOpTime = 720
+
+# ---------------------------------------------------------------------
+# Network settings
+
+# Version of IRCu used on the network (11 or 12)
+# Use 11 for u2.10.11 and 12 for u2.10.12
+# NOTE: You MUST restart GNUWorld for this change to take place.
+version = 12
+
+# Should burst be used to fix takeovers (through a manual fix)?
+# Burst guarantees that the abusers will not be reopped due to
+# a netsplit, but it can cause problems due to lowering timestamp.
+# NOTE: You MUST restart GNUWorld for this change to take place.
+useBurstToFix = true
+
+# Total number of servers on the network
+numServers = 10
+
+# The minimum percentage of servers that need to be linked;
+# if there are fewer servers linked, chanfix will not fix
+# any channels, be it automatic or manual.
+minServersPresent = 75
+
+# The full server name of the channel service. This is used in
+# checking whether the channel service is currently linked or
+# not to the network.
+chanServName = channels.undernet.org
+
+# ---------------------------------------------------------------------
+# Interface settings
+
+# The amount of scores to report when issuing the SCORE #channel
+# command. Do not set this to a higher value than 10.
+numTopScores = 10
+
+# ---------------------------------------------------------------------
+# Database settings
+
+# Minimum clients needed in a channel for it to be scored
+minClients = 4
+
+# Which clients score a point if they are opped?
+# Client needs to be idented (no ~ before username)
+clientNeedsIdent = false
+
+# ---------------------------------------------------------------------
+# Miscellaneous settings
+
+# Frequency (in seconds) between database connection status checks
+connectCheckFreq = 10
+
+# File where all admin commands sent to backchan are logged and saved
+adminLogFile = chanfix-admin.log
+
+# File where all debug information sent to backchan is logged and saved
+debugLogFile = chanfix-debug.log
+
+# End of config file.
+# ---------------------------------------------------------------------

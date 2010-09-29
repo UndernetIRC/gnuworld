@@ -1,0 +1,51 @@
+Example:
+
+Let's look at an example channel, #mod.Chanfix. Currently, the following people
+are on #mod.Chanfix:
+
+Users on #mod.Chanfix:
+
+[@Beige ] [@cryogen] [@sabre2th] [+cfan    ] [morfie]
+[@cfgaar] [@Garion ] [@smurf   ] [+Domilijn] [as4   ]
+#mod.Chanfix: Total of 10 nicks [6 ops, 2 voices, 2 normal]
+
+Here is a list of all the hostmasks of the users on #mod.Chanfix:
+
+@ Beige        beige@oper.suid.sh
+@ cfgaar      garion@open.chanfix
+@ cryogen   ~cryogen@bin.bash.sh
+@ Garion      garion@hub.nl
+@ sabre2th  sabre2th@feed.your.supermind
+@ smurf        smurf@80.60.12.241
++ cfan          cfan@jd-163-76.doc.aca.mmu.ac.uk
++ Domilijn  domilijn@kansloos.carnique.nl
+  morfie        morf@217-195-236-172.dsl.esined.net
+  as4             as@CPE-65-28-140-90.neb.rr.com
+
+Now, #mod.Chanfix has existed for several weeks now, so there are scores for
+the channel in the mod.Chanfix database. These scores are:
+
+1. 3651 garion@open.chanfix
+2. 3548 beige@oper.suid.sh
+3. 3498 domilijn@kansloos.carnique.nl
+4. 3289 garion@hub.nl
+5. 3176 ivo@echelon.schaapje.org
+6. 3006 sabre2th@feed.your.supermind
+7. 1252 smurf@80.60.12.241
+
+As you can see, cryogen, whilst being opped, doesn't have a record in the
+database. The reason that he doesn't have a score is that he is not idented;
+you can see this because he has a tilde (~) before his username.
+Let's ask C what he thinks about the status of the channel as it is now.
+
+<Garion> score #mod.Chanfix
+<C> Top 10 scores for channel "#mod.Chanfix" in the database:
+<C> 3651, 3548, 3498, 3289, 3176, 3006, 1252.
+<C> Top 10 scores for ops in channel "#mod.Chanfix" in the database:
+<C> 3651, 3548, 3289, 3006, 1252.
+<C> Top 10 scores for non-ops in channel "#mod.Chanfix" in the database:
+<C> 3498.
+
+From these scores you can see that the scores of the opped people are the same
+as the top scores in the database, so the channel is currently with the
+"rightful" owners.

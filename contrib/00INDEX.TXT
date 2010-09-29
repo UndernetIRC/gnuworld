@@ -1,0 +1,3 @@
+encrypt.sh	Program to generate cmaster password hashes
+chktrans.py	Program to generate a report on the translations table
+00INDEX.TXT	This file.

@@ -1,0 +1,85 @@
+# $Id: ccontrol.example.conf.in,v 1.4 2009/06/09 05:55:55 hidden1 Exp $
+# conf file for testClient
+
+# database specifications
+sql_host = 127.0.0.1
+sql_port = 5432
+
+# sql_db = Name of the database. 
+
+sql_db = ccontrol
+
+#if you dont need user/pass just leave it with ''
+sql_user = dan
+sql_pass = foo
+
+# The following fields are required
+username = UWorld
+nickname = UWorld
+hostname = UWorld.Undernet.org
+userdescription = UWorld
+
+operchanmodes = +isn
+mode = +iodkw
+
+# make sure channel names are preceeded
+# by the '#' character
+operchan = #valhalla
+
+# msgchan is also an operchan
+msgchan = #gnuworld.message
+
+# Default gline length (in seconds)
+glength = 3600
+
+# Default reason for adding an oper chan
+operchanreason = This is now an IRC Operator only channel
+
+# report specification
+
+# abuse_mail - the email that the report should be emailed to
+abuse_mail = abuse@yournet.org 
+
+# ccemail - the email that ccontrol will put in the from field
+# of the report
+ccemail = uworld-report@yourdomain.com
+
+# sendmail - full path to the sendmail program
+sendmail = /usr/sbin/sendmail
+
+# mail_report - set 1 for the bot to mail the report
+# set to 0 if you dont want a report to be mailed
+mail_report = 0
+
+# gline_interval - the interval in which ccontrol should check
+# for expired glines
+gline_interval = 3600
+
+# max_connection - the maximum connections a host can have before glined
+max_connection = 5
+
+# max_GLen - the length of the gline the for excessive
+# connection (in seconds)
+max_GLen = 86400
+
+# max_threads - maximum number of gate checking threads to start
+max_threads = 100
+
+# check_gates - set 1 for the bot to check for open gates, or 0 for not 
+check_gates = 0
+
+# check_clones - set 1 for the bot to check for clones, or 0 for not
+check_clones = 0
+
+# Expired_Interval
+Expired_interval = 60
+
+# dbinterval
+dbinterval = 60
+
+# showCGIpsInLogs - If set to 1, it shows channel glines IPs in lastcom logs and in daily logs sent by email
+showCGIpsInLogs = 1
+
+# AnnounceNick - Nick used by the fake client to make announcements using the ANNOUNCE command
+AnnounceNick = A
+

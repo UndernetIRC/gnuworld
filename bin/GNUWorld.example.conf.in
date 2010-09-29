@@ -1,0 +1,74 @@
+# $Id: GNUWorld.example.conf.in,v 1.15 2006/12/22 06:41:41 kewlio Exp $
+# GNUWorld Core Configuration File
+#
+
+uplink = 192.168.181.111
+port = 4400
+password = 54321
+name = services.undernet.org
+description = UnderNet Services
+numeric = 51
+
+# Set this variable to yes if you want the server to attempt
+# to auto_reconnect when a connection is terminated, set
+# to no otherwise.
+# Be careful using this.
+auto_reconnect = yes
+
+# There is currently a bug in ircu which causes the first client
+# of a multiclient server to be lost, but only if maxclients is set
+# to an even number.
+# Therefore, only use odd numbers for maxclients here.
+maxclients = 1023
+
+# This is the variable which defines the host suffix to be concatenated
+# onto the user's account name for host hiding.
+hidden_host_suffix = .users.undernet.org
+
+# command_map is the name of the file which contains the mappings
+# from module filenames (of server command handlers) to the
+# message name to which it is associated.
+# You probably will not need to ever change this.
+command_map = server_command_map
+
+# libdir is the path to the directory containing
+# the gnuworld modules
+libdir = ../lib
+
+# To use a certain module, uncomment it below.
+#module = libcservice.la cservice.example.conf
+#module = libccontrol.la ccontrol.example.conf
+#module = libchanfix.la openchanfix.example.conf
+#module = libcloner.la cloner.example.conf
+#module = libnickserv.la nickserv.example.conf
+#module = libstats.la stats.example.conf
+#module = libscanner.la scanner.example.conf
+#module = libgnutest.la gnutest.example.conf
+#module = libclientExample.la clientExample.example.conf
+#module = libdronescan.la dronescan.example.conf
+#module = libsnoop.la snoop.example.conf
+
+# Control nicknames
+# List here the nicknames to which you want the server to respond
+# for control commands.
+# You need not list any, it could be construed as a security
+# risk, but adds very nice functionality.
+# No clients are burst for control, instead control commands
+# must be sent via MSG controlnick@server.name <command>
+controlnick = control
+
+# List the AC account usernames for those users you want to
+# have access to the control commands.
+# Be careful who you choose for this.
+# AC account usernames are case sensitive.
+allowcontrol = reppir
+
+#################################################
+# It is safe to leave the rest of this file alone
+# These variables are for fine tuning
+
+# The time between checks for expired glines (seconds)
+glineUpdateInterval = 15
+
+# The time between pings to the uplink (seconds)
+pingUpdateInterval = 60

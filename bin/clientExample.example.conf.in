@@ -1,0 +1,8 @@
+# $Id: clientExample.example.conf.in,v 1.2 2003/06/05 01:38:01 dan_karrels Exp $
+# conf file for testClient
+username = clientEx
+nickname = clientEx
+hostname = undernet.org
+userdescription = GNUWorld Test Client
+
+mode = +i

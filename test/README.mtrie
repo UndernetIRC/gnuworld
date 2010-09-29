@@ -1,0 +1,32 @@
+
+The mtrie* suite is used to test the gnuworld matching trie (MTrie).
+
+mtrie
+-----
+Reads a socket file, putting all hostnames found in "N" commands into
+an MTrie.  It then provides an interactive menu system allowing you to
+search/insert/delete items in the MTrie.
+
+mtrie_perf
+----------
+Reads a socket file, putting all hostnames found in "N" commands into
+an MTrie.  This program will invoke the MTrie's dumpDebug() information
+into a file like "mtrie_perf_<name of socket file>".  This file includes
+information about each node in the MTrie: level number, number of
+subtrees (sub nodes), and number of values stored at that node.  It is
+in a syntax that should be easily parsed by some other program.
+
+mtrie_perf_summary
+------------------
+This program reads an mtrie_perf output file and spits out some useful
+information about the MTrie, like max level, average number of values
+per node, etc.
+
+mtrie_load
+----------
+Perform load testing of the matching trie, comparing it to a multimap.  It 
+reads a file with N (optionally wildcard) strings to search for.  The 
+default files are mtrie.match*.  This program accepts a handful of command 
+line arguments and should be easy to use.  By default a multimap is used, 
+add -t to the command line to use a matching trie instead.
+

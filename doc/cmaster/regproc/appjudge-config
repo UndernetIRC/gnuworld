@@ -1,0 +1,39 @@
+#
+# $Id: appjudge-config,v 1.7 2003/08/23 16:02:25 nighty Exp $
+# original code by Sengaia
+#
+# Database name (duh)
+set SQL_DB "cservice"
+set SQL_USER "gnuworld"
+set SQL_PASS ""
+set SQL_HOST "127.0.0.1"
+
+# Number of seconds in a day, I suggest you do not change this ;)
+set DAY				86400
+
+# Number of days an application has to pass the activity test
+set MAX_DAYS			99
+
+# Number of unique IP's that must visit a channel during the activity test
+set UNIQUE_JOINS		99
+
+# Number of supporters that must visit the channel during the activity test
+set MIN_SUPPORTERS		99
+
+# Duration of the notify period
+set NOTIFY_DAYS			99
+
+# Number of days supporters have to confirm their support
+set SUPPORT_DAYS		99
+
+# The Judge's Reviewer ID
+set REVIEWER_ID                 0
+
+# These are better left alone
+set AS_PENDING_SUPPORT		0
+set AS_TRAFFIC_CHECK		1
+set AS_NOTIFICATION		2
+set AS_COMPLETED		3
+set AS_CANCELLED		4
+set AS_PENDREVIEW		8
+set AS_REJECTED			9

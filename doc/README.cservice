@@ -1,0 +1,76 @@
+-- "$Id: README.cservice,v 1.19 2005/09/30 00:48:43 kewlio Exp $"
+--
+-- For more detailed information about setting up GNUworld, visit :
+--      http://coder-com.undernet.org/gnuworld-setup/
+--
+--
+-- 2001-10-04: nighty <nighty@undernet.org>
+--
+
+
+Follow these steps to setup the database for the cservice module.  This
+file assumes that postgresql is running and configured, and that you have
+access to add and modify databases within it.
+
+Create the database
+-------------------
+> createdb cservice
+
+Note that this assumes that the cservice database does not already exist.
+
+Install the pl language
+-----------------------
+The following command assumes (in addition to above conditions) that the
+pgsql libraries are located in /usr/local/pgsql/lib:
+
+> createlang -L /usr/local/pgsql/lib plpgsql cservice
+
+Load the schema
+---------------
+Make sure you are in the gnuworld/doc directory.
+
+> psql cservice < cservice.sql
+> psql cservice < languages.sql
+> psql cservice < language_table.sql
+> psql cservice < cservice.help.sql
+> psql cservice < cservice.web.sql
+> psql cservice < cservice.config.sql
+> psql cservice < greeting.sql
+
+Create a local (for the www) Database called 'local_db' for webcookies
+(without this local db the website will NOT work)
+Tho you can also choose to name the 'cservice' db 'local_db' for a
+strictly and whole local use of DB + webserver, and issue the
+following to the same db and then  forgot the other 'createdb' thing.
+
+This database will also hosts the pending verif q/a reset requests.
+---------------------------------------------------------------------
+
+> createdb local_db
+> psql local_db < local_db.sql
+
+
+Add administrator account
+-------------------------
+This command will add an account called 'Admin' with level 1000 access on
+channel '*'...use this power wisely, The Dark Side is very powerful.
+
+This will also register channel #coder-com to 'Admin' to make the VERIFY
+command work on authenticated users.
+
+> psql cservice < cservice.addme.sql
+
+Using this account you will be able to login as Admin online with your
+cservice bot.
+
+Username: Admin
+Password: temPass (be sure to change this after login online)
+
+All Done
+--------
+That's it for the sql stuff.  Be sure to edit the configuration file for
+cmaster (../bin/cservice.conf), giving username, nickname, etc, and
+database information.
+For the website, be sure to edit website/php_includes/config.inc to configure your website.
+
+The GNUWorld development team

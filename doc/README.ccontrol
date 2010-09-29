@@ -1,0 +1,65 @@
+-- "$Id: README.ccontrol,v 1.10 2008/08/06 19:35:58 hidden1 Exp $"
+--
+-- For more detailed information about setting up GNUworld, visit :
+--      http://coder-com.undernet.org/gnuworld-setup/
+--
+-- 2001-10-04: nighty <nighty@undernet.org>
+--
+
+
+
+            Setting up ccontrol for the first time 
+---------------------------------------------------------------
+	    
+Follow these steps to setup the database for the ccontrol module.  This
+file assumes that postgresql is running and configured, and that you have
+access to add and modify databases within it.
+
+Create the database
+-------------------
+> createdb ccontrol
+
+Note that this assumes that the ccontrol database does not already exist.
+
+Load the schema
+---------------
+Make sure you are in the gnuworld/doc directory.
+
+> psql ccontrol < ccontrol.sql
+> psql ccontrol < ccontrol.help.sql
+> psql ccontrol < ccontrol.shells.sql
+
+Add yourself
+------------
+
+After all this is done, you need to add yourself to the bot , to do that simply run
+
+> psql ccontrol < ccontrol.addme.sql
+
+Note: the script add the user Admin , with all commands enabled .
+      the host that will be added is *!*@* , you should change it 
+      the first time that you login to the bot along with the pass
+      which is temPass , for more help /msg bot help modoper.
+      
+      
+then you should
+
+> psql ccontrol < ccontrol.commands.sql
+
+
+If you have problems with an upgrade of GNUworld with ccontrol module on certain features,
+you may want to upgrade your old tables to fit, then do the following :
+
+> psql ccontrol < ccontrol.update.sql
+
+
+NOTE: in the default GNUworld.conf use rather 'ccontrol.conf' as a default for CControl
+than the 'gnuworld3.conf' file (it's not complete).
+
+All Done
+--------
+That's it for the sql stuff.  Be sure to edit the configuration file for
+cmaster (../bin/ccontrol.conf), giving username, nickname, etc, and
+database information.
+
+The GNUworld development team.

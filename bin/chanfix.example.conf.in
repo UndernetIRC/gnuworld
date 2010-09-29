@@ -1,0 +1,27 @@
+# Configuration file for the GNUWorld ChanFix module
+
+username = ChanFix
+nickname = CF
+hostname = undernet.org
+userdescription = GNUWorld ChanFix
+
+mode = +idk
+
+# Console channel
+consoleChannel = #chanfix
+# Console channel modes
+consoleModes = +ns
+
+# Delay between linking and starting to count in seconds
+startDelay = 120
+
+# Number of points to allocate to an authed op per period
+pointsAuth = 10
+
+# Duration of a single period in seconds
+period = 60
+
+# Maximum points a user can gain
+# Set this to be equal to 24 hours of ops
+# ie (24*60*60) * (pointsAuth / period)
+maxPoints = 100

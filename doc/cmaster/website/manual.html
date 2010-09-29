@@ -1,0 +1,671 @@
+<html>
+<!-- CMaster Channel Services Website. -->
+<!-- $Id: manual.html,v 1.3 2001/12/22 22:46:17 gte Exp $ -->
+
+<head>
+<title>GNUWorld / CMaster / CControl Manual</title>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#003366" vlink="#003366" alink="#003366">
+<p><font face="Geneva, Arial, Helvetica, san-serif" size="+2">GNUWorld / CMaster
+  / CControl Manual </font></p>
+<p>************************************************************************************************************************<br>
+  ************************************************************************************************************************<br>
+  <br>
+  <b>Version : 1.1<br>
+  Author : Cti- <a href="mailto:cti@zurna.org">Cti@zurna.org</a><br>
+  Language : English<br>
+  Document : General info (manual)<br>
+  Last Update: 22/12/2001<br>
+  Web Address: http://gnuworld.undernet.org/cmaster/manual.htm</b></p>
+<p>UPDATES:</p>
+<p>1.1 - Fixed missing sections (2.2, 2.3, 3.1) - Added links for easy use - Rewrite
+  HTML.<br>
+  <br>
+  <br>
+  ************************************************************************************************************************<br>
+  <br>
+  This file contains general information about<br>
+  the manuals. There are four main manuals you can find.<br>
+  manual.gnuworld : GNUWorld installation guide<br>
+  manual.ccontrol : ccontrol installation guide (EUworld)<br>
+  manual.cservice : cservice installation guide (X)<br>
+  manual.website : Customized Web Interface guide<br>
+  <br>
+  ************************************************************************************************************************<br>
+  <br>
+  These manuals does NOT include problems occured during the compiling of GNUWorld,
+  I accept that<br>
+  you compiled and configured GNUWorld correctly. But you can still find a quick
+  installation guide<br>
+  inside the manual.gnuworld. For details refer to the README file by GNUWorld
+  development team.<br>
+  If you still have some errors visit us at #coder-com on Undernet, if you are
+  lucky you can find <br>
+  someone to help you there.<br>
+  <br>
+  ************************************************************************************************************************<br>
+  ccontrol.manual includes <br>
+  ************************************************************************************************************************<br>
+  Short description of ccontrol module<br>
+  Setting up ccontrol for the first time<br>
+  Example *.conf file<br>
+  F.A.Q (not yet)<br>
+  <br>
+  <br>
+  ************************************************************************************************************************<br>
+  cservice.manual includes<br>
+  ************************************************************************************************************************<br>
+  Short description of cservice module<br>
+  Setting up cservice for the first time<br>
+  Example *.conf file<br>
+  How to add extra level 1000's to DB<br>
+  F.A.Q<br>
+  <br>
+  ************************************************************************************************************************<br>
+  manual.website includes<br>
+  ************************************************************************************************************************<br>
+  Short description of website<br>
+  How to install Apache for your box<br>
+  How to install an PHP interpreter<br>
+  Config files for apache and php<br>
+  Explanation on config.inc<br>
+  F.A.Q (again)<br>
+  <br>
+  If you have any questions regarding these fallowing topics please feel free
+  to mail to <br>
+  "<a href="mailto:gnuworld-devel@lists.sourceforge.net">gnuworld-devel@lists.sourceforge.net</a>"
+  and we will insert it as soon as possible.<br>
+  ************************************************************************************************************************<br>
+  <font size="+2">INDEX </font><br>
+  ************************************************************************************************************************<br>
+  <font size="+1"><a href="#part1">PART I - MANUAL.GNUWORLD</a></font><br>
+  <b><a href="#11">Section 1.1 - Obtaining GNUWorld with CVS</a><br>
+  <a href="#12">Section 1.2 - Building GNUWorld</a><br>
+  <a href="#13">Section 1.3 - Editing the config file (localhost.conf)</a><br>
+  <a href="#14">Section 1.4 - Running GNUWorld</a></b><br>
+  <font size="+1"><a href="#part2">PART II - MANUAL.CSERVICE</a></font><br>
+  <b><a href="#21">Section 2.1 - Setting up cservice module for the first time</a><br>
+  <a href="#22">Section 2.2 - Editing cservice.conf file</a><br>
+  <a href="#23">Section 2.3 - Adding Extra Level 1000 accounts to DB</a></b><br>
+  <font size="+1"><a href="#part3">PART III - MANUAL.CCONTROL</a></font><br>
+  <b><a href="#31">Section 3.1 - Setting up ccontrol module for the first time</a><br>
+  <a href="#32">Section 3.2 - Editing ccontrol.conf file</a></b><br>
+  <font size="+1"><a href="#part4">PART IV - MANUAL.WEBSITE</a></font><br>
+  <b><a href="#41">Section 4.1 - Obtaining Apache & PHP interpreter</a><br>
+  <a href="#42">Section 4.2 - Compiling Apache & PHP interpreter</a><br>
+  <a href="#43">Section 4.3 - Configuring Apache & PHP interpreter</a><br>
+  <a href="#43">Section 4.4 - Editing config.inc file</a></b><br>
+  <font size="+1"><a href="#part5">PART V - PostGreS Short Manual</a></font><br>
+  <br>
+  <br>
+  ************************************************************************************************************************<br>
+  ************************************************************************************************************************<br>
+  ************************************************************************************************************************<br>
+  <br>
+  <a name="part1"></a>PART I - MANUAL.GNUWORLD<br>
+  <br>
+  We assume that you have the fallowing stuff installed<br>
+  and working properly on your box to run GNUWorld<br>
+  <br>
+  - A working PostGreSQL server with right permissions<br>
+  - An uplink IRC server with the proper U Lines<br>
+  - Copy of GNUWorld (check section 1.1 to how to get)<br>
+  - A machine to run GNUWorld<br>
+  <br>
+  For the customized web site you also need the<br>
+  following services working properly<br>
+  <br>
+  - Running web server (Recommended Apache)<br>
+  (get latest apache server relase from <a href="http://www.apache.org">http://www.apache.org</a>)<br>
+  - PHP interpreter<br>
+  (get latest relase from <a href="http://www.php.net">http://www.php.net</a>)<br>
+  ************************************************************************************************************************<br>
+  <a name="11"></a>Section 1.1 * Obtaining GNUWorld and Web site with CVS<br>
+  ************************************************************************************************************************<br>
+  <br>
+  1- cvs -d :pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld<br>
+  login<br>
+  2- When prompted for a password, hit the return key<br>
+  3- cvs -z3 -d :pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld<br>
+  co gnuworld<br>
+  4- cvs -z3 -d :pserver:anonymous@cvs.gnuworld.sourceforge.net:/cvsroot/gnuworld<br>
+  co website<br>
+  (Execute the above commands on a single line in your shell) Line 3 will create<br>
+  a directory under your current directory named "gnuworld" in which all of<br>
+  GNUWorld's files will be placed. Line 4 will create a directory under your<br>
+  current directory named "website" in which all of website files will be<br>
+  placed.<br>
+  <br>
+  If you downloaded the tar gzipped version of GNUWorld use<br>
+  the fallowing command to unpack the archive as fallows:<br>
+  <br>
+  gzip -cd gnuworld.xxx.tar.gz | tar xf -<br>
+  <br>
+  where xxx is the version of GNUWorld you have obtained.<br>
+  <br>
+  <br>
+  ************************************************************************************************************************<br>
+  <a name="12"></a>Section 1.2 * Building GNUWorld<br>
+  ************************************************************************************************************************<br>
+  <br>
+  To build GNUWorld you need a complier that supports ANSI C++ Standart.<br>
+  (gmake also recommended).<br>
+  1- cd gnuworld<br>
+  <br>
+  2- ./configure<br>
+  (if you do not want to load all the modules but a specific one<br>
+  use the following commands as needed)<br>
+  <br>
+  CONFIGURE FOR ONLY THE CSERVICE CLIENT:<br>
+  ./configure --enable-modules=cservice<br>
+  CONFIGURE FOR ONLY THE CCONTROL CLIENT:<br>
+  ./configure --enable-modules=ccontrol<br>
+  CONFIGURE BOTH THE CSERVICE & CCONTROL MODULES:<br>
+  ./configure --enable-modules=cservice,ccontrol<br>
+  <br>
+  Configure will build the Makefiles that GNUWorld will use to<br>
+  compile its source.<br>
+  <br>
+  3- make<br>
+  This will build all the libraries and binaries.<br>
+  <br>
+  4- make install<br>
+  To install the binaries and library.<br>
+  <br>
+  ************************************************************************************************************************<br>
+  <a name="13"></a>Section 1.3 * Editing the config file<br>
+  ************************************************************************************************************************<br>
+  <br>
+  Switch to the /bin directory and edit the localhost.conf<br>
+  <br>
+  uplink = 25.202.242.30 # The server we will connect to<br>
+  port = 5500 # The port we will connect to<br>
+  password = santa # Our server password in Uplink's C: Line<br>
+  name = channels.undernet.org # Our server name<br>
+  description = Channel Service # The description will be seen in /links<br>
+  numeric = 63 # Our server numeric (must be unique on the network)<br>
+  maxclients = 50 # maxclients we can run<br>
+  <br>
+  <br>
+  module = libcservice.la (related conf file)<br>
+  module = libccontrol.la (related conf file)<br>
+  <br>
+  Example: <br>
+  <br>
+  module = libcservice.la cservice.conf<br>
+  (This will load the cservice module and looks for cservice.conf file for its
+  configration. If you have a <br>
+  differnt name than cservice.conf, like X.conf etc. specify it here like : module
+  = libcservice.la X.conf )<br>
+  <br>
+  Don't touch the rest of the file for fine tuning.<br>
+  <br>
+  ************************************************************************************************************************<br>
+  Section 1.4 * Running GNUWorld<br>
+  ************************************************************************************************************************<br>
+  <br>
+  Simply type <br>
+  ./gnuworld -f localhost.conf<br>
+  <br>
+  EOP ( End of Part :P )<br>
+  ************************************************************************************************************************<br>
+  ************************************************************************************************************************<br>
+  ************************************************************************************************************************<br>
+  <br>
+  <br>
+  <a name="part2"></a>PART II - MANUAL.CSERVICE<br>
+  CService module is used to maintain channels over the network and keep them
+  open<br>
+  <br>
+  ********************************************************************************<br>
+  <a name="21"></a>Section 2.1 * Setting up cservice for the first time<br>
+  ********************************************************************************<br>
+  <br>
+  We assume that pgSQL is running and configured and you have the right permissions
+  to create and<br>
+  modify a database.<br>
+  <br>
+  <br>
+  1- Create the database for cservice module<br>
+  >createdb cservice<br>
+  <br>
+  (assume cservice database does not exist)<br>
+  <br>
+  2- Install the PL Language<br>
+  > createlang plpgsql cservice -L /usr/local/pgsql/lib<br>
+  <br>
+  3- Switch to gnuworld/doc directory<br>
+  <br>
+  4- Load the schema <br>
+  > psql cservice </p>
+<cservice.sql><br>
+    > psql cservice <languages.sql><br>
+    > psql cservice <language.table.sql><br>
+    > psql cservice <cservice.web.sql><br>
+<br>
+ 5- Add the administrator account<br>
+    > psql cservice <cservice.addme.sql><br>
+<br>
+    This will create an account with level 1000 on channel "*"<br>
+    NOTE: "*" is not a physical channel that you can not /join it.<br>
+<br>
+ 6- Connect to the IRC Server and login to your admin account.<br>
+<b><br>
+Username: Admin<br>
+Password: temPass<br>
+<br>
+Be sure to change your password.</b><br>
+<br>
+************************************************************************************************************************<br>
+<a name="22"></a>Section 2.2 * Example conf file<br>
+************************************************************************************************************************<br>
+<br>
+The default conf file is cservice.conf. You can find it under /bin directory.<br>
+<br>
+sql_host = 127.0.0.1 # Hostname/IP of PostGreSQL server<br>
+sql_port = 5432 # Port of PostGreSQL server<br>
+sql_db = Database name<br>
+(If you did everything as we told you it have to be cmaster,sql_db = cservice )<br>
+<br>
+sql_user = gnuworld  # sql_user is the username to pass to PostGreSQL<br>
+                       on connection.Usefull if your accoount name is<br>
+                       not the same as your Database username.<br>
+<br>
+nickname = E42-b # Bot name (X on Undernet)<br>
+username = cservice # Bot username (Cservice on Undernet)<br>
+hostname = undernet.org # Bot Hostname (undernet.org on Undernet)<br>
+userdescription = # Client description For help type: /msg X help<br>
+mode = +idk # Usermodes<br>
+<br>
+relay_channel = #cmaster.info  # Channel to relay useful information.<br>
+<br>
+debug_channel = #cmaster.debug # Channel to relay debug information.<br>
+<br>
+You can get info about other values in the conf file itself.<br>
+<br>
+<br>
+************************************************************************************************************************<br>
+<a name="23"></a>Section 2.3 * Adding Extra level 1000 admin accounts.<br>
+************************************************************************************************************************<br>
+<br>
+ Adding extra 1000's has two ways. First one is adding them directly to the database and second one is editing<br>
+ cservice.addme.sql file and loading it with: psql cservice <cservice.addme.sql><br>
+<br>
+ Its suggested that, add any extra level 1000 accounts before adding any new channels/usernames to database.<br>
+ <br>
+<br>
+ INSERT into users (user_name,password,language_id,last_updated)<br>
+ VALUES ('the_user_name','07d976a29bdb3ff42e10c102852151b28097bbad',1,now()::abstime::int4);<br>
+<br>
+ INSERT into levels (channel_id,user_id,access,last_updated)<br>
+ VALUES (1,the_user_id,1000,now()::abstime::int4);<br>
+<br>
+ * the_user_name should be the username will be added with level 1000<br>
+<br>
+ * the_user_id should be the "current users +1". If you only added the admin<br>
+   account it should be 2 now. When adding a third person it should be 3<br>
+   and go on...<br>
+ <br>
+   The password of the newuser will be temPass again.<br>
+<br>
+   Change the values in cservice.addme.sql and load it with the command above or switch to<br>
+   pgsql's directory (default is /usr/local/pgsql/bin) type psql and hit enter.<br>
+   After that copy and paste the changed values (the ones above)into the shell and hit enter.<br>
+<br>
+EOP<br>
+************************************************************************************************************************<br>
+************************************************************************************************************************<br>
+************************************************************************************************************************<br>
+<br>
+<a name="part3"></a>PART III - MANUAL.CCONTROL<br>
+<br>
+CControl is an IRC Operator Service which is also in use on Undernet now.<br>
+This part dedicated to ccontrol :P<br>
+<br>
+********************************************************************************<br>
+<a name="31"></a>Section 3.1 * Setting up ccontrol module for the first time<br>
+********************************************************************************<br>
+<br>
+Follow these steps to setup the database for the ccontrol module.  This<br>
+file assumes that postgresql is running and configured, and that you have<br>
+access to add and modify databases within it.<br>
+<br>
+ 1- Create the database if you didn't do it before<br>
+    > createdb ccontrol<br>
+<br>
+ 2- Switch to doc directory <br>
+    cd doc<br>
+<br>
+ 3- Load the schema<br>
+    > psql ccontrol < ccontrol.sql<br>
+    > psql ccontrol < ccontrol.help.sql<br>
+ <br>
+ 4- Add yourself to the bot<br>
+    > psql ccontrol < ccontrol.addme.sql<br>
+<br>
+This will add the user Admin with *!*@* hostmask and all the commands enabled.<br>
+Handle: Admin password: temPass<br>
+(This script should be run once and before any modifications to database)<br>
+<br>
+Do NOT forget to change your hostmask for your needs after your first login.<br>
+You can get more info by: /msg bot help modoper<br>
+<br>
+********************************************************************************<br>
+<a name="32"></a>Section 3.2 * Editing ccontrol.conf file<br>
+********************************************************************************<br>
+<br>
+ The default conf file is ccontrol.conf you can find it under /bin directory<br>
+<br>
+ sql_host = 127.0.0.1 # Host/IP of the PostGreSQL server<br>
+ sql_port = 5432 # Port of SQL server<br>
+ sql_db = database name (default ccontrol)<br>
+ <br>
+ ## Bot Info ##<br>
+ <br>
+username = KWorld2                  # Bot's username<br>
+nickname = KWorld2                  # Bot's nickname<br>
+hostname = KWorld2.krushnet.org     # Bot's hostname<br>
+userdescription = KWorld2           # Information seen in /whois<br>
+operchanmodes = +isn                # IRC Operator channel modes to set<br>
+mode = +iodkw                       # Default Bot modes<br>
+operchan = #valhalla                # IRC Operator channel<br>
+msgchan = #gnuworld.message         # Channel where useful info relayed<br>
+glength = 3600                      # Default gline length (in seconds)<br>
+operchanreason = Oper only channel  # Default reason for adding an oper chan<br>
+abuse_mail = abuse@yournet.org      # the email that the report should be emailed to<br>
+ccemail = ccontrol@yournet.org      # the email that ccontrol will put in the from field of the report<br>
+sendmail = /usr/sbin/sendmail       # Full path to the sendmail program<br>
+mail_report = 0                     # set 1 for the bot to mail the report , 0 if you dont want a report to be mailed<br>
+gline_interval = 3600               # the interval in which ccontrol should check for expired glines<br>
+max_connection = 5                  # the maximum connections a host can have before glined<br>
+max_GLen = 86400                    # the length of the gline the for excessive connection (in seconds)<br>
+<br>
+<br>
+EOP<br>
+************************************************************************************************************************<br>
+************************************************************************************************************************<br>
+************************************************************************************************************************<br>
+ <br>
+<a name="part4"></a>PART IV - MANUAL.GNUWORLD<br>
+<br>
+Here is the part where everybody is waiting for...<br>
+<br>
+********************************************************************************<br>
+<a name="41"></a>Section 4.1 * Obtaining Apache Web Server & PHP interpreter<br>
+********************************************************************************<br>
+<br>
+You can get the latest relase of apache web server at:<br>
+  http://httpd:apache.org/distbinaries/linux/<br>
+<br>
+You can get the latest relase of PHP interpreter at:<br>
+  http://www.php.net<br>
+<br>
+<br>
+********************************************************************************<br>
+<a name="42"></a>Section 4.2 * Compiling Apache Web Server & PHP interpreter<br>
+********************************************************************************<br>
+<br>
+ Be sure that Complete Source Codes of both these are in the same directory.<br>
+ Name of the apache should be something like that: apapche_1.3.x.tar.gz<br>
+<br>
+ 1- After downloading the latest version of Apache untar it:<br>
+   > gunzip -c apache_1.3.x.tar.gz | tar -xf <br>
+   where x is the version you have just downloaded.<br>
+
+ 2- Unpack the php-4.0.x.tar.gz file<br>
+    > gunzip -c php-4.0.x.tar.gz | tar -xf<br>
+    again x is the version info.<br>
+<br>
+    After these two steps we have two new directories. One for Apache and one for PHP.<br>
+    Now let's switch to apache and configure it <br>
+<br>
+ 3- After you unpack, switch to Apache's directory.<br>
+    cd apache_1.3.x<br>
+<br>
+ 4- Run the configure script:<br>
+    ./configure<br>
+ <br>
+ 5- Then part apache's directory<br>
+    cd ..<br>
+<br>
+    It's PHP interpreters turn now... Well performance is important for us so we will<br>
+    use module installation of PHP. And we will use Static Module where we insert <br>
+    PHP into Apache. They will work like 1 program :)<br>
+<br>
+6- Switch to PHP's directory<br>
+   cd php-4.0.x<br>
+
+7- And configure it:<br>
+   ./configure-with-pgsql-with-apache=../apache_1.3.x-enable-track-vars<br>
+
+!!! IMPORTANT !!!<br>
+After "apache=" specify the directory of apache...<br>
+
+8- If you want to use PHP with graphics also you will need GD Library<br>
+   like we insert apache and pgsql support with "-with" tag we will insert<br>
+   GD library with "-with-gd"<br>
+./configure-with-pgsql-with-gd-with-apache=../apache_1.3.x-enable-track-vars<br>
+<br>
+9- Make and install it (depends on your box this will take 2-8 minutes)<br>
+   make<br>
+   make install<br>
+<br>
+<br>
+After compiling switch back to Apache's directory<br>
+<br>
+10- cd ../apache_1.3.x<br>
+<br>
+11- Configure it<br>
+    ./configure-prefix=/www-active-module=src/modules/php4/libphp4.a<br>
+<br>
+the -prefix=/www paramater tells where to install apache. If you want to install it to /home/httpd<br>
+than you have to use -prefix=/home/httpd<br>
+<br>
+12- make and install again (this time apache)<br>
+    make<br>
+    make install<br>
+<br>
+13- After that copy the php.ini file to /usr/local/lib/ and edit it with a text editor.<br>
+    cd ../php-4.0.x<br>
+    cp php.ini-dist /usr/local/lib/php.ini<br>
+<br>
+14- Now add some little info to apache's conf file (httpd.conf) for PHP.<br>
+    you can find that file under apache_1.3.x/conf/<br>
+    <br>
+    Addtype application/x-httpd-php .php<br>
+    Addtype application/x-httpd-php .php3<br>
+    Addtype application/x-httpd-php .php4<br>
+<br>
+15- Pray to god and start apache<br>
+    ./apactrl start<br>
+<br>
+16- To check if its running type:<br>
+    ps -aux | grep 'httpd'<br>
+<br>
+<br>
+<br>
+********************************************************************************<br>
+<a name="43"></a>Section 4.3 * Configuring Apache & PHP interpreter<br>
+********************************************************************************<br>
+<br>
+ This section includes the *must* variables you have to set in apache and php's conf <br>
+ files before you run them... For more details of conf file of Apache see Section 4.5<br>
+<br>
+ To run apache properly you have to set some variables in httpd.conf. You can find this<br>
+ file under /conf directory of apache. Simply open httpd.conf with a text editor<br>
+<br>
+ !!!IMPORTANT!!! Edit these variables to suit your needs. Do not copy paste.<br>
+<br>
+ServerRoot "/www" -- The top directory which server conf files and error files kept.<br>
+KeepAlive On  -- To allow persistant connectios. On or Off. GNUWorld needs this value on.<br>
+ServerAdmin you@yournet -- The Server Administrator's info<br>
+Port 80 -- The listening port for standalone servers.<br>
+DocumentRoot "/home/root" -- The directory out of which you will serve your documents. <br>
+                             By default, all requests are taken from this directory, <br>
+                             but symbolic links and aliases may be used to point to other locations.<br>
+<br>
+ServerName "www.your.net" -- Specifies your server's name. In older relases apache won't run if you <br>
+                             do not define this.<br>
+<br>
+<Directory "/home/root">
+<p>-- This should be the same as DocumentRoot. <br>
+  <br>
+  *****************************<br>
+  <br>
+  in the php.ini file edit these<br>
+  <br>
+  [PostgresSQL]<br>
+  ; Allow or prevent persistent links.<br>
+  pgsql.allow_persistent = On<br>
+  <br>
+  [extension_dir]<br>
+  ; Directory in which the loadable extensions (modules) reside.<br>
+  extension_dir = ./<br>
+  <br>
+  <br>
+  This is the basic stuff for apache and php. If you have more questions come
+  and ask in #coder-com<br>
+  But do not forget we are not apache experts but couple of ppl coding for Undernet
+  on our free<br>
+  times. <br>
+  <br>
+  ********************************************************************************<br>
+  <a name="44"></a>Section 4.4 * Editing config.inc file<br>
+  ********************************************************************************<br>
+  <br>
+  Config.inc file is the only file you have to EDIT for your *very own* customized<br>
+  Web Interface. If you don't have PHP experience don't play with the other files<br>
+  that you might have screw them up.<br>
+  <br>
+  define(LIVE_LOCATION,"/live"); define this to "" if you dont put it in a subdirectory
+  like '/live' (default) but in '/' for example.<br>
+  define(IFACE_URL,"http://cservice.undernet.org/live/"); // The GUI main URL
+  (the one to access it)<br>
+  define(SERVICE_CHANNEL,"#cservice"); // The CService Official Channel<br>
+  <br>
+  /* NOTE: to FORGE reply adresses, user 'nobody' needs a 'Tnobody' line added
+  in /etc/sendmail.cf (or equiv.) */<br>
+  define(NETWORK_NAME,"Undernet"); // Define this to your network name... better
+  to be a "normal" single word ;)<br>
+  define(BOT_NAME,"X"); // You bot's name, defines some strings in the website
+  to fit more your configuration.<br>
+  define(IRC_SERVER,"irc.undernet.org"); // Default server for irc:// option.<br>
+  define(NETWORK_EMAIL,"cservice@undernet.org"); // the email of your network
+  (default).<br>
+  <br>
+  define(PURGE_EMAIL,"purge@undernet.org"); // the email where channel purge request
+  form is sent.<br>
+  define(XAT_EMAIL,"x@undernet.org"); // the email where manager change form is
+  sent.<br>
+  <br>
+  define(FROM_NEWUSER,"cmaster@undernet.org"); // the From: email for a NEWUSER
+  registration email.<br>
+  define(FROM_NEWUSER_SUBJECT,"Your Undernet Channel Service Account"); // the
+  subject of that mail.<br>
+  <br>
+  define(FROM_FPASS,"cmaster-recovery@undernet.org"); // the From: email for a
+  FORGOTTEN PASSWORD email.<br>
+  define(FROM_FPASS_SUBJECT,"Your Undernet Channel Service Password for "); //
+  the sujbect of that mail. 'username' is added at this string's end.<br>
+  <br>
+  /******************************/<br>
+  /* LOCAL DATABASE DEFINITIONS */<br>
+  /******************************/<br>
+  define(LOCALDB_NAME,"local_db"); // the local database that contains the gnuworld/doc/local_db.sql
+  information.<br>
+  define(LOCALDB_USER,"gnuworld"); // the local user that has full access to LOCALDB_NAME.<br>
+  define(LOCALDB_PASS,""); // the password, use blank if you dont use passwords.<br>
+  <br>
+  /*******************************/<br>
+  /* REMOTE DATABASE DEFINITIONS */<br>
+  /*******************************/<br>
+  define(REMOTEDB_NAME,"cservice"); // the remote databasr that contains cservice.sql,
+  cservice.web.sql information.<br>
+  define(REMOTEDB_USER,"gnuworld"); // the user that has access remotely to that
+  db<br>
+  define(REMOTEDB_PASS,""); // the password, use blank if you dont use passwords.<br>
+  define(REMOTEDB_HOST,"127.0.0.1"); // define to whatever host/IP of the "remote"
+  db is.<br>
+  <br>
+  /*******************************/<br>
+  /* LOCAL WEBSITE CONFIGURATION */<br>
+  /*******************************/<br>
+  define(HEAD_LOGO,"cservice-head.jpg"); // this points to an existing image in
+  website/docs/gnuworld/images. 59 pixels max height.<br>
+  define(HOSTING_LOGO,""); // this image should go in website/docs/gnuworld/images
+  and be maximum 250*33 pixels.<br>
+  define(HOSTING_URL,"");<br>
+  <br>
+  define(CSERVICE_SITE_URL,"../");<br>
+  <br>
+  those options are only used when using multiple mirrors of your CService website<br>
+  if you dont do mirrors at all, just leave those options as they are, this wont
+  affect anything.<br>
+  if you do mirrors, the following options means that if the website is accessed
+  with "ROUNDROBIN",<br>
+  it will automatically redirect accesses to "LOCALMIRROR".<br>
+  <br>
+  define(LOCALMIRROR,"cservice-live.xx.undernet.org");<br>
+  define(ROUNDROBIN,"cservice-live.undernet.org");<br>
+  <br>
+  <br>
+  /* IP CHECK OPTIONS */<br>
+  <br>
+  define(IPCHK_MAXHITS,3); // Number of failed forgotten_pass/login attempts before
+  IP_LOCK<br>
+  define(IPCHK_BANTIME,86400); // Time your IP/username is locked (seconds) when
+  caught into IPCHK_MAXHITS+ failed attempts.<br>
+  <br>
+  define(LREQ_TIME,600); // min time between forgotten password requests to avoid
+  flooding, set this to 0 to disable.<br>
+  define(UNETUB_TIME,14400); // 4 hours before being able to create another user
+  from the same IP. set to 0 to disable.<br>
+  <br>
+  <br>
+  <br>
+  <b>!!!! DONT FORGET TO REMOVE THE LAST LINE ON THE CONFIG.INC OR IT WILL NOT
+  WORK... !!!!</b><br>
+  <br>
+  <br>
+  <br>
+  <br>
+  For More questions you know what to do !!! Send them to me and I will add them
+  on the next relase of this help file.<br>
+  <br>
+  <br>
+  EOP<br>
+  ************************************************************************************************************************<br>
+  ************************************************************************************************************************<br>
+  ************************************************************************************************************************<br>
+  <br>
+  <a name="part5"></a>PART V - PostGre Short Installation<br>
+  <br>
+  This is the file that you can find also in the INSTALL file.<br>
+  If you have questions please send them to cti@zurna.org<br>
+  and I will add them to FAQ's when I do it. Cti-<br>
+  <br>
+  (You have to switch to Super User -Root- to do these steps)<br>
+  <br>
+  ./configure<br>
+  gmake<br>
+  gmake install<br>
+  adduser postgres<br>
+  su - postgres<br>
+  /usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data<br>
+  /usr/local/pgsql/bin/postmaster -D /usr/local/pgsql/data >logfile 2>&1 &<br>
+  adduser cmaster<br>
+  <br>
+  When it asked you "this user can add other users? y/n" Hit no (or yes)<br>
+  and when it asked "this user can create databases" hit YES<br>
+  <br>
+  After that switch to cmaster ( or whatever your username is)<br>
+  and type /usr/local/pgsql/bin createdb cmaster (or what you want your database
+  name to be)<br>
+  <br>
+  And its ready now !!!!</p>
+<p><a href="http://gnuworld.undernet.org/cmaster/index.html">[Go Back]</a> - <a href="mailto:cti@zurna.org">[Maintainer]</a><br>
+  <br>
+  <br>
+</p>
+</body>
+</html>

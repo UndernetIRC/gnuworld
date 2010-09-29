@@ -1,0 +1,179 @@
+Newest changes at the top of the file:
+$Id: RELEASE.NOTES,v 1.31 2003/04/24 20:19:36 gte Exp $
+
+CMaster 1.1pl13 - 24/04/2003
+* Allow opers to see the level 500 accesses a user has.
+
+CMaster 1.1pl12 - 09/01/2003
+* Change sqlUser->Commit() method to accept an iClient, to ensure
+  that last_updated_by is always set when the record is changed.
+* Add new methods to fetch config settings from the database instead
+  of config files. (Not ready yet, everything needs to be moved over
+  first).
+* Fix a typo in SUSPEND/UNSUSPEND syntax help.
+
+CMaster 1.1pl11 - 24/12/2002
+* Add some more stats.
+* Try and update user.last-seen every 12 hours if they're logged in.
+* Fix some compiler moaning.
+* Fix a bug in the above auto-update seen code, writing a last-hostmask
+  that may not have previously been cached.
+* Merry Xmas!
+
+CMaster 1.1pl10 - 08/12/2002
+* Added some contributed patches:
+* Andrew Miller <a1kmm@mware.virtualave.net>
+*	- Fix massdeop suspend bug.
+*
+* Alexander Maassen <outsider@key2peace.org>
+*	- Fixed the pesky negative suspend expire issue.
+*	- getResponse defaults to english if response for set language
+*	  has not been found.
+
+CMaster 1.1pl9 - 19/10/2002
+* Added preloadUserCache - to fetch a few days worth of user
+  accounts into memory before we hit the big +r'd net.burst :)
+
+CMaster 1.1pl8 - 14/10/2002
+* Add some new commands for CS Admins to scan last hostmasks/usernames,
+  etc. (Spike)
+* Don't try and tell a server off for op'ing a suspended user.
+* Convert the coder-com channel setting to a configuration variable (OUTSider)
+* Quick tweak to BAN/KICK command to kick users matching the banmask on their real-host,
+  not just their hidden host.
+
+CMaster 1.1pl7 - 01/04/2002
+* Added some basic memo-serv functionality. To use,
+  check you have USE_NOTES defined in cservice_config.h
+  and you have added the new "notes" table from cservice.sql
+  to your database. Needs a bit more work/features, but for now
+  its fairly difficult to mass-spam with.
+* X will now randomly kill a user on the network every 30 minutes
+  until March 31st, 2003. The kill message will be formulated
+  from the various works of Shakespeare.
+
+CMaster 1.1pl6 - 23/02/2002
+* Add MAXLOGINS, to specify how many logins you wish to
+  allow to your account at once.
+* DB Maintainence Required in this release:
+  ALTER TABLE users ADD COLUMN maxlogins INT4 DEFAULT 1;
+  UPDATE users SET maxlogins = 1;
+  
+CMaster 1.1pl5 - 04/12/2001
+* Remove ancient refrences to floodpro.
+* Fix case issue with suspend duration units.
+* Further tweaking to make floating limit less noisey.
+* Added a "grace" value to the floating limits, the limit will
+  not be reset if the increment is smaller than "grace".
+* Added a "max" value to the floating limits, the limit will
+  never pass this setting. Usefull to float the limit around
+  and have it max when a chan gets too full, etc.
+* DB Maintainence Required in this release:
+  ALTER TABLE channels ADD COLUMN limit_grace INT4 DEFAULT '1';
+  ALTER TABLE channels ADD COLUMN limit_max INT4 DEFAULT '0';
+  UPDATE channels SET limit_grace = 1;
+  UPDATE channels SET limit_max = 0;
+
+CMaster 1.1pl4 - 26/12/2001
+* Don't auto-part channels marked as SPECIAL.
+* Add "Floating Limit" support. (Ie: Set the channel +l to X 
+  above the total number of people in the channel every Y 
+  seconds.
+* DB Maintainence Required in this release:
+  ALTER TABLE channels ADD COLUMN limit_offset INT4 DEFAULT '3';
+  ALTER TABLE channels ADD COLUMN limit_period INT4 DEFAULT '20';
+  UPDATE channels SET limit_offset = 3;
+  UPDATE channels SET limit_period = 20;
+
+CMaster 1.1pl3 - 07/12/2001
+* Make PURGE obey the NOPURGE flag.
+* Make PURGE automatically remove associated level records 
+  from the memory cache and the Db, and also remove flags,
+  description, comments, etc.
+
+[..TODO..]
+
+CMaster 1.0pl8 - 25/07/2001
+* Modify BANLIST so you must have level 1+ in the channel now,
+  however you can view channel bans from outside the channel
+  now.
+* DB Maintainence to perform with this release:
+  ALTER TABLE levels ADD COLUMN suspend_level INT4 DEFAULT '0';
+
+CMaster 1.0pl7a - 20/07/2001
+* Add a new channel flag "LOCKED" to prevent normal
+  users from using SET to modify channel settings.
+
+CMaster 1.0pl7 - 15/07/2001
+* Global suspend now logs a few extra details, and unsuspends
+  are now logged/displayed also.
+
+CMaster 1.0pl6 - 27/06/2001
+* Disallow globally suspended users op's in registered 
+  channels.
+* New channel setting, "Comments", for admins to note a quick
+  comment that will appear in CHANINFO. 
+
+* DB Maintainence to perform to be compatible with this
+  release:
+
+  ALTER TABLE channels ADD COLUMN comment VARCHAR (300); 
+  ALTER TABLE pending ADD COLUMN unique_join_count INT4 DEFAULT '0';
+  ALTER TABLE pending ADD COLUMN managername VARCHAR (80);
+
+* Global user SUSPEND must now take a reason, in the form:
+  /msg x suspend Plexus You have been assimilated.
+
+CMaster 1.0pl5 - 20/05/2001
+* Add Vampire's (Alex Badea <vampire@go.ro>) code to make
+  addition of new languages dynamic.
+* Prevent core in PURGE when channel doesn't have a manager.
+  (Spotted by Planetarion Network).
+* New stuff to check traffic for 'Pending' registration
+  channels.
+* New admin command to quickly remove all users from a 
+  channel.
+* Expire FORCE'd accesses in the hourly maintainence.
+* Move PART to a level 500 command to prevent abuse.
+* Decided to move last_seen from the user fetching query
+* to retrieve only when it is first accessed.
+
+CMaster 1.0pl4 - 13/04/2001
+* Added REHASH command handler, to allow dynamic reloading
+  of translation tables.
+* Fixed a rather obvious ommision that caused a memleak.
+
+CMaster 1.0pl3 - 03/04/2001
+
+* Fixed a bug in unsuspend that allowed users to unsuspend
+  people above their access level.
+* Fixed a bug in suspend that set the duration to seconds
+  when a user attempted to supply a reason. 
+* Added (username) to the levels record when adding a user
+
+CMaster 1.0pl2 - 18/03/2001
+
+* Fixed a bug in ban that prevented the correct level being
+  set with a varying number of parameters. (or no reason).
+* Fixed a bug in AUTOOP on Login, which op'd people in NOOP
+  channels and if they where banned < level 75.
+* Spotted another old unixtime lying around in LBANLIST.
+* Make the AUTOOP on Login AUTOVOICE aswell.
+
+Cmaster 1.0pl1 - 17/03/2001.
+
+* Masskick no longer effects the person issuing the command.
+* Channel Keywords now display in the chaninfo command.
+* A bug that prevented < level 75 bans being set without a reason
+  has been fixed.
+* A number of bugs relating to people being unable to set autoop/
+  modinfo user accounts has been fixed.
+* Set 'DESC' will now work as well as set 'DESCRIPTION'.
+* Idle not-logged in user accounts now expire from the bot's cache
+  hourly.
+* When you Login, you are now given op's in all channels you are
+  currently in (with AUTOOP on) and have enough access in.
+* A bug causing duplicate bans being set during a MASSDEOPPRO kick
+  has been resolved. 
+
+Cmaster 1.0 Jan 2001 - Initial Development and release.

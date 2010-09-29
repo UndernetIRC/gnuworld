@@ -1,0 +1,55 @@
+2004-05-15 0.0.9.1 Jeekay
+* Added ability to set a default access level for opers
+* Bumped version to 0.0.9.1
+
+2003-10-10 0.0.9 Jeekay
+* Removed return value from commands
+* Added automatic cache refresh
+* Added ability to add fake clients
+* Bumped version to 0.0.9
+
+2003-09-04 0.0.8 Jeekay
+* Made reporting of active channels less spammy. They now only are displayed if
+  there has not been a join inside the dcInterval, rather than once every
+  dcInterval.
+* Bumped version to 0.0.8
+
+2003-08-31 0.0.7 Jeekay
+* Fixed various bits of code to allow it to compile on dodgy compilers.
+* Bumped version to 0.0.7
+
+2003-08-13 0.0.6 Jeekay
+* Added total channel size to join flood notification
+* Bumped version to 0.0.6
+
+2003-08-01 0.0.5 Jeekay
+* Added support for dynamic variables in tests
+* Added QUOTECommand
+* Started standardising levels
+* Added ADDUSER, MODUSER and REMUSER
+* Bumped version to 0.0.5
+
+2003-07-07 0.0.4 Jeekay
+* Added support for DB authenticated users
+* Added LIST USERS
+* Added STATUS
+* Bumped version to 0.0.4
+
+2003-06-20 0.0.3 Jeekay
+* Added throttling of join flood to the console.
+* Added LIST JOINFLOOD command to show channels currently being flooded.
+* Bumped version to 0.0.3
+
+2003-06-20 0.0.2 Jeekay
+* Added throttling of EVT_JOIN spam to console.
+* Added LIST ACTIVE to show channels that are currently being throttled
+* Bumped version to 0.0.2
+
+2003-06-14 0.0.1 Jeekay
+* Changed channel finding to scoring instead of voting.
+* Added scoring cutoff.
+* Added HASALLOPS and COMMONREAL tests.
+* Moved configuration items into test objects.
+* Added dynamic reconfiguration via SET.
+* Made getAccess() allow minimal oper access by default.
+* Bumped version to 0.0.1

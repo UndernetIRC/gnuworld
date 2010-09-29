@@ -1,0 +1,83 @@
+# $Id: cloner.example.conf.in,v 1.5 2005/01/08 23:33:41 dan_karrels Exp $
+# Configuration file for Cloner (mod.cloner)
+
+# The following fields pertain to the client that connects and
+# provides an interface to the server
+username = Cloner
+nickname = Cloner
+hostname = undernet.org
+userdescription = I am the clone man!
+
+# The mode for the cloning client
+mode = +iodk
+
+# permit the given user -- by account login name -- to use the
+# module.  You may have as many of these as you like (including none).
+# This is case-insensitive.
+permit_user = reppir
+permit_user = someotherusername
+
+# Set this to true if you want to permit opers to use the module,
+# set to false otherwise (will not affect other users who have access)
+allow_opers = true
+
+########
+# The following fields are information about the clones
+# and the server created to host them.
+
+# The name of the server to which to connect the clones
+fakeservername = spawn.undernet.org
+
+# The server description of the fake clone server
+fakeserverdescription = Clones really are my bag baby!
+
+# fakehost's are used for clone host names
+# There may be as many as you like
+fakehost=this.is.a.fake.host.com
+fakehost=whitehouse.gov
+fakehost=cia.gov
+fakehost=fbi.gov
+fakehost=clone.fbi.gov
+fakehost=i.hacked.cia.gov
+fakehost=osd.gov
+fakehost=af.mil
+fakehost=army.mil
+fakehost=marines.mil
+fakehost=navy.mil
+fakehost=coastguard.mil
+
+# fakeuser's are used for clone usernames
+# There may be as many as you like
+fakeuser=bill
+fakeuser=mcnamara
+fakeuser=hillary
+fakeuser=mccain
+fakeuser=gore
+fakeuser=big_al
+fakeuser=george
+fakeuser=cheney
+fakeuser=lott
+fakeuser=blair
+fakeuser=bigdick
+fakeuser=rumsfeld
+fakeuser=hw
+fakeuser=tenet
+fakeuser=graham
+fakeuser=clarke
+fakeuser=rice
+
+# Real name field of each clone
+clonedescription = This is a clone, this is only a clone...
+
+# Modes that each clone needs to set
+clonemode = +d
+
+# The minimum length of a clone nickname
+minnicklength = 5
+
+# The maximum length of a clone nickname (default max on normal
+# non-edited IRCu is 9)
+maxnicklength = 9
+
+# The max number of clones to burst on each iteration
+cloneburstcount = 35

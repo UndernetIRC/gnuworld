@@ -1,0 +1,21 @@
+-- "$Id: README,v 1.5 2002/08/30 10:38:15 nighty Exp $"
+--
+-- For more detailed information about setting up GNUworld, visit :
+--      http://coder-com.undernet.org/gnuworld-setup/
+--
+--
+-- 2001-10-04: nighty <nighty@undernet.org>
+--
+
+	Main Help Section
+
+
+		README			- This file
+		README.pgsql		- How to setup pgsql for GNUworld
+		README.ccontrol		- How to prepare things to use the 'ccontrol' module
+		README.cservice 	- How to prepare things to use the 'cservice' module
+		REAMDE.sharedmemory	- How to tweak shared memory to run more pgsl threads
+
+
+	The GNUworld development team.
+

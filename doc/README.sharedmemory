@@ -1,0 +1,97 @@
+-- "$Id: README.sharedmemory,v 1.6 2002/08/30 10:38:15 nighty Exp $"
+--
+-- For more detailed information about setting up GNUworld, visit :
+--      http://coder-com.undernet.org/gnuworld-setup/
+--
+-- Manipulating shared memory 
+--
+-- 2001-12-25: nighty <nighty@undernet.org>: fixed example
+-- 2001-10-04: nighty <nighty@undernet.org>
+--
+
+
+PostgreSQL runs 32 maximum threads by default
+if you want to increase this (-N parameter) you will need
+to increase the -B paramter as well (buffers)
+
+and '-B' must be at least twice '-N' but you will prefer
+set -B bigger on more important networks.
+
+for example :
+
+/usr/local/pgsql/bin/postmaster -S -B 1024 -N 200 -i -D /usr/local/pgsql/data -o -F
+
+for 200 threads,
+you would need to tweak max # of shared memory segments etc...
+
+
+we will explain two cases, /proc/* compatible linux, and FreeBSD kernel options.
+
+1) The '/proc/*' Linux case
+---------------------------
+
+	add the following to /etc/rc.d/rc.local (or equivalent) :
+
+		echo -n 100000000 > /proc/sys/kernel/shmmax
+		echo -n 100000000 > /proc/sys/kernel/shmall
+
+
+
+	You may also issue them directly on the shell as root to avoid rebooting,
+	it will be in the startup file in case reboot happen.
+
+
+
+2) The FreeBSD kernel tweaking case
+-----------------------------------
+
+	You need your kernel sources installed.
+	do all the following as root :
+
+
+	# cd /usr/src/sys/i386/conf
+
+	if you don't have a config already here, do this :
+	# cp GENERIC YOURCONF
+
+	then...
+
+	# vi YOURCONF
+
+	set 'maxusers' to 512.
+
+	and add the following lines :
+
+		options         SYSVSHM
+		options         SYSVMSG
+		options         SYSVSEM 
+
+		options         SHMMAXPGS=100000000
+		options         SHMMAX=100000000
+		options         SHMALL=100000000
+		options         SHMMNI=8192
+		options         SHMMIN=1
+		options         SHMSEG=512
+
+		options         SEMMNI=32
+		options         SEMMNS=2048
+		options         SEMMNU=30
+		options         SEMMAP=30
+		options         SEMMSL=512
+
+	configure your new kernel :
+
+	# /usr/sbin/config YOURCONF
+
+	build it.
+
+	# cd ../../compile/YOURCONF
+	# make depend
+	# make
+	# make install
+
+	then reboot the machine
+
+	# reboot
+
+

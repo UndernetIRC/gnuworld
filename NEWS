@@ -1,0 +1,7 @@
+
+The newest versions (v7.3.x) of postgresql do not come with c++ support by 
+default.  These libraries have been moved to a separate project.  However, 
+that project is not yet mature enough to compile no most systems.  
+Therefore, we recommend you use the latest version of pgsql v7.2.x 
+(currently 7.2.4).
+

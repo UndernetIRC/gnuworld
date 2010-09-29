@@ -1,0 +1,1500 @@
+// $Id: ChangeLog,v 1.173 2010/04/10 18:56:06 danielaustin Exp $ //
+
+2010-04-10	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/ADDUSERCommand.cc:
+		* mod.cservice/MODINFOCommand.cc:
+		* mod.cservice/REMUSERCommand.cc:
+		* mod.cservice/SUSPENDCommand.cc:
+		* mod.cservice/UNSUSPENDCommand.cc:
+		* mod.cservice/levels.h: specify admin levels for dealing with the
+			"*" channel.  Levels are listed in levels.h - this is not
+			the best way of dealing with it, but will do for now.
+
+			Modified based on patch supplied by LordLuke
+
+2010-04-10	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/MODINFOCommand.cc: add extra checks so that forced
+			access users dont cause issues in cservice module.
+
+			Based on a patch supplied by LordLuke - thanks.
+
+2009-09-22	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: add some extra checks to lag detection
+			code.  Don't check lag for JUPEd servers either.
+
+2009-07-25	Hidden
+ Modified Files:
+	* Makefile.am
+	* bin/server_command_map.in
+	* doc/ccontrol.help.sql
+	* doc/ccontrol.sql
+	* doc/ccontrol.update.sql
+	* libircu/Makefile.am
+    * libircu/Makefile.in
+    * libircu/msg_G.cc
+    * mod.ccontrol/ADDCOMMANDCommand.cc
+    * mod.ccontrol/CHECKNETCommand.cc
+    * mod.ccontrol/Constants.h
+    * mod.ccontrol/LOGINCommand.cc
+    * mod.ccontrol/MODUSERCommand.cc
+    * mod.ccontrol/NEWPASSCommand.cc
+    * mod.ccontrol/USERINFOCommand.cc
+    * mod.ccontrol/ccServer.cc
+    * mod.ccontrol/ccServer.h
+    * mod.ccontrol/ccUser.cc
+    * mod.ccontrol/ccUser.h
+    * mod.ccontrol/ccontrol.cc
+    * mod.ccontrol/ccontrol.h
+ Added Files:
+    * libircu/msg_M391.cc 
+    * libircu/msg_RO.cc
+
+ Description:
+
+		- AsLL now works on every machines. There's a strange bahviour with stringstream that made AsLL to not work on every machines: fixed.
+		- gnuworld now supports RPING replies (RO - RPONG)
+		- gnuworld now supports TIME replies
+		- Added lag reports support (can be toggled on/off using MODUSER -glag option)
+		- Server lags now appear in the "list servers" command.
+		- Time diffs for servers, if too big, are now reported in MsgChanLog.
+		- Server now appears in the logs for Failed and Successful logins
+		- Last time a password was changed will be showed if the -cl option is used in USERINFO
+
+To update from previous version:
+		- You will have to run psql < doc/ccontrol.help.sql and psql < doc/ccontrol.update.sql
+		- You will have to run ./configure again
+		- you're ready to make, make install
+		- type cp bin/server_command_map.in bin/server_command_map
+		- You're ready to run it.
+
+
+2009-06-25	MrBean
+		* mod.cservice/CIDRBanMatcher.cc
+		* mod.cservice/CIDRBanMatcher.h
+		* mod.cservice/HostBanMatcher.cc
+		* mod.cservice/HostBanMatcher.h
+		* mod.cservice/banMatcher.h
+		* mod.cservice/BANCommand.cc
+		* mod.cservice/Makefile.am
+		* mod.cservice/Makefile.in
+		* mod.cservice/UNBANCommand.cc
+		* mod.cservice/cservice.cc
+		* mod.cservice/sqlBan.cc
+		* mod.cservice/sqlBan.h : First implementation of CIDR
+			ban support for X.
+			Probably still buggy as its not tested fully yet.
+			You will need re-run configure for this to work.
+
+
+2009-06-09	MrBean
+		* mod.cservice/ACCESSCommand.cc:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/CHANINFOCommand.cc:
+		* mod.cservice/levels.h:
+		* mod.cservice/responses.h:
+		* mod.cservice/LOGINCommand.cc:
+		* mod.cservice/MODINFOCommand.cc:
+		* mod.cservice/SHOWCOMMANDSCommand.cc:
+		* mod.cservice/sqlLevel.cc:
+		* mod.cservice/sqlLevel.h: Added invite on LOGIN, 
+			to toggle: /msg X modinfo #chan INVITE <ON|OFF>
+			
+2009-05-16	Isomer
+		* mod.ccontrol/FORCECHANGLINECommand.cc:
+		* mod.ccontrol/FORCEGLINECommand.cc:
+		* mod.ccontrol/GLINECommand.cc:
+		* mod.ccontrol/SCHANGLINECommand.cc:
+		* mod.ccontrol/SGLINECommand.cc: Allow an internal logging
+			reason to be given to glines by appending a pipe char
+			followed by the logging reason.  This reason is not
+			sent out to the network in the gline message.
+
+2009-02-17	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: Check exceptions list when checking
+			CIDR ident clones.
+
+2008-06-20	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: fix a problem when X is not in a 
+			channel (due to +R modifications)
+
+2008-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: stop unregistered channel msgs.
+
+2008-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc:
+		* mod.cservice/cservice.cc: Send SILENCE removals to (*) all
+			targets rather than a specific target.  *bug fix*
+
+2008-04-18	Dan-m00 <daniel@undernet.org>
+		* doc/autokill.sql: Modify autokill script to work with pgsql
+			version 8 and above.  Slightly modified from original
+			submission due to obselete tables.
+
+		Originally submitted by Adrian Szabo
+
+2008-04-18	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: remove depreciated "U" user status
+			flag (serves no purpose anymore)
+
+2008-04-16	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc:
+		* mod.cservice/JOINCommand.cc:
+		* mod.cservice/OPERJOINCommand.cc:
+		* mod.cservice/OPERPARTCommand.cc:
+		* mod.cservice/PARTCommand.cc:
+		* mod.cservice/PURGECommand.cc:
+		* mod.cservice/REGISTERCommand.cc:
+		* mod.cservice/SETCommand.cc: Add support to cservice module for
+			new '+R' mode.  Also adjust channel events to watch for
+			registered channels even when the bot is not present.
+
+2008-04-16	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h:
+		* libircu/msg_B.cc:
+		* libircu/msg_CM.cc:
+		* libircu/msg_M.cc:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/client.cc:
+		* src/server.cc: Add support for ircu2.10.12.13's new '+R' mode
+			(registered channel)
+
+2008-04-16	Dan-m00 <daniel@undernet.org>
+		* configure.ac: Removed boost requirement for chanfix, altered
+			output for for ./configure script and tidied up old
+			leftover configure code.
+		* configure:
+		* libltdl/acinclude.m4:
+		* */Makefile.in: Rebuilt configure/make system
+
+2008-01-09	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/PURGECommand: check global and channel lists for
+			suspended usernames (do not reop suspended users)
+
+2008-01-05	Dan-m00 <daniel@undernet.org>
+		* doc/languages.sql: change language #15 to hebrew.
+
+2008-01-03	Dan-m00 <daniel@undernet.org>
+		* doc/ccontrol.help.sql: Modify CONFIG help for new feature.
+		* mod.ccontrol/ccontrol.h:
+		* mod.ccontrol/ccontrol.cc: modify 'status' output to be more
+			user friendly, including new time specifications.
+			Also, incorporate new feature config options.
+		* mod.ccontrol/CONFIGCommand.cc: allow changes to the new CIDR
+			gline duration (including new time specs)
+		* mod.ccontrol/ccontrol_generic.cc: modify Ago() function to
+			only show seconds if greater than zero, or if no other
+			time units are present.
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* db/gnuworldDB.cc: add dummy function to prevent pedantic
+			compilers from complaining.  Thanks to Isomer for this!
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: make OP code send channel creation timestamp.
+		* mod.cservice/cservice.cc: make cservice reops send channel
+			creation timestamps.
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: modify 'info <username>'
+			output to give a flags line for various settings.
+
+2008-01-01	Dan-m00 <daniel@undernet.org>
+		* doc/update_config_20080101.sql:
+		* doc/cservice.config.sql: add USE_LOGIN_DELAY variable to set
+			if we use the login grace period or not.
+		* mod.cservice/LOGINCommand.cc: modify login command to check
+			the above configuration variable.
+
+		NOTE: please import the new config variable with the cmd:
+
+			psql cservice < doc/update_config_20080101.sql
+
+2007-12-31	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: modify chaninfo output to
+			show suspend reasons to cservice administrators.
+
+2007-12-31	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: add new function for fetching the
+			channel log entries (for events).  currently this is
+			not used but is for future use.
+
+2007-12-31	Dan-m00 <daniel@undernet.org>
+		* mod.service/CHANINFOCommand.cc: remove "URL" line of output
+			from username information (NOT channel info!)
+
+2007-12-31	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SETCommand.cc: report channel (un-)suspends to
+			the admin channel.
+
+2007-12-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/PURGECommand.cc: check that the channel actually
+			exists on the network before attempting a reop.
+			(fixes core when purging empty channels)
+
+2007-12-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: Check admin suspensions when using
+			admin level commands.
+
+2007-12-28	Dan-m00 <daniel@undernet.org>
+		* doc/update_suspend_2071228.sql:
+		* doc/cservice.help.sql: modify help for SUSPEND command.
+		* mod.cservice/SUSPENDCommand.cc: modify suspend command to use
+			standard time specification (while maintaining original
+			syntax is used)
+
+		NOTE: either reimport your help files, or run the following
+		command to update the syntax of SUSPEND in help:
+
+			psql cservice < doc/update_suspend_20071228.sql
+
+2007-12-28	Dan-m00 <daniel@undernet.org>
+		* doc/update_purge_20071227.sql:
+		* doc/cservice.help.sql:
+		* mod.cservice/cservice.cc: modify help for PURGE command syntax.
+		* mod.cservice/PURGECommand.cc: modify purge command to auto
+			op all level 100+ users upon purge UNLESS -noop given.
+
+		NOTE: either reimport your help files, or run the following
+		command to update the syntax of PURGE in help:
+
+			psql cservice < doc/update_purge_20071227.sql
+
+2007-12-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/UNBANCommand.cc: modified UNBAN command so that
+			it will only remove an exact matching ban if one is
+			found.  Also, report the number of bans removed from
+			the channel banlist NOT banlist+channel banlist!
+
+2007-12-27	Dan-m00 <daniel@undernet.org>
+		* doc/update_variables_20071227.sql:
+		* doc/cservice.config.sql:
+		* doc/cservice.help.sql: update SQL data for new format BAN
+			command for mod.cservice
+		* mod.cservice/BANCommand.cc: modified BAN command to allow a
+			more friendly and usable format for ban duration.  It
+			allows a unit specifier (s,m,h,d) after the time.
+
+		NOTE: the default variable for max ban duration is 2400.  This
+		will equate to 2400 SECONDS after this change.  To avoid this,
+		run the following command ONCE ONLY:
+
+			psql cservice < doc/update_variables_20071227.sql
+
+2007-12-27	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h: add IsTimeSpec() function to check for
+			a valid time specification.  Also modify the extractTime
+			function to allow variable default units to be used.
+		* mod.ccontrol/FORCECHANGLINECommand.cc:
+		* mod.ccontrol/FORCEGLINECommand.cc:
+		* mod.ccontrol/GLINECommand.cc:
+		* mod.ccontrol/SCHANGLINECommand.cc: modify function calls to
+			extractTime() for the above changes.  Also implement
+			IsTimeSpec() checks rather than checking for a zero
+			reply from extractTime()
+
+2007-12-26	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SETCommand.cc: alter set userflags to display
+			current setting if called with no arguments.
+		* mod.cservice/STATUSCommand.cc: show current channel userflags
+			setting in flags: line of 'STATUS' (if OP or VOICE)
+
+2007-12-26	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: move IPR requirement check into a
+			seperate function (needIPRcheck).  This enables us to
+			require IPR even when someone is disableauth'd.
+
+2007-12-26	Dan-m00 <daniel@undernet.org>
+		* doc/language*.sql: modify languages for new 101+101 responses
+			for userflags replies.
+		* doc/doc/update_languages_20071226_100_101.sql: update SQL for
+			previous installations.
+		* mod.cservice/SETCommand.cc: modify userflags functionality so
+			that you can use text or numeric settings.
+
+		NOTE: cservice module will CORE if you do not run the update
+		sql file, an example follows:
+
+			psql cservice < doc/update_languages_20071226_100_101.sql
+
+		however, it is PREFERRED that you re-import the entire language
+		database due to several other changes.  The correct order is:
+
+			psql cservice < doc/languages.sql
+			psql cservice < doc/language_table.sql
+
+		followed by any of the optional languages in language_*.sql
+
+2007-12-26	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: dont clear out a channel if joining with a zero
+			timestamp - removed a desync.
+		* mod.cservice/cservice.cc: modified ReOp code to use the
+			xServer::Mode() function to set automodes (removed a
+			desync)
+
+2007-12-24	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: add channel creation timestamp after all DEOP
+			commands (to prevent desyncs caused when deopping users)
+
+2007-11-06	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/REGISTERCommand.cc: don't log SQL queries unless
+			enabled in cservice_config.h
+		* mod.cservice/PURGECommand.cc: don't log purging information
+			unless debugging is enabled in cservice_config.h
+		* mod.cservice/cservice.cc: move a few more entries to only
+			log when debugging is enabled.
+
+2007-11-06	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/REGISTERCommand.cc: Fix problem when registering
+			channels (no manager added!) due to SQL Exec mods.
+
+2007-11-05	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/ACCESSCommand.cc: fix output when too many
+			entries are listed (uses same response as too many ban
+			list entries!)
+
+2007-11-05	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/CHANINFOCommand.cc: modify command to output a
+			summary of number of ops and voice in a channel.  Also
+			shows full user list to CODER level (with +o/+v flag)
+
+2007-10-31	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/commLevels.h: move UNJUPE access to second access
+			flag instead of first (otherwise it doesn't work!)
+
+2007-10-31	Dan-m00 <daniel@undernet.org>
+		* build-system: Rebuild entire configure/build system.  This
+			fixes problems running ./configure (COND_PCRE errors)
+			and pgsql warnings.
+
+2007-10-31	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: fix bug in reop code that causes
+			newer GCC versions to coredump on reops.
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/match.cc: Remove compiler warnings relating to
+			empty body in while() and for() loops
+
+		* mod.ccontrol/ccontrol.h:
+		* mod.ccontrol/ccontrol.cc: Remove compiler warnings relating
+			to invalid type conversions.
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* Re-built configure system
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* src/server_glines.cc: Modify the way we erase items from the
+			gline map.  This stops coredumps in newer gcc versions.
+		* mod.ccontrol/ccontrol.cc: add parenthesis around tests to
+			remove compile time warnings and potential mis-testing.
+
+2007-09-12	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/Signal.cc:
+		* libgnuworld/match.cc:
+		* mod.ccontrol/ccLog.cc: Added missing stdlib.h includes that
+			cause gcc4.3 to complain.
+
+2007-09-01	MrBean <mrbean@undernet.org>
+		* Fixed the build system to include PGSQL lib in case postgresql is selected
+		* Modules can now link against log4cpp, use --with-log4cpp=<dir> to use it
+		* mod.cservice/cservice.cc - Fixed a bug which prevented X from starting
+		* mod.dronescan/* - Dronescan now logs all the glines it issues (need to enable log4cpp for it to work)
+
+2007-08-24	MrBean <mrbean@undernet.org>
+		* mod.dronescan/* Added exceptional channels (channels which are not checked)
+				  The dronescan can now gline join flood offenders
+		
+		NOTE: you must run the update sql file : psql dronescan < doc/update_exceptionalChannels_20070824.sql
+
+2007-08-07	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LBANLISTCommand.cc: Set response to 'too many
+			bans' to be dynamic (from cservice_config.h)
+
+		* doc/language_*.sql: Modify response for the above.
+		* doc/update_languages_20070807_31.sql: modification sql file
+
+		NOTE: cservice module will CORE if you do not run the update
+		sql file, an example follows:
+
+			psql cservice < doc/update_languages_20070807_31.sql
+
+2007-08-06	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/sqlChannel.h:
+		* mod.cservice/sqlChannel.cc: Updated event types to reflect
+			all known events from the database.
+		* mod.cservice/SETCommand.cc: Updated 'SUSPEND' to require a
+			suspension reason, which gets logged to the channel
+			log with event type 'suspend' or 'unsuspend' with
+			the reason
+		* mod.cservice/STATUSCommand.cc: remove certain flags from
+			public view so that only '*' users can see them.
+			(e.g. SPECIAL, MIA ...)
+
+2007-26-05	MrBean <MrBean@undernet.org>
+		* include/iClient.h
+		  src/iClient.cc :  Added the getServer method which returns
+		 		    the server on which this client is
+				    connected
+	       
+2007-12-05	MrBean <MrBean@undernet.org>
+		* libircu/msg_S.cc: Fixed a bug which caused gnuworld to falsly
+			consider servers as bursting after EOB.
+			
+2007-04-27	MrBean <MrBean@undernet.org>
+		* include/Network.h:
+		* src/Network.cc: Added the getAllBurstingServers method to
+			allow clients to get a list of the currently bursting
+			servers.
+		* mod.dronescan/*: Fixed a bug in which the bot was stuck in
+			in bursting state if the burst was not completed.
+			Fixed a bug in which number of clients that parted
+			wasn't updated
+
+2007-04-21	MrBean <MrBean@undernet.org>
+		* mod.dronescan/*: started working on the ability to auto
+			gline join/part flooders, currently it only reports
+			them.
+			
+2007-04-18	Dan-m00 <daniel@undernet.org>
+		* libircu/msg_J.cc: alter logic slightly as a join to '0' (the
+			'part all channels' special exception) may not have a
+			timestamp (as it doesnt join anything)
+
+		* src/server.cc: added extra debug info to xServer::JoinChannel
+
+2007-04-18	Dan-m00 <daniel@undernet.org>
+		* src/server.cc: fix parsing of channel modes on join (when +D
+			is encountered.
+
+		* libircu/msg_I.cc: add support (although unused) for invite
+			timestamps from .12 hubs
+
+		* libircu/msg_J.cc: add debug information to joins.
+
+2007-04-18	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql:
+		* mod.cservice/LOGINCommand.cc: add new functionality to the
+			max logins from same ip code.  You can now force the
+			check of ident as well as IP in order to login.
+
+			requires 'LOGINS_FROM_SAME_IP_AND_IDENT' = 1 in the
+			variables table.
+
+2007-04-16	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/FORCEGLINECommand.cc: Remove compiler warning
+			about unused variable.
+
+		* mod.ccontrol/ccontrol.cc: fix uptime output in 'status' cmd.
+			Also remove redundant variables/calculations.
+
+2007-30-03      MrBean <mrbean@undernet.org>
+                * mod.ccontrol/GLINECommand.cc
+		* mod.ccontrol/FORCECHANGLINECommand.cc: Use the extractTime
+			method in CHANGLINE and FORCECHANGLINE instead of
+			duplicating the code.
+
+
+2007-03-30	MrBean <mrbean@undernet.org>
+		* mod.ccontrol/*: Changed the name of the CHANGLINE command
+			to SCHANGLINE to conform with the SCOMMAND > FCOMMAND
+			> COMMAND standard.
+
+2007-03-26	Dan-m00 <daniel@undernet.org>
+		* configure:
+		* */Makefile.in:
+		* mod.openchanfix/*: Update auto-build system, and remove all
+			old remnants of the openchanfix seperate module.  This
+			will fix the bugs in building gnuworld with openchanfix
+
+2007-03-25	Dan-m00 <daniel@undernet.org>
+		* doc/update_channels_20070325.sql: SQL update for new max_bans
+			feature.  This MUST be run if upgrading from an earlier
+			release of GNUworld!
+
+			psql cservice < doc/update_channels_20070325.sql
+
+		* doc/cservice.sql: alter the table structure for new max_bans.
+
+		* mod.cservice/constants.h:
+		* mod.cservice/sqlChannel.h:
+		* mod.cservice/sqlChannel.cc: Add new max_bans field to struct.
+
+		* mod.cservice/BANCommand.cc: use the greater of global and
+			local max_bans setting as the definitive figure.
+
+		*** note: currently, this feature will be configurable ONLY via
+			the website (currently pending coding) ***
+
+2007-03-24	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc:	Added support for multiple logins
+			from the same IP when a user has maxlogins=1.
+
+		* doc/cservice.config.sql: Added variable for the above.  This
+			defaults to zero (previous behavior, feature disabled)
+
+2007-03-16	MrBean <mrbean@undernet.org>
+		libircu/msg_C.cc:
+		libircu/msg_J.cc:
+		src/client.cc:		Fixed a bug which caused modes
+			desynch when the join/creation time is older than the
+			creation time of the channel.
+		mod.ccontrol/CHANGLINECommand.cc: 	
+		mod.ccontrol/CommandsDec.h:
+		mod.ccontrol/Makefile.am:
+		mod.ccontrol/Makefile.in:
+		mod.ccontrol/ccontrol.cc:
+		mod.ccontrol/ccontrol.h:
+		mod.ccontrol/commLevels.h:
+		mod.ccontrol/FORCECHANGLINECommand.cc:	Added the
+			FORCECHANGLINE command which is semiliar to the
+			CHANGLINE command but limited to no more than 24 hours and
+			doesnt work on no mode channels or channels with opers.
+		mod.ccontrol/LISTCommand.cc: 	Changed the command to list
+			nomode channels from LIST badchannels to LIST nomodechannels
+		
+
+2006-12-21	Dan-m00 <daniel@undernet.org>
+		* src/server.cc:
+		* libircu/msg_I.cc:	Modified debug output to get more info
+			upon certain runtime conditions.
+
+		* mod.cservice/cservice.cc:	Fixed output of some debug
+			entries.
+
+2006-12-21	mod.openchanfix development team
+		* libircu/msg_CM.cc:
+		* libircu/msg_M.cc:
+		* libircu/msg_S.cc:
+		* libircu/msg_Server.cc:
+		* include/events.h:
+		* include/iServer.h:
+		* src/Network.cc:
+		* src/iServer.cc:
+		* src/server_connection.cc:	Merge patches from the open
+			chanfix dev team.  It adds a new handler for server
+			modes.  It also adds parsing of server flags.
+
+2006-12-21	Dan-m00 <daniel@undernet.org>
+		* bin/openchanfix.example.conf.in (new file):
+		* bin/GNUWorld.example.conf.in:
+		* bin/server_command_map.in:
+		* bin/.cvsignore:
+		* mod.openchanfix/LASTCOMCommand.cc:
+		* mod.openchanfix/STATUSCommand.cc:
+		* mod.openchanfix/chanfix.cc:	re-merge openchanfix with
+			main gnuworld distribution.
+
+2006-12-21	Dan-m00 <daniel@undernet.org>
+		* ac_cxx_namespaces.m4 (new file):
+		* ax_boost_thread.m4 (new file):
+		* aclocal.m4, INSTALL:
+		* Makefile.am, Makefile.in:
+		* config.guess, config.sub, configure.ac, configure:
+		* depcomp, install-sh, ltmain.sh, missing, mkinstalldirs:
+		* include/defs.h.in:
+		* <alldirs>/Makefile.in, <alldirs>/Makefile.am:
+		* libltdl/*:	Rebuilt entire configure system, including
+			adding additional options and importing macros from
+			mod.openchanfix
+
+2006-10-08	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: comment out legacy realname gline
+			check as all servers should now support rnglines
+			natively.
+
+2006-09-26	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol_generic.cc: fix typo - d'oh
+
+2006-09-26	Dan-m00 <daniel@undernet.org>
+		* src/Network.cc: fix compiler warning when compiling with
+			optimisations.
+
+2006-09-26	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/CHANGLINECommand.cc: fix a bug in this code
+			which could lead to more glines than required being
+			added during a channel gline.
+
+		* src/Network.cc: modify matching code to speed up automated
+			glines (skip running match() for '*' idents)
+
+2006-09-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/CHECKNETCommand.cc:
+		* mod.ccontrol/ccLog.cc: Resolved compiler warnings due to
+			mismatched types.
+
+		* mod.ccontrol/*: Phase 1 of code audit
+			- fixed typos and textual errors.
+			- moved db check to command handler instead
+			  of inside each command file (pointless
+			  (duplication of code)
+			- updated Ago/Duration functions to be less
+			  cpu intensive (and less code duplication)
+
+		* include/gnuworld_config.h:
+		* src/main.cc: make gnuworld fork into background.
+
+			define 'DAEMON' to use this functionality
+
+		* tools/checkgnuworld.sh.in:
+		* configure*:
+		* */Makefile.in:
+		* Makefile*:	Added crontab script to use with the
+			new daemon functionality.  Rebuilt configure
+			and makefiles to build a copy in tools/ with
+			the correct exec prefix
+
+2006-08-15	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: Added extra line of info
+			to show NOADDUSER setting (on or off) in 'info'
+
+2006-08-10	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/sqlChannel.h:
+		* mod.cservice/sqlChannel.cc: Add flag for new MIA review
+			tag (0x400 in sqlChannel flags field)
+
+		* mod.cservice/STATUSCommand.cc: show 'MIA' in flags output
+			if MIA review tag is set.
+
+2006-05-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: set gline reason for each kind of
+			gline seperately - makes for easier log parsing.
+			ALSO: fix a big bug that made cidr glining work even
+			if disabled (if an earlier gline was triggered)
+
+2006-05-03	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.h: addition of IClonesGline variable
+
+		* mod.ccontrol/ccontrol.cc: addition of auto-gline function for
+			CIDR ident clones (including a slight output change)
+
+		* mod.ccontrol/CONFIGCommand.cc: add config for the above.
+			(CONFIG -IClonesGline Yes/No) - default to 'no'.
+
+		* doc/ccontrol.help.sql: updated help for CONFIG command to
+			reflect new configuration option.
+
+2006-02-05	clsk <alan.alvarez@us.army.mil>
+		* mod.ccontrol/ccontrol.cc: get UplinkServer from global
+			Network instance. Data2 is not filled by AttachServer
+			and was causing this to dereference a NULL pointer.
+
+		<Dan-m00> AttachServer was sending an iClient object, instead
+			of an iServer object, which caused the invalid ref.
+
+2006-02-10	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc:
+		* mod.ccontrol/NOMODECommand.cc: Actually give some output from
+			NOMODE command if the command is successful!
+
+2006-02-10	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: Stop outputting two sets of
+			"Channels: " info for opers who 'info' themselves.
+
+		* mod.cservice/LOGINCommand.cc:
+		* mod.cservice/cservice.cc: (Bug workaround) re-create a users'
+			users_lastseen table entry if it does not exist.  This
+			resolves an issue with some entries that have no last
+			seen time.
+
+2006-01-31	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.help.sql:
+		* doc/language_christmas.sql:
+		* doc/language_dutch.sql:
+		* doc/language_easter.sql:
+		* doc/language_german.sql:
+		* doc/language_greek.sql:
+		* doc/language_halloween.sql:
+		* doc/language_swedish.sql:
+		* doc/language_table.sql: Update response code 20 (ban command)
+			to utilise a dynamic max ban duration figure.
+
+		* mod.cservice/BANCommand.cc: implement the change of output
+			for the above changed files.
+
+		* doc/update_languages_20060131_20.sql (new file):
+			Perform an upgrade of existing SQL tables to have the
+			new data for response code 20.
+
+		NOTE: if you upgrade this code without either re-importing all
+		language data OR running the contents of the update sql file,
+		mod.cservice will operate with unknown results, possibly even
+		causing a segmentation fault.  YOU HAVE BEEN WARNED.
+
+		psql cservice < doc/update_languages_20060131_20.sql
+
+2006-01-26	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: add new 'max_ban_duration' config
+			option for the maximum length a ban can be set.
+
+		* mod.cservice/BANCommand.cc: implement the above config var,
+			this replaces the hardcoded default of 14 days.
+
+2006-01-18	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: Update automated gline to prefix
+			'AUTO ' before '[xxx] Automatically...' to match other
+			automated gline notices.
+
+2006-01-09	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: add timestamp and human readable
+			time to 'list glines' command for when a gline was set.
+
+2006-01-09	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: Remove a ban before setting it
+			during checkbansonjoin() - if the ban doesnt exist, it
+			will return false anyway.  Stops duplication if a user
+			is invited into a channel where they are banned.
+
+2005-11-16	Reed Loden <reed@reedloden.com>
+		* libircu/msg_B.cc: Fix two problems when bursting:
+			1. channel modes were not being removed when an
+			older channel was bursted (found by coekie);
+			2. the wrong if check was being performed for
+			the creation time.
+
+		* src/server.cc: Four vectors for the limit, key, Upass,
+			and Apass were never actually being used.
+			This was causing problems with (de)synching of
+			modes (found by coekie).
+
+		This is part of a patch submitted by Reed Loden.
+
+2006-01-02	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: Update logging to HD.  This patch
+			disables buffering, and opens files for appending.
+			This resolves a problem in new versions of GCC where
+			the logfile is not recreated if opened without append.
+
+2005-12-28	Dan-m00 <daniel@undernet.org>
+		* autogen.sh: (new file) script to rebuild using auto-tools.
+
+		* Makefile.in, aclocal.m4, config.guess, config.sub, configure,
+		  configure.ac, ltmail.sh, */Makefile.in:
+		* libltdl/*: Updated build system including latest libtool.
+
+2005-12-27	Entrope <mdpoole@troilus.org>
+		* configure.ac: Fix VPATH builds.
+
+		* configure: rebuild from configure.ac with autoconf
+
+		* mod.ccontrol/CControlCommands.h: Properly declare class
+			gnuworld::xServer.
+
+		* mod.ccontrol/CommandsDec.h: No need to say "using
+			gnuworld::xServer" due to Koenig lookup.
+			Remove it since it is invalid C++.
+
+		* mod.ccontrol/ccontrol.h: Likewise it.  We must also properly
+			qualify types qualify types that come from inside
+			xServer.
+
+		* mod.ccontrol/ccontrol.cc: Fix erroneous loop termination
+			conditions.
+
+		This patch makes GNUWorld compile with gcc4.  Tested on the
+		following FreeBSD/gcc versions:
+			FreeBSD/amd64 6.0-STABLE: gcc3.4.4
+			FreeBSD/i386 4.11-STABLE: gcc2.95
+			FreeBSD/i386 7.0-CURRENT: gcc3.4.4
+			FreeBSD/i386 7.0-CURRENT: gcc4.0.2
+			FreeBSD/i386 7.0-CURRENT: gcc4.2.0
+			Redhat Enterprise Linux WS release 3/2.4: gcc 3.2.3
+
+		NOTE: GNUWorld does NOT compile on FreeBSD/amd64 gcc4 at the
+		current time (but works with gcc3.4.4)
+
+2005-12-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/networkData.h:
+		* mod.cservice/networkData.cc: add failed logins info for a
+			client to track the number of failed logins per client
+			rather than per username.
+
+		* doc/cservice.config.sql: add configuration variable for the
+			maximum failed login count per client.
+			Set to 0 (ZERO) to disable the check.
+
+		* mod.cservice/responses.h: add max failed login failure msg.
+
+		* doc/language_table.sql: add message for the above response.
+
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: add functions to get/set the failed
+			login counter for clients.
+
+		* mod.cservice/LOGINCommand.cc: add maximum failed login
+			checks.  If they exceed them, they will have to
+			reconnect to the network.
+
+2005-12-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc: add a checksum to the failed
+			login messages to identify if it's the same or a
+			different password being used each time.
+			Generate the checksum from the MD5 hash rather than
+			the plaintext password to make it harder to fool.
+
+2005-12-12	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.web.sql: roll-back previous commit after
+			replacing glasses.
+
+2005-12-12	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.web.sql: forgot the table for web relay msgs ;)
+
+2005-12-06	Dan-m00 <daniel@undernet.org>
+		* bin/cservice.example.conf.in: Added privileged relay channel
+			(priv_relay_channel) for privileged output.
+
+		* mod.cservice/cservice.h: Added channel variable and function
+			prototype for priveleged relay channel.
+
+		* mod.cservice/cservice.cc: Added function for output of the
+			above.  Also, load the config for the channel.
+
+		* mod.cservice/LOGINCommand.cc: Modify failed login messages to
+			output to the priveleged relay channel.
+
+			Also, report 900+ logins to privileged relay channel.
+
+2005-12-05	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/FORCECommand.cc:
+		* mod.cservice/SHOWCOMMANDSCommand.cc:
+		* mod.cservice/UNFORCECommand.cc: Alter login used to determine
+			if the user is an admin or not (use the common function
+			which takes into accounts alumni's etc)
+
+		* mod.cservice/SETCommand.cc: As above, also make 'SET
+			DISABLEAUTH ON' command only available to admins.
+			make 'SET DISABLEAUTH OFF' command only available to
+			people who have it currently set.
+
+2005-12-02	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: New config variable to set the time
+			between alerts (per user) for failed login alerts.
+
+		* mod.cservice/sqlUser.h: define a timestamp of the last alert
+
+		* mod.cservice/sqlUser.cc: set the default timestamp on create.
+
+		* mod.cservice/LOGINCommand.cc: Alter login to only alert when
+			the time between alerts has been reached.
+
+2005-12-02	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: New config variable to enable or
+			disable flood messages.
+
+			New config variable to set the level at which we alert
+			the relay channel for failed logins on a user.  Set
+			this is '0' (ZERO) to disable the alerts.
+
+			New config variable to enable or disable the notice to
+			users when they successfully login to report failed
+			logins.
+
+			Also, added the required_supporters config var back
+			in (required by the web)
+
+		* mod.cservice/cservice.cc: Implement the above config var.
+
+		* mod.cservice/sqlUser.h: define failed_logins variable for
+			the number of failed logins since last successful.
+
+		* mod.cservice/sqlUser.cc: set failed_logins in zero upon
+			creation of sqlUser record.
+
+		* mod.cservice/responses.h: define new failed login response.
+
+		* doc/language_table.sql: define the new failed login response.
+
+			Also, include some responses that were missing (171-172)
+
+		* mod.cservice/LOGINCommand.cc: log failed IP restrictions to
+			the relay channel.
+
+			Report to the user upon successful login about the
+			number of failed logins since they last logged in.
+
+			Also, log failed logins when they reach a configurable
+			limit. (see above)
+
+2005-12-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: apply logic to UNSUSPEND
+			which was previously missed during changes to SUSPEND.
+
+2005-12-01	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/SAYCommand.cc:
+		* mod.ccontrol/ccontrol.cc: Modify 'say' command to accept 'do'
+			for /me's
+
+2005-12-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SAYCommand.cc:
+		* mod.cservice/cservice.cc: Modify 'say' command to accept 'do'
+			for /me's
+
+2005-11-30	Dan-m00 <daniel@undernet.org>
+		* bin/cservice.example.conf.in: added command log config var.
+
+		* mod.cservice/cservice_config.h: added USE_COMMAND_LOG option
+			to turn command log on and off.
+
+		* mod.cservice/cservice.h: Define command log path variable.
+
+		* mod.cservice/cservice.cc: Use command log path variable from
+			above.  Also fixed an SQL query output.
+
+		* mod.cservice/SCANHOSTCommand.cc:
+		* mod.cservice/SCANUNAMECommand.cc: Updated SQL query output.
+
+2005-11-30	Dan-m00 <daniel@undernet.org> / Reed Loden <reed@reedloden.com>
+
+		This patch is based on a patch provided by Reed Loden.
+
+		* include/iClient.h:
+		* libircu/msg_N.cc:
+		* src/server.cc: Remove IP restriction code from the core.
+
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: Add new IP restriction functions
+			to use iClient network data rather than core.
+
+		* mod.cservice/networkData.h:
+		* mod.cservice/networkData.cc: define the IP restriction ts
+			in cservice data here.
+
+2005-11-30	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SCANUNAMECommand.cc: add SQL query logging.
+
+		* mod.cservice/SCANHOSTCommand.cc: hide IP output for users.
+			Also, add SQL query logging option.
+
+2005-11-30	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc: move IP restriction check to
+			after password check, also no longer apply logic to
+			alumni accounts.
+
+		* mod.cservice/cservice.cc: no longer apply IP restriction to
+			alumni accounts.
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/REMUSERCommand.cc:
+		* mod.cservice/SUPPORTCommand.cc:
+			make sql query logs only log during LOG_SQL
+
+		* mod.cservice/cservice.cc:
+			(cservice::OnEvent):
+			(cservice::expireBans):
+			(cservice::expireSuspends):
+				make debug messages debug only.
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* bin/cservice.example.conf.in: add new 'webrelay_interval'
+			configuration entry.  This is the number of seconds
+			between webrelay checks.
+
+		* mod.cservice/cservice.h: Add new timer for the above feature.
+
+		* mod.cservice/cservice.cc: Implement the new timer for the
+			above feature.
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc: strip out hostnames/ips from
+			INFO output where a username is suspended/unsuspended.
+
+2005-11-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/LOGINCommand.cc: notify relay channel when a
+			privileged user logs in.
+
+2005-11-28	Dan-m00 <daniel@undernet.or>
+		* mod.cservice/cservice_config.h: define IP restriction default
+			behaviour (default allow if no IPR entries)
+
+		* mod.cservice/cservice.cc: use the above define in IPR logic.
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/sqlUser.cc:
+		* mod.cservice/sqlUser.h: define new flag for "oper status"
+
+		* mod.cservice/SCANUNAMECommand.cc:
+		* mod.cservice/CHANINFOCommand.cc: update logic to treat people
+			with 'oper status' as a * user.
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CHANINFOCommand.cc:
+		* mod.cservice/SCANUNAMECommand.cc: Alter logic so that users
+			of level 800 and above can see IPs.
+
+*** CORRECTION: version is 1.3, not 1.4 ***
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: definately time to bump the version
+			number (up to 1.4, no patchlevel)
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.sql: define (in a comment) the flag for the new
+			"no adduser" flag.  (note: no schema change)
+
+		* mod.cservice/sqlUser.cc:
+		* mod.cservice/sqlUser.h: define new flag (as above)
+
+		* mod.cservice/SETCommand.cc: add toggle for the above flag.
+
+		* mod.cservice/ADDUSERCommand.cc: check the user's flag before
+			adding them to a channel.
+
+		* mod.cservice/responses.h: add response codes for the above.
+
+		* doc/language_table.sql: add english output for response codes.
+
+		* doc/cservice.help.sql: add help topics for SET NOADDUSER.
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: make IP restriction check work with
+			IP masks as well as host masks.
+
+2005-11-28	Dan-m00 <daniel@undernet.org>
+		* include/iClient.h: Add IP restriction timestamp so that we
+			can track when users have passed IP restriction checks.
+
+		* src/server.cc:
+		* libircu/msg_N.cc: Initialise IP restriction timestamp when a
+			new client is introduced.
+
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice.cc: Add new function checkIPR() to
+			check IP restrictions.  Also, check IPR for all "*"
+			accounts upon command use (except 'LOGIN')
+
+		* mod.cservice/LOGINCommand.cc: Add call to checkIPR() to check
+			against IP restrictions for "*" accounts during login.
+
+2005-11-27	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/SCANUNAMECommand.cc:
+		* mod.cservice/CHANINFOCommand.cc: remove IPs from output if
+			target user(s) have admin access
+
+2005-11-25	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: Fix coredump when the DB saved pass
+			was an invalid MD5 hash.
+
+2005-11-17	Reed Loden <reed@reedloden.com>
+		* mod.cservice/NEWPASSCommand.cc: Due to the 64-bit
+		changes of the md5 hashing code, we now need to
+		#include <inttypes.h> in order to compile NEWPASS.
+
+2005-11-17	Dan-m00 <daniel@undernet.org>
+		* src/server.cc: update JoinChannel() function to handle channel
+			keys that change when X has a channel key stored.
+			X will now restore the saved channel key and gnuworld's
+			internal database will not be out of sync.
+
+2005-11-17	Dan-m00 <daniel@undernet.org>
+		* src/client.cc: update clearmode function to allow a manual
+			clearmode (i.e. using "M" instead of "CM") for non-opers.
+
+		* mod.cservice/CLEARMODECommand.cc: set "clearmode as server"
+			flag to "no" to force the bot to use a manual mode.
+
+2005-11-17	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/sqlUser.h:
+		* mod.cservice/sqlUser.cc: add F_ALUMNI flag (0x80)
+
+		* mod.cservice/cservice.h: update getAdminAccessLevel() to
+			accept a boolean "verify" (used to disable the alumni
+			check explicitly in the 'verify' command)
+
+		* mod.cservice/cservice.cc: implement the above check.
+
+		* mod.cservice/VERIFYCommand.cc: implement the above check.
+
+2005-11-16	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/md5hash.h:
+		* libgnuworld/md5hash.cc: include inttypes.h and convert md5
+			functions to 64bit safe.  GNUworld now compiles and
+			runs on 64bit operating systems.
+
+			Tested on FreeBSD/amd64 6.0-STABLE/gcc3
+
+2005-11-15	Dan-m00 <daniel@undernet.org>
+		* include/gnuworld_config.h: update defines and comment to the
+			new filename.
+
+2005-11-14	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/BANCommand.cc: fix a bug when banning a hostmask.
+			when banning a hostmask, set 1 ban on the original mask,
+			not 1 ban per nick.
+
+2005-11-14	Dan-m00 <daniel@undernet.org>
+		* bin/server_command_map.in: handle DE (destruct) protocol as
+			noop command - may be used later, but for now not needed.
+
+2005-11-14	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: (validUserMask) change maximum nick
+			length allowed from 9 to 15 characters in-line with
+			current undernet policies.
+
+2005-11-14	Dan-m00 <daniel@undernet.org> / Isomer
+		* mod.cservice/BANCommand.cc: fix some (possibly?) GCC compiler
+			optimisation bugs that caused an infinite loop somehow!
+
+		* src/iClient.cc: make things compile when both ASUKA and SRVX
+			are not defined.
+
+2005-11-13	LordLuke
+		* mod.cservice/cservice.cc: update logging from flat file to SQL
+			for admin log.
+
+		* doc/cservice.sql: add adminlog table at the bottom of the file
+			for the above.
+
+2005-10-07	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: add extra memory/stats output into
+			'status' command (show rate-limit entries)
+
+			Fixed memory leak within rate limiting and clone warnings.
+
+2005-10-05	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: rollback previous memory leak fix
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/HELPCommand.cc: fix HELP command to work the way it
+			was intended (to support subcommands properly)
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* doc/ccontrol.help.sql: completely updated help files for ccontrol
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: fix a possible memory leak in the
+			handling of queued glines.
+
+		* libgnuworld/match.cc: fix CIDR matching incorrectly broken in
+			an earlier commit.
+
+		* src/Network.cc: optimise user@host matching code (used for glines
+			and various other core tasks)
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/USERINFOCommand.cc: add "-cl" option to userinfo
+			to show Command List available to the user.
+
+		* mod.ccontrol/ccontrol.cc: update syntax for userinfo command
+
+2005-10-04	Dan-m00 <daniel@undernet.org>
+		* aclocal.m4:
+		* mod.ccontrol/Makefile.am:
+		* mod.ccontrol/Makefile.in: update Makefiles for new file
+
+		* mod.ccontrol/CHANGLINECommand.cc: new channel gline command
+
+		* mod.ccontrol/CommandsDec.h: register new changline command
+
+		* mod.ccontrol/commLevels.h: add a new level for changline command
+
+		* mod.ccontrol/ccontrol.cc: bump version number and add new changline
+			command
+
+		* mod.ccontrol/GLINECommand.cc: no longer handle channel glines.
+
+2005-10-03	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/ConnectionManager.cc:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/server.cc: make modifications to accommodate FreeBSD/gcc3
+			compilation and running (it seems FreeBSD handles c++ STL
+			differently for some reason)
+
+			GNUWorld now works on FreeBSD5+/gcc3
+
+2005-10-03	Dan-m00 <daniel@undernet.org>
+		* doc/cservice.config.sql: add BAN_CHECK_ON_BURST tunable variable
+			to check users against bans during burst.
+
+		* mod.cservice/cservice.cc: use the above variable.
+
+2005-10-03	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/BANCommand.cc: BAN command now matches IPs as well as
+			hosts.
+
+		* mod.cservice/cservice.cc: match IPs as well as hosts when a client
+			joins a channel.
+			Also check userlist against internal banlist on channel burst.
+
+2005-10-02	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/match.cc: fix CIDR handling.  Only match CIDR if the
+			text before the '/' is an IP address.
+
+		* mod.ccontrol/ccontrol.cc: apply the same logic to gline check
+
+2005-10-01	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: increase size of numeric column to 4 in
+			'LIST servers' command.  Fix fake servers to align in output.
+
+2005-10-01	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/BANCommand.cc:
+		* mod.cservice/cservice.cc: when a user sets a hidden host ban, match
+			users that are logged in, but not hidden against it.
+			e.g. *!*@test.users.undernet.org will match a regular user that
+				is authed under 'test', but not set mode +x
+
+2005-10-01	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/EConfig.cc: Add an extra warning when a "key=value" pair
+			contains no value as this is a common user error.  Suggest that
+			they use "key=''" to specify an empty value (such as SQL pass)
+
+2005-09-30	Dan-m00 <daniel@undernet.org>
+		* libgnuworld/ConnectionManager.cc: remove redundant and pointless cast.
+
+2005-09-30	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.h: add structures for virtual clones rate limiting
+
+		* mod.ccontrol/ccontrol.cc: add virtual clones rate limiting
+			alter the output format of CIDR-based ident clones warnings
+
+2005-09-30	Dan-m00 <daniel@undernet.org>
+		* src/server.cc: swap function that handles 'regular' channel modes.
+
+		* mod.ccontrol/LISTCommand.cc: fix compiler warning.
+
+		* mod.ccontrol/ccontrol.h: add structures for ident clones warnings
+
+		* mod.ccontrol/ccontrol.cc: add 'CIDR-based ident clones' warnings
+
+		* mod.ccontrol/CONFIGCommand.cc: add config for the above feature (-IClones)
+
+2005-09-30	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/cservice.cc: bumped version number up.
+			Made GNUworld(cserver module) compatible with gcc4
+			Tested with gcc4.0.2 / FreeBSD 7.0-CURRENT
+
+2005-09-29	Dan-m00 <daniel@undernet.org>
+		* mod.cservice/CLEARMODECommand.cc: add "D" to the modes cleared.
+			Don't clear oplevel modes as they should never be touched by cservice.
+
+		* doc/cservice.config.sql: remove old, unused variables
+			Add new 'MAX_BANS' config entry for BAN command.
+
+		* doc/README.cservice: add references to cservice.config.sql and
+			greeting.sql as these are not already listed.
+
+		* mod.cservice/BANCommand.cc: add a maximum limit of bans per channel.
+			This is set via the config command (variables SQL table)
+
+		* libircu/msg_B.cc: fixed parsing of oplevels in burst (ignore them)
+
+2005-09-29	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h:
+		* include/client.h:
+		* include/events.h:
+		* include/server.h:
+		* libircu/msg_B.cc:
+		* libircu/msg_M.cc:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/client.cc:
+		* src/server.cc:
+		* src/server_events.cc:
+			Add basic support for oplevels from u2.10.12
+			Thanks to reed for the initial diff
+
+		* mod.cservice/cservice.cc: fix a ban bug - thanks to reed for this diff
+
+2005-09-29	Dan-m00 <daniel@undernet.org>
+		* configure.ac: config.h hasnt existed in... years! update to gnuworld_config.h
+
+		* configure: rebuilt configure with autoconf
+
+2005-09-28	Dan-m00 <daniel@undernet.org>
+		* .cvsignore: ignore configure.lineno, tidy up
+
+		* libltdl/.cvsignore: ignore configure.lineno
+
+		* mod.cservice/ACCESSCommand.cc:
+		* mod.cservice/CHANINFOCommand.cc:
+		* mod.cservice/CLEARMODECommand.cc:
+		* mod.cservice/LBANLISTCommand.cc:
+		* mod.cservice/SEARCHCommand.cc:
+		* mod.cservice/SETCommand.cc:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h:
+		* mod.cservice/levels.h:
+		* mod.cservice/sqlChannel.cc:
+			Merge changes from private repositories into mainstream CVS
+			Most notable is extra IP-based flood protection and a few level changes.
+
+			This is in preparation for u2.10.12 updates to the code and bugfixes.
+
+2005-08-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/JUPECommand.cc: remove the 'currently connected' check when
+			juping a server as ircu will automatically /squit it for you.
+
+2005-08-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/WHOISCommand.cc: split channel output to multiple lines if the
+			user is in multiple long channels.
+			Thanks to coekie + compy for spotting this bug.
+
+2005-08-16	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/EXCEPTIONCommand.cc: generate a warning if an unknown subcommand
+			is used to 'exceptions' (e.g. 'exceptions delete')
+
+2005-08-16	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/SGLINECommand.cc: disallow '/' character in sglines (bugfix) as
+			ircu handles these differently to ccontrol.
+
+2005-06-25	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/LISTCommand.cc: added channel usercount to 'list channels' output
+
+2005-06-24	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h: added support for new u2.10.12 "+D" channel mode.
+
+		* libircu/msg_B.cc: as above.
+
+		* libircu/msg_CM.cc: as above.
+
+		* libircu/msg_M.cc: as above.
+
+		* src/Channel.cc: as above.
+
+		* src/client.cc: as above.
+
+		* src/server.cc: as above.
+
+		* include/Network.h: added function prototype for GetChannelsWithModes()
+
+		* src/Network.cc: added function for GetChannelsWithModes()
+
+		* mod.ccontrol/LISTCommand.cc: updated 'list' command to include the following:
+			'list channels modes X'
+
+2005-06-24	Dan-m00 <daniel@undernet.org>
+		* include/Network.h: added function prototype for the following functions:
+			GetChannelsWithTopic()
+			GetChannelsWithTopicBy()
+
+		* src/Network.cc: added functions (above)
+
+		* mod.ccontrol/LISTCommand.cc: updated 'list' command to include the following:
+			'list channels topic X'
+			'list channels topicby nick!user@host'
+
+		* mod.ccontrol/ccontrol.cc: updated usage syntax for 'list' command to include 'channels'
+
+2005-06-24	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/LISTCommand.cc: fixed a bug which causes an assertion failure if
+			a channel key is not given in 'list channels key...' command.
+
+2005-06-23	Dan-m00 <daniel@undernet.org>
+		* include/Network.h: added function prototype for GetChannelsWithKey() function
+
+		* src/Network.cc: added function GetChannelsWithKey()
+
+		* mod.ccontrol/LISTCommand.cc: updated 'list' command to include 'list channels key X'
+			to return a list of channels matching a key.
+
+2005-06-20	Dan-m00 <daniel@undernet.org>
+		* include/Channel.h: added new variables to channel structure;
+			topic_ts (timestamp topic was set)
+			topic_whoset (who set the topic in "nick!user@host [ip]" format
+			added get/setTopicTS(), get/setTopicWhoSet() functions
+
+		* libircu/msg_T.cc: update topic timestamp + who set when we receive topics
+			also fixed a bug that stopped topic_track working in u2.10.12
+
+		* src/iClient.cc: when new channel is created (and topic_track enabled), initialise
+			new variables to 0/blank.
+
+		* mod.ccontrol/CHANINFOCommand.cc: add new topic ts+set info into 'chaninfo' command
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/WHOISCommand.cc: added connection time to 'whois' command in
+			human readable format - also listed unix ts for those that like to convert.
+
+		* mod.ccontrol/OPCommand.cc: check that at least 1 user to op is in the
+			channel to op!  If not, tell the user.
+
+		* src/client.cc: don't require ccontrol user to join channel in order to invite.
+
+		* mod.ccontrol/INVITECommand.cc: check that the channel exists before issuing an invite.
+
+		* mod.ccontrol/DEOPCommand.cc: check that at least 1 user to deop is in the
+			channel!  If not, tell the user.
+
+		* mod.ccontrol/SCANCommand.cc: add extra option "-i" to SCAN command.
+			- shows an ident report (number of unique idents etc to assist clone hunters)
+
+		* mod.ccontrol/ccontrol.cc: update syntax in 'SCAN' command.
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol_generic.h: added Duration() function similar to Ago()
+
+		* mod.ccontrol/ccontrol_generic.cc: added Duration() function similar to Ago()
+
+		* mod.ccontrol/ccontrol.cc: changed output of 'list' commands to be more readable
+			- made output of 'list glines' more human readable
+			- made output of 'list servers' more human readable
+
+		* mod.ccontrol/DEAUTHCommand.cc: stop auto-authentication after netsplit if deauth'd
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccUser.h: added LastAuthTS + LastAuthNumeric to users class
+
+		* mod.ccontrol/LOGINCommand.cc: after successful login, record TS+Numeric for user.
+
+		* mod.ccontrol/ccontrol.cc: check ts+numeric against opers table to auto-logon after netsplit.
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.h: added new global variable (CClonesTime) for below.
+			- changed format of client ip maps from int to long (to hold timestamps)
+
+		* mod.ccontrol/ccontrol.cc: added configurable time between cidr clones announcements.
+
+		* mod.ccontrol/CONFIGCommand.cc: as above.
+
+		* mod.ccontrol/WHOISCommand.cc: added 'account' status in 'whois' command
+
+2005-06-19	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/ccontrol.cc: added IP after host in excessive clients msg
+			also, changed affected users count to square brackets.
+
+		* mod.ccontrol/ccontrol_generic.h: function prototypes (new file)
+
+		* mod.ccontrol/ccontrol_generic.cc: new human readable generic functions.
+
+		* mod.ccontrol/Makefile.am: Updated makefile for new files
+
+		* mod.ccontrol/Makefile.in: Updated makefile for new files
+
+		* mod.ccontrol/CHECKNETCommand.cc: made output more human readable.
+
+		* mod.ccontrol/CHANINFOCommand.cc: made output more human readable.
+
+		* mod.ccontrol/MAXUSERSCommand.cc: made output more human readable.
+
+2005-06-18	Dan-m00 <daniel@undernet.org>
+		* mod.ccontrol/FORCEGLINECommand.cc: CIDR reply info added for forceglines
+
+		* mod.ccontrol/GLINECommand.cc: CIDR reply info added for glines
+
+		* mod.ccontrol/SGLINECommand.cc: CIDR reply info added for sglines
+
+2005-06-18	Dan-m00 <daniel@undernet.org>
+		* src/Channel.cc: fixed problem that stopped compilation on FreeBSD/gcc 2.95
+
+		* src/server.cc: fixed problem that stopped compilation on FreeBSD/gcc 2.95
+
+		* include/Channel.h: gnuworld_config.h was not included, so topic_track did not work.
+
+		* mod.ccontrol/REOPCommand.cc: fixed a few things here.
+			- check that the user to be reop'd is actually in the channel.
+			- dont join channel, op, part channel - get server to do it in 1 mode.
+
+		* mod.ccontrol/ccontrol.h: added new variables for CIDR clone detection
+
+		* mod.ccontrol/ccontrol.cc: added CIDR support.  also fixed gline bug
+			- glines cannot start with a "."
+			- glines cannot contain consecutive "."'s
+
+		* libgnuworld/match.cc: added CIDR support to match() function.
+
+		* mod.ccontrol/CONFIGCommand.cc: added CIDR options (see seperate commit)
+
+		* mod.ccontrol/Constants.h: defined new return codes for CIDR matches
+

@@ -1,0 +1,59 @@
+--
+-- $Id: README,v 1.2 2006/07/17 01:24:02 nighty Exp $
+--
+
+This directory contains the PHP file present on http://www.gnuworld.org/gnuworld-setup/
+that is the Interactive GNUworld Installation Guide.
+
+regards..
+
+--
+--
+--
+
+INSTALLING INTERACTIVE GUIDE
+----------------------------
+
+	actually it just needs to be moved in a directory you can access on an URL,
+	and that has PHP4+ support with .PHP file extention.
+	Best is to put that in a subdirectory and then access that sub directory,
+
+
+Basical Apache Installation :
+
+	htt://www.your-website.com/ points to /usr/local/apache/htdocs/ local directory,
+	just do :
+			yourbox:/home/gnuworld/gnuworld/doc/idoc# cd ..
+			yourbox:/home/gnuworld/gnuworld/doc# cp -rp idoc/ /usr/local/apache/htdocs
+
+	then access http://www.you-website.com/idoc/ with your usual web browser.
+
+
+
+
+If you don't know what its all about, but you already have a working website interface (/live)
+just copy that 'idoc' directory in you GNUworld website directory (as website/docs/gnuworld/idoc)
+and then you should find easy enough how to access it using you usual URL for your GNUworld website
+and adding the idoc/ sub directory.
+
+
+NOTE TO CONTRIBUTORS
+--------------------
+
+	This documentation, even tho it doesnt evolve very fast on the coder-com website,
+	does evolve sorta fast on my development space, its heavily linked to website interface
+	changes so its the more up-to-date as i can, so it hopefully provide a full help over the
+	GNUworld installation process.
+
+	If you want to contribute, by proposing more FAQs or if you for example tested it on another
+	operating system and can tell me it does work without (or with some) modifications, then i will
+	be happy to hear it .. and i encourage you to contact me, even for it being a request to know
+	if your idea is not either allready in the TODO list too close, allready done, obsolete due to
+	some changes, or whatever before you go any further.
+
+--
+--
+--
+--
+--
+

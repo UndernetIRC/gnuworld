@@ -1,0 +1,22 @@
+**** IMPORTANT NOTE ****
+
+There must be a path for AC tokens from your cservice (or other 
+authenticating service) to NickServ! This will usually mean that all the 
+servers between cservice and NickServ MUST BE RUNNING ircu2.10.11. If this 
+is not the case, NickServ will not see users authenticating and will not 
+be able to function.
+
+It is now possible to run NickServ and CService on the same GNUWorld core.
+
+**** IMPORTANT NOTE ****
+
+Basic Installation Instructions:
+
+1) Create the nickserv db: createdb nickserv
+
+2) Load the NickServ schema: psql nickserv < nickserv.sql
+
+3) Configure to use nickserv: ./configure --enable-modules=nickserv --other-options-you-use
+
+4) Run gnuworld
+

@@ -1,0 +1,20 @@
+#!/bin/sh
+# "$Id: cycle-judge,v 1.6 2004/01/02 01:59:04 nighty Exp $"
+# Changes: use gzip when present to compress files, and give users the option to control the behaviour
+# "Alexander Maassen" <outsider@key2peace.org>
+#
+# Fixed cycle-judge so it WORKS!
+# "Reed Loden" <reed@reedloden.com>
+
+# Change the setting below to the location where your judge.log resides without the trailing slash
+SRCPATH=/usr/local/pgsql/regproc
+# Change the setting below if you want the archived logs somewhere else
+DSTPATH=/usr/local/pgsql/regproc/logs
+
+if [ -f $SRCPATH/judge.log ]; then
+  gzip -9 $SRCPATH/judge.log
+  mv $SRCPATH/judge.log.gz $DSTPATH/judge.log.`date +%Y%m%d`.gz
+  touch $SRCPATH/judge.log
+else
+  echo "No logs found. Aborting..."
+fi

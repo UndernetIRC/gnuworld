@@ -1,0 +1,34 @@
+Admin FAQ
+--------------------------------------------------------------------------------------
+
+* I want to run mod.Chanfix on my network, anything I need to be aware of?
+
+If you are just starting with mod.Chanfix, you should run it in no-fix mode for 1-2 weeks.
+This allows it to gather scores of channels and avoids people complaining that mod.Chanfix
+is not fixing their 20-point channel. Furthermore, explain to your users that mod.Chanfix
+is not similar to channel registration at all, but a last resort service. Point them to
+the User FAQ if they have questions.
+
+* Can more than one mod.Chanfix run on the same network?
+
+Yes. However, you should make sure that never more than one mod.Chanfix has fixing enabled.
+Having two mod.Chanfix servers both set to perform automatic and manual fixes could lead to
+confusing or even damaging situations, for example:
+
+- oper1 tells chanfix1 to manually fix #channel
+- chanfix1 enters #channel, removing all ops
+- chanfix2 sees an opless #channel and tries to fix it
+
+- oper1 tells chanfix1 to manually fix #channel
+- a few minutes later, oper2 tells chanfix2 to manually fix #channel
+
+Until a mechanism to communicate between mod.Chanfix servers has been devised, be careful
+while running more than a single mod.Chanfix instance.
+
+* I'm running mod.Chanfix but i'm not seeing any scores! What's wrong?
+
+Make sure that enough servers are linked. You can confirm that via the STATUS command. If
+chanfix has disabled fixing because not enough servers are linked, it is also not scoring
+any channels. Second, a channel won't get scores unless it has 4 or more clients in it.
+
+

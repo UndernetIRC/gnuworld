@@ -1,0 +1,46 @@
+CMaster Channel Services Development Team:
+------------------------------------------
+
+The following (and more) have contributed to the development of
+the undernet channel services server.
+ 
+GNUworld server API: 
+ripper_ - Dan Karrels <dan@karrels.com>
+nextie
+
+CMaster Client Developers
+Gte-    - Greg Sikorski <gte@atomicrevs.demon.co.uk>
+ripper_ - Dan Karrels <dan@karrels.com>
+Isomer  - Perry Lorier <perry@coders.net>
+
+CMaster Client Contributers:
+Plexus   - David Henriksen <david@itwebnet.dk>
+Vampire  - Alex Badea <vampire@go.ro>
+Ultimate - Matthias Crauwels <ultimate_@wol.be>
+
+CMaster SQL Schema/Replication:
+moof    - 
+Kev     - Kevin Mitchell <klmitch@MIT.EDU>
+Bleep   - Thomas Helvey <@home.com> 
+Sengaia - Arjen BOFH
+
+CMaster PHP Interface:
+nighty - <nighty@undernet.org>
+LGM    - Alex Dawson <alex@theducks.org>
+Isomer - Perry Lorier <perry@coders.net>
+Gator  - Robert White <gator@cajun-gator.net>
+
+Co-ordinators:
+Gator    - Robert White <gator@cajun-gator.net>
+DrCkTaiL - "Doctor" Cocktail
+
+Project BST:
+Gator  - Robert White <gator@cajun-gator.net>
+
+CMaster Language Translations:
+svr    - Daniel Simard <svr@undernet.org>
+plexus - David Henriksen <david@itwebnet.dk>
+Sebastian Serruys <sebastian.serruys@pandora.be>
+
+And also, many thanks to all of cservice for their help in testing and debugging :)
+If you should be on this list and I've forgotten, please mail ;)
