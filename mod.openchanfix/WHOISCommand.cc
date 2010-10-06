@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: WHOISCommand.cc,v 1.5 2010/10/06 18:10:38 denspike Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: WHOISCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: WHOISCommand.cc,v 1.5 2010/10/06 18:10:38 denspike Exp $");
 
 namespace gnuworld
 {
@@ -44,7 +44,7 @@ void WHOISCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::strin
 StringTokenizer st(Message);
 
 bot->logAdminMessage("%s (%s) WHOIS %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     st[1].c_str());
 
