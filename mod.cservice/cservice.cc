@@ -4997,7 +4997,7 @@ if (!isPasswordRight(theUser, st.assemble(4)))
 		logPrivAdminMessage("%d failed logins for %s (last attempt from iauth with IP %s), checksum %d).",
 			theUser->getFailedLogins(),
 			theUser->getUserName().c_str(),
-			st[2],
+			st[2].c_str(),
 			checksum);
 	
 	}
