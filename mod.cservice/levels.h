@@ -85,7 +85,8 @@ namespace gnuworld {
   const int scanhost = 600;
   const int registercmd = 750;
   const int globalsuspend = 750;
-  const int rehash = 900;
+  const int rehash_admin = 800;
+  const int rehash_coder = 900;
 
   const int purge = 750;
   const int removeall = 750;

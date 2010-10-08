@@ -367,6 +367,8 @@ public:
 
 	void loadTranslationTable();
 
+	int rehashMOTD();
+
 	// Method to retrieve a translation string.
 	const string getResponse( sqlUser*, int , string = string() );
 

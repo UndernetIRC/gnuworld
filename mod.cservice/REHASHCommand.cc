@@ -48,7 +48,7 @@ sqlUser* theUser = bot->isAuthed(theClient, true);
 if (!theUser) return false;
 
 int level = bot->getAdminAccessLevel(theUser);
-if (level < level::rehash)
+if (level < level::rehash_admin)
 {
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
@@ -59,13 +59,17 @@ if (level < level::rehash)
 
 string option = string_upper(st[1]);
 
-if (option == "TRANSLATIONS")
+if (option == "MOTD")
 	{
-		bot->languageTable.clear();
-		bot->translationTable.clear();
-		bot->loadTranslationTable();
-		bot->Notice(theClient, "Done. %i entries in language table.",
-			bot->translationTable.size());
+                int lastupdate = bot->rehashMOTD();
+                if (lastupdate > 0) {
+                        bot->Notice(theClient, "Done. Rehashed the MOTD, last updated %s ago.",
+                                bot->prettyDuration(lastupdate).c_str(), lastupdate);
+			return true;
+                } else {
+                        bot->Notice(theClient, "Couldn't update the MOTD.");
+			return false;
+                }
 	}
 
 if (option == "HELP")
@@ -74,6 +78,25 @@ if (option == "HELP")
 		bot->loadHelpTable();
 		bot->Notice(theClient, "Done. %i entries in help table.",
 			bot->helpTable.size());
+	}
+
+/* Options below require a higher level to rehash */
+if (level < level::rehash_coder)
+{
+        bot->Notice(theClient,
+                bot->getResponse(theUser,
+                        language::insuf_access,
+                        string("You have insufficient access to perform that command.")));
+        return false;
+}
+
+if (option == "TRANSLATIONS")
+	{
+		bot->languageTable.clear();
+		bot->translationTable.clear();
+		bot->loadTranslationTable();
+		bot->Notice(theClient, "Done. %i entries in language table.",
+			bot->translationTable.size());
 	}
 
 if (option == "CONFIG")

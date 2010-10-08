@@ -261,7 +261,7 @@ RegisterCommand(new SERVNOTICECommand(this, "SERVNOTICE", "<#channel> <text>", 5
 RegisterCommand(new SAYCommand(this, "SAY", "<#channel> <text>", 5));
 RegisterCommand(new SAYCommand(this, "DO", "<#channel> <text>", 5));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<text>", 5));
-RegisterCommand(new REHASHCommand(this, "REHASH", "[translations | help]]", 5));
+RegisterCommand(new REHASHCommand(this, "REHASH", "[translations | help | config | motd]", 5));
 RegisterCommand(new STATSCommand(this, "STATS", "", 8));
 RegisterCommand(new ADDCOMMENTCommand(this, "ADDCOMMENT", "<username> <comment>", 10));
 RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN", "[reason]", 10));
@@ -1764,6 +1764,36 @@ if( SQLDb->Exec(
 #endif
 
 }
+
+int cservice::rehashMOTD() {
+/* 
+ * Trying to rehash the MOTD.
+ * If it succeeds, we return when it was last adjusted. 
+ */
+
+int lang_id = 1;
+pair<int, int> thePair( lang_id, language::motd );
+translationTableType::iterator ptr = translationTable.find(thePair);
+if(ptr != translationTable.end())
+	{
+	translationTable.erase(thePair);
+	stringstream selectQuery;
+	selectQuery	<< "SELECT text,last_updated FROM "
+        	        << "translations WHERE language_id = "
+			<< lang_id
+			<< "AND response_id = "
+			<< language::motd
+			<< ends;
+	if( SQLDb->Exec( selectQuery, true ) ) 
+		{
+		translationTable.insert(translationTableType::value_type(thePair, SQLDb->GetValue(0,0)) );
+		int last_updated = atoi(SQLDb->GetValue(0,1));
+		return last_updated;			
+		}
+	}
+return 0;
+}
+
 
 bool cservice::isOnChannel( const string& /* chanName */ ) const
 {
