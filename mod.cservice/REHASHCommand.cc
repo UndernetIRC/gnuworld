@@ -78,6 +78,7 @@ if (option == "HELP")
 		bot->loadHelpTable();
 		bot->Notice(theClient, "Done. %i entries in help table.",
 			bot->helpTable.size());
+		return true;
 	}
 
 /* Options below require a higher level to rehash */

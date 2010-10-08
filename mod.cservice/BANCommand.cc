@@ -306,7 +306,30 @@ if (max_bans > 0)
 	}
 }
 
-string banTarget = st[2];
+StringTokenizer st2( st[2], ',' );
+StringTokenizer::size_type counter = 0;
+
+//int max_multibans = bot->getConfigVar("MAX_MULTIBANS")->asInt();
+int max_multibans = 10;
+
+if (st2.size() > max_multibans)
+	{
+	bot->Notice(theClient, "Sorry, you can only add %i bans with one BAN command.",
+			max_multibans);
+	return true;
+	}
+
+if ((st2.size() + ban_count) > max_bans)
+	{
+	bot->Notice(theClient, "Sorry, the channel banlist is full (%i set, adding %i, maximum %i)",
+		ban_count, st2.size(), max_bans);
+	return true;
+	}
+
+
+for( ; counter < st2.size() ; counter++ ) {
+string banTarget = st2[counter];
+elog << "ST " << counter << ": " << st2[counter] << endl;
 
 bool isNick = bot->validUserMask( banTarget ) ? false : true ;
 
@@ -318,9 +341,9 @@ if( isNick )
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 			language::cant_find_on_chan).c_str(),
-			st[2].c_str(), theChan->getName().c_str()
+			st2[counter].c_str(), theChan->getName().c_str()
 		);
-		return true;
+		continue;
 		}
 
 	/* Ban and kick this user */
@@ -337,6 +360,7 @@ xCIDR cidr = xCIDR(banTarget);
 std::map < int,sqlBan* >::iterator ptr = theChan->banList.begin();
 vector <sqlBan*> oldBans;
 
+bool banExists = false;
 while (ptr != theChan->banList.end())
 	{
 	sqlBan* theBan = ptr->second;
@@ -347,7 +371,8 @@ while (ptr != theChan->banList.end())
 			bot->getResponse(theUser,
 			language::ban_exists).c_str()
 		);
-		return true;
+		banExists = true;
+		break;
 		}
 
 	if(!cidr.GetValid())
@@ -375,12 +400,16 @@ while (ptr != theChan->banList.end())
 				bot->getResponse(theUser,
 				language::ban_covered).c_str(),
 				banTarget.c_str(), theBan->getBanMask().c_str());
-			return true;
+			banExists = true;
+			break;
 			}
 		// Carry on regardless.
 		} //cidr.GetValid
 	++ptr;
 	} // while()
+
+if (banExists) { continue; }
+
 /*
  Go over the bans that needs to be removed
  and remove them
@@ -515,7 +544,7 @@ bot->Notice(theClient,
 	newBan->getBanMask().c_str(),
 	theChannel->getName().c_str(),
 	newBan->getLevel());
-
+}
 return true ;
 }
 
