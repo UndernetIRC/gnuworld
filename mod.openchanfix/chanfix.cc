@@ -1932,6 +1932,11 @@ for (xNetwork::channelIterator ptr = Network->channels_begin(); ptr != Network->
    thisChan = ptr->second;
    bool opLess = true;
    bool hasService = false;
+
+   // Do not autofix +R channels
+   if (thisChan->getMode(Channel::MODE_REG))
+     continue;
+
    if (thisChan->size() >= minClients && !isBeingFixed(thisChan)) {
      /* Don't autofix if the chan is temp blocked */
      tbPtr = tempBlockList.find(thisChan->getName());
@@ -2703,6 +2708,7 @@ return false;
 
 bool chanfix::canScoreChan(Channel* theChan)
 {
+
 for (Channel::const_userIterator ptr = theChan->userList_begin();
      ptr != theChan->userList_end(); ++ptr)
    if (ptr->second->getClient()->getMode(iClient::MODE_SERVICES))

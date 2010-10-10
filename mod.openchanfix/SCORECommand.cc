@@ -54,7 +54,9 @@ sqlChanOp* curOp = 0;
 
 Channel* netChan = Network->findChannel(st[1]);
 
-if (netChan && !bot->canScoreChan(netChan)) {
+// If netchan is not null, AND either canScoreChan is false or the chan is +R
+// reject the request
+if ((netChan) && (!bot->canScoreChan(netChan) || netChan->getMode(Channel::MODE_REG))) {
   if (compact)
     bot->SendTo(theClient, "~! %s", netChan->getName().c_str());
   else
