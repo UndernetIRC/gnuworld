@@ -44,7 +44,7 @@ void WHOISCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::strin
 StringTokenizer st(Message);
 
 bot->logAdminMessage("%s (%s) WHOIS %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     st[1].c_str());
 
