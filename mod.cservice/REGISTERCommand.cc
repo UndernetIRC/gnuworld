@@ -292,8 +292,12 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newManager));
 
 	/* set channel mode R - tmpChan is created further above */
+	stringstream tmpTS;
+	tmpTS << channel_ts;
+	string channelTS = tmpTS.str();
+
 	if (tmpChan)
-		bot->getUplink()->Mode(NULL, tmpChan, string("+R"), string() );
+		bot->getUplink()->Mode(NULL, tmpChan, string("+R"), channelTS );
 	bot->getUplink()->RegisterChannelEvent(st[1],bot);
 	return true;
 }

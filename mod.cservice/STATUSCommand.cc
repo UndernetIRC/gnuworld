@@ -323,6 +323,14 @@ if (admLevel >= 1)
 		}
 }
 
+/*
+if (admLevel > level::admin::admin)
+{
+	 bot->Notice(theClient, "DB TS: %i -- IRC TS: %i",
+	 		theChan->getChannelTS(), tmpChan ? tmpChan->getCreationTime() : 0 );
+}
+*/
+
 return true ;
 }
 

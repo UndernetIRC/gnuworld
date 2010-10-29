@@ -430,7 +430,12 @@ void cservice::BurstChannels()
 	}
 	
 	MyUplink->RegisterChannelEvent( theChan->getName(), this ) ;
+
+	tmpChan = Network->findChannel(theChan->getName());
 	
+	if (tmpChan && tmpChan->getCreationTime() < theChan->getChannelTS())
+			theChan->setChannelTS(tmpChan->getCreationTime());	
+
 	if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) 
 		{
 		string tempModes = theChan->getChannelMode();
@@ -447,7 +452,6 @@ void cservice::BurstChannels()
 			if (getConfigVar("BAN_CHECK_ON_BURST")->asInt() == 1)
 			{
 				/* check current inhabitants of the channel against our banlist */
-				tmpChan = Network->findChannel(theChan->getName());
 				for (Channel::userIterator chanUsers = tmpChan->userList_begin();
 					chanUsers != tmpChan->userList_end(); ++chanUsers)
 				{
@@ -460,11 +464,12 @@ void cservice::BurstChannels()
 			/* although AUTOJOIN isn't set, set the channel to +R if
 			 * it exists on the Network.
 			 */
-			tmpChan = Network->findChannel(theChan->getName());
 			if (tmpChan)
 			{
-				string tempModes = "+R";
-				MyUplink->Mode(NULL, tmpChan, tempModes, string() );
+				stringstream tmpTS;
+				tmpTS << theChan->getChannelTS();
+				string channelTS = tmpTS.str();
+				MyUplink->Mode(NULL, tmpChan, string("+R"), channelTS );
 			}
 		}
 	++ptr;
@@ -3529,8 +3534,12 @@ switch( whichEvent )
 		/* This is a registered channel, check it is set +R.
 		 * If not, set it to +R (channel creation)
 		 */
-		if (!theChan->getMode(Channel::MODE_REG))
-			MyUplink->Mode(NULL, theChan, string("+R"), string() );
+		if (!theChan->getMode(Channel::MODE_REG)) {
+			stringstream tmpTS;
+			tmpTS << reggedChan->getChannelTS();
+			string channelTS = tmpTS.str();
+			MyUplink->Mode(NULL, theChan, string("+R"), channelTS );
+		}
 
 		/* If this is a registered channel, but we're not in it -
 		 * then we're not interested in the following commands!

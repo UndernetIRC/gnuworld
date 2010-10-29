@@ -2238,7 +2238,6 @@ for( ; tokenIndex < st.size() ; )
 			case 'n':
 			case 'p':
 			case 'r':
-			case 'R':
 			case 's':
 			case 't':
 			case 'D':
@@ -2254,6 +2253,26 @@ for( ; tokenIndex < st.size() ; )
 					polarityString + theChar,
 					string() ) ) ;
 				break ;
+			case 'R':
+					/* mod.cservice setting +R with a TS */
+					if( nextArgIndex < st.size() && polarityBool ) {
+						std::string TS = st[ nextArgIndex ] ;
+						++nextArgIndex ;
+                		                modeVector.push_back( make_pair(
+                                		        polarityBool,
+		                                        chanModes[ theChar ] ) ) ;
+		                                rawModeVector.push_back( make_pair(
+                		                        polarityString + theChar,
+                                		        TS ) ) ;						
+					} else {
+						modeVector.push_back( make_pair(
+		                                        polarityBool,
+		                                        chanModes[ theChar ] ) ) ;
+                		                rawModeVector.push_back( make_pair(
+                                		        polarityString + theChar,
+		                                        string() ) ) ;
+					}
+				break;
 			case 'k':
 				{
 //				elog	<< "xServer::Mode> Mode 'k'"
