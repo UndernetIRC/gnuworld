@@ -30,11 +30,11 @@
 namespace gnuworld {
 
  namespace adminlevel {
-  const int adduser = 750;
-  const int remuser = 750;
-  const int modinfo = 750;
-  const int suspend = 750;
-  const int unsuspend = 750;
+  const int adduser = 800;
+  const int remuser = 800;
+  const int modinfo = 800;
+  const int suspend = 600;
+  const int unsuspend = 800;
  }
 
  namespace level {
