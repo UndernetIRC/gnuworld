@@ -513,6 +513,8 @@ public:
 	unsigned int noteDuration;
 	unsigned int noteLimit;
 
+	unsigned int partIdleChan;
+
 	void doCoderStats(iClient* theClient);
 
 	typedef map< string, ConfigData*, noCaseCompare > configHashType;

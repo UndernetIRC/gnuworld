@@ -187,3 +187,10 @@ hello_block_period = 3600
 
 webrelay_interval = 10;
 
+#
+# How long the bot should stay in an idle channel before leaving it.
+# This only takes into account join/parts, not privmsg.
+# Default is 2 days (172800 seconds)
+#
+
+part_idle_chan = 172800

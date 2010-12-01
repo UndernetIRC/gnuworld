@@ -336,6 +336,7 @@ loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
 noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());
 preloadUserDays = atoi((cserviceConfig->Require( "preload_user_days" )->second).c_str());
+partIdleChan = atoi((cserviceConfig->Require( "part_idle_chan" )->second).c_str());
 #ifdef USE_COMMAND_LOG
 commandlogPath = cserviceConfig->Require( "command_logfile" )->second ;
 #endif
@@ -2230,8 +2231,7 @@ void cservice::cacheExpireLevels()
 		 * If so, we might want to part and turn off autojoin.. etc.
 		 */
 
-		/* 2 Days for now, move to config.. (172800) */
-		if ( ((currentTime() - theChan->getLastUsed()) >= 172800)
+		if ( ((currentTime() - theChan->getLastUsed()) >= partIdleChan)
 			&& theChan->getInChan()
 			&& !theChan->getFlag(sqlChannel::F_SPECIAL) )
 		{

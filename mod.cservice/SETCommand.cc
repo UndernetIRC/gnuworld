@@ -643,6 +643,39 @@ else
 	    return true;
 	}
 
+        if(option == "MIA")
+        {
+            // Check for admin access
+            int admLevel = bot->getAdminAccessLevel(theUser);
+            if(admLevel < level::set::mia)
+            {
+                        // No need to tell users about admin commands.
+                        Usage(theClient);
+                        return true;
+            }
+            if(value == "ON") theChan->setFlag(sqlChannel::F_MIA);
+            else if(value == "OFF") theChan->removeFlag(sqlChannel::F_MIA);
+            else
+            {
+                bot->Notice(theClient,
+                        bot->getResponse(theUser,
+                                language::set_cmd_syntax_on_off,
+                                string("value of %s must be ON or OFF")).c_str(),
+                        option.c_str());
+                return true;
+            }
+            theChan->commit();
+            bot->Notice(theClient,
+                        bot->getResponse(theUser,
+                                language::set_cmd_status,
+                                string("%s for %s is %s")).c_str(),
+                        option.c_str(),
+                        theChan->getName().c_str(),
+                        theChan->getFlag(sqlChannel::F_MIA) ? "ON" : "OFF");
+            return true;
+        }
+
+
 	if(option == "NOOP")
 	{
 	    if(level < level::set::noop)

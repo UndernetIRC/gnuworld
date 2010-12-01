@@ -128,6 +128,7 @@ namespace gnuworld {
     const int tempman = 501;
     const int caution = 501;
     const int vacation = 501;
+    const int mia = 800;
   }
 
   namespace immune {
