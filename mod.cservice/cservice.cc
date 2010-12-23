@@ -453,6 +453,7 @@ void cservice::BurstChannels()
 			if (getConfigVar("BAN_CHECK_ON_BURST")->asInt() == 1)
 			{
 				/* check current inhabitants of the channel against our banlist */
+				tmpChan = Network->findChannel(theChan->getName());
 				for (Channel::userIterator chanUsers = tmpChan->userList_begin();
 					chanUsers != tmpChan->userList_end(); ++chanUsers)
 				{
