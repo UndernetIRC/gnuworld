@@ -290,14 +290,27 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	/*
 	 * Show admins some more details about the user.
 	 */
-	unsigned int theTime;
-	string userComments = theUser->getLastEvent(sqlUser::EV_COMMENT, theTime);
 
-	if (!userComments.empty() && (userComments[0] != ' '))
-		{
+	stringstream queryString;
+
+	queryString	<< "SELECT message,ts"
+                        << " FROM userlog WHERE user_id = "
+                        << theUser->getID()
+                        << " AND event = "
+                        << sqlUser::EV_COMMENT
+                        << " ORDER BY ts DESC LIMIT 3"
+                        << ends;
+
+	if( bot->SQLDb->Exec(queryString, true ) )
+        {
+		for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++) {
+		        string userComments = bot->SQLDb->GetValue(i, 0);
+		        unsigned int theTime = atoi(bot->SQLDb->GetValue(i, 1));
 			bot->Notice(theClient,"\002Admin Comment\002: %s ago (%s)", bot->prettyDuration(theTime).c_str(),
 				userComments.c_str());
 		}
+        }
+
 
 	if (theUser->getFlag(sqlUser::F_FRAUD))
 		{

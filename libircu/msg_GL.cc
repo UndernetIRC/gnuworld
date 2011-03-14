@@ -90,7 +90,7 @@ if( Params.size() < 5 )
 Gline* newGline = new (std::nothrow) Gline(
 		Params[ 0 ],
 		Params[ 2 ] + 1,
-		Params[ 6 ],
+		Params[ Params.size() - 1 ],
 		atoi( Params[ 3 ] ),
 		atoi( Params[ 4 ] )) ;
 assert( newGline != 0 ) ;
