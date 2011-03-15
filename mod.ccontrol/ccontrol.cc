@@ -1871,7 +1871,7 @@ else if (timer_id == rpingCheck)
 			// Send RPING to euworld's hub each 30 seconds instead of each minute.
 			if (((counter % 20) != tID) && (TmpServer->getNetServer()->getIntYY() != myHub->getIntYY()))
 				continue;
-			if ((TmpServer->getNetServer()->getIntYY() == myHub->getIntYY()) && ((::time(0) - ccHub->getLastLagSent()) < 30))
+			if ((TmpServer->getNetServer()->getIntYY() == myHub->getIntYY()) && ((!ccHub || (::time(0) - ccHub->getLastLagSent()) < 30)))
 				continue;
 			Write("%s RI %s %s %d %s :%d %s", getCharYY().c_str(), TmpServer->getNetServer()->getCharYY().c_str(), getCharYYXXX().c_str(), ::time(0), s.str().c_str(), ::time(0), s.str().c_str());
 			TmpServer->setLastLagSent(::time(0));
