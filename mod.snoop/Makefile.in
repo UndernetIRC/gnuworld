@@ -15,7 +15,7 @@
 
 @SET_MAKE@
 
-# "$Id: Makefile.in,v 1.32 2010/08/29 13:01:35 denspike Exp $"
+# "$Id: Makefile.am,v 1.1 2003/12/04 00:44:24 dan_karrels Exp $"
 
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
