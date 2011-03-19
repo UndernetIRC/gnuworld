@@ -83,6 +83,7 @@ namespace gnuworld {
   const int addcommentcmd = 600;
   const int scanuname = 600;
   const int scanhost = 600;
+  const int scanemail = 600;
   const int registercmd = 750;
   const int globalsuspend = 750;
   const int rehash_admin = 800;

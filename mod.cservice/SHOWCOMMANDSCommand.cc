@@ -37,7 +37,7 @@ static const char* lvl_1000_cmds = "\002Level 1000\002: anything";
 static const char* lvl_900_cmds = "\002Level  900\002: shutdown rehash";
 static const char* lvl_800_cmds = "\002Level  800\002: say servnotice";
 static const char* lvl_750_cmds = "\002Level  750\002: register purge removeall";
-static const char* lvl_600_cmds = "\002Level  600\002: remignore addcomment scanhost scanuname";
+static const char* lvl_600_cmds = "\002Level  600\002: remignore addcomment scanhost scanuname scanemail";
 
 static const char* lvl_500_cmds = "\002Level  500\002: part";
 static const char* lvl_450_cmds = "\002Level  450\002: join set%s*";

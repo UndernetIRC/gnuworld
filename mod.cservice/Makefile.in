@@ -102,6 +102,7 @@ am_libcservice_la_OBJECTS = libcservice_la-cservice.lo \
 	libcservice_la-REMUSERCommand.lo libcservice_la-SAYCommand.lo \
 	libcservice_la-SCANHOSTCommand.lo \
 	libcservice_la-SCANUNAMECommand.lo \
+	libcservice_la-SCANEMAILCommand.lo \
 	libcservice_la-SEARCHCommand.lo \
 	libcservice_la-SERVNOTICECommand.lo \
 	libcservice_la-SETCommand.lo \
@@ -322,6 +323,7 @@ libcservice_la_SOURCES = cservice.cc \
 	SAYCommand.cc \
 	SCANHOSTCommand.cc \
 	SCANUNAMECommand.cc \
+	SCANEMAILCommand.cc \
 	SEARCHCommand.cc \
 	SERVNOTICECommand.cc \
 	SETCommand.cc \
@@ -470,6 +472,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-REMOVEALLCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-REMUSERCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-SAYCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-SCANEMAILCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-SCANHOSTCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-SCANUNAMECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcservice_la-SEARCHCommand.Plo@am__quote@
@@ -833,6 +836,13 @@ libcservice_la-SCANUNAMECommand.lo: SCANUNAMECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SCANUNAMECommand.cc' object='libcservice_la-SCANUNAMECommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o libcservice_la-SCANUNAMECommand.lo `test -f 'SCANUNAMECommand.cc' || echo '$(srcdir)/'`SCANUNAMECommand.cc
+
+libcservice_la-SCANEMAILCommand.lo: SCANEMAILCommand.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT libcservice_la-SCANEMAILCommand.lo -MD -MP -MF $(DEPDIR)/libcservice_la-SCANEMAILCommand.Tpo -c -o libcservice_la-SCANEMAILCommand.lo `test -f 'SCANEMAILCommand.cc' || echo '$(srcdir)/'`SCANEMAILCommand.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libcservice_la-SCANEMAILCommand.Tpo $(DEPDIR)/libcservice_la-SCANEMAILCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SCANEMAILCommand.cc' object='libcservice_la-SCANEMAILCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o libcservice_la-SCANEMAILCommand.lo `test -f 'SCANEMAILCommand.cc' || echo '$(srcdir)/'`SCANEMAILCommand.cc
 
 libcservice_la-SEARCHCommand.lo: SEARCHCommand.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT libcservice_la-SEARCHCommand.lo -MD -MP -MF $(DEPDIR)/libcservice_la-SEARCHCommand.Tpo -c -o libcservice_la-SEARCHCommand.lo `test -f 'SEARCHCommand.cc' || echo '$(srcdir)/'`SEARCHCommand.cc

@@ -251,6 +251,7 @@ RegisterCommand(new SUSPENDMECommand(this, "SUSPENDME", "<password>", 15));
 
 RegisterCommand(new SCANHOSTCommand(this, "SCANHOST", "<mask> [-all]", 10));
 RegisterCommand(new SCANUNAMECommand(this, "SCANUNAME", "<mask> [-all]", 10));
+RegisterCommand(new SCANEMAILCommand(this, "SCANEMAIL", "<mask> [-all]", 10));
 RegisterCommand(new REMIGNORECommand(this, "REMIGNORE", "<mask>", 5));
 RegisterCommand(new REGISTERCommand(this, "REGISTER", "<#channel> <username>", 8));
 RegisterCommand(new REMOVEALLCommand(this, "REMOVEALL", "<#channel>", 15));

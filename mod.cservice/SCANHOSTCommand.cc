@@ -114,13 +114,13 @@ bot->Notice(theClient,"Found %i matches", bot->SQLDb->Tuples());
 
 if( bot->SQLDb->Tuples() >= 50 )
 	{
-	bot->Notice(theClient, "More then 50 matches were found, please visit the website.");
+	bot->Notice(theClient, "More than 50 matches were found, please visit the website.");
 	return false;
 	}
 
 if((bot->SQLDb->Tuples() > 15) && (!showAll))
 	{
-	bot->Notice(theClient, "More then 15 matches were found without the use of -all, please visit the website.");
+	bot->Notice(theClient, "More than 15 matches were found without the use of -all, please visit the website.");
 	return false;
 	}
 
