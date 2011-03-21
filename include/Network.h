@@ -769,7 +769,7 @@ public:
 	 * to each channel on the network.  Return a list of pointers
 	 * to const Channel's which match.
 	 */
-	virtual std::list<const Channel::Channel*> getChannelsWithKey(
+	virtual std::list<const Channel*> getChannelsWithKey(
 			const std::string& key) const;
 
 	/**
@@ -777,7 +777,7 @@ public:
 	 * to each channel on the network.  Return a list of pointers
 	 * to const Channel's which match.
 	 */
-	virtual std::list<const Channel::Channel*> getChannelsWithModes(
+	virtual std::list<const Channel*> getChannelsWithModes(
 			const std::string& modes) const;
 
 #ifdef TOPIC_TRACK
@@ -786,7 +786,7 @@ public:
 	 * to each channel on the network.  Return a list of pointers
 	 * to const Channel's which match.
 	 */
-	virtual std::list<const Channel::Channel*> getChannelsWithTopic(
+	virtual std::list<const Channel*> getChannelsWithTopic(
 			const std::string& topic) const;
 
 	/**
@@ -794,7 +794,7 @@ public:
 	 * to each channel on the network.  Return a list of pointers
 	 * to const Channel's which match.
 	 */
-	virtual std::list<const Channel::Channel*> getChannelsWithTopicBy(
+	virtual std::list<const Channel*> getChannelsWithTopicBy(
 			const std::string& topicby) const;
 #endif
 	/**
