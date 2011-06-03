@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ccontrol.cc,v 1.243 2010/09/12 20:28:24 hidden1 Exp $
+ * $Id: ccontrol.cc,v 1.244 2011/06/03 19:46:10 danielaustin Exp $
 */
 
 #define MAJORVER "1"
@@ -68,7 +68,7 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.243 2010/09/12 20:28:24 hidden1 Exp $" ) ;
+RCSTAG( "$Id: ccontrol.cc,v 1.244 2011/06/03 19:46:10 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
@@ -2335,7 +2335,7 @@ if(dbConnected)
   
                                 int CurConnections = ++clientsIpMap[tIP];
   
-                                if (((CurConnections > maxClones)) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+                                if ((!isShellException) && ((CurConnections > maxClones)) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
                                         (CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
                                 {
                                         sprintf(Log,"*@%s", NewUser->getRealInsecureHost().c_str());
