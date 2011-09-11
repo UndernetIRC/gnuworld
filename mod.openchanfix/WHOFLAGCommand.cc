@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOFLAGCommand.cc,v 1.1 2006/12/22 03:11:44 buzlip01 Exp $
+ * $Id: WHOFLAGCommand.cc,v 1.2 2011/09/11 21:30:57 buzlip01 Exp $
  */
  
 #include "gnuworld_config.h"
@@ -74,7 +74,7 @@ while (ptr != bot->usersMap_end()) {
 }
 
 bot->logAdminMessage("%s (%s) WHOFLAG %s",
-		     theUser->getUserName().c_str(), 
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(), 
 		     st[1].c_str());
 

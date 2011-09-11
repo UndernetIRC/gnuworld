@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: INFOCommand.cc,v 1.7 2008/01/16 02:03:37 buzlip01 Exp $
+ * $Id: INFOCommand.cc,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: INFOCommand.cc,v 1.7 2008/01/16 02:03:37 buzlip01 Exp $");
+RCSTAG("$Id: INFOCommand.cc,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -118,6 +118,19 @@ if (netChan && bot->isBeingFixed(netChan)) {
 		bot->getResponse(theUser,
 				language::info_fix_waiting,
 				std::string("Current fix is on hold (waiting for ops to join)")).c_str());
+}
+else
+{
+	unsigned int lastfix = bot->getLastFix(theChan);
+	
+	std::string dateTimeOfLastFix;
+	if (lastfix == 0)
+		dateTimeOfLastFix = "Never";
+	else
+		dateTimeOfLastFix = bot->tsToDateTime(lastfix, true);
+		
+	bot->SendTo(theClient, "Last fix: %s (%s ago)", dateTimeOfLastFix.c_str(), bot->prettyDuration(lastfix).c_str());
+	
 }
 
 if (!theChan->useSQL()) {

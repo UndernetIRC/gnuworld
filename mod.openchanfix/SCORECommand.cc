@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: SCORECommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $
+ * $Id: SCORECommand.cc,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include <sstream>
@@ -37,7 +37,7 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: SCORECommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $");
+RCSTAG("$Id: SCORECommand.cc,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -54,7 +54,9 @@ sqlChanOp* curOp = 0;
 
 Channel* netChan = Network->findChannel(st[1]);
 
-if (netChan && !bot->canScoreChan(netChan)) {
+// If netchan is not null, AND either canScoreChan is false or the chan is +R
+// reject the request
+if ((netChan) && (!bot->canScoreChan(netChan) || netChan->getMode(Channel::MODE_REG))) {
   if (compact)
     bot->SendTo(theClient, "~! %s", netChan->getName().c_str());
   else

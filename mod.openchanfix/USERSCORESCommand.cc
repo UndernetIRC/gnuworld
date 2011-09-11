@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: USERSCORESCommand.cc,v 1.3 2010/03/04 04:24:11 hidden1 Exp $
+ * $Id: USERSCORESCommand.cc,v 1.4 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include <sstream>
@@ -35,7 +35,7 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: USERSCORESCommand.cc,v 1.3 2010/03/04 04:24:11 hidden1 Exp $");
+RCSTAG("$Id: USERSCORESCommand.cc,v 1.4 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -82,7 +82,7 @@ if (!foundOne) {
 }
 
 bot->logAdminMessage("%s (%s) USERSCORES %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     st[1].c_str());
 

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: ADDUSERCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $
+ * $Id: ADDUSERCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: ADDUSERCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $");
+RCSTAG("$Id: ADDUSERCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -89,7 +89,7 @@ if (st.size() > 2) {
 				 std::string("Created user %s (%s).")).c_str(),
 				 st[1].c_str(), st[2].c_str());
     bot->logAdminMessage("%s (%s) ADDUSER %s %s",
-			 theUser->getUserName().c_str(), 
+			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 			 theClient->getRealNickUserHost().c_str(),
 			 st[1].c_str(), st[2].c_str());
   } else {
@@ -106,7 +106,7 @@ if (st.size() > 2) {
 				language::created_user_wo_host,
 				std::string("Created user %s.")).c_str(), st[1].c_str());
   bot->logAdminMessage("%s (%s) ADDUSER %s",
-		       theUser->getUserName().c_str(), 
+		       theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		       theClient->getRealNickUserHost().c_str(),
 		       st[1].c_str());
 }

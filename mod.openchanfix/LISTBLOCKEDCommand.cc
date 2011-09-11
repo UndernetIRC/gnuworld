@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTBLOCKEDCommand.cc,v 1.4 2008/01/16 02:03:37 buzlip01 Exp $
+ * $Id: LISTBLOCKEDCommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -33,7 +33,7 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: LISTBLOCKEDCommand.cc,v 1.4 2008/01/16 02:03:37 buzlip01 Exp $");
+RCSTAG("$Id: LISTBLOCKEDCommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -99,8 +99,9 @@ bot->SendTo(theClient,
 		numBlocks);
 
 bot->logAdminMessage("%s (%s) LISTBLOCKED",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str());
+
 
 bot->logLastComMessage(theClient, Message);
 

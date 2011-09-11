@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: DELFLAGCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $
+ * $Id: DELFLAGCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: DELFLAGCommand.cc,v 1.5 2008/01/16 02:03:37 buzlip01 Exp $");
+RCSTAG("$Id: DELFLAGCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -136,7 +136,7 @@ bot->SendTo(theClient,
                                         targetUser->getUserName().c_str());
 
 bot->logAdminMessage("%s (%s) DELFLAG %s %c",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str(), flag);
 

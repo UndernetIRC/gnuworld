@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: WHOISCommand.cc,v 1.5 2010/10/06 18:10:38 denspike Exp $
+ * $Id: WHOISCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -32,7 +32,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: WHOISCommand.cc,v 1.5 2010/10/06 18:10:38 denspike Exp $");
+RCSTAG("$Id: WHOISCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: RELOADCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: RELOADCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: RELOADCommand.cc,v 1.5 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: RELOADCommand.cc,v 1.6 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -57,11 +57,11 @@ bot->SendTo(theClient,
                             std::string("Reloading client...see you on the flip side")).c_str());
 
 bot->logDebugMessage("%s (%s) is reloading the chanfix module.",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str());
 
 bot->logAdminMessage("%s (%s) RELOAD %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     (st.size() < 2) ? "" : st.assemble(1).c_str());
 

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: LISTHOSTSCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: LISTHOSTSCommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: LISTHOSTSCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: LISTHOSTSCommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -100,7 +100,7 @@ bot->SendTo(theClient,
 			std::string("End of host list.")).c_str());
 
 bot->logAdminMessage("%s (%s) LISTHOSTS %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str());
 

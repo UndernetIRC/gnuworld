@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: chanfix_config.h,v 1.7 2010/03/04 04:24:12 hidden1 Exp $
+ * $Id: chanfix_config.h,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #ifndef __CHANFIX_CONFIG_H
-#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.7 2010/03/04 04:24:12 hidden1 Exp $"
+#define __CHANFIX_CONFIG_H "$Id: chanfix_config.h,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $"
 
 #define CHANFIX_DEBUG 1
 
@@ -192,5 +192,15 @@
  * NOTE: New scores weigh the time first opped into users scores
  */
 #define ENABLE_NEWSCORES
+
+/**
+ * Should host checking be enabled?
+ * NOTE: Host checking checks to make sure that the hosts assigned to staff accounts match before
+ * any staff command can be issued. This is for paranoid sysadmins.
+ */
+#undef ENABLE_HOST_CHECKING
+ 
+#undef USERADMIN
+
 
 #endif // __CHANFIX_CONFIG_H

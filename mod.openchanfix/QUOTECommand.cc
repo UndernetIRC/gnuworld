@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: QUOTECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
+ * $Id: QUOTECommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: QUOTECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
+RCSTAG("$Id: QUOTECommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -58,7 +58,7 @@ StringTokenizer st(Message);
 bot->Write( st.assemble(1) );
 
 bot->logAdminMessage("%s (%s) QUOTE %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     st.assemble(1).c_str());
 

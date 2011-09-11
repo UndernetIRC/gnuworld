@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  * USA.
  *
- * $Id: DEBUGCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
+ * $Id: DEBUGCommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include	<string>
@@ -32,7 +32,7 @@
 #include	"chanfix.h"
 #include	"responses.h"
 
-RCSTAG("$Id: DEBUGCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
+RCSTAG("$Id: DEBUGCommand.cc,v 1.5 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -51,7 +51,7 @@ std::string option = string_upper(st[1]);
 
 if (option == "ROTATE") {
   bot->logDebugMessage("%s (%s) ordered a manual DB rotation.",
-		       theUser->getUserName().c_str(),
+		       theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		       theClient->getRealNickUserHost().c_str());
   bot->rotateDB();
   return;
@@ -68,13 +68,13 @@ if (option == "UPDATE") {
 
   if ((st.size() > 2) && string_upper(st[2]) == "THREADED") {
     bot->logDebugMessage("%s (%s) ordered a manual DB update (threaded).",
-			 theUser->getUserName().c_str(),
+			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 			 theClient->getRealNickUserHost().c_str());
     bot->prepareUpdate(true);
     return;
   } else {
     bot->logDebugMessage("%s (%s) ordered a manual DB update.",
-			 theUser->getUserName().c_str(),
+			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 			 theClient->getRealNickUserHost().c_str());
     bot->prepareUpdate(false);
     return;

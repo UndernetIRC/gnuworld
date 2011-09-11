@@ -1,6 +1,6 @@
 -- Help information.
 --
--- $Id: chanfix.help.sql,v 1.5 2006/12/26 14:36:08 buzlip01 Exp $
+-- $Id: chanfix.help.sql,v 1.6 2011/09/11 21:30:58 buzlip01 Exp $
 
 DELETE FROM help;
 
@@ -49,7 +49,7 @@ UNSUSPEND	1	Unsuspends the specified user.
 USERSCORES	1	Shows all scores for the given account over all channels. 
 WHOGROUP	1	Shows all users in the specified group along with their flags. If no argument is given, all groups are listed.
 <INDEXNORMAL>	1	\002Normal User\002: CANFIX REQUESTOP
-<INDEXOPER>	1	\002Oper Level\002: SCORE CSCORE CHECK HISTORY INFO OPLIST OPNICKS STATUS
+<INDEXOPER>	1	\002Oper Level\002: CHANFIX SIMULATE SCORE CSCORE CHECK HISTORY INFO OPLIST OPNICKS STATUS
 <INDEXLOGGEDIN>	1	\002Logged In\002: LISTHOSTS USET USERSCORES WHOIS WHOFLAG
 <INDEXBLOCK>	1	\002Blocker (+b)\002: BLOCK UNBLOCK LISTBLOCKED
 <INDEXCOMMENT>	1	\002Commenter (+c)\002: ADDNOTE DELNOTE ALERT UNALERT

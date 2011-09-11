@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: CHANFIXCommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $
+ * $Id: CHANFIXCommand.cc,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $
  */
 
 #include "gnuworld_config.h"
@@ -31,7 +31,7 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-RCSTAG("$Id: CHANFIXCommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $");
+RCSTAG("$Id: CHANFIXCommand.cc,v 1.8 2011/09/11 21:30:57 buzlip01 Exp $");
 
 namespace gnuworld
 {
@@ -94,7 +94,7 @@ if (!netChan) {
   return;
 }
 
-if (!bot->canScoreChan(netChan)) {
+if (!bot->canScoreChan(netChan) || netChan->getMode(Channel::MODE_REG)) {
   bot->SendTo(theClient,
 	      bot->getResponse(theUser,
 			       language::registered_channel,
@@ -212,7 +212,7 @@ bot->SendTo(theClient,
                             std::string("Manual chanfix acknowledged for %s")).c_str(),
                                         netChan->getName().c_str());
 bot->logAdminMessage("%s (%s) CHANFIX %s%s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     netChan->getName().c_str(),
 		     (override) ? " [override]" : "");
