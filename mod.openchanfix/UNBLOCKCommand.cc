@@ -89,7 +89,7 @@ bot->SendTo(theClient,
 
 /* Log command */
 bot->logAdminMessage("%s (%s) UNBLOCK %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str());
 

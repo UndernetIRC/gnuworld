@@ -116,7 +116,7 @@ if (netChan) {
 
 /* Log command */
 bot->logAdminMessage("%s (%s) BLOCK %s%s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str(),
 		     extraLog.c_str());

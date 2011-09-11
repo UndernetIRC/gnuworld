@@ -43,7 +43,7 @@ void WHOGROUPCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::st
 StringTokenizer st(Message);
 
 bot->logAdminMessage("%s (%s) WHOGROUP %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     (st.size() > 1) ? st[1].c_str() : "");
 

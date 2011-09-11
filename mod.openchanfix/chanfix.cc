@@ -117,7 +117,6 @@ adminLog.open(adminLogFile.c_str(), std::ios::out | std::ios::app);
 debugLog.open(debugLogFile.c_str(), std::ios::out | std::ios::app);
 
 /* Register the commands we want to use */
-#ifdef USERADMON
 RegisterCommand(new ADDFLAGCommand(this, "ADDFLAG",
 	"<username> <flag>",
 	3,
@@ -128,19 +127,16 @@ RegisterCommand(new ADDHOSTCommand(this, "ADDHOST",
 	3,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
-#endif
 RegisterCommand(new ADDNOTECommand(this, "ADDNOTE",
 	"<#channel> <reason>",
 	3,
 	sqlcfUser::F_COMMENT
 	));
-#ifdef USERADMIN
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER",
 	"<username> [host]",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
-#endif
 RegisterCommand(new ALERTCommand(this, "ALERT",
 	"<#channel> <reason>",
 	3,
@@ -159,7 +155,7 @@ RegisterCommand(new CANFIXCommand(this, "CANFIX",
 RegisterCommand(new CHANFIXCommand(this, "CHANFIX",
 	"<#channel> [override] [contact]",
 	2,
-	sqlcfUser::F_CHANFIX
+	0 /* Set to 0 to allow all opers to access it, otherwise this should be sqlcfUser::F_CHANFIX */
 	));
 RegisterCommand(new CHECKCommand(this, "CHECK",
 	"<#channel>",
@@ -173,7 +169,6 @@ RegisterCommand(new DEBUGCommand(this, "DEBUG",
 	sqlcfUser::F_OWNER
 	));
 #endif /* CHANFIX_DEBUG */
-#ifdef USERADMIN
 RegisterCommand(new DELFLAGCommand(this, "DELFLAG",
 	"<username> <flag>",
 	3,
@@ -184,19 +179,16 @@ RegisterCommand(new DELHOSTCommand(this, "DELHOST",
 	3,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
-#endif
 RegisterCommand(new DELNOTECommand(this, "DELNOTE",
 	"<#channel> <note_id>",
 	3,
 	sqlcfUser::F_COMMENT
 	));
-#ifdef USERADMIN
 RegisterCommand(new DELUSERCommand(this, "DELUSER",
 	"<username>",
 	2,
 	sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN
 	));
-#endif
 RegisterCommand(new HELPCommand(this, "HELP",
 	"[command]",
 	1,
@@ -212,13 +204,11 @@ RegisterCommand(new INFOCommand(this, "INFO",
 	2,
 	0
 	));
-#ifdef USERADMIN
 RegisterCommand(new INVITECommand(this, "INVITE",
 	"",
 	1,
 	sqlcfUser::F_OWNER
 	));
-#endif
 RegisterCommand(new LASTCOMCommand(this, "LASTCOM",
 	"[amount of commands] [days from]",
 	1,
@@ -229,13 +219,11 @@ RegisterCommand(new LISTBLOCKEDCommand(this, "LISTBLOCKED",
 	1,
 	sqlcfUser::F_BLOCK
 	));
-#ifdef USERADMIN
 RegisterCommand(new LISTHOSTSCommand(this, "LISTHOSTS",
 	"[username]",
 	1,
 	sqlcfUser::F_LOGGEDIN
 	));
-#endif
 RegisterCommand(new OPLISTCommand(this, "OPLIST",
 	"<#channel> [-all] [-days]",
 	2,
@@ -253,20 +241,16 @@ RegisterCommand(new QUOTECommand(this, "QUOTE",
 	sqlcfUser::F_OWNER
 	));
 #endif /* ENABLE_QUOTE */
-#ifdef USERADMIN
 RegisterCommand(new REHASHCommand(this, "REHASH",
 	"",
 	1,
 	sqlcfUser::F_OWNER
 	));
-#endif
-#ifdef USERADMIN
 RegisterCommand(new RELOADCommand(this, "RELOAD",
 	"[reason]",
 	1,
 	sqlcfUser::F_OWNER
 	));
-#endif
 RegisterCommand(new REQUESTOPCommand(this, "REQUESTOP",
 	isAllowingTopOpAlert() ? "<#channel> [contact]" : "<#channel>",
 	2,
@@ -282,20 +266,16 @@ RegisterCommand(new SCORECommand(this, "CSCORE",
 	2,
 	0
 	));
-#ifdef USERADMIN
 RegisterCommand(new SAYCommand(this, "SAY",
 	"<#channel> <text>",
 	3,
 	sqlcfUser::F_OWNER
 	));
-#endif
-#ifdef USERADMIN
 RegisterCommand(new SETCommand(this, "SET",
 	"<option> <value>",
 	3,
 	sqlcfUser::F_OWNER
 	));
-#endif
 #ifdef USERADMIN
 RegisterCommand(new SETGROUPCommand(this, "SETGROUP",
 	"<username> <group>",
@@ -306,15 +286,13 @@ RegisterCommand(new SETGROUPCommand(this, "SETGROUP",
 RegisterCommand(new SIMULATECommand(this, "SIMULATE",
 	"<#channel> <auto/manual>",
 	3,
-	sqlcfUser::F_CHANFIX
+	0 /* Set to 0 to allow all opers to access it, otherwise this should be sqlcfUser::F_CHANFIX */
 	));
-#ifdef USERADMIN
 RegisterCommand(new SHUTDOWNCommand(this, "SHUTDOWN",
 	"[reason]",
 	1,
 	sqlcfUser::F_OWNER
 	));
-#endif
 RegisterCommand(new STATUSCommand(this, "STATUS",
 	"",
 	1,
@@ -719,7 +697,7 @@ if (st.size() < commHandler->second->getNumParams()) {
 
 /* If you change this code, remember to change it in HELPCommand.cc */
 sqlcfUser::flagType requiredFlags = commHandler->second->getRequiredFlags();
-if (requiredFlags && 0 /* Disable all flag checks Isomer 2010-03-01 */) {
+if (requiredFlags) {
   if (!theUser) {
     SendTo(theClient,
            getResponse(theUser,
@@ -735,7 +713,7 @@ if (requiredFlags && 0 /* Disable all flag checks Isomer 2010-03-01 */) {
                        std::string("Your access to this service is suspended.")).c_str());
     return;
   }
-
+#ifdef ENABLE_HOST_CHECKING
   if (!theUser->matchHost(theClient->getRealNickUserHost().c_str())) {
     SendTo(theClient,
            getResponse(theUser,
@@ -743,6 +721,7 @@ if (requiredFlags && 0 /* Disable all flag checks Isomer 2010-03-01 */) {
                        std::string("Your current host does not match any registered hosts for your username.")).c_str());
     return;
   }
+#endif
 
   if (requiredFlags != sqlcfUser::F_LOGGEDIN &&
       !theUser->getFlag(requiredFlags)) {
@@ -921,6 +900,8 @@ bool chanfix::logLastComMessage(iClient* theClient, const std::string& Message)
     return false;
 
   const std::string Command = string_upper(st[0]);
+  
+  const std::string username = (theClient->getAccount() != "") ? theClient->getAccount() : theClient->getNickName();
 
   std::string log;
   dbHandle* cacheCon = getLocalDBHandle();
@@ -929,7 +910,7 @@ bool chanfix::logLastComMessage(iClient* theClient, const std::string& Message)
 
   std::stringstream insertString;
   insertString	<< Main
-		<< theClient->getAccount()
+		<< username
 		<< "','"
 		<< Command
 		<< " ";
@@ -2708,12 +2689,14 @@ return false;
 
 bool chanfix::canScoreChan(Channel* theChan)
 {
-
-for (Channel::const_userIterator ptr = theChan->userList_begin();
-     ptr != theChan->userList_end(); ++ptr)
-   if (ptr->second->getClient()->getMode(iClient::MODE_SERVICES))
-     return false;
-
+  // Lets leave this and just return 'true' since we're allowing +R channels to be scored
+  /*
+   * for (Channel::const_userIterator ptr = theChan->userList_begin();
+   *  ptr != theChan->userList_end(); ++ptr)
+   *if (ptr->second->getClient()->getMode(iClient::MODE_SERVICES))
+   *  return false;
+   */
+   
 return true;
 }
 

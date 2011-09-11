@@ -142,7 +142,7 @@ bot->SendTo(theClient,
                                         messageId, theChan->getChannel().c_str());
 
 bot->logAdminMessage("%s (%s) DELNOTE %s %d",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str(), messageId);
 

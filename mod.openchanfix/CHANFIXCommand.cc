@@ -212,7 +212,7 @@ bot->SendTo(theClient,
                             std::string("Manual chanfix acknowledged for %s")).c_str(),
                                         netChan->getName().c_str());
 bot->logAdminMessage("%s (%s) CHANFIX %s%s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     netChan->getName().c_str(),
 		     (override) ? " [override]" : "");

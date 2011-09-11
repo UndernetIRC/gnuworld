@@ -193,4 +193,14 @@
  */
 #define ENABLE_NEWSCORES
 
+/**
+ * Should host checking be enabled?
+ * NOTE: Host checking checks to make sure that the hosts assigned to staff accounts match before
+ * any staff command can be issued. This is for paranoid sysadmins.
+ */
+#undef ENABLE_HOST_CHECKING
+ 
+#undef USERADMIN
+
+
 #endif // __CHANFIX_CONFIG_H

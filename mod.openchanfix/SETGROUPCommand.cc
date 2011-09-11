@@ -77,7 +77,7 @@ bot->SendTo(theClient,
                                         group.c_str(), targetUser->getUserName().c_str());
 
 bot->logAdminMessage("%s (%s) SETGROUP %s %s",
-	    theUser->getUserName().c_str(),
+	    theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 	    theClient->getRealNickUserHost().c_str(),
 	    targetUser->getUserName().c_str(),
 	    group.c_str());

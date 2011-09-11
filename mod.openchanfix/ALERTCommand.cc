@@ -82,7 +82,7 @@ bot->SendTo(theClient,
 
 /* Log command */
 bot->logAdminMessage("%s (%s) ALERT %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     theChan->getChannel().c_str());
 

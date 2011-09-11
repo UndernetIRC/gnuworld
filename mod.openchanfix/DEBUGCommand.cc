@@ -51,7 +51,7 @@ std::string option = string_upper(st[1]);
 
 if (option == "ROTATE") {
   bot->logDebugMessage("%s (%s) ordered a manual DB rotation.",
-		       theUser->getUserName().c_str(),
+		       theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		       theClient->getRealNickUserHost().c_str());
   bot->rotateDB();
   return;
@@ -68,13 +68,13 @@ if (option == "UPDATE") {
 
   if ((st.size() > 2) && string_upper(st[2]) == "THREADED") {
     bot->logDebugMessage("%s (%s) ordered a manual DB update (threaded).",
-			 theUser->getUserName().c_str(),
+			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 			 theClient->getRealNickUserHost().c_str());
     bot->prepareUpdate(true);
     return;
   } else {
     bot->logDebugMessage("%s (%s) ordered a manual DB update.",
-			 theUser->getUserName().c_str(),
+			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 			 theClient->getRealNickUserHost().c_str());
     bot->prepareUpdate(false);
     return;

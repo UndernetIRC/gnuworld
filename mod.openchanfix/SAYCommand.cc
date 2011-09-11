@@ -47,7 +47,7 @@ std::string option = st[1];
 std::string value = st.assemble(2);
 
 bot->logAdminMessage("%s (%s) SAY %s %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     option.c_str(), value.c_str());
 

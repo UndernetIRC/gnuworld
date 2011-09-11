@@ -99,8 +99,9 @@ bot->SendTo(theClient,
 		numBlocks);
 
 bot->logAdminMessage("%s (%s) LISTBLOCKED",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str());
+
 
 bot->logLastComMessage(theClient, Message);
 

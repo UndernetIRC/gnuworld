@@ -137,7 +137,7 @@ bot->SendTo(theClient,
 					 targetUser->getUserName().c_str());
 
 bot->logAdminMessage("%s (%s) ADDFLAG %s %c",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str(), flag);
 

@@ -86,7 +86,7 @@ option = string_upper(st[1]);
 value = string_upper(st[2]);
 
 bot->logAdminMessage("%s (%s) USET %s %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     option.c_str(), value.c_str());
 

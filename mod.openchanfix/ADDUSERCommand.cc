@@ -89,7 +89,7 @@ if (st.size() > 2) {
 				 std::string("Created user %s (%s).")).c_str(),
 				 st[1].c_str(), st[2].c_str());
     bot->logAdminMessage("%s (%s) ADDUSER %s %s",
-			 theUser->getUserName().c_str(), 
+			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 			 theClient->getRealNickUserHost().c_str(),
 			 st[1].c_str(), st[2].c_str());
   } else {
@@ -106,7 +106,7 @@ if (st.size() > 2) {
 				language::created_user_wo_host,
 				std::string("Created user %s.")).c_str(), st[1].c_str());
   bot->logAdminMessage("%s (%s) ADDUSER %s",
-		       theUser->getUserName().c_str(), 
+		       theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		       theClient->getRealNickUserHost().c_str(),
 		       st[1].c_str());
 }

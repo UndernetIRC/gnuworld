@@ -113,7 +113,7 @@ bot->SendTo(theClient,
                                         st[2].c_str(), targetUser->getUserName().c_str());
 
 bot->logAdminMessage("%s (%s) DELHOST %s %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str(), st[2].c_str());
 

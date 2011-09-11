@@ -119,6 +119,19 @@ if (netChan && bot->isBeingFixed(netChan)) {
 				language::info_fix_waiting,
 				std::string("Current fix is on hold (waiting for ops to join)")).c_str());
 }
+else
+{
+	unsigned int lastfix = bot->getLastFix(theChan);
+	
+	std::string dateTimeOfLastFix;
+	if (lastfix == 0)
+		dateTimeOfLastFix = "Never";
+	else
+		dateTimeOfLastFix = bot->tsToDateTime(lastfix, true);
+		
+	bot->SendTo(theClient, "Last fix: %s (%s ago)", dateTimeOfLastFix.c_str(), bot->prettyDuration(lastfix).c_str());
+	
+}
 
 if (!theChan->useSQL()) {
   bot->logAdminMessage("%s (%s) INFO %s",

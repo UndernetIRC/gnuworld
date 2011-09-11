@@ -209,7 +209,7 @@ COPY "translations" FROM stdin;
 1	203	Sorry, I'm too busy at the moment. Please try again soon.	31337	0
 1	204	Sorry, I cant fix channels at the moment.	31337	0
 1	205	Fixing %s, please wait.	31337	0
-1	206	You must wait %d seconds before %s can be fixed again with this command, or contact a help channel.	31337	0
+1	206	You must wait %s seconds before %s can be fixed again with this command, or contact a help channel.	31337	0
 1	207	End of OPLIST for %s	31337	0
 1	208	You cannot see logs more than one year ago.	31337	0
 1	209	Listing last %d messages from day %d.	31337	0

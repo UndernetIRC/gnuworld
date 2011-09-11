@@ -100,7 +100,7 @@ bot->SendTo(theClient,
 			std::string("End of host list.")).c_str());
 
 bot->logAdminMessage("%s (%s) LISTHOSTS %s",
-		     theUser->getUserName().c_str(),
+		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
 		     theClient->getRealNickUserHost().c_str(),
 		     targetUser->getUserName().c_str());
 

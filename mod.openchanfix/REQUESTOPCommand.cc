@@ -37,89 +37,27 @@ namespace gnuworld
 {
 namespace cf
 {
-
+/* 20110830 - Modified the REQUESTOP command to support the new CFV that was passed for criteria on Undernet
+ * A REQUESTOP succeeds if the following criteria are met:
+ * 1. The requester has a score of >= 1000
+ * 2. There is nobody opped on the channel with a high score >= 2000
+ * 3. There is nobody opped on the channel with a higher score than the requester
+ * 4. There is nobody opped on the channel with a 'first opped date' within 3 days of the oldest first opped date.
+ * 5. The requester is in the top 10 high scores for the channel
+ */
 void REQUESTOPCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
 {
 StringTokenizer st(Message);
 
+bool isRequesterScoreHighEnough = false;
+int pScore, requesterScore = 0;
 bool alert = false;
-bool ishighscore = false;
+bool inChan = false;
+sqlChanOp* curOp = 0;
 
-chanfix::chanOpsType myOps = bot->getMyOps(st[1]);
+// If the bot is not allowing top op fixes (REQUESTOP), ignore the request
+if (!bot->isAllowingTopFix()) return;
 
-if (bot->isAllowingTopFix()) {
-  sqlChanOp* curOp = 0;
-  int maxScore = 0;
-  unsigned int opCount = 0;
-  unsigned int pScore;
-  unsigned int percent;
-  unsigned int wScore;
-
-  /* First off we need the top score from the channel */
-  for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
-       opPtr != myOps.end(); opPtr++) {
-    curOp = *opPtr;
-    opCount++;
-
-    if (curOp->getPoints() > maxScore)
-      maxScore = curOp->getPoints();
-  }
-
-  opCount = 0;
-
-  /* Secondly we need to make sure that the person's score who is requesting
-     REQUESTOP is within X% of the top score, specified in the config file.
-     If it isnt then we reject them soon */
-  for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
-       opPtr != myOps.end(); opPtr++) {
-    curOp = *opPtr;
-    opCount++;
-
-    pScore = curOp->getPoints();
-    percent = static_cast<int>((static_cast<float>(pScore) / static_cast<float>(maxScore)) * 100);
-    wScore = 100 - percent;
-    if ((static_cast<float>(wScore) <= bot->getTopOpPercent()) && (static_cast<float>(pScore) >= bot->getMinFixScore())) {
-      if (string_lower(curOp->getAccount()) == string_lower(theClient->getAccount()))
-        ishighscore = true;
-    }
-  }
-}
-
-Channel* netChan = Network->findChannel(st[1]);
-if (!netChan) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_such_channel,
-                              std::string("No such channel %s.")).c_str(), st[1].c_str());
-  return;
-}
-
-if (!ishighscore) {
-  if (bot->isAllowingTopFix()) {
-    bot->SendTo(theClient,
-                bot->getResponse(theUser,
-                                language::score_not_high_enough,
-                                std::string("You score for %s is not high enough to issue a fix.")).c_str(),
-                                            netChan->getName().c_str());
-  }
-  return;
-}
-
-/* This could be done simpler however if we decide to add
-   more parameters to REQUESTOP then its as simple as
-   adding a couple of lines to this section. (Plus the
-   other nessarcery code */
-if (bot->isAllowingTopOpAlert()) {
-  if (st.size() > 2) {
-    unsigned int pos = 2;
-    while(pos < st.size()) {
-      if (!strcasecmp(st[pos],"CONTACT"))
-        alert = true;
-
-      pos++;
-    }
-  }
-}
 
 /* Check if manual chanfix has been disabled in the config. */
 if (!bot->doChanFix()) {
@@ -138,6 +76,18 @@ if (bot->getState() != chanfix::RUN) {
                               std::string("Sorry, chanfix cannot fix channels at the moment, please try again soon.")).c_str());
   return;
 }
+
+// Does the channel exist on the network? If not, discontinue the request
+Channel* netChan = Network->findChannel(st[1]);
+if (!netChan) {
+  bot->SendTo(theClient,
+              bot->getResponse(theUser,
+                              language::no_such_channel,
+                              std::string("No such channel %s.")).c_str(), st[1].c_str());
+  return;
+}
+
+chanfix::chanOpsType myOps = bot->getMyOps(st[1]);
 
 if (!bot->canScoreChan(netChan) || netChan->getMode(Channel::MODE_REG)) {
   bot->SendTo(theClient,
@@ -159,12 +109,115 @@ if (myOps.empty()) {
   return;
 }
 
+// Next lets make sure the requester has a score of >= 1000
+for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
+   opPtr != myOps.end(); opPtr++) {
+  curOp = *opPtr;
+
+  pScore = curOp->getPoints() + curOp->getBonus();
+  //bot->SendTo(theClient, "Current Op: %s -- You: %s -- pScore: %d", curOp->getAccount().c_str(), theClient->getAccount().c_str(), pScore);
+  if (string_lower(curOp->getAccount()) == string_lower(theClient->getAccount()) && pScore >= 1000)
+  {
+	isRequesterScoreHighEnough = true;
+	requesterScore = pScore;
+	break;
+  }
+}
+if (!isRequesterScoreHighEnough)
+{
+  bot->SendTo(theClient,
+                bot->getResponse(theUser,
+                                language::score_not_high_enough,
+                                std::string("You score for %s is not high enough to issue a fix.")).c_str(),
+                                            netChan->getName().c_str());
+  return;
+}
+
+// Is there anyone opped on the chan with a score >= 2000?
+std:string nickName;
+for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
+     opPtr != myOps.end(); opPtr++) {
+  curOp = *opPtr;
+  pScore = curOp->getPoints() + curOp->getBonus();
+  inChan = bot->accountIsOnChan(st[1], curOp->getAccount());
+  if (inChan && pScore >= 2000)
+  {
+    nickName = bot->getChanNickName(st[1], curOp->getAccount());
+	// Are they opped?
+	if (nickName[0] == '@')
+	{
+		bot->SendTo(theClient, "Sorry, there is somebody currently opped on %s with a high score.", st[1].c_str());
+		return;
+	}
+  }
+}
+
+//Is there anyone opped on the channel with a higher score than the requester?
+for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
+     opPtr != myOps.end(); opPtr++) {
+  curOp = *opPtr;
+  pScore = curOp->getPoints() + curOp->getBonus();
+  inChan = bot->accountIsOnChan(st[1], curOp->getAccount());
+  if (inChan && pScore >= requesterScore)
+  {
+    nickName = bot->getChanNickName(st[1], curOp->getAccount());
+	// Are they opped?
+	if (nickName[0] == '@')
+	{
+		bot->SendTo(theClient, "Sorry, there is somebody currently opped on %s with a higher score than you.", st[1].c_str());
+		return;
+	}
+  }
+}
+
+// Is there anyone opped on the channel with a 'first opped date' within 3 days of the oldest first opped date?
+// First, get the oldest first opped TS and add 3 days to it
+time_t ts_firstOpped = 0;
+for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
+     opPtr != myOps.end(); opPtr++) {
+  curOp = *opPtr;
+  if (curOp->isOldestOp())
+  {
+    ts_firstOpped = (curOp->getTimeFirstOpped() + (3 * 86400));
+  }
+}
+// Got the first opped TS, now we make sure there's not an op with a first_opped_ts within 3 days of this
+for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
+     opPtr != myOps.end(); opPtr++) {
+  curOp = *opPtr;
+  //bot->SendTo(theClient, "curOp: %s Time First Opped: %d ts_firstOpped: %d", curOp->getAccount().c_str(), curOp->getTimeFirstOpped(), ts_firstOpped);
+  inChan = bot->accountIsOnChan(st[1], curOp->getAccount());
+  if (inChan)
+  {
+    nickName = bot->getChanNickName(st[1], curOp->getAccount());
+    if (nickName[0] == '@' && !curOp->isOldestOp() && curOp->getTimeFirstOpped() <= ts_firstOpped)
+    {
+      bot->SendTo(theClient, "Sorry, there is somebody opped on %s that has been opped longer.", st[1].c_str());
+	  return;
+    }
+  }
+}
+
+// Make sure the requester is in the top 10 scores list
+int opCount = 0;
+for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
+     opPtr != myOps.end(); opPtr++) {
+  curOp = *opPtr;
+  opCount++;
+  
+  if (string_lower(curOp->getAccount()) == string_lower(theClient->getAccount()) && opCount > 10)
+  {
+	bot->SendTo(theClient, "Sorry, you are not within the top 10 channel ops in %s.", st[1].c_str());
+	return;
+  }
+}
+
 /* Don't fix a channel being chanfixed. */
 if (bot->isBeingChanFixed(netChan)) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::already_being_man_fixed,
-                              std::string("The channel %s is already being manually fixed.")).c_str(),
+                              std::string("The channel %s is already being fixed.")).c_str(),
                                           netChan->getName().c_str());
   return;
 }
@@ -184,26 +237,8 @@ if (mintime < bot->getMinRequestOpTime()) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::requestop_must_wait,
-                              std::string("You must wait %d seconds before %s can be fixed again with this command, or contact a help channel.")).c_str(),
-                                          mint, netChan->getName().c_str());
-  return;
-}
-
-/* Check if the highest score is high enough for a fix. */
-if (myOps.begin() != myOps.end())
-  theChan->setMaxScore((*myOps.begin())->getPoints());
-
-if (theChan->getMaxScore() <= 
-    static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE)) 
-{
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::highscore_channel,
-                              std::string("The highscore in channel %s is %d which is lower than the minimum score required (%.2f * %d = %d).")).c_str(),
-                                          theChan->getChannel().c_str(), theChan->getMaxScore(),
-                                          FIX_MIN_ABS_SCORE_END, MAX_SCORE,
-                                          static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) 
-                                          * MAX_SCORE));
+                              std::string("You must wait %s seconds before %s can be fixed again with this command, or contact a help channel.")).c_str(),
+                                          bot->prettyDuration(mint).c_str(), netChan->getName().c_str());
   return;
 }
 
@@ -228,6 +263,10 @@ if ((bot->isTempBlocked(theChan->getChannel())) || (theChan->getFlag(sqlChannel:
   return;
 }
 
+/* Add the channel to the SQL database if it hasn't already been added */
+if (!theChan->useSQL())
+  theChan->Insert(bot->getLocalDBHandle());
+  
 /* Add the channel to the SQL database if it hasn't already been added */
 if (!theChan->useSQL())
   theChan->Insert(bot->getLocalDBHandle());
@@ -256,7 +295,6 @@ bot->logAdminMessage("%s (%s) REQUESTOP %s %s",
 
 bot->logLastComMessage(theClient, Message);
 
-return;
 }
 
 } // namespace cf
