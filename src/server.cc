@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: server.cc,v 1.226 2010/08/31 21:16:46 denspike Exp $
+ * $Id: server.cc,v 1.227 2011/09/27 19:56:15 hidden1 Exp $
  */
 
 #include	<sys/time.h>
@@ -70,7 +70,7 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.226 2010/08/31 21:16:46 denspike Exp $" ) ;
+RCSTAG( "$Id: server.cc,v 1.227 2011/09/27 19:56:15 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -772,6 +772,27 @@ if( !strcasecmp( serverName, this->ServerName ) )
 //elog	<< "xServer::SquitServer> Searching for server "
 //	<< serverName
 //	<< endl ;
+
+
+/* Post Event
+ * (Added Sept.26th 2011 by Hidden - Should fix a lag report bug in mod.ccontrol when a JUPE is issued)
+ */
+iServer* tmpServer = Network->findServerName(serverName);
+if( NULL == tmpServer )
+	{
+	// The server doesn't exist.
+	elog	<< "xServer::SquitServer> Unable to find server: "
+		<< serverName
+		<< endl ;
+	return false ;
+	}
+string source(getCharYY());
+string nreason(reason);
+PostEvent(EVT_NETBREAK,
+	static_cast<void *>(tmpServer),
+	static_cast<void*>(&source),
+	static_cast<void*>(&nreason));
+
 
 iServer* theServer = Network->removeServerName( serverName ) ;
 if( NULL == theServer )
