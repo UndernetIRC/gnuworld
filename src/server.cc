@@ -773,6 +773,26 @@ if( !strcasecmp( serverName, this->ServerName ) )
 //	<< serverName
 //	<< endl ;
 
+/* Post Event
+ * (Added Sept.26th 2011 by Hidden - Should fix a lag report bug in mod.ccontrol when a JUPE is issued)
+ */
+iServer* tmpServer = Network->findServerName(serverName);
+if( NULL == tmpServer )
+	{
+	// The server doesn't exist.
+	elog	<< "xServer::SquitServer> Unable to find server: "
+		<< serverName
+		<< endl ;
+	return false ;
+	}
+string source(getCharYY());
+string nreason(reason);
+PostEvent(EVT_NETBREAK,
+	static_cast<void *>(tmpServer),
+	static_cast<void*>(&source),
+	static_cast<void*>(&nreason));
+
+         
 iServer* theServer = Network->removeServerName( serverName ) ;
 if( NULL == theServer )
 	{
