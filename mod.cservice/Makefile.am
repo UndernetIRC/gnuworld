@@ -15,6 +15,7 @@ libcservice_la_SOURCES = cservice.cc \
 	sqlBan.cc \
 	sqlPendingChannel.cc \
 	sqlPendingTraffic.cc \
+	csGline.cc \
 	ACCESSCommand.cc \
 	ADDCOMMENTCommand.cc \
 	ADDUSERCommand.cc \
@@ -70,6 +71,7 @@ libcservice_la_SOURCES = cservice.cc \
 	UNSUSPENDCommand.cc \
 	VERIFYCommand.cc \
 	VOICECommand.cc \
+	WHITELISTCommand.cc \
 	CIDRBanMatcher.cc \
 	HostBanMatcher.cc
 
@@ -87,5 +89,6 @@ EXTRA_DIST = banMatcher.h \
 	sqlPendingChannel.h \
 	sqlPendingTraffic.h \
 	sqlUser.h \
+	csGline.h \
 	README \
 	RELEASE.NOTES

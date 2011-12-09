@@ -10,3 +10,12 @@ CREATE TABLE glines (
         Reason VARCHAR(255)
         );
 
+
+CREATE TABLE whitelist (
+	Id SERIAL,
+	IP VARCHAR(15) UNIQUE NOT NULL,
+	AddedBy VARCHAR(128) NOT NULL,
+	AddedOn INT4 NOT NULL,
+	ExpiresAt INT4 NOT NULL,
+	Reason VARCHAR(255)
+	);

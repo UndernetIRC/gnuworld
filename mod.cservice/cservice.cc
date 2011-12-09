@@ -185,6 +185,9 @@ MyUplink->RegisterEvent( EVT_NICK, this );
 MyUplink->RegisterEvent( EVT_ACCOUNT, this );
 MyUplink->RegisterEvent( EVT_BURST_ACK, this );
 MyUplink->RegisterEvent( EVT_XQUERY, this );
+MyUplink->RegisterEvent( EVT_GLINE , this );
+MyUplink->RegisterEvent( EVT_REMGLINE , this );
+
 
 xClient::OnAttach() ;
 }
@@ -249,6 +252,7 @@ RegisterCommand(new OPERPARTCommand(this, "OPERPART", "<#channel>", 8));
 RegisterCommand(new CLEARMODECommand(this, "CLEARMODE", "<#channel>", 4));
 RegisterCommand(new SUSPENDMECommand(this, "SUSPENDME", "<password>", 15));
 
+RegisterCommand(new WHITELISTCommand(this, "WHITELIST", "<ADD|REM|VIEW> <IP> [duration] [reason]", 10));
 RegisterCommand(new SCANHOSTCommand(this, "SCANHOST", "<mask> [-all]", 10));
 RegisterCommand(new SCANUNAMECommand(this, "SCANUNAME", "<mask> [-all]", 10));
 RegisterCommand(new SCANEMAILCommand(this, "SCANEMAIL", "<mask> [-all]", 10));
@@ -380,6 +384,9 @@ preloadLevelsCache();
 
 /* Preload any user accounts we want to */
 preloadUserCache();
+
+/* Load the glines from db */
+loadGlines();
 
 /*
  * Init the admin log.
@@ -2619,6 +2626,8 @@ if (timer_id == expire_timerID)
 	expireBans();
 	expireSuspends();
 	expireSilence();
+	expireGlines();
+	expireWhitelist();
 
 	/* Refresh Timer */
 	time_t theTime = time(NULL) + expireInterval;
@@ -3249,6 +3258,62 @@ switch( theEvent )
 
 		break;
 		} // case EVT_NICK
+	case EVT_GLINE:
+		{
+                if(!data1) //TODO: find out how we get this (Do we even ever get this?)
+                        {
+                        return ;
+                        }
+                Gline* newG = static_cast< Gline* >(data1);
+
+                csGline* newGline = findGline(newG->getUserHost());
+                if(!newGline)
+                        {
+                        newGline = new (std::nothrow) csGline(SQLDb);
+                        assert (newGline != NULL);
+                        iServer* serverAdded = Network->findServer(newG->getSetBy());
+                        if(serverAdded)
+                                newGline->setAddedBy(serverAdded->getName());
+                        else
+                                newGline->setAddedBy("Unknown");
+                        }
+                else
+                        {
+                        if(newGline->getLastUpdated() >= newG->getLastmod())
+                                {
+                                return ;
+                                }
+
+                        }
+                newGline->setAddedOn(::time(0));
+                newGline->setHost(newG->getUserHost());
+                newGline->setReason(newG->getReason());
+                newGline->setExpires(newG->getExpiration());
+                        
+		newGline->Insert();
+                newGline->loadData(newGline->getHost());
+                
+		addGline(newGline);
+
+                break;               
+		} // case EVT_GLINE
+	case EVT_REMGLINE:
+		{
+                if(!data1)
+                        {
+                        return ;
+                        }
+
+                Gline* newG = static_cast< Gline* >(data1);
+                csGline* newGline = findGline(newG->getUserHost());
+                if(newGline)
+                        {
+                        remGline(newGline);
+                        newGline->Delete();
+                        delete newGline;
+                        }
+                break;
+		} // case EVT_REMGLINE
 	} // switch()
 xClient::OnEvent( theEvent,
 	data1, data2, data3, data4 ) ;
@@ -5202,4 +5267,169 @@ output << ends;
 return string( salt + output.str()  );
 }
 
+bool cservice::addGline( csGline* TempGline)
+{
+
+glineIterator ptr;
+if(TempGline->getHost().substr(0,1) == "$") //check if its a realname gline
+        {
+	return true;
+        }
+else
+        {
+        ptr = glineList.find(TempGline->getHost());
+        if(ptr != glineList.end())
+                {
+                if(ptr->second != TempGline)
+                        {
+                        delete ptr->second;
+                        glineList.erase(ptr);
+                        }
+                }
+        glineList[TempGline->getHost()] = TempGline;
+
+        }
+return true;
+}
+
+bool cservice::remGline( csGline* TempGline)
+{
+if(TempGline->getHost().substr(0,1) == "$")
+        {
+	return true;
+        }
+else
+        {
+        glineList.erase(TempGline->getHost()) ;
+        }
+return true;
+}
+
+csGline* cservice::findGline( const string& HostName )
+{
+glineIterator ptr = glineList.find(HostName);
+if(ptr != glineList.end())
+        {
+        return ptr->second;
+        }
+
+return NULL ;
+}
+
+bool cservice::loadGlines()
+{
+static const char *Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines";
+
+stringstream eraseQuery;
+eraseQuery	<< "DELETE FROM glines";
+if( !SQLDb->Exec( eraseQuery, true ) )
+	{
+	elog    << "cservice::loadGlines::Erase> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl;
+	return false;
+	}
+
+stringstream theQuery;
+theQuery        << Main
+                << ends;
+
+#ifdef LOG_SQL
+elog    << "cservice::loadGlines> "
+        << theQuery.str().c_str()
+        << endl;
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
+        {
+        elog    << "cservice::loadGlines> SQL Failure: "
+                << SQLDb->ErrorMessage()
+                << endl ;
+
+        return false;
+        }
+
+csGline *tempGline = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
+        {
+        tempGline =  new (std::nothrow) csGline(SQLDb);
+        assert( tempGline != NULL ) ;
+
+        tempGline->setId(SQLDb->GetValue(i,0));
+        tempGline->setHost(SQLDb->GetValue(i,1));
+        tempGline->setAddedBy(SQLDb->GetValue(i,2)) ;
+        tempGline->setAddedOn(static_cast< time_t >(
+                atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+        tempGline->setExpires(static_cast< time_t >(
+                atoi( SQLDb->GetValue(i,4).c_str() ) )) ;
+        tempGline->setLastUpdated(static_cast< time_t >(
+                atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+        tempGline->setReason(SQLDb->GetValue(i,6));
+        addGline(tempGline);
+        }
+return true;
+}
+
+bool cservice::expireGlines()
+{
+
+int totalFound = 0;
+csGline * tempGline;
+list<string> remList;
+list<string>::iterator remIterator;
+for(glineIterator ptr = glineList.begin();ptr != glineList.end();++ptr)
+        {
+        tempGline = ptr->second;
+        if((tempGline->getExpires() <= ::time(0))
+            && ((tempGline->getHost().substr(0,1) != "#") ||
+            (tempGline->getExpires() != 0)))
+
+                {
+                //remove the gline from the database
+                tempGline->Delete();
+                remList.push_back(ptr->first);
+//              ptr = glineList.erase(ptr);
+                delete tempGline;
+                ++totalFound;
+                }
+        }
+
+for(remIterator = remList.begin();remIterator != remList.end();)
+        {
+        glineList.erase(*remIterator);
+        remIterator = remList.erase(remIterator);
+        }
+
+if(totalFound > 0)
+     elog 	<< "[Refresh Glines]: "
+     		<< totalFound << " expired"
+		<< endl;
+return true;
+
+}
+
+bool cservice::expireWhitelist()
+{
+stringstream whitelistQuery;
+whitelistQuery	<< "DELETE FROM whitelist WHERE "
+		<< "expiresat <= now()::abstime::int4 AND "
+		<< "expiresat != 0" << ends;
+
+#ifdef LOG_SQL
+        elog    << "sqlQuery> "
+                << whitelistQuery.str().c_str()
+                << endl;
+#endif
+
+if( !SQLDb->Exec(whitelistQuery, true ) )
+	{
+	elog	<< "cservice::expireBans> SQL Error: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+return true;
+}
 } // namespace gnuworld

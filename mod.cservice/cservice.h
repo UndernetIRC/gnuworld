@@ -41,6 +41,7 @@
 #include	"sqlLevel.h"
 #include	"sqlBan.h"
 #include	"sqlPendingChannel.h"
+#include	"csGline.h"
 #include	"dbHandle.h"
 
 namespace gnuworld
@@ -166,6 +167,18 @@ public:
 
 	constCommandIterator findCommand( const string& theComm ) const
                 { return commandMap.find( theComm ) ; }
+	
+	typedef map< string, csGline* >        glineListType ;
+        glineListType                   glineList ;
+
+        typedef glineListType::iterator  glineIterator;
+
+	glineIterator gline_begin()
+		{ return glineList.begin() ; }
+
+	glineIterator gline_end()
+	        { return glineList.end() ; }
+
 
 	/* returns true is IPR checking is required for this user */
 	bool needIPRcheck( sqlUser* );
@@ -437,6 +450,8 @@ public:
 	void expireSuspends();
 	void expireSilence();
 	void expireBans();
+	bool expireGlines();
+	bool expireWhitelist();
 
 	/*
 	 *  Cache expiration functions.
@@ -488,6 +503,8 @@ public:
 	void preloadChannelCache();
 	void preloadLevelsCache();
 	void preloadUserCache();
+	
+	bool loadGlines();
 
 	void updateChannels();
 	void updateUsers();
@@ -495,6 +512,11 @@ public:
 	void updateBans();
 
 	void updateLimits();
+
+        bool addGline( csGline* );
+        bool remGline( csGline* );
+        csGline* findGline( const string& );
+
 
 	typedef map < string, int > statsMapType;
 	statsMapType statsMap;

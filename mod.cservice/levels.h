@@ -84,6 +84,8 @@ namespace gnuworld {
   const int scanuname = 600;
   const int scanhost = 600;
   const int scanemail = 600;
+  const int whitelist = 750;
+  const int whitelistadmin = 800;
   const int registercmd = 750;
   const int globalsuspend = 750;
   const int rehash_admin = 800;
