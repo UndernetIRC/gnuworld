@@ -3,6 +3,8 @@
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2011-12-12: Spike
+--	       Added gline and whitelist tables.
 -- 2006-08-10: nighty
 --             Modified flags definitions for table channels, according to actual
 --             truth, thus adding a previously undocumented flag : 0x200 for FLOATLIM Active.
@@ -644,6 +646,26 @@ CREATE TABLE webnotices (
 	created_ts 	int4 NOT NULL,
 	contents 	VARCHAR(255) NOT NULL,
 	PRIMARY KEY(id)
+);
+
+CREATE TABLE glines (
+        Id SERIAL,
+        Host VARCHAR(128) UNIQUE NOT NULL,
+        AddedBy VARCHAR(128) NOT NULL,
+        AddedOn INT4 NOT NULL,
+        ExpiresAt INT4 NOT NULL,
+        LastUpdated INT4 NOT NULL DEFAULT now()::abstime::int4,
+        Reason VARCHAR(255)
+);
+
+
+CREATE TABLE whitelist (
+        Id SERIAL,
+        IP VARCHAR(15) UNIQUE NOT NULL,
+        AddedBy VARCHAR(128) NOT NULL,
+        AddedOn INT4 NOT NULL,
+        ExpiresAt INT4 NOT NULL,
+        Reason VARCHAR(255)
 );
 
 
