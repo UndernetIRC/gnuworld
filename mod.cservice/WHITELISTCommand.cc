@@ -231,7 +231,7 @@ if (option == "VIEW")
 		}
 
 	const time_t timeAddedOn = (time_t)dbAddedOn;
-	bot->Notice(theClient, "%s: Added on %s (expires in: %s) by %s -- %s", dbIP.c_str(), ctime(&timeAddedOn));
+	bot->Notice(theClient, "%s: Added on %s", dbIP.c_str(), ctime(&timeAddedOn));
 	bot->Notice(theClient, "(expires in: %s) by %s -- %s", 
 		bot->prettyDuration(bot->currentTime() - (dbExpires - bot->currentTime())).c_str(), 
 		dbAddedBy.c_str(), dbReason.c_str());
