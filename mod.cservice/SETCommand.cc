@@ -799,7 +799,7 @@ else
 	    {
 	    	theChan->setFlag(sqlChannel::F_AUTOJOIN);
 			theChan->setInChan(true);
-			bot->Join(theChan->getName(), theChan->getChannelMode(),
+			bot->Join(theChan->getName(), "+R",
 				theChan->getChannelTS(), false);
 			bot->joinCount++;
 			bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(), bot->currentTime() + 15) );
