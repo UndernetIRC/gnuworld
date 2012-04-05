@@ -139,8 +139,6 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	newChan->setChannelMode("+tn");
 	newChan->setLastUsed(bot->currentTime());
 
-	bot->sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
-	bot->sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 
  	/*
 	 *  If this channel exists in the database (without a registered_ts set),
@@ -244,6 +242,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		{
 			theId = atoi(bot->SQLDb->GetValue(0, 0));
 			newChan->setID(theId);
+			
+			bot->sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
+			bot->sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 		} else
 		{
 			/*
