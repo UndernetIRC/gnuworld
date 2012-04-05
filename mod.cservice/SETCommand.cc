@@ -1094,7 +1094,8 @@ else
 	if(option == "COMMENT")
 	{
 	    /* Check for admin access */
-	    if(level < level::set::comment)
+	    int admLevel = bot->getAdminAccessLevel(theUser);
+	    if(admLevel < level::set::comment)
 			{
 			/* No need to tell users about admin commands. */
 			Usage(theClient);
