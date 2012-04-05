@@ -24,8 +24,8 @@
 */
 
 #define MAJORVER "1"
-#define MINORVER "2pl6"
-#define RELDATE "16th March, 2007"
+#define MINORVER "2pl7"
+#define RELDATE "05th April, 2012"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
