@@ -101,9 +101,8 @@ else
 		return false;
 		}
 	//Check if the users mask is in his access list
-		
 	if((!bot->UserGotMask(theUser,theClient->getRealNickUserHost()))
-	    &&(!bot->UserGotMask(theUser,xIP(theClient->getIP()).GetNumericIP())))	
+	    &&(!bot->UserGotMask( theUser,theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP(theClient->getIP()).GetNumericIP())))	
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getRealNickUserHost().c_str());
 	
