@@ -38,6 +38,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	LISTHOSTSCommand.cc \
 	LISTIGNORESCommand.cc \
 	LISTOPERCHANSCommand.cc \
+	LISTUSERSCommand.cc \
 	LOGINCommand.cc \
 	MAXUSERSCommand.cc \
 	MODECommand.cc \

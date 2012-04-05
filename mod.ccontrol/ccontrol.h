@@ -223,7 +223,10 @@ protected:
 	iServer* myHub;
 
 	ccServer* ccHub;
-	
+
+	typedef pair< unsigned int, string> levelMapperType;
+	vector<levelMapperType> levelMapper;
+
 public:
 
 	/**
@@ -399,6 +402,9 @@ public:
 	
 	void addGlineToUplink( ccGline* );
 	
+	int strToLevel(const string&);
+	
+	const string& levelToStr(unsigned int level);
 	/**
 	 * This method will check if a client is authenticated 
 	 * based on the iClient structure

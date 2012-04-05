@@ -526,7 +526,16 @@ RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
 	false,
 	false,
 	operLevel::OPERLEVEL,
-	false ) ) ;
+	false ) );
+RegisterCommand(new LISTUSERSCommand(this, "LISTUSERS", "[-l CODER/SMT/ADMIN/OPER/UHS] "
+	"List users with specific parameters",
+	true,
+	commandLevel::flg_LIST,
+	false,
+	false,
+	false,
+	operLevel::OPERLEVEL,
+	true));
 RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
 	"Removes all channel modes",
 	false,
@@ -879,6 +888,15 @@ if(!loadMisc())
 connectCount = 0;
 connectRetry = 5;
 curUsers = 0;
+
+
+levelMapper.push_back(levelMapperType(operLevel::UHSLEVEL, operLevel::UHSLEVELSTR));
+levelMapper.push_back(levelMapperType(operLevel::OPERLEVEL, operLevel::OPERLEVELSTR));
+levelMapper.push_back(levelMapperType(operLevel::ADMINLEVEL, operLevel::ADMINLEVELSTR));
+levelMapper.push_back(levelMapperType(operLevel::SMTLEVEL, operLevel::SMTLEVELSTR));
+levelMapper.push_back(levelMapperType(operLevel::CODERLEVEL, operLevel::CODERLEVELSTR));
+levelMapper.push_back(levelMapperType(0,""));
+
 
 #ifdef LOGTOHD
 	initLogs();
@@ -2503,6 +2521,31 @@ else
 	{
 	return NULL;
 	}
+		}
+
+int ccontrol::strToLevel(const string& level) {
+	int i=0;
+	
+	while(levelMapper[i].first != 0) {
+		if(!strcasecmp(levelMapper[i].second,level )) {
+			return levelMapper[i].first;
+		}
+		i++;
+	}
+	
+	return -1;
+}
+
+const string& ccontrol::levelToStr(unsigned int level) {
+	int i = 0;
+	while (levelMapper[i].first != 0) {
+		if (levelMapper[i].first == level) {
+			return levelMapper[i].second;
+		}
+		i++;
+	}
+
+	return levelMapper[i].second; //empty string
 }
 
 ccUser* ccontrol::IsAuth( const string& Numeric ) 
@@ -5708,7 +5751,7 @@ for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 			base64toint(tmpServer->getLastNumeric().c_str()),
 			tmpServer->getName().c_str(),
 			tmpServer->getVersion().c_str());
-		buf[sizeof(buf)] = '\0'; //Just in case
+		buf[sizeof(buf)-1] = '\0'; //Just in case
 		Notice(theClient, "%s %s", buf, s.str().c_str());
 
 		//Notice(theClient,"%3s (%4d) Name: %s Version: %s",

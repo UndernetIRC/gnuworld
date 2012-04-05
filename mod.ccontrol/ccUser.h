@@ -31,11 +31,16 @@
 #include	"CControlCommands.h" 
 
 #include	"iClient.h"
+
+
+#include <vector>
 //#include	"ccontrol.h"
 namespace gnuworld
 { 
 
-using std::string ;
+using std::string;
+using std::vector;
+using std::pair;
 
 namespace uworld
 {
@@ -47,6 +52,13 @@ namespace operLevel
 	const unsigned int ADMINLEVEL = 0x03;
 	const unsigned int SMTLEVEL = 0x04;
 	const unsigned int CODERLEVEL = 0x05;
+	const string CODERLEVELSTR = "CODER";
+	const string SMTLEVELSTR = "SMT";
+	const string ADMINLEVELSTR = "ADMIN";
+	const string OPERLEVELSTR = "OPER";
+	const string UHSLEVELSTR = "UHS";
+	
+	
 	}
 	
 /*

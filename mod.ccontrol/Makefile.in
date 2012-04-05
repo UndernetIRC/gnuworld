@@ -99,6 +99,7 @@ am_libccontrol_la_OBJECTS = libccontrol_la-ccontrol.lo \
 	libccontrol_la-LISTHOSTSCommand.lo \
 	libccontrol_la-LISTIGNORESCommand.lo \
 	libccontrol_la-LISTOPERCHANSCommand.lo \
+	libccontrol_la-LISTUSERSCommand.lo \
 	libccontrol_la-LOGINCommand.lo \
 	libccontrol_la-MAXUSERSCommand.lo \
 	libccontrol_la-MODECommand.lo \
@@ -319,6 +320,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	LISTHOSTSCommand.cc \
 	LISTIGNORESCommand.cc \
 	LISTOPERCHANSCommand.cc \
+	LISTUSERSCommand.cc \
 	LOGINCommand.cc \
 	MAXUSERSCommand.cc \
 	MODECommand.cc \
@@ -477,6 +479,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LISTHOSTSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LISTIGNORESCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LISTOPERCHANSCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LISTUSERSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LOGINCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-MAXUSERSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-MODECommand.Plo@am__quote@
@@ -791,6 +794,13 @@ libccontrol_la-LISTOPERCHANSCommand.lo: LISTOPERCHANSCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LISTOPERCHANSCommand.cc' object='libccontrol_la-LISTOPERCHANSCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-LISTOPERCHANSCommand.lo `test -f 'LISTOPERCHANSCommand.cc' || echo '$(srcdir)/'`LISTOPERCHANSCommand.cc
+
+libccontrol_la-LISTUSERSCommand.lo: LISTUSERSCommand.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-LISTUSERSCommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-LISTUSERSCommand.Tpo -c -o libccontrol_la-LISTUSERSCommand.lo `test -f 'LISTUSERSCommand.cc' || echo '$(srcdir)/'`LISTUSERSCommand.cc
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libccontrol_la-LISTUSERSCommand.Tpo $(DEPDIR)/libccontrol_la-LISTUSERSCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LISTUSERSCommand.cc' object='libccontrol_la-LISTUSERSCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-LISTUSERSCommand.lo `test -f 'LISTUSERSCommand.cc' || echo '$(srcdir)/'`LISTUSERSCommand.cc
 
 libccontrol_la-LOGINCommand.lo: LOGINCommand.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-LOGINCommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-LOGINCommand.Tpo -c -o libccontrol_la-LOGINCommand.lo `test -f 'LOGINCommand.cc' || echo '$(srcdir)/'`LOGINCommand.cc
