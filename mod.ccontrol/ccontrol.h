@@ -660,6 +660,8 @@ public:
 
 	void addLogin( iClient* );
 	
+	void addFloodData(iClient*, unsigned int);
+	
 	int removeIgnore( const string & );
 	
 	int removeIgnore( iClient * );

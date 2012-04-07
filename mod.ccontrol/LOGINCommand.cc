@@ -105,8 +105,8 @@ else
 	    &&(!bot->UserGotMask( theUser,theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP(theClient->getIP()).GetNumericIP())))	
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getRealNickUserHost().c_str());
-	
-		bot->Notice(theClient, "FALSE LOGIN, DENIED");
+		if(theClient->isOper()) 
+			bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient);
 		return false;
 		}
@@ -140,7 +140,8 @@ else
 	if (md5Part != output.str().c_str()) // If the MD5 hash's don't match..
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password (%s)\n",theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
-		bot->Notice(theClient, "FALSE LOGIN, DENIED");
+		if(theClient->isOper()) 
+			bot->Notice(theClient, "FALSE LOGIN, DENIED");
 		bot->addLogin(theClient);
 		return false;
 		}
@@ -164,7 +165,7 @@ else
 			bot->Notice(theClient, "Authentication successful as %s, "
 				"however you are currently suspended ",
 				theUser->getUserName().c_str()); 
-	else
+	else if(theClient->isOper())
 	        bot->Notice(theClient, "Error in authentication as %s",theUser->getUserName().c_str()); 
         bot->MsgChanLog("(%s) - %s: AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
                         theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());

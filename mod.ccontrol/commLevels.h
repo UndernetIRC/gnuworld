@@ -114,8 +114,10 @@ const unsigned long int flg_ANNOUNCE = 0x20000000;
  Default commands that are added upon adding a new oper
 */
 
-const unsigned long int OPER = flg_HELP | flg_DEAUTH | flg_NEWPASS 
-			| flg_MODE | flg_OP | flg_DEOP | flg_MODERATE 
+const unsigned long int UHS = flg_NEWPASS | flg_HELP | flg_DEAUTH ;
+const unsigned long int SUHS = flg_ANNOUNCE;
+
+ const unsigned long int OPER = UHS | flg_MODE | flg_OP | flg_DEOP | flg_MODERATE 
 		        | flg_UNMODERATE | flg_INVITE | flg_GLINE | flg_SCGLINE 
 			| flg_REMGLINE | flg_LOPCHN | flg_CHINFO | flg_WHOIS 
 			| flg_TRANS | flg_KICK | flg_CLEARCHAN | flg_LISTHOSTS

@@ -239,7 +239,7 @@ RegisterCommand( new INVITECommand( this, "INVITE", "<#channel> "
 	false,
 	commandLevel::flg_INVITE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -248,7 +248,7 @@ RegisterCommand( new JUPECommand( this, "JUPE", "<servername> <reason> "
 	false,
 	commandLevel::flg_JUPE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -257,7 +257,7 @@ RegisterCommand( new MODECommand( this, "MODE", "<channel> <modes> "
 	false,
 	commandLevel::flg_MODE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -267,27 +267,27 @@ RegisterCommand( new SCHANGLINECommand( this, "SCHANGLINE",
 	true,
 	commandLevel::flg_SCHANGLINE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
 RegisterCommand( new FORCECHANGLINECommand( this, "FORCECHANGLINE",
-		"[-u] <#channel> <duration>[time units (s,d,h)] <reason> "
-		"Gline a given channel for the given reason",
-		true,
-		commandLevel::flg_FORCECHANGLINE,
-		false,
-		false,
-		false,
-		operLevel::OPERLEVEL,
-		true ) ) ;
+	"[-u] <#channel> <duration>[time units (s,d,h)] <reason> "
+	"Gline a given channel for the given reason",
+	true,
+	commandLevel::flg_FORCECHANGLINE,
+	false,
+	true,
+	false,
+	operLevel::OPERLEVEL,
+	true ) ) ;
 RegisterCommand( new GLINECommand( this, "GLINE",
 	"<user@host> <duration>[time units (s,d,h)] <reason> "
 	"Gline a given user@host for the given reason",
 	true,
 	commandLevel::flg_GLINE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -296,7 +296,7 @@ RegisterCommand( new SCANGLINECommand( this, "SCANGLINE", "<mask> "
 	false,
 	commandLevel::flg_SCGLINE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -305,7 +305,7 @@ RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
 	true,
 	commandLevel::flg_REMGLINE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -314,7 +314,7 @@ RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
 	false,
 	commandLevel::flg_TRANS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -323,7 +323,7 @@ RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
 	false,
 	commandLevel::flg_WHOIS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -332,7 +332,7 @@ RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
 	false,
 	commandLevel::flg_KICK,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -346,7 +346,7 @@ RegisterCommand( new ADDOPERCHANCommand( this, "ADDOPERCHAN", "<channel>"
 	false,
 	commandLevel::flg_ADDOPCHN,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -355,7 +355,7 @@ RegisterCommand( new REMOPERCHANCommand( this, "REMOPERCHAN", "<channel>"
 	false,
 	commandLevel::flg_REMOPCHN,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -363,7 +363,7 @@ RegisterCommand( new LISTOPERCHANSCommand( this, "LISTOPERCHANS",
 	"List current IRCoperator only channels",
 	false,
 	commandLevel::flg_LOPCHN,
-	false,
+	true,
 	false,
 	false,operLevel::OPERLEVEL,
 	false ) ) ;
@@ -374,7 +374,7 @@ RegisterCommand( new CHANINFOCommand( this, "CHANINFO", "<channel>"
 	false,
 	commandLevel::flg_CHINFO,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -383,7 +383,7 @@ RegisterCommand( new LOGINCommand( this, "LOGIN", "<USER> <PASS> "
 	true,
 	commandLevel::flg_LOGIN,
 	false,
-	true,
+	false,
 	true,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -411,7 +411,7 @@ RegisterCommand( new ADDUSERCommand( this, "ADDUSER",
 	true,
 	commandLevel::flg_ADDNOP,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -420,7 +420,7 @@ RegisterCommand( new REMUSERCommand( this, "REMUSER", "<USER> "
 	true,
 	commandLevel::flg_REMOP,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -430,7 +430,7 @@ RegisterCommand( new ADDCOMMANDCommand( this, "ADDCOMMAND",
 	true,
 	commandLevel::flg_ADDCMD,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -440,7 +440,7 @@ RegisterCommand( new REMCOMMANDCommand( this, "REMCOMMAND",
 	true,
 	commandLevel::flg_DELCMD,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -451,7 +451,7 @@ RegisterCommand( new NEWPASSCommand( this, "NEWPASS", "<PASSWORD> "
 	false,
 	false,
 	true,
-	operLevel::OPERLEVEL,
+	operLevel::UHSLEVEL,
 	false ) ) ;
 RegisterCommand( new SUSPENDCommand( this, "SUSPEND",
 	"<OPER> <DURATION> [-l level] <REASON>"
@@ -459,7 +459,7 @@ RegisterCommand( new SUSPENDCommand( this, "SUSPEND",
 	true,
 	commandLevel::flg_SUSPEND,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -468,7 +468,7 @@ RegisterCommand( new UNSUSPENDCommand( this, "UNSUSPEND", "<OPER> "
 	true,
 	commandLevel::flg_UNSUSPEND,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -478,7 +478,7 @@ RegisterCommand( new MODUSERCommand( this, "MODUSER",
 	true,
 	commandLevel::flg_MODOP,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -487,7 +487,7 @@ RegisterCommand( new MODERATECommand( this, "MODERATE", "<#Channel> "
 	false,
 	commandLevel::flg_MODERATE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -496,7 +496,7 @@ RegisterCommand( new UNMODERATECommand( this, "UNMODERATE", "<#Channel> "
 	false,
 	commandLevel::flg_UNMODERATE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -505,7 +505,7 @@ RegisterCommand( new OPCommand( this, "OP", "<#Channel> <nick> [nick] .. "
 	false,
 	commandLevel::flg_OP,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -514,7 +514,7 @@ RegisterCommand( new DEOPCommand( this, "DEOP", "<#Channel> <nick> [nick] .. "
 	false,
 	commandLevel::flg_DEOP,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -523,7 +523,7 @@ RegisterCommand( new LISTHOSTSCommand( this, "LISTHOSTS", "<oper> "
 	true,
 	commandLevel::flg_LISTHOSTS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) );
@@ -532,7 +532,7 @@ RegisterCommand(new LISTUSERSCommand(this, "LISTUSERS", "[-l CODER/SMT/ADMIN/OPE
 	true,
 	commandLevel::flg_LIST,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true));
@@ -541,7 +541,7 @@ RegisterCommand( new CLEARCHANCommand( this, "CLEARCHAN", "<#chan> "
 	false,
 	commandLevel::flg_CLEARCHAN,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -550,7 +550,7 @@ RegisterCommand( new ADDSERVERCommand( this, "ADDSERVER", "<Server> "
 	true,
 	commandLevel::flg_ADDSERVER,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -559,7 +559,7 @@ RegisterCommand( new LEARNNETCommand( this, "LEARNNET", ""
 	true,
 	commandLevel::flg_LEARNNET,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -568,7 +568,7 @@ RegisterCommand( new REMSERVERCommand( this, "REMSERVER", "<Server name>"
 	true,
 	commandLevel::flg_REMSERVER,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -577,7 +577,7 @@ RegisterCommand( new CHECKNETCommand( this, "CHECKNET", ""
 	true,
 	commandLevel::flg_CHECKNET,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -587,7 +587,7 @@ RegisterCommand( new LASTCOMCommand( this, "LASTCOM",
 	true,
 	commandLevel::flg_LASTCOM,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true) ) ;
@@ -597,7 +597,7 @@ RegisterCommand( new LASTCOMCommand( this, "LASTCOMM",
 	true,
 	commandLevel::flg_LASTCOM,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true) ) ;
@@ -608,7 +608,7 @@ RegisterCommand( new FORCEGLINECommand( this, "FORCEGLINE",
 	true,
 	commandLevel::flg_FGLINE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -618,7 +618,7 @@ RegisterCommand( new SGLINECommand( this, "SGLINE",
 	true,
 	commandLevel::flg_SGLINE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -628,7 +628,7 @@ RegisterCommand( new REMSGLINECommand( this, "REMSGLINE",
 	true,
 	commandLevel::flg_REMSGLINE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -639,7 +639,7 @@ RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	true,
 	commandLevel::flg_EXCEPTIONS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -648,7 +648,7 @@ RegisterCommand( new SHELLSCommand( this, "SHELLS",
 	true,
 	commandLevel::flg_SHELLS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -666,7 +666,7 @@ RegisterCommand( new LISTIGNORESCommand( this, "LISTIGNORES",
 	false,
 	commandLevel::flg_LISTIGNORES,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -675,7 +675,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	false,
 	commandLevel::flg_REMIGNORE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -684,7 +684,7 @@ RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/nomodechannels/
 	false,
 	commandLevel::flg_LIST,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -694,7 +694,7 @@ RegisterCommand( new COMMANDSCommand( this, "COMMANDS",
 	true,
 	commandLevel::flg_COMMANDS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -704,7 +704,7 @@ RegisterCommand( new GCHANCommand( this, "GCHAN",
 	true,
 	commandLevel::flg_GCHAN,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -713,7 +713,7 @@ RegisterCommand( new REMGCHANCommand( this, "REMGCHAN", "#channel "
 	true,
 	commandLevel::flg_GCHAN,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -722,7 +722,7 @@ RegisterCommand( new USERINFOCommand( this, "USERINFO",
 	false,
 	commandLevel::flg_USERINFO,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -730,7 +730,7 @@ RegisterCommand( new STATUSCommand( this, "STATUS", "Shows debug status ",
 	false,
 	commandLevel::flg_STATUS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -739,7 +739,7 @@ RegisterCommand( new SHUTDOWNCommand( this, "SHUTDOWN",
 	false,
 	commandLevel::flg_SHUTDOWN,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -749,7 +749,7 @@ RegisterCommand( new SCANCommand( this, "SCAN",
 	false,
 	commandLevel::flg_SCAN,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -758,7 +758,7 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 	false,
 	commandLevel::flg_MAXUSERS,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -774,7 +774,7 @@ RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	false,
 	commandLevel::flg_CONFIG,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -784,7 +784,7 @@ RegisterCommand( new NOMODECommand( this, "NOMODE",
 	false,
 	commandLevel::flg_NOMODE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::SMTLEVEL,
 	true ) ) ;
@@ -794,7 +794,7 @@ RegisterCommand( new SAYCommand( this, "SAY",
 	false,
 	commandLevel::flg_SAY,
 	false,
-	false,
+	true,
 	false,
 	operLevel::CODERLEVEL,
 	true ) ) ;
@@ -803,7 +803,7 @@ RegisterCommand( new SAYCommand( this, "DO",
 	false,
         commandLevel::flg_SAY,
         false,
-        false,
+        true,
         false,
         operLevel::CODERLEVEL,
         true ) ) ;  
@@ -812,7 +812,7 @@ RegisterCommand( new REOPCommand( this, "REOP", "<#chan> <nick> "
 	false,
 	commandLevel::flg_REOP,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
@@ -822,7 +822,7 @@ RegisterCommand( new UNJUPECommand( this, "UNJUPE",
 	false,
 	commandLevel::flg_UNJUPE,
 	false,
-	false,
+	true,
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
@@ -1081,30 +1081,12 @@ const string Command = string_upper( st[ 0 ] ) ;
 
 ccUser* theUser = IsAuth(theClient);
 
-if((!theUser) && !(theClient->isOper()))
+/*if((!theUser) && !(theClient->isOper()))
 	{
-	// We need to add the flood points for this user
-	if(!theClient->getCustomData(this))
-		{
-		elog << "Couldnt find custom data for " 
-		     << theClient->getNickName() << endl;
-		return ;
-		}
-		
-	ccFloodData* floodData = (static_cast< ccUserData* >(
-	theClient->getCustomData(this) ))->getFlood() ;
-	
-	if(floodData->addPoints(flood::MESSAGE_POINTS))
-		{
-		// yes we need to ignore this user
-		ignoreUser(floodData);
-		
-		MsgChanLog("[FLOOD MESSAGE: %s has been ignored",
-			theClient->getNickName().c_str());
-		}
+	addFloodData(theClient,flood::MESSAGE_POINTS);
 	xClient::OnPrivateMessage( theClient, Message ) ;
 	return ;
-	}
+	}**/
 
 // Attempt to find a handler for this method.
 commandIterator commHandler = findCommand( Command ) ;
@@ -1126,6 +1108,7 @@ int ComAccess = commHandler->second->getFlags();
 
 if((!theUser) && (ComAccess) && !(theClient->isOper()))
 	{
+	addFloodData(theClient,flood::MESSAGE_POINTS);
 	xClient::OnPrivateMessage( theClient, Message ) ;	
 	return ;
 	}
@@ -1135,31 +1118,41 @@ if((!theUser) && !(ComAccess & commandLevel::flg_NOLOGIN) && (ComAccess))
 	 //and he must be to run this command
 	if((theClient->isOper()) && !(theClient->getMode(iClient::MODE_SERVICES)))
 		Notice(theClient,"Sorry, you must be authenticated to run this command");
-
+	else if(!theClient->isOper()) 
+		addFloodData(theClient,flood::MESSAGE_POINTS);
 	xClient::OnPrivateMessage( theClient, Message ) ;
 	return ;
 	}	 	 
 
+
+//If user is not not opered and the command requires to be opered
+if((!theClient->isOper()) && (commHandler->second->getNeedOp())) {
+	addFloodData(theClient,flood::MESSAGE_POINTS);
+	xClient::OnPrivateMessage(theClient, Message);
+	return;	
+}
 if((theUser) && (!theClient->isOper()) && (theUser->getNeedOp()))
 	{
 	if(!theClient->getMode(iClient::MODE_SERVICES))
 		Notice(theClient,
 			"You must be oper'd to use this command");
+		xClient::OnPrivateMessage(theClient, Message);
+		return;
 	}
 else if( (ComAccess) && (theUser) && !(theUser->gotAccess(commHandler->second)))
 	{
-	if(!theClient->getMode(iClient::MODE_SERVICES))
+	if(!theClient->getMode(iClient::MODE_SERVICES) && theClient->isOper())
 		Notice( theClient, "You don't have access to that command" ) ;
 	}
 else if(( (theUser) && isSuspended(theUser) ) && ( ComAccess ) )
 		{
-		if(theClient->getMode(iClient::MODE_SERVICES))
+		if(theClient->getMode(iClient::MODE_SERVICES) && theClient->isOper())
 			Notice( theClient,
 				"Sorry, you are suspended");
 		}
 else if(commHandler->second->getIsDisabled())
 	{
-	if(!theClient->getMode(iClient::MODE_SERVICES))
+	if(!theClient->getMode(iClient::MODE_SERVICES) && theClient->isOper())
 		Notice(theClient,
 			"Sorry, this command is currently disabled");
 	}
@@ -1172,8 +1165,9 @@ else
 			if (!dbConnected)
 			{
 				/* failed */
-				Notice(theClient, "Sorry, the database connection "
-					"is currently down, please try again later.");
+				if(theClient->isOper() && !theClient->isModeK()) 
+					Notice(theClient, "Sorry, the database connection "
+						"is currently down, please try again later.");
 				xClient::OnPrivateMessage(theClient, Message);
 				return;
 			}
@@ -5400,7 +5394,26 @@ if(LogInfo->getLogins() > 5)
 	{
 	ignoreUser(LogInfo);
 	}
-}	
+}
+
+void ccontrol::addFloodData(iClient* theClient, unsigned int floodPoints) {
+	if (!theClient->getCustomData(this)) {
+		elog << "Couldnt find custom data for "
+			<< theClient->getNickName() << endl;
+		return;
+	}
+
+	ccFloodData* floodData = (static_cast<ccUserData*> (
+		theClient->getCustomData(this)))->getFlood();
+
+	if (floodData->addPoints(flood::MESSAGE_POINTS)) {
+		// yes we need to ignore this user
+		ignoreUser(floodData);
+
+		MsgChanLog("[FLOOD MESSAGE: %s has been ignored",
+			theClient->getNickName().c_str());
+	}
+}
 
 int ccontrol::removeIgnore( const string &Host )
 {
@@ -5442,7 +5455,7 @@ int ccontrol::removeIgnore( iClient *theClient )
 string Host = string( "*!*" )
 		+ theClient->getUserName() 
 		+ string( "@" )
-		+ theClient->getRealInsecureHost();
+		+ theClient->getRealNickUserHost();
 int retMe = removeIgnore(Host);
 return retMe;
 }
@@ -5451,13 +5464,15 @@ void ccontrol::ignoreUser( ccFloodData* Flood )
 {
 
 const iClient* theClient = Network->findClient(Flood->getNumeric());
-Notice(theClient,"I don't think I like you anymore, consider yourself ignored!");
+if(theClient->isOper()) {
+	Notice(theClient,"I don't think I like you anymore, consider yourself ignored!");
+}
 MsgChanLog("Added %s to my ignore list\n",theClient->getRealNickUserHost().c_str());
 
 string silenceMask = string( "*!*" )
 	+ theClient->getUserName()
 	+ "@"
-	+ theClient->getRealInsecureHost();
+	+ theClient->getRealNickUserHost();
 
 stringstream s;
 s	<< getCharYYXXX() 
@@ -5850,6 +5865,8 @@ for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	
 bool ccontrol::updateCommand ( Command* Comm)
 {
+
+static const char *existsQ = "SELECT RealName from Commands where lower(RealName) = '";
 static const char *Main = "UPDATE Commands set name = '";
 
 if(!dbConnected)
@@ -5858,7 +5875,11 @@ if(!dbConnected)
 	}
 
 stringstream theQuery;
-theQuery	<< Main
+theQuery << existsQ << string_lower(removeSqlChars(Comm->getRealName())) << "'";
+bool update = (SQLDb->Exec(theQuery, true) && (SQLDb->Tuples() > 0));
+theQuery.str("");
+if(update) {
+	theQuery	<< Main
 		<< removeSqlChars(Comm->getName())
 		<< "', isDisabled = "
 		<< (Comm->getIsDisabled() ? "'t'" : "'n'")
@@ -5873,10 +5894,22 @@ theQuery	<< Main
 		<< "'"
 		<< ends;
 
+} else {
+	theQuery << "INSERT into Commands (RealName,Name,Flags,IsDisabled,NeedOp,NoLog,MinLevel,SAccess) VALUES (";
+	theQuery << "'" << removeSqlChars(Comm->getRealName()) << "',";
+	theQuery << "'" << removeSqlChars(Comm->getName()) << "',";
+	theQuery << Comm->getFlags() << ",";
+	theQuery << (Comm->getIsDisabled() ? "'t'" : "'n'") << ",";
+	theQuery << (Comm->getNeedOp() ? "'t'" : "'n'") << ",";
+	theQuery << (Comm->getNoLog() ? "'t'" : "'n'") << ",";
+	theQuery << Comm->getMinLevel() << ",";
+	theQuery << (Comm->getSecondAccess() ? "'t'" : "'n'") << ")";
+	
+}
 #ifdef LOG_SQL
-elog	<< "ccontrol::updateCommands> "
-	<< theQuery.str().c_str()
-	<< endl; 
+			elog << "ccontrol::updateCommands> "
+				<< theQuery.str().c_str()
+				<< endl;
 #endif
 
 if( !SQLDb->Exec( theQuery ) )

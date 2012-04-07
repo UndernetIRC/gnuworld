@@ -107,7 +107,11 @@ else if(!strcasecmp(st[2],"oper"))
         NewAccess = commandLevel::OPER;
 	NewSAccess = commandLevel::SOPER;
         NewFlags = operLevel::OPERLEVEL;
-	}
+} else if (!strcasecmp(st[2], "uhs")) {
+	NewAccess = commandLevel::UHS;
+	NewSAccess = commandLevel::SUHS;
+	NewFlags = operLevel::UHSLEVEL;
+}
 else
 	{
 	bot->Notice(theClient,
