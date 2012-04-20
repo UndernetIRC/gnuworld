@@ -576,10 +576,14 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 	 */
 
 	sqlBan* tmpBan = bot->isBannedOnChan(theChan, theClient);
-	if( tmpBan && (tmpBan->getLevel() < 75) )
-		{
-		continue;
+	if( tmpBan) {
+		if (tmpBan->getLevel() < 75)  {
+			continue;
+		} else {
+			bot->Kick(netChan,theClient,tmpBan->getReason());
+			continue;
 		}
+	}
 
 	/*
  	 *  If its AUTOOP, check for op's and do the deed.
