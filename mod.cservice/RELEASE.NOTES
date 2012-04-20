@@ -8,6 +8,7 @@ CMaster 1.4.1pl1 - 14/04/2012
  * Invite command supports multiple channels (invite #chan1 #chan2 #chan3)
  * Fixed bug - X doesnt kick users who are banned with level >=75 after they login
  * Changed the reply for invisible users to include the username 
+ * Fixed bug - Prevent banned users from inviting themselves to a channel  (instead of inviting them only to be kicked by X as they join)
 
 CMaster 1.1pl13 - 24/04/2003
 * Allow opers to see the level 500 accesses a user has.
