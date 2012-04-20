@@ -67,40 +67,42 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the channel is actually registered.
 	 */
 
-	sqlChannel* theChan = bot->getChannelRecord(st[1]);
-	if (!theChan) {
-		bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
-			st[1].c_str());
-		return false;
+	int max_channels = st.size() < 10 ? st.size() : 10;
+	for(int i=1; i < max_channels;++i) {
+		sqlChannel* theChan = bot->getChannelRecord(st[i]);
+		if (!theChan) {
+			bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
+				st[i].c_str());
+			continue;
+		}
+
+		/* Check the bot is in the channel. */
+
+		if (!theChan->getInChan()) {
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::i_am_not_on_chan,
+					string("I'm not in that channel!")));
+			continue;
+		}
+
+		/*
+		 *  Check the user has sufficient access on this channel.
+		 */
+
+		int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+		if (level < level::invite)
+		{
+			bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
+			return false;
+		}
+
+		/*
+		 *  No parameters, Just invite them to the channel.
+		 */
+
+		bot->Invite(theClient, theChan->getName());
 	}
-
- 	/* Check the bot is in the channel. */
-
-	if (!theChan->getInChan()) {
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::i_am_not_on_chan,
-				string("I'm not in that channel!")));
-		return false;
-	}
-
-	/*
-	 *  Check the user has sufficient access on this channel.
-	 */
-
-	int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-	if (level < level::invite)
-	{
-		bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
-		return false;
-	}
-
-	/*
-	 *  No parameters, Just invite them to the channel.
-	 */
-
-	bot->Invite(theClient, theChan->getName());
-
 	return true;
 }
 

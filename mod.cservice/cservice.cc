@@ -232,7 +232,7 @@ RegisterCommand(new ADDUSERCommand(this, "ADDUSER", "<#channel> <username> <acce
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<#channel> <username>", 4));
 RegisterCommand(new MODINFOCommand(this, "MODINFO", "<#channel> [ACCESS <username> <level>] [AUTOMODE <username> <NONE|OP|VOICE>] [INVITE <ON|OFF>]", 6));
 RegisterCommand(new SETCommand(this, "SET", "[#channel] <variable> <value> or, SET <invisible> <ON|OFF> or, SET LANG <language> or, SET MAXLOGINS <max-logins>.", 6));
-RegisterCommand(new INVITECommand(this, "INVITE", "<#channel>", 2));
+RegisterCommand(new INVITECommand(this, "INVITE", "<#channel> <#channel> <#channel> ... ", 2));
 RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
 RegisterCommand(new CHANINFOCommand(this, "INFO", "<username>", 3));
@@ -1027,7 +1027,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.4.1p1");
+		"] Release 1.4.1pl1");
 	}
 else if(Command == "PROBLEM?")
 	{
