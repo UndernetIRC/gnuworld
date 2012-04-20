@@ -67,12 +67,27 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 	 *  Check the channel is actually registered.
 	 */
 
-	int max_channels = st.size() < 10 ? st.size() : 10;
-	for(int i=1; i < max_channels;++i) {
-		sqlChannel* theChan = bot->getChannelRecord(st[i]);
+	char delim = 0;
+	string source;
+	int i = 1;
+	string::size_type pos = st[1].find_first_of(',');
+	/* Found a comma? */
+	if (string::npos != pos) {
+		/* We'll do a comma seperated search then. */
+		source = st.assemble(1);
+		delim = ',';
+		i = 0;
+	} else {
+		source = Message;
+		delim = ' ';
+	}
+	StringTokenizer st2(source, delim);
+	int max_channels = st2.size() < 10 ? st2.size() : 10;
+	for(; i < max_channels;++i) {
+		sqlChannel* theChan = bot->getChannelRecord(st2[i]);
 		if (!theChan) {
 			bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
-				st[i].c_str());
+				st2[i].c_str());
 			continue;
 		}
 
