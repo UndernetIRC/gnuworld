@@ -210,10 +210,14 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		/* If they don't have * access, deny. */
 		if( !((tmpUser) && bot->getAdminAccessLevel(tmpUser)) && (tmpUser != theUser))
 			{
-			bot->Notice(theClient,
-				bot->getResponse(tmpUser,
+			static char resBuf[1024];
+			sprintf(resBuf, bot->getResponse(tmpUser,
+						language::info_about,
+						string("Information about: %s (%i)")).c_str(),
+						theUser->getUserName().c_str(), 0);
+			bot->Notice(theClient,"%s - %s",resBuf,bot->getResponse(tmpUser,
 					language::no_peeking,
-					string("Unable to view user details (Invisible)")));
+					string("Unable to view user details (Invisible)")).c_str());
 
 			/* Show flags even when invisible */
 			bot->Notice(theClient,
