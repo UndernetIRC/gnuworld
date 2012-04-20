@@ -94,9 +94,15 @@ bool INVITECommand::Exec( iClient* theClient, const string& Message )
 		if (level < level::invite)
 		{
 			bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
-			return false;
+			continue;
 		}
 
+		sqlBan* tmpBan = bot->isBannedOnChan(theChan, theClient);
+		if (tmpBan && tmpBan->getLevel() >= 75) {
+			bot->Notice(theClient,"Can't invite you to channel %s, you are banned",theChan->getName().c_str());
+			continue;
+		}
+		
 		/*
 		 *  No parameters, Just invite them to the channel.
 		 */

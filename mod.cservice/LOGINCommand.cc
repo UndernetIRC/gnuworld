@@ -546,19 +546,21 @@ for (autoOpVectorType::const_iterator resultPtr = autoOpVector.begin();
 		}
 
 	ChannelUser* tmpChanUser = netChan->findUser(theClient) ;
-	if(!tmpChanUser)
-		{
+	if(!tmpChanUser) {
 		//The user is not in the channel, lets see if their autoinvite is on and act upon it
-		if (resultPtr->flags & sqlLevel::F_AUTOINVITE) 
-			{
+		if (resultPtr->flags & sqlLevel::F_AUTOINVITE)  {
 			int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-			if(level >= level::invite) 
-				{
-				bot->Invite(theClient,netChan);
+			if(level >= level::invite) {
+				sqlBan* tmpBan = bot->isBannedOnChan(theChan, theClient);
+				if (tmpBan && tmpBan->getLevel() >= 75) {
+					bot->Notice(theClient, "Can't invite you to channel %s, you are banned", theChan->getName().c_str());
+					continue;
 				}
+				bot->Invite(theClient,netChan);
 			}
-		continue;
 		}
+		continue;
+	}
 
 	/*
 	 * Check if the channel is NOOP.
