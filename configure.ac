@@ -278,6 +278,39 @@ if [test "x$check_log4cplus" != "x" ]; then
 	CXXFLAGS="${CXXFLAGS} -I${LOG4CPLUS_INCLUDE}"
 fi
 
+dnl Enable liboath if required
+AC_ARG_WITH(liboath,
+        AC_HELP_STRING([--with-liboath],
+                        [Check liboath, if not enabled TOTP functionality will not be available]),
+        [check_liboath=$withval]
+)
+if [test "$check_liboath" == "yes"]; then
+        check_liboath=/usr/local
+fi
+OATH_LIB="${check_liboath}/lib"
+AC_ARG_WITH(liboath-lib,
+        AC_HELP_STRING([--with-liboath-lib=LIBOATHLIBDIR],
+                        [Specify location to find liboath.so]),
+        [OATH_LIB=$withval]
+)
+
+OATH_INCLUDE="${check_liboath}/include"
+AC_ARG_WITH(liboath-include,
+        AC_HELP_STRING([--with-liboath-include=OATHINCLUDEDIR],
+                        [Specify location to find oath.h]),
+        [OATH_INCLUDE=$withval]
+)
+
+if [test "x$check_liboath" != "x" ]; then
+        LDFLAGS="${LDFLAGS} -L${OATH_LIB}"
+        CXXFLAGS="${CXXFLAGS} -I${OATH_INCLUDE} -L${OATH_LIB}"
+        dnl AC_CHECK_FILE("$OATH_LIB/liboath.so",, [AC_MSG_ERROR([Unable to find liboath.so, \
+        dnl                 please use the --with-liboath-lib argument to point to the right path],1)])
+        AC_CHECK_LIB(oath,oath_totp_validate,, [AC_MSG_ERROR([Unable to find liboath.so, please use the --with-liboath-lib argument to point to the right path],1)])
+        AC_CHECK_FILE("$OATH_INCLUDE/liboath/oath.h",, [AC_MSG_ERROR([Unable to find oath.h, please use the --with-liboath-include argument to point to the right path],1)])
+        dnl AC_DEFINE([ENABLE_LIBOATH], [], [Enable LIBOATH])
+fi
+
 dnl Allow selection of additional includes and libraries paths
 dnl just in case!
 
