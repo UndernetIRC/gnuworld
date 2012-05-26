@@ -284,16 +284,16 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 				}
 				if(string_upper(st[3]) == "-FORCE") {
 					//Create a random hex string 168bit long
-					char str_key2[10];
-					char hex_key[21];
+					char str_key2[20];
+					char hex_key[41];
 					srand(clock()*745+time(NULL));
 					hex_key[0] = 0;
-					for(int i=0; i < 10; i++) {
+					for(int i=0; i < 20; i++) {
 						str_key2[i]=((rand() %95) + 32);
 						sprintf(hex_key+(i*2),"%02x",str_key2[i] & 0xFF);
 					}	
 					char* key;
-					int res = oath_base32_encode(str_key2,10,&key,NULL);
+					int res = oath_base32_encode(str_key2,20,&key,NULL);
 					if(res != OATH_OK) {
 						bot->Notice(theClient,"Failed to enable TOTP authentication, please contact a cservice representitive");
 						return true;
