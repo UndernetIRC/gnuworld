@@ -220,8 +220,16 @@ if (!bot->isPasswordRight(theUser, st.assemble(2,pass_end)))
 	}
 #ifdef TOTP_AUTH_ENABLED
 if(totp_enabled) {
-        const char* token = st[st.size()-1].c_str();
-        int res=oath_totp_validate(theUser->getTotpKey().c_str(),theUser->getTotpKey().size(),time(NULL),30,0,1,token);
+        char* key;
+	size_t len;
+	int res  = oath_base32_decode(theUser->getTotpKey().c_str(),theUser->getTotpKey().size(),&key,&len);
+	if(res != OATH_OK) {
+		bot->Notice(theClient,"AUTHENTICATION FAILED as %s due to an error, please contact CService represetitive",st[1].c_str());
+		elog << "ERROR while decoding base32 (" << st[st.size()-1].c_str() << ") " << oath_strerror(res) << "\n";
+		return false;
+	}
+        res=oath_totp_validate(key,len,time(NULL),30,0,1,st[st.size()-1].c_str());
+	free(key);
         if(res < 0 ) {
 		bot->setFailedLogins(theClient, failedLogins+1);
 	        bot->Notice(theClient,

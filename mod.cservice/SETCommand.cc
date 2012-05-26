@@ -45,6 +45,7 @@
 #include	"levels.h"
 #include	"responses.h"
 #include	"cservice_config.h"
+#include <stdio.h>
 #ifdef HAVE_LIBOATH
 extern "C" {
 #include <liboath/oath.h>
@@ -282,20 +283,22 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 					return true;
 				}
 				if(string_upper(st[3]) == "-FORCE") {
-					//Create a random hex stringi 168bit long
-					static char hex_chars[] = "1234567890abcdef";
-					srand(clock()*745);
-					std::stringstream s;
-					for(int i=0; i < 40; i++) {
-						s << hex_chars[rand() % 16];
+					//Create a random hex string 168bit long
+					char str_key2[10];
+					char hex_key[21];
+					srand(clock()*745+time(NULL));
+					hex_key[0] = 0;
+					for(int i=0; i < 10; i++) {
+						str_key2[i]=((rand() %95) + 32);
+						sprintf(hex_key+(i*2),"%02x",str_key2[i] & 0xFF);
 					}	
 					char* key;
-					int res = oath_base32_encode(s.str().c_str(),s.str().size(),&key,NULL);
+					int res = oath_base32_encode(str_key2,10,&key,NULL);
 					if(res != OATH_OK) {
 						bot->Notice(theClient,"Failed to enable TOTP authentication, please contact a cservice representitive");
 						return true;
 					}
-					theUser->setTotpKey(s.str());
+					theUser->setTotpKey(string(key));
 					theUser->setFlag(sqlUser::F_TOTP_ENABLED);
 					if(!theUser->commit(theClient)) {
 						bot->Notice(theClient,"Failed to enable TOTP authentication, please contact a cservice representitive");
@@ -303,7 +306,8 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 						return true;
 					}
 
-					bot->Notice(theClient,"TOTP Authentication is ENABLED.  Your secret key is: %s",key);
+					bot->Notice(theClient,"TOTP Authentication is ENABLED.  Your base 32 encoded secret key is: %s",key);
+					bot->Notice(theClient,"Your key in hex string: %s",hex_key);
 					bot->Notice(theClient,"For QR representation of your key, visit : https://cservice.undernet.org/genqr.php?code=%s&name=UnderNet",key);
 					bot->Notice(theClient,"Please note, this key will never be presented to you again.  NEVER GIVE YOUR KEY TO ANYONE!");			
 					free(key);
