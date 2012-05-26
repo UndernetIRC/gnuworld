@@ -99,4 +99,10 @@
  */
 #undef USE_COMMAND_LOG
 
+/**
+ * Define this if you want TOTP authentication, note you must have liboath
+ * installed, and configure --with-liboath for totp to work
+ */
+#define TOTP_AUTH_ENABLED
+
 #endif // __CSERVICE_CONFIG_H

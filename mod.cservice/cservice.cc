@@ -352,6 +352,10 @@ commandlogPath = cserviceConfig->Require( "command_logfile" )->second ;
     "hello_block_period" )->second.c_str() ) ;
 #endif // ALLOW_HELLO
 
+#ifdef TOTP_AUTH_ENABLED
+  totpAuthEnabled = atoi((cserviceConfig->Require( "enable_totp" )->second).c_str()) == 1; 
+#endif
+
 loadConfigData();
 
 userHits = 0;
@@ -1027,7 +1031,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.4.1pl1");
+		"] Release 1.5.0");
 	}
 else if(Command == "PROBLEM?")
 	{

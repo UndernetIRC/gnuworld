@@ -197,6 +197,9 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			flagsSet+= "INVITE ";
 		}
 
+		if (theUser->getFlag(sqlUser::F_TOTP_ENABLED))
+                        flagsSet += "TOTP ";
+
 
 	}
 	/* set 'NONE' if no flags */

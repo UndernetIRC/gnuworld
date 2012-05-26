@@ -35,6 +35,11 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 #include	"ip.h"
+#ifdef HAVE_LIBOATH
+extern "C" {
+#include <liboath/oath.h>
+}
+#endif
 
 const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.67 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
@@ -140,6 +145,19 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 	st[1].c_str());
 	return false;
 	}
+int pass_end = st.size();
+
+#ifdef TOTP_AUTH_ENABLED
+bool totp_enabled = false;
+if(bot->totpAuthEnabled && theUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
+        if(st.size() < 4) {
+                bot->Notice(theClient,"AUTHENTICATION FAILED as %s. (Missing TOTP token)",st[1].c_str());
+                return false;
+        }
+        pass_end = st.size()-1;
+        totp_enabled = true;
+}
+#endif
 
 /*
  * Check password, if its wrong, bye bye.
@@ -151,8 +169,7 @@ unsigned int failed_login_rate = bot->getConfigVar("FAILED_LOGINS_RATE")->asInt(
 /* if it's not configured, default to every 15 minutes */
 if (failed_login_rate==0)
 	failed_login_rate = 900;
-
-if (!bot->isPasswordRight(theUser, st.assemble(2)))
+if (!bot->isPasswordRight(theUser, st.assemble(2,pass_end)))
 	{
 	bot->setFailedLogins(theClient, failedLogins+1);
 	bot->Notice(theClient,
@@ -201,6 +218,23 @@ if (!bot->isPasswordRight(theUser, st.assemble(2)))
 	}
 	return false;
 	}
+#ifdef TOTP_AUTH_ENABLED
+if(totp_enabled) {
+        const char* token = st[st.size()-1].c_str();
+        int res=oath_totp_validate(theUser->getTotpKey().c_str(),theUser->getTotpKey().size(),time(NULL),30,0,1,token);
+        if(res < 0 ) {
+		bot->setFailedLogins(theClient, failedLogins+1);
+	        bot->Notice(theClient,
+               		bot->getResponse(theUser,
+	                        language::auth_failed_token,
+               		        string("AUTHENTICATION FAILED as %s. (Invalid Token)")).c_str(),
+		                theUser->getUserName().c_str());
+	        /* increment failed logins counter */
+	        theUser->incFailedLogins();
+        	return false;
+	} 
+}
+#endif
 
 /*
  * Check if this is a privileged user, if so check against IP restrictions
@@ -661,34 +695,33 @@ for(unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 /*
  * See if they have any notes.
  */
-
 #ifdef USE_NOTES
 
 if(!theUser->getFlag(sqlUser::F_NONOTES))
-	{
-	stringstream noteQuery;
-	noteQuery	<< "SELECT message_id FROM notes "
-			<< "WHERE user_id = "
-			<< theUser->getID()
-			<< ends;
+        {
+        stringstream noteQuery;
+        noteQuery       << "SELECT message_id FROM notes "
+                        << "WHERE user_id = "
+                        << theUser->getID()
+                        << ends;
 
 #ifdef LOG_SQL
-	elog	<< "LOGIN::sqlQuery> "
-		<< noteQuery.str().c_str()
-		<< endl;
+        elog    << "LOGIN::sqlQuery> "
+                << noteQuery.str().c_str()
+                << endl;
 #endif
 
-	bot->SQLDb->Exec(noteQuery, true) ;
+        bot->SQLDb->Exec(noteQuery, true) ;
 
-	unsigned int count = bot->SQLDb->Tuples();
-	if(count)
-		{
-		bot->Notice(theClient, "You have %i note(s). To read "
-			"them type /msg %s notes read all",
-			count,
-			bot->getNickName().c_str());
-		}
-	}
+        unsigned int count = bot->SQLDb->Tuples();
+        if(count)
+                {
+                bot->Notice(theClient, "You have %i note(s). To read "
+                        "them type /msg %s notes read all",
+                        count,
+                        bot->getNickName().c_str());
+                }
+        }
 
 #endif
 

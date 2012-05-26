@@ -26,7 +26,6 @@
 #include	<string>
 
 #include	<cassert>
-
 #include	"StringTokenizer.h"
 
 const char rcsId[] = "$Id: StringTokenizer.cc,v 1.7 2005/02/20 15:49:21 dan_karrels Exp $" ;
@@ -158,26 +157,36 @@ delete[] addMe ;
  * Assemble into a string all tokens starting from index
  * (start).
  */
-string StringTokenizer::assemble( const size_type& start ) const
+string StringTokenizer::assemble( const size_type& start, int end ) const
 {
+
 // check if the beginning index is valid
 if( !validSubscript( start ) )
 	{
 	return string() ;
 	}
 
+if(end < 0) 
+	{
+        end = size();
+	} 
+else if(!validSubscript(end-1)) 
+	{
+        return string();
+	}	
+
 // retMe will be returned at the end of the method
 string retMe ;
 retMe.reserve( totalChars() ) ;
 
 // continue while there are more tokens to concatenate
-for( size_type i = start ; i < size() ; i++ )
+for( size_type i = start ; i < end ; i++ )
 	{
 	// Add this token to the returning string
 	retMe += array[ i ] ;
 
 	// If there is another token, put a delimiter here
-	if( (i + 1) < size() )
+	if( (i + 1) < end )
 		{
 		retMe += delimiter ;
 		}

@@ -37,6 +37,7 @@
  */
 
 #include	<string>
+#include 	<sstream>
 
 #include	"StringTokenizer.h"
 #include	"cservice.h"
@@ -44,7 +45,11 @@
 #include	"levels.h"
 #include	"responses.h"
 #include	"cservice_config.h"
-
+#ifdef HAVE_LIBOATH
+extern "C" {
+#include <liboath/oath.h>
+}
+#endif
 const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.64 2008/04/16 20:34:44 danielaustin Exp $" ;
 
 namespace gnuworld
@@ -262,6 +267,52 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		return true;
 	}
 
+#ifdef	TOTP_AUTH_ENABLED
+	if (option == "TOTP")
+	{	
+		int admin = bot->getAdminAccessLevel(theUser);
+		if((admin > 0) || (theUser->getFlag(sqlUser::F_OPER)) || (theClient->isOper())) {
+			if(value == "ON") {
+				if(theUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
+					bot->Notice(theClient,"TOTP is already enabled for your account");
+					return true;
+				}
+				if(st.size() == 3) {
+					bot->Notice(theClient,"WARNING:  This will enable time-based OTP (one time passwords).  Once enabled, in order to login you will require a device to generate the OTP token which has the stored secret key.  If you are sure, type: /msg X set totp ON -force"); 
+					return true;
+				}
+				if(string_upper(st[3]) == "-FORCE") {
+					//Create a random hex stringi 168bit long
+					static char hex_chars[] = "1234567890abcdef";
+					srand(clock()*745);
+					std::stringstream s;
+					for(int i=0; i < 40; i++) {
+						s << hex_chars[rand() % 16];
+					}	
+					char* key;
+					int res = oath_base32_encode(s.str().c_str(),s.str().size(),&key,NULL);
+					if(res != OATH_OK) {
+						bot->Notice(theClient,"Failed to enable TOTP authentication, please contact a cservice representitive");
+						return true;
+					}
+					theUser->setTotpKey(s.str());
+					theUser->setFlag(sqlUser::F_TOTP_ENABLED);
+					if(!theUser->commit(theClient)) {
+						bot->Notice(theClient,"Failed to enable TOTP authentication, please contact a cservice representitive");
+						free(key);
+						return true;
+					}
+
+					bot->Notice(theClient,"TOTP Authentication is ENABLED.  Your secret key is: %s",key);
+					bot->Notice(theClient,"For QR representation of your key, visit : https://cservice.undernet.org/genqr.php?code=%s&name=UnderNet",key);
+					bot->Notice(theClient,"Please note, this key will never be presented to you again.  NEVER GIVE YOUR KEY TO ANYONE!");			
+					free(key);
+					return true;
+				}
+			}
+		} 
+	}
+#endif
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::invalid_option,

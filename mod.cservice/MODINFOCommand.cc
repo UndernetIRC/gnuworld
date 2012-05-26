@@ -48,6 +48,7 @@ bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 {
 bot->incStat("COMMANDS.MODINFO");
 
+
 StringTokenizer st( Message ) ;
 if( st.size() < 4 )
 	{
@@ -55,13 +56,14 @@ if( st.size() < 4 )
 	return true;
 	}
 
-string command = string_upper(st[2]);
-if ((command != "ACCESS") && (command != "AUTOMODE") && (command != "INVITE"))
+string command = string_upper(st[1]) == "TOTP" ? "TOTP" : string_upper(st[2]);
+if ((command != "ACCESS") && (command != "AUTOMODE") && (command != "INVITE") && (command != "TOTP"))
 	{
 	Usage(theClient);
 	return true;
 	}
-if(command != "INVITE" && st.size() < 5 )
+
+if(command != "INVITE"  && command != "TOTP" && st.size() < 5 )
 	{
 	Usage(theClient);
 	return true;
@@ -77,6 +79,44 @@ if (!theUser)
 	return false;
 	}
 
+if (command == "TOTP") {
+	if(bot->getAdminAccessLevel(theUser) < adminlevel::modinfo) {
+		bot->Notice(theClient,
+               		bot->getResponse(theUser,
+                        	language::insuf_access,
+	                        string("Sorry, you have insufficient access to perform that command.")));
+		return false;
+	}
+	sqlUser* modUser = bot->getUserRecord(st[2]);
+	if(theUser == modUser) {
+		bot->Notice(theClient,"Sorry, you can not disable your own TOTP setting");
+		return false;
+	}
+
+	if(string_upper(st[3]) == "OFF") {
+		if(modUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
+			modUser->removeFlag(sqlUser::F_TOTP_ENABLED);
+			if(!modUser->commit(theClient)) {
+				bot->Notice(theClient,"Failed to disable totp for %s",st[2].c_str());
+				return false;
+			}
+			bot->Notice(theClient,"TOTP Authentication disabled for %s",st[2].c_str());
+			return true;
+		} 
+		bot->Notice(theClient,"TOTP Authentication already disabled for %s",st[2].c_str());
+		return false;
+	} else if(string_upper(st[3]) == "ON") {
+		bot->Notice(theClient,"Cannot enable TOTP for other users");
+		return false;
+	}
+	bot->Notice(theClient,"Unknown option %s , valid option is OFF",st[3].c_str());
+	return false;
+}
+
+if(st.size() < 4) {
+	Usage(theClient);
+	return true;
+}
 /*
  *  First, check the channel is registered.
  */

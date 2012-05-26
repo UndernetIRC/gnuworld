@@ -3,6 +3,8 @@
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2012-05-25: MrBean
+--	       Added 'totp_key' colum  to 'users' table	
 -- 2011-12-12: Spike
 --	       Added gline and whitelist tables.
 -- 2006-08-10: nighty
@@ -221,7 +223,7 @@ CREATE TABLE users (
 	signup_ts INT4,
 	signup_ip VARCHAR(15),
 	maxlogins INT4 DEFAULT 1,
-
+	totp_key  VARCHAR(60) DEFAULT '',
 	PRIMARY KEY ( id )
 ) ;
 

@@ -53,6 +53,7 @@ const sqlUser::flagType sqlUser::F_NOADMIN =		0x40 ;
 const sqlUser::flagType sqlUser::F_ALUMNI =		0x80 ;
 const sqlUser::flagType sqlUser::F_OPER =		0x100 ;
 const sqlUser::flagType sqlUser::F_NOADDUSER =		0x200 ;
+const sqlUser::flagType sqlUser::F_TOTP_ENABLED = 	0x400;
 
 const unsigned int sqlUser::EV_SUSPEND		= 1;
 const unsigned int sqlUser::EV_UNSUSPEND	= 2;
@@ -198,7 +199,7 @@ email = SQLDb->GetValue(row, 8);
 maxlogins = atoi(SQLDb->GetValue(row, 9));
 failed_logins = 0;
 failed_login_ts = 0;
-
+totp_key = SQLDb->GetValue(row, 10);
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
 }
@@ -226,7 +227,8 @@ queryString	<< queryHeader
 		<< "language_id = " << language_id << ", "
 		<< "maxlogins = " << maxlogins << ", "
 		<< "last_updated = now()::abstime::int4, "
-		<< "last_updated_by = '" << escapeSQLChars(last_updated_by) << "' "
+		<< "last_updated_by = '" << escapeSQLChars(last_updated_by) << "', "
+		<< "totp_key = '" << escapeSQLChars(totp_key) << "' "
 		<< queryCondition << id
 		<< ends;
 

@@ -52,6 +52,7 @@ public:
 	static const flagType F_ALUMNI;
 	static const flagType F_OPER;
 	static const flagType F_NOADDUSER;
+	static const flagType F_TOTP_ENABLED;
 
 	/*
 	 *   User 'Event' Flags, used in the userlog table.
@@ -139,6 +140,9 @@ public:
 
 	inline const unsigned int& getLastFailedLoginTS() const
 		{ return failed_login_ts ; }
+	
+	inline const std::string&	getTotpKey() const
+		{ return totp_key ; }
 
 	/*
 	 *  Methods to set data atrributes.
@@ -200,6 +204,8 @@ public:
 	inline void setLastFailedLoginTS( const unsigned int& _ts )
 		{ failed_login_ts = _ts ; }
 
+	inline void setTotpKey( const std::string& _totp_key )
+		{ totp_key = _totp_key ; }
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -246,6 +252,7 @@ protected:
 	unsigned int	notes_sent;
 	unsigned int	failed_logins;
 	unsigned int	failed_login_ts;
+	std::string	totp_key;
 
 	dbHandle*	SQLDb;
 } ;

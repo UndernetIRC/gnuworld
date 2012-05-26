@@ -1,6 +1,18 @@
 Newest changes at the top of the file:
 $Id: RELEASE.NOTES,v 1.31 2003/04/24 20:19:36 gte Exp $
 
+CMaster 1.5 	 - 26/05/2012
+ * Added TOTP Authentication support to enable follow this procedure:
+   - compile and install liboath (http://www.nongnu.org/oath-toolkit/)
+   - conigure gnuworld --with-liboath (in case it is not installed to the default location use --with-liboath-include and --with-liboath-lib to point to the right directory)
+   - edit mod.cservice/cservice_config.h and change #undef TOTP_AUTH_ENABLED to #define TOTP_AUTH_ENABLED
+   - compile gnuworld
+   - import doc/update.totp_key.sql into the cservice db (psql cservice < doc/update.totp_key.sql)
+   - edit bin/cservice.conf and add the following var: enable_totp = 1
+   - start gnuworld normally
+   Once enabled * and opers will be able to /msg x set totp on , which would enable totp for their account
+   To disable another user with >=800 access will need to /msg x modinfo totp <user> off
+
 CMaster 1.4.1pl1 - 14/04/2012
  * Fixed bug - X complaining about being deoped when joining a channel
  * Removed the need for an admin to FORCE before being able to SET COMMENT on a channel.

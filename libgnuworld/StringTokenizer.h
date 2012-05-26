@@ -129,7 +129,7 @@ public:
 	 * With no argument supplied, assemble() will return the entire
 	 * original string, delimiters included.
 	 */
-	std::string		assemble( const size_type& = 0 ) const ;
+	std::string		assemble( const size_type& = 0, int = -1 ) const ;
 
 	/**
 	 * The immutable iterator type to use for walking through

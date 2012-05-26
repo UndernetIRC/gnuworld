@@ -571,6 +571,10 @@ public:
 	helloIPListType	helloIPList ;
 	unsigned int helloBlockPeriod ;
 #endif // ALLOW_HELLO
+
+#ifdef TOTP_AUTH_ENABLED
+	bool totpAuthEnabled;
+#endif
 } ;
 
 const string escapeSQLChars(const string& theString);
