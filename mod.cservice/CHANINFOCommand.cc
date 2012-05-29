@@ -152,6 +152,8 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			flagsSet += "ALUMNI ";
 		if (theUser->getFlag(sqlUser::F_NOADMIN))
 			flagsSet += "DISABLEAUTH ";
+		if (theUser->getFlag(sqlUser::F_TOTP_ENABLED))
+                        flagsSet += "TOTP ";
 	}
 	/* flags with variables */
 	if (langString.size() > 0)
@@ -196,9 +198,6 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		{
 			flagsSet+= "INVITE ";
 		}
-
-		if (theUser->getFlag(sqlUser::F_TOTP_ENABLED))
-                        flagsSet += "TOTP ";
 
 
 	}
