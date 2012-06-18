@@ -1,6 +1,9 @@
 Newest changes at the top of the file:
 $Id: RELEASE.NOTES,v 1.31 2003/04/24 20:19:36 gte Exp $
 
+CMaster 1.5pl2 	 - 18/06/2012
+ * Do not crash when disabling totp using MODINFO ... 
+
 CMaster 1.5pl1 	 - 29/05/2012
  * Require users to provide the correct token in order to confirm TOTP activation
 
