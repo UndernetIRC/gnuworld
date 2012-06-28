@@ -895,11 +895,11 @@ else
 				theChan->getChannelTS(), false);
 			bot->joinCount++;
 			bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(), bot->currentTime() + 15) );
-		if (tmpChan)
+		/*if (tmpChan)
 			{
 			if(theChan->getFlag(sqlChannel::F_NOOP)) bot->deopAllOnChan(tmpChan);
 			if(theChan->getFlag(sqlChannel::F_STRICTOP)) bot->deopAllUnAuthedOnChan(tmpChan);
-			}
+			}*/
 		}
 	    else if(value == "OFF")
 	    {

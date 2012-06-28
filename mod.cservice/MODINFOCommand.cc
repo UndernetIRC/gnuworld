@@ -56,7 +56,7 @@ if( st.size() < 4 )
 	return true;
 	}
 
-string command = string_upper(st[1]) == "TOTP" ? "TOTP" : string_upper(st[2]);
+string command = string_upper(st[2]);
 if ((command != "ACCESS") && (command != "AUTOMODE") && (command != "INVITE") && (command != "TOTP"))
 	{
 	Usage(theClient);
@@ -87,7 +87,11 @@ if (command == "TOTP") {
 	                        string("Sorry, you have insufficient access to perform that command.")));
 		return false;
 	}
-	sqlUser* modUser = bot->getUserRecord(st[2]);
+	sqlUser* modUser = bot->getUserRecord(st[1]);
+	if(!modUser) {
+		bot->Notice(theClient,"I can't find %s anywhere",st[1].c_str());
+		return false;
+	}	
 	if(theUser == modUser) {
 		bot->Notice(theClient,"Sorry, you can not disable your own TOTP setting");
 		return false;
@@ -97,13 +101,13 @@ if (command == "TOTP") {
 		if(modUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
 			modUser->removeFlag(sqlUser::F_TOTP_ENABLED);
 			if(!modUser->commit(theClient)) {
-				bot->Notice(theClient,"Failed to disable totp for %s",st[2].c_str());
+				bot->Notice(theClient,"Failed to disable totp for %s",st[1].c_str());
 				return false;
 			}
-			bot->Notice(theClient,"TOTP Authentication disabled for %s",st[2].c_str());
+			bot->Notice(theClient,"TOTP Authentication disabled for %s",st[1].c_str());
 			return true;
 		} 
-		bot->Notice(theClient,"TOTP Authentication already disabled for %s",st[2].c_str());
+		bot->Notice(theClient,"TOTP Authentication already disabled for %s",st[1].c_str());
 		return false;
 	} else if(string_upper(st[3]) == "ON") {
 		bot->Notice(theClient,"Cannot enable TOTP for other users");
