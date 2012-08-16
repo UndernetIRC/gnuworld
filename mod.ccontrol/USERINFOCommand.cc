@@ -112,8 +112,11 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 			{
 			Suspended = false;
 			}
-		
-		if(tempUser->isOper())
+		if (tempUser->isUhs()) 
+			{
+			Level.assign("UHS");
+			}
+		else if(tempUser->isOper())
 			{
 			Level.assign("OPER");
 			}
