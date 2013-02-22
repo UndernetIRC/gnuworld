@@ -80,7 +80,15 @@ if (option == "HELP")
 			bot->helpTable.size());
 		return true;
 	}
-
+if (option == "TRANSLATIONS")
+	{
+		bot->languageTable.clear();
+		bot->translationTable.clear();
+		bot->loadTranslationTable();
+		bot->Notice(theClient, "Done. %i entries in language table.",
+			bot->translationTable.size());
+		return true;
+	}
 /* Options below require a higher level to rehash */
 if (level < level::rehash_coder)
 {
@@ -91,14 +99,7 @@ if (level < level::rehash_coder)
         return false;
 }
 
-if (option == "TRANSLATIONS")
-	{
-		bot->languageTable.clear();
-		bot->translationTable.clear();
-		bot->loadTranslationTable();
-		bot->Notice(theClient, "Done. %i entries in language table.",
-			bot->translationTable.size());
-	}
+
 
 if (option == "CONFIG")
 	{

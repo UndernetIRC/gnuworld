@@ -1,6 +1,12 @@
 Newest changes at the top of the file:
 $Id: RELEASE.NOTES,v 1.31 2003/04/24 20:19:36 gte Exp $
 
+CMaster 1.5pl3   - 22/02/2013
+ * Hide user email on INFO command from non *
+ * Notify user upon authentication in case there are other users who are autheticated with the same username
+ * Changed required level for rehash translations from rehash_coder to rehash_admin
+
+	
 CMaster 1.5pl2 	 - 18/06/2012
  * Do not crash when disabling totp using MODINFO ... 
 

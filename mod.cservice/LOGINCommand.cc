@@ -343,7 +343,8 @@ if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
  * If this user account is already authed against, send a notice to the other
  * users warning them that someone else has logged in too.
  */
-if(theUser->isAuthed())
+bool multiAuth = theUser->isAuthed();
+if(multiAuth)
 	{
 	bot->noticeAllAuthedClients(theUser,
 	"%s has just authenticated as you (%s). "
@@ -429,6 +430,26 @@ if (bot->getConfigVar("ALERT_FAILED_LOGINS")->asInt()==1 &&
 			language::auth_failed_logins,
 			string("There were %d failed login attempts since your last successful login.")).c_str(),
 			theUser->getFailedLogins());
+}
+
+if(multiAuth) {
+        bot->Notice(theClient, bot->getResponse(theUser,language::following_clients_auth,"The following clients are also authenticated as %s:").c_str(),theUser->getUserName().c_str());
+
+        for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
+                ptr != theUser->networkClientList.end() ; ++ptr )
+                {
+                iClient* Target = (*ptr);
+		if(Target != theClient) {
+	                bot->Notice(theClient,"    %s",Target->getNickUserHost().c_str());
+		}
+                }
+        bot->Notice(theClient,bot->getResponse(theUser,language::suspend_if_not_you,"if any of these clients are not you, your account may have been compromised. "
+        "If you wish to suspend all your access as a precautionary measure, "
+        "type '\002/msg %s@%s suspendme <password>'\002 and contact a "
+        "CService representative to resolve the problem.").c_str(),  bot->getNickName().c_str(),bot-> getUplinkName().c_str());
+        bot->Notice(theClient,bot->getResponse(theUser,language::account_unusable_suspendme,"\002** Note: You will NOT be able to use your account after "
+        "you issue this command **\002").c_str());
+
 }
 theUser->setFailedLogins(0);
 theUser->setLastFailedLoginTS(0);

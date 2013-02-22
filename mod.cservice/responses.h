@@ -215,6 +215,9 @@ namespace gnuworld
 		const int max_failed_logins =		177;
 		const int automode_invite =			178;
 		const int auth_failed_token =			179;
+		const int following_clients_auth = 		180;
+		const int suspend_if_not_you = 			181;
+		const int account_unusable_suspendme = 		182;
 		const int greeting = 				9998;
 		const int motd =					9999;
 	}

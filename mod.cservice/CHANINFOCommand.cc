@@ -382,11 +382,13 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	 * Only show to those with admin access, or the actual user.
 	 */
 
-	if( adminAccess || (tmpUser == theUser) )
-		{
+	if(adminAccess) {
 		bot->Notice(theClient, "EMail: %s",
 			theUser->getEmail().c_str());
+	}
 
+	if( adminAccess || (tmpUser == theUser) )
+		{
 		if ((tmpUser != theUser) && ((tmpadminLevel > 0 || theUser->getFlag(sqlUser::F_OPER))) && (adminAccess < 800))
 		{
 			bot->Notice(theClient, "Last Hostmask: Not Available");
