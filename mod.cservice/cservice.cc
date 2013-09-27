@@ -2085,14 +2085,12 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 		}
 	else
 		{
-		// BUG: Correct me if Im wrong, but this will crash, 
-		// right?
-		sqlBan* theBan = ptr->second;
+		#ifdef LOG_DEBUG
 		elog << "Unable to find ban "
-		     << theBan->getBanMask()
 		     << " with id " 
-		     << theBan->getID()
+		     << resultPtr->second
 		     << endl;
+		#endif
 		}     
 	} /* Forall results in set */
 
@@ -4192,7 +4190,8 @@ for( string::const_iterator ptr = theString.begin() ;
 	{
 	if( *ptr == '\'' )
 		{
-		retMe += "\\\047" ;
+		//retMe += "\\\047" ;
+		retMe += "''";
 		}
 	else if ( *ptr == '\\' )
 		{
