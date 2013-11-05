@@ -2347,7 +2347,7 @@ if(dbConnected)
   
                                 int CurConnections = ++clientsIpMap[tIP];
   
-                                if (((CurConnections > maxClones)) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+				if ((!isShellException) && (CurConnections > maxClones) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
                                         (CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
                                 {
                                         sprintf(Log,"*@%s", NewUser->getRealInsecureHost().c_str());
