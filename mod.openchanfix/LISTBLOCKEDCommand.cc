@@ -52,6 +52,7 @@ if (!bot->doChanBlocking()) {
 }
 
 /* List blocks */
+
 dbHandle* cacheCon = bot->getLocalDBHandle();
 
 std::stringstream theQuery;
@@ -68,6 +69,8 @@ if (!cacheCon->Exec(theQuery.str(),true)) {
   return;
 }
 
+
+
 // SQL query returned no errors
 unsigned int numBlocks = 0;
 std::string strBlocks;
@@ -76,11 +79,14 @@ bot->SendTo(theClient,
 		language::listblocks_blocked_chans,
 		std::string("List of all blocked channels:")).c_str());
 
+
 for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
   strBlocks += cacheCon->GetValue(i, 0);
+
+
   strBlocks += " ";
   if (strBlocks.size() >= 410) {
-    bot->SendTo(theClient, strBlocks.c_str());
+    bot->SendTo(theClient, strBlocks);
     strBlocks = "";
   }
   numBlocks++;
@@ -89,8 +95,10 @@ for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
 /* Dispose of our connection instance */
 //bot->theManager->removeConnection(cacheCon);
 
+
 if (strBlocks.size())
   bot->SendTo(theClient, strBlocks.c_str());
+
 
 bot->SendTo(theClient,
 	bot->getResponse(theUser,

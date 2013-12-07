@@ -765,9 +765,9 @@ if (Command == "DCC") {
 } else if (Command == "PING" || Command == "ECHO") {
   DoCTCP(theClient, CTCP, Message);
 } else if (Command == "VERSION") {
-  DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.0 [compiled "__DATE__" "__TIME__"]");
+  DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.1 [compiled "__DATE__" "__TIME__"]");
 } else if (Command == "WHODUNIT?") {
-  DoCTCP(theClient, CTCP, "reed, ULtimaTe_, Compy, SiRVulcaN");
+  DoCTCP(theClient, CTCP, "reed, ULtimaTe_, Compy, SiRVulcaN, Hidden");
 } else if (Command == "SUBVERSION") {
   DoCTCP(theClient, CTCP, rcsId);
 } else if (Command == "GENDER") {
@@ -1177,6 +1177,7 @@ void chanfix::SendTo(iClient* theClient, const std::string& theMessage)
 {
 sqlcfUser* theUser = isAuthed(theClient->getAccount());
 
+
 if (theUser && !theUser->getUseNotice())
   Message(theClient, theMessage);
 else
@@ -1241,6 +1242,8 @@ return;
 
 void chanfix::SendTo(iClient* theClient, const char *Msg, ...)
 {
+try
+{
 char buffer[ 1024 ] = { 0 } ;
 va_list list;
 
@@ -1254,6 +1257,11 @@ if (theUser && !theUser->getUseNotice())
   Message(theClient, "%s", buffer);
 else
   Notice(theClient, "%s", buffer);
+
+}
+catch (int e)
+{
+}
 }
 
 void chanfix::doSqlError(const std::string& theQuery, const std::string& theError)

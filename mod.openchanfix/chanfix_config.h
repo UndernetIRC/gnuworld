@@ -24,7 +24,7 @@
 
 #define CHANFIX_DEBUG 1
 
-#define CHANFIX_VERSION "1.3"
+#define CHANFIX_VERSION "2.1"
 
 /**
  * Defines that deal with fixing channels, both manually and
