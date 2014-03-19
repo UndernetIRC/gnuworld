@@ -69,20 +69,6 @@ if( st.size() < 3 )
 	}
 
 /*
- * Are we allowing logins yet?
- */
-unsigned int useLoginDelay = bot->getConfigVar("USE_LOGIN_DELAY")->asInt();
-unsigned int loginTime = bot->getUplink()->getStartTime() + bot->loginDelay;
-if ( (useLoginDelay == 1) && (loginTime >= (unsigned int)bot->currentTime()) )
-	{
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Unable "
-		"to login during reconnection, please try again in "
-		"%i seconds)",
-		st[1].c_str(), (loginTime - bot->currentTime()));
-	return false;
-	}
-
-/*
  * Check theClient isn't already logged in, if so, tell
  * them they shouldn't be.
  */
@@ -95,248 +81,175 @@ if (tmpUser)
 		tmpUser->getUserName().c_str());
 	return false;
 	}
-
-/*
- * Check if this client has exceeded their max logins
- */
-
 unsigned int maxFailedLogins = bot->getConfigVar("MAX_FAILED_LOGINS")->asInt();
 unsigned int failedLogins = bot->getFailedLogins(theClient);
 if ((maxFailedLogins > 0) && (failedLogins >= maxFailedLogins))
 {
-	/* exceeded maximum failed logins */
-	bot->Notice(theClient,
-		bot->getResponse(tmpUser,
-		language::max_failed_logins,
-		string("AUTHENTICATION FAILED as %s (Exceeded maximum login failures for this session)")).c_str(),
-		st[1].c_str());
-	return false;
+        /* exceeded maximum failed logins */
+        bot->Notice(theClient,
+                bot->getResponse(tmpUser,
+                language::max_failed_logins,
+                string("AUTHENTICATION FAILED as %s (Exceeded maximum login failures for this session)")).c_str(),
+                st[1].c_str());
+        return false;
 }
 
-/*
- * Find the user record, confirm authorisation and attach the record
- * to this client.
- */
-
-if(st[1][0] == '#')
-	{
-	bot->setFailedLogins(theClient, failedLogins+1);
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s.", st[1].c_str());
-	return false;
-	}
-
-// TODO: Force a refresh of the user's info from the db
-sqlUser* theUser = bot->getUserRecord(st[1]);
-if( !theUser )
-	{
-	bot->setFailedLogins(theClient, failedLogins+1);
-	bot->Notice(theClient,
-		bot->getResponse(tmpUser,
-			language::not_registered,
-			string("AUTHENTICATION FAILED as %s.")).c_str(),
-		st[1].c_str());
-	return false;
-	}
-
-if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-	{
-	bot->setFailedLogins(theClient, failedLogins+1);
-	bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Suspended)",
-	st[1].c_str());
-	return false;
-	}
-int pass_end = st.size();
-
-#ifdef TOTP_AUTH_ENABLED
-bool totp_enabled = false;
-if(bot->totpAuthEnabled && theUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
-        if(st.size() < 4) {
-                bot->Notice(theClient,"AUTHENTICATION FAILED as %s. (Missing TOTP token)",st[1].c_str());
-                return false;
-        }
-        pass_end = st.size()-1;
-        totp_enabled = true;
-}
-#endif
-
-/*
- * Check password, if its wrong, bye bye.
- */
-
+sqlUser* theUser;
+int auth_res =  bot->authenticateUser(st[1],st.assemble(2),theClient,&theUser);
+unsigned int loginTime = bot->getUplink()->getStartTime() + bot->loginDelay;
 unsigned int max_failed_logins = bot->getConfigVar("FAILED_LOGINS")->asInt();
 unsigned int failed_login_rate = bot->getConfigVar("FAILED_LOGINS_RATE")->asInt();
+string clientList;
 
-/* if it's not configured, default to every 15 minutes */
-if (failed_login_rate==0)
-	failed_login_rate = 900;
-if (!bot->isPasswordRight(theUser, st.assemble(2,pass_end)))
+switch(auth_res) 
 	{
-	bot->setFailedLogins(theClient, failedLogins+1);
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::auth_failed,
-			string("AUTHENTICATION FAILED as %s.")).c_str(),
-		theUser->getUserName().c_str());
-	/* increment failed logins counter */
-	theUser->incFailedLogins();
-	if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
-		(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
-	{
-		/* we have exceeded our maximum - alert relay channel */
-		/* work out a checksum for the password.  Yes, I could have
-		 * just used a checksum of the original password, but this
-		 * means it's harder to 'fool' the check digit with a real
-		 * password - create MD5 from original salt stored */
-		unsigned char	checksum;
-		md5		hash;
-		md5Digest	digest;
-
-		if (theUser->getPassword().size() < 9)
-		{
-			checksum = 0;
-		} else {
-			string salt = theUser->getPassword().substr(0, 8);
-			string guess = salt + st.assemble(2);
-
-			hash.update( (const unsigned char *)guess.c_str(), guess.size() );
-			hash.report( digest );
-
-			checksum = 0;
-			for (size_t i = 0; i < MD5_DIGEST_LENGTH; i++)
-			{
-				/* add ascii value to check digit */
-				checksum += digest[i];
-			}
-		}
-
-		theUser->setLastFailedLoginTS(time(NULL));
-		bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s, checksum %d).",
-			theUser->getFailedLogins(),
-			theUser->getUserName().c_str(),
-			theClient->getRealNickUserHost().c_str(),
-			checksum);
-	}
-	return false;
-	}
-#ifdef TOTP_AUTH_ENABLED
-if(totp_enabled) {
-        char* key;
-	size_t len;
-	int res  = oath_base32_decode(theUser->getTotpKey().c_str(),theUser->getTotpKey().size(),&key,&len);
-	if(res != OATH_OK) {
-		bot->Notice(theClient,"AUTHENTICATION FAILED as %s due to an error, please contact CService represetitive",st[1].c_str());
-		elog << "ERROR while decoding base32 (" << st[st.size()-1].c_str() << ") " << oath_strerror(res) << "\n";
+	case cservice::TOO_EARLY_TOLOGIN: 
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Unable "
+                	"to login during reconnection, please try again in "
+	                "%i seconds)",
+        	        st[1].c_str(), (loginTime - bot->currentTime()));
 		return false;
-	}
-        res=oath_totp_validate(key,len,time(NULL),30,0,1,st[st.size()-1].c_str());
-	free(key);
-        if(res < 0 ) {
+		break;
+	case cservice::AUTH_FAILED:
 		bot->setFailedLogins(theClient, failedLogins+1);
-	        bot->Notice(theClient,
-               		bot->getResponse(theUser,
-	                        language::auth_failed_token,
-               		        string("AUTHENTICATION FAILED as %s. (Invalid Token)")).c_str(),
-		                theUser->getUserName().c_str());
-	        /* increment failed logins counter */
-	        theUser->incFailedLogins();
+	        bot->Notice(theClient, "AUTHENTICATION FAILED as %s.", st[1].c_str());
         	return false;
-	} 
-}
-#endif
-
-/*
- * Check if this is a privileged user, if so check against IP restrictions
- */
-if ((bot->getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser::F_ALUMNI)))
-{
-	/* ok, they have "*" access (excluding alumni's) */
-	if (!bot->checkIPR(theClient, theUser))
-	{
+		break;
+	case cservice::AUTH_UNKNOWN_USER:
+	        bot->setFailedLogins(theClient, failedLogins+1);
+	        bot->Notice(theClient,
+        	        bot->getResponse(tmpUser,
+                        language::not_registered,
+                        string("AUTHENTICATION FAILED as %s.")).c_str(),
+                st[1].c_str());
+	        return false;
+		break;
+	case cservice::AUTH_SUSPENDED_USER: 
+	        bot->setFailedLogins(theClient, failedLogins+1);
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Suspended)",
+        		st[1].c_str());
+	        return false;
+		break;
+	case cservice::AUTH_NO_TOKEN:
 		bot->setFailedLogins(theClient, failedLogins+1);
-		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",  
-			st[1].c_str());
-		/* notify the relay channel */
-		bot->logAdminMessage("%s (%s) failed IPR check.",
-			theClient->getNickName().c_str(),
-			st[1].c_str());
-		/* increment failed logins counter */
-		theUser->incFailedLogins();
-		if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
-			(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
-		{
-			/* we have exceeded our maximum - alert relay channel */
-			theUser->setLastFailedLoginTS(time(NULL));
-			bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s).",
-				theUser->getFailedLogins(),
-				theUser->getUserName().c_str(),
-				theClient->getRealNickUserHost().c_str());
-		}
-		return false;
-	}
-}
+		bot->Notice(theClient,"AUTHENTICATION FAILED as %s. (Missing TOTP token)",st[1].c_str());
+                return false;
+		break;
+	case cservice::AUTH_INVALID_PASS:
+		if (failed_login_rate==0)
+		        failed_login_rate = 900;
+		      bot->setFailedLogins(theClient, failedLogins+1);
+	        bot->Notice(theClient,
+                bot->getResponse(theUser,
+                        language::auth_failed,
+                        string("AUTHENTICATION FAILED as %s.")).c_str(),
+                theUser->getUserName().c_str());
+        	/* increment failed logins counter */
+	        theUser->incFailedLogins();
+        	if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
+                	(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
+		        {	
+	                /* we have exceeded our maximum - alert relay channel */
+        	        /* work out a checksum for the password.  Yes, I could have
+                	 * just used a checksum of the original password, but this
+	                 * means it's harder to 'fool' the check digit with a real
+        	         * password - create MD5 from original salt stored */
+                	unsigned char   checksum;
+	                md5             hash;
+        	        md5Digest       digest;
 
-/*
- * Don't exceed MAXLOGINS.
- */
+                	if (theUser->getPassword().size() < 9)
+                	{
+                        	checksum = 0;
+	                } else {
+        	                string salt = theUser->getPassword().substr(0, 8);
+                	        string guess = salt + st.assemble(2);
 
-bool iploginallow = false;
-if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins())
-	{
-	/* They have exceeded their maxlogins setting, but check if they
-	   are allowed to login from the same IP - only applies if their
-	   maxlogins is set to ONE */
-	uint32_t iplogins = bot->getConfigVar("LOGINS_FROM_SAME_IP")->asInt();
-	uint32_t iploginident = bot->getConfigVar("LOGINS_FROM_SAME_IP_AND_IDENT")->asInt();
-	if ((theUser->getMaxLogins() == 1) && (iplogins > 1))
-	{
-		/* ok, we're using the multi-logins feature (0=disabled) */
-		if (theUser->networkClientList.size() + 1 <= iplogins)
-		{
-			/* Check their IP from previous session against
-			   current IP.  If it matches, allow the login.
-			   As this only applies if their maxlogin is 1, we
-			   know there is only 1 entry in their clientlist */
-			if (theClient->getIP() == theUser->networkClientList.front()->getIP())
-			{
-				if (iploginident==1)
-				{
-					/* need to check ident here */
-					string oldident = theUser->networkClientList.front()->getUserName();
-					string newident = theClient->getUserName();
-					if ((oldident[0]=='~') || (oldident==newident))
-					{
-						/* idents match (or they are unidented) - allow this login */
-						iploginallow = true;
-					}
-				} else {
-					/* don't need to check ident, this login is allowed */
-					iploginallow = true;
-				}
-			}
-		}
-	}
-	if (!iploginallow)
-	{
+                        	hash.update( (const unsigned char *)guess.c_str(), guess.size() );
+	                        hash.report( digest );
+
+        	                checksum = 0;
+                	        for (size_t i = 0; i < MD5_DIGEST_LENGTH; i++)
+                        	{
+	                                /* add ascii value to check digit */
+        	                        checksum += digest[i];
+                	        }
+                	}
+
+	                theUser->setLastFailedLoginTS(time(NULL));
+        	        bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s, checksum %d).",
+                	        theUser->getFailedLogins(),
+                        	theUser->getUserName().c_str(),
+	                        theClient->getRealNickUserHost().c_str(),
+        	                checksum);
+	        }	
+        	return false;
+		break;
+	case cservice::AUTH_ERROR:
+		bot->Notice(theClient,"AUTHENTICATION FAILED as %s due to an error, please contact CService represetitive",st[1].c_str());
+                return false;
+		break;
+	case cservice::AUTH_INVALID_TOKEN:
+		 bot->setFailedLogins(theClient, failedLogins+1);
+	         bot->Notice(theClient,
+                 bot->getResponse(theUser,
+                 	language::auth_failed_token,
+                        string("AUTHENTICATION FAILED as %s. (Invalid Token)")).c_str(),
+                        theUser->getUserName().c_str());
+                /* increment failed logins counter */
+                theUser->incFailedLogins();
+                return false;
+		break;
+	case cservice::AUTH_FAILED_IPR:
+		 bot->setFailedLogins(theClient, failedLogins+1);
+                bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",
+                        st[1].c_str());
+                /* notify the relay channel */
+                bot->logAdminMessage("%s (%s) failed IPR check.",
+                        theClient->getNickName().c_str(),
+                        st[1].c_str());
+                /* increment failed logins counter */
+                theUser->incFailedLogins();
+                if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
+                        (theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
+                {
+                        /* we have exceeded our maximum - alert relay channel */
+                        theUser->setLastFailedLoginTS(time(NULL));
+                        bot->logPrivAdminMessage("%d failed logins for %s (last attempt by %s).",
+                                theUser->getFailedLogins(),
+                                theUser->getUserName().c_str(),
+                                theClient->getRealNickUserHost().c_str());
+                }
+                return false;
+		break;
+	case cservice::AUTH_ML_EXCEEDED:
 		bot->setFailedLogins(theClient, failedLogins+1);
-		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum "
-			"concurrent logins exceeded).",
-			theUser->getUserName().c_str());
+                bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum "
+                        "concurrent logins exceeded).",
+                        theUser->getUserName().c_str());
 
-		string clientList;
-		for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
-			ptr != theUser->networkClientList.end() ; )
-			{
-			clientList += (*ptr)->getNickUserHost();
-			++ptr;
-			if (ptr != theUser->networkClientList.end())
-				{
-				clientList += ", ";
-				}
-			} // for()
+                for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
+                        ptr != theUser->networkClientList.end() ; )
+                        {
+                        clientList += (*ptr)->getNickUserHost();
+                        ++ptr;
+                        if (ptr != theUser->networkClientList.end())
+                                {
+                                clientList += ", ";
+                                }
+                        } // for()
 
-		bot->Notice(theClient, "Current Sessions: %s", clientList.c_str());
+                bot->Notice(theClient, "Current Sessions: %s", clientList.c_str());
+                return false;
+		break;
+	case cservice::AUTH_SUCCEEDED:
+		break;
+	defult:
+		//Should never get here!
+		elog << "Response " << auth_res << " while authenticating!\n";
+		bot->Notice(theClient,"AUTHENTICATION FAILED as %s (due to an error)\n",st[1].c_str());
 		return false;
-		} // for()
+		break;
 	}
 
 /*

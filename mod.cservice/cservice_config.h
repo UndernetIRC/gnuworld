@@ -103,6 +103,6 @@
  * Define this if you want TOTP authentication, note you must have liboath
  * installed, and configure --with-liboath for totp to work
  */
-#undef TOTP_AUTH_ENABLED
+#define TOTP_AUTH_ENABLED
 
 #endif // __CSERVICE_CONFIG_H

@@ -53,6 +53,12 @@
 #include	"md5hash.h"
 #include	"responses.h"
 
+#ifdef HAVE_LIBOATH
+extern "C" {
+#include <liboath/oath.h>
+}
+#endif
+
 namespace gnuworld
 {
 
@@ -1031,7 +1037,7 @@ else if(Command == "VERSION")
 	xClient::DoCTCP(theClient, CTCP,
 		"Undernet P10 Channel Services II ["
 		__DATE__ " " __TIME__
-		"] Release 1.5.0pl1");
+		"] Release 1.5.0pl2");
 	}
 else if(Command == "PROBLEM?")
 	{
@@ -1312,7 +1318,7 @@ void cservice::setIPRts(iClient* theClient, unsigned int _ipr_ts)
 /**
  *  Check a user against IP restrictions
  */
-bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
+ bool cservice::checkIPR(const string& hostname, const string& ip, sqlUser* theUser,unsigned int& ipr_ts)
 {
 	stringstream theQuery;
 	theQuery	<< "SELECT allowmask,allowrange1,allowrange2,added FROM "
@@ -1346,8 +1352,8 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 	}
 	/* cycle through results to find a match */
 	bool ipr_match = false;
-	unsigned int ipr_ts = 0;
-	unsigned int tmpIP = xIP(theClient->getIP()).GetLongIP();
+	ipr_ts = 0;
+	unsigned int tmpIP = xIP(ip).GetLongIP();
 	for (unsigned int i=0; i < SQLDb->Tuples(); i++)
 	{
 		/* get some variables out of the db row */
@@ -1380,8 +1386,8 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 				if (ipr_allowmask.size() > 0)
 				{
 					/* yes it is, does it match our hostname? */
-					if (!match(ipr_allowmask, theClient->getRealInsecureHost()) ||
-						!match(ipr_allowmask, xIP(theClient->getIP()).GetNumericIP()))
+					if (!match(ipr_allowmask, hostname) ||
+						!match(ipr_allowmask, xIP(ip).GetNumericIP()))
 					{
 						ipr_match = true;
 						break;
@@ -1399,11 +1405,17 @@ bool cservice::checkIPR( iClient* theClient, sqlUser* theUser )
 		return false;
 	} else {
 		/* IP restriction check passed - mark it against this user */
-		setIPRts(theClient, ipr_ts);
 		return true;
 	}
 }
-
+bool cservice::checkIPR( iClient* theClient, sqlUser* theUser ) {
+	unsigned int ipr_ts;
+	if(checkIPR(theClient->getRealInsecureHost(),xIP(theClient->getIP()).GetNumericIP(),theUser,ipr_ts)) {
+		setIPRts(theClient, ipr_ts);
+                return true;
+	}
+	return false;
+}
 /**
  * Fetch the number of failed logins for a client
  */
@@ -3157,14 +3169,14 @@ switch( theEvent )
 			//No command or no nick supplied
         		break;
        			}
-		if (st[0] == getNickName()) 
-			{
-			string Command = string_upper(st[1]);
-			if (Command == "LOGIN")
+		//if (st[0] == getNickName()) 
+		//	{
+			string Command = string_upper(st[0]);
+			if (Command == "LOGIN2")
 				{
 				doXQLogin(theServer, Routing, Message);		
 				}
-			}
+		//	}
 		break;
 		}
 	case EVT_ACCOUNT:
@@ -4936,16 +4948,167 @@ void cservice::loadConfigData()
 
 }
 
+int  cservice::authenticateUser(const string& username, const string& password, const string& hostname, const string& ip, const string& ident,unsigned int& ipr_ts,sqlUser** suser) {
+
+unsigned int useLoginDelay = getConfigVar("USE_LOGIN_DELAY")->asInt();
+unsigned int loginTime = getUplink()->getStartTime() + loginDelay;
+if ( (useLoginDelay == 1) && (loginTime >= (unsigned int)currentTime()) )
+        {
+        return TOO_EARLY_TOLOGIN;
+        }
+
+/*
+ * Find the user record, confirm authorisation and attach the record
+ * to this client.
+ */
+if(username[0] == '#')
+        {
+        return AUTH_FAILED;
+        }
+
+// TODO: Force a refresh of the user's info from the db
+*suser = getUserRecord(username);
+
+sqlUser* theUser = *suser;
+if( !theUser )
+        {
+        return AUTH_UNKNOWN_USER;
+        }
+
+if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
+        {
+        return AUTH_SUSPENDED_USER;
+        }
+StringTokenizer st (password);
+int pass_end = st.size();
+
+#ifdef TOTP_AUTH_ENABLED
+bool totp_enabled = false;
+if(totpAuthEnabled && theUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
+	if(st.size() == 1 ) {
+                return AUTH_NO_TOKEN;
+        }
+        pass_end = st.size()-1;
+        totp_enabled = true;
+}
+#endif
+
+/*
+ * Check password, if its wrong, bye bye.
+ */
+
+
+if (!isPasswordRight(theUser, st.assemble(0,pass_end)))
+        {
+        return AUTH_INVALID_PASS;
+        }
+#ifdef TOTP_AUTH_ENABLED
+if(totp_enabled) {
+        char* key;
+        size_t len;
+        int res  = oath_base32_decode(theUser->getTotpKey().c_str(),theUser->getTotpKey().size(),&key,&len);
+        if(res != OATH_OK) {
+                return AUTH_ERROR;
+        }
+        res=oath_totp_validate(key,len,time(NULL),30,0,1,st[st.size()-1].c_str());
+        free(key);
+        if(res < 0 ) {
+                return AUTH_INVALID_TOKEN;
+        }
+}
+#endif
+
+/*
+ * Check if this is a privileged user, if so check against IP restrictions
+ */
+if ((getAdminAccessLevel(theUser, true) > 0) && (!theUser->getFlag(sqlUser::F_ALUMNI)))
+{
+        /* ok, they have "*" access (excluding alumni's) */
+        if (!checkIPR(hostname,ip, theUser,ipr_ts))
+        {
+                return AUTH_FAILED_IPR;
+        }
+}
+
+/*
+ * Don't exceed MAXLOGINS.
+ */
+
+bool iploginallow = false;
+unsigned long clip = xIP(ip.c_str(),false).GetLongIP();
+if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins()) {
+        /* They have exceeded their maxlogins setting, but check if they
+           are allowed to login from the same IP - only applies if their
+           maxlogins is set to ONE */
+        uint32_t iplogins = getConfigVar("LOGINS_FROM_SAME_IP")->asInt();
+        uint32_t iploginident = getConfigVar("LOGINS_FROM_SAME_IP_AND_IDENT")->asInt();
+        if ((theUser->getMaxLogins() == 1) && (iplogins > 1))
+        {
+                /* ok, we're using the multi-logins feature (0=disabled) */
+                if (theUser->networkClientList.size() + 1 <= iplogins)
+                {
+                        /* Check their IP from previous session against
+                           current IP.  If it matches, allow the login.
+                           As this only applies if their maxlogin is 1, we
+                           know there is only 1 entry in their clientlist */
+                        if (clip == (theUser->networkClientList.front()->getIP()))
+                        {
+                                if (iploginident==1)
+                                {
+                                        /* need to check ident here */
+                                        string oldident = theUser->networkClientList.front()->getUserName();
+                                        if ((oldident[0]=='~') || (oldident==ident))
+                                        {
+                                                /* idents match (or they are unidented) - allow this login */
+                                                iploginallow = true;
+                                        }
+                                } else {
+                                        /* don't need to check ident, this login is allowed */
+                                        iploginallow = true;
+                                }
+                        }
+                }
+        }
+      if (!iploginallow)
+        {
+	return AUTH_ML_EXCEEDED;
+        }
+}
+return AUTH_SUCCEEDED;
+}
+
+int cservice::authenticateUser(const string& username, const string& password, iClient* theClient,sqlUser** theUser) {
+	unsigned int ipr_ts;
+	const string ip = xIP(theClient->getIP()).GetNumericIP();
+	const string hostname = theClient->getRealNickUserHost();
+	int res = authenticateUser(username,password,hostname,ip,theClient->getUserName(),ipr_ts,theUser);
+	if(res == AUTH_SUCCEEDED) {
+   	        setIPRts(theClient, ipr_ts);
+
+	}
+	return res;
+
+}
 
 bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string& Message)
 {
 //What's going to be in Message?
 //<ournick> LOGIN <ip> <username> <password>
+// AB XQ Az iauth:12/1.2.3.4/55836 :LOGIN2 1.2.3.4 some.host.name ~mrbean mrbean testtest
+
+elog << "doXQLogin: Routing: " << Routing << " Message: " << Message << "\n";
 StringTokenizer st( Message );
-if( st.size() < 5 )
+if( st.size() < 6 )
         {
 	return false;
         }
+
+sqlUser* theUser;
+unsigned int ipr_ts;
+int res = authenticateUser(st[4],st.assemble(5),st[2],st[1],st[3],ipr_ts,&theUser);
+Write("%s XR %s %s :%s %s", getCharYY().c_str(),theServer->getCharYY().c_str(),Routing.c_str(),res == AUTH_SUCCEEDED ? "OK" : "NO",st[4].c_str());
+elog << "Auth res is " << res << "\n";
+return true;
 
 /*
  *  Are we allowing logins yet?
@@ -4960,7 +5123,7 @@ if ( (useLoginDelay == 1) && (loginTime >= (unsigned int)currentTime()) )
 
 
 
-sqlUser* theUser = getUserRecord(st[3]);
+theUser = getUserRecord(st[3]);
 if( !theUser )
         {
 	elog 	<< "doXQLogin: "

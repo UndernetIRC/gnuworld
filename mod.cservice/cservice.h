@@ -104,7 +104,20 @@ public:
 	unsigned int connectCheckFreq;
 	unsigned int connectRetry;
 	unsigned int limitCheckPeriod;
-
+	enum {
+		AUTH_SUCCEEDED,
+		AUTH_FAILED,
+		TOO_EARLY_TOLOGIN,
+		AUTH_UNKNOWN_USER,
+		AUTH_SUSPENDED_USER,
+		AUTH_NO_TOKEN,
+		AUTH_INVALID_PASS,
+		AUTH_ERROR,
+		AUTH_INVALID_TOKEN,
+		AUTH_FAILED_IPR,
+		AUTH_ML_EXCEEDED
+		
+	};
 	void checkDbConnectionStatus();
 	string pendingPageURL;
 
@@ -199,6 +212,7 @@ public:
 	void setIPRts( iClient*, unsigned int );
 
 	/* Checks a user against IP restrictions */
+	bool checkIPR(const string& hostname, const string& ip, sqlUser*, unsigned int& );
 	bool checkIPR( iClient*, sqlUser* );
 
 	/* Get failed login counter for client */
@@ -255,6 +269,9 @@ public:
 	void setOutputTotal(const iClient* theClient, unsigned int count);
 	unsigned int getOutputTotal(const iClient* theClient);
 	bool hasOutputFlooded(iClient*);
+
+	int  authenticateUser(const string& username, const string& password, const string& hostname, const string&ip, const string& ident,unsigned int&,sqlUser**);
+	int  authenticateUser(const string& username, const string& password, iClient*,sqlUser**);
 
 	bool doXQLogin(iServer* , const string&, const string&);
 
