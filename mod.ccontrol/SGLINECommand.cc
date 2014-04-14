@@ -56,14 +56,14 @@ bool SGLINECommand::Exec( iClient* theClient, const string& Message )
 
 StringTokenizer st( Message ) ;
 
-if(st.size() < 3)
+if(st.size() < 4)
         {
         Usage( theClient ) ;
         return true ;
         }
 StringTokenizer::size_type pos = 1 ;
 bool RealName = (!strcasecmp(st[pos],"-rn"));
-if(RealName && (st.size() < 4))
+if(RealName && (st.size() < 5))
 	{
 	Usage(theClient);
 	return true;
@@ -112,7 +112,7 @@ else //RealName Gline
 		RealHost = st[pos];
 		}
 	//Do alittle sanity check
-	for(string::size_type p =2; p< st[pos].size();++p)
+	for(string::size_type p =2; p< RealHost.size();++p)
 		{
 		if(RealHost[p] != '$' && RealHost[p] != '*' && RealHost[p] != '?')
 			hostOk = true;
