@@ -249,7 +249,10 @@ public:
 	bool addExceptionalChannel(const std::string&);
 	
 	bool remExceptionalChannel(const std::string&);
-	 
+
+	virtual char*	Ago(long);
+	virtual char*	Duration(long);
+
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;

@@ -831,14 +831,17 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					<< joinPartIt->second.numOfJoins 
 					<< std::string("]<");
 					std::list<std::string> clients;
+					int nickCount = 0;
 					for(;numericsIt != joinPartIt->second.numerics.end();++numericsIt)
 						{
 						iClient* theClient = Network->findClient(*numericsIt);
 						if(theClient && !strcmp(xIP(theClient->getIP()).GetNumericIP().c_str()
 							,joinPartIt->first.c_str()))
 							{
-							tempNames 	<< theClient->getNickName() 
-								<< ",";
+							nickCount++;
+							if (nickCount > 1)
+								tempNames << ",";
+							tempNames 	<< theClient->getNickName();
 							if (isoktogline == true)
 								{
 								clients.push_back(theClient->getNickName() + "!" + theClient->getUserName() +"@"
@@ -1030,13 +1033,21 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		tempNames << *Itr2 << std::string("[") 
 		<< jcFC->count 
 		<< std::string("]<");
+		int Count = 0;
 		for (; Itr3 != jcFC->nicks.end(); Itr3++) {
-			tempNames << *Itr3 << ",";
+			Count++;
+			if (Count > 1)
+				tempNames << ",";
+			tempNames << *Itr3;
 		}
 		tempNames << ">(";
 		Itr3 = jcFC->chans.begin();
+		Count = 0;
 		for (; Itr3 != jcFC->chans.end(); Itr3++) {
-			tempNames << *Itr3 << ",";
+			Count++;
+			if (Count > 1)
+				tempNames << ",";
+			tempNames << *Itr3;
 		}
 		tempNames << ")";
 
@@ -1065,11 +1076,14 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		jcFloodClients* jcFC;
 		jcFCInterval = ::time(0);
 		clientsIPFloodMapType::iterator anItr = clientsIPFloodMap.begin();
-		for (; anItr != clientsIPFloodMap.end(); anItr++) {
+		while (anItr != clientsIPFloodMap.end()) {
 			jcFC = anItr->second;
 			if ((unsigned int) (::time(0) - jcFC->ctime) > jcJoinsPerIPTime) {
-				clientsIPFloodMap.erase(anItr);
+				anItr = clientsIPFloodMap.erase(anItr);
 				delete jcFC;
+			}
+			else {
+				anItr++;
 			}
 		}
 	}
@@ -1242,8 +1256,9 @@ if( droneChanItr != droneChannels.end() )
 	}
 
 /* Do join count processing if applicable */
+if ((::time(0) - lastBurstTime) < 60)
+	return;  /* Don't report join/floods right after a burst */
 const string& channelName = theChannel->getName();
-
 jcChanMapIterator jcChanIt = jcChanMap.find(channelName);
 jfChannel* channel;
 if( jcChanIt != jcChanMap.end() )
@@ -1272,7 +1287,7 @@ if(channel->getJoinFlooded())
 	if (joinCount >= jcCutoff) {
 		string IP = xIP(theClient->getIP()).GetNumericIP();
 		jcFloodClients* jcFC;
-		if ((::time(0) - lastBurstTime) > 25 && jcGlineEnable) {
+		if ((::time(0) - lastBurstTime) >= 60 && jcGlineEnable) {
 			clientsIPFloodMapType::const_iterator Itr = clientsIPFloodMap.find(IP);
 			if (Itr != clientsIPFloodMap.end()) {
 				jcFC = Itr->second;
@@ -1597,14 +1612,36 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 			chanParams << theChannel->getLimit();
 		}
 
-		log(WARN, "[%u] (%4u) %s +%s %s",
+		std::stringstream s;
+		char buf[512];
+
+		//s << "[" << failed << "] ("
+		//	<<
+		snprintf(buf, 511, "[%u] (%4u) %s +%s %s",
 			failed,
 			theChannel->size(),
 			theChannel->getName().c_str(),
 			chanStat.str().c_str(),
-			chanParams.str().c_str()
-			);
+			chanParams.str().c_str());
+		buf[511] = 0;
+		s << buf;
+		int spaces = 40 - s.str().size();
+		for (int i=0; i<spaces; i++) {
+			s << " ";
+		}
+		s << "  (" << Ago(theChannel->getCreationTime()) << ")";
+		log(WARN, s.str().c_str());
 
+		/*
+		log(WARN, "[%u] (%4u) %s +%s %s    (%s old)",
+			failed,
+			theChannel->size(),
+			theChannel->getName().c_str(),
+			chanStat.str().c_str(),
+			chanParams.str().c_str(),
+			Ago(theChannel->getCreationTime())
+			);
+		*/
 		/* Add this channel to the actives list */
 		activeChannel *newActive = new activeChannel(theChannel->getName(), ::time(0));
 		droneChannels[theChannel->getName()] = newActive;
@@ -2025,11 +2062,67 @@ for(;it != exceptionalChannels.end();++it)
 return true;
 }
 
+char* dronescan::Duration(long ts)
+{
+	/* express duration in human readable format */
+	long duration;
+	int days, hours, mins = 0;
+	char tmp[16];
+	static char ago[250];
+
+	ago[0] = '\0';
+
+	duration = ts;
+
+	days = (duration / 86400);
+	duration %= 86400;
+	hours = (duration / 3600);
+	duration %= 3600;
+	mins = (duration / 60);
+	duration %= 60;
+
+	if (days > 0)
+	{
+		sprintf(tmp, "%dd", days);
+		strcat(ago, tmp);
+	}
+	if (hours > 0)
+	{
+		sprintf(tmp, "%dh", hours);
+		strcat(ago, tmp);
+	}
+	if (mins > 0)
+	{
+		sprintf(tmp, "%dm", mins);
+		strcat(ago, tmp);
+	}
+	/* only show seconds if we have any (or no other units */
+	if ((duration > 0) || (strlen(ago) == 0))
+	{
+		sprintf(tmp,"%ds", (int) duration);
+		strcat(ago,tmp);
+	}
+
+	return ago;
+}
+
+char* dronescan::Ago(long ts)
+{
+        /* express a a timestamp in human readable format */
+        long duration;
+
+	duration = (time(NULL) - ts);
+
+        return (Duration(duration));
+}
+
+
 /** Return usage information for a client */
 void Command::Usage( const iClient *theClient )
 {
 bot->Reply(theClient, "SYNTAX: %s", getInfo().c_str());
 }
+
 
 } // namespace ds
 
