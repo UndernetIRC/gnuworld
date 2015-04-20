@@ -43,6 +43,8 @@ libircu msg_T T
 libircu msg_V V
 libircu msg_WA WA
 libircu msg_W W
+libircu msg_XQ XQ
+libircu msg_XR XR
 libircu msg_Y Y
 libircu msg_Y ERROR
 libircu msg_NOOP Z
