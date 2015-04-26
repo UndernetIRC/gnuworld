@@ -2169,7 +2169,7 @@ NewUser->setCustomData(this,
 										/* set the gline reason */
 										//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
 										sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)", AffectedUsers, (*ptr)->shellco->getName().c_str());
-										gDuration = maxGlineLen;
+										gDuration = CClonesGTime;
 
 										iClient* theClient = Network->findClient(this->getCharYYXXX());
 #ifndef LOGTOHD
