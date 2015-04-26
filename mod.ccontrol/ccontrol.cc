@@ -2083,118 +2083,131 @@ assert( floodData != 0 ) ;
 ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
 NewUser->setCustomData(this,
 	static_cast< void* >( UserData ) );
-if(dbConnected)
-	{
-	string tIP = xIP( NewUser->getIP()).GetNumericIP();
-			/* Shell stuff here */
-			for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
-				if (isCidrMatch((*ptr)->getCidr(),tIP)) {
-					if (shellnbMap.find(*ptr) == shellnbMap.end()) {
-						shellnbMap.insert(std::make_pair<ccShellnb*,int>(*ptr, 1));
-					}
-					else {
-						shellnbMap[*ptr]++;
-					}
-
-					if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
-						shellcoMap.insert(std::make_pair<ccShellco*,int>((*ptr)->shellco, 1));
-					}
-					else {
-						shellcoMap[(*ptr)->shellco]++;
-					}
-					if ((*ptr)->shellco->isActive()) {
-						isShellException = true;
-						if (shellcoMap[(*ptr)->shellco] > (*ptr)->shellco->getLimit()) {
-							for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
-								if ((*nptr)->shellco == (*ptr)->shellco) {
-
-									shellglinecounter++;
-									if ((shellglinecounter == 1) || (s.str().size() > 250)) {
-										if (s.str().size() > 250)
-											MsgChanLog("%s", s.str().c_str());
-										s.str("");
-										s << "Excessive connections (" << shellcoMap[(*ptr)->shellco] << ") from SHELL " << (*ptr)->shellco->getName().c_str() << " (will GLINE): *@";
-									}
-									else
-										s << ", *@";
-									s << (*nptr)->getCidr() << " (" << shellnbMap[*nptr] << ")";
-									sprintf(Log,"Glining SHELL *@%s (%s) for excessive connections (%d)",
-										(*nptr)->getCidr().c_str(), (*nptr)->shellco->getName().c_str(), shellnbMap[(*nptr)]);
-									sprintf(GlineMask,"*@%s", (*nptr)->getCidr().c_str());
-									//AffectedUsers = shellnbMap[(*nptr)];
-									AffectedUsers = shellcoMap[(*nptr)->shellco];
-									/* set the gline reason */
-									//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
-									sprintf(GlineReason,"AUTO [%d] (shell: %s) Automatically banned for excessive connections",AffectedUsers, (*nptr)->shellco->getName().c_str());
-									gDuration = maxGlineLen;
-
-				iClient* theClient = Network->findClient(this->getCharYYXXX());
-#ifndef LOGTOHD
-				DailyLog(theClient,"%s",Log);
-#else
-				ccLog* newLog = new (std::nothrow) ccLog();
-				newLog->Time = ::time(0);
-				newLog->Desc = Log;
-				newLog->Host = theClient->getRealNickUserHost().c_str();
-				newLog->User = "Me";			
-				newLog->CommandName = "AUTOGLINE";
-				DailyLog(newLog);
-#endif
-				glSet = true;
-				ccGline *tmpGline;
-				tmpGline = new ccGline(SQLDb);
-				tmpGline->setHost(GlineMask);
-				tmpGline->setExpires(::time(0) + gDuration);
-				tmpGline->setReason(GlineReason);
-				tmpGline->setAddedOn(::time(0));
-				tmpGline->setAddedBy(nickName);
-				tmpGline->setLastUpdated(::time(0));
-				tmpGline->Insert();
-				tmpGline->loadData(tmpGline->getHost());
-				addGline(tmpGline);
-				if(!getUplink()->isBursting())
-					addGlineToUplink(tmpGline);
-								}
-							}
-							MsgChanLog("%s", s.str().c_str());
-						}
-					}
-				}
-			}
-			/* End of shell stuff */
 
 	if(checkClones)
 		{
+		string tIP = xIP( NewUser->getIP()).GetNumericIP();
 		if(strcasecmp(tIP,"0.0.0.0"))			
 			{
-			
+			/* CIDR checks */
+			/* convert ip to longip */
+			i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
+			mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
+			/* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
+			for (i = 0; i < (32-CClonesCIDR); i++)
+			{
+				/* right shift */
+				mask_ip >>= 1;
+			}
+			for (i = 0; i < (32-CClonesCIDR); i++)
+			{
+				/* left shift */
+				mask_ip <<= 1;
+			}
+			/* convert longip back to ip */
+			mask_ip = htonl(mask_ip);
+			tmp_ip.s_addr = mask_ip;
+			clientip = inet_ntoa(tmp_ip);
+			strncpy(client_ip, clientip, 18);
+			client_ip[18] = '\0';
+			sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, NewUser->getUserName().c_str());
+			int CurIdentConnections = ++clientsIp24IdentMap[Log];
+			int CurCIDRConnections = ++clientsIp24Map[client_ip];
+			sprintf(Log,"*@%s/%d", client_ip, CClonesCIDR);
 
-                                /* CIDR checks */
-                                /* convert ip to longip */
-                                i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
-                                mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
-                                /* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
-                                for (i = 0; i < (32-CClonesCIDR); i++)
-                                {
-                                        /* right shift */
-                                        mask_ip >>= 1;
-                                }
-                                for (i = 0; i < (32-CClonesCIDR); i++)
-                                {
-                                        /* left shift */
-                                        mask_ip <<= 1;
-                                }
-                                /* convert longip back to ip */
-                                mask_ip = htonl(mask_ip);
-				tmp_ip.s_addr = mask_ip;
-                                clientip = inet_ntoa(tmp_ip);
-								strncpy(client_ip, clientip, 18);
-								client_ip[18] = '\0';
-				sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, NewUser->getUserName().c_str());
-				int CurIdentConnections = ++clientsIp24IdentMap[Log];
-                                int CurCIDRConnections = ++clientsIp24Map[client_ip];
-                                sprintf(Log,"*@%s/%d", client_ip, CClonesCIDR);
 
+			if(dbConnected)
+			{
+				/* Shell stuff here */
+				for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
+					if (isCidrMatch((*ptr)->getCidr(),tIP)) {
+						if (shellnbMap.find(*ptr) == shellnbMap.end()) {
+							shellnbMap.insert(std::make_pair<ccShellnb*,int>(*ptr, 1));
+						}
+						else {
+							shellnbMap[*ptr]++;
+						}
+
+						if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
+							shellcoMap.insert(std::make_pair<ccShellco*,int>((*ptr)->shellco, 1));
+						}
+						else {
+							shellcoMap[(*ptr)->shellco]++;
+						}
+						if ((*ptr)->shellco->isActive()) {
+							isShellException = true;
+							int shellCurConn = (*ptr)->getCidr2() > 24 ? shellcoMap[(*ptr)->shellco] : CurCIDRConnections;
+							if (shellCurConn > (*ptr)->shellco->getLimit()) {
+								for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
+									if ((*nptr)->shellco == (*ptr)->shellco) {
+										string netblockToBan;
+										int numUsers;
+										if ((*ptr)->getCidr2() <= 24) {  // If /24 or larger, do not gline other netblocks from the same shell
+											nptr = ptr;
+											netblockToBan = string(client_ip) + "/24";
+											numUsers = CurCIDRConnections;
+										}
+										else {
+											netblockToBan = (*nptr)->getCidr();
+											numUsers = shellnbMap[*nptr];
+										}
+										shellglinecounter++;
+										if ((shellglinecounter == 1) || (s.str().size() > 250)) {
+											if (s.str().size() > 250)
+												MsgChanLog("%s", s.str().c_str());
+											s.str("");
+											s << "Excessive connections (" << shellCurConn << ") from SHELL " << (*ptr)->shellco->getName().c_str() << " (will GLINE): *@";
+										}
+										else
+											s << ", *@";
+										s << netblockToBan << " (" << numUsers << ")";
+										sprintf(Log,"Glining SHELL *@%s (%s) for excessive connections (%d)",
+											netblockToBan.c_str(), (*nptr)->shellco->getName().c_str(), numUsers);
+										sprintf(GlineMask,"*@%s", netblockToBan.c_str());
+										//AffectedUsers = shellnbMap[(*nptr)];
+										AffectedUsers = shellCurConn;
+										/* set the gline reason */
+										//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
+										sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)",AffectedUsers, netblockToBan.c_str());
+										gDuration = maxGlineLen;
+
+										iClient* theClient = Network->findClient(this->getCharYYXXX());
+#ifndef LOGTOHD
+										DailyLog(theClient,"%s",Log);
+#else
+										ccLog* newLog = new (std::nothrow) ccLog();
+										newLog->Time = ::time(0);
+										newLog->Desc = Log;
+										newLog->Host = theClient->getRealNickUserHost().c_str();
+										newLog->User = "Me";			
+										newLog->CommandName = "AUTOGLINE";
+										DailyLog(newLog);
+#endif
+										glSet = true;
+										ccGline *tmpGline;
+										tmpGline = new ccGline(SQLDb);
+										tmpGline->setHost(GlineMask);
+										tmpGline->setExpires(::time(0) + gDuration);
+										tmpGline->setReason(GlineReason);
+										tmpGline->setAddedOn(::time(0));
+										tmpGline->setAddedBy(nickName);
+										tmpGline->setLastUpdated(::time(0));
+										tmpGline->Insert();
+										tmpGline->loadData(tmpGline->getHost());
+										addGline(tmpGline);
+										if(!getUplink()->isBursting())
+											addGlineToUplink(tmpGline);
+										
+										if ((*ptr)->getCidr2() <= 24) // If /24 or larger, do not gline other netblocks from the same shell
+											break;
+									}
+								}
+								MsgChanLog("%s", s.str().c_str());
+							}
+						}
+					}
+				}
+				/* End of shell stuff */
 
 				/* check idents to see if we have too many */
 				if ((CurIdentConnections > maxIClones) && (CurIdentConnections > getExceptions(NewUser->getUserName() + "@" + tIP)) &&
@@ -2347,7 +2360,7 @@ if(dbConnected)
   
                                 int CurConnections = ++clientsIpMap[tIP];
   
-				if ((!isShellException) && (CurConnections > maxClones) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+                                if ((!isShellException) && (CurConnections > maxClones) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
                                         (CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
                                 {
                                         sprintf(Log,"*@%s", NewUser->getRealInsecureHost().c_str());
@@ -4863,7 +4876,7 @@ bool ccontrol::isValidCidr( const string& cidrmask )
 std::list< string >* ccontrol::getOtherCidrs( const string& cidrmask )
 //stringListType* ccontrol::getOtherCidrs( const string& cidrmask )
 {
-	/* If we're here, it's because there's an exception on a netblock smaller than CClonesCIDR (a /24) and we want
+	/* If we're here, it's because there's an exception on a netblock narrower than CClonesCIDR (a /24) and we want
 	 * to get a list of all netblocks that would cover the non-exempted shell netblocks.
 	 * You will probably dislike how this function was written, I do too. It's not efficient at all,
 	 * but atleast it does the work.
@@ -4993,8 +5006,23 @@ Notice(theClient,"-= Shell Exceptions list - listing a total of %d shell compani
 for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++) {
 	int i = 0;
 	bool multiple_lines = false;
+	bool isLimitPer24 = false;
+
+	for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
+		if ((*nptr)->shellco == *ptr) {
+			if ((*nptr)->getCidr2() <= 24)
+				isLimitPer24 = true;
+		}
+	}
+
+
 	stringstream s;
-	s << (*ptr)->getName() << ":   Limit: " << (*ptr)->getLimit() << " (" << shellcoMap[*ptr] << " online)    Netblocks: ";
+	if (isLimitPer24)
+		s << (*ptr)->getName() << ":   Limit: " << (*ptr)->getLimit() << " per /24 (" << shellcoMap[*ptr] << " total online)    Netblocks: ";
+	else
+		s << (*ptr)->getName() << ":   Limit: " << (*ptr)->getLimit() << " (" << shellcoMap[*ptr] << " online)    Netblocks: ";
+
+
 	for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
 		if ((*nptr)->shellco == *ptr) {
 			i++;
@@ -5154,13 +5182,26 @@ if (CClonesCIDR != 24)
 	return false;
 	}
 
-if (atoi(st[1].c_str()) < 8)
-	{
-	Notice(theClient, "You can't add an exception for something bigger than a /8");
-	return false;
-	}
+//if (atoi(st[1].c_str()) < 8)
+//	{
+//	Notice(theClient, "You can't add an exception for something bigger than a /8");
+//	return false;
+//	}
+bool isSmallNb = (atoi(st[1].c_str()) > 24) ? true : false;
 for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) 
 	{
+	if ((*ptr)->getCompanyID() == Company)
+		{
+		bool isSmallNbToo = ((*ptr)->getCidr2() > 24) ? true : false;
+		if (isSmallNb != isSmallNbToo)
+			{
+			Notice(theClient, "Can't add netblock %s. In this case, there is at least one netblock listed (%s) which prevents you from adding this netblock", Cidr.c_str(), (*ptr)->getCidr().c_str());
+			Notice(theClient, "If all the netblocks listed are a /24 or wider, the company limit will be applied per /24 and only the offending /24 will be G-lined for excessive connections, not all netblocks associated to the company.");
+			Notice(theClient, "If every netlock is a /25 or narrower, the company limit will be applied on the total number of clients associated with the company (not a \"per netblock\" limit) and all netblocks from that company will be G-lined for excessive connections.");
+			Notice(theClient, "Examples: you can't have both a /24 and a /25 listed under one Company. But you can have a /16, a /22 and a /24 listed under one company and have a /25, a /27 and a /32 under another company without any problem");
+			return false;
+			}
+		}
 	if (isCidrMatch(Cidr,(*ptr)->getCidr()))
 		{
 			if ((*ptr)->getCompanyID() == Company)
