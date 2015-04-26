@@ -2168,7 +2168,7 @@ NewUser->setCustomData(this,
 										AffectedUsers = shellCurConn;
 										/* set the gline reason */
 										//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
-										sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)",AffectedUsers, netblockToBan.c_str());
+										sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)", AffectedUsers, (*ptr)->shellco->getName().c_str());
 										gDuration = maxGlineLen;
 
 										iClient* theClient = Network->findClient(this->getCharYYXXX());
