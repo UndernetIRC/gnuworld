@@ -140,13 +140,12 @@ while(pos < st.size())
 		}			
 	else if(!strcasecmp(st[pos],"-ah")) //Trying to add a new host ?
 		{
-		/*if((Same) && (AdFlag < operLevel::CODERLEVEL))
+		if((Same) && (AdFlag < operLevel::ADMINLEVEL))
 			{
 			bot->Notice(theClient,"You can't add yourself another host");
 			pos+=2;
 			continue;
 			}			
-		*/
 
 		if((pos + 1) >= st.size())
 			{
@@ -331,7 +330,7 @@ while(pos < st.size())
 			}
 		else
 			{
-			bot->Notice(theClient,"unknown option %s for -no must be on/off",st[pos+1].c_str());
+			bot->Notice(theClient,"unknown option %s. -autoop must be on/off",st[pos+1].c_str());
 			}
 		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
 		tmpUser->Update();
