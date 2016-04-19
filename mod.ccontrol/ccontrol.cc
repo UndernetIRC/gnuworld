@@ -1043,6 +1043,7 @@ MyUplink->RegisterEvent( EVT_GLINE , this );
 MyUplink->RegisterEvent( EVT_REMGLINE , this );
 MyUplink->RegisterEvent( EVT_NICK , this );
 MyUplink->RegisterEvent( EVT_OPER , this );
+MyUplink->RegisterEvent( EVT_ACCOUNT , this );
 
 MyUplink->RegisterEvent( EVT_NETBREAK, this );
 
@@ -1628,7 +1629,7 @@ switch( theEvent )
 		inBurst = false;
 		ccServer* curServer;
 		const iServer* curNetServer; 
-		for(serversConstIterator ptr = serversMap_begin();
+		for(serversconstiterator ptr = serversMap_begin();
 		        ptr != serversMap_end() && !inBurst; ++ptr)
 			{
 			curServer = ptr->second;
@@ -1648,7 +1649,7 @@ switch( theEvent )
 		ccServer* curServer;
 		//refreshOpersIPMap();
 		const iServer* curNetServer; 
-		for(serversConstIterator ptr = serversMap_begin();
+		for(serversconstiterator ptr = serversMap_begin();
 		        ptr != serversMap_end() && !inBurst; ++ptr)
 			{
 			curServer = ptr->second;
@@ -1743,6 +1744,14 @@ switch( theEvent )
 		{
 		iClient* theUser = static_cast< iClient* >( Data1);
 		isNowAnOper(theUser);
+		if (theUser->isModeR())
+			handleAC(theUser);
+		break;
+		}
+	case EVT_ACCOUNT:
+		{
+		iClient* theUser = static_cast< iClient* >( Data1);
+		handleAC(theUser);
 		break;
 		}
 	} // switch()
@@ -1812,7 +1821,7 @@ else if(timer_id == glineQueueCheck)
 else if (timer_id == timeCheck)
 	{
 	ccServer* TmpServer;
-	for (serversConstIterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
+	for (serversconstiterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
 		{
 		TmpServer = ptr->second;
 		if (TmpServer->getNetServer())
@@ -1855,7 +1864,7 @@ else if (timer_id == rpingCheck)
 
 	ccServer* TmpServer;
 	int counter = -1;
-	for (serversConstIterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
+	for (serversconstiterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
 		{
 		TmpServer = ptr->second;
 		/* don't bother reporting on juped servers - they dont exist */
@@ -2052,6 +2061,66 @@ Part( chanName ) ;
 return true ;
 }
 
+void ccontrol::handleAC( iClient* theClient)
+{
+ccUser *theUser = GetOperByAC(theClient->getAccount());
+if ((!theUser) || (theUser->getAccountTS() != theClient->getAccountTS()))
+	return;
+if (!theUser->getSso())
+	return;
+if (!theClient->isOper()) {
+	if (theUser->getSsooo())
+		return;
+	if ((!UserGotMask(theUser,theClient->getRealNickUserHost()))
+           &&(!UserGotMask( theUser,theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP(theClient->getIP()).GetNumericIP())))
+		return;
+}
+if (IsAuth(theClient))
+	return;
+OkAuthUser(theClient, theUser);
+return;
+}
+
+void ccontrol::OkAuthUser(iClient* theClient, ccUser* theUser)
+{
+//Ok the password match , prepare the ccUser data (or we're here because of Single Sign On)
+string Name = theUser->getUserName();
+iServer* targetServer = Network->findServer( theClient->getIntYY() ) ;
+if(theUser->getClient()) //there is already a user authenticated under that nick
+	{
+	const iClient *tClient = theUser->getClient();
+	Notice(tClient,"You have just been deauthenticated");
+	MsgChanLog("Login conflict for user %s from %s and %s (%s)\n",
+			Name.c_str(),theClient->getNickName().c_str(),
+			tClient->getNickName().c_str(), targetServer->getName().c_str());
+	deAuthUser(theUser);
+	}
+theUser->setUserName(Name);
+theUser->setNumeric(theClient->getCharYYXXX());
+//Try creating an authentication entry for the user
+if(AuthUser(theUser,theClient))
+	if(!(isSuspended(theUser)))
+		Notice(theClient, "Authentication successful as %s! ",theUser->getUserName().c_str()); 
+	else 
+		Notice(theClient, "Authentication successful as %s, "
+			"however you are currently suspended ",
+			theUser->getUserName().c_str()); 
+else if(theClient->isOper())
+        Notice(theClient, "Error in authentication as %s",theUser->getUserName().c_str()); 
+MsgChanLog("(%s) - %s: AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
+	theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
+/* record their connection timestamp + numeric */
+theUser->setLastAuthTS(::time(0));
+theUser->setLastAuthNumeric(theClient->getCharYYXXX());
+if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser))) {
+	std::string Numeric = getUplink()->getCharYY();
+	Write("%s M %s :+o", Numeric.c_str(), theClient->getCharYYXXX().c_str());
+	theClient->setModeO();
+	getUplink()->PostEvent(EVT_OPER, static_cast< void* >(theClient));
+}
+} 
+
+
 void ccontrol::handleNewClient( iClient* NewUser)
 {
 bool glSet = false;
@@ -2071,8 +2140,6 @@ stringListType *OthersList;
 
 GlineReason[0] = '\0';
 curUsers++;
-if (NewUser->isOper())
-	isNowAnOper(NewUser);
 if(!inBurst)
 	{
 	checkMaxUsers();
@@ -2083,6 +2150,11 @@ assert( floodData != 0 ) ;
 ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
 NewUser->setCustomData(this,
 	static_cast< void* >( UserData ) );
+if (NewUser->isOper())
+	isNowAnOper(NewUser);
+if (NewUser->isModeR()) {
+	handleAC(NewUser);
+}
 
 	if(checkClones)
 		{
@@ -2528,7 +2600,7 @@ else
 	{
 	return NULL;
 	}
-		}
+}
 
 int ccontrol::strToLevel(const string& level) {
 	int i=0;
@@ -2562,7 +2634,7 @@ return IsAuth(Network->findClient(Numeric));
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT INTO opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice,GetLag,LastPassChangeTS) VALUES ('";
+static const char *Main = "INSERT INTO opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -2594,6 +2666,11 @@ theQuery	<< Main
 		<< "," << (Oper->getNotice() ? "'t'" : "'n'")
 		<< "," << (Oper->getLag() ? "'t'" : "'n'")
 		<< ",now()::abstime::int4"
+		<< "," << (Oper->getSso() ? "'t'" : "'n'")
+		<< "," << (Oper->getSsooo() ? "'t'" : "'n'")
+		<< "," << (Oper->getAutoOp() ? "'t'" : "'n'")
+		<< ",'" << removeSqlChars(Oper->getAccount())
+		<< "'," << Oper->getAccountTS()
 		<< ")"
 		<< ends;
 
@@ -2602,6 +2679,8 @@ if( SQLDb->Exec( theQuery.str().c_str() ) )
 	if(!Oper->loadData(Oper->getUserName()))
 		return false;
 	usersMap[Oper->getUserName()] = Oper;
+	if (!Oper->getAccount().empty())
+		accountsMap[Oper->getAccount()] = Oper;
 	return true;
 	}
 
@@ -2611,8 +2690,18 @@ elog	<< "ccontrol::AddOper> SQL Failure: "
 return false;
 }
 
+bool ccontrol::accountsMapDel (const string& AC)
+{
+if (GetOperByAC(AC) != NULL) {
+	accountsMap.erase(AC);
+	return true;
+}
+return false;
+}
+
 bool ccontrol::DeleteOper (const string& Name)
 {
+string AC;
 if(!dbConnected)
 	{
 	return false;
@@ -2622,6 +2711,7 @@ ccUser* tUser = usersMap[Name];
 //Delete the user hosts
 if(tUser)
     {
+    AC = tUser->getAccount();
     static const char *tMain = "DELETE FROM hosts WHERE User_Id = ";    
     stringstream HostQ;
     HostQ << tMain;
@@ -2642,6 +2732,8 @@ if( !SQLDb->Exec( HostQ ) )
 	return false;
 	}
 	usersMap.erase(usersMap.find(Name));
+	if (!AC.empty())
+		accountsMap.erase(accountsMap.find(AC));
     }    
 
 static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
@@ -3122,6 +3214,14 @@ while(tIterator != usersMap.end())
 		}
 	++tIterator;
 	}
+return NULL;
+}
+
+ccUser* ccontrol::GetOperByAC(const string& AC)
+{
+accountsIterator tmpUser = accountsMap.find(AC);
+if (tmpUser != accountsMap.end())
+	return tmpUser->second;
 return NULL;
 }
 
@@ -4095,7 +4195,7 @@ bool ccontrol::refreshVersions()
 {
 ccServer* curServer;
 const iServer* curNetServer; 
-for(serversConstIterator ptr = serversMap_begin();
+for(serversconstiterator ptr = serversMap_begin();
     ptr != serversMap_end(); ++ptr)
 	{
 	curServer = ptr->second;
@@ -4355,7 +4455,15 @@ for(unsigned int i =0;i<SQLDb->Tuples();++i)
 		}
 	tempUser->setLag(!strcasecmp(SQLDb->GetValue(i,21),"t"));
 	tempUser->setPassChangeTS(atoi(SQLDb->GetValue(i,22).c_str()));
+	tempUser->setSso(!strcasecmp(SQLDb->GetValue(i,23),"t"));
+	tempUser->setSsooo(!strcasecmp(SQLDb->GetValue(i,24),"t"));
+	tempUser->setAutoOp(!strcasecmp(SQLDb->GetValue(i,25),"t"));
+	tempUser->setAccount(SQLDb->GetValue(i,26));
+	tempUser->setAccountTS(atoi(SQLDb->GetValue(i,27).c_str()));
 	usersMap[tempUser->getUserName()]=tempUser;
+	string AC = tempUser->getAccount();
+	if (!AC.empty())
+		accountsMap[AC]=tempUser;
 
 	}
 return true;
@@ -5781,7 +5889,7 @@ void ccontrol::listSuspended( iClient * )
 void ccontrol::listServers( iClient * theClient)
 {
 ccServer* tmpServer;
-for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
+for(serversconstiterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 	{
 	tmpServer = ptr->second;
 	if(tmpServer->getNetServer())

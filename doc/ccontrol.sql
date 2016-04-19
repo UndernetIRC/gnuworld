@@ -1,5 +1,8 @@
 -- "$Id: ccontrol.sql,v 1.34 2009/07/25 18:12:33 hidden1 Exp $"
 
+-- 2016-04-17 : Hidden
+-- Added Single Sign On + /oper anywhere support
+
 -- 2009-01-16 : Spike
 -- Merged ShellCompanies and ShellNetblocks tables in.
 
@@ -44,7 +47,12 @@ CREATE TABLE opers (
 	getLOGS BOOLEAN NOT NULL DEFAULT 'n',
 	GetLAG BOOLEAN NOT NULL DEFAULT 'n',
 	needOP BOOLEAN NOT NULL DEFAULT 'n',
+	autoop BOOLEAN NOT NULL DEFAULT 'n',
+	sso BOOLEAN NOT NULL DEFAULT 'n',
+	ssooo BOOLEAN NOT NULL DEFAULT 'n',
 	email VARCHAR(128),
+	account VARCHAR(128),
+	accountts INT4 NOT NULL DEFAULT '0',
 	last_updated_by VARCHAR (128),		-- nick!user@host
 	last_updated INT4 NOT NULL,
 	LastPassChangeTS INT4 NOT NULL DEFAULT '0',

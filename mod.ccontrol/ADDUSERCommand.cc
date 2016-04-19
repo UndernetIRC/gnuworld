@@ -66,7 +66,7 @@ if(st[1].size() > User::MaxName)
 ccUser* theUser = bot->GetOper(st[1]);
 if (theUser)  
 	{ 
-	bot->Notice(theClient,"Oper '%s' already exsits in my database, " 
+	bot->Notice(theClient,"Oper '%s' already exists in my database, " 
 		"please change the oper handle and try again.",
 		theUser->getUserName().c_str());
 	return false;
@@ -115,7 +115,7 @@ else if(!strcasecmp(st[2],"oper"))
 else
 	{
 	bot->Notice(theClient,
-		"Illegal oper type; types are: oper, admin, smt and coder");
+		"Illegal oper type; types are: uhs, oper, admin, smt and coder");
 	return false;
 	}	     	
 
@@ -192,6 +192,12 @@ theUser->setType(NewFlags);
 theUser->setLast_Updated_By(theClient->getRealNickUserHost());
 theUser->setNeedOp(true);
 theUser->setNotice(true); //default to notice
+theUser->setLogs(false);
+theUser->setLag(false);
+theUser->setSso(true);
+theUser->setSsooo(true);
+theUser->setAutoOp(false);
+
 
 if(bot->AddOper(theUser) == true)
 	{

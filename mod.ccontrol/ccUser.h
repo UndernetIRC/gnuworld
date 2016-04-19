@@ -96,6 +96,12 @@ public:
         inline const string&		getEmail() const
 		    { return Email ; }
 		    
+        inline const string&		getAccount() const
+		    { return Account ; }
+		    
+        inline const time_t&		getAccountTS() const
+		    { return AccountTS ; }
+		    
 	inline const bool&       	getIsSuspended() const
 		    { return IsSuspended ; }
 	
@@ -156,6 +162,15 @@ public:
 	inline const bool&		getLag() const
 		    { return GetLag;  }
 
+	inline const bool&		getSso() const
+		    { return Sso;  }
+
+	inline const bool&		getSsooo() const
+		    { return Ssooo;  }
+
+	inline const bool&		getAutoOp() const
+		    { return AutoOp;  }
+
 	inline const bool&		getNeedOp() const
 		    { return NeedOp;  }
 
@@ -187,6 +202,12 @@ public:
 	inline void 			setEmail(const string& _Email)
 		    { Email = _Email; }
 		    
+	inline void 			setAccount(const string& _Account)
+		    { Account = _Account; }
+		    
+	inline void			setAccountTS(const unsigned int _AccountTS)
+		    { AccountTS = _AccountTS; }
+
 	inline void 			setIsSuspended(const bool _suspeneded)
 		    { IsSuspended = _suspeneded; }
 		
@@ -235,6 +256,15 @@ public:
 
 	inline void			setLag( const bool _Lag )
 		    { GetLag = _Lag; }
+		
+	inline void			setSso( const bool _Sso )
+		    { Sso = _Sso; }
+		
+	inline void			setSsooo( const bool _Ssooo )
+		    { Ssooo = _Ssooo; }
+		
+	inline void			setAutoOp( const bool _autoOp )
+		    { AutoOp = _autoOp; }
 		
 	inline void			setNeedOp( const bool _needOp )
 		    { NeedOp = _needOp; }
@@ -294,6 +324,8 @@ protected:
 	string Numeric;
 	string Server;
 	string Email;
+	string Account;
+	time_t AccountTS;
 	bool   IsSuspended;
 	time_t SuspendExpires;
 	string SuspendedBy;
@@ -309,6 +341,9 @@ protected:
 	bool IsCoder;
 	bool GetLogs;
 	bool GetLag;
+	bool Sso;
+	bool Ssooo;
+	bool AutoOp;
 	bool NeedOp;
 	bool Notice;
 	iClient* Client;
