@@ -189,7 +189,7 @@ MODERATE		4	<#channel> - the channel to moderate
 MODUSER		1	****** MODUSER COMMAND ******
 MODUSER		2	Modify an existing bot user
 MODUSER		3	Syntax: /msg $BOT$ moduser <username> [-ah new host] [-dh host] [-s server] [-p password] [-gl on|off]
-MODUSER		4	  [-op on|off] [-ua] [-uf flags] [-e email] [-mt m|n]
+MODUSER		4	  [-op on|off] [-ua] [-uf flags] [-e email] [-mt m|n] [-glag on|off] [-x] [-sso on|off] [-ssooo on|off] [-autoop on|off]
 MODUSER		5	<username> - username to modify
 MODUSER		6	[-ah host] - adds a new host for the user
 MODUSER		7	[-dh host] - removes a host for a user
@@ -202,7 +202,7 @@ MODUSER		13	[-uf flags] - updates the oper flags to new one (OPER|ADMIN|SMT|CODE
 MODUSER		14	[-e email] - updates the user's email
 MODUSER		15	[-mt m|n] - change the way the bot communicates to the user (m=message,n=notice)
 MODUSER		16	[-glag on|off] - toggles whether the server lag reports will be messaged to the user
-MODUSER		17	[-x] - sets (or clears) X username (Account)
+MODUSER		17	[-x] - sets (or clears) username (Account)
 MODUSER		18	[-sso on|off] - toggles if Single Sign On is enabled
 MODUSER		19	[-ssooo on|off] - toggles if the client has to be opered for Single Sign On to work
 MODUSER		20	[-autoop on|off] - toggles if the client will be automatically opered (usermode +o) after authentication

@@ -542,40 +542,40 @@ while(pos < st.size())
 		pos+=2;
 		}
 		
-	else if(!strcasecmp(st[pos],"-x")) //Trying to set X username
+	else if(!strcasecmp(st[pos],"-x")) //Trying to set account
 		{
 		string cAC = theClient->getAccount();
 		string dbAC = tmpUser->getAccount();
 		if (!Same) {
-			bot->Notice(theClient,"You can only set an X username for yourself");
+			bot->Notice(theClient,"You can only set an account for yourself");
 			return false;
 		}
 		if (theClient->isModeR()) {
 			if (!strcasecmp(cAC,dbAC)) {
-				bot->Notice(theClient, "Your X username is already set to %s", cAC.c_str());
+				bot->Notice(theClient, "Your account is already set to %s", cAC.c_str());
 				return false;
 			}
 			ccUser *otherUser;
 			if ((otherUser = bot->GetOperByAC(theClient->getAccount()))) {
-				bot->Notice(theClient, "This X username already belongs to another user: %s", otherUser->getUserName().c_str());
+				bot->Notice(theClient, "This account already belongs to another user: %s", otherUser->getUserName().c_str());
 				return false;
 			}
 			tmpUser->setAccount(bot->removeSqlChars(theClient->getAccount()));
 			tmpUser->setAccountTS(theClient->getAccountTS());
-			bot->Notice(theClient,"Successfully set your X username to: %s.",theClient->getAccount().c_str());
+			bot->Notice(theClient,"Successfully set your account to: %s.",theClient->getAccount().c_str());
 		}
 		else {
 			if (!tmpUser->getAccount().empty())
 				bot->accountsMapDel(tmpUser->getAccount());
 			tmpUser->setAccount("");
 			tmpUser->setAccountTS(0);
-			bot->Notice(theClient,"Successfully removed your X username.");
+			bot->Notice(theClient,"Successfully removed your account.");
 		}
 
 		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
 		if(!tmpUser->Update())
 			{
-			bot->Notice(theClient,"Error while updating X username");
+			bot->Notice(theClient,"Error while updating account");
 			}
 		pos+=2;
 		}

@@ -2670,7 +2670,7 @@ theQuery	<< Main
 		<< "," << (Oper->getSsooo() ? "'t'" : "'n'")
 		<< "," << (Oper->getAutoOp() ? "'t'" : "'n'")
 		<< ",'" << removeSqlChars(Oper->getAccount())
-		<< "'," << Oper->getAccountTS()
+		<< "'," << "0"
 		<< ")"
 		<< ends;
 
@@ -2684,16 +2684,20 @@ if( SQLDb->Exec( theQuery.str().c_str() ) )
 	return true;
 	}
 
-elog	<< "ccontrol::AddOper> SQL Failure: "
-	<< SQLDb->ErrorMessage()
-	<< endl ;
+elog    << "ccontrol::AddOper> SQL Failure: "
+        << SQLDb->ErrorMessage()
+        << "Query was:  " << theQuery.str()
+        << endl ;
 return false;
 }
 
 bool ccontrol::accountsMapDel (const string& AC)
 {
-if (GetOperByAC(AC) != NULL) {
-	accountsMap.erase(AC);
+accountsMapType::iterator it = accountsMap.find(AC);
+//if (GetOperByAC(AC) != NULL) {
+if (it != accountsMap.end()) {
+	accountsMap.erase(it);
+	//accountsMap.erase(AC);
 	return true;
 }
 return false;
@@ -2732,8 +2736,9 @@ if( !SQLDb->Exec( HostQ ) )
 	return false;
 	}
 	usersMap.erase(usersMap.find(Name));
-	if (!AC.empty())
-		accountsMap.erase(accountsMap.find(AC));
+	if (!AC.empty()) {
+		accountsMapDel(AC);
+	}
     }    
 
 static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
