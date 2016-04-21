@@ -555,17 +555,18 @@ while(pos < st.size())
 				return false;
 			}
 			ccUser *otherUser;
-			if ((otherUser = bot->GetOperByAC(theClient->getAccount()))) {
+			if ((otherUser = bot->GetOperByAC(cAC))) {
 				bot->Notice(theClient, "This account already belongs to another user: %s", otherUser->getUserName().c_str());
 				return false;
 			}
-			tmpUser->setAccount(bot->removeSqlChars(theClient->getAccount()));
+			tmpUser->setAccount(bot->removeSqlChars(cAC));
 			tmpUser->setAccountTS(theClient->getAccountTS());
-			bot->Notice(theClient,"Successfully set your account to: %s.",theClient->getAccount().c_str());
+			bot->accountsMapAdd(tmpUser, cAC);
+			bot->Notice(theClient,"Successfully set your account to: %s.",cAC.c_str());
 		}
 		else {
-			if (!tmpUser->getAccount().empty())
-				bot->accountsMapDel(tmpUser->getAccount());
+			if (!dbAC.empty())
+				bot->accountsMapDel(dbAC);
 			tmpUser->setAccount("");
 			tmpUser->setAccountTS(0);
 			bot->Notice(theClient,"Successfully removed your account.");

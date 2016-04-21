@@ -2064,8 +2064,14 @@ return true ;
 void ccontrol::handleAC( iClient* theClient)
 {
 ccUser *theUser = GetOperByAC(theClient->getAccount());
-if ((!theUser) || (theUser->getAccountTS() != theClient->getAccountTS()))
+if (!theUser)
 	return;
+if (theUser->getAccountTS() != theClient->getAccountTS()) {
+	elog << "ccontrol::handleAC()> getAccount mismatch for " << theClient->getAccount()
+		<< ". theClient->getAccountTS() = " << theClient->getAccountTS() << " && theUser->getAccountTS() = "
+		<< theUser->getAccountTS() << endl;
+	return;
+}
 if (!theUser->getSso())
 	return;
 if (!theClient->isOper()) {
@@ -2689,6 +2695,11 @@ elog    << "ccontrol::AddOper> SQL Failure: "
         << "Query was:  " << theQuery.str()
         << endl ;
 return false;
+}
+
+bool ccontrol::accountsMapAdd (ccUser* theUser, const string& AC)
+{
+accountsMap[AC] = theUser;
 }
 
 bool ccontrol::accountsMapDel (const string& AC)
@@ -6934,6 +6945,10 @@ return success;
 
 void ccontrol::isNowAnOper (iClient* theUser)
 {
+	if (!theUser)
+		return;
+	iServer* tServer = Network->findServer( theUser->getIntYY() ) ;
+	elog << "ccontrol::isNowAnOper()>  " << theUser->getRealNickUserHost() << "  (" << tServer->getName() << ")  " << ::time(0) <<  endl;
 	string IP = xIP(theUser->getIP()).GetNumericIP();
 	opersIPMap[IP] = theUser->getRealNickUserHost();
 }

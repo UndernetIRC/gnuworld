@@ -547,6 +547,11 @@ public:
 	ccUser *GetOperByAC( const string& );
 
 	/**
+	 * This method will add an account to accountsMap
+	 */
+	bool accountsMapAdd (ccUser*, const string&);
+
+	/**
 	 * This method will remove an account from accountsMap
 	 */
 	bool accountsMapDel (const string&);
