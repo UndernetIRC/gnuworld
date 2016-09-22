@@ -1,0 +1,59 @@
+/*
+ * IPv4 to inet IPv4/IPv6 migartion documentation
+ * 2014.05.09 Seven (gergo_f@yahoo.com)
+ */
+There are a few tables only needed to convert to inet type.
+Those with string ip types can be converted directly, postgres understands the conversion.
+This is the case with the cservice whitelist table.
+We can run the script:
+
+gnuworld@irc:~/gnuworld/doc/inet-migration$ /usr/local/pgsql/bin/psql cservice < update_cservice-whitelist.2014.05.09.sql
+
+
+Not so simple with integer stored ip numbers. Like the pending_traffic table
+I wrote a simple convert tool, it is named ipconvert.cpp
+Compile it with command:
+
+g++ ipconvert.cpp -o ipconvert
+
+Now, we can import out the pending_traffic table, just that table, and in an "insertable" form
+Run the command:
+
+/usr/local/pgsql/bin/pg_dump --table=pending_traffic --data-only --column-inserts cservice > traffic-in.sql
+
+Check the resultng file, you'll understand why is useful.
+
+Now our tool converts it to an immediate useable form:
+
+./ipconvert traffic-in.sql traffic-out.sql
+
+Check the resulting file.
+
+Before insert back, we save out the ip_restrict table too, this is our next problem
+
+/usr/local/pgsql/bin/pg_dump --table=ip_restrict --data-only --column-inserts cservice > ip_restrict.sql
+
+Because the old ip_restrict table structure contains additional single ip value, ip ranged, and hosts
+the resulting file need to be edit suitable.
+
+Now it can be removed the two old table 'pending_traffic' and 'ip_restrict', and creat it back with the new structure:
+
+/usr/local/pgsql/bin/psql cservice < update_cservice-2014.05.09.sql
+
+Now insert back the 'new' tables:
+
+/usr/local/pgsql/bin/psql cservice < traffic-out.sql
+/usr/local/pgsql/bin/psql cservice < ip_restrict.sql
+
+Update the mod.ccontrol's help, with the new remsgline "-fr" forceremove option possibility
+
+/usr/local/pgsql/bin/psql ccontrol < update_ccontrol.help-2013.12.14.sql
+
+Update bans for the extended 365 days ban, and 0 for permanent ban, we apply:
+
+/usr/local/pgsql/bin/psql cservice < update_variables_20150518.sql
+/usr/local/pgsql/bin/psql cservice < update_languages_2015.05.23.sql
+
+Adding the new StarWars language:
+
+/usr/local/pgsql/bin/psql cservice < language_starwars.sql
