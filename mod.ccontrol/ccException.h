@@ -38,6 +38,9 @@ using std::string ;
 namespace uworld
 {
 
+typedef std::map<string, int> 		ip6clonesMapType;
+
+
 class ccException
 {
 public:	
@@ -256,6 +259,204 @@ protected:
 
 }; 
 
+class ccIp6isp
+{
+public:	
+	ccIp6isp(dbHandle* _SQLDb);
+	virtual ~ccIp6isp();
+	
+
+	inline bool		isActive() const
+		{ return (active == 1 ? true : false); }
+	inline bool		isForcecount() const
+		{ return (forcecount == 1 ? true : false); }
+	inline const string& 		getName() const
+		{ return Name; }
+		
+	inline const int&		getID() const
+		{ return id; }
+
+	inline const int&		getLimit() const
+		{ return maxlimit; }
+	
+	inline const string&		getEmail() const
+		{ return email; }
+	
+	inline const int&		getCloneCidr() const
+		{ return clonecidr; }
+	
+	inline const string&		getAddedBy() const
+		{ return AddedBy; }
+		
+	inline time_t			getAddedOn() const
+		{ return AddedOn; }
+
+	inline const string&		getModBy() const
+		{ return ModBy; }
+		
+	inline time_t			getModOn() const
+		{ return ModOn; }
+
+	inline const int& 		getCount() const
+			{ return count; }
+
+	inline void 		setName( const string& _Name ) 
+		{ Name = _Name; }
+		
+	inline void		setLimit( const int _maxlimit ) 
+		{  maxlimit = _maxlimit; }
+	
+	inline void		setID( const int _id ) 
+		{  id = _id; }
+
+	inline void		setAddedBy( const string& _AddedBy) 
+		{ AddedBy = _AddedBy; }
+		
+	inline void		setAddedOn( const time_t _AddedOn )
+		{ AddedOn = _AddedOn; }
+	
+	inline void		setModBy( const string& _ModBy) 
+		{ ModBy = _ModBy; }
+		
+	inline void		setModOn( const time_t _ModOn )
+		{ ModOn = _ModOn; }
+		
+	inline void		setEmail( const string& _email )
+		{ email = _email; }
+
+	inline void		setCloneCidr( const int _clonecidr ) 
+		{ clonecidr = _clonecidr; }
+	
+	inline void 	setActive( const int _active) 
+		{ active = _active; }
+
+	inline void 	setForcecount( const int _forcecount) 
+		{ forcecount = _forcecount; }
+
+	inline void 		incCount( const int _count ) 
+		{ count += _count; }
+			
+	inline void		setSqldb(dbHandle* _SQLDb)
+		{ SQLDb = _SQLDb; }
+	
+	int		loadData(const string& Name);
+	
+	int		updateData();
+				
+	bool		Insert();
+	
+	bool		Delete();
+	
+	static unsigned int numAllocated;
+
+protected:
+	
+	int		id;
+	int		forcecount;
+	string 		Name;
+	string 		email;
+	int		clonecidr;
+	int 		maxlimit;
+	int		count;
+	int		active;
+	string 		AddedBy;
+	time_t		AddedOn;
+	string 		ModBy;
+	time_t		ModOn;
+	dbHandle* SQLDb;
+
+}; 
+
+class ccIp6nb
+{
+public:	
+	ccIp6nb(dbHandle* _SQLDb);
+	virtual ~ccIp6nb();
+	
+	inline bool operator==( const string& ExceptionHost ) const
+		{ return (!strcasecmp( cidr, ExceptionHost )
+		    || !match(cidr.c_str(),ExceptionHost.c_str())) ; }
+
+	inline bool		isActive() const
+		{ return ip6isp->isActive(); }
+
+	inline bool		isForcecount() const
+		{ return ip6isp->isForcecount(); }
+
+	inline const string& 		getCidr() const
+			{ return cidr; }
+		
+	inline const string& 		getCidr1() const
+			{ return cidr1; }
+
+	inline const int& 		getCidr2() const
+			{ return cidr2; }
+
+	inline const int& 		getIp6ispID() const
+			{ return ip6ispid; }
+
+	inline const int& 		getCount() const
+			{ return count; }
+
+	inline const ccIp6isp*		getIp6isp() const
+			{ return ip6isp; }
+	
+	inline const int& 		getCloneCidr() const
+			{ return ip6isp->getCloneCidr(); }
+
+	inline const int& 		getLimit() const
+			{ return ip6isp->getLimit(); }
+
+	inline const string&		getAddedBy() const
+		{ return AddedBy; }
+		
+	inline time_t			getAddedOn() const
+		{ return AddedOn; }
+	
+	inline void 		setIp6isp( ccIp6isp* _ip6isp ) 
+		{ ip6isp = _ip6isp; }
+
+	inline void 		setIp6ispID( const int _ip6ispid ) 
+		{ ip6ispid = _ip6ispid; }
+			
+	inline void 		incCount( const int _count ) 
+		{ count += _count; }
+			
+	inline void		setAddedBy( const string& _AddedBy) 
+		{ AddedBy = _AddedBy; }
+		
+	inline void		setAddedOn( const time_t _AddedOn )
+		{ AddedOn = _AddedOn; }
+
+	void 		setCidr( const string& _cidr );
+
+	inline void		setSqldb(dbHandle* _SQLDb)
+		{ SQLDb = _SQLDb; }
+
+
+
+	bool		Insert();
+	
+	bool		Delete();
+
+	ip6clonesMapType 	ip6clonesMap;
+
+	ccIp6isp*	ip6isp;
+	
+	static unsigned int numAllocated;
+
+protected:
+
+	int		ip6ispid;
+	int		count;
+	string 		cidr;
+	string 		cidr1;
+	int		cidr2;
+	string 		AddedBy;
+	time_t		AddedOn;
+	dbHandle* SQLDb;
+
+}; 
 }
 }
 #endif // __CCEXCEPTION_H

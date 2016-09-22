@@ -652,6 +652,15 @@ RegisterCommand( new SHELLSCommand( this, "SHELLS",
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
+RegisterCommand( new IP6Command( this, "IP6",
+	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chname / chemail / forcecount / active / chccidr / clearall / userinfo)",
+	true,
+	commandLevel::flg_IP6,
+	false,
+	true,
+	false,
+	operLevel::OPERLEVEL,
+	true ) ) ;
 RegisterCommand( new ANNOUNCECommand( this, "ANNOUNCE",
 	"<message>",
 	false,
@@ -679,7 +688,7 @@ RegisterCommand( new REMOVEIGNORECommand( this, "REMIGNORE", "(nick/host)"
 	false,
 	operLevel::OPERLEVEL,
 	true ) ) ;
-RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/nomodechannels/exceptions/shells/channels)"
+RegisterCommand( new LISTCommand( this, "LIST", "(glines/servers/nomodechannels/exceptions/shells/ip6/channels)"
 	" Get all kinds of lists from the bot",
 	false,
 	commandLevel::flg_LIST,
@@ -1465,14 +1474,16 @@ switch( theEvent )
 					}
 				}
 				/* End of shell stuff */
+		else
+			ip6DropClient(tmpUser);
 		if ((checkClones) && (irc_in_addr_valid(&tmpUser->getIP()))) //avoid 0:: (0.0.0.0) ip addresses
 			{
             if (irc_in_addr_is_ipv4(&tmpUser->getIP()))
             {
             	is_ipv4 = true;
        			client_ip = IPCIDRMinIP(tIP,CClonesCIDR24 + 96);
-	        }
-	        else
+	    }
+	    else
 	        {
     			client_ip = IPCIDRMinIP(tIP,CClonesCIDR48);
 	        }
@@ -2442,6 +2453,35 @@ CClonesCIDR << " (will GLINE): *@";
                                 } // END OF SHELL RELATED PART !!!
 				// ***************** END OF SHELL RELATED PART !!! *******************
 
+			if (!irc_in_addr_is_ipv4(&NewUser->getIP())) {
+				ccIp6nb* nb;
+				ip6retPairListType retList;
+				bool ip6RetVal = isIp6ClientAllowed(NewUser, retList, true);
+				for (ip6retPairListType::iterator lItr = retList.begin(); lItr != retList.end(); lItr++) {
+					nb = lItr->first;
+					int ip6conncount = lItr->second;
+					ip6RetVal = ip6conncount > nb->getLimit() ? false : true;
+					string netblock = IPCIDRMinIP(client_ip, nb->getCloneCidr()) + "/" + std::to_string(nb->getCloneCidr());
+					if ((clientsIp24MapLastWarn[netblock] + CClonesTime) <= time(NULL)) {
+						MsgChanLog("Excessive connections (%d/%d) from subnet *@%s [ref: %s' %s] (will%s GLINE)\n",
+								ip6conncount, nb->getLimit(), netblock.c_str(), nb->ip6isp->getName().c_str(),
+								nb->getCidr().c_str(), !ip6RetVal && nb->isActive()  ? "" : " _NOT_");
+						clientsIp24MapLastWarn[netblock] = time(NULL);
+					}
+
+					/* check for auto-gline feature */
+					if ((!ip6RetVal && nb->isActive())/* && (shellglinecounter == 0)*/) {
+						sprintf(Log,"Glining *@%s for excessive connections (%d / %d)",
+								netblock.c_str(), ip6conncount, nb->getLimit());
+						sprintf(GlineMask,"*@%s", netblock.c_str());
+						AffectedUsers = ip6conncount;
+						/* set the gline reason */
+						sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
+						DoGline = true;
+						gDuration = CClonesGTime;
+					}
+				}
+			}
 			//START Replacement for shell related part
 			if ((SKIPTHIS) || (!irc_in_addr_is_ipv4(&NewUser->getIP())))
 			if (/*(!isShellException) && */(CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
@@ -2730,6 +2770,7 @@ return false;
 bool ccontrol::accountsMapAdd (ccUser* theUser, const string& AC)
 {
 accountsMap[AC] = theUser;
+return true;
 }
 
 bool ccontrol::accountsMapDel (const string& AC)
@@ -5076,6 +5117,47 @@ bool ccontrol::isCidrMatch( const string& cidrmask1, const string& cidrmask2 )
 	return false;
 }
 
+bool ccontrol::getValidCidr( const string& cidrmask, string& newmask )
+{
+	string mask;
+	int cidr;
+	StringTokenizer st(cidrmask, '/');
+	bool isv6 = true;
+
+	elog << "getValidCidr() called with cidrmask = " << cidrmask;
+	newmask = "invalid";
+	if (st.size() > 2)
+		return false;
+	if (st.size() < 2)
+		mask = cidrmask;
+	irc_in_addr longip = xIP(mask).GetLongIP();
+	if (irc_in_addr_is_ipv4(&longip))
+		isv6 = false;
+	//elog << "  and isv6 = ";
+	if (isv6)
+		elog << "true" << endl;
+	else
+		elog << "false" << endl;
+	if (st.size() < 2) {
+		if (isv6)
+			cidr = 128;
+		else
+			cidr = 32;
+	}
+	else {
+		mask = st[0];
+		cidr = atoi(st[1]);
+	}
+	if (isv6)
+		newmask = IPCIDRMinIP(mask, cidr);
+	else
+		newmask = IPCIDRMinIP(mask, cidr + 96);
+	newmask += "/" + std::to_string(cidr);
+	if (cidrmask != newmask)
+		return false;
+	return true;
+}
+
 
 bool ccontrol::isValidCidr( const string& cidrmask )
 {
@@ -5286,7 +5368,7 @@ for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++)
 				multiple_lines = true;
 				i = 0;
 				Notice(theClient, "%s", s.str().c_str());
-				s.str("");
+				s.str("        ");
 			}
 		}
 	}
@@ -5847,146 +5929,6 @@ if(TotalFound > 0)
 return true;
 
 }
-bool ccontrol::loadExceptions()
-{
-static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions";
-static const char Query2[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active FROM ShellCompanies";
-static const char Query3[] = "SELECT cidr,companyid,AddedBy,AddedOn FROM ShellNetblocks";
-
-if(!dbConnected)
-	{
-	return false;
-	}
-
-stringstream theQuery;
-theQuery	<< Query
-		<< ends;
-
-#ifdef LOG_SQL
-elog	<< "ccontrol::loadExceptions> "
-	<< theQuery.str().c_str()
-	<< endl; 
-#endif
-
-if( !SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::loadExceptions> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	
-	return false;
-	}
-
-ccException *tempException = NULL;
-
-for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
-	{
-	tempException =  new (std::nothrow) ccException(SQLDb);
-	assert( tempException != 0 ) ;
-
-	tempException->setHost(SQLDb->GetValue(i,0));
-	tempException->setConnections(atoi(SQLDb->GetValue(i,1).c_str()));
-	tempException->setAddedBy(SQLDb->GetValue(i,2)) ;
-	tempException->setAddedOn(static_cast< time_t >(
-		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
-	tempException->setReason(SQLDb->GetValue(i,4));
-	exceptionList.push_back(tempException);
-	}
-
-
-theQuery.str("");
-theQuery	<< Query2
-		<< ends;
-
-#ifdef LOG_SQL
-elog	<< "ccontrol::loadExceptions> "
-	<< theQuery.str().c_str()
-	<< endl; 
-#endif
-
-if( !SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::loadExceptions> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	
-	return false;
-	}
-
-ccShellco *tempShellco = NULL;
-
-for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
-	{
-
-	tempShellco =  new (std::nothrow) ccShellco(SQLDb);
-	assert( tempShellco != 0 ) ;
-
-	tempShellco->setName(SQLDb->GetValue(i,0));
-	tempShellco->setID(atoi(SQLDb->GetValue(i,1).c_str()));
-	tempShellco->setAddedBy(SQLDb->GetValue(i,2)) ;
-	tempShellco->setAddedOn(static_cast< time_t >(
-		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
-	tempShellco->setModBy(SQLDb->GetValue(i,4)) ;
-	tempShellco->setModOn(static_cast< time_t >(
-		atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
-	tempShellco->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
-	tempShellco->setActive(atoi(SQLDb->GetValue(i,7).c_str()));
-	shellcoList.push_back(tempShellco);
-	}
-
-
-theQuery.str("");
-theQuery	<< Query3
-		<< ends;
-
-#ifdef LOG_SQL
-elog	<< "ccontrol::loadExceptions> "
-	<< theQuery.str().c_str()
-	<< endl; 
-#endif
-
-if( !SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::loadExceptions> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	
-	return false;
-	}
-
-ccShellnb *tempShellnb = NULL;
-
-for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ ) {
-
-	tempShellnb =  new (std::nothrow) ccShellnb(SQLDb);
-	assert( tempShellnb != 0 ) ;
-
-	tempShellnb->setCidr(SQLDb->GetValue(i,0));
-	int companyID = atoi(SQLDb->GetValue(i,1).c_str());
-	tempShellnb->setCompanyID(companyID);
-	tempShellnb->shellco = getShellcobyID(companyID);
-	tempShellnb->setAddedBy(SQLDb->GetValue(i,2)) ;
-	tempShellnb->setAddedOn(static_cast< time_t >(
-		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
-	//tempShellnb->setModBy(SQLDb->GetValue(i,4)) ;
-	//tempShellnb->setModOn(static_cast< time_t >(
-	//	atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
-	//tempShellnb->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
-	tempShellnb->set24Mask();
-
-	if (getShellcobyID(companyID) == 0) { //This should not happen
-		MsgChanLog("Loading Shell netblock failed for %s. CompanyID %d not found.", tempShellnb->getCidr().c_str(), companyID);
-		delete tempShellnb;
-		continue;
-	}
-	shellnbList.push_back(tempShellnb);
-}
-
-return true;	
-} 
 
 void ccontrol::listGlines( iClient *theClient, string Mask )
 {
@@ -7176,6 +7118,892 @@ void ccontrol::announce(iClient* theClient, const string& text)
 	
 }
 
+bool ccontrol::reloadIp6isp( iClient *theClient, ccIp6isp* isp )
+{
+int count = 0;
+list<string> nbList;
+ccIp6nb* nb;
+bool ret = true;
+
+if (isp == 0)
+	return false;
+//elog << "IP6 Debug> ip6nbVector: " << endl;
+for (ip6nbIterator ptr = ip6nbVector.begin(); ptr != ip6nbVector.end(); ptr++) {
+	//elog << "IP6 Debug> " << ptr->first << " " << ptr->second->getCidr() << endl;
+	nb = ptr->second;
+	if (nb->ip6isp->getID() == isp->getID()) {
+		count++;
+		nbList.push_back(nb->getCidr());
+	}
+
 }
+
+for  (list<string>::iterator ptr = nbList.begin(); ptr != nbList.end(); ptr++) {
+	string ispname = isp->getName();
+	string cidr = *ptr;
+	if (delIp6nb(theClient, ispname, cidr, true) == false)
+		ret = false;
+}
+for  (list<string>::iterator ptr = nbList.begin(); ptr != nbList.end(); ptr++) {
+	if (insertIp6nb(theClient, *ptr, isp->getID(), true) == false)
+		ret = false;
+}
+Notice(theClient, "Reloaded %d netblock%s for %s", count, (count == 1 ? "" : "s"), isp->getName().c_str());
+return ret;
+}
+
+ccIp6isp* ccontrol::getIp6isp( const string& Name )
+{
+for (ip6ispIterator ptr = ip6ispVector.begin(); ptr != ip6ispVector.end(); ptr++)
+	if (!strcasecmp(Name.c_str(),(*ptr)->getName().c_str()))
+		return *ptr;
+return 0;
+}
+
+ccIp6isp* ccontrol::getIp6ispbyID( const int& id)
+{
+for (ip6ispIterator ptr = ip6ispVector.begin(); ptr != ip6ispVector.end(); ptr++)
+	if (id == (*ptr)->getID())
+		return *ptr;
+return 0;
+}
+
+ccIp6nb* ccontrol::getIp6nb( const string& Cidr, const string& Isp )
+{
+for (ip6nbIterator ptr = ip6nbVector.begin(); ptr != ip6nbVector.end(); ptr++)
+	if ((Cidr == ptr->second->getCidr()) && (!strcasecmp(ptr->second->ip6isp->getName().c_str(),Isp.c_str())))
+		return ptr->second;
+return 0;
+}
+
+bool ccontrol::listIp6Exceptions( iClient *theClient )
+{
+
+Notice(theClient,"-= ISP list - listing a total of %d ISPs =-",
+	ip6ispVector.size());
+
+for (ip6ispIterator ptr = ip6ispVector.begin(); ptr != ip6ispVector.end(); ptr++) {
+	ccIp6isp* isp = *ptr;
+	int i = 0;
+	bool multiple_lines = false;
+
+	stringstream s;
+	string str1("");
+	if (!isp->isActive())
+		str1 = " [NO G]";
+	if (isp->isForcecount())
+		str1 += " [fcount]";
+	s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "   Limit: " << isp->getLimit() << " per /" << isp->getCloneCidr() << "    Netblocks: ";
+
+
+	for (ip6nbIterator nptr = ip6nbVector.begin(); nptr != ip6nbVector.end(); nptr++) {
+		if (isp != nptr->second->ip6isp)
+			continue;
+		ccIp6nb *nb = nptr->second;
+		i++;
+		if (i > 1)
+			s << ",  ";
+		s << nb->getCidr() << " (" << nb->getCount() << ")";
+		if (s.str().size() > 200) {
+			multiple_lines = true;
+			i = 0;
+			Notice(theClient, "%s", s.str().c_str());
+			s.str("        ");
+		}
+	}
+	if ((i != 0) || (multiple_lines == false)) {
+		Notice(theClient, "%s", s.str().c_str());
+	}
+}
+
+Notice(theClient,"-= End of isp list =-");
+
+return true;
+}
+
+
+bool ccontrol::insertIp6isp( iClient *theClient , const string& Name , int Connections, int CloneCidr, const string& Email, int Active, int Forcecount )
+{
+
+if(!dbConnected)
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+
+if(getIp6isp(Name) != 0)
+	{
+	Notice(theClient,
+		"There is already an ISP called %s",
+		Name.c_str());		
+	return false;
+	}
+
+if ((CloneCidr < 30) || (CloneCidr > 128)) {
+	Notice(theClient, "Invalid CloneCidr range. Must be 30-128");
+	return false;
+}
+//Create a new ccIp6isp structure 
+ccIp6isp* tempIp6isp = new (std::nothrow) ccIp6isp(SQLDb);
+assert(tempIp6isp != NULL);
+
+tempIp6isp->setName(removeSqlChars(Name));
+tempIp6isp->setLimit(Connections);
+tempIp6isp->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempIp6isp->setAddedOn(::time(0));
+tempIp6isp->setModBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempIp6isp->setModOn(::time(0));
+tempIp6isp->setCloneCidr(CloneCidr);
+tempIp6isp->setEmail(removeSqlChars(Email));
+tempIp6isp->setForcecount(Forcecount);
+tempIp6isp->setActive(Active);
+//Update	the database, and the internal list
+if(!tempIp6isp->Insert())
+	{
+	delete tempIp6isp;
+	Notice(theClient, "SQL Insertion failed.");
+	return false;
+	}
+
+tempIp6isp->loadData(tempIp6isp->getName()); //The inserted id is needed in memory
+
+//ip6ispMap.insert(ip6ispMapType::value_type(tempIp6isp,0));
+//ip6ispVector.push_back(ip6ispVectorType::value_type(tempIp6isp, tempIp6isp->getCloneCidr()));
+ip6ispVector.push_back(tempIp6isp);
+return true;
+}
+
+bool ccontrol::ip6userInfo( iClient *theClient, iClient *target )
+{
+ccIp6nb* nb;
+int clonecidr;
+string ip = xIP(target->getIP()).GetNumericIP();
+
+if (!irc_in_addr_valid(&target->getIP())) { //avoid 0:: (0.0.0.0) ip addresses
+	Notice(theClient, "Come on. Are you really worried about %s's clone count?", target->getNickName().c_str());
+	return true;
+}
+
+if (irc_in_addr_is_ipv4(&target->getIP())) {
+	Notice( theClient, "This is an ipv4 user");
+	return false;
+}
+
+ip6numericIterator numItr;
+numItr = ip6numericMap.find(target->getCharYYXXX());
+if (numItr == ip6numericMap.end()) {
+	elog << "ccontrol::ip6userInfo> bug: why is this empty?" << endl;
+	return false;
+}
+ip6nbListType ip6nbList = numItr->second;
+
+Notice(theClient, "--- Listing ip6 infos for %s [%s] ---", target->getNickUserHost().c_str(), ip.c_str());
+for (ip6nbListType::iterator nptr = ip6nbList.begin(); nptr != ip6nbList.end(); nptr++) {
+	nb = *nptr;
+	if (match(nb->getCidr(), ip) != 0) {
+		elog << "ccontrol::ip6userInfo> This shouldn't have happened" << endl;
+	}
+	clonecidr = nb->getCloneCidr();
+
+	string m = IPCIDRMinIP(ip, clonecidr) + "/" + std::to_string(clonecidr);
+	ip6clonesMapIterator itr = nb->ip6clonesMap.find(m);
+	if (itr != nb->ip6clonesMap.end()) {
+		Notice(theClient, "%s: %d/%d connections for %s (ref: %s)", 
+			nb->ip6isp->getName().c_str(), itr->second, nb->getLimit(), m.c_str(), 
+			nb->getCidr().c_str());
+	}
+	else {
+		elog << "ccontrol::ip6userInfo> bug: Did we really get here?" << endl;
+	}
+}
+Notice(theClient, "--- End of ip6 infos ---");
+return true;
+}
+bool ccontrol::ip6DropClient( iClient *theClient )
+{
+ccIp6nb* nb;
+int clonecidr;
+string ip = xIP(theClient->getIP()).GetNumericIP();
+
+if (irc_in_addr_is_ipv4(&theClient->getIP()))  /* Ipv6 restriction */
+	return false;
+
+if (!irc_in_addr_valid(&theClient->getIP())) //avoid 0:: (0.0.0.0) ip addresses
+	return true;
+
+ip6numericIterator numItr;
+numItr = ip6numericMap.find(theClient->getCharYYXXX());
+if (numItr == ip6numericMap.end()) {
+	elog << "ccontrol::ip6DropClient> bug: why is this empty?" << endl;
+	return false;
+}
+ip6nbListType ip6nbList = numItr->second;
+
+for (ip6nbListType::iterator nptr = ip6nbList.begin(); nptr != ip6nbList.end(); nptr++) {
+	nb = *nptr;
+	if (match(nb->getCidr(), ip) != 0) {
+		elog << "ccontrol::ip6DropClient> This shouldn't have happened" << endl;
+	}
+	clonecidr = nb->getCloneCidr();
+
+	string m = IPCIDRMinIP(ip, clonecidr) + "/" + std::to_string(clonecidr);
+	ip6clonesMapIterator itr = nb->ip6clonesMap.find(m);
+	if (itr != nb->ip6clonesMap.end()) {
+		nb->incCount(-1);
+		nb->ip6isp->incCount(-1);
+		if (itr->second <= 1) {
+			nb->ip6clonesMap.erase(itr);
+		}
+		else
+			itr->second--;
+	}
+	else {
+		elog << "ccontrol::ip6DropClient> bug: Did we really get here?" << endl;
+		nb->incCount(-1);
+		nb->ip6isp->incCount(-1);
+	}
+}
+return true;
+}
+
+
+bool ccontrol::isIp6ClientAllowed( iClient *theClient, ip6retPairListType& retList, bool incCount)
+ /* returns false if no more clients are allowed, not counting the new one if incCount is true
+ */
+{
+ccIp6nb* nb;
+int numLeft = 1000000;
+int clonecidr;
+string ip = xIP(theClient->getIP()).GetNumericIP();
+ip6nbListType ip6nbList;
+int widestCidr = 129;
+int smallestCidr = 0;
+
+if (!irc_in_addr_valid(&theClient->getIP())) //avoid 0:: (0.0.0.0) ip addresses
+	return true;
+
+if (irc_in_addr_is_ipv4(&theClient->getIP()))  /* Ipv6 restriction */
+	return false;
+
+for (ip6nbIterator nptr = ip6nbVector.begin(); nptr != ip6nbVector.end(); nptr++) {
+	nb = nptr->second;
+	if (match(nb->getCidr(), ip) == 0) {
+		/* Only keep going if the cidr < the previous one matched, except for forcecount netblocks, which show first in the list
+		 * Note: ptr is of type ip6nbVectorType (pair<int, ccIp6nb*>) that is always sorted with netblocks 
+		 * that have forcecount at the top with nptr->first = 129, and all the others have nptr->first == ntpr->second->getCidr2()
+		 */
+		if ((nptr->first < 129) && (nb->getCidr2() < smallestCidr)) { /* cidr/129 means we have forcecount set */
+			break;
+		}
+		clonecidr = nb->getCloneCidr();
+
+		string m = IPCIDRMinIP(ip, clonecidr) + "/" + std::to_string(clonecidr);
+		elog << "IP6 DEBUG: " << nb->ip6isp->getName() << ":  mask = " << m << endl;
+		ip6clonesMapIterator itr = nb->ip6clonesMap.find(m);
+		if (itr != nb->ip6clonesMap.end()) {
+			int t = (nb->getLimit() - itr->second);
+			if ((t < numLeft) && (nb->isActive())) {
+				if (nb->getCidr2() < widestCidr) {
+					widestCidr = nb->getCidr2();
+				}
+				numLeft = t;
+			}
+
+			if (incCount) {
+				itr->second++;
+				nb->incCount(1);
+				nb->ip6isp->incCount(1);
+			}
+			if (t <= 0)
+				retList.push_back(std::make_pair(nb, itr->second));
+		}
+		else if (incCount) {
+			nb->incCount(1);
+			nb->ip6isp->incCount(1);
+			nb->ip6clonesMap.insert(ip6clonesMapType::value_type(m, 1));
+			//elog << "IP6 DEBUG: ip6clonesMap insert for " << nb->getCidr() << " (/" << nb->getCloneCidr() << "): "
+			//	<< m << endl; 
+		}
+		if (incCount) {
+			ip6nbList.push_back(nb);
+		}
+		if ((nb->getCidr2() > smallestCidr) && (nb->isActive()))
+			smallestCidr = nb->getCidr2();
+	}
+}
+if (incCount)
+	ip6numericMap[theClient->getCharYYXXX()] = ip6nbList;
+return (numLeft > 0 ? true : false);
+}
+
+bool ccontrol::insertIp6nb( iClient *theClient , const string& Cidr, int Isp, bool silent )
+{
+int count=0;
+int reassignedcount=0;
+StringTokenizer st(Cidr,'/');
+
+if (st.size() != 2) {
+	Notice(theClient, "Invalid cidr netblock provided");
+	return false;
+}
+
+if(!dbConnected)
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+
+std::size_t colpos = st[0].find(".");
+if (colpos != string::npos) {
+	Notice(theClient, "IP6 command does not support IPv4 addresses.");
+	return false;
+}
+
+ccIp6isp *ip6Isp = getIp6ispbyID(Isp);
+if (ip6Isp == 0) {
+	Notice(theClient, "ccontrol::insertIp6nb> ip6Isp pointer to 0. That would be a bug. Poke a coder");
+	return false;
+}
+int clonecidr = ip6Isp->getCloneCidr();
+
+if (atoi(st[1]) > clonecidr) {
+	Notice(theClient, "%s's clone limit is per /%d. You can't add a netblock smaller than that", ip6Isp->getName().c_str(), clonecidr);
+	return false;
+}
+
+string tCidr;
+
+if (!getValidCidr(Cidr, tCidr))
+	{
+		Notice(theClient, "Unwanted cidr format: %s  -  Suggestion: %s", Cidr.c_str(), tCidr.c_str());
+		return false;
+	}
+
+
+for (ip6ispIterator iptr = ip6ispVector.begin(); iptr != ip6ispVector.end(); iptr++) {
+	ccIp6nb* tnb;
+	ccIp6isp* tisp;
+	int tclonecidr;
+
+	tisp = *iptr;
+	tclonecidr = tisp->getCloneCidr();
+	for (ip6nbIterator nptr = ip6nbVector.begin(); nptr != ip6nbVector.end(); nptr++) {
+		tnb = nptr->second;
+		if (tnb->ip6isp != ip6Isp)
+			continue;
+		if (tnb->getCidr() == Cidr) {
+			if (tisp == ip6Isp) {
+				Notice(theClient, "Netblock %s is already added for ISP %s", Cidr.c_str(), tisp->getName().c_str());
+				return false;
+			}
+			if (clonecidr == tclonecidr) {
+				Notice(theClient, "ISP %s already has clone matching for /%d on netblock %s", tisp->getName().c_str(), tclonecidr, Cidr.c_str());
+				return false;
+			}
+		}
+		if (tisp == ip6Isp) {
+			if (cidrmatch(Cidr,tnb->getCidr()) == 0) {
+				Notice(theClient, "Can't add netblock %s: it's overlapping with %s for the same ISP", Cidr.c_str(), tnb->getCidr().c_str());
+				return false;
+			}
+		}
+
+	}
+}
+
+
+//Create a new ccIp6nb structure 
+ccIp6nb* tempIp6nb = new (std::nothrow) ccIp6nb(SQLDb);
+assert(tempIp6nb != NULL);
+
+tempIp6nb->setCidr(removeSqlChars(Cidr));
+tempIp6nb->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempIp6nb->setAddedOn(::time(0));
+//tempIp6nb->setModBy(removeSqlChars(theClient->getRealNickUserHost()));
+//tempIp6nb->setModOn(::time(0));
+tempIp6nb->setIp6ispID(Isp);
+//Update the database, and the internal list
+if(!tempIp6nb->Insert())
+	{
+	delete tempIp6nb;
+	Notice(theClient, "SQL Insertion failed.");
+	return false;
+	}
+
+
+tempIp6nb->ip6isp = getIp6ispbyID(Isp);
+//ip6nbVector.push_back(tempIp6nb);
+int cidr2 = (tempIp6nb->ip6isp->isForcecount() ? 129 : tempIp6nb->getCidr2());
+//ip6nbVector.push_back(ip6nbVectorType::value_type(tempIp6nb, cidr2));
+ip6nbVector.push_back(ip6nbVectorType::value_type(cidr2, tempIp6nb));
+
+sort(ip6nbVector.rbegin(), ip6nbVector.rend());
+
+for( xNetwork::const_clientIterator cItr = Network->clients_begin() ; cItr != Network->clients_end() ; ++cItr )	{
+	iClient* tmpClient = cItr->second;
+	if (irc_in_addr_is_ipv4(&tmpClient->getIP())) /* Ipv6 restriction */
+		continue;
+	const string tIP = xIP(tmpClient->getIP()).GetNumericIP();
+	if (match(tempIp6nb->getCidr(), tIP) == 0) {
+		ip6DropClient(tmpClient);
+		ip6retPairListType retList;
+		isIp6ClientAllowed(tmpClient, retList, true);
+		/* 
+		 * The following code design is broken, because it currently does not give the ability
+		 * to assign the connection to a new isp. Using the 3-line "drop client and
+		 * reconnect it" solution instead.
+		 */
+		continue;  /* don't execute below */
+		ip6numericIterator numItr = ip6numericMap.find(tmpClient->getCharYYXXX());
+		if (numItr == ip6numericMap.end())
+			continue;
+		int highCidr = 0;
+		bool eraseMe = false;
+		ccIp6nb *tnb;
+		ip6nbListType nbList = numItr->second;
+		for (ip6nbListType::iterator nbItr = nbList.begin() ; nbItr != nbList.end() ; nbItr++ ) {
+			tnb = *nbItr;
+			if ((tnb->getCidr2() > highCidr) && (tnb->isActive()))
+				highCidr = tnb->getCidr2();
+		}
+		for (ip6nbListType::iterator nbItr = nbList.begin() ; nbItr != nbList.end() ; ) {
+			tnb = *nbItr;
+			if ((tempIp6nb->getCidr2() > tnb->getCidr2()) && (!tnb->ip6isp->isForcecount())) {
+				eraseMe = true;
+				for (ip6clonesMapType::iterator clonesItr = tnb->ip6clonesMap.begin() ; 
+						clonesItr != tnb->ip6clonesMap.end() ;  ) {
+					if (cidrmatch(clonesItr->first, tempIp6nb->getCidr()) == 0) {
+						reassignedcount += clonesItr->second;
+						tnb->incCount(clonesItr->second * -1);
+						tnb->ip6isp->incCount(clonesItr->second * -1);
+						clonesItr = tnb->ip6clonesMap.erase(clonesItr);
+					}
+					else
+						clonesItr++;
+				}
+			}
+			if (eraseMe)
+				nbItr = nbList.erase(nbItr);
+			else
+				nbItr++;
+		}
+		if ((tempIp6nb->getCidr2() >= highCidr) || (tempIp6nb->isForcecount() == true)) {
+			count++;
+			tempIp6nb->incCount(1);
+			tempIp6nb->ip6isp->incCount(1);
+			numItr->second.push_back(tempIp6nb);
+			string m = IPCIDRMinIP(tIP, tempIp6nb->getCloneCidr()) + "/" + std::to_string(tempIp6nb->getCloneCidr());
+			ip6clonesMapIterator clonesItr = tempIp6nb->ip6clonesMap.find(m);
+			if (clonesItr != tempIp6nb->ip6clonesMap.end()) {
+				clonesItr->second++;
+			}
+			else
+				tempIp6nb->ip6clonesMap.insert(ip6clonesMapType::value_type(m, 1));
+		}
+	}
+}
+if (!silent) {
+	if (tempIp6nb->isForcecount())
+		Notice(theClient, "There are currently %c%d users%c online that match %s. %d users were reassigned from other netblocks", 2, tempIp6nb->getCount(), 2, Cidr.c_str(), reassignedcount);
+	else
+		Notice(theClient, "There are currently %c%d users%c online that have %s as the narrowest match. %d users were reassigned from other netblocks", 2, tempIp6nb->getCount(), 2, Cidr.c_str(), reassignedcount);
+}
+return true;
+}
+
+bool ccontrol::delIp6nb( iClient *theClient , const string& IspName, const string& Host, bool silent )
+{
+ccIp6nb* Ip6nb;
+ccIp6isp* Ip6isp;
+string tIspName;
+if(!dbConnected) 
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+Ip6isp = getIp6isp(IspName);
+if (Ip6isp == 0) {
+	Notice(theClient, "Can't find isp %s", IspName.c_str());
+	return false;
+}
+Ip6nb = getIp6nb(Host, IspName);
+if (Ip6nb == 0) {
+	Notice(theClient, "Can't find ip6 netblock for host %s associated to isp %s", Host.c_str(), IspName.c_str());
+	return false;
+}
+tIspName = Ip6isp->getName();
+
+list<iClient *> cList;
+for( xNetwork::const_clientIterator cItr = Network->clients_begin() ; cItr != Network->clients_end() ; ++cItr )	{
+	iClient* tmpClient = cItr->second;
+	const string tIP = xIP(tmpClient->getIP()).GetNumericIP();
+	if (match(Ip6nb->getCidr(), tIP) == 0) {
+		ip6numericIterator numItr = ip6numericMap.find(tmpClient->getCharYYXXX());
+		if (numItr == ip6numericMap.end())
+			continue;
+		ip6nbListType nbList = numItr->second;
+		for (ip6nbListType::iterator nbItr = nbList.begin() ; nbItr != nbList.end() ; ) {
+			ccIp6nb *tnb = *nbItr;
+			if (tnb == Ip6nb) {
+				cList.push_back(tmpClient);
+				break;
+			}
+			nbItr++;
+		}
+	}
+}
+
+for (list<iClient *>::iterator lItr = cList.begin(); lItr != cList.end(); lItr++) {
+	ip6DropClient(*lItr);
+}
+
+bool status = Ip6nb->Delete();
+ip6nbIterator Itr = ip6nbVector.begin();
+while (Itr != ip6nbVector.end()) {
+	if ((Itr->second == Ip6nb) && (Ip6nb->ip6isp == Itr->second->ip6isp)) {
+		Itr = ip6nbVector.erase(Itr);
+	}
+	else
+		Itr++;
+}
+
+if (!silent)
+	Notice(theClient, "There were %c%d users%c online associated with %s's %s", 2, cList.size(), 2, tIspName.c_str(), Ip6nb->getCidr().c_str());
+delete Ip6nb;
+for (list<iClient *>::iterator lItr = cList.begin(); lItr != cList.end(); lItr++) {
+	ip6retPairListType retList;
+	isIp6ClientAllowed(*lItr, retList, true);
+}
+
+return status;
+
+}
+
+bool ccontrol::ip6cidrChangeCheck(iClient* theClient, ccIp6isp *isp, int newcidr)
+{
+int highCidr = 0;
+if ((newcidr > 128) || (newcidr < 30)) {
+	Notice(theClient, "Invalid cidr range. Must be between 30-128");
+	return false;
+}
+for (ip6nbIterator nptr = ip6nbVector.begin(); nptr != ip6nbVector.end(); nptr++) {
+	ccIp6nb *nb = nptr->second;
+	if ((nb->ip6isp == isp) && (nb->getCidr2() > highCidr))
+		highCidr = nb->getCidr2();
+}
+if (highCidr > newcidr) {
+	Notice(theClient, "You have at least one netblock that matches connections for a /%d, you cannot set your limit per /%d"
+		". new CloneCidr must be >%d if you're not deleting netblocks", highCidr, newcidr, (highCidr - 1));
+	return false;
+}
+return true;
+}
+
+bool ccontrol::clearIsps( iClient *theClient )
+{
+bool ret = true;
+list<string> s;
+for (ip6ispIterator ptr = ip6ispVector.begin(); ptr != ip6ispVector.end(); ptr++) {
+	string Name = (*ptr)->getName();
+	s.push_back(Name);
+}
+for (list<string>::iterator ptr = s.begin(); ptr != s.end(); ptr++) {
+	Notice(theClient, "Deleting isp '%s'", ptr->c_str());
+	if (delIp6isp(theClient, *ptr) == false)
+		ret = false;
+}
+s.clear();
+return ret;
+}
+
+bool ccontrol::delIp6isp( iClient *theClient , const string &Name )
+{
+ccIp6isp* Ip6isp;
+if(!dbConnected) 
+	{
+	Notice(theClient, "error: DB not connected.");
+	return false;
+	}
+
+Ip6isp = getIp6isp(Name);
+if (Ip6isp == 0) {
+	Notice(theClient, "Can't find isp: %s", Name.c_str());
+	return false;
+}
+
+
+ip6nbIterator ptr = ip6nbVector.begin();
+while (ptr != ip6nbVector.end()) {
+	ip6nbIterator ptr2;
+	if (ptr->second->ip6isp == Ip6isp) {
+		ptr2 = ptr;
+		ptr2++;
+		if (!delIp6nb(theClient, ptr->second->ip6isp->getName(), ptr->second->getCidr(), false)) {
+			Notice(theClient,"Error while deleting netblock '%s'",ptr->second->getCidr().c_str());
+		}
+		ptr = ptr2;
+	}
+	else
+		ptr++;
+}
+ip6ispVectorType::iterator Itr = ip6ispVector.begin();
+while (Itr != ip6ispVector.end()) {
+	if (*Itr == Ip6isp) {
+		Itr = ip6ispVector.erase(Itr);
+	}
+	else
+		Itr++;
+}
+
+bool status = Ip6isp->Delete();
+//ip6ispVector.erase(Ip6isp);
+
+delete Ip6isp;
+
+return status;
+
+}
+
+bool ccontrol::loadExceptions()
+{
+static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions";
+static const char Query2[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active FROM ShellCompanies";
+static const char Query3[] = "SELECT cidr,companyid,AddedBy,AddedOn FROM ShellNetblocks";
+static const char Query4[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount FROM ip6ISPs";
+static const char Query5[] = "SELECT cidr,ispid,AddedBy,AddedOn FROM ip6Netblocks";
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
+stringstream theQuery;
+theQuery	<< Query
+		<< ends;
+
+#ifdef LOG_SQL
+elog	<< "ccontrol::loadExceptions> "
+	<< theQuery.str().c_str()
+	<< endl; 
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	
+	return false;
+	}
+
+ccException *tempException = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+	tempException =  new (std::nothrow) ccException(SQLDb);
+	assert( tempException != 0 ) ;
+
+	tempException->setHost(SQLDb->GetValue(i,0));
+	tempException->setConnections(atoi(SQLDb->GetValue(i,1).c_str()));
+	tempException->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempException->setAddedOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	tempException->setReason(SQLDb->GetValue(i,4));
+	exceptionList.push_back(tempException);
+	}
+
+
+theQuery.str("");
+theQuery	<< Query2
+		<< ends;
+
+#ifdef LOG_SQL
+elog	<< "ccontrol::loadExceptions> "
+	<< theQuery.str().c_str()
+	<< endl; 
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	
+	return false;
+	}
+
+ccShellco *tempShellco = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
+{
+
+	tempShellco =  new (std::nothrow) ccShellco(SQLDb);
+	assert( tempShellco != 0 ) ;
+
+	tempShellco->setName(SQLDb->GetValue(i,0));
+	tempShellco->setID(atoi(SQLDb->GetValue(i,1).c_str()));
+	tempShellco->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempShellco->setAddedOn(static_cast< time_t >(
+	atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	tempShellco->setModBy(SQLDb->GetValue(i,4)) ;
+	tempShellco->setModOn(static_cast< time_t >(
+	atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+	tempShellco->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
+	tempShellco->setActive(atoi(SQLDb->GetValue(i,7).c_str()));
+	shellcoList.push_back(tempShellco);
+}
+
+
+theQuery.str("");
+theQuery	<< Query3
+<< ends;
+
+#ifdef LOG_SQL
+elog	<< "ccontrol::loadExceptions> "
+<< theQuery.str().c_str()
+<< endl; 
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+	//if( PGRES_TUPLES_OK != status )
+	{
+		elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+
+		return false;
+	}
+
+ccShellnb *tempShellnb = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ ) {
+
+	tempShellnb =  new (std::nothrow) ccShellnb(SQLDb);
+	assert( tempShellnb != 0 ) ;
+
+	tempShellnb->setCidr(SQLDb->GetValue(i,0));
+	int companyID = atoi(SQLDb->GetValue(i,1).c_str());
+	tempShellnb->setCompanyID(companyID);
+	tempShellnb->shellco = getShellcobyID(companyID);
+	tempShellnb->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempShellnb->setAddedOn(static_cast< time_t >(
+	atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	//tempShellnb->setModBy(SQLDb->GetValue(i,4)) ;
+	//tempShellnb->setModOn(static_cast< time_t >(
+	//	atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+	//tempShellnb->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
+	tempShellnb->set24Mask();
+
+	if (getShellcobyID(companyID) == 0) { //This should not happen
+		MsgChanLog("Loading Shell netblock failed for %s. CompanyID %d not found.", tempShellnb->getCidr().c_str(), companyID);
+		delete tempShellnb;
+		continue;
+	}
+	shellnbList.push_back(tempShellnb);
+}
+
+theQuery.str("");
+theQuery	<< Query4
+		<< ends;
+
+#ifdef LOG_SQL
+elog	<< "ccontrol::loadExceptions> "
+	<< theQuery.str().c_str()
+	<< endl; 
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	
+	return false;
+	}
+
+ccIp6isp *tempIp6isp = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	{
+
+	tempIp6isp =  new (std::nothrow) ccIp6isp(SQLDb);
+	assert( tempIp6isp != 0 ) ;
+
+	tempIp6isp->setName(SQLDb->GetValue(i,0));
+	tempIp6isp->setID(atoi(SQLDb->GetValue(i,1).c_str()));
+	tempIp6isp->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempIp6isp->setAddedOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	tempIp6isp->setModBy(SQLDb->GetValue(i,4)) ;
+	tempIp6isp->setModOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+	tempIp6isp->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
+	tempIp6isp->setActive(atoi(SQLDb->GetValue(i,7).c_str()));
+	tempIp6isp->setEmail(SQLDb->GetValue(i,8)) ;
+	tempIp6isp->setCloneCidr(atoi(SQLDb->GetValue(i,9).c_str()));
+	tempIp6isp->setForcecount(atoi(SQLDb->GetValue(i,10).c_str()));
+	ip6ispVector.push_back(tempIp6isp);
+	}
+
+theQuery.str("");
+theQuery	<< Query5
+		<< ends;
+
+#ifdef LOG_SQL
+elog	<< "ccontrol::loadExceptions> "
+	<< theQuery.str().c_str()
+	<< endl; 
+#endif
+
+if( !SQLDb->Exec( theQuery, true ) )
+//if( PGRES_TUPLES_OK != status )
+	{
+	elog	<< "ccontrol::loadExceptions> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	
+	return false;
+	}
+
+ccIp6nb *tempIp6nb = NULL;
+
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ ) {
+
+	tempIp6nb =  new (std::nothrow) ccIp6nb(SQLDb);
+	assert( tempIp6nb != 0 ) ;
+
+	tempIp6nb->setCidr(SQLDb->GetValue(i,0));
+	int ispID = atoi(SQLDb->GetValue(i,1).c_str());
+	tempIp6nb->setIp6ispID(ispID);
+	tempIp6nb->ip6isp = getIp6ispbyID(ispID);
+	tempIp6nb->setAddedBy(SQLDb->GetValue(i,2)) ;
+	tempIp6nb->setAddedOn(static_cast< time_t >(
+		atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+	//tempIp6nb->setModBy(SQLDb->GetValue(i,4)) ;
+	//tempIp6nb->setModOn(static_cast< time_t >(
+	//	atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+	//tempIp6nb->setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
+	//tempIp6nb->set24Mask();
+
+	if (getIp6ispbyID(ispID) == 0) { //This should not happen
+		MsgChanLog("Loading IP6 netblock failed for %s. IspID %d not found.", tempIp6nb->getCidr().c_str(), ispID);
+		delete tempIp6nb;
+		continue;
+	}
+	//ip6nbVector.push_back(tempIp6nb);
+	int cidr2 = (tempIp6nb->ip6isp->isForcecount() ? 129 : tempIp6nb->getCidr2());
+	//ip6nbVector.push_back(ip6nbVectorType::value_type(tempIp6nb, cidr2));
+	ip6nbVector.push_back(ip6nbVectorType::value_type(cidr2, tempIp6nb));
+}
+sort(ip6nbVector.rbegin(), ip6nbVector.rend());
+
+return true;	
+} 
+
+
+} // namespace uworld
 
 } // namespace gnuworld

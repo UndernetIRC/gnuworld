@@ -226,6 +226,15 @@ else if(!strcasecmp(st[1].c_str(),"delcompany"))
 	}
 else if(!strcasecmp(st[1].c_str(),"clearall"))
 	{
+	if (st.size() < 3) {
+		bot->Notice(theClient, "Are you sure? Use CLEARALL -f");
+		return true;
+	}
+	if (strcasecmp(st[2].c_str(),"-f")) {
+		bot->Notice(theClient, "Are you sure? Use CLEARALL -f");
+		return true;
+	}
+
 	if(bot->clearShells(theClient))
 		{
 		bot->Notice(theClient,"Successfully deleted all shell companies");

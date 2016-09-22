@@ -134,4 +134,26 @@ alter TABLE opers add Ssooo BOOLEAN NOT NULL DEFAULT 't';
 alter TABLE opers add Account VARCHAR(128);
 alter TABLE opers add AccountTS INT4 NOT NULL DEFAULT '0';
 
+-- 2016/08/27 Tables for ipv6 connection management
+CREATE TABLE ip6ISPs (
+        id SERIAL,
+        name VARCHAR(200) UNIQUE NOT NULL,
+        email VARCHAR(200) NOT NULL,
+        clonecidr int4 NOT NULL DEFAULT 0,
+        maxlimit int4 NOT NULL DEFAULT 0,
+        forcecount int4 NOT NULL DEFAULT 0,
+        active int4 NOT NULL DEFAULT 1,
+        addedby VARCHAR(200) NOT NULL,
+        addedon int4 NOT NULL,
+        lastmodby VARCHAR(200) NOT NULL,
+        lastmodon int4 NOT NULL
+        );
+
+CREATE TABLE ip6Netblocks (
+        ispid int4 NOT NULL,
+        cidr VARCHAR(50) NOT NULL,
+        addedby VARCHAR(200) NOT NULL,
+        addedon int4 NOT NULL
+        );
+
 

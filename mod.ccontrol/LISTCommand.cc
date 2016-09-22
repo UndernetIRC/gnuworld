@@ -89,6 +89,10 @@ else if(!strcasecmp(st[1].c_str(),"shells"))
 	{
 	bot->listShellExceptions(theClient);
 	}
+else if(!strcasecmp(st[1].c_str(),"ip6"))
+	{
+	bot->listIp6Exceptions(theClient);
+	}
 else if(!strcasecmp(st[1].c_str(),"channels"))
 	{
 		/* new "list channels" command */

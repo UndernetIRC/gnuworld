@@ -215,6 +215,36 @@ protected:
 
 	shellnbMapType		shellnbMap;
 
+	typedef vector< ccIp6isp* >    ip6ispVectorType;
+	
+	ip6ispVectorType		ip6ispVector;
+
+	typedef vector< pair<int, ccIp6nb*> >    ip6nbVectorType;
+	
+	ip6nbVectorType		ip6nbVector;
+		
+	//typedef map<ccIp6isp*, int>	ip6ispMapType;
+
+	//ip6ispMapType		ip6ispMap;
+
+	//typedef map<ccIp6nb*, int>	ip6nbMapType;
+
+	//ip6nbMapType		ip6nbMap;
+
+	typedef map<string, int>	ip6clonesMapType;
+
+	//ip6clonesMapType		ip6clonesMap;
+
+	typedef list< ccIp6nb* >    ip6nbListType;
+
+	typedef map<string, ip6nbListType>	ip6numericMapType;
+
+	ip6numericMapType		ip6numericMap;
+
+	typedef pair<ccIp6nb*, int>	ip6retPairType;
+
+	typedef list<ip6retPairType>	ip6retPairListType;
+
 	typedef map<string,long> 	clientsIpMapType;
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
@@ -688,6 +718,8 @@ public:
 	ccShellnb* getShellnb( const string & );
 
 	bool isValidCidr( const string & );
+
+	bool getValidCidr( const string &, string &  );
 	
 	bool isCidrMatch( const string & , const string & );
 	
@@ -706,6 +738,34 @@ public:
 
 	bool clearShells( iClient * );
 	
+        ccIp6isp* getIp6isp( const string & );
+
+	ccIp6isp* getIp6ispbyID( const int & );
+
+	ccIp6nb* getIp6nb( const string &, const string & );
+        
+	bool listIp6Exceptions( iClient * );
+
+	bool isIp6ClientAllowed( iClient *, ip6retPairListType &, bool);
+
+	bool ip6DropClient( iClient * );
+
+	bool reloadIp6isp( iClient *, ccIp6isp* );
+
+	bool insertIp6isp( iClient * , const string& , int, int, const string &, int, int );
+
+	bool insertIp6nb( iClient * , const string & , int, bool );
+
+	bool delIp6nb( iClient * , const string &, const string&, bool );
+
+	bool delIp6isp( iClient * , const string & );
+
+	bool clearIsps( iClient * );
+
+	bool ip6cidrChangeCheck(iClient *, ccIp6isp *, int);
+
+	bool ip6userInfo( iClient *, iClient * );
+
 	ccFloodData *findLogin( const string & );
 
 	void removeLogin( ccFloodData * );
@@ -942,6 +1002,10 @@ public:
 	typedef exceptionListType::iterator exceptionIterator;
 	typedef shellcoListType::iterator shellcoIterator;
 	typedef shellnbListType::iterator shellnbIterator;
+	typedef ip6ispVectorType::iterator ip6ispIterator;
+	typedef ip6nbVectorType::iterator ip6nbIterator;
+	typedef ip6numericMapType::iterator ip6numericIterator;
+	typedef ip6clonesMapType::iterator ip6clonesMapIterator;
 	
 	exceptionIterator exception_begin() 
 		{ return exceptionList.begin(); }
@@ -951,7 +1015,7 @@ public:
 	
 	clientsIpMapType		clientsIpMap;
 
-	opersIPMapType				opersIPMap;
+	opersIPMapType			opersIPMap;
 	
 	clientsIpIterator clientsIp_begin()
 		{ return clientsIpMap.begin(); }
@@ -1053,6 +1117,13 @@ public:
 	gnuworld::xServer::timerID rpingCheck;
 
 	gnuworld::xServer::timerID timeCheck;
+
+	struct sort_pred {
+		bool operator()(const std::pair<string,int> &left, const std::pair<string,int> &right) {
+			return left.second < right.second;
+		}
+	};
+
 
 protected:
 
@@ -1196,7 +1267,8 @@ protected:
 	unsigned int 		glineBurstCount; 
 	
 	bool			saveGlines;
-	
+
+
 } ; 
 
 extern bool dbConnected;
