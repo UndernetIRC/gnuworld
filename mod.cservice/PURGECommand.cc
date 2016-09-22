@@ -234,7 +234,7 @@ if (reop)
 
 theChan->clearFlags();
 theChan->setMassDeopPro(3);
-theChan->setFloodPro(7);
+theChan->setFloodPro(0);
 theChan->setURL("");
 theChan->setDescription("");
 theChan->setComment("");

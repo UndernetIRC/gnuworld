@@ -64,7 +64,7 @@ const string& ChannelUser::getHostName() const
 return theClient->getInsecureHost() ;
 }
 
-const unsigned int& ChannelUser::getIP() const
+const irc_in_addr& ChannelUser::getIP() const
 {
 return theClient->getIP() ;
 }

@@ -25,7 +25,6 @@
 #include	<string>
 #include	<ctime>
 #include	"dbHandle.h"
-#include	"banMatcher.h"
  
 using std::string ;
 
@@ -70,9 +69,6 @@ public:
 	inline const time_t&		getLastUpdated() const
 		{ return last_updated ; }
 
-	inline banMatcher* getMatcher() const
-		{ return matcher; }
-		
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -81,8 +77,7 @@ public:
 		{ channel_id = _channel_id; } 
  	
 	inline void setBanMask( const string& _banmask )
-		{ banmask = _banmask; 
-		  initMatcher();} 
+		{ banmask = _banmask; }
 
 	inline void setSetBy( const string& _set_by )
 		{ set_by = _set_by; } 
@@ -106,8 +101,6 @@ public:
 
 	void setAllMembers(int);
 	
-	void initMatcher();
-		
 protected:
  
 	unsigned int	id ; 
@@ -121,7 +114,6 @@ protected:
 	time_t		last_updated ;
 	
 	dbHandle*	SQLDb;
-	banMatcher*	matcher;
 } ;
 
 } 

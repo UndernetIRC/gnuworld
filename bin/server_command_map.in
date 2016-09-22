@@ -4,6 +4,7 @@
 # example: libircu msg_AC AC
 # example: libircu msg_P P
 # example: libircu msg_NOOP Z
+# 2014.04.27 - Added msg_XQ command handler --Seven
 
 libircu msg_AC AC
 libircu msg_AD AD

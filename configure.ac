@@ -330,6 +330,8 @@ m4_include([ac_cxx_namespaces.m4])
 m4_include([ax_boost_thread.m4])
 CXXFLAGS="$CXXFLAGS $threadLib"
 AX_BOOST_THREAD
+m4_include([ax_cxx_compile_stdcxx_11.m4])
+AX_CXX_COMPILE_STDCXX_11
 
 echo
 echo "Detecting modules..."

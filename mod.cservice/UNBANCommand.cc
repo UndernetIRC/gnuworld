@@ -37,7 +37,7 @@
 #include	"levels.h"
 #include	"responses.h"
 #include	"match.h"
-#include	"cidr.h"
+#include	"banMatcher.h"
 
 const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.22 2009/06/25 19:05:23 mrbean_ Exp $" ;
 
@@ -134,11 +134,10 @@ if(level < level::unban)
 /*
  *  Are they trying to unban by nick or hostmask?
  */
-bool isNick = bot->validUserMask( st[2] ) ? false : true ;
+bool isNick = validUserMask(fixAddress(st[2])) ? false : true ;
 
 /* Try by nickname first, remove any bans that match this users host */
 string banTarget ;
-bool isCIDR = false;
 if( isNick )
 	{
 	iClient* aNick = Network->findNick(st[2]);
@@ -153,12 +152,11 @@ if( isNick )
 		return true;
 		}
 
-	banTarget = aNick->getNickUserHost();
+	banTarget = Channel::createBan(aNick);
 	}
 else
 	{
-	banTarget = st[2];
-	isCIDR = xCIDR(banTarget).GetValid();
+	banTarget = fixAddress(st[2]);
 	}
 
 /*
@@ -167,8 +165,8 @@ else
 std::map< int,sqlBan* >::iterator ptr = theChan->banList.begin();
 
 size_t banCount = 0;
-unsigned short comparison = 0;
-unsigned short exactmatch = 0;
+bool comparison = false;
+bool exactmatch = false;
 vector <sqlBan*> oldBans;
 
 while (ptr != theChan->banList.end())
@@ -180,23 +178,18 @@ while (ptr != theChan->banList.end())
 	 */
 
 	/* do a (case insensitive) literal match */
-	if (!strcasecmp(theBan->getBanMask(), banTarget))
-		exactmatch = 1;
+	exactmatch = !(strcasecmp(theBan->getBanMask(), banTarget));
 
 	if ( isNick )
 		{
-		comparison = match(theBan->getBanMask(), banTarget);
+		comparison = !(match(theBan->getBanMask(), banTarget));
 		}
-	else if(!isCIDR)
+	else
 		{
-		comparison = match(banTarget, theBan->getBanMask());
+		comparison = banMatch(banTarget, theBan->getBanMask());
 		}
 
-	else 
-		{
-		comparison = 1; //Its a cidr, No match
-		}
-	if ( comparison == 0 )
+	if ( comparison )
 		{
 		/* Matches! remove this ban - if we can. */
 		if (theBan->getLevel() > level)
@@ -211,7 +204,7 @@ while (ptr != theChan->banList.end())
 		else
 			{
 			/* if it's an exact match, we want to only remove that ban */
-			if (exactmatch == 1)
+			if (exactmatch)
 			{
 				oldBans.clear();
 				oldBans.push_back(theBan);
@@ -263,20 +256,20 @@ while (cPtr != theChannel->banList_end())
 	{
 	if ( isNick )
 		{
-		comparison = match((*cPtr), banTarget);
+		comparison = !(match((*cPtr), banTarget));
 		}
-	else if (!isCIDR)
+	else
 		{
-		comparison = match(banTarget, (*cPtr));
+		comparison = banMatch(banTarget, (*cPtr));
 		}
 
-	if (exactmatch == 1)
+	if (exactmatch)
 		{		
 		/* if we matched exactly above, we want to match exactly here too */
-		comparison = strcasecmp((*cPtr), banTarget);
+		comparison = !(strcasecmp((*cPtr), banTarget));
 		}
 
-	if ( comparison == 0)
+	if ( comparison )
 		{
 		// Can't call xClient::UnBan inside the loop it will
 		// modify without a return value.

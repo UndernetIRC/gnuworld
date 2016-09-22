@@ -389,7 +389,10 @@ public:
 	inline userIterator userList_end()
 		{ return userList.end() ; }
 
-	/**
+
+	inline size_type userList_size()
+		{ return userList.size() ; }
+/**
 	 * Retrieve a const iterator to the beginning of
 	 * this channel's user structure.
 	 */

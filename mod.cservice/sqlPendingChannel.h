@@ -42,16 +42,27 @@ public:
 	bool commit();
 	bool commitSupporter(unsigned int, unsigned int);
 	void loadTrafficCache();
+	void loadSupportersTraffic();
 
 	unsigned int channel_id;
 	unsigned int join_count;
 	unsigned int unique_join_count;
+	time_t checkStart;
 
 	typedef std::map < int, int > supporterListType;
 	supporterListType supporterList;
 
-	typedef std::map < unsigned int, sqlPendingTraffic* > trafficListType;
+	typedef std::map < string, sqlPendingTraffic* > trafficListType;
 	trafficListType trafficList;
+
+	//Is this channel first time inited?!
+	bool initialised;
+
+	/* With loadSupportersTraffic() we load the joincounts of every supporter for a given channel
+	 * in a trafficListType array.
+	 * The sqlPendingTraffic->ip_number we will use for supporter user_id
+	 */
+	trafficListType uniqueSupporterList;
 
 	dbHandle*	SQLDb;
 };

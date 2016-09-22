@@ -52,7 +52,7 @@ void ANALYSECommand::Exec( const iClient *theClient, const string& Message, cons
 
 	if(!theChannel) {
 		bot->Reply(theClient, "Unable to find channel: %s",
-			theChannel->getName().c_str()
+			st.assemble(1).c_str()
 			);
 		return ;
 	}

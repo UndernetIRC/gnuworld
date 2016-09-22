@@ -54,6 +54,7 @@ const sqlUser::flagType sqlUser::F_ALUMNI =		0x80 ;
 const sqlUser::flagType sqlUser::F_OPER =		0x100 ;
 const sqlUser::flagType sqlUser::F_NOADDUSER =		0x200 ;
 const sqlUser::flagType sqlUser::F_TOTP_ENABLED = 	0x400;
+const sqlUser::flagType sqlUser::F_TOTP_REQ_IPR =       0x800;
 
 const unsigned int sqlUser::EV_SUSPEND		= 1;
 const unsigned int sqlUser::EV_UNSUSPEND	= 2;
@@ -72,6 +73,7 @@ sqlUser::sqlUser(dbHandle* _SQLDb)
    last_used( 0 ),
    instantiated_ts( ::time(NULL) ),
    email(),
+   verifdata(),
    last_hostmask(),
    maxlogins(0),
    last_note(0),
@@ -197,9 +199,10 @@ last_updated_by = SQLDb->GetValue(row, 6);
 last_updated = atoi(SQLDb->GetValue(row, 7));
 email = SQLDb->GetValue(row, 8);
 maxlogins = atoi(SQLDb->GetValue(row, 9));
+verifdata = SQLDb->GetValue(row, 10);
 failed_logins = 0;
 failed_login_ts = 0;
-totp_key = SQLDb->GetValue(row, 10);
+totp_key = SQLDb->GetValue(row, 11);
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
 }

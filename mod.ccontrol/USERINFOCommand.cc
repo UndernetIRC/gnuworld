@@ -68,14 +68,17 @@ bool Suspended;
 char GetLogs[4];
 char GetLag[4];
 char NeedOp[4];
+char SSO[4];
+char SSOOO[4];
+char AutoOp[4];
 string SuspendedBy;
 string SuspendReason;
 time_t SuspendExpires;
 unsigned int Id;
 unsigned int SuspendLevel;
 string SLevel;
-ccontrol::usersConstIterator ptr;
-for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
+ccontrol::usersconstiterator ptr;
+for(ptr = bot->usersmap_begin();ptr != bot->usersmap_end();++ptr)
 	{
 	tempUser = ptr->second;
 	if(!(match(st[1],tempUser->getUserName())) || 
@@ -149,6 +152,33 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 			sprintf(GetLag,"NO");
 			}
 
+		if(tempUser->getSso())
+			{
+			sprintf(SSO,"YES");
+			}
+		else
+			{
+			sprintf(SSO,"NO");
+			}
+
+		if(tempUser->getSsooo())
+			{
+			sprintf(SSOOO,"YES");
+			}
+		else
+			{
+			sprintf(SSOOO,"NO");
+			}
+
+		if(tempUser->getAutoOp())
+			{
+			sprintf(AutoOp,"YES");
+			}
+		else
+			{
+			sprintf(AutoOp,"NO");
+			}
+
 		if(tempUser->getNeedOp())
 			{
 			sprintf(NeedOp,"YES");
@@ -182,9 +212,14 @@ for(ptr = bot->usersMap_begin();ptr != bot->usersMap_end();++ptr)
 			}
 		bot->Notice(theClient,"User Flags: GetLogs \002%s\002 NeedOp \002%s\002 GetLag \002%s\002",
 			GetLogs,NeedOp,GetLag);
+		bot->Notice(theClient,"Single Sign On: \002%s\002  (only if opered: \002%s\002)   AutoOp: \002%s\002",SSO,SSOOO,AutoOp);
+		std::string Account = tempUser->getAccount();
+		if (strcasecmp(Account,"") != 0)
+			bot->Notice(theClient,"account associated: %s", Account.c_str());
 		if ((st.size() > 2) && (!strcasecmp(st[2],"-cl")))
 		{
 			bot->Notice(theClient, "Password last changed: %s ago", (tempUser->getPassChangeTS() == 0) ? "N/A" : Ago(tempUser->getPassChangeTS()));
+
 			/* commands list requested */
 			bot->Notice(theClient,"Commands available to this user:");
 			string cmdList = "";

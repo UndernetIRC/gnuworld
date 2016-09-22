@@ -26,9 +26,12 @@
 
 #include	"match_table.h"
 #include	"ircd_chattr.h"
+#include	"Numeric.h"
+#include	"iClient.h"
 
 namespace gnuworld
 {
+using std::string;
 /*
  * Prototypes
  */
@@ -37,15 +40,25 @@ namespace gnuworld
  * XXX - match returns 0 if a match is found. Smelly interface
  * needs to be fixed. --Bleep
  */
-int match( const std::string&, const std::string& ) ;
-//int mmatch( const char *old_mask, const char *new_mask);
+int match( const string&, const string& ) ;
+int match(const string&, const iClient*);
 int match( const char *ma, const char *na);
+int smatch( const char *mask, const char *name );
+int casematch( const char *ma, const char *na);
+int casematch( const std::string& s1, const std::string& s2 );
+int mmatch( const char *old_mask, const char *new_mask);
+int ipmask_check(const struct irc_in_addr *addr, const struct irc_in_addr *mask, unsigned char bits);
+
 char *collapse(char *pattern);
 
 int matchcomp(char *cmask, int *minlen, int *charset, const char *mask);
 int matchexec(const char *string, const char *cmask, int minlen);
 int matchdecomp(char *mask, const char *cmask);
 int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen);
+//Given mask matches with every mask
+int matchall(const std::string&);
+int cidrmatch(const char *mask1, const char *mask2);
+int cidrmatch(const string&, const string&);
 
 } // namespace gnuworld
 

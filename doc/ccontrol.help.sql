@@ -66,16 +66,17 @@ CONFIG		4	<option> may be:
 CONFIG		5	-GTime <duration> - default gline time (accepts friendly times e.g. 900s, 30m, 3h, 1d)
 CONFIG		6	-VClones <amount> - threshold for warning about virtual (realname) clones
 CONFIG		7	-Clones <amount> - threshold for clones on a single IP
-CONFIG		8	-CClones <amount> - threshold for CIDR clones (see below)
-CONFIG		9	-CClonesCIDR <size> - CIDR bit length for clones (0-32)
-CONFIG		10	-CClonesGline <Yes|No> - auto-gline for CIDR clones flag
-CONFIG		11	-CClonesGTime <duration> - gline duration for CIDR clones (accepts friendly times)
-CONFIG		12	-IClones <amount> - threshold for CIDR ident clones
-CONFIG		13	-IClonesGline <Yes|No> - auto-gline for CIDR ident clones flag
-CONFIG		14	-CClonesTime <duration> - time between clone warnings to msglog (accepts friendly times)
-CONFIG		15	-GBCount <count> - number of glines to set at once
-CONFIG		16	-GBInterval <duration> - time between setting gline bursts (accepts friendly times)
-CONFIG		17	-SGline <Yes|No> - Save glines flag
+CONFIG		8	-CClones <amount> - threshold for CIDR clones (see below) for both IPv4 and IPv6!
+CONFIG		9	-CClonesCIDR24 <size> - CIDR bit length for IPv4 clones (16-32)
+CONFIG		10	-CClonesCIDR48 <size> - CIDR bit length for IPv6 clones (16-64)
+CONFIG		11	-CClonesGline <Yes|No> - auto-gline for CIDR clones flag
+CONFIG		12	-CClonesGTime <duration> - gline duration for CIDR clones (accepts friendly times)
+CONFIG		13	-IClones <amount> - threshold for CIDR ident clones
+CONFIG		14	-IClonesGline <Yes|No> - auto-gline for CIDR ident clones flag
+CONFIG		15	-CClonesTime <duration> - time between clone warnings to msglog (accepts friendly times)
+CONFIG		16	-GBCount <count> - number of glines to set at once
+CONFIG		17	-GBInterval <duration> - time between setting gline bursts (accepts friendly times)
+CONFIG		18	-SGline <Yes|No> - Save glines flag
 DEAUTH		1	****** DEAUTH COMMAND ******
 DEAUTH		2	Deauthenticates you from the bot
 DEAUTH		3	Syntax: /msg $BOT$ deauth
@@ -189,7 +190,7 @@ MODERATE		4	<#channel> - the channel to moderate
 MODUSER		1	****** MODUSER COMMAND ******
 MODUSER		2	Modify an existing bot user
 MODUSER		3	Syntax: /msg $BOT$ moduser <username> [-ah new host] [-dh host] [-s server] [-p password] [-gl on|off]
-MODUSER		4	  [-op on|off] [-ua] [-uf flags] [-e email] [-mt m|n]
+MODUSER		4	  [-op on|off] [-ua] [-uf flags] [-e email] [-mt m|n] [-glag on|off] [-x] [-sso on|off] [-ssooo on|off] [-autoop on|off]
 MODUSER		5	<username> - username to modify
 MODUSER		6	[-ah host] - adds a new host for the user
 MODUSER		7	[-dh host] - removes a host for a user
@@ -202,6 +203,10 @@ MODUSER		13	[-uf flags] - updates the oper flags to new one (OPER|ADMIN|SMT|CODE
 MODUSER		14	[-e email] - updates the user's email
 MODUSER		15	[-mt m|n] - change the way the bot communicates to the user (m=message,n=notice)
 MODUSER		16	[-glag on|off] - toggles whether the server lag reports will be messaged to the user
+MODUSER		17	[-x] - sets (or clears) username (Account)
+MODUSER		18	[-sso on|off] - toggles if Single Sign On is enabled
+MODUSER		19	[-ssooo on|off] - toggles if the client has to be opered for Single Sign On to work
+MODUSER		20	[-autoop on|off] - toggles if the client will be automatically opered (usermode +o) after authentication
 NEWPASS		1	****** NEWPASS COMMAND ******
 NEWPASS		2	Changes your password for the bot
 NEWPASS		3	Syntax: /msg $BOT$ newpass <newpass>
@@ -243,8 +248,9 @@ REMSERVER		3	Syntax: /msg $BOT$ remserver <server name>
 REMSERVER		4	NOTE: use with caution!
 REMSGLINE		1	****** REMSGLINE COMMAND ******
 REMSGLINE		2	Removes an SGLINE from the network
-REMSGLINE		3	Syntax: /msg $BOT$ remsgline <user@host>
-REMSGLINE		4	<user@host> - the user@host to remove from the sgline list
+REMSGLINE		3	Syntax: /msg $BOT$ remsgline [-fr] <user@host>
+REMSGLINE		4	-fr - Removes all the matching and the specified gline, otherwise just the specified gline.
+REMSGLINE		5	<user@host> - the user@host to remove from the sgline list
 REMUSER		1	****** REMOVEOPER COMMAND ******
 REMUSER		2	Removes an oper from the bot's access list
 REMUSER		3	Syntax: /msg $BOT$ remuser <username>

@@ -103,6 +103,37 @@
  * Define this if you want TOTP authentication, note you must have liboath
  * installed, and configure --with-liboath for totp to work
  */
-#undef TOTP_AUTH_ENABLED
+#define TOTP_AUTH_ENABLED
+
+/**
+ * Define this if you want channel registration process to be handled internally within gnuworld
+ * otherwise you can use external script
+ */
+#define USE_INTERNAL_THE_JUDGE
+
+/**
+ * Enable NOVOICE channel flag and function?
+ * Prevents anyone voiced on a channel having this flag enabled
+ */
+#undef USE_NOVOICE
+
+/**
+ * Define this if you want to enable NOTAKE channel flag for your network,
+ * it will report and prevent any 'take over' attempt: banning through X the *!*@* mask
+ */
+#define USE_NOTAKE
+
+/**
+ * Enable ANTIFLOOD channel flag and function?
+ * Protection against mass channel messages, channel notices, channel CTCP's
+ */
+#define USE_FLOODPRO
+
+/*
+ * Enable this Under CARREFULL CONSIDERATION, recommended for smaller networks, where admins can
+ * take care of possible abuse of the function
+ */
+#undef GLINE_ON_ANTIFLOOD
+
 
 #endif // __CSERVICE_CONFIG_H

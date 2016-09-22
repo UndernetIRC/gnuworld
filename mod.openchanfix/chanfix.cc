@@ -765,7 +765,7 @@ if (Command == "DCC") {
 } else if (Command == "PING" || Command == "ECHO") {
   DoCTCP(theClient, CTCP, Message);
 } else if (Command == "VERSION") {
-  DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.1 [compiled "__DATE__" "__TIME__"]");
+  DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.1 [compiled " __DATE__ " " __TIME__ "]");
 } else if (Command == "WHODUNIT?") {
   DoCTCP(theClient, CTCP, "reed, ULtimaTe_, Compy, SiRVulcaN, Hidden");
 } else if (Command == "SUBVERSION") {
@@ -2165,7 +2165,7 @@ chanStatus      << "* Channel Status for "
 		<< netChan->getName() << ": "
 		<< netChan->banList_size()
                 << " bans -- Restrictive Modes: +"
-		<< chanModes
+		<< chanModes.str().c_str()
                 ;
 
 SendTo(theClient, chanStatus.str().c_str());

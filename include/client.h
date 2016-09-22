@@ -552,6 +552,12 @@ public:
 				const std::string& ) ;
 
 	/**
+	 * Kick all users from a channel that matches the specified IP, join/part if necessary.
+	 */
+	virtual bool	Kick( Channel*, const string&,
+				const std::string& ) ;
+
+	/**
 	 * Set the topic in a channel, joining, opping, and parting
 	 * the client if necessary.
 	 */
@@ -730,6 +736,18 @@ public:
 	 * This Notice() signature will send a channel NOTICE.
 	 */
 	virtual bool Notice( const Channel* theChan,
+		const char* Message, ... ) ;
+
+	/**
+	 * Notice channel operators with given message.
+	 */
+	virtual bool NoticeChannelOps( const Channel* theChan,
+		const char* Message, ... ) ;
+
+	/**
+	 * Notice channel operators with given message.
+	 */
+	virtual bool NoticeChannelOps( const string& chanName,
 		const char* Message, ... ) ;
 
 	/**

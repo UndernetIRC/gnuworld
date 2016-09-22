@@ -61,7 +61,7 @@
  * TOPIC_TRACK
  * Set if you want gnuworld to track topics in the network channels
  */
-#undef TOPIC_TRACK
+#define TOPIC_TRACK
 
 /**
  * DAEMON

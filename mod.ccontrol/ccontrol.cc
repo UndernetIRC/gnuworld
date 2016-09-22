@@ -23,9 +23,9 @@
  * $Id: ccontrol.cc,v 1.243 2010/09/12 20:28:24 hidden1 Exp $
 */
 
-#define MAJORVER "1"
-#define MINORVER "2pl7"
-#define RELDATE "05th April, 2012"
+#define MAJORVER "2"
+#define MINORVER "B1"
+#define RELDATE "11th December, 2013"
 
 #include        <sys/types.h> 
 #include        <sys/socket.h>
@@ -765,7 +765,7 @@ RegisterCommand( new MAXUSERSCommand( this, "MAXUSERS",
 
 RegisterCommand( new CONFIGCommand( this, "CONFIG",
 	" -GTime <duration in secs> / -VClones <amount> -Clones <amount>"
-	" -CClones <amount> -CClonesCIDR <size> -CClonesGline <Yes/No>"
+	" -CClones <amount> -CClonesCIDR24|CClonesCIDR48 <size> -CClonesGline <Yes/No>"
 	" -CClonesGTime <duration>"
 	" -IClones <amount> -IClonesGline <Yes/No>"
 	" -CClonesTime <seconds> / -GBCount <count> / -GBInterval <interval in secs> "
@@ -1043,6 +1043,7 @@ MyUplink->RegisterEvent( EVT_GLINE , this );
 MyUplink->RegisterEvent( EVT_REMGLINE , this );
 MyUplink->RegisterEvent( EVT_NICK , this );
 MyUplink->RegisterEvent( EVT_OPER , this );
+MyUplink->RegisterEvent( EVT_ACCOUNT , this );
 
 MyUplink->RegisterEvent( EVT_NETBREAK, this );
 
@@ -1424,12 +1425,10 @@ else
 void ccontrol::OnEvent( const eventType& theEvent,
 	void* Data1, void* Data2, void* Data3, void* Data4 )
 {
-int i=0;
-int client_addr[4] = { 0 };
-struct in_addr tmp_ip;
-unsigned long mask_ip;
-char *client_ip;
+string client_ip = "";
 char Log[200];
+bool is_ipv4 = false;
+
 switch( theEvent )
 	{
 	case EVT_QUIT:
@@ -1445,19 +1444,20 @@ switch( theEvent )
 			static_cast< iClient* >( Data1 ) :
 			static_cast< iClient* >( Data2 ) ;
 		--curUsers;
-		string tIP = xIP( tmpUser->getIP()).GetNumericIP();
+		string tIP = xIP( tmpUser->getIP()).GetNumericIP(true);
 				/* Shell stuff here */
+		if (irc_in_addr_is_ipv4(&tmpUser->getIP()))
 				for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
 					if (isCidrMatch((*ptr)->getCidr(),tIP)) {
 						if (shellnbMap.find(*ptr) == shellnbMap.end()) {
-							shellnbMap.insert(std::make_pair<ccShellnb*,int>(*ptr, 0));
+							shellnbMap.insert(shellnbMapType::value_type(*ptr, 0));
 						}
 						else {
 							shellnbMap[*ptr]--;
 						}
 	
 						if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
-							shellcoMap.insert(std::make_pair<ccShellco*,int>((*ptr)->shellco, 0));
+							shellcoMap.insert(shellcoMapType::value_type((*ptr)->shellco, 0));
 						}
 						else {
 							shellcoMap[(*ptr)->shellco]--;
@@ -1465,28 +1465,17 @@ switch( theEvent )
 					}
 				}
 				/* End of shell stuff */
-		if(checkClones)
+		if ((checkClones) && (irc_in_addr_valid(&tmpUser->getIP()))) //avoid 0:: (0.0.0.0) ip addresses
 			{
-
-	                        /* CIDR checks */
-	                        /* convert ip to longip */
-	                        i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
-	                        mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
-	                        /* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
-	                        for (i = 0; i < (32-CClonesCIDR); i++)
-	                        {
-	                                /* right shift */
-	                                mask_ip >>= 1;
-	                        }
-	                        for (i = 0; i < (32-CClonesCIDR); i++)
-	                        {
-	                                /* left shift */
-	                                mask_ip <<= 1;
-	                        }
-	                        /* convert longip back to ip */
-	                        mask_ip = htonl(mask_ip);
-				tmp_ip.s_addr = mask_ip;
-	                        client_ip = inet_ntoa(tmp_ip);
+            if (irc_in_addr_is_ipv4(&tmpUser->getIP()))
+            {
+            	is_ipv4 = true;
+       			client_ip = IPCIDRMinIP(tIP,CClonesCIDR24 + 96);
+	        }
+	        else
+	        {
+    			client_ip = IPCIDRMinIP(tIP,CClonesCIDR48);
+	        }
 				if ((clientsIp24Map.find(client_ip) != clientsIp24Map.end()) && 
 					(--clientsIp24Map[client_ip] < 1))
 	                        {
@@ -1497,7 +1486,7 @@ switch( theEvent )
 	                        }
 
 				/* ident clones */
-				sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, tmpUser->getUserName().c_str());
+				sprintf(Log, "%s/%d-%s", client_ip.c_str(), is_ipv4 ? CClonesCIDR24 : CClonesCIDR48, tmpUser->getUserName().c_str());
 				if ((clientsIp24IdentMap.find(Log) != clientsIp24IdentMap.end()) &&
 					(--clientsIp24IdentMap[Log] < 1))
 				{
@@ -1511,17 +1500,12 @@ switch( theEvent )
 				{
 				clientsIpMap.erase(clientsIpMap.find(tIP));
 				}
-				string virtualHost = tmpUser->getDescription() + "@";
-				int dots = 0;
-				for(string::size_type ptr = 0;ptr < tIP.size() && dots < 3;++ptr)
-					{
-					if(tIP[ptr] == '.')
-						{
-						++dots;
-						}
-					virtualHost += tIP[ptr];
-					}
-				virtualHost += '*';
+			string ipClass;
+        	if (is_ipv4)
+        		ipClass = IPCIDRMinIP(tIP,120) + "/24";
+			else
+				ipClass = IPCIDRMinIP(tIP,48) + "/48";
+			string virtualHost = tmpUser->getDescription() + "@" + ipClass;
 			if ((virtualClientsMap.find(virtualHost) != virtualClientsMap.end()) &&
 				(--virtualClientsMap[virtualHost] < 1))
 				{
@@ -1561,8 +1545,7 @@ switch( theEvent )
 			delete UserData;
 			}
 		break ;
-		} // case EVT_KILL/case EVT_QUIT
-	
+		} // case EVT_KILL/case EVT_QUIT	
 	case EVT_NETJOIN:
 		{
 		/*
@@ -1628,7 +1611,7 @@ switch( theEvent )
 		inBurst = false;
 		ccServer* curServer;
 		const iServer* curNetServer; 
-		for(serversConstIterator ptr = serversMap_begin();
+		for(serversconstiterator ptr = serversMap_begin();
 		        ptr != serversMap_end() && !inBurst; ++ptr)
 			{
 			curServer = ptr->second;
@@ -1648,7 +1631,7 @@ switch( theEvent )
 		ccServer* curServer;
 		//refreshOpersIPMap();
 		const iServer* curNetServer; 
-		for(serversConstIterator ptr = serversMap_begin();
+		for(serversconstiterator ptr = serversMap_begin();
 		        ptr != serversMap_end() && !inBurst; ++ptr)
 			{
 			curServer = ptr->second;
@@ -1743,6 +1726,14 @@ switch( theEvent )
 		{
 		iClient* theUser = static_cast< iClient* >( Data1);
 		isNowAnOper(theUser);
+		if (theUser->isModeR())
+			handleAC(theUser);
+		break;
+		}
+	case EVT_ACCOUNT:
+		{
+		iClient* theUser = static_cast< iClient* >( Data1);
+		handleAC(theUser);
 		break;
 		}
 	} // switch()
@@ -1812,7 +1803,7 @@ else if(timer_id == glineQueueCheck)
 else if (timer_id == timeCheck)
 	{
 	ccServer* TmpServer;
-	for (serversConstIterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
+	for (serversconstiterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
 		{
 		TmpServer = ptr->second;
 		if (TmpServer->getNetServer())
@@ -1855,7 +1846,7 @@ else if (timer_id == rpingCheck)
 
 	ccServer* TmpServer;
 	int counter = -1;
-	for (serversConstIterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
+	for (serversconstiterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
 		{
 		TmpServer = ptr->second;
 		/* don't bother reporting on juped servers - they dont exist */
@@ -1939,7 +1930,7 @@ return isOperChan( theChan->getName() ) ;
 
 // This method does NOT add the channel to any internal tables
 bool ccontrol::Join( const string& chanName, const string& chanModes,
-	time_t joinTime, bool getOps )
+	const time_t& joinTime, bool getOps )
 {
 if( isOnChannel( chanName ) )
 	{
@@ -1956,7 +1947,7 @@ operChans.push_back( chanName ) ;
 return result ;
 }
 
-bool ccontrol::Part( const string& chanName )
+bool ccontrol::Part( const string& chanName, const string& reason )
 {
 bool foundChannel = false ;
 for( vector< string >::iterator ptr = operChans.begin() ;
@@ -1976,7 +1967,7 @@ if( !foundChannel )
 	return false ;
 	}
 
-bool result = xClient::Part( chanName ) ;
+bool result = xClient::Part( chanName, reason ) ;
 if( result )
 	{
 	MyUplink->UnRegisterChannelEvent( chanName, this ) ;
@@ -2052,27 +2043,96 @@ Part( chanName ) ;
 return true ;
 }
 
+void ccontrol::handleAC( iClient* theClient)
+{
+ccUser *theUser = GetOperByAC(theClient->getAccount());
+if (!theUser)
+	return;
+if (theUser->getAccountTS() != theClient->getAccountTS()) {
+	elog << "ccontrol::handleAC()> getAccount mismatch for " << theClient->getAccount()
+		<< ". theClient->getAccountTS() = " << theClient->getAccountTS() << " && theUser->getAccountTS() = "
+		<< theUser->getAccountTS() << endl;
+	return;
+}
+if (!theUser->getSso())
+	return;
+if (!theClient->isOper()) {
+	if (theUser->getSsooo())
+		return;
+	if ((!UserGotMask(theUser,theClient->getRealNickUserHost()))
+           &&(!UserGotMask( theUser,theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP(theClient->getIP()).GetNumericIP())))
+		return;
+}
+if (IsAuth(theClient))
+	return;
+OkAuthUser(theClient, theUser);
+return;
+}
+
+void ccontrol::OkAuthUser(iClient* theClient, ccUser* theUser)
+{
+//Ok the password match , prepare the ccUser data (or we're here because of Single Sign On)
+string Name = theUser->getUserName();
+iServer* targetServer = Network->findServer( theClient->getIntYY() ) ;
+if(theUser->getClient()) //there is already a user authenticated under that nick
+	{
+	const iClient *tClient = theUser->getClient();
+	Notice(tClient,"You have just been deauthenticated");
+	MsgChanLog("Login conflict for user %s from %s and %s (%s)\n",
+			Name.c_str(),theClient->getNickName().c_str(),
+			tClient->getNickName().c_str(), targetServer->getName().c_str());
+	deAuthUser(theUser);
+	}
+theUser->setUserName(Name);
+theUser->setNumeric(theClient->getCharYYXXX());
+//Try creating an authentication entry for the user
+if(AuthUser(theUser,theClient))
+	if(!(isSuspended(theUser)))
+		Notice(theClient, "Authentication successful as %s! ",theUser->getUserName().c_str()); 
+	else 
+		Notice(theClient, "Authentication successful as %s, "
+			"however you are currently suspended ",
+			theUser->getUserName().c_str()); 
+else if(theClient->isOper())
+        Notice(theClient, "Error in authentication as %s",theUser->getUserName().c_str()); 
+MsgChanLog("(%s) - %s: AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
+	theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
+/* record their connection timestamp + numeric */
+theUser->setLastAuthTS(::time(0));
+theUser->setLastAuthNumeric(theClient->getCharYYXXX());
+if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser))) {
+	std::string Numeric = getUplink()->getCharYY();
+	Write("%s M %s :+o", Numeric.c_str(), theClient->getCharYYXXX().c_str());
+	theClient->setModeO();
+	getUplink()->PostEvent(EVT_OPER, static_cast< void* >(theClient));
+}
+} 
+
+
+/*
+ * Note: All elogs with ccontrol::handleNewClient> can be/are considered for debugging
+ */
 void ccontrol::handleNewClient( iClient* NewUser)
 {
 bool glSet = false;
 bool DoGline = false;
 int gDuration = maxGlineLen;
-int i=0, AffectedUsers = 0;
-int client_addr[4] = { 0 };
-unsigned long mask_ip;
-struct in_addr tmp_ip;
-char *clientip;
-char client_ip[19];
+int AffectedUsers = 0;
+string client_ip;
 char Log[200], GlineMask[250], GlineReason[250];
 bool isShellException = false;
 int shellglinecounter=0;
 std::stringstream s;
 stringListType *OthersList;
 
+//Variable used to disable shell related part
+bool SKIPTHIS = false;
+
+int CClonesCIDR;
+bool is_ipv4 = false;
+
 GlineReason[0] = '\0';
 curUsers++;
-if (NewUser->isOper())
-	isNowAnOper(NewUser);
 if(!inBurst)
 	{
 	checkMaxUsers();
@@ -2083,221 +2143,244 @@ assert( floodData != 0 ) ;
 ccUserData* UserData = new (std::nothrow) ccUserData(floodData);
 NewUser->setCustomData(this,
 	static_cast< void* >( UserData ) );
+if (NewUser->isOper())
+	isNowAnOper(NewUser);
+if (NewUser->isModeR()) {
+	handleAC(NewUser);
+}
+if(dbConnected)
+	{
+	string tIP = xIP( NewUser->getIP()).GetNumericIP(true);
+/*DEBUG*/elog << "ccontrol::handleNewClient> tIP = " << tIP << endl;
+	if (irc_in_addr_is_ipv4(&NewUser->getIP()))
+	{
+		CClonesCIDR = CClonesCIDR24;
+		is_ipv4 = true;
+	}
+	else
+		CClonesCIDR = CClonesCIDR48;
 
-	if(checkClones)
+	if (is_ipv4)
+		client_ip = IPCIDRMinIP(tIP, CClonesCIDR + 96);
+	else
+		client_ip = IPCIDRMinIP(tIP, CClonesCIDR);
+			/* Shell stuff here */
+	if (irc_in_addr_is_ipv4(&NewUser->getIP())) {
+		client_ip = IPCIDRMinIP(tIP, CClonesCIDR + 96);
+		int CurCIDRConnections = clientsIp24Map[client_ip];
+		for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
+			if (isCidrMatch((*ptr)->getCidr(),tIP)) {
+				if (shellnbMap.find(*ptr) == shellnbMap.end()) {
+					shellnbMap.insert(shellnbMapType::value_type(*ptr, 1));
+				}
+				else {
+					shellnbMap[*ptr]++;
+				}
+
+				if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
+					shellcoMap.insert(shellcoMapType::value_type((*ptr)->shellco, 1));
+				}
+				else {
+					shellcoMap[(*ptr)->shellco]++;
+				}
+				if ((*ptr)->shellco->isActive()) {
+					isShellException = true;
+					int shellCurConn = (*ptr)->getCidr2() > 24 ? shellcoMap[(*ptr)->shellco] : CurCIDRConnections;
+					if (shellCurConn > (*ptr)->shellco->getLimit()) {
+						for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
+							if ((*nptr)->shellco == (*ptr)->shellco) {
+								string netblockToBan;
+								int numUsers;
+								if ((*ptr)->getCidr2() <= 24) {  // If /24 or larger, do not gline other netblocks from the same shell
+									nptr = ptr;
+									netblockToBan = string(client_ip) + "/24";
+									numUsers = CurCIDRConnections;
+								}
+								else {
+									netblockToBan = (*nptr)->getCidr();
+									numUsers = shellnbMap[*nptr];
+								}
+								shellglinecounter++;
+								if ((shellglinecounter == 1) || (s.str().size() > 250)) {
+									if (s.str().size() > 250)
+										MsgChanLog("%s", s.str().c_str());
+									s.str("");
+									s << "Excessive connections (" << shellCurConn << ") from SHELL " << (*ptr)->shellco->getName().c_str() << " (will GLINE): *@";
+								}
+								else
+									s << ", *@";
+								s << netblockToBan << " (" << numUsers << ")";
+								sprintf(Log,"Glining SHELL *@%s (%s) for excessive connections (%d)",
+									netblockToBan.c_str(), (*nptr)->shellco->getName().c_str(), numUsers);
+								sprintf(GlineMask,"*@%s", netblockToBan.c_str());
+								//AffectedUsers = shellnbMap[(*nptr)];
+								AffectedUsers = shellCurConn;
+								/* set the gline reason */
+								//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
+								sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)", AffectedUsers, (*ptr)->shellco->getName().c_str());
+								gDuration = CClonesGTime;
+
+								iClient* theClient = Network->findClient(this->getCharYYXXX());
+#ifndef LOGTOHD
+								DailyLog(theClient,"%s",Log);
+#else
+								ccLog* newLog = new (nothrow) ccLog();
+								newLog->Time = ::time(0);
+								newLog->Desc = Log;
+								newLog->Host = theClient->getRealNickUserHost().c_str();
+								newLog->User = "Me";			
+								newLog->CommandName = "AUTOGLINE";
+								DailyLog(newLog);
+#endif
+								glSet = true;
+								ccGline *tmpGline;
+								tmpGline = new ccGline(SQLDb);
+								tmpGline->setHost(GlineMask);
+								tmpGline->setExpires(::time(0) + gDuration);
+								tmpGline->setReason(GlineReason);
+								tmpGline->setAddedOn(::time(0));
+								tmpGline->setAddedBy(nickName);
+								tmpGline->setLastUpdated(::time(0));
+								tmpGline->Insert();
+								tmpGline->loadData(tmpGline->getHost());
+								addGline(tmpGline);
+								if(!getUplink()->isBursting())
+									addGlineToUplink(tmpGline);
+								
+								if ((*ptr)->getCidr2() <= 24) // If /24 or larger, do not gline other netblocks from the same shell
+									break;
+							}
+						}
+						MsgChanLog("%s", s.str().c_str());
+					}
+				}
+			}
+		}
+	}
+	/* End of shell stuff */
+
+	//DEBUG
+	if (!checkClones)
+		elog << "ccontrol::handleNewClient> checkClones is DISABLED!" << endl;
+
+	if ((checkClones) && (irc_in_addr_valid(&NewUser->getIP()))) //avoid 0:: (0.0.0.0) ip addresses
 		{
-		string tIP = xIP( NewUser->getIP()).GetNumericIP();
-		if(strcasecmp(tIP,"0.0.0.0"))			
+	//DEBUG Start
+			if (is_ipv4)
 			{
-			/* CIDR checks */
-			/* convert ip to longip */
-			i = sscanf(tIP.c_str(), "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
-			mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
-			/* bitshift ip to strip the last (32-cidrmask) bits (leaving a mask for the ip) */
-			for (i = 0; i < (32-CClonesCIDR); i++)
-			{
-				/* right shift */
-				mask_ip >>= 1;
+				elog << "ccontrol::handleNewClient> CClonesCIDR24 = " << CClonesCIDR24 << endl;
+				elog << "ccontrol::handleNewClient> client_ip = IPCIDRMinIP(" << tIP << ", " << CClonesCIDR + 96 << ") = " << client_ip << endl;
 			}
-			for (i = 0; i < (32-CClonesCIDR); i++)
+			else
 			{
-				/* left shift */
-				mask_ip <<= 1;
+				elog << "ccontrol::handleNewClient> CClonesCIDR48 = " << CClonesCIDR24 << endl;
+				elog << "ccontrol::handleNewClient> client_ip = IPCIDRMinIP(" << tIP << ", " << CClonesCIDR << ") = " << client_ip << endl;
 			}
-			/* convert longip back to ip */
-			mask_ip = htonl(mask_ip);
-			tmp_ip.s_addr = mask_ip;
-			clientip = inet_ntoa(tmp_ip);
-			strncpy(client_ip, clientip, 18);
-			client_ip[18] = '\0';
-			sprintf(Log, "%s/%d-%s", client_ip, CClonesCIDR, NewUser->getUserName().c_str());
+	//DEBUG End
+
+			sprintf(Log, "%s/%d-%s", client_ip.c_str(), CClonesCIDR, NewUser->getUserName().c_str());
 			int CurIdentConnections = ++clientsIp24IdentMap[Log];
+	/*DEBUG*/elog << "ccontrol::handleNewClient> CurIdentConnections = ++clientsIp24IdentMap[" << Log << "] = " << CurIdentConnections << endl;
 			int CurCIDRConnections = ++clientsIp24Map[client_ip];
-			sprintf(Log,"*@%s/%d", client_ip, CClonesCIDR);
+	/*DEBUG*/elog << "ccontrol::handleNewClient> CurCIDRConnections = ++clientsIp24Map[" << client_ip << "] = " << CurCIDRConnections << endl;
+			sprintf(Log,"*@%s/%d", client_ip.c_str(), CClonesCIDR);
 
-
-			if(dbConnected)
+			/* check idents to see if we have too many */
+			if ((CurIdentConnections > maxIClones) && (CurIdentConnections > getExceptions(NewUser->getUserName() + "@" + tIP)) &&
+				(CurIdentConnections > getExceptions(NewUser->getUserName() + "@" + NewUser->getRealInsecureHost())))
 			{
-				/* Shell stuff here */
-				for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
-					if (isCidrMatch((*ptr)->getCidr(),tIP)) {
-						if (shellnbMap.find(*ptr) == shellnbMap.end()) {
-							shellnbMap.insert(std::make_pair<ccShellnb*,int>(*ptr, 1));
-						}
-						else {
-							shellnbMap[*ptr]++;
-						}
+				/* too many - send a warning to the chanlog if within warning range */
+				if ((clientsIp24IdentMapLastWarn[Log] + CClonesTime) <= time(NULL))
+				{
+			/*DEBUG*/elog << "ccontrol::handleNewClient> clientsIp24IdentMapLastWarn[" << Log << "] Excessive CIDR Ident clones" << endl;
+					MsgChanLog("Excessive CIDR Ident clones (%d) for %s@%s/%d (will%s GLINE)\n",
+						CurIdentConnections, NewUser->getUserName().c_str(), client_ip.c_str(),
+						CClonesCIDR, IClonesGline ? "" : " _NOT_");
+					clientsIp24IdentMapLastWarn[Log] = time(NULL);
+				}
+				/* check for auto-gline feature */
+				if (IClonesGline)
+				{
+					sprintf(Log,"Glining %s@%s/%d for excessive CIDR ident connections (%d)",
+						NewUser->getUserName().c_str(), client_ip.c_str(), CClonesCIDR, CurIdentConnections);
+			/*DEBUG*/elog << "ccontrol::handleNewClient> " << Log << endl;
+					sprintf(GlineMask,"%s@%s/%d", NewUser->getUserName().c_str(), client_ip.c_str(), CClonesCIDR);
+					AffectedUsers = CurIdentConnections;
+					/* set the gline reason */
+					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR ident connections",AffectedUsers);
+					DoGline = true;
+					gDuration = maxGlineLen;
+				}
+			}
 
-						if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
-							shellcoMap.insert(std::make_pair<ccShellco*,int>((*ptr)->shellco, 1));
+			//START OF SHELL RELATED - this is completely skipped
+			if (!SKIPTHIS)
+			if (irc_in_addr_is_ipv4(&NewUser->getIP()))
+			if ((!isShellException) && (CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+									(CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
+			{
+					// Shell stuff again here
+					if (CClonesCIDR == 24)
+					{
+						int NewLimit = maxCClones;
+						int m = 256;
+						OthersList = 0;
+						int theCount = CurCIDRConnections;
+						string strclient_ip = string(client_ip);
+						for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++)
+						{
+				//elog << "ShellDebug: " << (*ptr)->getCidr() << ":  get24Mask(): " << (*ptr)->get24Mask() << " client_ip: " << string(client_ip) << endl;
+
+							if ((*ptr)->get24Mask() == strclient_ip) /* There is a shell exception somewhere on that /24, but not for that IP */
+							{
+								stringstream ss;
+								if (!isShellException) {
+									ss << strclient_ip << "/" << CClonesCIDR;
+									OthersList = getOtherCidrs(ss.str());
+								}
+
+								isShellException = true;
+								int j=1;
+								int l=0;
+								l = (*ptr)->getCidr2();
+								if (l <= 24) {
+									elog << "ShellDebug: This shouldn't happen. l = " << l << endl;
+								}
+								for (int k=32; k>l; k--)
+								{
+									j = j * 2;
+								}
+								m -= j;
+								theCount -= shellnbMap[*ptr];
+							}
 						}
-						else {
-							shellcoMap[(*ptr)->shellco]++;
-						}
-						if ((*ptr)->shellco->isActive()) {
-							isShellException = true;
-							int shellCurConn = (*ptr)->getCidr2() > 24 ? shellcoMap[(*ptr)->shellco] : CurCIDRConnections;
-							if (shellCurConn > (*ptr)->shellco->getLimit()) {
-								for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
-									if ((*nptr)->shellco == (*ptr)->shellco) {
-										string netblockToBan;
-										int numUsers;
-										if ((*ptr)->getCidr2() <= 24) {  // If /24 or larger, do not gline other netblocks from the same shell
-											nptr = ptr;
-											netblockToBan = string(client_ip) + "/24";
-											numUsers = CurCIDRConnections;
-										}
-										else {
-											netblockToBan = (*nptr)->getCidr();
-											numUsers = shellnbMap[*nptr];
-										}
+						NewLimit = m / 256 * maxCClones;
+						if ((OthersList != 0) && (OthersList->size() > 0))
+						{
+							if (CurCIDRConnections > NewLimit)
+							{
+								shellglinecounter = 0;
+								for (stringListType::iterator nptr = OthersList->begin(); nptr != OthersList->end(); nptr++) {
 										shellglinecounter++;
 										if ((shellglinecounter == 1) || (s.str().size() > 250)) {
 											if (s.str().size() > 250)
 												MsgChanLog("%s", s.str().c_str());
 											s.str("");
-											s << "Excessive connections (" << shellCurConn << ") from SHELL " << (*ptr)->shellco->getName().c_str() << " (will GLINE): *@";
+											s << "Excessive connections (" << theCount << ") from subnet *@" << strclient_ip << "/" <<
+CClonesCIDR << " (will GLINE): *@";
+
 										}
 										else
 											s << ", *@";
-										s << netblockToBan << " (" << numUsers << ")";
-										sprintf(Log,"Glining SHELL *@%s (%s) for excessive connections (%d)",
-											netblockToBan.c_str(), (*nptr)->shellco->getName().c_str(), numUsers);
-										sprintf(GlineMask,"*@%s", netblockToBan.c_str());
-										//AffectedUsers = shellnbMap[(*nptr)];
-										AffectedUsers = shellCurConn;
+										s << (*nptr);
+
+										sprintf(Log,"Glining non-exempted SHELL *@%s for excessive connections (%d)",
+											(*nptr).c_str(), theCount);
+										sprintf(GlineMask,"*@%s", (*nptr).c_str());
+										AffectedUsers = theCount;
 										/* set the gline reason */
-										//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
-										sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)", AffectedUsers, (*ptr)->shellco->getName().c_str());
+										sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
 										gDuration = CClonesGTime;
-
-										iClient* theClient = Network->findClient(this->getCharYYXXX());
-#ifndef LOGTOHD
-										DailyLog(theClient,"%s",Log);
-#else
-										ccLog* newLog = new (std::nothrow) ccLog();
-										newLog->Time = ::time(0);
-										newLog->Desc = Log;
-										newLog->Host = theClient->getRealNickUserHost().c_str();
-										newLog->User = "Me";			
-										newLog->CommandName = "AUTOGLINE";
-										DailyLog(newLog);
-#endif
-										glSet = true;
-										ccGline *tmpGline;
-										tmpGline = new ccGline(SQLDb);
-										tmpGline->setHost(GlineMask);
-										tmpGline->setExpires(::time(0) + gDuration);
-										tmpGline->setReason(GlineReason);
-										tmpGline->setAddedOn(::time(0));
-										tmpGline->setAddedBy(nickName);
-										tmpGline->setLastUpdated(::time(0));
-										tmpGline->Insert();
-										tmpGline->loadData(tmpGline->getHost());
-										addGline(tmpGline);
-										if(!getUplink()->isBursting())
-											addGlineToUplink(tmpGline);
-										
-										if ((*ptr)->getCidr2() <= 24) // If /24 or larger, do not gline other netblocks from the same shell
-											break;
-									}
-								}
-								MsgChanLog("%s", s.str().c_str());
-							}
-						}
-					}
-				}
-				/* End of shell stuff */
-
-				/* check idents to see if we have too many */
-				if ((CurIdentConnections > maxIClones) && (CurIdentConnections > getExceptions(NewUser->getUserName() + "@" + tIP)) &&
-					(CurIdentConnections > getExceptions(NewUser->getUserName() + "@" + NewUser->getRealInsecureHost())))
-				{
-					/* too many - send a warning to the chanlog if within warning range */
-					if ((clientsIp24IdentMapLastWarn[Log] + CClonesTime) <= time(NULL))
-					{
-						MsgChanLog("Excessive CIDR Ident clones (%d) for %s@%s/%d (will%s GLINE)\n",
-							CurIdentConnections, NewUser->getUserName().c_str(), client_ip,
-							CClonesCIDR, IClonesGline ? "" : " _NOT_");
-						clientsIp24IdentMapLastWarn[Log] = time(NULL);
-					}
-					/* check for auto-gline feature */
-					if (IClonesGline)
-					{
-						sprintf(Log,"Glining %s@%s/%d for excessive CIDR ident connections (%d)",
-							NewUser->getUserName().c_str(), client_ip, CClonesCIDR, CurIdentConnections);
-						sprintf(GlineMask,"%s@%s/%d", NewUser->getUserName().c_str(), client_ip, CClonesCIDR);
-						AffectedUsers = CurIdentConnections;
-						/* set the gline reason */
-						sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR ident connections",AffectedUsers);
-						DoGline = true;
-						gDuration = maxGlineLen;
-					}
-				}
-  
-				if ((!isShellException) && (CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
-                                        (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
-				{
-						// Shell stuff again here
-						if (CClonesCIDR == 24)
-						{
-							int NewLimit = maxCClones;
-							int m = 256;
-							OthersList = 0;
-							int theCount = CurCIDRConnections;
-							string strclient_ip = string(client_ip);
-							for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++)
-							{
-								//elog << "ShellDebug: " << (*ptr)->getCidr() << ":  get24Mask(): " << (*ptr)->get24Mask() << " client_ip: " << string(client_ip) << endl;
-								if ((*ptr)->get24Mask() == strclient_ip) /* There is a shell exception somewhere on that /24, but not for that IP */
-								{
-									std::stringstream ss;
-									if (!isShellException) {
-										ss << strclient_ip << "/" << CClonesCIDR;
-									    OthersList = getOtherCidrs(ss.str());
-									}
-
-									isShellException = true;
-									int j=1;
-									int l=0;
-									l = (*ptr)->getCidr2();
-									if (l <= 24) {
-										elog << "ShellDebug: This shouldn't happen. l = " << l << endl;
-									}
-									for (int k=32; k>l; k--)
-									{
-										j = j * 2;
-									}
-									m -= j;
-									theCount -= shellnbMap[*ptr];
-								}
-							}
-							NewLimit = m / 256 * maxCClones;
-							if ((OthersList != 0) && (OthersList->size() > 0))
-							{
-								if (CurCIDRConnections > NewLimit)
-								{
-									shellglinecounter = 0;
-									for (stringListType::iterator nptr = OthersList->begin(); nptr != OthersList->end(); nptr++) {
-											shellglinecounter++;
-											if ((shellglinecounter == 1) || (s.str().size() > 250)) {
-												if (s.str().size() > 250)
-													MsgChanLog("%s", s.str().c_str());
-												s.str("");
-												s << "Excessive connections (" << theCount << ") from subnet *@" << strclient_ip << "/" << CClonesCIDR << " (will GLINE): *@";
-
-											}
-											else
-												s << ", *@";
-											s << (*nptr);
-
-											sprintf(Log,"Glining non-exempted SHELL *@%s for excessive connections (%d)",
-												(*nptr).c_str(), theCount);
-											sprintf(GlineMask,"*@%s", (*nptr).c_str());
-	                                        AffectedUsers = theCount;
-											/* set the gline reason */
-											sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
-											gDuration = CClonesGTime;
 
 				iClient* theClient = Network->findClient(this->getCharYYXXX());
 #ifndef LOGTOHD
@@ -2307,7 +2390,7 @@ NewUser->setCustomData(this,
 				newLog->Time = ::time(0);
 				newLog->Desc = Log;
 				newLog->Host = theClient->getRealNickUserHost().c_str();
-				newLog->User = "Me";			
+				newLog->User = "Me";
 				newLog->CommandName = "AUTOGLINE";
 				DailyLog(newLog);
 #endif
@@ -2330,113 +2413,137 @@ NewUser->setCustomData(this,
 
 								}
 							}
-						}
+						} // end of if (CClonesCIDR == 24)
 					if ((clientsIp24MapLastWarn[client_ip] + CClonesTime) <= time(NULL))
 					{
-						
+
 						if (shellglinecounter == 0)
 						{
-							
-				                            MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
-			                                        CurCIDRConnections, client_ip, CClonesCIDR, CClonesGline ? "" : " _NOT_");
-						clientsIp24MapLastWarn[client_ip] = time(NULL);
+
+				                        MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
+			                                        CurCIDRConnections, client_ip.c_str(), CClonesCIDR, CClonesGline ? "" : " _NOT_");
+							clientsIp24MapLastWarn[client_ip] = time(NULL);
 						}
 					}
-						
+
 
 					/* check for auto-gline feature */
 					if ((CClonesGline) && (shellglinecounter == 0))
 					{
 	                                        sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
-	                                                client_ip, CClonesCIDR, CurCIDRConnections);
-	                                        sprintf(GlineMask,"*@%s/%d", client_ip, CClonesCIDR);
+	                                                client_ip.c_str(), CClonesCIDR, CurCIDRConnections);
+	                                        sprintf(GlineMask,"*@%s/%d", client_ip.c_str(), CClonesCIDR);
 	                                        AffectedUsers = CurCIDRConnections;
 						/* set the gline reason */
 						sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
                                                 DoGline = true;
 						gDuration = CClonesGTime;
 					}
-                                }
-  
-                                int CurConnections = ++clientsIpMap[tIP];
-  
-                                if ((!isShellException) && (CurConnections > maxClones) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
-                                        (CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
-                                {
-                                        sprintf(Log,"*@%s", NewUser->getRealInsecureHost().c_str());
-                                        MsgChanLog("Excessive connections [%d] from host *@%s [%s] server:{%s}\n",
-                                                CurConnections,NewUser->getRealInsecureHost().c_str(), tIP.c_str(),
-						NewUser->getServer()->getName().c_str());
-                                        sprintf(Log,"Glining *@%s/32 for excessive connections (%d)",
-                                                tIP.c_str(),CurConnections);
-                                        sprintf(GlineMask,"*@%s/32",tIP.c_str());
-                                        AffectedUsers = CurConnections;
-					/* set the gline reason */
-					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
-                                        DoGline = true;
-					gDuration = maxGlineLen;
-                                }
-  
-                                if ((DoGline) && (shellglinecounter == 0))
-								{
-                                        iClient* theClient = Network->findClient(this->getCharYYXXX());
-#ifndef LOGTOHD
-				DailyLog(theClient,"%s",Log);
-#else
-				ccLog* newLog = new (std::nothrow) ccLog();
-				newLog->Time = ::time(0);
-				newLog->Desc = Log;
-				newLog->Host = theClient->getRealNickUserHost().c_str();
-				newLog->User = "Me";			
-				newLog->CommandName = "AUTOGLINE";
-				DailyLog(newLog);
-#endif
-				glSet = true;
-				ccGline *tmpGline;
-				tmpGline = new ccGline(SQLDb);
-				tmpGline->setHost(GlineMask);
-				tmpGline->setExpires(::time(0) + gDuration);
-				tmpGline->setReason(GlineReason);
-				tmpGline->setAddedOn(::time(0));
-				tmpGline->setAddedBy(nickName);
-				tmpGline->setLastUpdated(::time(0));
-				tmpGline->Insert();
-				tmpGline->loadData(tmpGline->getHost());
-				addGline(tmpGline);
-				if(!getUplink()->isBursting())
-					addGlineToUplink(tmpGline);
-				}	
-			else
+                                } // END OF SHELL RELATED PART !!!
+				// ***************** END OF SHELL RELATED PART !!! *******************
+
+			//START Replacement for shell related part
+			if ((SKIPTHIS) || (!irc_in_addr_is_ipv4(&NewUser->getIP())))
+			if (/*(!isShellException) && */(CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+									(CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
+			{
+				if ((clientsIp24MapLastWarn[client_ip] + CClonesTime) <= time(NULL))
 				{
-				int dots = 0;
-				string ipClass = "";
-				for(string::size_type ptr = 0;ptr < tIP.size() && dots < 3;++ptr)
+					//if (shellglinecounter == 0)
+					//{
+						MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
+								CurCIDRConnections, client_ip.c_str(), CClonesCIDR, CClonesGline ? "" : " _NOT_");
+						clientsIp24MapLastWarn[client_ip] = time(NULL);
+					//}
+				}
+
+				/* check for auto-gline feature */
+				if ((CClonesGline)/* && (shellglinecounter == 0)*/)
+				{
+					sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
+							client_ip.c_str(), CClonesCIDR, CurCIDRConnections);
+					sprintf(GlineMask,"*@%s/%d", client_ip.c_str(), CClonesCIDR);
+					AffectedUsers = CurCIDRConnections;
+					/* set the gline reason */
+					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
+					DoGline = true;
+					gDuration = CClonesGTime;
+				}
+			}
+			//END Replacement for shell related part
+			int CurConnections = ++clientsIpMap[tIP];
+
+			if ((!isShellException) && (CurConnections > maxClones) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
+					(CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
+			{
+				sprintf(Log,"*@%s", NewUser->getRealInsecureHost().c_str());
+				MsgChanLog("Excessive connections [%d] from host *@%s [%s] server:{%s}\n",
+						CurConnections,NewUser->getRealInsecureHost().c_str(), tIP.c_str(),	NewUser->getServer()->getName().c_str());
+				sprintf(Log,"Glining *@%s for excessive connections (%d)", tIP.c_str(), CurConnections);
+				sprintf(GlineMask,"*@%s",tIP.c_str());
+				AffectedUsers = CurConnections;
+				/* set the gline reason */
+				sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
+				DoGline = true;
+				gDuration = maxGlineLen;
+			}
+			if ((DoGline) && (shellglinecounter == 0))
+			{
+		/*DEBUG*/elog << "ccontrol::handleNewClient> *** (DoGline) ***" << endl;
+				iClient* theClient = Network->findClient(this->getCharYYXXX());
+#ifndef LOGTOHD
+			DailyLog(theClient,"%s",Log);
+#else
+			ccLog* newLog = new (std::nothrow) ccLog();
+			newLog->Time = ::time(0);
+			newLog->Desc = Log;
+			newLog->Host = theClient->getRealNickUserHost().c_str();
+			newLog->User = "Me";
+			newLog->CommandName = "AUTOGLINE";
+			DailyLog(newLog);
+#endif
+			glSet = true;
+			ccGline *tmpGline;
+			tmpGline = new ccGline(SQLDb);
+			tmpGline->setHost(GlineMask);
+			tmpGline->setExpires(::time(0) + gDuration);
+			tmpGline->setReason(GlineReason);
+			tmpGline->setAddedOn(::time(0));
+			tmpGline->setAddedBy(nickName);
+			tmpGline->setLastUpdated(::time(0));
+			tmpGline->Insert();
+			tmpGline->loadData(tmpGline->getHost());
+			addGline(tmpGline);
+			if(!getUplink()->isBursting())
+				addGlineToUplink(tmpGline);
+			}
+		else
+			{
+	/*DEBUG*/elog << "ccontrol::handleNewClient> Checking Virtual Clones case ..." << endl;
+			string ipClass;
+			if (is_ipv4)
+				ipClass = IPCIDRMinIP(tIP,120) + "/24";
+			else
+				ipClass = IPCIDRMinIP(tIP,48) + "/48";
+			string virtualHost = NewUser->getDescription() + '@' + ipClass;
+			CurConnections = ++virtualClientsMap[virtualHost];
+			if((CurConnections > maxVClones) &&
+				 (CurConnections > getExceptions("*@" + createClass(tIP))))	//getExceptions("*@" + ipClass)))
+				{
+					/* check for rate limiting */
+					if ((virtualClientsMapLastWarn[virtualHost] + CClonesTime) <= time(NULL))
 					{
-					if(tIP[ptr] == '.')
-						{
-						++dots;
-						}
-					ipClass += tIP[ptr];
-					}
-				ipClass += '*';
-				CurConnections = ++virtualClientsMap[NewUser->getDescription() + "@" + ipClass];
-				if((CurConnections > maxVClones) &&
-				     (CurConnections > getExceptions("*@" + ipClass)))
-					{
-						/* check for rate limiting */
-						if ((virtualClientsMapLastWarn[NewUser->getDescription() + "@" + ipClass] + CClonesTime) <= time(NULL))
-						{
-							/* send the chanlog message and dont warn for another CClonesTime seconds */
-							MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
-							    NewUser->getDescription().c_str()
-							    ,ipClass.c_str()
-							    ,CurConnections);
-							virtualClientsMapLastWarn[NewUser->getDescription() + "@" + ipClass] = time(NULL);
-						}
+						/* send the chanlog message and dont warn for another CClonesTime seconds */
+						MsgChanLog("Virtual clones for real name %s on %s, total connections %d\n",
+							NewUser->getDescription().c_str()
+							,ipClass.c_str()
+							,CurConnections);
+						virtualClientsMapLastWarn[virtualHost] = time(NULL);
 					}
 				}
 			}
 		}
+	}
 /* TODO: actually remove this once we're certain.
 	if((!glSet)) 
 		{	
@@ -2445,7 +2552,7 @@ NewUser->setCustomData(this,
 			{
 			glSet = true;
 			string tIP = xIP( NewUser->getIP()).GetNumericIP();
-			ccGline * theGline = new (std::nothrow) ccGline(SQLDb);
+			ccGline * theGline = new (nothrow) ccGline(SQLDb);
 			theGline->setHost(string("*@") + tIP);
 			theGline->setAddedBy(tempGline->getAddedBy());
 			theGline->setExpires((tempGline->getExpires() > 3600 + ::time(0)) ? 3600 : tempGline->getExpires() - time(0));
@@ -2455,7 +2562,7 @@ NewUser->setCustomData(this,
 			queueGline(theGline,false);
 			}
 		} */
-	}
+	//}
         /* check if they are already logged into us */
         usersIterator tIterator = usersMap.begin();
         while (tIterator != usersMap.end())
@@ -2528,7 +2635,7 @@ else
 	{
 	return NULL;
 	}
-		}
+}
 
 int ccontrol::strToLevel(const string& level) {
 	int i=0;
@@ -2562,7 +2669,7 @@ return IsAuth(Network->findClient(Numeric));
 
 bool ccontrol::AddOper (ccUser* Oper)
 {
-static const char *Main = "INSERT INTO opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice,GetLag,LastPassChangeTS) VALUES ('";
+static const char *Main = "INSERT INTO opers (user_name,password,access,saccess,last_updated_by,last_updated,flags,server,isSuspended,suspend_expires,suspended_by,suspend_level,suspend_reason,isUhs,isOper,isAdmin,isSmt,isCoder,GetLogs,NeedOp,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -2594,6 +2701,12 @@ theQuery	<< Main
 		<< "," << (Oper->getNotice() ? "'t'" : "'n'")
 		<< "," << (Oper->getLag() ? "'t'" : "'n'")
 		<< ",now()::abstime::int4"
+		<< "," << (Oper->getSso() ? "'t'" : "'n'")
+		<< "," << (Oper->getSsooo() ? "'t'" : "'n'")
+		<< "," << (Oper->getAutoOp() ? "'t'" : "'n'")
+		<< ",'" << removeSqlChars(Oper->getAccount())
+		<< "'," << "0"
+
 		<< ")"
 		<< ends;
 
@@ -2602,17 +2715,38 @@ if( SQLDb->Exec( theQuery.str().c_str() ) )
 	if(!Oper->loadData(Oper->getUserName()))
 		return false;
 	usersMap[Oper->getUserName()] = Oper;
+	if (!Oper->getAccount().empty())
+		accountsMap[Oper->getAccount()] = Oper;
 	return true;
 	}
 
-elog	<< "ccontrol::AddOper> SQL Failure: "
-	<< SQLDb->ErrorMessage()
-	<< endl ;
+elog    << "ccontrol::AddOper> SQL Failure: "
+        << SQLDb->ErrorMessage()
+        << "Query was:  " << theQuery.str()
+        << endl ;
+return false;
+}
+
+bool ccontrol::accountsMapAdd (ccUser* theUser, const string& AC)
+{
+accountsMap[AC] = theUser;
+}
+
+bool ccontrol::accountsMapDel (const string& AC)
+{
+accountsMapType::iterator it = accountsMap.find(AC);
+//if (GetOperByAC(AC) != NULL) {
+if (it != accountsMap.end()) {
+	accountsMap.erase(it);
+	//accountsMap.erase(AC);
+	return true;
+}
 return false;
 }
 
 bool ccontrol::DeleteOper (const string& Name)
 {
+string AC;
 if(!dbConnected)
 	{
 	return false;
@@ -2622,6 +2756,7 @@ ccUser* tUser = usersMap[Name];
 //Delete the user hosts
 if(tUser)
     {
+    AC = tUser->getAccount();
     static const char *tMain = "DELETE FROM hosts WHERE User_Id = ";    
     stringstream HostQ;
     HostQ << tMain;
@@ -2642,6 +2777,9 @@ if( !SQLDb->Exec( HostQ ) )
 	return false;
 	}
 	usersMap.erase(usersMap.find(Name));
+	if (!AC.empty()) {
+		accountsMapDel(AC);
+	}
     }    
 
 static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
@@ -2840,36 +2978,6 @@ for( size_t ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
 output << ends;
 
 return string( salt + output.str().c_str() );
-}
-
-bool ccontrol::validUserMask(const string& userMask) const
-{
-
-// Check that a '!' exists, and that the nickname
-// is no more than 9 characters
-StringTokenizer st1( userMask, '!' ) ;
-if( (st1.size() != 2) || (st1[ 0 ].size() > 9) )
-	{
-	return false ;
-	}
-
-// Check that a '@' exists and that the username is
-// no more than 12 characters
-StringTokenizer st2( st1[ 1 ], '@' ) ;
-
-if( (st2.size() != 2) || (st2[ 0 ].size() > 12) )
-	{
-	return false ;
-	}
-
-// Be sure that the hostname is no more than 128 characters
-if( st2[ 1 ].size() > 128 )
-	{
-	return false ;
-	}
-
-// Tests have passed
-return true ;
 }
 
 bool ccontrol::AddHost( ccUser* user, const string& host )
@@ -3125,6 +3233,14 @@ while(tIterator != usersMap.end())
 return NULL;
 }
 
+ccUser* ccontrol::GetOperByAC(const string& AC)
+{
+accountsIterator tmpUser = accountsMap.find(AC);
+if (tmpUser != accountsMap.end())
+	return tmpUser->second;
+return NULL;
+}
+
 bool ccontrol::addGline( ccGline* TempGline)
 {
 
@@ -3172,6 +3288,105 @@ else
 	glineList.erase(TempGline->getHost()) ;
 	}
 return true;
+}
+
+ccGline* ccontrol::findGline( const string& HostName )
+{
+
+glineIterator ptr = glineList.find(HostName);
+if(ptr != glineList.end())
+	{
+	return ptr->second;
+	}
+
+return NULL ;
+}
+
+ccGline* ccontrol::findRealGline( const string& HostName )
+{
+
+glineIterator ptr = rnGlineList.find(HostName);
+if(ptr != rnGlineList.end())
+	{
+	return ptr->second;
+	}
+
+return NULL ;
+}
+
+ccGline* ccontrol::findGlineAndRealGline( const string& HostName )
+{
+	glineIterator ptr;
+	if (HostName.substr(0,1) != "$") //check if its not a realname gline
+	{
+		ptr = glineList.find(HostName);
+		if(ptr != glineList.end())
+			return ptr->second;
+	}
+	else //then it's realname
+	{
+		ptr = rnGlineList.find(HostName);
+		if(ptr != rnGlineList.end())
+			return ptr->second;
+	}
+	return NULL ;
+
+}
+
+vector< ccGline* > ccontrol::findAllMatchingGlines(const string& Mask)
+{
+	ccGline *tmpGline;
+	vector< ccGline* > retMe;
+
+	for (glineListType::const_iterator ptr = gline_begin(); ptr != gline_end(); ++ptr)
+	{
+		tmpGline = ptr->second;
+		if (!match(Mask,tmpGline->getHost()))
+			retMe.push_back(tmpGline);
+	}
+
+	for (glineListType::const_iterator ptr = rnGlineList.begin(); ptr != rnGlineList.end(); ++ptr)
+	{
+		tmpGline = ptr->second;
+		if (!match(Mask,tmpGline->getHost()))
+			retMe.push_back(tmpGline);
+	}
+	return retMe;
+}
+
+bool ccontrol::removeAllMatchingGlines(const string& Mask, bool ForceRemove)
+{
+	bool AllOk = true;
+	//ForceRemove == Removing all matching glines
+	if (ForceRemove)
+	{
+		vector< ccGline* > vGlines;
+		vGlines = findAllMatchingGlines(Mask);
+		for (vector< ccGline* >::size_type i = 0; i < vGlines.size(); i++)
+		{
+			if (!vGlines.at(i)->Delete())
+			{
+				MsgChanLog("Error while removing gline for host %s from the db\n",vGlines[i]->getHost().c_str());
+				AllOk = false;
+			}
+			remGline(vGlines.at(i));
+			MyUplink->removeGline(vGlines[i]->getHost(),this);
+		}
+		vGlines.clear();
+		return AllOk;
+	}
+	//Remove only the exact mask/gline
+	ccGline *tmpGline;
+    tmpGline = findGlineAndRealGline(Mask);
+	if (tmpGline != NULL)
+	{
+		if(!tmpGline->Delete())
+			MsgChanLog("Error while removing gline for host %s from the database\n", Mask.c_str());
+		remGline(tmpGline);
+		delete tmpGline;
+	}
+	MyUplink->removeGline(Mask, this);
+	return AllOk;
 }
 
 ccGline* ccontrol::findMatchingGline( const iClient* theClient )
@@ -3227,30 +3442,6 @@ for(glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end(); ++ptr)
 			return theGline;
 			}
 		}
-	}
-
-return NULL ;
-}
-
-ccGline* ccontrol::findGline( const string& HostName )
-{
-
-glineIterator ptr = glineList.find(HostName);
-if(ptr != glineList.end())
-	{
-	return ptr->second;
-	}
-	
-return NULL ;
-}
-
-ccGline* ccontrol::findRealGline( const string& HostName )
-{
-
-glineIterator ptr = rnGlineList.find(HostName);
-if(ptr != rnGlineList.end())
-	{
-	return ptr->second;
 	}
 
 return NULL ;
@@ -3774,262 +3965,304 @@ system(SendMail);
 return true;
 }
 
-
-int ccontrol::checkGline(const string Host,unsigned int Len,unsigned int &Affected)
+int ccontrol::checkGline4(string &Host,unsigned int Len,unsigned int &Affected)
 {
+	int retMe = 0;
+	bool IsWildcard = false;
+	unsigned char ipmask_len = 128; //suposing at first we have a full IP or host
 
-const unsigned int isWildCard = 0x01;
-const unsigned int isIP = 0x02;
-unsigned int Mask = 0;
-unsigned int Dots = 0;
-unsigned int GlineType = isIP;
-bool ParseEnded = false;
-bool isCIDR = false;
-int retMe = 0, i = 0;
-char CIDRip[16];
-int client_addr[4] = { 0 };
-unsigned long mask_ip, orig_mask_ip;
-string::size_type pos = Host.find_first_of('@');
-string Ident = Host.substr(0,pos);
-string Hostname = Host.substr(pos+1);
-if(Len >  gline::MFU_TIME)  //Check for maximum time
-	retMe |=  gline::BAD_TIME;
-if((signed int) Len < 0)
-	retMe |=  gline::NEG_TIME;
-if (Hostname[0] == '.')
-	retMe |= gline::BAD_HOST;
-for(string::size_type pos = 0; pos < Hostname.size();++pos)
+	if (Len > gline::MFU_TIME)  //Check for maximum time
+		retMe |= gline::BAD_TIME;
+
+	if ((signed int) Len < 0)
+		retMe |= gline::NEG_TIME;
+
+	if (Len > gline::MFGLINE_TIME)
+		retMe |= gline::FU_NEEDED_TIME;
+
+	if (Len > gline::MGLINE_TIME)
+		retMe |= gline::FORCE_NEEDED_TIME;
+
+	string Ident = extractNickUser(Host);
+	string Hostname = extractHostIP(Host);
+	if (!isUserHost(Host)) //only Hostname specified, Ident is empty
+		Hostname = Host;
+
+	if (Hostname.find('*') != string::npos)
+		IsWildcard = true;
+
+	if (Hostname[0] == '.')
+		retMe |= gline::BAD_HOST;
+
+	ipmask_len = fixToCIDR64(Hostname);
+	if (ipmask_len == 0)
+		ipmask_len = 128; //make sure if the convert failed we 'understand' as full ip|host
+
+	if (!Ident.empty())
+		Host = Ident + '@' + Hostname;
+
+	if (ipmask_len < 120)   //(120 = 128 - 8)
+		retMe |= gline::HUH_NO_HOST;  //Its too wide
+
+	//If we have a '/' character then we surely have a cidr or wildcard
+	if (Hostname.find('/') != string::npos)
 	{
-	if(Hostname[pos] =='.')
-		{
-		Dots++;
-		if((GlineType & (isWildCard | isIP)) == isIP)
-			Mask+=8; //Keep track of the mask
-			if (Hostname[pos+1] == '.')
-				retMe |= gline::BAD_HOST;
-		}
-	else if((Hostname[pos] =='*') || (Hostname[pos] == '?'))
-		GlineType |= isWildCard;
-	else if(Hostname[pos] == '/')
-		{
-                        if (!(GlineType & isIP))        // must be an ip to specify 
-                                return  gline::BAD_HOST;
-
-			if (Dots>3)			// can't have more than 3 dots
-				return	gline::BAD_HOST;
-  
-                        if (GlineType & isWildCard)     // cidr may not contain wildcards
-                                return  gline::BAD_HOST;
-  
-                        /* copy the mask to CIDRip */
-                        if (pos > 15)
-                                pos = 15;
-                        for (i=0; i<(int) pos; i++)
-                                CIDRip[i] = Hostname[i];
-                        CIDRip[i++] = '\0';
-  
-                        Mask = atol((Hostname.substr(++pos)).c_str());
-                        isCIDR = true;
-                        retMe |= gline::FORCE_NEEDED_HOST;
-                        /* check if the mask matches the cidr size */
-                        i = sscanf(CIDRip, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
-                        mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
-                        orig_mask_ip = mask_ip;
-                        for (i = 0; i < (32 - (int) Mask); i++)
-                        {
-                                /* right shift */
-                                mask_ip >>= 1;
-                        }
-                        for (i = 0; i < (32 - (int) Mask); i++)
-                        {
-                                /* left shift */
-                                mask_ip <<= 1;
-                        }
-                        if (mask_ip != orig_mask_ip)
-                        {
-                                /* mask no longer matches the original mask - ip was not on the bit boundary */
-                                retMe |= gline::BAD_CIDRMASK;
-                        }
-                        if (!(Mask) || (Mask > 32))
-                                retMe |= gline::BAD_HOST;
-                        if (Mask < 16)
-                                retMe |= gline::BAD_CIDRLEN;
-                        if (Mask < 32)
-                                GlineType |= isWildCard;
-                        if ((GlineType & isIP) && (isCIDR) && (Dots != 3))
-                                retMe |= gline::BAD_CIDROVERRIDE;
-                        ParseEnded = true;                      
-                        break;
-		 }
-	else if((Hostname[pos] > '9') || (Hostname[pos] < '0')) 
-		GlineType &= ~isIP;
+		//if (IsWildcard)
+			retMe |= gline::FORCE_NEEDED_HOST;
+		if ((ipmask_len < 112) && (!IsWildcard)) //(112 = 128 - 16)
+			retMe |= gline::BAD_CIDRLEN;
 	}
 
-Affected = Network->countMatchingRealUserHost(Host); //Calculate the number of affected
-if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
-	retMe |=  gline::BAD_HOST;
-if(((GlineType & (isIP || isWildCard)) == isIP) && !(ParseEnded))
-	Mask +=8; //Add the last mask count if needed
-if((GlineType & isIP) && (Mask < 24))
-	retMe |=  gline::HUH_NO_HOST;  //Its too wide
-if(!(GlineType & isIP) && (Dots < 2) && (GlineType & isWildCard))
-	retMe |=  gline::HUH_NO_HOST; //Wildcard gline must have atleast 2 dots
-if(Affected >  gline::MFGLINE_USERS) 
-	retMe |=  gline::FU_NEEDED_USERS; //This gline must be set with -fu flag
-if(Len >  gline::MFGLINE_TIME)
-	retMe |=  gline::FU_NEEDED_TIME;
-if(Len >  gline::MGLINE_TIME)
-	retMe |=  gline::FORCE_NEEDED_TIME;
-if(GlineType & (isWildCard))
-	{//Need to check the Ident now
-	bool hasId = false;
-	for(string::size_type pos = 0; pos < Ident.size();++pos)
+	Affected = Network->countMatchingRealUserHost(Host); //Calculate the number of affected
+
+	if (Affected > gline::MFGLINE_USERS)
+		retMe |= gline::FU_NEEDED_USERS; //This gline must be set with -fu flag
+
+	if(Len >  gline::MFGLINE_TIME)
+		retMe |=  gline::FU_NEEDED_TIME;
+	if(Len >  gline::MGLINE_TIME)
+		retMe |=  gline::FORCE_NEEDED_TIME;
+	if (ipmask_len > 0) //we have a 'wildcard' gline
+	{  //Need to check the Ident now
+		bool hasId = false;
+		for(string::size_type pos = 0; pos < Ident.size();++pos)
 		{
-		if((Ident[pos] == '*') || (Ident[pos] == '?'))
+			if((Ident[pos] == '*') || (Ident[pos] == '?'))
 			{
-			continue;
+				continue;
 			}
-		else
+			else
 			{ //Its not */? so we have a legal ident
-			hasId = true;
-			break;
+				hasId = true;
+				break;
 			}
 		}
-	if((hasId & (Len >  gline::MGLINE_WILD_TIME)) 
-		|| (!hasId & (Len >  gline::MGLINE_WILD_NOID_TIME)))
+		if((hasId & (Len >  gline::MGLINE_WILD_TIME))
+			|| (!hasId & (Len >  gline::MGLINE_WILD_NOID_TIME)))
 		{
-		retMe |=  gline::FORCE_NEEDED_WILDTIME;
+			retMe |=  gline::FORCE_NEEDED_WILDTIME;
 		}
 	}
-if (getExceptions("*@" + Hostname) > 0) 
-	{
-	retMe |= gline::HUH_IS_EXCEPTION;
-	}
-if (isIpOfOper(Hostname))
-	retMe |= gline::HUH_IS_IP_OF_OPER;
-	
-//if(GlineType & (isWildCard & (Len >  gline::MGLINE_WILD_TIME)))
-//	retMe |=  gline::FORCE_NEEDED_WILDTIME;
-if(!retMe)
-	retMe =  gline::GLINE_OK;
-return retMe;
+
+	if (getExceptions("*@" + Hostname) > 0)
+		retMe |= gline::HUH_IS_EXCEPTION;
+
+	if (isIpOfOper(Hostname))
+		retMe |= gline::HUH_IS_IP_OF_OPER;
+
+	if (!retMe)
+		retMe = gline::GLINE_OK;
+
+	return retMe;
 }
 
-int ccontrol::checkSGline(const string Host,unsigned int Len,unsigned int &Affected)
+int ccontrol::checkSGline4(string &Host,unsigned int Len,unsigned int &Affected)
 {
+	int retMe = 0;
+	unsigned char ipmask_len = 128; //suposing at first we have a full IP or host
+	bool hasId = false;
+	bool IsWildcard = false;
+	string Ident = extractNickUser(Host);
+	string Hostname = extractHostIP(Host);
+	if (!isUserHost(Host)) //only Hostname specified, Ident is empty
+		Hostname = Host;
 
-const unsigned int isWildCard = 0x01;
-const unsigned int isIP = 0x02;
-unsigned int Mask = 0;
-unsigned int Dots = 0;
-unsigned int GlineType = isIP;
-bool ParseEnded = false;
-bool hasId = false;
-bool isCIDR = false;
-int retMe = 0, i = 0;
-char CIDRip[16];
-int client_addr[4] = { 0 };
-unsigned long mask_ip, orig_mask_ip;
-string::size_type pos = Host.find_first_of('@');
-string Ident = Host.substr(0,pos);
-string Hostname = Host.substr(pos+1);
-if((signed int)Len < 0)
-	retMe |=  gline::NEG_TIME;
-//Check the ident first, if its valid then the gline is ok 
-Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
-for(string::size_type pos = 0; pos < Ident.size();++pos)
+	if (Hostname.find('*') != string::npos)
+		IsWildcard = true;
+
+	if((signed int)Len < 0)
+		retMe |=  gline::NEG_TIME;
+	Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
+	//Check the ident first, if its valid then the gline is ok
+	for(string::size_type pos = 0; pos < Ident.size();++pos)
 	{
-	if((Ident[pos] == '*') || (Ident[pos] == '?'))
+		if((Ident[pos] == '*') || (Ident[pos] == '?'))
 		{
-		continue;
+			continue;
 		}
-	else
+		else
 		{ //Its not */? so we have a legal ident
-		hasId = true;
-		break;
+			hasId = true;
+			break;
 		}
 	}
-if(hasId)
-	return gline::GLINE_OK;
+	if(hasId)
+		return gline::GLINE_OK;
 
-if (Hostname[0]=='.')
-	retMe |= gline::BAD_HOST;
-for(string::size_type pos = 0; pos < Hostname.size();++pos)
+	if (Hostname[0]=='.')
+		retMe |= gline::BAD_HOST;
+
+	ipmask_len = fixToCIDR64(Hostname);
+	if (ipmask_len == 0)
+		ipmask_len = 128; //make sure if the convert failed we 'understand' as full ip|host
+
+	if (!Ident.empty())
+		Host = Ident + '@' + Hostname;
+
+	retMe |= gline::FORCE_NEEDED_HOST;
+
+	if ((ipmask_len < 104) && (IsWildcard)) //(104 = 128 - (32-8))
+		retMe |= gline::HUH_NO_HOST;  //Its too wide
+
+	//If we have a '/' character then we surely have a cidr or a wildcard
+	if (Hostname.find('/') != string::npos)
+	if ((ipmask_len < 104) && (!IsWildcard))
+		retMe |= gline::BAD_CIDRLEN;
+
+	if(!retMe)
+		retMe =  gline::GLINE_OK;
+	return retMe;
+}
+
+int ccontrol::checkGline6(string &Host,unsigned int Len,unsigned int &Affected)
+{
+	int retMe = 0;
+	unsigned char ipmask_len;
+	irc_in_addr convIP;
+	bool IsWildcard = false;
+
+	if (Len > gline::MFU_TIME)  //Check for maximum time
+		retMe |= gline::BAD_TIME;
+
+	if ((signed int) Len < 0)
+		retMe |= gline::NEG_TIME;
+
+	if (Len > gline::MFGLINE_TIME)
+		retMe |= gline::FU_NEEDED_TIME;
+
+	if (Len > gline::MGLINE_TIME)
+		retMe |= gline::FORCE_NEEDED_TIME;
+
+	string Ident = extractNickUser(Host);
+	string Hostname = extractHostIP(Host);
+	if (!isUserHost(Host)) //only Hostname specified, Ident is empty
+		Hostname = Host;
+
+	if (Hostname.find('*') != string::npos)
+		IsWildcard = true;
+
+	//ipmask_len = fixToCIDR64(Hostname);
+	ipmask_parse(Hostname.c_str(), &convIP, &ipmask_len);
+	if (!ipmask_len)
+		return gline::BAD_HOST;
+
+	if (!Ident.empty())
+		Host = Ident + '@' + Hostname;
+
+	if (ipmask_len < 64)
+		retMe |= gline::FORCE_NEEDED_HOST;
+
+	if (ipmask_len < 48)
+		retMe |= gline::HUH_NO_HOST;  //Its too wide
+
+	if ((ipmask_len < 32) && (!IsWildcard))
+		retMe |= gline::BAD_CIDRLEN;
+
+	Affected = Network->countMatchingRealUserHost(Host); //Calculate the number of affected
+
+	if (Affected > gline::MFGLINE_USERS)
+		retMe |= gline::FU_NEEDED_USERS; //This gline must be set with -fu flag
+
+	if (getExceptions("*@" + Hostname) > 0)
+		retMe |= gline::HUH_IS_EXCEPTION;
+
+	if (isIpOfOper(Hostname))
+		retMe |= gline::HUH_IS_IP_OF_OPER;
+
+	if (!retMe)
+		retMe = gline::GLINE_OK;
+
+	return retMe;
+}
+
+int ccontrol::checkSGline6(string &Host,unsigned int Len,unsigned int &Affected)
+{
+	int retMe = 0;
+	unsigned char ipmask_len;
+	irc_in_addr convIP;
+	bool hasId = false;
+	bool IsWildcard = false;
+
+	string Ident = extractNickUser(Host);
+	string Hostname = extractHostIP(Host);
+	if (!isUserHost(Host)) //only Hostname specified, Ident is empty
+		Hostname = Host;
+
+	if (Hostname.find('*') != string::npos)
+		IsWildcard = true;
+
+	if((signed int)Len < 0)
+		retMe |=  gline::NEG_TIME;
+	Affected = Network->countMatchingUserHost(Host); //Calculate the number of affected
+	//Check the ident first, if its valid then the gline is ok
+	for(string::size_type pos = 0; pos < Ident.size();++pos)
 	{
-	if(Hostname[pos] =='.')
+		if((Ident[pos] == '*') || (Ident[pos] == '?'))
 		{
-		Dots++;
-		if((GlineType & (isWildCard | isIP)) == isIP)
-			Mask+=8; //Keep track of the mask
-			if (Hostname[pos+1] == '.')
-				retMe |= gline::BAD_HOST;
+			continue;
 		}
-	else if((Hostname[pos] =='*') || (Hostname[pos] == '?'))
-		GlineType |= isWildCard;
-	else if(Hostname[pos] == '/')
-		{
-                       if (!(GlineType & isIP))        // must be an ip to specify CIDR mask
-                               return  gline::BAD_HOST;
-                       if (GlineType & isWildCard)     // cidr can't contain wildcards
-                               return  gline::BAD_HOST;
-                       /* copy the mask to CIDRip */
-                       if (pos > 15)
-                               pos = 15;
-                       for (i=0; i<(int) pos; i++)
-                               CIDRip[i] = Hostname[i];
-                       CIDRip[i++] = '\0';
- 
-                       Mask = atol((Hostname.substr(++pos)).c_str());
-                       isCIDR = true;
- 
-                       /* check if the mask matches the cidr size */
-                       i = sscanf(CIDRip, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
-                       mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
-                       orig_mask_ip = mask_ip;
-                       for (i = 0; i < (32 - (int) Mask); i++)
-                       {
-                               /* right shift */
-                               mask_ip >>= 1;
-                       }
-                       for (i = 0; i < (32 - (int) Mask); i++)
-                       {
-                               /* left shift */
-                               mask_ip <<= 1;
-                       }
-                       if (mask_ip != orig_mask_ip)
-                       {
-                               /* mask no longer matches the original mask - ip was not on the bit boundary */
-                               retMe |= gline::BAD_CIDRMASK;
-                       }
-                       if(!(Mask) || (Mask > 32))      // must be under a /32 to be valid
-                               retMe |= gline::BAD_HOST;
-                       if(Mask < 8)                    // must be a /8 or more specific
-                               retMe |= gline::BAD_CIDRLEN;
-                       if(Mask < 32)
-                               GlineType |= isWildCard;
-                       ParseEnded = true;                      
-                       break;
+		else
+		{ //Its not */? so we have a legal ident
+			hasId = true;
+			break;
 		}
-	else if((Hostname[pos] > '9') || (Hostname[pos] < '0')) 
-		GlineType &= ~isIP;
 	}
+	if(hasId)
+		return gline::GLINE_OK;
 
+	//ipmask_len = fixToCIDR64(Hostname);
+	ipmask_parse(Hostname.c_str(), &convIP, &ipmask_len);
+	if (!ipmask_len)
+		return gline::BAD_HOST;
 
+	if (!Ident.empty())
+		Host = Ident + '@' + Hostname;
 
-if((Dots > 3) && (GlineType & isIP)) //IP addy cant have more than 3 dots
-	retMe |=  gline::BAD_HOST;
-if((GlineType & isIP) && (isCIDR) && (Dots != 3))
-	retMe |= gline::BAD_CIDROVERRIDE;
-if(((GlineType & (isIP || isWildCard)) == isIP) && !(ParseEnded))
-	Mask +=8; //Add the last mask count if needed
-if((GlineType & isIP) && (Mask < 8))
-	retMe |=  gline::HUH_NO_HOST;  //Its too wide
-if(!(GlineType & isIP) && (Dots < 1) && (GlineType & isWildCard))
-	retMe |=  gline::HUH_NO_HOST; //Wildcard gline must have atleast 2 dots
-	
-if(!retMe)
-	retMe =  gline::GLINE_OK;
-return retMe;
+	retMe |= gline::FORCE_NEEDED_HOST; //using only to not to return 0 (0 == need to use gline)
+
+	if (ipmask_len < 16) //32
+		retMe |= gline::HUH_NO_HOST;  //Its too wide
+
+	//If we have a '/' character then we surely have a cidr address or a wildcard
+	//if (Hostname.find('/') != string::npos)  //enable this if cidr > 16
+	if ((ipmask_len < 16) && (!IsWildcard))
+		retMe |= gline::BAD_CIDRLEN;
+
+	if(!retMe)
+		retMe =  gline::GLINE_OK;
+	return retMe;
+}
+
+int ccontrol::checkGline(string &Host,unsigned int Len,unsigned int &Affected)
+{
+	if (Host.find(':') == string::npos)
+	{
+		//checkGline4 handles hostname and IPv4 glines
+		elog << "checkGline4" << endl;
+		return checkGline4(Host, Len, Affected);
+	}
+	else
+	{
+		//checkGline6 handles IPv6 addresses only
+		elog << "checkGline6" << endl;
+		return checkGline6(Host, Len, Affected);
+	}
+}
+
+int ccontrol::checkSGline(string &Host,unsigned int Len,unsigned int &Affected)
+{
+	if (Host.find(':') == string::npos)
+	{
+		//checkSGline4 handles hostname and IPv4 glines
+		elog << "checkSGline4" << endl;
+		return checkSGline4(Host, Len, Affected);
+	}
+	else
+	{
+		//checkSGline6 handles IPv6 addresses only
+		elog << "checkSGline6" << endl;
+		return checkSGline6(Host, Len, Affected);
+	}
 }
 
 bool ccontrol::isSuspended(ccUser *theUser)
@@ -4095,7 +4328,7 @@ bool ccontrol::refreshVersions()
 {
 ccServer* curServer;
 const iServer* curNetServer; 
-for(serversConstIterator ptr = serversMap_begin();
+for(serversconstiterator ptr = serversMap_begin();
     ptr != serversMap_end(); ++ptr)
 	{
 	curServer = ptr->second;
@@ -4355,7 +4588,15 @@ for(unsigned int i =0;i<SQLDb->Tuples();++i)
 		}
 	tempUser->setLag(!strcasecmp(SQLDb->GetValue(i,21),"t"));
 	tempUser->setPassChangeTS(atoi(SQLDb->GetValue(i,22).c_str()));
+	tempUser->setSso(!strcasecmp(SQLDb->GetValue(i,23),"t"));
+	tempUser->setSsooo(!strcasecmp(SQLDb->GetValue(i,24),"t"));
+	tempUser->setAutoOp(!strcasecmp(SQLDb->GetValue(i,25),"t"));
+	tempUser->setAccount(SQLDb->GetValue(i,26));
+	tempUser->setAccountTS(atoi(SQLDb->GetValue(i,27).c_str()));
 	usersMap[tempUser->getUserName()]=tempUser;
+	string AC = tempUser->getAccount();
+	if (!AC.empty())
+		accountsMap[AC]=tempUser;
 
 	}
 return true;
@@ -4523,7 +4764,8 @@ bool gotCount = false;
 bool gotVClones = false;
 bool gotClones = false;
 bool gotCClones = false;
-bool gotCClonesCIDR = false;
+bool gotCClonesCIDR24 = false;
+bool gotCClonesCIDR48 = false;
 bool gotCClonesTime = false;
 bool gotCClonesGline = false;
 bool gotCClonesGTime = false;
@@ -4581,10 +4823,15 @@ for(unsigned int i=0; i< SQLDb->Tuples();++i)
                 gotCClones = true;
                 maxCClones = atoi(SQLDb->GetValue(i,1).c_str());
                 }
-        else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesCIDR"))
+        else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesCIDR24"))
                 {
-                gotCClonesCIDR = true;
-                CClonesCIDR = atoi(SQLDb->GetValue(i,1).c_str());
+                gotCClonesCIDR24 = true;
+                CClonesCIDR24 = atoi(SQLDb->GetValue(i,1).c_str());
+                }
+        else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesCIDR48"))
+                {
+                gotCClonesCIDR48 = true;
+                CClonesCIDR48 = atoi(SQLDb->GetValue(i,1).c_str());
                 }
 	else if(!strcasecmp(SQLDb->GetValue(i,0),"CClonesTime"))
 		{
@@ -4649,10 +4896,15 @@ if(!gotCClones)
         maxCClones = 275;
         updateMisc("CClones",maxCClones);
         }
-if(!gotCClonesCIDR)
+if(!gotCClonesCIDR24)
         {
-        CClonesCIDR = 24;
-        updateMisc("CClonesCIDR",CClonesCIDR);
+        CClonesCIDR24 = 24;
+        updateMisc("CClonesCIDR24",CClonesCIDR24);
+        }
+if(!gotCClonesCIDR48)
+        {
+        CClonesCIDR48 = 48;
+        updateMisc("CClonesCIDR48",CClonesCIDR48);
         }
 if(!gotCClonesTime)
 	{
@@ -4886,7 +5138,7 @@ std::list< string >* ccontrol::getOtherCidrs( const string& cidrmask )
 	int i=0;
 	int j=0;
 	int k=0;
-	int highest = CClonesCIDR + 1;
+	int highest = CClonesCIDR24 + 1;
 	int lowest = 32;
 	std::list< ccShellnb* > tmpList;
 	static stringListType* theList = 0;
@@ -5006,6 +5258,7 @@ Notice(theClient,"-= Shell Exceptions list - listing a total of %d shell compani
 for (shellcoIterator ptr = shellcoList.begin(); ptr != shellcoList.end(); ptr++) {
 	int i = 0;
 	bool multiple_lines = false;
+
 	bool isLimitPer24 = false;
 
 	for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
@@ -5153,7 +5406,7 @@ if(!tempShellco->Insert())
 
 tempShellco->loadData(tempShellco->getName()); //The inserted id is needed in memory
 
-shellcoMap.insert(std::make_pair<ccShellco*,int>(tempShellco,0));
+shellcoMap.insert(shellcoMapType::value_type(tempShellco,0));
 shellcoList.push_back(tempShellco);
 return true;
 }
@@ -5176,17 +5429,25 @@ if(!dbConnected)
 	}
 
 
-if (CClonesCIDR != 24)
+if (CClonesCIDR24 != 24)
 	{
-	Notice(theClient, "SHELLS exception will only work properly if you type that command: /msg <mynick> CONFIG -CClonesCIDR 24");
+	Notice(theClient, "SHELLS exception will only work properly if you type that command: /msg <mynick> CONFIG -CClonesCIDR24 24");
 	return false;
 	}
 
-//if (atoi(st[1].c_str()) < 8)
-//	{
-//	Notice(theClient, "You can't add an exception for something bigger than a /8");
-//	return false;
-//	}
+std::size_t colpos = st[0].find(":");
+if (colpos != string::npos)
+{
+	Notice(theClient, "SHELLS exception currently works only with IPv4 addresses.");
+	return false;
+}
+
+/*if (atoi(st[1].c_str()) < 8)
+	{
+	Notice(theClient, "You can't add an exception for something bigger than a /8");
+	return false;
+	}
+*/
 bool isSmallNb = (atoi(st[1].c_str()) > 24) ? true : false;
 for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) 
 	{
@@ -5246,13 +5507,13 @@ for( xNetwork::const_clientIterator cItr = Network->clients_begin() ; cItr != Ne
 		if (isCidrMatch(tempShellnb->getCidr(),tIP)) {
 			count++;
 			if (shellnbMap.find(tempShellnb) == shellnbMap.end()) {
-				shellnbMap.insert(std::make_pair<ccShellnb*,int>(tempShellnb, 1));
+				shellnbMap.insert(shellnbMapType::value_type(tempShellnb, 1));
 			}
 			else {
 				shellnbMap[tempShellnb]++;
 			}
 			if (shellcoMap.find(tempShellnb->shellco) == shellcoMap.end()) {
-				shellcoMap.insert(std::make_pair<ccShellco*,int>(tempShellnb->shellco, 1));
+				shellcoMap.insert(shellcoMapType::value_type(tempShellnb->shellco, 1));
 			}
 			else {
 				shellcoMap[tempShellnb->shellco]++;
@@ -5737,7 +5998,7 @@ Notice(theClient,"-= Gline List =-");
 for(glineIterator ptr = gline_begin();ptr != gline_end();++ptr)
 	{
 	tempGline = ptr->second;
-	if((tempGline ->getExpires() > ::time(0)) 
+	if((tempGline->getExpires() > ::time(0))
 	    && (!match(Mask,tempGline->getHost())))
 		{
 		sprintf(gline_set, "%s", Duration(time(NULL) - tempGline->getAddedOn()));
@@ -5781,7 +6042,7 @@ void ccontrol::listSuspended( iClient * )
 void ccontrol::listServers( iClient * theClient)
 {
 ccServer* tmpServer;
-for(serversConstIterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
+for(serversconstiterator ptr = serversMap_begin();ptr != serversMap_end();++ptr)
 	{
 	tmpServer = ptr->second;
 	if(tmpServer->getNetServer())
@@ -6186,13 +6447,18 @@ Notice(tmpClient,"(Gline Burst) - GBCount: %d , GBInterval: %d",
 	glineBurstCount,
 	glineBurstInterval);
 Notice(tmpClient,"Max Clones: %d, Max Virtual Clones: %d",maxClones,maxVClones);
-Notice(tmpClient,"Max Ident Clones: %d per /%d - Auto-Gline: %s",
+Notice(tmpClient,"Max Ident24 Clones: %d per /%d",
 	maxIClones,
-	CClonesCIDR,
-	IClonesGline ? "True" : "False");
-Notice(tmpClient,"Max CIDR Clones: %d per /%d - Auto-Gline: %s (for %s)",
-	maxCClones,CClonesCIDR,CClonesGline ? "YES" : "NO",
-	Duration(CClonesGTime));
+	CClonesCIDR24);
+Notice(tmpClient,"Max Ident48 Clones: %d per /%d",
+	maxIClones,
+	CClonesCIDR48);
+Notice(tmpClient,"  Auto-Gline: %s", IClonesGline ? "True" : "False");
+Notice(tmpClient,"Max CIDR24 Clones: %d per /%d",
+	maxCClones,CClonesCIDR24);
+Notice(tmpClient,"Max CIDR48 Clones: %d per /%d",
+	maxCClones,CClonesCIDR48);
+Notice(tmpClient,"  Auto-Gline: %s (for %s)", CClonesGline ? "YES" : "NO", Duration(CClonesGTime));
 Notice(tmpClient,"  (%s between announcements per block)", Duration(CClonesTime));
 Notice(tmpClient,"Save gline is: %s",saveGlines ? "Enabled" : "Disabled"); 
 Notice(tmpClient,"Currently Bursting: %s",inBurst ? "YES" : "NO");
@@ -6221,9 +6487,13 @@ else if(!strcasecmp(varName,"CClones"))
         {
         maxCClones = Value;
         }
-else if(!strcasecmp(varName,"CClonesCIDR"))
+else if(!strcasecmp(varName,"CClonesCIDR24"))
         {
-        CClonesCIDR = Value;
+        CClonesCIDR24 = Value;
+        }
+else if(!strcasecmp(varName,"CClonesCIDR48"))
+        {
+        CClonesCIDR48 = Value;
         }
 else if(!strcasecmp(varName,"CClonesTime"))
 	{
@@ -6821,6 +7091,10 @@ return success;
 
 void ccontrol::isNowAnOper (iClient* theUser)
 {
+	if (!theUser)
+		return;
+	iServer* tServer = Network->findServer( theUser->getIntYY() ) ;
+	elog << "ccontrol::isNowAnOper()>  " << theUser->getRealNickUserHost() << "  (" << tServer->getName() << ")  " << ::time(0) <<  endl;
 	string IP = xIP(theUser->getIP()).GetNumericIP();
 	opersIPMap[IP] = theUser->getRealNickUserHost();
 }

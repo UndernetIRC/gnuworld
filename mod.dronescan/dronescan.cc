@@ -845,7 +845,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 							if (isoktogline == true)
 								{
 								clients.push_back(theClient->getNickName() + "!" + theClient->getUserName() +"@"
-									+ xIP(theClient->getIP()).GetNumericIP() + " " + theClient->getDescription());
+									+ xIP(theClient->getIP()).GetNumericIP(true) + " " + theClient->getDescription());
 									
 								}
 							}
@@ -859,7 +859,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						tempNames.str("");
 						if (isoktogline == true)
 								{
-								glineData* theGline = new (std::nothrow) glineData("*@" +joinPartIt->first,jcGlineReason,jcGlineLength);
+								glineData* theGline = new (std::nothrow) glineData("*@" + fixToCIDR64(joinPartIt->first),jcGlineReason,jcGlineLength);
 								assert(theGline != 0);
 								glined.push_back(std::pair<glineData*,std::list<std::string> >(theGline,clients));
 								clientcount += clients.size();

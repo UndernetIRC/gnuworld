@@ -47,6 +47,7 @@
 #include	<cassert>
 #include	<cerrno>
 #include	<csignal>
+#include	<cstdarg>
 
 #include	"gnuworld_config.h"
 #include	"misc.h"
@@ -1898,6 +1899,7 @@ PostChannelEvent( EVT_JOIN, theChan,
 	static_cast< void* >( theIClient ),
 	static_cast< void* >( theChanUser ) ) ;
 
+theClient->OnJoin(theChan->getName());
 return true ;
 }
 
@@ -3364,6 +3366,48 @@ s	<< getCharYY()
 	<< " :"
 	<< message ;
 return Write( s.str() ) ;
+}
+
+bool xServer::serverNotice( Channel* theChan, const char* format, ... )
+{
+	assert( theChan != 0 ) ;
+
+	char buf[ 1024 ] = { 0 } ;
+	va_list _list ;
+
+	va_start( _list, format ) ;
+	vsnprintf( buf, 1024, format, _list ) ;
+	va_end( _list ) ;
+
+	stringstream s;
+	s	<< getCharYY()
+		<< " O "
+		<< theChan->getName()
+		<< " :"
+		<< buf
+		<< ends;
+
+	return Write( s );
+}
+
+bool xServer::serverNotice( Channel* theChan, const string& Message)
+{
+	assert( theChan != 0 ) ;
+
+	if( Message.empty() || !isConnected() )
+	{
+		return false ;
+	}
+
+	stringstream s;
+	s	<< getCharYY()
+		<< " O "
+		<< theChan->getName()
+		<< " :"
+		<< Message
+		<< ends;
+
+	return Write( s );
 }
 
 bool xServer::XReply (iServer* theServer, const string& Routing,

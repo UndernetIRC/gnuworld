@@ -53,7 +53,7 @@ char tNum[512];
 std::stringstream s;
 int count = 0;
 
-for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ; 
+for (ccontrol::serversconstiterator ptr = bot->serversMap_begin() ; 
 	ptr != bot->serversMap_end();++ptr)
 	{
 	//For each server on the database check if its connetcted
@@ -98,7 +98,7 @@ for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ;
 	}
 
 /*
-for (ccontrol::serversConstIterator ptr = bot->serversMap_begin() ; 
+for (ccontrol::serversconstiterator ptr = bot->serversMap_begin() ; 
 	ptr != bot->serversMap_end();++ptr)
 	{
 	//For each server on the database check if its connetcted

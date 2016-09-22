@@ -147,8 +147,8 @@ if (!AllOpers && !AllAdmins && !AllSmts && !AllCoders)
 	}
 else
 	{
-	ccontrol::usersConstIterator uItr = bot->usersMap_begin();
-	for (; uItr != bot->usersMap_end(); uItr++)
+	ccontrol::usersconstiterator uItr = bot->usersmap_begin();
+	for (; uItr != bot->usersmap_end(); uItr++)
 		{
 		if (AllCoders)
 			{

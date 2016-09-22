@@ -51,7 +51,7 @@ if( st.size() < 2 )
 	Usage( theClient ) ;
 	return true ;
 	}
-bot->MsgChanLog("REMGLINE %s\n",st.assemble(1).c_str());
+//bot->MsgChanLog("REMGLINE %s\n",st.assemble(1).c_str());
 
 if(st[1].substr(0,1) == "#")
 	{
@@ -72,7 +72,9 @@ if (st[1].find('@',1) == string::npos)
 
 unsigned int dummy;
 
-if(bot->checkGline(st[1],0,dummy) & gline::HUH_NO_HOST)
+string gHost = st[1];
+
+if(bot->checkGline(gHost,0,dummy) & gline::HUH_NO_HOST)
 	{
 	bot->Notice(theClient,"Please use REMSGLINE to remove a this gline");
 	return false;
@@ -85,8 +87,9 @@ if(tmpGline != NULL)
 		bot->MsgChanLog("Error while removing gline for host %s from the db\n",st[1].c_str());
 	bot->remGline(tmpGline);
 	delete tmpGline;
-	}	
-server->removeGline(st[1],bot);
+	}
+bot->MsgChanLog("REMGLINE %s %s\n", st[1].c_str(), st.assemble(2).c_str());	
+server->removeGline(st[1], bot);
 bot->Notice( theClient, "Removal of gline succeeded\n" ) ;
 return true ;
 }

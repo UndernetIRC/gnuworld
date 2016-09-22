@@ -52,6 +52,19 @@ using std::endl ;
 using std::stringstream ;
 using std::ends ;
 
+chanFloodType::chanFloodType()
+	:last_time((time_t)(0)),
+	 msgCount(0),
+	 noticeCount(0),
+	 ctcpCount(0)
+{
+	 repCount = 1;
+}
+
+chanFloodType::~chanFloodType()
+{
+}
+
 const sqlChannel::flagType sqlChannel::F_NOPURGE  = 0x00000001 ;
 const sqlChannel::flagType sqlChannel::F_SPECIAL  = 0x00000002 ;
 const sqlChannel::flagType sqlChannel::F_NOREG    = 0x00000004 ;
@@ -71,6 +84,10 @@ const sqlChannel::flagType sqlChannel::F_AUTOTOPIC = 0x00080000 ;
 const sqlChannel::flagType sqlChannel::F_OPONLY    = 0x00100000 ; // Deprecated
 const sqlChannel::flagType sqlChannel::F_AUTOJOIN  = 0x00200000 ;
 const sqlChannel::flagType sqlChannel::F_NOFORCE   = 0x00400000 ; // Reserved for use by Planetarion.
+const sqlChannel::flagType sqlChannel::F_NOVOICE   = 0x00800000 ;
+const sqlChannel::flagType sqlChannel::F_NOTAKE    = 0x01000000 ;
+const sqlChannel::flagType sqlChannel::F_FLOODPRO  = 0x02000000 ;
+const sqlChannel::flagType sqlChannel::F_FLOODPROGLINE  = 0x04000000 ;
 
 const int sqlChannel::EV_MISC     = 1 ;
 const int sqlChannel::EV_JOIN     = 2 ;
@@ -102,7 +119,13 @@ sqlChannel::sqlChannel(dbHandle* _SQLDb)
    name(),
    flags(0),
    mass_deop_pro(3),
-   flood_pro(7),
+   flood_pro(0),
+   msg_period(0),
+   notice_period(0),
+   ctcp_period(0),
+   flood_period(0),
+   repeat_count(0),
+   antiflood(ANTIFLOOD_NONE),
    url(),
    description(),
    comment(),
@@ -117,9 +140,11 @@ sqlChannel::sqlChannel(dbHandle* _SQLDb)
    limit_offset(3),
    limit_period(20),
    last_limit_check(0),
+   last_flood(0),
    limit_grace(2),
    limit_max(0),
    max_bans(0),
+   no_take(0),
    SQLDb( _SQLDb )
 {
 }
@@ -245,6 +270,9 @@ limit_period = atoi(SQLDb->GetValue(row,15));
 limit_grace = atoi(SQLDb->GetValue(row,16));
 limit_max = atoi(SQLDb->GetValue(row,17));
 max_bans = atoi(SQLDb->GetValue(row,18));
+no_take = atoi(SQLDb->GetValue(row,19));
+
+setAllFlood();
 }
 
 bool sqlChannel::commit()
@@ -275,7 +303,8 @@ queryString	<< queryHeader
 		<< "limit_max = " << limit_max << ", "
 		<< "max_bans = " << max_bans << ", "
 		<< "description = '" << escapeSQLChars(description) << "', "
-		<< "comment = '" << escapeSQLChars(comment) << "' "
+		<< "comment = '" << escapeSQLChars(comment) << "', "
+		<< "no_take = " << no_take << " "
 		<< queryCondition << id
 		<< ends;
 
@@ -331,9 +360,369 @@ if( !SQLDb->Exec(queryString ) )
 return true;
 }
 
+void sqlChannel::setAllFlood()
+{
+	if (flood_pro == 0) return;
+	unsigned int tmp = flood_pro;
+	div_t divresult;
+	divresult = div (tmp,0x100);
+	msg_period = divresult.rem;
+	tmp = divresult.quot;
+	divresult = div (tmp, 0x10);
+	notice_period = divresult.rem;
+	tmp = divresult.quot;
+	divresult = div (tmp, 0x10);
+	ctcp_period = divresult.rem;
+	tmp = divresult.quot;
+	divresult = div (tmp, 0x10);
+	flood_period = divresult.rem;
+	tmp = divresult.quot;
+	divresult = div (tmp, 0x10);
+    repeat_count = divresult.rem;
+}
+
+void sqlChannel::setFloodMsg(const unsigned short& _floodMsg)
+{
+	msg_period = _floodMsg;
+	div_t divresult;
+	divresult = div (flood_pro,0x100);
+	flood_pro = flood_pro - divresult.rem  + _floodMsg;
+}
+
+void sqlChannel::setFloodNotice(const unsigned short& _floodNotice)
+{
+	notice_period = _floodNotice;
+	div_t div1,div2;
+	div1 = div (flood_pro,0x100);
+	int tmp = div1.quot;
+	div2 = div (tmp,0x10);
+	tmp = tmp - div2.rem + _floodNotice;
+	flood_pro = tmp * 0x100 + div1.rem;
+}
+
+void sqlChannel::setFloodCTCP(const unsigned short& _floodCTCP)
+{
+	ctcp_period = _floodCTCP;
+	div_t div1,div2;
+	div1 = div (flood_pro,0x1000);
+	int tmp = div1.quot;
+	div2 = div (tmp,0x10);
+	tmp = tmp - div2.rem + _floodCTCP;
+	flood_pro = tmp * 0x1000 + div1.rem;
+}
+
+void sqlChannel::setFloodPeriod(const unsigned short& _floodPrd)
+{
+	flood_period = _floodPrd;
+	div_t div1,div2;
+	div1 = div (flood_pro,0x10000);
+	int tmp = div1.quot;
+	div2 = div (tmp,0x10);
+	tmp = tmp - div2.rem + _floodPrd;
+	flood_pro = tmp * 0x10000 + div1.rem;
+}
+
+void sqlChannel::setRepeatCount(const unsigned short& _repCount)
+{
+    repeat_count = _repCount;
+	div_t div1,div2;
+	div1 = div (flood_pro,0x100000);
+	int tmp = div1.quot;
+	div2 = div (tmp,0x10);
+    tmp = tmp - div2.rem + _repCount;
+	flood_pro = tmp * 0x100000 + div1.rem;
+}
+
+void sqlChannel::setDefaultFloodproValues()
+{
+	setFloodMsg(15);
+	setFloodNotice(5);
+	setFloodCTCP(5);
+	setFloodPeriod(15);
+	setRepeatCount(5);
+	setAntiFlood(sqlChannel::ANTIFLOOD_NONE);
+}
+
+unsigned int sqlChannel::getTotalMessageCount(const string& IP)
+{
+	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	chanFloodType* theChFlood = itr->second;
+	if (itr != chanFloodMap.end())
+		return theChFlood->getTotalMessageCount();
+	return 0;
+}
+
+unsigned int sqlChannel::getTotalNoticeCount(const string& IP)
+{
+	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	chanFloodType* theChFlood = itr->second;
+	if (itr != chanFloodMap.end())
+		return theChFlood->getTotalNoticeCount();
+	return 0;
+}
+
+unsigned int sqlChannel::getTotalCTCPCount(const string& IP)
+{
+	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	chanFloodType* theChFlood = itr->second;
+	if (itr != chanFloodMap.end())
+		return theChFlood->getTotalCTCPCount();
+	return 0;
+}
+
+string sqlChannel::getAntiFloodName(const AntiFloodType& floodType)
+{
+	if (floodType == ANTIFLOOD_NONE) return "NONE";
+	if (floodType == ANTIFLOOD_KICK) return "KICK";
+	if (floodType == ANTIFLOOD_BAN) return "BAN";
+	if (floodType == ANTIFLOOD_GLINE) return "GLINE";
+	return "NONE";
+}
+
+sqlChannel::repeatIPMapType sqlChannel::getRepeatMessageCount(const string& Message, string IP)
+{
+	unsigned int sum = 0;
+	repeatIPMapType res;
+	std::list < string > IPlist;
+	chanFloodMapType::iterator ptr = chanFloodMap.begin();
+	while (ptr != chanFloodMap.end())
+	{
+		bool incIP = false;
+		chanFloodType* currChanFloodMap = ptr->second;
+		// If an IP is specified, means we want to count repetition referring to a single IP
+		if ((!IP.empty()) && (IP != ptr->first))
+		{
+			ptr++;
+			continue;
+		}
+		if (currChanFloodMap->getLastMessage() == Message)
+		{
+			sum += currChanFloodMap->repCount;
+			incIP = true;
+		}
+		if (incIP) IPlist.push_back(ptr->first);
+		ptr++;
+	}
+	//if (IPlist.size() > 1) incAntiFlood();
+	res = std::make_pair(sum, IPlist);
+	return res;
+}
+
+time_t sqlChannel::getIPLastTime(const string& IP)
+{
+	if (chanFloodMap.find(IP) != chanFloodMap.end())
+		return chanFloodMap[IP]->getLastTime();
+	return (time_t)(0);
+}
+
+//void sqlChannel::setIPLastTime(const string& IP)
+//{
+//	if (chanFloodMap.find(IP) != chanFloodMap.end())
+//		chanFloodMap[IP]->setLastTime(now);
+//}
+
+void sqlChannel::RemoveFlooderIP(const string& IP)
+{
+	if (chanFloodMap.find(IP) != chanFloodMap.end())
+	{
+		//elog << "sqlChannel::RemoveFlooderIP> chanFloodMap.find(" << IP << ") != chanFloodMap.end() ERASING" << endl;
+		delete chanFloodMap[IP];
+		chanFloodMap.erase(IP);
+	}
+}
+
+void sqlChannel::handleNewMessage(const FloodType& floodtype, const string& IP, const string& Message)
+{
+	chanFloodType* chanFlooder;
+	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	if (itr == chanFloodMap.end())
+	{
+		chanFlooder = new (std::nothrow) chanFloodType();
+		assert(chanFlooder != 0);
+		chanFlooder->setLastTime(now);
+		chanFlooder->setLastMessage(Message);
+		chanFlooder->repCount = 1;
+		if (floodtype == FLOOD_MSG)
+		{
+			chanFlooder->messageFloodMap[Message].first = now;
+			chanFlooder->messageFloodMap[Message].second = 1;
+		}
+		if (floodtype == FLOOD_NOTICE)
+		{
+			chanFlooder->noticeFloodMap[Message].first = now;
+			chanFlooder->noticeFloodMap[Message].second = 1;
+		}
+		if (floodtype == FLOOD_CTCP)
+		{
+			chanFlooder->ctcpFloodMap[Message].first = now;
+			chanFlooder->ctcpFloodMap[Message].second = 1;
+		}
+		chanFloodMap.insert(std::make_pair(IP, chanFlooder));
+	}
+	else
+	{
+		//If expired ...
+		chanFlooder = itr->second;
+		if ((now - chanFlooder->getLastTime()) > (time_t)flood_period)
+		{
+			chanFlooder->messageFloodMap.clear();
+			chanFlooder->noticeFloodMap.clear();
+			chanFlooder->ctcpFloodMap.clear();
+			chanFlooder->messageFloodMap[Message].second = 0;
+			chanFlooder->noticeFloodMap[Message].second = 0;
+			chanFlooder->ctcpFloodMap[Message].second = 0;
+			chanFlooder->repCount = 0;
+		}
+		floodMessageType currMessageMap;
+		if (floodtype == FLOOD_MSG)
+		{
+			currMessageMap = chanFlooder->messageFloodMap;
+			if (currMessageMap.find(Message) != currMessageMap.end())
+			{
+				chanFlooder->messageFloodMap[Message].second++;
+				if (chanFlooder->getLastMessage() == Message)
+					chanFlooder->repCount++;
+				else
+					chanFlooder->repCount = 1;
+			}
+			else
+			{
+				chanFlooder->messageFloodMap[Message].second = 1;
+				chanFlooder->repCount = 1;
+			}
+			chanFlooder->messageFloodMap[Message].first = now;
+		}
+		if (floodtype == FLOOD_NOTICE)
+		{
+			currMessageMap = chanFlooder->noticeFloodMap;
+			if (currMessageMap.find(Message) != currMessageMap.end())
+			{
+				chanFlooder->noticeFloodMap[Message].second++;
+				if (chanFlooder->getLastMessage() == Message)
+					chanFlooder->repCount++;
+				else
+					chanFlooder->repCount = 1;
+			}
+			else
+			{
+				chanFlooder->noticeFloodMap[Message].second = 1;
+				chanFlooder->repCount = 1;
+			}
+			chanFlooder->noticeFloodMap[Message].first = now;
+		}
+		if (floodtype == FLOOD_CTCP)
+		{
+			currMessageMap = chanFlooder->ctcpFloodMap;
+			if (currMessageMap.find(Message) != currMessageMap.end())
+			{
+				chanFlooder->ctcpFloodMap[Message].second++;
+				if (chanFlooder->getLastMessage() == Message)
+					chanFlooder->repCount++;
+				else
+					chanFlooder->repCount = 1;
+			}
+			else
+			{
+				chanFlooder->ctcpFloodMap[Message].second = 1;
+				chanFlooder->repCount = 1;
+			}
+			chanFlooder->ctcpFloodMap[Message].first = now;
+		}
+		chanFlooder->setLastTime(now);
+		chanFlooder->setLastMessage(Message);
+	}
+	if (floodtype == FLOOD_MSG) calcTotalMessageCount(IP);
+	if (floodtype == FLOOD_NOTICE) calcTotalNoticeCount(IP);
+	if (floodtype == FLOOD_CTCP) calcTotalCTCPCount(IP);
+}
+
+void sqlChannel::calcTotalMessageCount(const string& IP)
+{
+	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(IP);
+	if (ptr != chanFloodMap.end())
+	{
+		unsigned int sum = 0;
+		chanFloodType* currChanFloodMap = ptr->second;
+		if ((now - currChanFloodMap->getLastTime()) > (time_t)flood_period)
+		{
+			RemoveFlooderIP(IP);
+			return;
+		}
+		floodMessageType currMessageMap = currChanFloodMap->messageFloodMap;
+		floodMessageType::iterator ptr2 = currMessageMap.begin();
+		while (ptr2 != currMessageMap.end())
+		{
+			if ((now - ptr2->second.first) > (time_t)flood_period)
+				currMessageMap.erase(ptr2++);
+			else
+			{
+				sum += ptr2->second.second;
+				ptr2++;
+			}
+		}
+		currChanFloodMap->setTotalMessageCount(sum);
+	}
+}
+
+void sqlChannel::calcTotalNoticeCount(const string& IP)
+{
+	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(IP);
+	if (ptr != chanFloodMap.end())
+	{
+		unsigned int sum = 0;
+		chanFloodType* currChanFloodMap = ptr->second;
+		if ((now - currChanFloodMap->getLastTime()) > (time_t)flood_period)
+		{
+			RemoveFlooderIP(IP);
+			return;
+		}
+		floodMessageType currMessageMap = currChanFloodMap->noticeFloodMap;
+		floodMessageType::iterator ptr2 = currMessageMap.begin();
+		while (ptr2 != currMessageMap.end())
+		{
+			if ((now - ptr2->second.first) > (time_t)flood_period)
+				currMessageMap.erase(ptr2++);
+			else
+			{
+				sum += ptr2->second.second;
+				ptr2++;
+			}
+		}
+		currChanFloodMap->setTotalNoticeCount(sum);
+	}
+}
+
+void sqlChannel::calcTotalCTCPCount(const string& IP)
+{
+	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(IP);
+	if (ptr != chanFloodMap.end())
+	{
+		unsigned int sum = 0;
+		chanFloodType* currChanFloodMap = ptr->second;
+		if ((now - currChanFloodMap->getLastTime()) > (time_t)flood_period)
+		{
+			RemoveFlooderIP(IP);
+			return;
+		}
+		floodMessageType currMessageMap = currChanFloodMap->ctcpFloodMap;
+		floodMessageType::iterator ptr2 = currMessageMap.begin();
+		while (ptr2 != currMessageMap.end())
+		{
+			if ((now - ptr2->second.first) > (time_t)flood_period)
+				currMessageMap.erase(ptr2++);
+			else
+			{
+				sum += ptr2->second.second;
+				ptr2++;
+			}
+		}
+		currChanFloodMap->setTotalCTCPCount(sum);
+	}
+}
+
 sqlChannel::~sqlChannel()
 {
 	/* TODO: Clean up bans */
+	chanFloodMap.clear();
 }
-
 } // Namespace gnuworld

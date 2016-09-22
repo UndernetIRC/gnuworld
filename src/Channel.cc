@@ -36,7 +36,6 @@
 #include	"ELog.h"
 #include	"match.h"
 #include	"server.h"
-#include	"ConnectionManager.h"
 
 RCSTAG("$Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $") ;
 
@@ -523,47 +522,12 @@ return (modeString + ' ' + argString) ;
 
 string Channel::createBan( const iClient* theClient )
 {
-assert( theClient != 0 ) ;
+	assert( theClient != 0 ) ;
 
-string theBan = "*!*" ;
-
-// If we're +x, don't bother with the user name either.
-if(!theClient->isModeX())
-	{
-	// Don't include the '~'
-	if( (theClient->getUserName().size() >= 2) &&
-		('~' == theClient->getUserName()[ 0 ]) )
-		{
-		theBan += theClient->getUserName().c_str() + 1 ;
-		}
-	else if( !theClient->getUserName().empty() )
-		{
-		theBan += theClient->getUserName() ;
-		}
-	}
-
-theBan += '@' ;
-
-StringTokenizer st( theClient->getInsecureHost(), '.' ) ;
-if( ConnectionManager::isIpAddress( theClient->getInsecureHost() ) )
-	{
-	theBan += st[ 0 ] + '.' ;
-	theBan += st[ 1 ] + '.' ;
-	theBan += st[ 2 ] + ".*" ;
-	}
-else
-	{
-	if( (2 == st.size()) || theClient->isModeX() )
-		{
-		theBan += theClient->getInsecureHost() ;
-		}
+	if (theClient->isModeX())
+		return "*!*@" + theClient->getInsecureHost();
 	else
-		{
-		theBan += "*." + st.assemble( 1 ) ;
-		}
-	}
-
-return theBan ;
+		return createBanMask(theClient->getNickUserHost());
 }
 
 void Channel::removeAllModes()

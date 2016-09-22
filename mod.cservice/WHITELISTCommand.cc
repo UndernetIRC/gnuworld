@@ -80,15 +80,32 @@ if (level < level::whitelist)
         return false;
         }
 
-if (!ConnectionManager::isIpAddress(st[2]))
-	{
-	bot->Notice(theClient, "You can only supply a single IPv4 address in dot-decimal notation. (a.b.c.d)");
+string strIP = st[2];
+irc_in_addr whiteIP;
+unsigned char ipmask_len;
+if (!ipmask_parse(strIP.c_str(), &whiteIP, &ipmask_len))
+{
+	bot->Notice(theClient, "You must supply either a single IPv4 or /64 IPv6 address.");
 	return true;
-	}
+}
+
+bool IsIPv4 = irc_in_addr_is_ipv4(&whiteIP);
+if ((ipmask_len < 64) || ((IsIPv4) && (ipmask_len < 128)))
+{
+	bot->Notice(theClient, "You must supply either a single IPv4 or /64 IPv6 address.");
+	return true;
+}
+
+//Force the IPv6 address to a /64
+if ((!IsIPv4) && ((ipmask_len > 64) || (strIP.find('/') == string::npos)))
+{
+	strIP = strIP.substr(0, strIP.find('/'));
+	strIP = createClass(strIP);
+}
 
 stringstream whitelistQuery;
 whitelistQuery 	<< "SELECT ip, addedby, addedon, expiresat, reason FROM whitelist WHERE "
-		<< "IP = '" << st[2] << "'" << ends;
+		<< "IP = '" << strIP << "'" << ends;
 
 #ifdef LOG_SQL
         elog    << "WHITELIST::sqlQuery> "
@@ -128,7 +145,7 @@ if (option == "ADD")
 		}
 
 	if (onList) {
-		bot->Notice(theClient, "The IP %s is already added to the whitelist.", st[2].c_str());
+		bot->Notice(theClient, "The IP %s is already added to the whitelist.", strIP.c_str());
 		return true;
 		}
 
@@ -161,11 +178,11 @@ if (option == "ADD")
 	}
 	
 	string whiteReason = st.assemble(4);
-//	elog << st[1] << " " << st[2] << " " << whiteTime << " " << whiteReason << endl;
+//	elog << st[1] << " " << strIP << " " << whiteTime << " " << whiteReason << endl;
 
 	stringstream whitelistQuery;
 	whitelistQuery 	<< "INSERT INTO whitelist (IP, AddedBy, AddedOn, ExpiresAt, Reason) "
-                	<< "VALUES ('" << st[2] << "', '" << theUser->getUserName()
+                	<< "VALUES ('" << strIP << "', '" << theUser->getUserName()
 			<< "', now()::abstime::int4, " << expireTime << ", '"
 			<< whiteReason << "')"
 	                << ends;
@@ -183,7 +200,10 @@ if( !bot->SQLDb->Exec( whitelistQuery, true ) )
                 << endl ;
 		return false;
         }
-	bot->Notice(theClient, "IP %s added to the whitelist.", st[2].c_str());
+	bot->Notice(theClient, "IP %s added to the whitelist.", strIP.c_str());
+	bot->Notice(theClient, "(expires in: %s) by %s -- %s",
+		bot->prettyDuration(bot->currentTime() - whiteTime).c_str(),
+		theUser->getUserName().c_str(), whiteReason.c_str());
 	return true;
 	}
 
@@ -191,7 +211,7 @@ if (option == "REM" || option == "DEL")
         {
         if (!onList) 
 		{
-	        bot->Notice(theClient, "Can't find IP %s on the whitelist.", st[2].c_str());
+	        bot->Notice(theClient, "Can't find IP %s on the whitelist.", strIP.c_str());
 		return true;
 		}
 	
@@ -218,7 +238,7 @@ if( !bot->SQLDb->Exec( whitelistQuery, true ) )
                 << endl ;
                 return false;
         }
-	bot->Notice(theClient, "Removed IP %s from the whitelist.", st[2].c_str());
+	bot->Notice(theClient, "Removed IP %s from the whitelist.", strIP.c_str());
         return true;
         }
 
@@ -226,7 +246,7 @@ if (option == "VIEW")
         {
 	if (!onList)
 		{
-		bot->Notice(theClient, "Can't find IP %s on the whitelist.", st[2].c_str());
+		bot->Notice(theClient, "Can't find IP %s on the whitelist.", strIP.c_str());
 		return true;
 		}
 

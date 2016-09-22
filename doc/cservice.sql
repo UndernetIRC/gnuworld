@@ -3,6 +3,12 @@
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2014-08-11: Seven
+--             Added table 'user_sec_history' to track user login history
+-- 2013-12-07: Seven
+--             Changed 'pending_traffic' table 'ip_number' column type to inet
+--             Changed 'whitelist' table 'IP' column type to inet
+--             Updated table structure 'ip_restrict';
 -- 2012-05-25: MrBean
 --	       Added 'totp_key' colum  to 'users' table	
 -- 2011-12-12: Spike
@@ -130,7 +136,7 @@ CREATE TABLE channels (
 	-- Do we want to keep either or both of these?
 	-- nb: removed nickflood pro.  not useful.
 	mass_deop_pro INT2 NOT NULL DEFAULT 3,
-	flood_pro INT2 NOT NULL DEFAULT 7,
+	flood_pro INT4 NOT NULL DEFAULT '0',
 	url VARCHAR (128),
 	description VARCHAR (128),
 	-- Any administrative comments that apply globally to this
@@ -152,6 +158,7 @@ CREATE TABLE channels (
 	limit_period INT4 DEFAULT '20',
 	limit_grace INT4 DEFAULT '1',
 	limit_max INT4 DEFAULT '0',
+	no_take INT4 DEFAULT '0',
 
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
@@ -244,6 +251,15 @@ CREATE TABLE users_lastseen (
 	PRIMARY KEY (user_id)
 );
 
+CREATE TABLE user_sec_history (
+	user_id INT4 NOT NULL,
+	user_name TEXT NOT NULL,
+	command TEXT NOT NULL,
+	ip VARCHAR( 256 ) NOT NULL,
+	hostmask VARCHAR( 256 ) NOT NULL,
+	timestamp INT4 NOT NULL
+);
+
 CREATE TABLE levels (
 
 	channel_id INT4 CONSTRAINT levels_channel_id_ref REFERENCES channels ( id ),
@@ -257,6 +273,7 @@ CREATE TABLE levels (
 	suspend_expires INT4 DEFAULT '0',
 	suspend_level INT4 DEFAULT '0',
 	suspend_by VARCHAR( 128 ),
+	suspend_reason VARCHAR( 300 ),
 	added INT4,
 	added_By VARCHAR( 128 ),
 	last_Modif INT4,
@@ -339,6 +356,7 @@ CREATE TABLE supporters (
 -- ? - Not answered yet.
 -- Y - Supports this channel.
 -- N - Doesn't support this channel.
+	noticed CHAR NOT NULL DEFAULT 'N',
 	reason TEXT,
 -- Reason for not supporting it if required.
 	join_count INT4 DEFAULT '0',
@@ -377,6 +395,7 @@ CREATE TABLE pending (
 	last_updated INT4 NOT NULL,
 	description TEXT,
 	reviewed CHAR NOT NULL DEFAULT 'N',
+	first_init CHAR NOT NULL DEFAULT 'N',
 	reviewed_by_id INT4 CONSTRAINT pending_review_ref REFERENCES users (id),
 	PRIMARY KEY(channel_id)
 );
@@ -386,7 +405,7 @@ CREATE INDEX pending_manager_id_idx ON pending(manager_id);
 
 CREATE TABLE pending_traffic (
 	channel_id INT4 CONSTRAINT pending_traffic_channel_ref REFERENCES channels (id),
-	ip_number INT4,
+	ip_number inet,
 	join_count INT4,
 	PRIMARY KEY(channel_id, ip_number)
 );
@@ -469,6 +488,14 @@ CREATE TABLE notes (
 	PRIMARY KEY(message_id, user_id)
 );
 
+CREATE TABLE notices (
+	message_id SERIAL,
+	user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
+	message VARCHAR( 300 ),
+	last_updated INT4 NOT NULL,
+
+	PRIMARY KEY(message_id, user_id)
+);
 
 --CREATE TABLE mailq (
 --	user_id INT4 CONSTRAINT mailq_users_ref REFERENCES users(id),
@@ -631,14 +658,16 @@ CREATE INDEX adminlog_i_idx ON adminlog(issue_by);
 
 
 CREATE TABLE ip_restrict (
-	id 	SERIAL,
-	user_id	int4 NOT NULL,
-	allowmask 	varchar(255) NOT NULL,
-	allowrange1 	int4 NOT NULL,
-	allowrange2 	int4 NOT NULL,
-	added 	int4 NOT NULL,
-	added_by 	int4 NOT NULL,
-	type 	int4 NOT NULL
+	id		SERIAL,
+	user_id		int4 NOT NULL,
+	added		int4 NOT NULL,
+	added_by	int4 NOT NULL,
+	type		int4 NOT NULL DEFAULT 0,
+	value		inet NOT NULL,
+	last_updated	int4 NOT NULL DEFAULT now()::abstime::int4,
+	last_used	int4 NOT NULL DEFAULT 0,
+	expiry		int4 NOT NULL,
+	description	VARCHAR(255)
 );
 
 CREATE INDEX ip_restrict_idx ON ip_restrict(user_id,type);
@@ -663,7 +692,7 @@ CREATE TABLE glines (
 
 CREATE TABLE whitelist (
         Id SERIAL,
-        IP VARCHAR(15) UNIQUE NOT NULL,
+        IP inet UNIQUE NOT NULL,
         AddedBy VARCHAR(128) NOT NULL,
         AddedOn INT4 NOT NULL,
         ExpiresAt INT4 NOT NULL,

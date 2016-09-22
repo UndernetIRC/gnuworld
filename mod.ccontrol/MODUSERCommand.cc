@@ -140,7 +140,7 @@ while(pos < st.size())
 		}			
 	else if(!strcasecmp(st[pos],"-ah")) //Trying to add a new host ?
 		{
-		if((Same) && (AdFlag < operLevel::CODERLEVEL))
+		if((Same) && (AdFlag < operLevel::ADMINLEVEL))
 			{
 			bot->Notice(theClient,"You can't add yourself another host");
 			pos+=2;
@@ -157,7 +157,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"Hostname can't be more than 128 characters");
 			return false;
 			}
-		if(!bot->validUserMask(st[pos+1]))
+		if(!validUserMask(st[pos+1]))
 			{
 			bot->Notice(theClient,"Mask '%s' is not a valid mask in the form of *!*@*",
 				st[pos+1].c_str());
@@ -234,6 +234,103 @@ while(pos < st.size())
 			{
 			bot->Notice(theClient,"unknown option %s for -gl must be on/off",st[pos+1].c_str());
 			return false;
+			}
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->Update();
+		pos += 2;
+		}	
+
+	else if(!strcasecmp(st[pos],"-sso")) //Trying to toggle the Single Sign On
+		{
+		if((pos + 1) >= st.size())
+			{
+			bot->Notice(theClient,"-sso option must get on/off");
+			return false;
+			}
+		if(!strcasecmp(st[pos+1],"on"))
+			{
+			tmpUser->setSso(true);
+			bot->Notice(theClient,"Single Sign On has been turned on for %s",st[1].c_str());
+			}
+		else if(!strcasecmp(st[pos+1],"off"))
+			{
+			tmpUser->setSso(false);
+			bot->Notice(theClient,"Single Sign On has been turned off for %s",st[1].c_str());
+			}
+		else
+			{
+			bot->Notice(theClient,"unknown option %s for -sso must be on/off",st[pos+1].c_str());
+			return false;
+			}
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->Update();
+		pos += 2;
+		}	
+
+	else if(!strcasecmp(st[pos],"-ssooo")) //Trying to toggle the Single Sign On if Opered Only 
+		{
+		if (AdFlag < operLevel::SMTLEVEL)
+			{
+			bot->Notice(theClient,"Single sign on with oper requirement can only be modified by SMT+");
+			return false;
+			}
+		if((pos + 1) >= st.size())
+			{
+			bot->Notice(theClient,"-ssooo option must get on/off");
+			return false;
+			}
+		if(!strcasecmp(st[pos+1],"on"))
+			{
+			tmpUser->setSsooo(true);
+			bot->Notice(theClient,"Single sign on with oper requirement has been turned on for %s",st[1].c_str());
+			}
+		else if(!strcasecmp(st[pos+1],"off"))
+			{
+			// Only a smt+ can set Ssooo to off for an oper
+			if (AdFlag < operLevel::SMTLEVEL)
+				{
+				bot->Notice(theClient,"Single sign on with oper requirement can only be turned off by SMT+");
+				return false;
+				}
+			tmpUser->setSsooo(false);
+			bot->Notice(theClient,"Single sign on with oper requirement has been turned off for %s",st[1].c_str());
+			}
+		else
+			{
+			bot->Notice(theClient,"unknown option %s for -ssooo must be on/off",st[pos+1].c_str());
+			return false;
+			}
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->Update();
+		pos += 2;
+		}	
+
+	else if(!strcasecmp(st[pos],"-autoop")) //Trying to toggle autoop
+		{
+		if((pos + 1) >= st.size())
+			{
+			bot->Notice(theClient,"-autoop option must get on/off");
+			return false;
+			}
+		if(!strcasecmp(st[pos+1],"on"))
+			{
+			// Only a smt+ can set AutoOp to on
+			if (AdFlag < operLevel::SMTLEVEL)
+				{
+				bot->Notice(theClient,"-autoop can only be turned on by SMT+");
+				return false;
+				}
+			tmpUser->setAutoOp(true);
+			bot->Notice(theClient,"AutoOp has been turned on for %s",st[1].c_str());
+			}
+		else if(!strcasecmp(st[pos+1],"off"))
+			{
+			tmpUser->setAutoOp(false);
+			bot->Notice(theClient,"AutoOp has been turned off for %s",st[1].c_str());
+			}
+		else
+			{
+			bot->Notice(theClient,"unknown option %s. -autoop must be on/off",st[pos+1].c_str());
 			}
 		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
 		tmpUser->Update();
@@ -444,6 +541,45 @@ while(pos < st.size())
 		pos+=2;
 		}
 		
+	else if(!strcasecmp(st[pos],"-x")) //Trying to set account
+		{
+		string cAC = theClient->getAccount();
+		string dbAC = tmpUser->getAccount();
+		if (!Same) {
+			bot->Notice(theClient,"You can only set an account for yourself");
+			return false;
+		}
+		if (theClient->isModeR()) {
+			if (!strcasecmp(cAC,dbAC)) {
+				bot->Notice(theClient, "Your account is already set to %s", cAC.c_str());
+				return false;
+			}
+			ccUser *otherUser;
+			if ((otherUser = bot->GetOperByAC(cAC))) {
+				bot->Notice(theClient, "This account already belongs to another user: %s", otherUser->getUserName().c_str());
+				return false;
+			}
+			tmpUser->setAccount(bot->removeSqlChars(cAC));
+			tmpUser->setAccountTS(theClient->getAccountTS());
+			bot->accountsMapAdd(tmpUser, cAC);
+			bot->Notice(theClient,"Successfully set your account to: %s.",cAC.c_str());
+		}
+		else {
+			if (!dbAC.empty())
+				bot->accountsMapDel(dbAC);
+			tmpUser->setAccount("");
+			tmpUser->setAccountTS(0);
+			bot->Notice(theClient,"Successfully removed your account.");
+		}
+
+		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		if(!tmpUser->Update())
+			{
+			bot->Notice(theClient,"Error while updating account");
+			}
+		pos+=2;
+		}
+
 	else if(!strcasecmp(st[pos],"-e")) //Trying to change email
 		{
 		if((pos + 1) >= st.size())

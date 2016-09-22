@@ -149,6 +149,8 @@ if( tmpUser->commit(theClient) )
 		bot->getResponse(tmpUser,
 			language::pass_changed,
 			string("Password successfully changed.")));
+
+	bot->InsertUserHistory(theClient, "NEWPASS");
 	}
 else
 	{

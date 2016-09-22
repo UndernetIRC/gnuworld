@@ -87,8 +87,8 @@ if( st.size() >= 2 )
 			sqlPendingChannel::trafficListType::iterator tPtr = tmpPending->trafficList.begin();
 			for( ; tPtr != tmpPending->trafficList.end() ; ++tPtr )
 				{
-				bot->Notice(theClient, " - IP #: %i (Channel ID: %i) (Join Count: %i)",
-					tPtr->second->ip_number, tPtr->second->channel_id, tPtr->second->join_count);
+				bot->Notice(theClient, " - IP #: %s (Channel ID: %i) (Join Count: %i)",
+					tPtr->second->ip_number.c_str(), tPtr->second->channel_id, tPtr->second->join_count);
 				}
 		} else {
 			bot->Notice(theClient, "Channel doesn't have a pending application.");

@@ -90,6 +90,9 @@ if( NULL == theClient )
 // This first partString StringTokenizer will tokenize out the string
 // into two tokens (by space): chan1[,chan2,...] :part message
 StringTokenizer partString( Param[ 1 ] ) ;
+string partMsg;
+if (Param.size() > 2)
+	partMsg = string(Param[ 2 ]);
 
 // This tokenizer will separate out the invidividual channel names
 StringTokenizer st( partString[ 0 ], ',' ) ;
@@ -150,11 +153,11 @@ for( StringTokenizer::size_type i = 0 ; i < st.size() ; ++i )
 			<< endl ;
 		}
 
+	//elog << "msg_L> " << theClient << " Part " << theChan->getName() << " (" << partMsg << ")" << endl;
 	// Post the event to the clients listening for events on this
 	// channel, if any.
-	// TODO: Update message posting
 	theServer->PostChannelEvent( EVT_PART, theChan,
-		static_cast< void* >( theClient ) ) ;
+		static_cast< void* >( theClient ), static_cast< string* >( &partMsg )) ;
 
 	// Is the channel now empty, and no services clients are
 	// on the channel?

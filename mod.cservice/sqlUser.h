@@ -53,6 +53,7 @@ public:
 	static const flagType F_OPER;
 	static const flagType F_NOADDUSER;
 	static const flagType F_TOTP_ENABLED;
+	static const flagType F_TOTP_REQ_IPR;
 
 	/*
 	 *   User 'Event' Flags, used in the userlog table.
@@ -103,6 +104,9 @@ public:
 
 	inline const std::string&	getEmail() const
 		{ return email ; }
+
+	inline const std::string&	getVerifData() const
+		{ return verifdata ; }
 
 	inline bool isAuthed()
 		{ return (networkClientList.size() != 0); }
@@ -180,6 +184,9 @@ public:
 	inline void setEmail( const std::string& _email )
 		{ email = _email; }
 
+	inline void setVerifData( const std::string& _verifdata )
+		{ verifdata = _verifdata; }
+
 	inline void setMaxLogins( const unsigned int& _maxlogins )
 		{ maxlogins = _maxlogins; }
 
@@ -245,6 +252,7 @@ protected:
 	time_t		last_used;
 	time_t		instantiated_ts;
 	std::string	email ;
+	std::string	verifdata;
 	std::string	last_hostmask ;
 	std::string last_ip;
 	unsigned int	maxlogins;

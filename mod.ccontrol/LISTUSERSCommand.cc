@@ -68,10 +68,10 @@ bool LISTUSERSCommand::Exec(iClient* theClient, const string& Message) {
 		filters.addFilter(&levelsFilter);
 	}
 	ccUser* user;
-	ccontrol::usersConstIterator uItr = bot->usersMap_begin();
+	ccontrol::usersconstiterator uItr = bot->usersmap_begin();
 	int count = 0;
 	stringstream sstr;
-	for (; uItr != bot->usersMap_end(); uItr++) {
+	for (; uItr != bot->usersmap_end(); uItr++) {
 		user = uItr->second;
 		
 		if(filters.filter(user)) {

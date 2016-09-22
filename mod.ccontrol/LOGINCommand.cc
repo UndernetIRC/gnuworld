@@ -32,6 +32,7 @@
 #include	"StringTokenizer.h"
 #include	"md5hash.h" 
 #include        "ccUser.h"
+#include	"events.h"
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
@@ -51,6 +52,8 @@ namespace uworld
 bool LOGINCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
+
+bool isXAuthed = false;
 
 if( st.size() < 3 )
 	{
@@ -92,17 +95,20 @@ if (!theUser)
 	}
 else
 	{ 
-	//Check if the user need to be operd to login
-	if((!theClient->isOper()) && (theUser->getNeedOp()))
+	if ((!strcasecmp(theClient->getAccount(),theUser->getAccount())) && (theClient->getAccountTS() == theUser->getAccountTS()))
+		isXAuthed = true;
 
-		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - Not Oper'd\n",theClient->getRealNickUserHost().c_str());
-		bot->addLogin(theClient);
-		return false;
+	//Check if the user need to be operd to login
+	if((!theClient->isOper()) && (theUser->getNeedOp())) {
+		if ((!theUser->getAutoOp()) || (!isXAuthed)) {
+			bot->MsgChanLog("[FAILED LOGIN] %s - Not Oper'd\n",theClient->getRealNickUserHost().c_str());
+			bot->addLogin(theClient);
+			return false;
 		}
+	}
 	//Check if the users mask is in his access list
-	if((!bot->UserGotMask(theUser,theClient->getRealNickUserHost()))
-	    &&(!bot->UserGotMask( theUser,theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP(theClient->getIP()).GetNumericIP())))	
+	if((!theClient->isOper()) && (!bot->UserGotMask(theUser,theClient->getRealNickUserHost()))
+	    &&(!bot->UserGotMask( theUser,theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP(theClient->getIP()).GetNumericIP())))
 		{
 		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getRealNickUserHost().c_str());
 		if(theClient->isOper()) 
@@ -146,32 +152,7 @@ else
 		return false;
 		}
 	//Ok the password match , prepare the ccUser data
-	if(theUser->getClient()) //there is already a user authenticated under that nick
-		{
-		const iClient *tClient = theUser->getClient();
-		bot->Notice(tClient,"You have just been deauthenticated");
-		bot->MsgChanLog("Login conflict for user %s from %s and %s (%s)\n",
-				st[1].c_str(),theClient->getNickName().c_str(),
-				tClient->getNickName().c_str(), targetServer->getName().c_str());
-		bot->deAuthUser(theUser);
-		}
-	theUser->setUserName(st[1]);
-	theUser->setNumeric(theClient->getCharYYXXX());
-	//Try creating an authentication entry for the user
-	if(bot->AuthUser(theUser,theClient))
-		if(!(bot->isSuspended(theUser)))
-			bot->Notice(theClient, "Authentication successful as %s! ",theUser->getUserName().c_str()); 
-		else 
-			bot->Notice(theClient, "Authentication successful as %s, "
-				"however you are currently suspended ",
-				theUser->getUserName().c_str()); 
-	else if(theClient->isOper())
-	        bot->Notice(theClient, "Error in authentication as %s",theUser->getUserName().c_str()); 
-        bot->MsgChanLog("(%s) - %s: AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
-                        theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
-	/* record their connection timestamp + numeric */
-	theUser->setLastAuthTS(theClient->getConnectTime());
-	theUser->setLastAuthNumeric(theClient->getCharYYXXX());
+	bot->OkAuthUser(theClient, theUser);
 	} 
 
 return true; 

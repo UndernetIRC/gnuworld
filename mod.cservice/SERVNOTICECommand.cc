@@ -86,7 +86,7 @@ if (!tmpChan)
 	}
 
 string theMessage = st.assemble(2);
-bot->serverNotice(tmpChan, "%s", theMessage.c_str());
+this->server->serverNotice(tmpChan, "%s", theMessage.c_str());
 
 return true ;
 }

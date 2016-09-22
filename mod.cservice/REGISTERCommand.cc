@@ -55,12 +55,10 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 {
 	bot->incStat("COMMANDS.REGISTER");
 
-	StringTokenizer st( Message ) ;
-	if( st.size() < 3 )
-	{
-		Usage(theClient);
-		return true;
-	}
+	bool instantReg = false;
+
+	if (bot->RequiredSupporters == 0)
+		instantReg = true;
 
 	/*
 	 *  Fetch the sqlUser record attached to this client. If there isn't one,
@@ -69,6 +67,30 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 	sqlUser* theUser = bot->isAuthed(theClient, true);
 	if (!theUser) return false;
+
+	/*
+	 *  Check the user has sufficient access for this command..
+	 */
+	int level = bot->getAdminAccessLevel(theUser);
+	if ((level < level::registercmd) && (!instantReg))
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::insuf_access,
+				string("You have insufficient access to perform that command.")));
+		return false;
+	}
+
+	StringTokenizer st( Message ) ;
+
+	if (st.size() < 2)
+	{
+		if (level == 0)
+			Usage(theClient);
+		else
+			bot->Notice(theClient, "SYNTAX: REGISTER <#channel> [username]");
+		return true;
+	}
 
  	/*
 	 *  First, check the channel isn't already registered.
@@ -86,29 +108,44 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
-	sqlUser* tmpUser = bot->getUserRecord(st[2]);
-	if (!tmpUser)
+	sqlUser* tmpUser;
+
+	// In case of instant channel registration, the target user can be only the issuer user
+	if (instantReg)
+		tmpUser = theUser;
+
+	if ((st.size() > 2) && (level))
+	{
+		tmpUser = bot->getUserRecord(st[2]);
+		if (!tmpUser)
 		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::not_registered,
-				string("The user %s doesn't appear to be registered.")).c_str(),
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::not_registered,
+					string("The user %s doesn't appear to be registered.")).c_str(),
 			st[2].c_str());
 		return true;
 		}
+	}
 
-	/*
-	 *  Check the user has sufficient access for this command..
-	 */
-
-	int level = bot->getAdminAccessLevel(theUser);
-	if (level < level::registercmd)
+	if (!bot->isValidChannel(st[1]))
 	{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::insuf_access,
-				string("You have insufficient access to perform that command.")));
-		return false;
+		if (!bot->validResponseString.empty())
+		{
+			bot->Notice(theClient, "Cannot register, channel is %s",bot->getCurrentValidResponse().c_str());
+			bot->validResponseString.clear();
+		}
+       	return false;
+	}
+
+	if (!bot->isValidUser(tmpUser->getUserName()))
+	{
+		if (!bot->validResponseString.empty())
+		{
+			bot->Notice(theClient, "Cannot register, invalid target user (%s)",bot->getCurrentValidResponse().c_str());
+			bot->validResponseString.clear();
+		}
+       	return false;
 	}
 
 	string::size_type pos = st[1].find_first_of( ',' ); /* Don't allow comma's in channel names. :) */
@@ -136,9 +173,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	newChan->setName(st[1]);
 	newChan->setChannelTS(channel_ts);
 	newChan->setRegisteredTS(bot->currentTime());
-	newChan->setChannelMode("+tn");
+	newChan->setChannelMode("+tnR");
 	newChan->setLastUsed(bot->currentTime());
-
+	newChan->setFlag(sqlChannel::F_AUTOJOIN);
 
  	/*
 	 *  If this channel exists in the database (without a registered_ts set),
@@ -175,7 +212,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 		reclaimQuery<< "UPDATE channels SET registered_ts = now()::abstime::int4,"
 					<< " last_updated = now()::abstime::int4, "
-					<< " flags = 0, description = '', url = '', comment = '', keywords = '', channel_mode = '+tn' "
+					<< " flags = 0, description = '', url = '', comment = '', keywords = '', channel_mode = '+tnR' "
 					<< " WHERE lower(name) = '"
 					<< escapeSQLChars(string_lower(st[1]))
 					<< "'"
@@ -203,7 +240,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		}
 
 	}
-		else /* We perform a normal registration. */
+	else /* We perform a normal registration. */
 	{
 		newChan->insertRecord();
 
@@ -242,6 +279,9 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 		{
 			theId = atoi(bot->SQLDb->GetValue(0, 0));
 			newChan->setID(theId);
+			newChan->setFlag(sqlChannel::F_NOTAKE);
+			newChan->setNoTake(1);
+			newChan->commit();
 			
 			bot->sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
 			bot->sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
@@ -292,14 +332,22 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 	pair<int, int> thePair( newManager->getUserId(), newManager->getChannelId());
 	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newManager));
 
-	/* set channel mode R - tmpChan is created further above */
-	stringstream tmpTS;
-	tmpTS << channel_ts;
-	string channelTS = tmpTS.str();
-
-	if (tmpChan)
-		bot->getUplink()->Mode(NULL, tmpChan, string("+R"), channelTS );
 	bot->getUplink()->RegisterChannelEvent(st[1],bot);
+	bot->Join(newChan->getName(), string("+tnR"), newChan->getChannelTS(), true);
+	newChan->setInChan(true);
+	bot->joinCount++;
+
+	//Send a welcome notice to the channel
+	if (!bot->welcomeNewChanMessage.empty())
+		bot->Notice(newChan->getName(), TokenStringsParams(bot->welcomeNewChanMessage.c_str(), newChan->getName().c_str()).c_str());
+
+	//Set a welcome topic of the new channel, only if the actual topic is empty
+#ifdef TOPIC_TRACK
+	if (!bot->welcomeNewChanTopic.empty())
+	if (tmpChan && tmpChan->getTopic().empty())
+		bot->Topic(tmpChan, bot->welcomeNewChanTopic);
+#endif
+
 	return true;
 }
 

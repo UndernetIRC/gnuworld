@@ -76,6 +76,9 @@ public:
 	inline const string&		getSuspendBy() const
 		{ return suspend_by ; }
 
+	inline const string&		getSuspendReason() const
+		{ return suspend_reason ; }
+
 	inline const time_t&		getAdded() const
 		{ return added ; }
 
@@ -125,6 +128,9 @@ public:
 	inline void setSuspendBy( const string& _suspend_by )
 		{ suspend_by = _suspend_by; }
 
+	inline void setSuspendReason( const string& _suspend_reason )
+		{ suspend_reason = _suspend_reason; }
+
 	inline void setAdded( const time_t& _added )
 		{ added = _added; }
 
@@ -155,6 +161,7 @@ protected:
 	time_t			suspend_expires ;
 	int				suspend_level ;
 	string			suspend_by ;
+	string			suspend_reason ;
 	time_t			added ;
 	string			added_by ;
 	time_t			last_modif ;

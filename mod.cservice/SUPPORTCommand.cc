@@ -238,9 +238,10 @@ if (supportChar == 'Y')
 	 */
 
 	string support;
-	int supporterCount = bot->SQLDb->Tuples();
+	unsigned int supporterCount = bot->SQLDb->Tuples();
+	if (supporterCount < bot->RequiredSupporters) return false;
 
-	for (int i = 0 ; i < supporterCount; i++)
+	for (unsigned int i = 0 ; i < supporterCount; i++)
 		{
 		support = bot->SQLDb->GetValue(i,0);
 		if (support != "Y") allSupporting = false;
@@ -335,13 +336,17 @@ if (supportChar == 'N')
 	{
 		string managerName = bot->SQLDb->GetValue(0,0);
 		string managerEmail = bot->SQLDb->GetValue(0,1);
+		int noregTime = bot->JudgeDaySeconds * bot->NoRegDaysOnNOSupport;
 		static const char* cmdHeader = "INSERT INTO noreg (user_name,email,channel_name,type,expire_time,created_ts,set_by,reason) VALUES ";
 
 		stringstream noregQuery;
 		noregQuery	<< cmdHeader
 					<< "('', '','"
 					<< escapeSQLChars(channelName) << "',"
-					<< "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
+                    // << "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
+					<< "1, (now()::abstime::int4 + ("
+					<< noregTime
+					<< ")), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
 #ifdef LOG_SQL

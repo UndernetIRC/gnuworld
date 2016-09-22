@@ -53,36 +53,7 @@ EConfig::EConfig( const string& _configFileName )
  : configFileName( _configFileName ),
    error( false )
 {
-//elog	<< "EConfig> Opening configFile: "
-//	<< configFileName
-//	<< ", hasError(): "
-//	<< hasError()
-//	<< endl ;
-
-ifstream configFile( configFileName.c_str() ) ;
-if( !configFile.is_open() )
-	{
-	elog	<< "EConfig> Unable to open file: "
-		<< configFileName
-		<< endl ;
-	setError() ;
-	}
-//else
-//	{
-//	elog	<< "EConfig> Successfully opened"
-//		<< endl ;
-//	}
-
-if( !readFile( configFile ) )
-	{
-	setError() ;
-	}
-//else
-//	{
-//	elog	<< "EConfig> Successfully parsed"
-//		<< endl ;
-//	}
-configFile.close() ;
+	openConfigFile();
 }
 
 EConfig::~EConfig()
@@ -122,6 +93,44 @@ if( ptr == valueMap.end() )
 
 // At least one key/value pair for this key exists; return it
 return ptr ;
+}
+
+bool EConfig::openConfigFile()
+{
+	//elog	<< "EConfig> Opening configFile: "
+	//	<< configFileName
+	//	<< ", hasError(): "
+	//	<< hasError()
+	//	<< endl ;
+
+	ifstream configFile( configFileName.c_str() ) ;
+	if( !configFile.is_open() )
+		{
+		elog	<< "EConfig> Unable to open file: "
+			<< configFileName
+			<< endl ;
+		setError() ;
+		return false;
+		}
+	//else
+	//	{
+	//	elog	<< "EConfig> Successfully opened"
+	//		<< endl ;
+	//	}
+
+	if( !readFile( configFile ) )
+	{
+		setError() ;
+		configFile.close() ;
+		return false;
+	}
+	//else
+	//	{
+	//	elog	<< "EConfig> Successfully parsed"
+	//		<< endl ;
+	//	}
+	configFile.close() ;
+	return true;
 }
 
 bool EConfig::readFile( ifstream& configFile )
@@ -447,6 +456,11 @@ if( !foundIt )
 valueMap.insert( mapType::value_type( itr->first, newValue ) ) ;
 
 return writeFile() ;
+}
+
+void EConfig::Clear()
+{
+	valueMap.clear();
 }
 
 bool EConfig::AddComment( const string& commentData )

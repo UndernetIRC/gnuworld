@@ -135,6 +135,21 @@ protected:
 	typedef usersMapType::iterator     usersIterator;
 	
 	/**
+	 * The db accounts map
+	 */
+	typedef map<string ,ccUser* ,noCaseCompare> accountsMapType;
+
+	/**
+	 * Holds the authenticated user list
+	 */
+	accountsMapType			accountsMap ;
+
+	/**
+	 * A mutable iterator to the accountsMap.
+	 */
+	typedef accountsMapType::iterator     accountsIterator;
+	
+	/**
 	 * The db servers
 	 */
 	typedef map<string, ccServer*, noCaseCompare> serversMapType;
@@ -342,13 +357,13 @@ public:
 	 * channel.
 	 */
 	virtual bool Join( const string&, const string& = string(),
-		time_t = 0, bool = false) ;
+			const time_t& = 0, bool = false) ;
 
 	/**
 	 * This method will cause this client to part the given channel,
 	 * if it is already on that channel.
 	 */
-	virtual bool Part( const string& ) ;
+	virtual bool Part( const string& , const string& = string()) ;
 
 	/**
 	 * This method will register a given command handler, removing
@@ -389,6 +404,10 @@ public:
 	virtual bool removeOperChan( const string& ) ;
 
 	void handleNewClient( iClient* );
+
+	void handleAC( iClient* );
+
+	void OkAuthUser(iClient* , ccUser* );
 	
 	void isNowAnOper ( iClient* );
 
@@ -461,11 +480,6 @@ public:
 	static string CryptPass( const string& );
 
 	/**
-	 * This method will check if a mask is valid
-	 */
-	virtual bool validUserMask(const string& userMask) const ;
-
-	/**
 	 * This method will add a host to a client
 	 */
         bool AddHost( ccUser* , const string& host );
@@ -517,6 +531,22 @@ public:
 
 	/**
 	 * This method will attempt to load an oper info from the database
+	 * based on the user account
+	 */
+	ccUser *GetOperByAC( const string& );
+
+	/**
+	 * This method will add an account to accountsMap
+	 */
+	bool accountsMapAdd (ccUser*, const string&);
+
+	/**
+	 * This method will remove an account from accountsMap
+	 */
+	bool accountsMapDel (const string&);
+
+	/**
+	 * This method will attempt to load an oper info from the database
 	 * based on the user id
 	 */
 	ccUser *GetOper( unsigned int );
@@ -535,9 +565,20 @@ public:
 
 	ccGline* findMatchingRNGline( const iClient* );
 
+	//TODO Eventually merge these three functions, update it's dependencies
 	ccGline* findGline( const string& );
 
 	ccGline* findRealGline( const string& );
+
+	ccGline* findGlineAndRealGline( const string& );
+
+	vector< ccGline* > findAllMatchingGlines(const string& );
+
+	/*
+	 * Remove matching glines from mod.ccontrol's glines list, from 'gnuworld server' gline list
+	 * and also send gline remove messages to the network.
+	 */
+	bool removeAllMatchingGlines( const string& , bool );
 
 	/**
 	 * This method logs the bot commands to the message channel
@@ -578,12 +619,23 @@ public:
 	 */
 	bool MailReport(const char *, const char *);
 
+	/*
+	 * checkGline functions for IPv4 and hostnames
+	 */
+	int checkGline4(string &,unsigned int ,unsigned int &);
+
+	int checkSGline4(string &,unsigned int ,unsigned int &);
+
+	//Checkgline functions only for IPv6
+	int checkGline6(string &,unsigned int ,unsigned int &);
+
+	int checkSGline6(string &,unsigned int ,unsigned int &);
 	/**
 	 * This method checks the gline paramerters for valid time/host
 	 */
-	int checkGline(const string ,unsigned int ,unsigned int &);
+	int checkGline(string &,unsigned int ,unsigned int &);
 
-	int checkSGline(const string ,unsigned int ,unsigned int &);
+	int checkSGline(string &,unsigned int ,unsigned int &);
 
 	bool isSuspended(ccUser *);
 	
@@ -943,20 +995,28 @@ public:
 	clientsIpIterator virtualClientsMapLastWarn_end()
 		{ return virtualClientsMapLastWarn.end(); }
 	
-	typedef  usersMapType::const_iterator	usersConstIterator;
+	typedef  usersMapType::const_iterator	usersconstiterator;
 	
-	usersConstIterator		usersMap_begin() const
+	typedef  accountsMapType::const_iterator	accountsconstiterator;
+	
+	usersconstiterator		usersmap_begin() const
 		{ return usersMap.begin(); }
 
-	usersConstIterator		usersMap_end() const
+	usersconstiterator		usersmap_end() const
 		{ return usersMap.end(); }
 
-	typedef  serversMapType::const_iterator	serversConstIterator;
+	accountsconstiterator		accountsMap_begin() const
+		{ return accountsMap.begin(); }
+
+	accountsconstiterator		accountsMap_end() const
+		{ return accountsMap.end(); }
+
+	typedef  serversMapType::const_iterator	serversconstiterator;
 	
-	serversConstIterator		serversMap_begin() const
+	serversconstiterator		serversMap_begin() const
 		{ return serversMap.begin(); }
 
-	serversConstIterator		serversMap_end() const
+	serversconstiterator		serversMap_end() const
 		{ return serversMap.end(); }
 
 	allowedVersionsType		VersionsList;
@@ -1083,7 +1143,9 @@ protected:
 
 	int			maxCClones;
 
-	int			CClonesCIDR;
+	int			CClonesCIDR24;
+
+	int			CClonesCIDR48;
 
 	int			CClonesTime;
 

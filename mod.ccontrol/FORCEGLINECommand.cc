@@ -64,13 +64,15 @@ if( st.size() < 3 )
 StringTokenizer::size_type pos = 1 ;
 
 bool Forced = false;
+string cmdStr = "FORCEGLINE ";
 
 ccUser* tmpUser = bot->IsAuth(theClient);
-bot->MsgChanLog("FORCEGLINE %s\n",st.assemble(1).c_str());
+//bot->MsgChanLog("FORCEGLINE %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[pos],"-fu"))
 	{
 	Forced = true;
 	pos++;
+	cmdStr += "-fu ";
 	if( st.size() < 4 )
 		{
 		Usage( theClient ) ;
@@ -125,7 +127,10 @@ if((Forced) && (tmpUser->getType() < operLevel::SMTLEVEL))
 	}
 	
 unsigned int Users;
-int gCheck = bot->checkGline(st[pos],gLength,Users);
+string gHost = st[pos];
+int gCheck = bot->checkGline(gHost,gLength,Users);
+hostName = gHost;
+cmdStr += gHost + " " + st.assemble(pos+1);
 
 if(gCheck & gline::NEG_TIME)
 	{
@@ -272,13 +277,13 @@ if(Reason.size() > gline::MAX_REASON_LENGTH)
 	//st.assemble( pos + ResStart ) + "[" + Us + "]",
 	gLength , bot) ;*/
 
-ccGline *TmpGline = bot->findGline(st[pos]);
+ccGline *TmpGline = bot->findGline(gHost);
 bool Up = false;
 
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->setHost(st [ pos ]);
+TmpGline->setHost(gHost);
 TmpGline->setExpires(unsigned(::time(0) + gLength));
 TmpGline->setAddedBy(nickUserHost);
 TmpGline->setReason(Reason);
@@ -297,6 +302,7 @@ else
 	bot->addGline(TmpGline);
 	}
 
+bot->MsgChanLog(cmdStr.c_str());
 return true ;
 }
 

@@ -84,7 +84,7 @@ protected:
 	EConfig* cserviceConfig; /* Configfile */
 	typedef map< string, Command*, noCaseCompare > commandMapType ;
 	typedef commandMapType::value_type pairType ;
-	typedef map< unsigned int, unsigned int > ipMapType ;
+	typedef map< string, unsigned int > ipMapType ;
 	ipMapType		ipFloodMap;
 	commandMapType          commandMap;
 #ifdef USE_COMMAND_LOG
@@ -104,7 +104,19 @@ public:
 	unsigned int connectCheckFreq;
 	unsigned int connectRetry;
 	unsigned int limitCheckPeriod;
-
+	enum {
+		AUTH_SUCCEEDED,
+		AUTH_FAILED,
+		TOO_EARLY_TOLOGIN,
+		AUTH_UNKNOWN_USER,
+		AUTH_SUSPENDED_USER,
+		AUTH_NO_TOKEN,
+		AUTH_INVALID_PASS,
+		AUTH_ERROR,
+		AUTH_INVALID_TOKEN,
+		AUTH_FAILED_IPR,
+		AUTH_ML_EXCEEDED
+	};
 	void checkDbConnectionStatus();
 	string pendingPageURL;
 
@@ -115,11 +127,17 @@ public:
 	virtual void BurstChannels();
 	virtual void OnPrivateMessage( iClient*, const string&,
 		bool = false  );
+	virtual void OnChannelCTCP( iClient*, Channel*,	const string&, const string& ) ;
+	virtual void OnChannelMessage( iClient*, Channel*, const string& );
+	virtual void OnChannelNotice( iClient*, Channel*, const string& );
+	void handleChannelPart( iClient*, Channel*, const string& );
 	virtual void OnAttach() ;
 	virtual void OnShutdown(const string&);
 	virtual bool isOnChannel( const string& ) const;
 	virtual bool RegisterCommand( Command* ) ;
 	virtual bool UnRegisterCommand( const string& ) ;
+	virtual void OnChannelModeV( Channel*, ChannelUser*,
+		const xServer::voiceVectorType& ) ;
 	virtual void OnChannelModeO( Channel*, ChannelUser*,
 		const xServer::opVectorType& ) ;
 	virtual void OnChannelEvent( const channelEventType& whichEvent,
@@ -132,15 +150,20 @@ public:
                 const string& Message,
                 bool Secure = false ) ;
 	virtual void OnTimer(const xServer::timerID&, void*);
+	virtual void OnJoin( const std::string& ) ;
 	virtual bool Notice( const iClient* Target,
 		const char* Message, ... ) ;
 	virtual bool Notice( const iClient* Target, const string& ) ;
+	virtual bool Notice( const std::string& Channel,
+		const char* Message, ... ) ;
+	virtual bool Notice( const Channel* theChan,
+		const char* Message, ... ) ;
+	virtual bool Notice( const Channel*, const std::string& ) ;
+
+	virtual bool Topic( Channel*, const std::string& ) ;
+
 	virtual void OnWhois( iClient* sourceClient,
 			iClient* targetClient );
-
-	/* Sends a notice to a channel from the server. */
-	bool serverNotice( Channel*, const char*, ... );
-	bool serverNotice( Channel*, const string& );
 
 	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
@@ -195,10 +218,19 @@ public:
 	/* Check if a client has passed IP restriction checks */
 	bool passedIPR( iClient* );
 
+	/* Update last_used data on login */
+	bool updateIPRlast_used(sqlUser*, const string& );
+
 	/* Set (or clear) a client's IP restriction timestamp */
 	void setIPRts( iClient*, unsigned int );
 
+	/* Checks if a user has an existing ipr for it's username
+	 * If it's type = 0 disabled also returns false
+	 */
+	bool hasIPR( sqlUser* );
+
 	/* Checks a user against IP restrictions */
+	bool checkIPR(const string&, sqlUser*, unsigned int& );
 	bool checkIPR( iClient*, sqlUser* );
 
 	/* Get failed login counter for client */
@@ -215,6 +247,9 @@ public:
 
 	/* Fetch a user record for a user. */
 	sqlUser* getUserRecord( const string& );
+
+	/* Fetch a user record for a userId. */
+	sqlUser* getUserRecord( int );
 
 	/* Checks if this client is logged in, returns a sqlUser if true.
 	 * If "bool" is true, send a notice to the client telling them off. */
@@ -256,7 +291,14 @@ public:
 	unsigned int getOutputTotal(const iClient* theClient);
 	bool hasOutputFlooded(iClient*);
 
+	int authenticateUser(const string& username, const string& password, const string& ip, const string& ident,unsigned int&, sqlUser**);
+	int authenticateUser(const string& username, const string& password, iClient*, sqlUser**);
+
 	bool doXQLogin(iServer* , const string&, const string&);
+
+	bool doCommonAuth(iClient* , string username = string() );
+
+	bool doXResponse(iServer* , const string&, const string&, bool kill = false);
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.
@@ -266,7 +308,7 @@ public:
 	typedef map< string, sqlChannel*, noCaseCompare > sqlChannelHashType ;
 	typedef map< int, sqlChannel* > sqlChannelIDHashType ;
 
-	// Accesslevel cache, key is pair(chanid, userid).
+	// Accesslevel cache, key is pair(userid, chanid).
 	typedef map < std::pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
  	/* Silence List */
@@ -334,14 +376,71 @@ public:
 	int idleLevelPeriod;
 
 	/* Duration in seconds at which a 'pending' channel should
-	 * be notified that it is so. */
+	 * be refreshed/updated */
 	int pendingChanPeriod;
+
+	/* Duration in seconds at which a 'pending' channel should
+	 * be notified that it is so. */
+	int pendingNotifPeriod;
+
+	/* Duration in days, after the system purge unlogged users */
+	int UsersExpireDBDays;
+
+	/* Length of a day in seconds - refers to user expiration */
+	int daySeconds;
+
+	/*  ***   The Judge   ***  */
+	/*    related variables    */
+	unsigned int RequiredSupporters;
+	unsigned int JudgeDaySeconds;
+	unsigned int NoRegDaysOnNOSupport;
+	unsigned int RejectAppOnUserFraud;
+	//int AcceptOnTrafficPass = 1;
+	unsigned int ReviewOnObject;
+	unsigned int ReviewOnCompleted;
+	unsigned int ReviewsExpireTime;
+	unsigned int PendingsExpireTime;
+	unsigned int MaxDays;
+	unsigned int Joins;
+	unsigned int UniqueJoins;
+	unsigned int MinSupporters;
+	unsigned int MinSupportersJoin;
+	unsigned int NotifyDays;
+	unsigned int SupportDays;
+	unsigned int ReviewerId;
+	unsigned int LogToAdminConsole;
+
+	string validResponseString;
+	void AddToValidResponseString(const string&);
+	inline const string& getCurrentValidResponse() const
+		{ return validResponseString; }
+	bool logTheJudgeMessage(const char*, ... );
+	bool isValidUser(const string&);
+	bool isValidChannel(const string&);
+	bool RejectChannel(unsigned int, const string&);
+	bool ReviewChannel(unsigned int);
+	bool AcceptChannel(unsigned int, const string&);
+	bool sqlRegisterChannel(iClient*, sqlUser*, const string&);
+	bool wipeChannel(unsigned int);
+	void checkValidUsersAndChannelsState();
+	void checkNewIncomings();
+	void checkTrafficPass();
+	void checkObjections();
+	void checkAccepts();
+	void checkReviews();
+	void checkPendingCleanups();
+	void loadIncompleteChanRegs();
+
+	/* End of The Judge */
 
 	// Input flood rate.
 	unsigned int input_flood;
 	unsigned int output_flood;
 	int flood_duration;
 	int topic_duration;
+
+	unsigned int channelsFloodPeriod;
+	unsigned int antifloodRelaxTime;
 
 	// Timestamp's of when we last checked the database for updates.
 	time_t lastChannelRefresh;
@@ -364,11 +463,17 @@ public:
 	/* TimerID we recieve every XX hours for the notification of pending channels. */
 	xServer::timerID pending_timerID;
 
+	/* TimerID we recieve every XX hours for the notification of pending channels. */
+	xServer::timerID pendingNotif_timerID;
+
 	/* TimerID we recieve every seconds when we should check if a channel limit needs changing */
 	xServer::timerID limit_timerID;
 
 	/* TimerID for checking for web-relay messages */
 	xServer::timerID webrelay_timerID;
+
+	/* TimerID for checking channel flood cleanups */
+	xServer::timerID channels_flood_timerID;
 
 	// Language definitions table (Loaded from Db).
 	typedef map < string, std::pair <int, string> > languageTableType;
@@ -385,9 +490,6 @@ public:
 	// Method to retrieve a translation string.
 	const string getResponse( sqlUser*, int , string = string() );
 
-	// Check for valid hostmask.
-	virtual bool validUserMask(const string& userMask) const ;
-
 	/* Help topics (Loaded from Db) */
 	typedef map < std::pair <int, string>, string > helpTableType;
 	helpTableType helpTable;
@@ -400,9 +502,14 @@ public:
 	 */
 	static size_t countChanOps(const Channel*);
 
+	void deVoiceAllOnChan(Channel*);
+
 	// Deop everyone on this channel.
 	void deopAllOnChan(Channel*);
 	void deopAllUnAuthedOnChan(Channel*);
+	void deopSuspendedOnChan(Channel*, sqlUser*);
+	void doAllBansOnChan(Channel*);
+	void doTheRightThing(Channel*);
 
 	/* Sets a description (url) topic combo. */
 	void doAutoTopic(sqlChannel*);
@@ -410,14 +517,47 @@ public:
 	/* Automatically updates the floating limit for this channel */
 	void doFloatingLimit(sqlChannel*, Channel*);
 
+	/* Bans and kick just one client, with level, period, reason */
+	bool doSingleBanAndKick(sqlChannel*, iClient*, unsigned short, unsigned int, const string& theReason);
+
 	/* Bans & kicks a specified user with a specific reason */
 	bool doInternalBanAndKick(sqlChannel*, iClient*, const string&);
 
-	/* Support function to check if a user is banned on a channel. */
+    /* Bans & kicks all client belonging to the IP addrees, with a specific level, period, reason */
+    bool doInternalBanAndKick(sqlChannel*, iClient*, unsigned short, unsigned int, const string& theReason);
+
+    /* Bans & kicks all client belonging to a specified IP addrees, with a specific level, period, reason */
+    bool doInternalBanAndKick(sqlChannel*, const string&, unsigned short, unsigned int, const string&);
+
+    /* Suspends a specified user with a specific level, period, reason */
+    bool doInternalSuspend(sqlChannel*, iClient*, unsigned short, unsigned int, const string& theReason);
+
+    /* G-lines a target client to a time-period, with the reason */
+    bool doInternalGline(iClient*, const time_t&, const string&);
+
+    /* G-lines a numricIP to a time-period, with the reason */
+    bool doInternalGline(const string&, const time_t&, const string&);
+
+    /* Channel, FloodMessage, kickReason */
+    bool KickAllWithFloodMessage(Channel*, const string&, const string&, bool clearcount = true);
+
+    /* Channel, FloodMessage, numericIP, banLevel, banDuration, banReason */
+    bool KickBanAllWithFloodMessage(Channel*, const string&, unsigned short, unsigned int, const string&);
+
+    /* Channel, FloodMessage, Duration, Reason */
+    bool GlineAllWithFloodMessage(sqlChannel*, const string&, const time_t&, const string&);
+
+    /* Support function to check if a user is banned on a channel. */
 	sqlBan* isBannedOnChan(sqlChannel*, iClient*);
 
 	/* Matches DB bans, and kicks supplied user if neccessary */
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
+
+	/* Checking for need to raise the antiflood level. Returns the repetition number. */
+	unsigned int checkAntifloodLevel(sqlChannel*, const string&);
+
+	/* Cleanup the channel flood ip's/clients */
+	void checkChannelsFlood();
 
 	time_t currentTime() const ;
 
@@ -429,6 +569,38 @@ public:
 	typedef map < string, sqlPendingChannel*, noCaseCompare >
 		pendingChannelListType;
 	pendingChannelListType pendingChannelList;
+
+	struct AppData
+	{
+		int chanId;
+		string chanName;
+		int mngrUserId;
+	};
+
+	typedef vector<AppData> AppDataListType;
+
+	struct IncomingData
+	{
+		int chanId;
+		string chanName;
+		string mngrUserName;
+		bool noticed;
+	};
+
+	typedef vector<IncomingData> IncomingDataListType;
+	typedef map <int, IncomingDataListType> suppIdListType;
+
+	void setSupporterNoticedStatus(int suppId, int chanId, bool noticed);
+
+	/* This is a bug-workaround function, for some reason on cservice::doCommonAuth
+	 * doesn't work with the int chanId	*/
+	void setSupporterNoticedStatus(int suppId, const string& chanName, bool noticed);
+
+	/* checkIncomings is used to select the supporters of a new pending (status=0) channels
+	 * where the supporters had not lodged their support yet */
+	void checkIncomings(bool IsFirstNoticing = false);
+
+	void initialiseSupport(const string&, sqlPendingChannel::supporterListType );
 
 	/*
 	 *  Load the pendingChannelList from the database.
@@ -464,6 +636,9 @@ public:
 
 	void cacheExpireUsers();
 
+	//TODO: Enable this when sure!
+	void wipeNeverLoggedUsers();
+
 	/*
 	 *  Expire Ban records, only if the channel
 	 *  record is 'idle'.
@@ -477,10 +652,10 @@ public:
 
 	void cacheExpireLevels();
 
-	/*
-	 * Process any pending reop requests by the bot.
-	 */
-	void performReops();
+	bool deleteUserFromTable(unsigned int, const string&);
+	bool wipeUser(unsigned int, bool);
+
+	void ExpireUsers();
 
 	/*
 	 * Process any Postgres notification requests,
@@ -508,15 +683,18 @@ public:
 
 	void updateChannels();
 	void updateUsers();
-	void updateLevels();
+	void updateUserLevels(sqlUser* );
+	void updateLevels(int channelId = 0);
+	vector<sqlUser*> getChannelManager(int channelId);
 	void updateBans();
 
 	void updateLimits();
 
-        bool addGline( csGline* );
-        bool remGline( csGline* );
-        csGline* findGline( const string& );
+	bool addGline( csGline* );
+	bool remGline( csGline* );
+	csGline* findGline( const string& );
 
+	void addGlineToUplink(csGline* );
 
 	typedef map < string, int > statsMapType;
 	statsMapType statsMap;
@@ -525,6 +703,9 @@ public:
 	void incStat(const string& name, unsigned int amount);
 
 	void noticeAllAuthedClients(sqlUser* theUser, const char* Message, ... );
+	void NoteAllAuthedClients(sqlUser* theUser, const char* Message, ... );
+	void NoteChannelManager(const string& theChan, const char* Message, ...);
+	void NoteChannelManager(sqlChannel* theChan, const char* Message, ...);
 
 	bool isPasswordRight(sqlUser*, const string&);
 
@@ -536,6 +717,8 @@ public:
 	unsigned int noteLimit;
 
 	unsigned int partIdleChan;
+
+	unsigned int MAXnotes;
 
 	void doCoderStats(iClient* theClient);
 
@@ -554,6 +737,25 @@ public:
 	 */
 	void loadConfigData();
 
+	inline void clearConfigVariables()
+	{
+		return cserviceConfig->Clear();
+	}
+
+	inline int getConfigVariableSize()
+	{
+		return (int)cserviceConfig->size();
+	}
+
+	inline bool parseConfigFile()
+	{
+		return cserviceConfig->openConfigFile();
+	}
+	/*
+	 * Load variable values from cservice.conf
+	 */
+	void loadConfigVariables();
+
 	void outputChannelAccesses(iClient*, sqlUser*, sqlUser*, unsigned int);
 
 	/*
@@ -567,7 +769,7 @@ public:
 	static string CryptPass( const string& pass ) ;
 
 #ifdef ALLOW_HELLO
-	typedef std::map< int, time_t > helloIPListType ;
+	typedef std::map< string, time_t > helloIPListType ;
 	helloIPListType	helloIPList ;
 	unsigned int helloBlockPeriod ;
 #endif // ALLOW_HELLO
@@ -575,7 +777,15 @@ public:
 #ifdef TOTP_AUTH_ENABLED
 	bool totpAuthEnabled;
 #endif
+
+/* Welcome messages for newly registered channels */
+string welcomeNewChanMessage;
+string welcomeNewChanTopic;
+
+bool InsertUserHistory(iClient*, const string&);
+
 } ;
+
 
 const string escapeSQLChars(const string& theString);
 const string searchSQL(const string& theString);

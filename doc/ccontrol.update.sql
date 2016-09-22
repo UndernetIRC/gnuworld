@@ -123,6 +123,15 @@
 --  update opers set access = (access | 2097152);
 
 -- 2009/07/24 Add GETLAG and LastPassChangeTS to opers
-alter TABLE opers add LastPassChangeTS INT4 NOT NULL DEFAULT '0';
-alter TABLE opers add GetLAG BOOLEAN NOT NULL DEFAULT 'n';
+--alter TABLE opers add LastPassChangeTS INT4 NOT NULL DEFAULT '0';
+--alter TABLE opers add GetLAG BOOLEAN NOT NULL DEFAULT 'n';
+
+
+-- 2016/04/17 Added Single Sign On Support and ability to /oper from anywhere
+alter TABLE opers add AutoOp BOOLEAN NOT NULL DEFAULT 'n';
+alter TABLE opers add Sso BOOLEAN NOT NULL DEFAULT 'n';
+alter TABLE opers add Ssooo BOOLEAN NOT NULL DEFAULT 't';
+alter TABLE opers add Account VARCHAR(128);
+alter TABLE opers add AccountTS INT4 NOT NULL DEFAULT '0';
+
 

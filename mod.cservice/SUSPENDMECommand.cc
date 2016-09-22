@@ -86,6 +86,8 @@ theUser->writeEvent(sqlUser::EV_SUSPEND, theUser, "Self-Suspension");
 bot->logAdminMessage("%s (%s) has globally suspended their own account.",
 	theClient->getNickUserHost().c_str(), theUser->getUserName().c_str());
 
+bot->InsertUserHistory(theClient, "SUSPENDME");
+
 return false;
 }
 

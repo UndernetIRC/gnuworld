@@ -65,13 +65,16 @@ ccUser::ccUser(dbHandle* _SQLDb)
    IsCoder(0),
    GetLogs(0),
    GetLag(0),
+   Sso(0),
+   Ssooo(0),
+   AutoOp(0),
    NeedOp(0),
    Notice(0),
    Client(NULL),
    SQLDb( _SQLDb ),
    PassChangeTS(0)
 {
-++numAllocated;
++numAllocated;
 }
 
 ccUser::~ccUser()
@@ -86,7 +89,7 @@ if(!dbConnected)
 	return false;
 	}
 	
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS FROM opers WHERE lower(user_name) = '";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE lower(user_name) = '";
 
 if(!dbConnected)
 	{
@@ -121,7 +124,7 @@ if(!dbConnected)
 	return false;
 	}
 	
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS FROM opers WHERE user_id = ";
+static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE user_id = ";
 stringstream theQuery;
 
 if(!dbConnected)
@@ -173,6 +176,11 @@ SuspendReason = SQLDb->GetValue(0,19);
 Notice = (!strcasecmp(SQLDb->GetValue(0,20),"t") ? 1 : 0 );
 GetLag = (!strcasecmp(SQLDb->GetValue(0,21),"t") ? 1 : 0 );
 PassChangeTS = atoi(SQLDb->GetValue(0,22).c_str());
+Sso = (!strcasecmp(SQLDb->GetValue(0,23),"t") ? 1 : 0 ); 
+Ssooo = (!strcasecmp(SQLDb->GetValue(0,24),"t") ? 1 : 0 );
+AutoOp = (!strcasecmp(SQLDb->GetValue(0,25),"t") ? 1 : 0 );
+Account = SQLDb->GetValue(0,26);
+AccountTS = atoi(SQLDb->GetValue(0,27).c_str());
 }    
 
 bool ccUser::Update()
@@ -221,12 +229,22 @@ theQuery	<< Main
 		<< (GetLogs ? "'t'" : "'n'")
 		<< ",GetLag = "
 		<< (GetLag ? "'t'" : "'n'")
-		<<  ",LastPassChangeTS = "
+		<< ",Sso = "
+		<< (Sso ? "'t'" : "'n'")
+		<< ",Ssooo = "
+		<< (Ssooo ? "'t'" : "'n'")
+		<< ",AutoOp = "
+		<< (AutoOp ? "'t'" : "'n'")
+		<< ",LastPassChangeTS = "
 		<< PassChangeTS
+		<< ",AccountTS = "
+		<< AccountTS
 		<< ",NeedOp = "
 		<< (NeedOp ? "'t'" : "'n'")
 		<< ", Email = '"
 		<<  ccontrol::removeSqlChars(Email)
+		<< "', Account = '"
+		<<  ccontrol::removeSqlChars(Account)
 		<< "',Notice = "
 		<< (Notice ? "'t'" : "'n'")
 		<< " WHERE lower(user_name) = '" 

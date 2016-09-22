@@ -8645,9 +8645,6 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       hardcode_shlibpath_var=no
       ;;
 
-    freebsd1*)
-      ld_shlibs=no
-      ;;
 
     # FreeBSD 2.2.[012] allows us to include c++rt0.o to get C++ constructor
     # support.  Future versions do this automatically, but an explicit c++rt0.o
@@ -9294,9 +9291,6 @@ dgux*)
   shlibpath_var=LD_LIBRARY_PATH
   ;;
 
-freebsd1*)
-  dynamic_linker=no
-  ;;
 
 freebsd* | dragonfly*)
   # DragonFly does not have aout.  When/if they implement a new
@@ -10789,7 +10783,8 @@ shrext_cmds='$shrext_cmds'
 exeext="$exeext"
 
 # Additional compiler flags for building library objects.
-pic_flag=$lt_lt_prog_compiler_pic
+#pic_flag=$lt_lt_prog_compiler_pic
+pic_flag=" -fPIC -DPIC"
 pic_mode=$pic_mode
 
 # What is the maximum length of a command?
@@ -13264,9 +13259,6 @@ dgux*)
   shlibpath_var=LD_LIBRARY_PATH
   ;;
 
-freebsd1*)
-  dynamic_linker=no
-  ;;
 
 freebsd* | dragonfly*)
   # DragonFly does not have aout.  When/if they implement a new
@@ -15268,9 +15260,6 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       hardcode_shlibpath_var_F77=no
       ;;
 
-    freebsd1*)
-      ld_shlibs_F77=no
-      ;;
 
     # FreeBSD 2.2.[012] allows us to include c++rt0.o to get C++ constructor
     # support.  Future versions do this automatically, but an explicit c++rt0.o
@@ -15865,9 +15854,6 @@ dgux*)
   shlibpath_var=LD_LIBRARY_PATH
   ;;
 
-freebsd1*)
-  dynamic_linker=no
-  ;;
 
 freebsd* | dragonfly*)
   # DragonFly does not have aout.  When/if they implement a new
@@ -17873,9 +17859,6 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       hardcode_shlibpath_var_GCJ=no
       ;;
 
-    freebsd1*)
-      ld_shlibs_GCJ=no
-      ;;
 
     # FreeBSD 2.2.[012] allows us to include c++rt0.o to get C++ constructor
     # support.  Future versions do this automatically, but an explicit c++rt0.o
@@ -18470,9 +18453,6 @@ dgux*)
   shlibpath_var=LD_LIBRARY_PATH
   ;;
 
-freebsd1*)
-  dynamic_linker=no
-  ;;
 
 freebsd* | dragonfly*)
   # DragonFly does not have aout.  When/if they implement a new

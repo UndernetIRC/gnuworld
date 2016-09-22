@@ -126,6 +126,19 @@ if (!tmpChan)
 	return false;
 	}
 
+/*
+ *  If the NOVOICE flag is set, we aren't allowed to voice anyone.
+ */
+if(theChan->getFlag(sqlChannel::F_NOVOICE))
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::novoice_set,
+			string("The NOVOICE flag is set on %s")).c_str(),
+		theChan->getName().c_str());
+	return false;
+	}
+
 vector< iClient* > voiceList; // List of clients to Voice.
 
 /*

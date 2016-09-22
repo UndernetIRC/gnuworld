@@ -37,6 +37,7 @@
 
 #include	"StringTokenizer.h"
 #include	"ELog.h"
+#include	"Network.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
@@ -152,8 +153,13 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			flagsSet += "ALUMNI ";
 		if (theUser->getFlag(sqlUser::F_NOADMIN))
 			flagsSet += "DISABLEAUTH ";
-		if (theUser->getFlag(sqlUser::F_TOTP_ENABLED))
-                        flagsSet += "TOTP ";
+	}
+	if (adminAccess || (tmpUser == theUser))
+	{
+		if (theUser->getFlag(sqlUser::F_TOTP_REQ_IPR))
+			flagsSet += "TOTP_REQ_IPR ";
+		else if (theUser->getFlag(sqlUser::F_TOTP_ENABLED))
+			flagsSet += "TOTP ";
 	}
 	/* flags with variables */
 	if (langString.size() > 0)
@@ -198,8 +204,6 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		{
 			flagsSet+= "INVITE ";
 		}
-
-
 	}
 	/* set 'NONE' if no flags */
 	if (flagsSet.size() == 0)
@@ -429,25 +433,217 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 	
 	return true;
 }
-
-sqlUser* theUser = bot->isAuthed(theClient, false);
+stringstream theQuery;
+//sqlUser* theUser = bot->isAuthed(theClient, false);
+sqlUser* theUser = tmpUser;
+Channel* tmpChan = Network->findChannel(st[1]);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if( !theChan )
 	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::chan_not_reg,
-			string("The channel %s is not registered")).c_str(),
-		st[1].c_str());
+	unsigned int lastdays = (unsigned int)bot->currentTime() - ((unsigned int)bot->daySeconds*bot->PendingsExpireTime);
+	theQuery << "SELECT id,status,manager_id,managername,pending.description,decision,created_ts FROM channels,pending WHERE "
+			<< "registered_ts = 0 AND status <> 3 AND lower(channels.name) = '"
+			<< escapeSQLChars(string_lower(st[1]))
+			<< "'"
+			<< " AND channels.id = pending.channel_id AND (pending.decision_ts=0 OR (pending.decision_ts>0 AND pending.decision_ts>="
+			<< lastdays
+			<< "))"
+			<< ends;
+	#ifdef LOG_SQL
+		elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+	#endif
+	if (!bot->SQLDb->Exec(theQuery, true))
+	{
+		bot->logDebugMessage("Error on CHANInfo.status query: %s",theQuery.str().c_str());
+		return false;
+	}
+	else if (bot->SQLDb->Tuples() != 0)
+	{
+		unsigned int chanID = atoi(bot->SQLDb->GetValue(0,0));
+		unsigned int status = atoi(bot->SQLDb->GetValue(0,1));
+		string mngrID = bot->SQLDb->GetValue(0,2);
+		string mngrName = bot->SQLDb->GetValue(0,3);
+		string chandesc = bot->SQLDb->GetValue(0,4);
+		string decision = bot->SQLDb->GetValue(0,5);
+		time_t posted = atoi(bot->SQLDb->GetValue(0,6));
+		string suppUserName;
+		string supported;
+		string nick;
+		string supplist;
+		string joincount;
+		bool showsupplist = false;
+		string tmpUserName = tmpUser->getUserName();
+		sqlUser* mngrUser = bot->getUserRecord(mngrID);
+		if (!mngrUser)
+		{
+			bot->Notice(theClient, "Error. Manager info not found. Report to cservice.");
+			return false;
+		}
+		bot->Notice(theClient,"Channel %s is in applications list at stage:",st[1].c_str());
+		switch (status)
+		{
+			case 0: /* Pending Supporters Confirmation = Incoming */
+			{
+				bot->Notice(theClient," \002*** PENDING SUPPORTERS CONFIRMATION ***\002");
+				break;
+			}
+			case 1: /* Traffic Check */
+			{
+				bot->Notice(theClient,"  \002*** TRAFFIC CHECKING ***\002");
+				break;
+			}
+			case 2: /* Notification */
+			{
+				bot->Notice(theClient,"   \002*** NOTIFICATION ***\002");
+				break;
+			}
+			/* This case were filtered out on query, it means the channel was purged
+			   (registered_ts = 0 AND status = 3 Accepted)
+			case 3: // Completed
+			{
+				bot->Notice(theClient,"   \002*** ACCEPTED ***\002");
+				break;
+			} */
+			case 4: /* Cancelled by applicant */
+			{
+				bot->Notice(theClient,"  \002CANCELLED BY APPLICANT\002");
+				break;
+			}
+			case 8: /* Pending Admin Review */
+			{
+				bot->Notice(theClient," \002*** PENDING ADMIN REVIEW ***\002");
+				break;
+			}
+			case 9: /* Rejected */
+			{
+				bot->Notice(theClient,"   \002*** REJECTED ***\002");
+				break;
+			}
+			default:
+				break;
+		}
+		if ((adminAccess > 0) || (tmpUser == mngrUser) || (!mngrUser->getFlag(sqlUser::F_INVIS)))
+			bot->Notice(theClient,"Applicant: %s - last seen: %s ago",mngrUser->getUserName().c_str(),
+					prettyDuration((int)mngrUser->getLastSeen()).c_str());
+		else
+			bot->Notice(theClient,"Applicant: %s",mngrUser->getUserName().c_str());
+		if (adminAccess > 0)
+			bot->Notice(theClient,"Real Name: %s",mngrName.c_str());
+		bot->Notice(theClient,"Description: %s",chandesc.c_str());
+		if ((status == 9) && (decision.find("<br>") != string::npos))
+			decision.replace(decision.find("<br>"),4,": ");
+		theQuery.str("");
+		theQuery << "SELECT user_name,support,join_count FROM users,supporters WHERE channel_id="
+				<< chanID
+				<<" AND users.id = supporters.user_id"
+				<< ends;
+		if (!bot->SQLDb->Exec(theQuery, true))
+		{
+			bot->logDebugMessage("Error on CHANINFO.supporters.usernames query");
+			#ifdef LOG_SQL
+			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+			elog << "CHANINFO.supporters query> SQL Error: "
+			     << bot->SQLDb->ErrorMessage()
+			     << endl ;
+			#endif
+		}
+		if (bot->SQLDb->Tuples() == 0)
+		{
+			/*
+			if (theApp == bot->incompleteChanRegs.end())
+			{
+				bot->Notice(theClient,"No results returned on CHANINFO.supporters query");
+				return false;
+			}*/
+			bot->Notice(theClient,"Supporters: ");
+			return true;
+		}
+		for (unsigned int i = 0 ; i<bot->SQLDb->Tuples(); i++)
+		{
+			suppUserName = bot->SQLDb->GetValue(i,0);
+			supported = bot->SQLDb->GetValue(i,1);
+			joincount = bot->SQLDb->GetValue(i,2);
+			sqlUser* suppUser = bot->getUserRecord(suppUserName);
+			if ((tmpUser == mngrUser) || (adminAccess > 0))
+				showsupplist = true;
+			// bold indicates they have logged their support (either way)
+			if (supported == "Y" || supported == "N")
+				suppUserName = "\002" + suppUserName + "\002";
+			if (supplist == "")
+				supplist += "Supporters: " + suppUserName;
+			else
+				supplist += ", " + suppUserName;
+			nick = "";
+			for (sqlUser::networkClientListType::iterator ptr = suppUser->networkClientList.begin();
+				ptr != suppUser->networkClientList.end() ; ++ptr )
+				{
+					if (nick == "") nick += "/" + (*ptr)->getNickName();
+						else nick += " " + (*ptr)->getNickName();
+					if ((tmpChan) && (tmpChan->findUser(*ptr)))
+					{
+						nick = "\002" + nick + "\002";
+						nick.replace(nick.find("\002/"),2,"/\002");
+					}
+				}
+			supplist += nick;
+			if (adminAccess > 0) supplist += " ("+joincount+")";
+			// Quick buffer overload protection
+			// TODO: This will show to anyone if buffer overload,also decision must be solved
+			if (supplist.size() >= 450)
+			{
+				bot->Notice(theClient,supplist.c_str());
+				supplist.erase(supplist.begin(), supplist.end());
+			}
+		}
+		
+		// check for any objections
+		int objCount = 0;
+		theQuery.str("");
+		theQuery << "SELECT count(*) FROM objections WHERE channel_id="
+				<< chanID
+				<< ends;
+		if (!bot->SQLDb->Exec(theQuery, true))
+		{
+			bot->logDebugMessage("Error on CHANINFO.objections query");
+			#ifdef LOG_SQL
+			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+			elog << "CHANINFO.objections query> SQL Error: "
+			     << bot->SQLDb->ErrorMessage()
+			     << endl ;
+			#endif
+		}
+		if (bot->SQLDb->Tuples() > 0)
+			objCount = atoi(bot->SQLDb->GetValue(0,0));
+		
+		// output additional information if user is admin, supporter, or applicant)
+		if (showsupplist)
+		{
+			bot->Notice(theClient,"Application posted on: %s",ctime(&posted));
+			if ((status == 9) && (adminAccess > 0))
+				bot->Notice(theClient,"Decision: %s",decision.c_str());
+			bot->Notice(theClient,supplist.c_str());
+			if (objCount > 0)
+				bot->Notice(theClient,"Objections: %i",objCount);
+			return true;
+		}
 	return true;
 	}
+	else
+	{	bot->Notice(theClient,
+			bot->getResponse(tmpUser,
+				language::chan_not_reg,
+				string("The channel %s is not registered")).c_str(),
+			st[1].c_str());
+		return true;
+	}
+}
 
 /*
  * Receiving all the level 500's of the channel through a sql query.
  * The description and url, are received from the cache. --Plexus
  */
 
-stringstream theQuery;
+theQuery.str("");
 theQuery	<< queryHeader
 		<< queryString
 		<< "AND levels.channel_id = "

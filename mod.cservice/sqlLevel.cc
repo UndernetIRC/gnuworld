@@ -65,6 +65,7 @@ sqlLevel::sqlLevel(dbHandle* _SQLDb)
  suspend_expires(0),
  suspend_level(0),
  suspend_by(),
+ suspend_reason(),
  added(0),
  added_by(),
  last_modif(::time(NULL)),
@@ -145,6 +146,7 @@ added_by = SQLDb->GetValue(row, 8);
 last_modif = atoi(SQLDb->GetValue(row, 9));
 last_modif_by = SQLDb->GetValue(row, 10);
 last_updated = atoi(SQLDb->GetValue(row, 11));
+suspend_reason = SQLDb->GetValue(row, 12);
 }
 
 bool sqlLevel::commit()
@@ -163,6 +165,7 @@ queryString	<< queryHeader
 		<< "suspend_expires = " << suspend_expires << ", "
 		<< "suspend_level = " << suspend_level << ", "
 		<< "suspend_by = '" << escapeSQLChars(suspend_by) << "', "
+		<< "suspend_reason = '" << escapeSQLChars(suspend_reason) << "', "
 		<< "added = " << added << ", "
 		<< "added_by = '" << escapeSQLChars(added_by) << "', "
 		<< "last_modif = " << last_modif << ", "

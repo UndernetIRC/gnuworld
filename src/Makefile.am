@@ -8,12 +8,10 @@ libgnuworldcore_la_SOURCES = Channel.cc \
 	Network.cc \
 	ServerTimerHandlers.cc \
 	UnloadClientTimerHandler.cc \
-	cidr.cc	\
 	client.cc \
 	iClient.cc \
 	iServer.cc \
 	ip.cc \
-	nickUserCidr.cc \
 	server.cc \
 	server_connection.cc \
 	server_events.cc \

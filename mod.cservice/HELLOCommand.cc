@@ -5,6 +5,7 @@
 #include	"cservice_config.h"
 #include	"StringTokenizer.h"
 #include	"ELog.h"
+#include	"ip.h"
 #include	"Network.h"
 #include	"cservice.h"
 
@@ -42,7 +43,7 @@ if (theUser)
  */
 
 cservice::helloIPListType::iterator itr =
-	bot->helloIPList.find( theClient->getIP() ) ;
+	bot->helloIPList.find( xIP(theClient->getIP()).GetNumericIP(true) ) ;
 
 if (itr != bot->helloIPList.end())
 	{
@@ -171,6 +172,7 @@ newUser->setUserName(escapeSQLChars(st[1].c_str()));
 newUser->setEmail(escapeSQLChars(st[2]));
 newUser->setPassword(cryptpass.c_str());
 newUser->setLastUpdatedBy(updatedBy);
+newUser->setFlag(sqlUser::F_INVIS);
 newUser->Insert();
 
 bot->Notice(theClient, "I generated this password for you: \002%s\002",
@@ -185,9 +187,9 @@ bot->Notice(theClient, "Then change your password using \002/msg "
 	bot->getNickName().c_str(),
 	bot->getUplinkName().c_str());
 
-bot->helloIPList.erase(theClient->getIP());
+bot->helloIPList.erase(xIP(theClient->getIP()).GetNumericIP(true));
 bot->helloIPList.insert(
-	std::make_pair(theClient->getIP(),
+	std::make_pair(xIP(theClient->getIP()).GetNumericIP(true),
 		bot->currentTime() + bot->helloBlockPeriod) );
 
 delete (newUser);

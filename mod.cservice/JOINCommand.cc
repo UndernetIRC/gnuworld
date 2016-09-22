@@ -104,12 +104,8 @@ theChan->setInChan(true);
 bot->Join(theChan->getName(),
 	"+R",
 	theChan->getChannelTS(),
-	false);
+	true);
 bot->joinCount++;
-
-/* Whack this reop on the Q */
-bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(),
-	bot->currentTime() + 15) );
 
 return true;
 }
