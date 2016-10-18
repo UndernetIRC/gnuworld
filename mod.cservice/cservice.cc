@@ -4572,7 +4572,7 @@ void cservice::checkReviews()
 		{
 			string chanName = SQLDb->GetValue(i,0);
 			int chanId = atoi(SQLDb->GetValue(i,1));
-			string mngrUser = SQLDb->GetValue(i,3);
+			string mngrUser = SQLDb->GetValue(i,2);
 			reviewList.push_back(std::make_pair(std::make_pair(chanId,chanName),mngrUser));
 			logTheJudgeMessage(chanName.c_str());
 		}

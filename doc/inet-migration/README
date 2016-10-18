@@ -1,59 +1,77 @@
-/*
- * IPv4 to inet IPv4/IPv6 migartion documentation
- * 2014.05.09 Seven (gergo_f@yahoo.com)
- */
-There are a few tables only needed to convert to inet type.
-Those with string ip types can be converted directly, postgres understands the conversion.
-This is the case with the cservice whitelist table.
-We can run the script:
+#
+# Use this script to convert the mod.cservice tables to use 'inet' datatype:
+#       pending_traffic
+#       ip_restrict
+#
+# In the case of ip_restrict (IPR) entries the script will attempt to convert
+# hostnames to IPs, wildcards or ranges to CIDR notation. DNS and masks are not
+# longer permitted.
+#
+#
+# - Empus <empus@undernet.org>
+#
 
-gnuworld@irc:~/gnuworld/doc/inet-migration$ /usr/local/pgsql/bin/psql cservice < update_cservice-whitelist.2014.05.09.sql
+
+# INSTALL & USE INSTRUCTIONS BELOW
+
+# Requires python
+
+	sudo pkg install python
 
 
-Not so simple with integer stored ip numbers. Like the pending_traffic table
-I wrote a simple convert tool, it is named ipconvert.cpp
-Compile it with command:
+# Install python pip
 
-g++ ipconvert.cpp -o ipconvert
+	sudo pkg install py27-pip-8.1.2
 
-Now, we can import out the pending_traffic table, just that table, and in an "insertable" form
-Run the command:
 
-/usr/local/pgsql/bin/pg_dump --table=pending_traffic --data-only --column-inserts cservice > traffic-in.sql
+# Add pg_config to PATH
 
-Check the resultng file, you'll understand why is useful.
+	export PATH=$PATH:/usr/local/pgsql/bin
 
-Now our tool converts it to an immediate useable form:
 
-./ipconvert traffic-in.sql traffic-out.sql
+# Add pgsql library to LD_LIBRARY
 
-Check the resulting file.
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/pgsql/lib
 
-Before insert back, we save out the ip_restrict table too, this is our next problem
 
-/usr/local/pgsql/bin/pg_dump --table=ip_restrict --data-only --column-inserts cservice > ip_restrict.sql
+# Install python lirbary: psycopg2
 
-Because the old ip_restrict table structure contains additional single ip value, ip ranged, and hosts
-the resulting file need to be edit suitable.
+	sudo pip install psycopg2
 
-Now it can be removed the two old table 'pending_traffic' and 'ip_restrict', and creat it back with the new structure:
 
-/usr/local/pgsql/bin/psql cservice < update_cservice-2014.05.09.sql
+# Install python library: netaddr
 
-Now insert back the 'new' tables:
+	sudo pip install netaddr
 
-/usr/local/pgsql/bin/psql cservice < traffic-out.sql
-/usr/local/pgsql/bin/psql cservice < ip_restrict.sql
 
-Update the mod.ccontrol's help, with the new remsgline "-fr" forceremove option possibility
+# Usage: ./ipconvert.py -h <host> -d <database> -u <user> >> converted.sql
 
-/usr/local/pgsql/bin/psql ccontrol < update_ccontrol.help-2013.12.14.sql
+	./ipconvert.py -d cmaster >> converted.sql
 
-Update bans for the extended 365 days ban, and 0 for permanent ban, we apply:
 
-/usr/local/pgsql/bin/psql cservice < update_variables_20150518.sql
-/usr/local/pgsql/bin/psql cservice < update_languages_2015.05.23.sql
+# Analyze the output file before passing to pgsql appropriately. ie:
 
-Adding the new StarWars language:
+	/usr/local/pgsql/bin/psql cmaster -a -f converted.sql
 
-/usr/local/pgsql/bin/psql cservice < language_starwars.sql
+
+# Update multiple tables to support new features
+
+	/usr/local/pgsql/bin/psql cmaster -a -f update_cservice-20161018.sql
+
+
+# Update the mod.ccontrol's help, with the new remsgline "-fr" forceremove option possibility
+
+	/usr/local/pgsql/bin/psql ccontrol -a -f update_ccontrol.help-2013.12.14.sql
+
+
+# Update bans for the extended 365 days ban, and 0 for permanent ban, we apply:
+
+	/usr/local/pgsql/bin/psql cmaster -a -f update_variables_20150518.sql
+	/usr/local/pgsql/bin/psql cmaster -a -f update_languages_2015.05.23.sql
+
+
+# Adding the new StarWars language:
+
+	/usr/local/pgsql/bin/psql cmaster -a -f language_starwars.sql
+
+
