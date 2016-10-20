@@ -3909,7 +3909,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	newChan->setName(chanName);
 	newChan->setChannelTS(channel_ts);
 	newChan->setRegisteredTS(currentTime());
-	newChan->setChannelMode("+tn");
+	newChan->setChannelMode("+tnR");
 	newChan->setLastUsed(currentTime());
 
 	sqlUser* theUser = isAuthed(theClient, false);
@@ -3945,7 +3945,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		stringstream reclaimQuery;
 		reclaimQuery    << "UPDATE channels SET registered_ts = now()::abstime::int4,"
 						<< " last_updated = now()::abstime::int4, "
-						<< " flags = 0, description = '', url = '', comment = '', keywords = '', channel_mode = '+tn' "
+						<< " flags = 0, description = '', url = '', comment = '', keywords = '', channel_mode = '+tnR' "
 						<< " WHERE lower(name) = '"
 						<< escapeSQLChars(string_lower(chanName))
 						<< "'"
@@ -4061,7 +4061,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	//writeChannelLog(newChan, getInstance(), sqlChannel::EV_JOIN, "Channel Registered");
 
 	//newChan->setRegisteredTS(currentTime());
-	//newChan->setChannelMode("+tn");
+	//newChan->setChannelMode("+tnR");
 	//newChan->setLastUsed(currentTime());
 
 	//Send a welcome notice to the channel
@@ -5484,7 +5484,7 @@ switch( whichEvent )
 						/* Already cached, update and save. */
 						trafRecord = Tptr->second;
 						trafRecord->join_count++;
-						//trafRecord->commit();
+						trafRecord->commit();
 						}
 
 						ptr->second->unique_join_count = ptr->second->trafficList.size();
