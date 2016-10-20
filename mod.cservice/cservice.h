@@ -417,6 +417,7 @@ public:
 	bool logTheJudgeMessage(const char*, ... );
 	bool isValidUser(const string&);
 	bool isValidChannel(const string&);
+	bool isDBRegisteredChannel(const string&);
 	bool RejectChannel(unsigned int, const string&);
 	bool ReviewChannel(unsigned int);
 	bool AcceptChannel(unsigned int, const string&);

@@ -3820,6 +3820,34 @@ bool cservice::isValidChannel(const string& chName)
 	return true;
 }
 
+// We use this when we need to know if a channel in the meantime got registered in the database (eg. by the webpage)
+bool cservice::isDBRegisteredChannel(const string& chanName)
+{
+	stringstream theQuery;
+	theQuery	<< "SELECT COUNT(*) FROM channels WHERE registered_ts <> 0 AND lower(name) = '"
+				<< escapeSQLChars(string_lower(chanName))
+				<< "'"
+				<< ends;
+#ifdef LOG_SQL
+	elog	<< "cservice::isDBRegisteredChannel::sqlQuery> "
+		<< theQuery.str().c_str()
+		<< endl;
+#endif
+
+	if( !SQLDb->Exec(theQuery, true ) )
+//	if (PGRES_TUPLES_OK != status)
+	{
+		elog    << "cservice::isDBRegisteredChannel> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl;
+		return false;
+	}
+	if (SQLDb->Tuples() > 0)
+		return true;
+	else
+		return false;
+}
+
 bool cservice::RejectChannel(unsigned int chanId, const string& reason)
 {
 	stringstream theQuery;
@@ -5434,7 +5462,7 @@ switch( whichEvent )
 
 		pendingChannelListType::iterator ptr = pendingChannelList.find(theChan->getName());
 
-		if(ptr != pendingChannelList.end())
+		if (ptr != pendingChannelList.end() && (!isDBRegisteredChannel(theChan->getName())))
 			{
 			/*
 			 * Firstly, is this join a result of a server bursting onto the network?
