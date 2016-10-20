@@ -83,7 +83,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 	StringTokenizer st( Message ) ;
 
-	if (st.size() < 2)
+	if (st.size() < 3)
 	{
 		if (level == 0)
 			Usage(theClient);
