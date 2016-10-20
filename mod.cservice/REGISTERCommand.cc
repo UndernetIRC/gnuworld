@@ -285,6 +285,14 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 			
 			bot->sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
 			bot->sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
+			cservice::pendingChannelListType::iterator ptr = bot->pendingChannelList.find(newChan->getName());
+			if (ptr != bot->pendingChannelList.end())
+			{
+				sqlPendingChannel* pendingChan = ptr->second;
+				ptr->second = NULL;
+				delete(pendingChan);
+				bot->pendingChannelList.erase(ptr);
+			}
 		} else
 		{
 			/*

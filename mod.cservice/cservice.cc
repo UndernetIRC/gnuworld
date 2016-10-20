@@ -3988,6 +3988,14 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 
 			sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
 			sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
+			pendingChannelListType::iterator ptr = pendingChannelList.find(chanName);
+			if (ptr != pendingChannelList.end())
+			{
+				sqlPendingChannel* pendingChan = ptr->second;
+				ptr->second = NULL;
+				delete(pendingChan);
+				pendingChannelList.erase(ptr);
+			}
 		}
 		else
 		{
