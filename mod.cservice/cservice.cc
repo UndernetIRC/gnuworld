@@ -3660,7 +3660,7 @@ bool cservice::logTheJudgeMessage(const char* format, ... )
 
 	string logChannel;
 	if (LogToAdminConsole)
-		logChannel = privrelayChan;
+		logChannel = relayChan;
 	else
 		logChannel = debugChan;
 	/* try to locate the privileged relay channel */
