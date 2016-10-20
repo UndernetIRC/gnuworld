@@ -107,7 +107,7 @@ if( !bot->SQLDb->Exec( theQuery, true ) )
 if (bot->SQLDb->Tuples() <= 0)
 {
 	bot->Notice(theClient,
-		"The channel %s doesn't appear to have a pending application. Please ensure you have spelt the name correctly.",
+		"The channel %s doesn't appear to have a pending application, please ensure you have spelled the name correctly.",
 			channelName.c_str());
 	return false;
 }
@@ -144,7 +144,7 @@ if( !bot->SQLDb->Exec( supQuery, true ) )
 if (bot->SQLDb->Tuples() <= 0)
 {
 	bot->Notice(theClient,
-		"You don't appear to be listed as a supporter in %s, please ensure you have spelt the channel name correctly.",
+		"You don't appear to be listed as a supporter in %s, please ensure you have spelled the channel name correctly.",
 			channelName.c_str());
 	return false;
 }
