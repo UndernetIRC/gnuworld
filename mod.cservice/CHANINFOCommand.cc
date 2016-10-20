@@ -445,7 +445,7 @@ if( !theChan )
 			<< "registered_ts = 0 AND status <> 3 AND lower(channels.name) = '"
 			<< escapeSQLChars(string_lower(st[1]))
 			<< "'"
-			<< " AND channels.id = pending.channel_id AND (pending.decision_ts=0 OR (pending.decision_ts>0 AND pending.decision_ts>="
+			<< " AND channels.id = pending.channel_id AND (pending.decision_ts=0 OR pending.decision_ts IS null OR (pending.decision_ts>0 AND pending.decision_ts>="
 			<< lastdays
 			<< "))"
 			<< ends;
@@ -461,7 +461,7 @@ if( !theChan )
 	{
 		unsigned int chanID = atoi(bot->SQLDb->GetValue(0,0));
 		unsigned int status = atoi(bot->SQLDb->GetValue(0,1));
-		string mngrID = bot->SQLDb->GetValue(0,2);
+		int mngrID = atoi(bot->SQLDb->GetValue(0,2));
 		string mngrName = bot->SQLDb->GetValue(0,3);
 		string chandesc = bot->SQLDb->GetValue(0,4);
 		string decision = bot->SQLDb->GetValue(0,5);
