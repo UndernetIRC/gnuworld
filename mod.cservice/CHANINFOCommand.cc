@@ -527,8 +527,12 @@ if( !theChan )
 					prettyDuration((int)mngrUser->getLastSeen()).c_str());
 		else
 			bot->Notice(theClient,"Applicant: %s",mngrUser->getUserName().c_str());
+
+		/* Real Name no longer captured on channel applications
 		if (adminAccess > 0)
 			bot->Notice(theClient,"Real Name: %s",mngrName.c_str());
+		*/
+
 		bot->Notice(theClient,"Description: %s",chandesc.c_str());
 		if ((status == 9) && (decision.find("<br>") != string::npos))
 			decision.replace(decision.find("<br>"),4,": ");
