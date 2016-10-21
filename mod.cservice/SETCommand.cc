@@ -268,6 +268,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		return true;
 	}
 
+/* Require management of TOTP via website
 #ifdef	TOTP_AUTH_ENABLED
 	if (option == "TOTP")
 	{	
@@ -354,6 +355,8 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 		} 
 	}
 #endif
+*/
+
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::invalid_option,
