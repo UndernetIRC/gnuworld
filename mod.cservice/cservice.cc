@@ -3842,10 +3842,12 @@ bool cservice::isDBRegisteredChannel(const string& chanName)
 			<< endl;
 		return false;
 	}
-	if (SQLDb->Tuples() > 0)
+	unsigned int isReg = atoi(SQLDb->GetValue(0,0));
+	if (isReg > 0)
 		return true;
 	else
 		return false;
+
 }
 
 bool cservice::RejectChannel(unsigned int chanId, const string& reason)
