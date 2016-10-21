@@ -289,6 +289,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 			if (ptr != bot->pendingChannelList.end())
 			{
 				sqlPendingChannel* pendingChan = ptr->second;
+				pendingChan->commit();
 				ptr->second = NULL;
 				delete(pendingChan);
 				bot->pendingChannelList.erase(ptr);

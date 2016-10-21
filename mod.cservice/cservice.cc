@@ -4022,6 +4022,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 			if (ptr != pendingChannelList.end())
 			{
 				sqlPendingChannel* pendingChan = ptr->second;
+				pendingChan->commit();
 				ptr->second = NULL;
 				delete(pendingChan);
 				pendingChannelList.erase(ptr);
@@ -4440,6 +4441,11 @@ void cservice::checkTrafficPass()
 				logDebugMessage("Error on update pending trafficCheck -> notification");
 				else
 				logTheJudgeMessage("Channel %s has passed traffic checking, successfully moved to Notification stage",ptr->first.c_str());
+				pendingChan->commit();
+				ptr->second = NULL;
+				delete(pendingChan);
+				pendingChannelList.erase(ptr++);
+				continue;
 			}
 		} //(elapsedDays < currentTime())
 		if ((!uniqueJoinsPass) || (!JoinsPass))
@@ -4450,6 +4456,7 @@ void cservice::checkTrafficPass()
 		{
 			RejectChannel(pendingChan->channel_id,rejectReason);
 			logTheJudgeMessage("Rejecting channel %s with reason: %s",ptr->first.c_str(),rejectReason.c_str());
+			pendingChan->commit();
 			ptr->second = NULL;
 			delete(pendingChan);
 			pendingChannelList.erase(ptr++);
