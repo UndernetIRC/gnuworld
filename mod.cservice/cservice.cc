@@ -4524,10 +4524,10 @@ return;
 
 void cservice::checkAccepts()
 {
-	std::vector<std::pair<std::pair<int,string>, string> > acceptList;
+	std::vector<std::pair<std::pair<int,string>, std::pair<string, char> > > acceptList;
 	unsigned int notifTime = NotifyDays * JudgeDaySeconds;
 	stringstream theQuery;
-	theQuery	<< "SELECT channels.name,channels.id,users.user_name FROM channels,pending,users "
+	theQuery	<< "SELECT channels.name,channels.id,users.user_name,pending.reviewed FROM channels,pending,users "
 				<< "WHERE channels.id = pending.channel_id "
 				<< "AND pending.status = 2 AND (pending.check_start_ts + "
 				<< notifTime
@@ -4554,15 +4554,19 @@ void cservice::checkAccepts()
 			string chanName = SQLDb->GetValue(i,0);
 			int chanId = atoi(SQLDb->GetValue(i,1));
 			string mngrUser = SQLDb->GetValue(i,2);
-			acceptList.push_back(std::make_pair(std::make_pair(chanId,chanName),mngrUser));
+			char acc = (char)SQLDb->GetValue(i,3)[0];
+			acceptList.push_back(std::make_pair(std::make_pair(chanId,chanName),std::make_pair(mngrUser,acc)));
 			//logTheJudgeMessage(chanName.c_str());
 		}
 	}
 	if (!acceptList.empty())
 	for (unsigned int i=0; i<acceptList.size(); i++ )
 	{
-		sqlUser* mgrUsr = getUserRecord(acceptList[i].second.c_str());
-		if (ReviewOnCompleted)
+		sqlUser* mgrUsr = getUserRecord(acceptList[i].second.first.c_str());
+		bool reviewed = false;
+		if (acceptList[i].second.second == 'Y')
+			reviewed = true;
+		if (ReviewOnCompleted && !reviewed)
 		{
 			ReviewChannel(acceptList[i].first.first);
 			logTheJudgeMessage("Channel application %s completed, moved to 'Ready to review'",acceptList[i].first.second.c_str());
@@ -5533,6 +5537,7 @@ switch( whichEvent )
 						}
 
 						ptr->second->unique_join_count = ptr->second->trafficList.size();
+						ptr->second->commit();
 
 						//logDebugMessage("New total for IP#%u on %s is %i",
 						//	theClient->getIP(), theChan->getName().c_str(),
