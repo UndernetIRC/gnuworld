@@ -2853,8 +2853,7 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	sqlUser* tmpUser = getUserRecord(userId);
 	assert(tmpUser != 0);
 	string removeKey;
-	////Don't expire any newly created, never logged user sooner than 10 minutes
-	//if (((int)(currentTime() - tmpUser->getCreatedTS()) < 600) && (expired)) goto cacheclean;
+	bool deleted = false;
 	if (tmpUser->getFlag(sqlUser::F_NOPURGE))
 	{
 		goto cacheclean;
@@ -2874,6 +2873,8 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	deleteUserFromTable(userId,"users_lastseen");
 	deleteUserFromTable(userId,"users");
 
+	deleted = true;
+
 	if (expired) logAdminMessage("User %s (%s) has expired",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
 	else logDebugMessage("Deleted(wipeUser) %s (%i) from the database.", tmpUser->getUserName().c_str(),userId);
 
@@ -2886,14 +2887,14 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
     		sqlUserCache.erase(removeKey);
     	}
 
-	return true;
+	return deleted;
 }
 
 void cservice::ExpireUsers()
 {
 	if (UsersExpireDBDays == 0) return;
 	logDebugMessage("Performing Database Users Expire");
-    int usersCount=0;
+	int usersCount=0;
 	stringstream queryString;
 	queryString	<< "SELECT user_id FROM users_lastseen WHERE last_seen<="
 				<< currentTime()-UsersExpireDBDays
