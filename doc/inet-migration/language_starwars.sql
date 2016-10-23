@@ -4,8 +4,7 @@
 
 DELETE FROM translations WHERE language_id = 22;
 
--- Run this insert once, manually
--- INSERT INTO languages VALUES(22,'SW','StarWars',31337);
+INSERT INTO languages VALUES(22,'SW','StarWars',31337);
 
 COPY "translations" FROM stdin;
 22	1	You must unlearn what you have learnt. You are already dark sided as %s	31337	0

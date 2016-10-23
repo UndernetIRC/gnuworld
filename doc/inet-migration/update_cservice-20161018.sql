@@ -37,3 +37,6 @@ ALTER TABLE variables ADD COLUMN hint text;
 
 # -- fix reference to 'MASSDEOP' for MASSDEOPPRO
 UPDATE help SET contents = replace(contents, 'MASSDEOP', 'MASSDEOPPRO') WHERE topic='SET' and language_id IN (1, 8);
+UPDATE help SET contents = replace(contents, 'MASSDEOPPROPRO', 'MASSDEOPPRO') WHERE topic IN ('SET', 'SET MASSDEOP');
+UPDATE help SET topic='SET MASSDEOPPRO' WHERE topic='SET MASSDEOP';
+
