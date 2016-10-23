@@ -2855,17 +2855,10 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	string removeKey;
 	////Don't expire any newly created, never logged user sooner than 10 minutes
 	//if (((int)(currentTime() - tmpUser->getCreatedTS()) < 600) && (expired)) goto cacheclean;
-    if (tmpUser->getFlag(sqlUser::F_NOPURGE))
-    {
-    	//logDebugMessage("User %s (%i) had NOPURGE flag, but Purging It anyway!",tmpUser->getUserName().c_str(),userId);
-    	if (!tmpUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-		{
-   			//logDebugMessage("User %s (%i) has NOPURGE flag, so Not Purging It!",tmpUser->getUserName().c_str(),userId);
-   			goto cacheclean;
-		}
-		else
-			logDebugMessage("User %s (%i) is NOPURGE but SUSPENDED, so Purging It!",tmpUser->getUserName().c_str(),userId);
-    }
+	if (tmpUser->getFlag(sqlUser::F_NOPURGE))
+	{
+		goto cacheclean;
+	}
 	deleteUserFromTable(userId,"acl");
 	deleteUserFromTable(userId,"levels");
 	deleteUserFromTable(userId,"notices");
