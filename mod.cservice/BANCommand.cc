@@ -492,20 +492,15 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	/*
 	 *  Iterate over channel members, find a match and boot them..
 	 */
+	/* Don't kick +k things */
+	if (tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
+	{
+		takeMembersCount--;
+		continue;
+	}
 	if (banMatch(newBan->getBanMask(), tmpUser->getClient()))
-		{
-		/* Don't kick +k things */
-		if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
-		{
-			clientsToKick.push_back(tmpUser->getClient());
-		}
-		else
-		{
-			//Services doesn't count in 'everyone'
-			//TODO: but also we count only 'persons' with ip address different than issuer's address
-			//if ((xIP(theClient->getIP()).GetNumericIP(true)) != (xIP(tmpUser->getClient()->getIP()).GetNumericIP(true)))
-				takeMembersCount--;
-		}
+	{
+		clientsToKick.push_back(tmpUser->getClient());
 	}
 } // for()
 
