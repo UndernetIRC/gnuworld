@@ -35,3 +35,5 @@ ALTER TABLE users_lastseen ALTER COLUMN last_ip TYPE inet USING last_ip::inet;
 -- Empus (2016.10.18)
 ALTER TABLE variables ADD COLUMN hint text;
 
+# -- fix reference to 'MASSDEOP' for MASSDEOPPRO
+UPDATE help SET contents = replace(contents, 'MASSDEOP', 'MASSDEOPPRO') WHERE topic='SET' and language_id IN (1, 8);
