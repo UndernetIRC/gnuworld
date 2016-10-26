@@ -40,3 +40,12 @@ UPDATE help SET contents = replace(contents, 'MASSDEOP', 'MASSDEOPPRO') WHERE to
 UPDATE help SET contents = replace(contents, 'MASSDEOPPROPRO', 'MASSDEOPPRO') WHERE topic IN ('SET', 'SET MASSDEOP');
 UPDATE help SET topic='SET MASSDEOPPRO' WHERE topic='SET MASSDEOP';
 
+# -- support for new login history tracking (in SCANHOST command)
+CREATE TABLE user_sec_history (
+        user_id INT4 NOT NULL,
+        user_name TEXT NOT NULL,
+        command TEXT NOT NULL,
+        ip VARCHAR( 256 ) NOT NULL,
+        hostmask VARCHAR( 256 ) NOT NULL,
+        timestamp INT4 NOT NULL
+);
