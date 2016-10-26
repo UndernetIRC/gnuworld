@@ -5648,6 +5648,7 @@ switch( whichEvent )
 			if (!(accessLevel >= level::voice))
 			{
 				theLevel->removeFlag(sqlLevel::F_AUTOVOICE);
+				theLevel->commit();
 				break;
 			}
 			if (!reggedChan->getFlag(sqlChannel::F_NOVOICE))
@@ -5675,6 +5676,7 @@ switch( whichEvent )
 			{
 			if (!(accessLevel >= level::op)) {
 				theLevel->removeFlag(sqlLevel::F_AUTOOP);
+				theLevel->commit();
 				break;
 			}
 			Op(theChan, theClient);
