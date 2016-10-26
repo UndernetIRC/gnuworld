@@ -4953,7 +4953,7 @@ if ((theChanUser) && (deopCounter >= reggedChan->getMassDeopPro())
 	&& (reggedChan->getMassDeopPro() > 0) && !theChanUser->getClient()->getMode(iClient::MODE_SERVICES))
 	{
 		doInternalBanAndKick(reggedChan, theChanUser->getClient(),
-			"### MASSDEOPPRO TRIGGERED! ###");
+			"### Mass Deop Protection Triggered ###");
 	}
 }
 
