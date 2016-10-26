@@ -40,16 +40,21 @@ int match( const string& s1, const string& s2 )
 		return 1 ;
 	}
 
-	//Handle just two plainAddress|HostIP/cidr addresses
-	if (match(s1.c_str(), s2.c_str()) == 0)
-		return 0;
+	//Handle just two plainAddress! Withouth any nick!user part!
+	if (!isUserHost(s1) && !isUserHost(s2))
+	{
+		if (match(s1.c_str(), s2.c_str()) == 0)
+			return 0;
+	}
 
 	// Address checking, first we try to pass the address from the nick!user part ...
 	if (isUserHost(s1) && isUserHost(s2))
 	{
-		if (match(extractNickUser(s1).c_str(), extractNickUser(s2).c_str()))
+		if (match(extractNick(s1).c_str(), extractNick(s2).c_str()))
 			return 1;
 
+		if (match(extractUser(s1).c_str(), extractUser(s2).c_str()))
+			return 1;
 		/* If passed, we deal only with the hostip part, and because match() handles cidr addresses too
 		 * our matching is complete.
 		 */
@@ -64,8 +69,10 @@ int match(const string& mask, const iClient* theClient)
 	if (!isUserHost(mask))
 		return 1;
 
-	// Again, checking after nick!user part matching ...
-	if (match(extractNickUser(mask),theClient->getNickUser()))
+	if (match(extractNick(mask).c_str(), theClient->getNickName().c_str()))
+		return 1;
+
+	if (match(extractUser(mask).c_str(), theClient->getUserName().c_str()))
 		return 1;
 
 	// But now we match with realhost too
