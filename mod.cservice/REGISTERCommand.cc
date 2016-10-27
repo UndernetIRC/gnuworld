@@ -138,16 +138,6 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
        	return false;
 	}
 
-	if (!bot->isValidUser(tmpUser->getUserName()))
-	{
-		if (!bot->validResponseString.empty())
-		{
-			bot->Notice(theClient, "Cannot register, invalid target user (%s)",bot->getCurrentValidResponse().c_str());
-			bot->validResponseString.clear();
-		}
-       	return false;
-	}
-
 	string::size_type pos = st[1].find_first_of( ',' ); /* Don't allow comma's in channel names. :) */
 
 	if ( (st[1][0] != '#') || (string::npos != pos))
