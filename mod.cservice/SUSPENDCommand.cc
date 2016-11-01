@@ -135,7 +135,7 @@ if ((st[1][0] != '#') && (st[1][0] != '*'))
 		{
 			ChannelUser* theChannelUser = (*chItr)->findUser(*cliPtr);
 			sqlChannel* theChan = bot->getChannelRecord((*chItr)->getName());
-			if ((theChan) && (theChannelUser->getMode(ChannelUser::MODE_O)))
+			if ((theChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)) && (theChannelUser->getMode(ChannelUser::MODE_O)))
 			{
 				sqlLevel* tmpLevel = bot->getLevelRecord(targetUser, theChan);
 				if (tmpLevel)
@@ -348,7 +348,8 @@ aLevel->setLastModifBy( string( "("
 aLevel->commit();
 
 Channel* tmpChan = Network->findChannel(theChan->getName());
-if (tmpChan) bot->deopSuspendedOnChan(tmpChan,Target);
+if ((tmpChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)))
+	bot->deopSuspendedOnChan(tmpChan,Target);
 
 bot->Notice(theClient,
 	bot->getResponse(theUser,
