@@ -38,6 +38,7 @@
 #include	"levels.h"
 #include	"dbHandle.h"
 #include	"responses.h"
+#include	"Network.h"
 
 const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.19 2010/04/10 18:56:06 danielaustin Exp $" ;
 
@@ -211,6 +212,11 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	thePair = std::make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
 	bot->sqlLevelCache.erase(thePair);
 	delete(tmpLevel);
+	
+	// If strictop is set, the client has no longer right for op
+	Channel* tmpChan = Network->findChannel(theChan->getName());
+	if ((tmpChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)))
+	        bot->deopSuspendedOnChan(tmpChan,targetUser);
 
 	// Announce the manager about the new access change
 	if (level < 500)
