@@ -2584,6 +2584,7 @@ stringstream deleteQuery;
 deleteQuery	<< "DELETE FROM bans "
 		<< "WHERE expires <= "
 		<< expiredTime
+		<< " AND expires <> 0"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -5400,7 +5401,7 @@ void cservice::doAllBansOnChan(Channel* tmpChan)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
 		/* check if this user is banned */
-		(void)checkBansOnJoin(tmpChan, reggedChan, tmpUser->getClient());
+		checkBansOnJoin(tmpChan, reggedChan, tmpUser->getClient());
 	}
 	return;
 }
@@ -8429,6 +8430,21 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 		return true;
 		}
 
+	
+	/*
+	 * Check they aren't banned < 75 in any chan.
+	 */
+	for (iClient::channelIterator chItr = theClient->channels_begin(); chItr != theClient->channels_end(); ++chItr)
+	{
+		sqlChannel* theChan = getChannelRecord((*chItr)->getName());
+		//Channel* netChan = Network->findChannel(theChan->getName());
+		if (theChan)
+		{
+			checkBansOnJoin((*chItr), theChan, theClient);
+		}
+	}
+
+
 	/*
 	 * The fun part! For all channels this user has access on, and has
 	 * AUTOP set, and isn't already op'd on - do the deed.
@@ -8561,20 +8577,6 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 			{
 			continue;
 			}
-
-		/*
-		 * Check they aren't banned < 75 in the chan.
-		 */
-
-		sqlBan* tmpBan = isBannedOnChan(theChan, theClient);
-		if( tmpBan) {
-			if (tmpBan->getLevel() < 75)  {
-				continue;
-			} else {
-				Kick(netChan,theClient,tmpBan->getReason());
-				continue;
-			}
-		}
 
 		/*
 	 	 *  If its AUTOOP, check for op's and do the deed.
