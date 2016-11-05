@@ -3684,6 +3684,9 @@ void cservice::AddToValidResponseString(const string& resp)
 bool cservice::isValidUser(const string& userName)
 {
 	validResponseString = "";
+	// *** TODO: Need to deal with this (matching poblem)
+	return true;
+	// *************************************************
 	sqlUser* tmpUser = getUserRecord(userName);
 	if (!tmpUser)
 	{
