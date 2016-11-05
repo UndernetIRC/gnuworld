@@ -127,9 +127,9 @@ if (tmpChan)
 		}
 	}
 
-return true;
-
 #endif // USE_OPERPARTJOIN
+
+return true;
 
 }
 
