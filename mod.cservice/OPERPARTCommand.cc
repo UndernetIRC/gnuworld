@@ -115,9 +115,9 @@ bot->joinCount--;
 
 bot->Part(theChan->getName(), "At the request of an IRC Operator");
 
-return true;
-
 #endif // USE_OPERPARTJOIN
+
+return true;
 
 }
 
