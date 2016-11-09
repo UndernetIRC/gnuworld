@@ -3684,9 +3684,6 @@ void cservice::AddToValidResponseString(const string& resp)
 bool cservice::isValidUser(const string& userName)
 {
 	validResponseString = "";
-	// *** TODO: Need to deal with this (matching poblem)
-	return true;
-	// *************************************************
 	sqlUser* tmpUser = getUserRecord(userName);
 	if (!tmpUser)
 	{
@@ -3708,70 +3705,84 @@ bool cservice::isValidUser(const string& userName)
 	     		<< endl ;
 	#endif
 		return false;
-	} else if (SQLDb->Tuples() != 0)
+	}
+	else if (SQLDb->Tuples() != 0)
 	{
-		string matchString;
+		ValidUserDataListType ValidUserDataList;
 		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
-			if (atoi(SQLDb->GetValue(i,2)) == 6)
+			ValidUserData current;
+			current.UserName = SQLDb->GetValue(i,0);
+			current.Email = SQLDb->GetValue(i,1);
+			current.type = atoi(SQLDb->GetValue(i,2));
+			ValidUserDataList.push_back(current);
+		}
+		for (ValidUserDataListType::const_iterator itr = ValidUserDataList.begin() ; itr != ValidUserDataList.end(); ++itr)
+		{
+			if (itr->type == 6)
 			{
-				matchString = SQLDb->GetValue(i,0);
-				if (matchString[0] == '!')
+				if (itr->UserName[0] == '!')
 				{
+					string matchString = itr->UserName;
 					matchString.erase(0,1);
 					if (!match(matchString,tmpUser->getVerifData()))
 					{
-						AddToValidResponseString("INVALID VERIF");
+						if (validResponseString.find("INVALID VERIF") == string::npos)
+							AddToValidResponseString("INVALID VERIF");
 						isValid = false;
 					}
 				}
 				else
 				{   /* This should be the matchcase metod - TODO: need to find a solution */
-					if (!casematch(matchString,tmpUser->getVerifData()))
-					//if (0 != strcmp(matchString,tmpUser->getVerifData()))
+					if (!casematch(itr->UserName,tmpUser->getVerifData()))
+					//if (0 != strcmp(itr->UserName,tmpUser->getVerifData()))
 					{
-						AddToValidResponseString("INVALID VERIF");
+						if (validResponseString.find("INVALID VERIF") == string::npos)
+							AddToValidResponseString("INVALID VERIF");
 						isValid = false;
 					}
 				}
 			}
-			matchString = SQLDb->GetValue(i,0);
-			if (!match(matchString,tmpUser->getUserName()) && (matchString != "*"))
+			if (!match(itr->UserName,tmpUser->getUserName()) && (itr->UserName != "*"))
 			{
-				if (atoi(SQLDb->GetValue(i,2)) < 4)
+				if (itr->type < 4)
 				{
-					AddToValidResponseString("NOREG");
+					if (validResponseString.find("NOREG") == string::npos)
+						AddToValidResponseString("NOREG");
 					isValid = false;
 				}
 				//This case is taken account by the webinterface
 				//We skip this because we only look after *existing* usernames
-				//if (atoi(SQLDb->GetValue(i,2)) == 4)
+				//if (itr->type == 4)
 				//	AddToValidResponseString("FRAUD");
-				if (atoi(SQLDb->GetValue(i,2)) == 5)
+				if (itr->type == 5)
 				{
-					AddToValidResponseString("LOCKED");
+					if (validResponseString.find("LOCKED") == string::npos)
+						AddToValidResponseString("LOCKED");
 					isValid = false;
 				}
 			}
-			matchString = SQLDb->GetValue(i,1);
-			if (!match(matchString,tmpUser->getEmail()) && (matchString != "*"))
+			if (!match(itr->Email,tmpUser->getEmail()) && (itr->Email != "*"))
 			{
-				if (atoi(SQLDb->GetValue(i,2)) < 4)
+				if (itr->type < 4)
 				{
-					AddToValidResponseString("INV.E-MAIL");
+					if (validResponseString.find("INV.E-MAIL") == string::npos)
+						AddToValidResponseString("INV.E-MAIL");
 					isValid = false;
 				}
 				//This case is taken account by the webinterface
 				//TODO: probably we should handle this case too
-				//if (atoi(SQLDb->GetValue(i,2)) == 4)
+				//if (itr->type == 4)
 				//	AddToValidResponseString("FRAUD");
-				if (atoi(SQLDb->GetValue(i,2)) == 5)
+				if (itr->type == 5)
 				{
-					AddToValidResponseString("LOCKED E-MAIL");
+					if (validResponseString.find("LOCKED E-MAIL") == string::npos)
+						AddToValidResponseString("LOCKED E-MAIL");
 					isValid = false;
 				}
 			}
 		}
+		ValidUserDataList.clear();
 	}
 	if (tmpUser->getFlag(sqlUser::F_FRAUD))
 	{

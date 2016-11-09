@@ -56,6 +56,15 @@ using std::stringstream ;
 static const char* queryHeader = "SELECT channels.name,users.user_name,levels.access,users_lastseen.last_seen FROM levels,channels,users,users_lastseen ";
 static const char* queryString = "WHERE levels.channel_id=channels.id AND users.id=users_lastseen.user_id AND levels.access = 500 AND levels.user_id = users.id ";
 
+struct SuppData
+{
+	string UserName;
+	char Supported;
+	string JoinCount;
+};
+
+typedef vector<SuppData> SuppDataListType;
+
 bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 {
 bot->incStat("COMMANDS.INFO");
@@ -562,16 +571,23 @@ if( !theChan )
 			bot->Notice(theClient,"Supporters: ");
 			return true;
 		}
+		SuppDataListType SuppDataList;
 		for (unsigned int i = 0 ; i<bot->SQLDb->Tuples(); i++)
 		{
-			suppUserName = bot->SQLDb->GetValue(i,0);
-			supported = bot->SQLDb->GetValue(i,1);
-			joincount = bot->SQLDb->GetValue(i,2);
-			sqlUser* suppUser = bot->getUserRecord(suppUserName);
+			SuppData current;
+			current.UserName = bot->SQLDb->GetValue(i,0);
+			current.Supported = (char)bot->SQLDb->GetValue(i,1)[0];
+			current.JoinCount = bot->SQLDb->GetValue(i,2);
+			SuppDataList.push_back(current);
+		}
+		for (SuppDataListType::const_iterator itr = SuppDataList.begin() ; itr != SuppDataList.end(); itr++)
+		{
+			suppUserName = itr->UserName;
+			sqlUser* suppUser = bot->getUserRecord(itr->UserName);
 			if ((tmpUser == mngrUser) || (adminAccess > 0))
 				showsupplist = true;
 			// bold indicates they have logged their support (either way)
-			if (supported == "Y" || supported == "N")
+			if (itr->Supported == 'Y' || itr->Supported == 'N')
 				suppUserName = "\002" + suppUserName + "\002";
 			if (supplist == "")
 				supplist += "Supporters: " + suppUserName;
@@ -590,7 +606,7 @@ if( !theChan )
 					}
 				}
 			supplist += nick;
-			if (adminAccess > 0) supplist += " ("+joincount+")";
+			if (adminAccess > 0) supplist += " ("+itr->JoinCount+")";
 			// Quick buffer overload protection
 			// TODO: This will show to anyone if buffer overload,also decision must be solved
 			if (supplist.size() >= 450)
@@ -599,7 +615,7 @@ if( !theChan )
 				supplist.erase(supplist.begin(), supplist.end());
 			}
 		}
-		
+		SuppDataList.clear();
 		// check for any objections
 		int objCount = 0;
 		theQuery.str("");

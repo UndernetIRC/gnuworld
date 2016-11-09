@@ -562,9 +562,14 @@ public:
 
 	time_t currentTime() const ;
 
-	/* Queue to hold pending reops */
-	typedef map < string, time_t > reopQType;
-	reopQType reopQ;
+	struct ValidUserData
+	{
+		string UserName;
+		string Email;
+		int type;
+	};
+
+	typedef vector<ValidUserData> ValidUserDataListType;
 
 	/* List of channels in 'pending' registration state. */
 	typedef map < string, sqlPendingChannel*, noCaseCompare >
