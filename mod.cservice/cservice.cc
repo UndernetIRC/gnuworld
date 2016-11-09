@@ -6109,7 +6109,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	iClient* theClient, const string& theReason)
 {
 	unsigned short banLevel = 25;
-	unsigned int banExpire = (unsigned int)(300 + currentTime());
+	unsigned int banExpire = 300;
 	Channel* netChan = Network->findChannel(theChan->getName());
 	/* Even if the channel is currently empty, presumably the sqlChannel exists in the db */
 	if (!netChan)
@@ -6150,6 +6150,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 				accessRec->setSuspendLevel(susLev);
 			accessRec->setSuspendExpire(currentTime() + 300);
 			accessRec->setSuspendBy(nickName);
+			accessRec->setSuspendReason(theReason);
 			accessRec->commit();
 		}
 	}
