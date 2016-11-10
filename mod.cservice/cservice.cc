@@ -6110,6 +6110,32 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 {
 	unsigned short banLevel = 25;
 	unsigned int banExpire = 300;
+
+	/*
+	 * If this guy is auth'd.. suspend his account.
+	 */
+	sqlUser* theUser = isAuthed(theClient, false);
+	if (theUser)
+	{
+		sqlLevel* accessRec = getLevelRecord(theUser, theChan);
+		if (accessRec && (accessRec->getSuspendExpire() < (currentTime() + 300)))
+		{
+			int susLev = accessRec->getAccess() + 1;
+			if (susLev <= 500)
+			{
+				banLevel = susLev;
+				if (accessRec->getSuspendLevel() < susLev)
+					accessRec->setSuspendLevel(susLev);
+				accessRec->setSuspendExpire(currentTime() + 300);
+				accessRec->setSuspendBy(nickName);
+				accessRec->setSuspendReason(theReason);
+				accessRec->commit();
+			}
+		}
+	}
+	if (banLevel > 500)
+		return true;
+
 	Channel* netChan = Network->findChannel(theChan->getName());
 	/* Even if the channel is currently empty, presumably the sqlChannel exists in the db */
 	if (!netChan)
@@ -6133,25 +6159,6 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 			if (tmpUser->getClient()->isModeX())
 				continue;
 			doSingleBanAndKick(theChan, tmpUser->getClient(), banLevel, banExpire, theReason);
-		}
-	}
-
-	/*
-	 * Finally, if this guy is auth'd.. suspend his account.
-	 */
-	sqlUser* theUser = isAuthed(theClient, false);
-	if (theUser)
-	{
-		sqlLevel* accessRec = getLevelRecord(theUser, theChan);
-		if (accessRec && (accessRec->getSuspendExpire() < (currentTime() + 300)))
-		{
-			int susLev = accessRec->getAccess() + 1;
-			if (accessRec->getSuspendLevel() < susLev)
-				accessRec->setSuspendLevel(susLev);
-			accessRec->setSuspendExpire(currentTime() + 300);
-			accessRec->setSuspendBy(nickName);
-			accessRec->setSuspendReason(theReason);
-			accessRec->commit();
 		}
 	}
 	return true ;
