@@ -6149,6 +6149,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		doSingleBanAndKick(theChan, theClient, banLevel, banExpire, theReason);
 		return true;
 	}
+	vector< iClient* > clientsToKick ;
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
@@ -6158,8 +6159,13 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 			// so this is a logged clone of his, therefore his hidden address must be protected
 			if ((tmpUser->getClient()->isModeX()) && (tmpUser->getClient()->isModeR()))
 				continue;
-			doSingleBanAndKick(theChan, tmpUser->getClient(), banLevel, banExpire, theReason);
+			clientsToKick.push_back(tmpUser->getClient());
 		}
+	}
+	if (!clientsToKick.empty())
+	{
+		for (vector<iClient*>::iterator itr = clientsToKick.begin(); itr != clientsToKick.end(); ++itr)
+			doSingleBanAndKick(theChan, *itr, banLevel, banExpire, theReason);
 	}
 	return true ;
 }
@@ -6180,6 +6186,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		doSingleBanAndKick(theChan, theClient, banLevel, banExpire, theReason);
 		return true;
 	}
+	vector< iClient* > clientsToKick ;
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
@@ -6189,8 +6196,13 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 			// so this is a logged clone of his, therefore his hidden address must be protected
 			if ((tmpUser->getClient()->isModeX()) && (tmpUser->getClient()->isModeR()))
 				continue;
-			doSingleBanAndKick(theChan, tmpUser->getClient(), banLevel, banExpire, theReason);
+			clientsToKick.push_back(tmpUser->getClient());
 		}
+	}
+	if (!clientsToKick.empty())
+	{
+		for (vector<iClient*>::iterator itr = clientsToKick.begin(); itr != clientsToKick.end(); ++itr)
+			doSingleBanAndKick(theChan, *itr, banLevel, banExpire, theReason);
 	}
 	return true ;
 }
@@ -6249,6 +6261,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		return true;
 	}
 
+	vector< iClient* > clientsToKick ;
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
@@ -6257,8 +6270,13 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		if ((IP.compare(currIP) == 0) || (IP.compare(currIP64) == 0))
 		{
 			// Here we don't have sender, just a specified IP, so everyone covered going to be kickbanned
-			doSingleBanAndKick(theChan, tmpUser->getClient(), banLevel, banExpire, theReason);
+			clientsToKick.push_back(tmpUser->getClient());
 		}
+	}
+	if (!clientsToKick.empty())
+	{
+		for (vector<iClient*>::iterator itr = clientsToKick.begin(); itr != clientsToKick.end(); ++itr)
+			doSingleBanAndKick(theChan, *itr, banLevel, banExpire, theReason);
 	}
 	return true ;
 }
