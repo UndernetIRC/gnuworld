@@ -3762,7 +3762,7 @@ bool cservice::isValidUser(const string& userName)
 					isValid = false;
 				}
 			}
-			if (!match(itr->Email,tmpUser->getEmail()) && (itr->Email != "*"))
+			if (!match(fixAddress(itr->Email), fixAddress(tmpUser->getEmail())))
 			{
 				if (itr->type < 4)
 				{
