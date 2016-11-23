@@ -961,6 +961,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
+	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)) return;
 	StringTokenizer st(CTCPCommand);
 	string cmd = string_upper(st[0]);
 	string msg = st.assemble(1);
@@ -1095,7 +1096,7 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	if (!sqlChan->getFloodMsg()) return;
-
+	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)) return;
 	unsigned short banLevel = 75;
 	unsigned int banTime = 3 * 3600;
 	unsigned int glineTime = 1 * 3600;
@@ -1166,6 +1167,7 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	if (!sqlChan->getFloodNotice()) return;
+	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)) return;
 	unsigned short banLevel = 75;
 	unsigned int banTime = 3 * 3600;
 	unsigned int glineTime = 1 * 3600;
