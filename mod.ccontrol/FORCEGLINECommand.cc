@@ -246,6 +246,17 @@ if(gCheck & gline::FORCE_NEEDED_WILDTIME)
 	,theClient->getNickName().c_str()
 	,gline::MGLINE_WILD_TIME);
 	}*/
+string Cidr = hostName.substr(hostName.find('@')+1);
+
+if (Cidr.find('/') != string::npos) 
+	{
+	string tCidr;
+	if (!bot->getValidCidr(Cidr, tCidr))
+		{
+		bot->Notice(theClient, "Unwanted cidr format: %s  -  Suggestion: %s", Cidr.c_str(), tCidr.c_str());
+		Ok = false;
+		}
+	}
 if(!Ok)
 	{
 	bot->Notice(theClient,"Please fix all of the above, and try again");
