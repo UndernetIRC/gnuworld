@@ -441,7 +441,7 @@ public:
 	int topic_duration;
 
 	unsigned int channelsFloodPeriod;
-	unsigned int antifloodRelaxTime;
+	unsigned int floodnetRelaxTime;
 
 	// Timestamp's of when we last checked the database for updates.
 	time_t lastChannelRefresh;
@@ -521,7 +521,7 @@ public:
 	/* Bans and kick just one client, with level, period, reason */
 	bool doSingleBanAndKick(sqlChannel*, iClient*, unsigned short, unsigned int, const string& theReason);
 
-	/* Bans & kicks a specified user with a specific reason */
+	/* Bans & kicks & *Suspends* a specified user with a specific reason */
 	bool doInternalBanAndKick(sqlChannel*, iClient*, const string&);
 
     /* Bans & kicks all client belonging to the IP addrees, with a specific level, period, reason */
@@ -554,8 +554,8 @@ public:
 	/* Matches DB bans, and kicks supplied user if neccessary */
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
 
-	/* Checking for need to raise the antiflood level. Returns the repetition number. */
-	unsigned int checkAntifloodLevel(sqlChannel*, const string&);
+	/* Checking for need to raise the floodnet level. Returns the repetition number. */
+	unsigned int checkFloodnetLevel(sqlChannel*, const string&);
 
 	/* Cleanup the channel flood ip's/clients */
 	void checkChannelsFlood();

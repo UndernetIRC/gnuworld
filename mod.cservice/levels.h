@@ -121,7 +121,7 @@ namespace gnuworld {
     const int strictop = 500;
     const int lang = 500;
     const int floodpro = 450;
-    const int antiflood_gline = 800;
+    const int floodnet_gline = 800;
     const int autojoin = 500;
 
     const int nopurge = 501;

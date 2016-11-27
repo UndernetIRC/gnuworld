@@ -177,11 +177,11 @@ public:
 		FLOOD_CTCP
 	};
 
-	enum AntiFloodType {
-		ANTIFLOOD_NONE,
-		ANTIFLOOD_KICK,	//=WARNING
-		ANTIFLOOD_BAN,
-		ANTIFLOOD_GLINE
+	enum FloodNetType {
+		FLOODNET_NONE,
+		FLOODNET_KICK,	//=WARNING
+		FLOODNET_BAN,
+		FLOODNET_GLINE
 	};
 
 	/*
@@ -221,8 +221,8 @@ public:
     inline const unsigned short int& getRepeatCount() const
 		{ return repeat_count ; }
 
-    inline const AntiFloodType& getAntiFlood() const
-		{ return antiflood; }
+    inline const FloodNetType& getFloodNet() const
+		{ return floodnet; }
 
 	inline const time_t& 		getLastFloodTime() const
 		{ return last_flood; }
@@ -329,29 +329,29 @@ public:
 	inline void setFloodPro( const unsigned int& _flood_pro )
 		{ flood_pro = _flood_pro; }
 
-	inline void setAntiFlood( const AntiFloodType& _antiflood )
-		{ antiflood = _antiflood; }
+	inline void setFloodNet( const FloodNetType& _floodnet )
+		{ floodnet = _floodnet; }
 
-	inline void incAntiFlood()
+	inline void incFloodNet()
 	{
-		if (antiflood == ANTIFLOOD_NONE)
-			antiflood = ANTIFLOOD_KICK;
-		else if (antiflood == ANTIFLOOD_KICK)
-			antiflood = ANTIFLOOD_BAN;
-#ifdef GLINE_ON_ANTIFLOOD
-		else if ((antiflood == ANTIFLOOD_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
-			antiflood = ANTIFLOOD_GLINE;
+		if (floodnet == FLOODNET_NONE)
+			floodnet = FLOODNET_KICK;
+		else if (floodnet == FLOODNET_KICK)
+			floodnet = FLOODNET_BAN;
+#ifdef GLINE_ON_FLOODNET
+		else if ((floodnet == FLOODNET_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
+			floodnet = FLOODNET_GLINE;
 #endif
 	}
 
-	inline void decAntiFlood()
+	inline void decFloodNet()
 	{
-		if (antiflood == ANTIFLOOD_GLINE)
-			antiflood = ANTIFLOOD_BAN;
-		else if (antiflood == ANTIFLOOD_BAN)
-			antiflood = ANTIFLOOD_KICK;
-		else if (antiflood == ANTIFLOOD_KICK)
-			antiflood = ANTIFLOOD_NONE;
+		if (floodnet == FLOODNET_GLINE)
+			floodnet = FLOODNET_BAN;
+		else if (floodnet == FLOODNET_BAN)
+			floodnet = FLOODNET_KICK;
+		else if (floodnet == FLOODNET_KICK)
+			floodnet = FLOODNET_NONE;
 	}
 
 	inline void setLastFloodTime( const time_t& _last_flood )
@@ -433,7 +433,7 @@ public:
     // < total_count, IP_list >
 	typedef std::pair < unsigned int, std::list < string > > repeatIPMapType;
 
-	string getAntiFloodName(const AntiFloodType& );
+	string getFloodNetName(const FloodNetType& );
     repeatIPMapType getRepeatMessageCount(const string&, string IP = string());
 	time_t getIPLastTime(const string& );
 	//void setIPLastTime(const string&,);
@@ -473,7 +473,7 @@ protected:
 	unsigned short	ctcp_period;
 	unsigned short	flood_period;
     unsigned short	repeat_count;
-    AntiFloodType		antiflood;
+    FloodNetType		floodnet;
 	string		url ;
 	string		description ;
 	string		comment ;
@@ -489,7 +489,7 @@ protected:
 	unsigned int limit_offset;
 	time_t limit_period;
 	time_t last_limit_check;
-	time_t 		last_flood;	//last time when an antiflood measure was taken (kick/ban/gline)
+	time_t 		last_flood;	//last time when an floodnet measure was taken (kick/ban/gline)
 	unsigned int limit_grace;
 	unsigned int limit_max;
 	unsigned int max_bans;

@@ -124,7 +124,7 @@
 #define USE_NOTAKE
 
 /**
- * Enable ANTIFLOOD channel flag and function?
+ * Enable FLOODNET channel flag and function?
  * Protection against mass channel messages, channel notices, channel CTCP's
  */
 #define USE_FLOODPRO
@@ -133,7 +133,7 @@
  * Enable this Under CARREFULL CONSIDERATION, recommended for smaller networks, where admins can
  * take care of possible abuse of the function
  */
-#undef GLINE_ON_ANTIFLOOD
+#undef GLINE_ON_FLOODNET
 
 
 #endif // __CSERVICE_CONFIG_H

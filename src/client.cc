@@ -2222,7 +2222,7 @@ else
 		string currIP = xIP(tmpUser->getClient()->getIP()).GetNumericIP();
 		string currIP64 = xIP(tmpUser->getClient()->getIP()).GetNumericIP(true);
 		/* Idented and unidented clients need to be handled separately
-		 * In case of antiflood kick, IP can be in format of ident@ip !
+		 * In case of floodnet kick, IP can be in format of ident@ip !
 		 */
 		if (IP.find('@') != string::npos)
 		{
