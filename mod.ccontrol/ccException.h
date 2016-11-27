@@ -38,7 +38,7 @@ using std::string ;
 namespace uworld
 {
 
-typedef std::map<string, int> 		ip6clonesMapType;
+typedef std::map<string, int> 		ipLclonesMapType;
 
 
 class ccException
@@ -259,17 +259,25 @@ protected:
 
 }; 
 
-class ccIp6isp
+class ccIpLisp
 {
 public:	
-	ccIp6isp(dbHandle* _SQLDb);
-	virtual ~ccIp6isp();
+	ccIpLisp(dbHandle* _SQLDb);
+	virtual ~ccIpLisp();
 	
 
 	inline bool		isActive() const
 		{ return (active == 1 ? true : false); }
+
 	inline bool		isForcecount() const
 		{ return (forcecount == 1 ? true : false); }
+
+	inline int		isv6() const
+		{ return v6; }
+
+	inline bool		isGroup() const
+		{ return (group == 1 ? true : false); }
+
 	inline const string& 		getName() const
 		{ return Name; }
 		
@@ -333,6 +341,12 @@ public:
 	inline void 	setForcecount( const int _forcecount) 
 		{ forcecount = _forcecount; }
 
+	inline void 	setv6( const int _v6) 
+		{ v6 = _v6; }
+
+	inline void 	setGroup( const int _group) 
+		{ group = _group; }
+
 	inline void 		incCount( const int _count ) 
 		{ count += _count; }
 			
@@ -353,6 +367,8 @@ protected:
 	
 	int		id;
 	int		forcecount;
+	int		v6;
+	int		group;
 	string 		Name;
 	string 		email;
 	int		clonecidr;
@@ -367,21 +383,21 @@ protected:
 
 }; 
 
-class ccIp6nb
+class ccIpLnb
 {
 public:	
-	ccIp6nb(dbHandle* _SQLDb);
-	virtual ~ccIp6nb();
+	ccIpLnb(dbHandle* _SQLDb);
+	virtual ~ccIpLnb();
 	
 	inline bool operator==( const string& ExceptionHost ) const
 		{ return (!strcasecmp( cidr, ExceptionHost )
 		    || !match(cidr.c_str(),ExceptionHost.c_str())) ; }
 
 	inline bool		isActive() const
-		{ return ip6isp->isActive(); }
+		{ return ipLisp->isActive(); }
 
 	inline bool		isForcecount() const
-		{ return ip6isp->isForcecount(); }
+		{ return ipLisp->isForcecount(); }
 
 	inline const string& 		getCidr() const
 			{ return cidr; }
@@ -392,20 +408,20 @@ public:
 	inline const int& 		getCidr2() const
 			{ return cidr2; }
 
-	inline const int& 		getIp6ispID() const
-			{ return ip6ispid; }
+	inline const int& 		getIpLispID() const
+			{ return ipLispid; }
 
 	inline const int& 		getCount() const
 			{ return count; }
 
-	inline const ccIp6isp*		getIp6isp() const
-			{ return ip6isp; }
+	inline const ccIpLisp*		getIpLisp() const
+			{ return ipLisp; }
 	
 	inline const int& 		getCloneCidr() const
-			{ return ip6isp->getCloneCidr(); }
+			{ return ipLisp->getCloneCidr(); }
 
 	inline const int& 		getLimit() const
-			{ return ip6isp->getLimit(); }
+			{ return ipLisp->getLimit(); }
 
 	inline const string&		getAddedBy() const
 		{ return AddedBy; }
@@ -413,11 +429,11 @@ public:
 	inline time_t			getAddedOn() const
 		{ return AddedOn; }
 	
-	inline void 		setIp6isp( ccIp6isp* _ip6isp ) 
-		{ ip6isp = _ip6isp; }
+	inline void 		setIpLisp( ccIpLisp* _ipLisp ) 
+		{ ipLisp = _ipLisp; }
 
-	inline void 		setIp6ispID( const int _ip6ispid ) 
-		{ ip6ispid = _ip6ispid; }
+	inline void 		setIpLispID( const int _ipLispid ) 
+		{ ipLispid = _ipLispid; }
 			
 	inline void 		incCount( const int _count ) 
 		{ count += _count; }
@@ -439,15 +455,15 @@ public:
 	
 	bool		Delete();
 
-	ip6clonesMapType 	ip6clonesMap;
+	ipLclonesMapType 	ipLclonesMap;
 
-	ccIp6isp*	ip6isp;
+	ccIpLisp*	ipLisp;
 	
 	static unsigned int numAllocated;
 
 protected:
 
-	int		ip6ispid;
+	int		ipLispid;
 	int		count;
 	string 		cidr;
 	string 		cidr1;

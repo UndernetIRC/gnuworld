@@ -64,9 +64,14 @@ if( st.size() < 3 )
 ccUser* theUser = bot->IsAuth(theClient);
 if (theUser) 
 	{
-	//Dont let him authenticate under a new name (for now)
-	bot->Notice(theClient, "You are already authenticated! See DEAUTH command.");
-	return false;
+	if ((theUser->getAutoOp()) && (!theClient->isOper()))
+		bot->deAuthUser(theUser);
+	else 
+		{
+		//Dont let him authenticate under a new name (for now)
+		bot->Notice(theClient, "You are already authenticated! See DEAUTH command.");
+		return false;
+		}
 	}
 
 	/*
@@ -100,7 +105,7 @@ else
 
 	//Check if the user need to be operd to login
 	if((!theClient->isOper()) && (theUser->getNeedOp())) {
-		if ((!theUser->getAutoOp()) || (!isXAuthed)) {
+		if (!theUser->getAutoOp()) {
 			bot->MsgChanLog("[FAILED LOGIN] %s - Not Oper'd\n",theClient->getRealNickUserHost().c_str());
 			bot->addLogin(theClient);
 			return false;

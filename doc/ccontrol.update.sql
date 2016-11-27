@@ -135,7 +135,7 @@ alter TABLE opers add Account VARCHAR(128);
 alter TABLE opers add AccountTS INT4 NOT NULL DEFAULT '0';
 
 -- 2016/08/27 Tables for ipv6 connection management
-CREATE TABLE ip6ISPs (
+CREATE TABLE ipLISPs (
         id SERIAL,
         name VARCHAR(200) UNIQUE NOT NULL,
         email VARCHAR(200) NOT NULL,
@@ -143,13 +143,14 @@ CREATE TABLE ip6ISPs (
         maxlimit int4 NOT NULL DEFAULT 0,
         forcecount int4 NOT NULL DEFAULT 0,
         active int4 NOT NULL DEFAULT 1,
+        isgroup int4 NOT NULL DEFAULT 0,
         addedby VARCHAR(200) NOT NULL,
         addedon int4 NOT NULL,
         lastmodby VARCHAR(200) NOT NULL,
         lastmodon int4 NOT NULL
         );
 
-CREATE TABLE ip6Netblocks (
+CREATE TABLE ipLNetblocks (
         ispid int4 NOT NULL,
         cidr VARCHAR(50) NOT NULL,
         addedby VARCHAR(200) NOT NULL,

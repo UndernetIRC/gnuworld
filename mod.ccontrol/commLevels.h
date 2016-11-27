@@ -109,7 +109,7 @@ const unsigned long int flg_SCHANGLINE = 0x4000000;
 const unsigned long int flg_FORCECHANGLINE = 0x8000000;
 const unsigned long int flg_SHELLS = 0x10000000;
 const unsigned long int flg_ANNOUNCE = 0x20000000;
-const unsigned long int flg_IP6 = 0x40000000;
+const unsigned long int flg_LIMITS = 0x40000000;
 
 /*
  Default commands that are added upon adding a new oper
@@ -135,8 +135,8 @@ const unsigned long int SMT = ADMIN | flg_ADDSERVER;
 const unsigned long int SSMT = SADMIN | flg_REMSERVER | flg_LEARNNET | flg_NOMODE;
 const unsigned long int CODER = SMT;
 const unsigned long int SCODER =  SSMT | flg_COMMANDS| flg_GCHAN | flg_RGCHAN
-			| flg_EXCEPTIONS | flg_STATUS | flg_SHUTDOWN 
-			| flg_CONFIG | flg_SAY | flg_SGLINE | flg_REMSGLINE | flg_SCHANGLINE | flg_SHELLS | flg_IP6;
+			| flg_STATUS | flg_SHUTDOWN 
+			| flg_CONFIG | flg_SAY | flg_SGLINE | flg_REMSGLINE | flg_SCHANGLINE | flg_LIMITS;
 }
 
 }
