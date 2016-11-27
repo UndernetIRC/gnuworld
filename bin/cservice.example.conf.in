@@ -91,10 +91,10 @@ output_flood = 20480
 channels_flood_period = 30
 
 #
-# After how many seconds of absence of flood activity should turn off ANTIFLOOD flag
+# After how many seconds of absence of flood activity should reduce the FLOODNET value
 # Eg. 300 = 5 minutes. 
 
-antiflood_relaxtime = 300
+floodnet_relaxtime = 300
 
 #
 # How many not(ic)es will be stored for an offline user 
