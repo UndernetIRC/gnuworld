@@ -961,7 +961,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
-	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)) return;
+	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getFloodNet() > sqlChannel::FLOODNET_NONE)) return;
 	StringTokenizer st(CTCPCommand);
 	string cmd = string_upper(st[0]);
 	string msg = st.assemble(1);
@@ -978,7 +978,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 		sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, msg);
 		unsigned int repeatCount = sqlChan->getRepeatMessageCount(msg).first;
 
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_NONE)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_NONE)
 		{
 			if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
 				Kick(theChan, Sender, kickReason);
@@ -1001,21 +1001,21 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 		}
 		else
 		{
-			if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_KICK)
+			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 			{
 				if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 					KickAllWithFloodMessage(theChan, msg, kickReason, false);
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 					KickAllWithFloodMessage(theChan, msg, repeatReason, false);
 			}
-			if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_BAN)
+			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 			{
 				if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 					KickBanAllWithFloodMessage(theChan, msg, banLevel, banTime, kickReason);
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 					KickBanAllWithFloodMessage(theChan, msg, banLevel, banTime, repeatReason);
 			}
-			if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_GLINE)
+			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
 			{
 				if ((sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 					|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
@@ -1025,7 +1025,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 					|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 				sqlChan->setLastFloodTime(currentTime());
 		}
-		checkAntifloodLevel(sqlChan, msg);
+		checkFloodnetLevel(sqlChan, msg);
 	}
 	//if ((cmd == "PING") || (cmd == "VERSION") || (cmd == "TIME"))
 	if ((cmd != "ACTION") && (sqlChan->getFloodCTCP() > 0))
@@ -1036,7 +1036,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 		sqlChan->handleNewMessage(sqlChannel::FLOOD_CTCP, IP, msg);
 		unsigned int repeatCount = sqlChan->getRepeatMessageCount(msg).first;
 
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_NONE)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_NONE)
 		{
 			if (sqlChan->getTotalCTCPCount(IP) == sqlChan->getFloodCTCP())
 				Kick(theChan, Sender, kickReason);
@@ -1059,21 +1059,21 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 		}
 		else
 		{
-			if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_KICK)
+			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 			{
 				if (sqlChan->getTotalCTCPCount(IP) >= sqlChan->getFloodCTCP())
 					KickAllWithFloodMessage(theChan, msg, kickReason, false);
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 					KickAllWithFloodMessage(theChan, msg, repeatReason, false);
 			}
-			if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_BAN)
+			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 			{
 				if (sqlChan->getTotalCTCPCount(IP) >= sqlChan->getFloodCTCP())
 					KickBanAllWithFloodMessage(theChan, msg, banLevel, banTime, kickReason);
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 					KickBanAllWithFloodMessage(theChan, msg, banLevel, banTime, repeatReason);
 			}
-			if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_GLINE)
+			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
 			{
 				if ((sqlChan->getTotalCTCPCount(IP) >= sqlChan->getFloodCTCP())
 					|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
@@ -1083,7 +1083,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 					|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 				sqlChan->setLastFloodTime(currentTime());
 		}
-		checkAntifloodLevel(sqlChan, msg);
+		checkFloodnetLevel(sqlChan, msg);
 	}
 	return xClient::OnChannelCTCP(Sender, theChan, CTCPCommand, Message);
 }
@@ -1096,7 +1096,7 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	if (!sqlChan->getFloodMsg()) return;
-	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)) return;
+	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getFloodNet() > sqlChannel::FLOODNET_NONE)) return;
 	unsigned short banLevel = 75;
 	unsigned int banTime = 3 * 3600;
 	unsigned int glineTime = 1 * 3600;
@@ -1108,7 +1108,7 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
 
-	if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_NONE)
+	if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_NONE)
 	{
 		if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
 			Kick(theChan, Sender, kickReason);
@@ -1131,21 +1131,21 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	}
 	else
 	{
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_KICK)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 		{
 			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickAllWithFloodMessage(theChan, Message, repeatReason, false);
 		}
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_BAN)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 		{
 			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, kickReason);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, repeatReason);
 		}
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_GLINE)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
 		{
 			if ((sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
@@ -1155,7 +1155,7 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 			sqlChan->setLastFloodTime(currentTime());
 	}
-	checkAntifloodLevel(sqlChan, Message);
+	checkFloodnetLevel(sqlChan, Message);
 	xClient::OnChannelMessage(Sender, theChan, Message);
 }
 
@@ -1167,7 +1167,7 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	if (!sqlChan->getFloodNotice()) return;
-	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)) return;
+	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getFloodNet() > sqlChannel::FLOODNET_NONE)) return;
 	unsigned short banLevel = 75;
 	unsigned int banTime = 3 * 3600;
 	unsigned int glineTime = 1 * 3600;
@@ -1179,7 +1179,7 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_NOTICE, IP, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
 
-	if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_NONE)
+	if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_NONE)
 	{
 		if (sqlChan->getTotalNoticeCount(IP) == sqlChan->getFloodNotice())
 			Kick(theChan, Sender, kickReason);
@@ -1202,21 +1202,21 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	}
 	else
 	{
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_KICK)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 		{
 			if (sqlChan->getTotalNoticeCount(IP) >= sqlChan->getFloodNotice())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickAllWithFloodMessage(theChan, Message, repeatReason, false);
 		}
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_BAN)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 		{
 			if (sqlChan->getTotalNoticeCount(IP) >= sqlChan->getFloodNotice())
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, kickReason);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, repeatReason);
 		}
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_GLINE)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
 		{
 			if ((sqlChan->getTotalNoticeCount(IP) >= sqlChan->getFloodNotice())
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
@@ -1226,7 +1226,7 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 			sqlChan->setLastFloodTime(currentTime());
 	}
-	checkAntifloodLevel(sqlChan, Message);
+	checkFloodnetLevel(sqlChan, Message);
 	xClient::OnChannelNotice(Sender, theChan, Message);
 }
 
@@ -1332,7 +1332,7 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
 
-	if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_NONE)
+	if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_NONE)
 	{
 		if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
 			Kick(theChan, Sender, kickReason);
@@ -1355,21 +1355,21 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	}
 	else
 	{
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_KICK)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 		{
 			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickAllWithFloodMessage(theChan, Message, repeatReason, false);
 		}
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_BAN)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 		{
 			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, kickReason);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, repeatReason);
 		}
-		if (sqlChan->getAntiFlood() == sqlChannel::ANTIFLOOD_GLINE)
+		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
 		{
 			if ((sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
@@ -1379,7 +1379,7 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 			sqlChan->setLastFloodTime(currentTime());
 	}
-	checkAntifloodLevel(sqlChan, Message);
+	checkFloodnetLevel(sqlChan, Message);
 }
 
 /**
@@ -6405,7 +6405,7 @@ bool cservice::GlineAllWithFloodMessage(sqlChannel* sqlChan, const string& Messa
 	return true;
 }
 
-unsigned int cservice::checkAntifloodLevel(sqlChannel* sqlChan, const string& Message)
+unsigned int cservice::checkFloodnetLevel(sqlChannel* sqlChan, const string& Message)
 {
 	sqlChannel::repeatIPMapType rep = sqlChan->getRepeatMessageCount(Message);
 	unsigned int repeatCount = rep.first;
@@ -6413,16 +6413,16 @@ unsigned int cservice::checkAntifloodLevel(sqlChannel* sqlChan, const string& Me
 	if (sqlChan->getRepeatCount() == 0) return repeatCount;
 	if ((repeatCount >= sqlChan->getRepeatCount()) && IPcount > 1)
 	{
-		sqlChannel::AntiFloodType currAF = sqlChan->getAntiFlood();
-		if (currAF > sqlChannel::ANTIFLOOD_NONE)
+		sqlChannel::FloodNetType currFN = sqlChan->getFloodNet();
+		if (currFN > sqlChannel::FLOODNET_NONE)
 		{
-			sqlChan->incAntiFlood();
-			if (sqlChan->getAntiFlood() > currAF)
+			sqlChan->incFloodNet();
+			if (sqlChan->getFloodNet() > currFN)
 			{
-				string AFmessage = TokenStringsParams("Increased antiflood level to \002%s\002 for channel \002%s\002",
-						sqlChan->getAntiFloodName(sqlChan->getAntiFlood()).c_str(), sqlChan->getName().c_str());
-				NoticeChannelOps(sqlChan->getName(), AFmessage.c_str());
-				logPrivAdminMessage(AFmessage.c_str());
+				string FNmessage = TokenStringsParams("Increased floodnet punishment level to \002%s\002 for channel \002%s\002",
+						sqlChan->getFloodNetName(sqlChan->getFloodNet()).c_str(), sqlChan->getName().c_str());
+				NoticeChannelOps(sqlChan->getName(), FNmessage.c_str());
+				logPrivAdminMessage(FNmessage.c_str());
 			}
 		}
 	}
@@ -6458,18 +6458,18 @@ void cservice::checkChannelsFlood()
 			else
 				++itr;
 		}
-		if (theChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)
+		if (theChan->getFloodNet() > sqlChannel::FLOODNET_NONE)
 		{
 			time_t lastFloodTime = currentTime() - theChan->getLastFloodTime();
-			if ((theChan->getAntiFlood() > sqlChannel::ANTIFLOOD_NONE)
-					&& ((lastFloodTime) > ((time_t)antifloodRelaxTime)))
+			if ((theChan->getFloodNet() > sqlChannel::FLOODNET_NONE)
+					&& ((lastFloodTime) > ((time_t)floodnetRelaxTime)))
 			{
-				theChan->decAntiFlood();
+				theChan->decFloodNet();
 				theChan->setLastFloodTime(currentTime());
-				string AFmessage = TokenStringsParams("Relaxed antiflood level to \002%s\002 for channel \002%s\002",
-						theChan->getAntiFloodName(theChan->getAntiFlood()).c_str(), theChan->getName().c_str());
-				NoticeChannelOps(theChan->getName(), AFmessage.c_str());
-				logPrivAdminMessage(AFmessage.c_str());
+				string FNmessage = TokenStringsParams("Relaxed floodnet punishment level to \002%s\002 for channel \002%s\002",
+						theChan->getFloodNetName(theChan->getFloodNet()).c_str(), theChan->getName().c_str());
+				NoticeChannelOps(theChan->getName(), FNmessage.c_str());
+				logPrivAdminMessage(FNmessage.c_str());
 			}
 		}
 		++ptr;
@@ -7888,7 +7888,7 @@ void cservice::loadConfigVariables()
 	output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 	flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
 	channelsFloodPeriod = atoi((cserviceConfig->Require( "channels_flood_period" )->second).c_str());
-	antifloodRelaxTime = atoi((cserviceConfig->Require( "antiflood_relaxtime" )->second).c_str());
+	floodnetRelaxTime = atoi((cserviceConfig->Require( "floodnet_relaxtime" )->second).c_str());
 	MAXnotes = atoi((cserviceConfig->Require( "max_notes" )->second).c_str());
 	topic_duration = atoi((cserviceConfig->Require( "topic_duration" )->second).c_str());
 	UsersExpireDBDays = atoi((cserviceConfig->Require( "users_expire_days" )->second).c_str());

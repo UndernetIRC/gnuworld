@@ -125,7 +125,7 @@ sqlChannel::sqlChannel(dbHandle* _SQLDb)
    ctcp_period(0),
    flood_period(0),
    repeat_count(0),
-   antiflood(ANTIFLOOD_NONE),
+   floodnet(FLOODNET_NONE),
    url(),
    description(),
    comment(),
@@ -440,7 +440,7 @@ void sqlChannel::setDefaultFloodproValues()
 	setFloodCTCP(5);
 	setFloodPeriod(15);
 	setRepeatCount(5);
-	setAntiFlood(sqlChannel::ANTIFLOOD_NONE);
+	setFloodNet(sqlChannel::FLOODNET_NONE);
 }
 
 unsigned int sqlChannel::getTotalMessageCount(const string& IP)
@@ -470,12 +470,12 @@ unsigned int sqlChannel::getTotalCTCPCount(const string& IP)
 	return 0;
 }
 
-string sqlChannel::getAntiFloodName(const AntiFloodType& floodType)
+string sqlChannel::getFloodNetName(const FloodNetType& floodType)
 {
-	if (floodType == ANTIFLOOD_NONE) return "NONE";
-	if (floodType == ANTIFLOOD_KICK) return "KICK";
-	if (floodType == ANTIFLOOD_BAN) return "BAN";
-	if (floodType == ANTIFLOOD_GLINE) return "GLINE";
+	if (floodType == FLOODNET_NONE) return "NONE";
+	if (floodType == FLOODNET_KICK) return "KICK";
+	if (floodType == FLOODNET_BAN) return "BAN";
+	if (floodType == FLOODNET_GLINE) return "GLINE";
 	return "NONE";
 }
 
@@ -503,7 +503,7 @@ sqlChannel::repeatIPMapType sqlChannel::getRepeatMessageCount(const string& Mess
 		if (incIP) IPlist.push_back(ptr->first);
 		ptr++;
 	}
-	//if (IPlist.size() > 1) incAntiFlood();
+	//if (IPlist.size() > 1) incFloodNet();
 	res = std::make_pair(sum, IPlist);
 	return res;
 }

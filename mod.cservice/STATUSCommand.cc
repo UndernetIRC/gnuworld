@@ -196,14 +196,14 @@ if (theChan->getFlag(sqlChannel::F_FLOODPRO))
 {
     //flagsSet.empty();
     stringstream floodperiods;
-	if (theChan->getAntiFlood())
+	if (theChan->getFloodNet())
 	{
-		floodperiods << " \002ANTIFLOOD (";
-		if (theChan->getAntiFlood() == sqlChannel::ANTIFLOOD_KICK)
+		floodperiods << " \002FLOODNET (";
+		if (theChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 			floodperiods << "KICK";
-		if (theChan->getAntiFlood() == sqlChannel::ANTIFLOOD_BAN)
+		if (theChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 			floodperiods << "BAN";
-		if (theChan->getAntiFlood() == sqlChannel::ANTIFLOOD_GLINE)
+		if (theChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
 			floodperiods << "GLINE";
 		floodperiods	<< ")\002";
 	}

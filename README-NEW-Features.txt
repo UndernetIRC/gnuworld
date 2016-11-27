@@ -48,7 +48,7 @@ Remember: If you have an existing 'old' gnuworld installation, follow doc/inet-m
     Note:
     	/msg X set <channel> FLOODPRO DEFAULTS -- sets the defult values
 
-    /msg X set <channel> ANTIFLOOD <option>
+    /msg X set <channel> FLOODNET <option>
 
         ON/BAN            (3 hour ban @ level 75)
         WARN/KICK

@@ -982,10 +982,10 @@ else
 	    }
 	    else if(value == "OFF")
 	    {
-	    	theChan->setAntiFlood(sqlChannel::ANTIFLOOD_NONE);
+	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
 	    	//theChan->setFloodPro(0);
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
-	    	theChan->setAntiFlood(sqlChannel::ANTIFLOOD_NONE);
+	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
 	    }
 	    else if ((value == "DEFAULT") || (value == "DEFAULTS"))
 	    {
@@ -1015,7 +1015,7 @@ else
 	if (option == "FLOODPROGLINE")
 	{
 		int admLevel = (int)bot->getAdminAccessLevel(theUser);
-		if ((admLevel < level::set::antiflood_gline) && (level < level::set::antiflood_gline))
+		if ((admLevel < level::set::floodnet_gline) && (level < level::set::floodnet_gline))
 		{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
@@ -1163,7 +1163,7 @@ else
 	    if (numValue == 0)
 	    {
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
-	    	theChan->setAntiFlood(sqlChannel::ANTIFLOOD_NONE);
+	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
 	    	theChan->commit();
 	    	bot->Notice(theClient,
 	    			bot->getResponse(theUser,
@@ -1202,7 +1202,7 @@ else
 			theChan->getName().c_str(), value.c_str());
 	    return true;
 	}
-	if (option == "ANTIFLOOD")
+	if (option == "FLOODNET")
 	{
 		if(level < level::set::floodpro)
 		{
@@ -1212,7 +1212,7 @@ else
 				string("You do not have enough access!")));
 			return true;
 		}
-		sqlChannel::AntiFloodType prevAF = theChan->getAntiFlood();
+		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
 		if ((value == "KICK") || (value == "WARNING")
 				|| (value == "ON") || (value == "BAN")
 				|| (value == "GLINE"))
@@ -1227,17 +1227,17 @@ else
 		}
 		if ((value == "KICK") || (value == "WARNING"))
 		{
-			theChan->setAntiFlood(sqlChannel::ANTIFLOOD_KICK);
+			theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
 		}
 		else if ((value == "BAN") || (value == "ON"))
 		{
-			theChan->setAntiFlood(sqlChannel::ANTIFLOOD_BAN);
+			theChan->setFloodNet(sqlChannel::FLOODNET_BAN);
 		} /* Currently manual setting of GLINE severity is completely disabled
 		else if (value == "GLINE")
  		{
 			short effAccess = bot->getEffectiveAccessLevel(theUser, theChan, true);
-			if (effAccess >= level::set::antiflood_gline)
-				theChan->setAntiFlood(sqlChannel::ANTIFLOOD_GLINE);
+			if (effAccess >= level::set::floodnet_gline)
+				theChan->setFloodNet(sqlChannel::FLOODNET_GLINE);
 			else
 			{
 				bot->Notice(theClient,
@@ -1249,7 +1249,7 @@ else
  		}*/
 		else if ((value == "NONE") || (value == "OFF"))
 		{
-			theChan->setAntiFlood(sqlChannel::ANTIFLOOD_NONE);
+			theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
 		}
 		else
 		{
@@ -1268,7 +1268,7 @@ else
 					option.c_str(),
 					theChan->getName().c_str(),
 					value.c_str());
-		if (theChan->getAntiFlood() > prevAF)
+		if (theChan->getFloodNet() > prevFN)
 		{
 			bot->NoticeChannelOps(tmpChan,"Increased %s for %s to %s by %s",
 					option.c_str(),
@@ -1276,7 +1276,7 @@ else
 					value.c_str(),
 					theUser->getUserName().c_str());
 		}
-		else if (theChan->getAntiFlood() < prevAF)
+		else if (theChan->getFloodNet() < prevFN)
 		{
 			bot->NoticeChannelOps(tmpChan,"Decreased %s for %s to %s by %s",
 					option.c_str(),
