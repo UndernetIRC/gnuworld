@@ -2641,6 +2641,7 @@ CClonesCIDR << " (will GLINE): *@";
 			}
 			if ((DoGline) && (shellglinecounter == 0))
 			{
+			iClient* theClient = Network->findClient(this->getCharYYXXX());
 #ifndef LOGTOHD
 			DailyLog(theClient,"%s",Log);
 #else
