@@ -8168,6 +8168,8 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			return false;
 		}
 		username = st[1];
+		if (username.compare(0,1,":") == 0)
+			username.erase(0,1);
 		password = st.assemble(2);
 		elog << "cservice::doXQLogin: LOGIN " << username << " " << password << endl;
 	}
@@ -8180,6 +8182,8 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			return false;
 		}
 		username = st[4];
+		if (username.compare(0,1,":") == 0)
+			username.erase(0,1);
 		password = st.assemble(5);
 		ip = st[1];
 		hostname = st[2];
@@ -8194,7 +8198,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	switch(auth_res)
 		{
 		case TOO_EARLY_TOLOGIN:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Unable "
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Unable "
 	                	"to login during reconnection, please try again in "
 		                "%i seconds)",
 	        	        username.c_str(), (loginTime - currentTime()));
@@ -8202,23 +8206,23 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			elog << "cservice::doXQLogin: Auth res = TOO_EARLY_TOLOGIN" << endl;
 			break;
 		case AUTH_FAILED:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Erroneus username)", username.c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Erroneus username)", username.c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_FAILED" << endl;
 			break;
 		case AUTH_UNKNOWN_USER:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s.", username.c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s", username.c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_UNKNOWN_USER" << endl;
 			break;
 		case AUTH_SUSPENDED_USER:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Suspended)", theUser->getUserName().c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Suspended)", theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_SUSPENDED_USER" << endl;
 			break;
 		case AUTH_NO_TOKEN:
 			theUser->incFailedLogins();
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Missing TOTP token)", theUser->getUserName().c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Missing TOTP token)", theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_NO_TOKEN" << endl;
 			break;
@@ -8227,7 +8231,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			        failed_login_rate = 900;
 			AuthResponse = TokenStringsParams(getResponse(theUser,
 						language::auth_failed,
-						string("AUTHENTICATION FAILED as %s.")).c_str(),
+						string("AUTHENTICATION FAILED as %s")).c_str(),
 				theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);	// <- this will be removed!
 			elog << "cservice::doXQLogin: Auth res = AUTH_INVALID_PASS" << endl;
@@ -8280,7 +8284,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
             theUser->incFailedLogins();
             AuthResponse = TokenStringsParams(getResponse(theUser,
 	                 	language::auth_failed_token,
-	                        string("AUTHENTICATION FAILED as %s. (Invalid Token)")).c_str(),
+	                        string("AUTHENTICATION FAILED as %s (Invalid Token)")).c_str(),
 	                        theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_INVALID_TOKEN" << endl;
@@ -8288,7 +8292,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		case AUTH_FAILED_IPR:
             /* increment failed logins counter */
             theUser->incFailedLogins();
-            AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (IPR)", theUser->getUserName().c_str());
+            AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (IPR)", theUser->getUserName().c_str());
 	                /* notify the relay channel */
 	                logAdminMessage("%s@%s (%s) failed IPR check.",
 	                        ident.c_str(),
@@ -8310,7 +8314,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		case AUTH_ML_EXCEEDED:
             /* increment failed logins counter */
             theUser->incFailedLogins();
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Maximum "
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Maximum "
 	                        "concurrent logins exceeded).",
 	                        theUser->getUserName().c_str());
    			doXResponse(theServer, Routing, AuthResponse, true);

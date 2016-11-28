@@ -93,7 +93,7 @@ string clientList;
 switch(auth_res)
 	{
 	case cservice::TOO_EARLY_TOLOGIN:
-		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Unable "
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Unable "
                 	"to login during reconnection, please try again in "
 	                "%i seconds)",
         	        st[1].c_str(), (loginTime - bot->currentTime()));
@@ -101,7 +101,7 @@ switch(auth_res)
 		break;
 	case cservice::AUTH_FAILED:
 		bot->setFailedLogins(theClient, failedLogins+1);
-	        bot->Notice(theClient, "AUTHENTICATION FAILED as %s.", st[1].c_str());
+	        bot->Notice(theClient, "AUTHENTICATION FAILED as %s", st[1].c_str());
         	return false;
 		break;
 	case cservice::AUTH_UNKNOWN_USER:
@@ -109,19 +109,19 @@ switch(auth_res)
 	        bot->Notice(theClient,
         	        bot->getResponse(tmpUser,
                         language::not_registered,
-                        string("AUTHENTICATION FAILED as %s.")).c_str(),
+                        string("AUTHENTICATION FAILED as %s")).c_str(),
                 st[1].c_str());
 	        return false;
 		break;
 	case cservice::AUTH_SUSPENDED_USER:
 	        bot->setFailedLogins(theClient, failedLogins+1);
-		bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Suspended)",
+		bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Suspended)",
         		st[1].c_str());
 	        return false;
 		break;
 	case cservice::AUTH_NO_TOKEN:
 		bot->setFailedLogins(theClient, failedLogins+1);
-		bot->Notice(theClient,"AUTHENTICATION FAILED as %s. (Missing TOTP token)",st[1].c_str());
+		bot->Notice(theClient,"AUTHENTICATION FAILED as %s (Missing TOTP token)",st[1].c_str());
                 return false;
 		break;
 	case cservice::AUTH_INVALID_PASS:
@@ -131,7 +131,7 @@ switch(auth_res)
 	        bot->Notice(theClient,
                 bot->getResponse(theUser,
                         language::auth_failed,
-                        string("AUTHENTICATION FAILED as %s.")).c_str(),
+                        string("AUTHENTICATION FAILED as %s")).c_str(),
                 theUser->getUserName().c_str());
         	/* increment failed logins counter */
 	        theUser->incFailedLogins();
@@ -183,7 +183,7 @@ switch(auth_res)
 	         bot->Notice(theClient,
                  bot->getResponse(theUser,
                  	language::auth_failed_token,
-                        string("AUTHENTICATION FAILED as %s. (Invalid Token)")).c_str(),
+                        string("AUTHENTICATION FAILED as %s (Invalid Token)")).c_str(),
                         theUser->getUserName().c_str());
                 /* increment failed logins counter */
                 theUser->incFailedLogins();
@@ -191,7 +191,7 @@ switch(auth_res)
 		break;
 	case cservice::AUTH_FAILED_IPR:
 		 bot->setFailedLogins(theClient, failedLogins+1);
-                bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (IPR)",
+                bot->Notice(theClient, "AUTHENTICATION FAILED as %s (IPR)",
                         st[1].c_str());
                 /* notify the relay channel */
                 bot->logAdminMessage("%s (%s) failed IPR check.",
@@ -213,7 +213,7 @@ switch(auth_res)
 		break;
 	case cservice::AUTH_ML_EXCEEDED:
 		bot->setFailedLogins(theClient, failedLogins+1);
-                bot->Notice(theClient, "AUTHENTICATION FAILED as %s. (Maximum "
+                bot->Notice(theClient, "AUTHENTICATION FAILED as %s (Maximum "
                         "concurrent logins exceeded).",
                         theUser->getUserName().c_str());
 
