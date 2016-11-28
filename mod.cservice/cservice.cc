@@ -6475,7 +6475,7 @@ unsigned int cservice::checkFloodnetLevel(sqlChannel* sqlChan, const string& Mes
 			sqlChan->incFloodNet();
 			if (sqlChan->getFloodNet() > currFN)
 			{
-				string FNmessage = TokenStringsParams("Increased floodnet punishment level to \002%s\002 for channel \002%s\002",
+				string FNmessage = TokenStringsParams("Increased floodnet punishment level to \002%s\002 on channel \002%s\002",
 						sqlChan->getFloodNetName(sqlChan->getFloodNet()).c_str(), sqlChan->getName().c_str());
 				NoticeChannelOps(sqlChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
@@ -6522,7 +6522,7 @@ void cservice::checkChannelsFlood()
 			{
 				theChan->decFloodNet();
 				theChan->setLastFloodTime(currentTime());
-				string FNmessage = TokenStringsParams("Relaxed floodnet punishment level to \002%s\002 for channel \002%s\002",
+				string FNmessage = TokenStringsParams("Relaxed floodnet punishment level to \002%s\002 on channel \002%s\002",
 						theChan->getFloodNetName(theChan->getFloodNet()).c_str(), theChan->getName().c_str());
 				NoticeChannelOps(theChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
