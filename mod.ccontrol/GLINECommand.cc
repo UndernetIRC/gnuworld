@@ -252,6 +252,15 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 				Ok = false;
 			}
 			}
+		if (hostName.find('/') != string::npos) 
+			{
+			string tCidr;
+			if (!bot->getValidCidr(hostName, tCidr))
+				{
+				bot->Notice(theClient, "Unwanted cidr format: %s  -  Suggestion: %s", hostName.c_str(), tCidr.c_str());
+				Ok = false;
+				}
+			}
 		if(!Ok)
 			{
 			bot->Notice(theClient,"Please fix all of the above, and try again");

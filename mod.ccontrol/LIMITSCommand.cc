@@ -1,5 +1,5 @@
 /**
- * IP6Command.cc
+ * LIMITSCommand.cc
  * Modify the ipv6 connection limits
  *
  * This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: IP6Command.cc,v 1.3 2008/12/28 12:21:15 hidden1 Exp $
+ * $Id: LIMITSCommand.cc,v 1.3 2008/12/28 12:21:15 hidden1 Exp $
  */
 
 #include	<string>
@@ -33,7 +33,7 @@
 #include	"ccException.h"
 #include	"Network.h"
 
-RCSTAG( "$Id: IP6Command.cc,v 1.3 2008/12/28 12:21:15 hidden1 Exp $" ) ;
+RCSTAG( "$Id: LIMITSCommand.cc,v 1.3 2008/12/28 12:21:15 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -43,11 +43,11 @@ using std::string ;
 namespace uworld
 {
 
-bool IP6Command::Exec( iClient* theClient, const string& Message )
+bool LIMITSCommand::Exec( iClient* theClient, const string& Message )
 {	 
 StringTokenizer st( Message ) ;
-ccIp6isp* Ip6isp;
-//ccIp6nb* Ip6nb;
+ccIpLisp* IpLisp;
+//ccIpLnb* IpLnb;
 	
 if(st.size() < 2) 
 	{
@@ -55,10 +55,10 @@ if(st.size() < 2)
 	return true;
 	}
 
-bot->MsgChanLog("IP6 %s\n",st.assemble(1).c_str());
+bot->MsgChanLog("LIMITS %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[1].c_str(),"list"))
 	{
-	bot->listIp6Exceptions(theClient);
+	bot->listIpLExceptions(theClient);
 	return true;
 	}
 else if(!strcasecmp(st[1].c_str(),"addisp"))
@@ -82,9 +82,9 @@ else if(!strcasecmp(st[1].c_str(),"addisp"))
 		return true;
 		}
 
-	Ip6isp = bot->getIp6isp(st[2]);
+	IpLisp = bot->getIpLisp(st[2]);
 	
-	if (Ip6isp != 0)
+	if (IpLisp != 0)
 		{
 		bot->Notice(theClient,"An isp already exists with that name.");
 		return true;
@@ -93,7 +93,7 @@ else if(!strcasecmp(st[1].c_str(),"addisp"))
 	else
 		{
 		string email = (st.size() >= 5 ? st[4] : "none@available");
-		if(bot->insertIp6isp(theClient,st[2],atoi(st[3].c_str()),atoi(st[4].c_str()),email, 1, 0))
+		if(bot->insertIpLisp(theClient,st[2],atoi(st[3].c_str()),atoi(st[4].c_str()),email, 1, 0))
 			{
 			bot->Notice(theClient,"Successfully added isp '%s' for %d connections per /%d"
 				    ,st[2].c_str(),atoi(st[3].c_str()),atoi(st[4].c_str()));
@@ -107,16 +107,16 @@ else if(!strcasecmp(st[1].c_str(),"addnetblock"))
 		bot->Notice(theClient,"SYNTAX: ADDNETBLOCK <isp> <netblock>");
 		return true;
 		}
-	Ip6isp = bot->getIp6isp(st[2]);
+	IpLisp = bot->getIpLisp(st[2]);
 	
-	if (Ip6isp == 0)
+	if (IpLisp == 0)
 		{
 		bot->Notice(theClient,"Isp not found. Use ADDISP first");
 		return true;
 		}
 	else
 		{
-		if(bot->insertIp6nb(theClient,st[3],Ip6isp->getID(), false))
+		if(bot->insertIpLnb(theClient,st[3],IpLisp->getID(), false))
 			{
 			bot->Notice(theClient,"Successfully added '%s' to '%s'"
 				    ,st[3].c_str(),st[2].c_str());
@@ -135,9 +135,9 @@ else if(!strcasecmp(st[1].c_str(),"active"))
 		bot->Notice(theClient,"Isp can't exceed 32 characters");
 		return true;
 		}
-	Ip6isp = bot->getIp6isp(st[2]);
+	IpLisp = bot->getIpLisp(st[2]);
 	
-	if (Ip6isp == 0)
+	if (IpLisp == 0)
 		{
 		bot->Notice(theClient,"Isp not found.");
 		return true;
@@ -152,16 +152,56 @@ else if(!strcasecmp(st[1].c_str(),"active"))
 		bot->Notice(theClient,"must be yes or no");
 		return true;
 		}
-	Ip6isp->setActive(res);
-	Ip6isp->setModOn(::time(0));
-	Ip6isp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
-	bot->reloadIp6isp(theClient, Ip6isp);
-	if (!Ip6isp->updateData()) 
+	IpLisp->setActive(res);
+	IpLisp->setModOn(::time(0));
+	IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+	bot->reloadIpLisp(theClient, IpLisp);
+	if (!IpLisp->updateData()) 
 		{
 		bot->Notice(theClient, "SQL insertion failed.");
 		}
 	else
-		bot->Notice(theClient,"G-lines on %s %sactivated", Ip6isp->getName().c_str(), res ? "" : "de");
+		bot->Notice(theClient,"G-lines on %s %sactivated", IpLisp->getName().c_str(), res ? "" : "de");
+	}
+else if(!strcasecmp(st[1].c_str(),"group"))
+	{
+	if(st.size() < 4) 
+		{
+		bot->Notice(theClient,"SYNTAX: GROUP <isp> <yes|no>");
+		return true;
+		}
+	if(st[2].size() > 32)
+		{
+		bot->Notice(theClient,"Isp can't exceed 32 characters");
+		return true;
+		}
+	IpLisp = bot->getIpLisp(st[2]);
+	
+	if (IpLisp == 0)
+		{
+		bot->Notice(theClient,"Isp not found.");
+		return true;
+		}
+	int res;
+	if (!strcasecmp(st[3].c_str(), "yes"))
+		res = 1;
+	else if (!strcasecmp(st[3].c_str(), "no"))
+		res = 0;
+	else 
+		{
+		bot->Notice(theClient,"must be yes or no");
+		return true;
+		}
+	IpLisp->setGroup(res);
+	IpLisp->setModOn(::time(0));
+	IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+	bot->reloadIpLisp(theClient, IpLisp);
+	if (!IpLisp->updateData()) 
+		{
+		bot->Notice(theClient, "SQL insertion failed.");
+		}
+	else
+		bot->Notice(theClient,"group for %s is now %sabled", IpLisp->getName().c_str(), res ? "en" : "dis");
 	}
 else if(!strcasecmp(st[1].c_str(),"forcecount"))
 	{
@@ -175,9 +215,9 @@ else if(!strcasecmp(st[1].c_str(),"forcecount"))
 		bot->Notice(theClient,"Isp can't exceed 32 characters");
 		return true;
 		}
-	Ip6isp = bot->getIp6isp(st[2]);
+	IpLisp = bot->getIpLisp(st[2]);
 	
-	if (Ip6isp == 0)
+	if (IpLisp == 0)
 		{
 		bot->Notice(theClient,"Isp not found.");
 		return true;
@@ -192,16 +232,16 @@ else if(!strcasecmp(st[1].c_str(),"forcecount"))
 		bot->Notice(theClient,"must be yes or no");
 		return true;
 		}
-	Ip6isp->setForcecount(res);
-	Ip6isp->setModOn(::time(0));
-	Ip6isp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
-	bot->reloadIp6isp(theClient, Ip6isp);
-	if (!Ip6isp->updateData()) 
+	IpLisp->setForcecount(res);
+	IpLisp->setModOn(::time(0));
+	IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+	bot->reloadIpLisp(theClient, IpLisp);
+	if (!IpLisp->updateData()) 
 		{
 		bot->Notice(theClient, "SQL insertion failed.");
 		}
 	else
-		bot->Notice(theClient,"forcecount for %s is now %sabled", Ip6isp->getName().c_str(), res ? "en" : "dis");
+		bot->Notice(theClient,"forcecount for %s is now %sabled", IpLisp->getName().c_str(), res ? "en" : "dis");
 	}
 else if(!strcasecmp(st[1].c_str(),"chccidr"))
 	{
@@ -215,27 +255,27 @@ else if(!strcasecmp(st[1].c_str(),"chccidr"))
 		bot->Notice(theClient,"Isp can't exceed 32 characters");
 		return true;
 		}
-	Ip6isp = bot->getIp6isp(st[2]);
+	IpLisp = bot->getIpLisp(st[2]);
 	
-	if (Ip6isp == 0)
+	if (IpLisp == 0)
 		{
 		bot->Notice(theClient,"Isp not found.");
 		return true;
 		}
 	else
 		{
-		if (!bot->ip6cidrChangeCheck(theClient, Ip6isp, atoi(st[3]))) 
+		if (!bot->ipLcidrChangeCheck(theClient, IpLisp, atoi(st[3]))) 
 			return true;
-		Ip6isp->setCloneCidr(atoi(st[3].c_str()));
-		Ip6isp->setModOn(::time(0));
-		Ip6isp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
-		bot->reloadIp6isp(theClient, Ip6isp);
-		if (!Ip6isp->updateData()) 
+		IpLisp->setCloneCidr(atoi(st[3].c_str()));
+		IpLisp->setModOn(::time(0));
+		IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+		bot->reloadIpLisp(theClient, IpLisp);
+		if (!IpLisp->updateData()) 
 			{
 			bot->Notice(theClient, "SQL insertion failed.");
 			}
 		else
-			bot->Notice(theClient,"%s is now checking clones on /%ds. Limit: %d", Ip6isp->getName().c_str(), atoi(st[3].c_str()), Ip6isp->getLimit());
+			bot->Notice(theClient,"%s is now checking clones on /%ds. Limit: %d", IpLisp->getName().c_str(), atoi(st[3].c_str()), IpLisp->getLimit());
 		}
 	}
 else if(!strcasecmp(st[1].c_str(),"chlimit"))
@@ -250,24 +290,24 @@ else if(!strcasecmp(st[1].c_str(),"chlimit"))
 		bot->Notice(theClient,"Isp can't exceed 32 characters");
 		return true;
 		}
-	Ip6isp = bot->getIp6isp(st[2]);
+	IpLisp = bot->getIpLisp(st[2]);
 	
-	if (Ip6isp == 0)
+	if (IpLisp == 0)
 		{
 		bot->Notice(theClient,"Isp not found.");
 		return true;
 		}
 	else
 		{
-		Ip6isp->setLimit(atoi(st[3].c_str()));
-		Ip6isp->setModOn(::time(0));
-		Ip6isp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
-		if (!Ip6isp->updateData()) 
+		IpLisp->setLimit(atoi(st[3].c_str()));
+		IpLisp->setModOn(::time(0));
+		IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+		if (!IpLisp->updateData()) 
 			{
 			bot->Notice(theClient, "SQL insertion failed.");
 			}
 		else
-			bot->Notice(theClient,"New limit for %s is now %d", Ip6isp->getName().c_str(), Ip6isp->getLimit());
+			bot->Notice(theClient,"New limit for %s is now %d", IpLisp->getName().c_str(), IpLisp->getLimit());
 		}
 	}
 else if(!strcasecmp(st[1].c_str(),"chname"))
@@ -282,31 +322,31 @@ else if(!strcasecmp(st[1].c_str(),"chname"))
 		bot->Notice(theClient,"Isp can't be more than 32 characters");
 		return true;
 		}
-	Ip6isp = bot->getIp6isp(st[3]);
+	IpLisp = bot->getIpLisp(st[3]);
 	
-	if (Ip6isp != 0)
+	if (IpLisp != 0)
 		{
-		bot->Notice(theClient,"Isp %s already exists.", Ip6isp->getName().c_str());
+		bot->Notice(theClient,"Isp %s already exists.", IpLisp->getName().c_str());
 		return true;
 		}
-	Ip6isp = bot->getIp6isp(st[2]);
+	IpLisp = bot->getIpLisp(st[2]);
 	
-	if (Ip6isp == 0)
+	if (IpLisp == 0)
 		{
 		bot->Notice(theClient,"Isp not found.");
 		return true;
 		}
 	else
 		{
-		Ip6isp->setName(ccontrol::removeSqlChars(st[3]));
-		Ip6isp->setModOn(::time(0));
-		Ip6isp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
-		if (!Ip6isp->updateData()) 
+		IpLisp->setName(ccontrol::removeSqlChars(st[3]));
+		IpLisp->setModOn(::time(0));
+		IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+		if (!IpLisp->updateData()) 
 			{
 			bot->Notice(theClient, "SQL insertion failed.");
 			}
 		else
-			bot->Notice(theClient,"Renamed %s to %s", st[2].c_str(), Ip6isp->getName().c_str());
+			bot->Notice(theClient,"Renamed %s to %s", st[2].c_str(), IpLisp->getName().c_str());
 		}
 	}
 else if(!strcasecmp(st[1].c_str(),"delisp"))
@@ -323,7 +363,7 @@ else if(!strcasecmp(st[1].c_str(),"delisp"))
 		}
 	else
 		{
-		if(bot->delIp6isp(theClient,st[2]))
+		if(bot->delIpLisp(theClient,st[2]))
 			{
 			bot->Notice(theClient,"Successfully deleted isp '%s'",st[2].c_str());
 			}
@@ -357,7 +397,7 @@ else if(!strcasecmp(st[1].c_str(),"test"))
 
 	}
 	
-//ip6userInfo(
+//ipLuserInfo(
 
 else if(!strcasecmp(st[1].c_str(),"userinfo"))
 	{
@@ -372,7 +412,7 @@ else if(!strcasecmp(st[1].c_str(),"userinfo"))
 		bot->Notice( theClient, "Unable to find nick: %s", st[ 2 ].c_str() ) ;
 		return true ;
 		}
-	return bot->ip6userInfo(theClient, Target);
+	return bot->ipLuserInfo(theClient, Target);
 	}
 
 else if(!strcasecmp(st[1].c_str(),"delnetblock"))
@@ -384,7 +424,7 @@ else if(!strcasecmp(st[1].c_str(),"delnetblock"))
 		}
 	else
 		{
-		if(bot->delIp6nb(theClient,st[2],st[3], false))
+		if(bot->delIpLnb(theClient,st[2],st[3], false))
 			{
 			bot->Notice(theClient,"Successfully deleted netblock '%s'",st[2].c_str());
 			}

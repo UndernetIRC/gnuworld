@@ -190,7 +190,8 @@ am_libccontrol_la_OBJECTS = libccontrol_la-ccontrol.lo \
 	libccontrol_la-UNSUSPENDCommand.lo \
 	libccontrol_la-USERINFOCommand.lo \
 	libccontrol_la-WHOISCommand.lo libccontrol_la-SHELLSCommand.lo \
-	libccontrol_la-ANNOUNCECommand.lo libccontrol_la-IP6Command.lo
+	libccontrol_la-ANNOUNCECommand.lo \
+	libccontrol_la-LIMITSCommand.lo
 libccontrol_la_OBJECTS = $(am_libccontrol_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -468,7 +469,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	WHOISCommand.cc \
 	SHELLSCommand.cc \
 	ANNOUNCECommand.cc \
-	IP6Command.cc
+	LIMITSCommand.cc
 
 libccontrol_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
@@ -590,11 +591,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-GLINECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-HELPCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-INVITECommand.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-IP6Command.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-JUPECommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-KICKCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LASTCOMCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LEARNNETCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LIMITSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LISTCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LISTHOSTSCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccontrol_la-LISTIGNORESCommand.Plo@am__quote@
@@ -1153,12 +1154,12 @@ libccontrol_la-ANNOUNCECommand.lo: ANNOUNCECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-ANNOUNCECommand.lo `test -f 'ANNOUNCECommand.cc' || echo '$(srcdir)/'`ANNOUNCECommand.cc
 
-libccontrol_la-IP6Command.lo: IP6Command.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-IP6Command.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-IP6Command.Tpo -c -o libccontrol_la-IP6Command.lo `test -f 'IP6Command.cc' || echo '$(srcdir)/'`IP6Command.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libccontrol_la-IP6Command.Tpo $(DEPDIR)/libccontrol_la-IP6Command.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='IP6Command.cc' object='libccontrol_la-IP6Command.lo' libtool=yes @AMDEPBACKSLASH@
+libccontrol_la-LIMITSCommand.lo: LIMITSCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT libccontrol_la-LIMITSCommand.lo -MD -MP -MF $(DEPDIR)/libccontrol_la-LIMITSCommand.Tpo -c -o libccontrol_la-LIMITSCommand.lo `test -f 'LIMITSCommand.cc' || echo '$(srcdir)/'`LIMITSCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libccontrol_la-LIMITSCommand.Tpo $(DEPDIR)/libccontrol_la-LIMITSCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LIMITSCommand.cc' object='libccontrol_la-LIMITSCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-IP6Command.lo `test -f 'IP6Command.cc' || echo '$(srcdir)/'`IP6Command.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o libccontrol_la-LIMITSCommand.lo `test -f 'LIMITSCommand.cc' || echo '$(srcdir)/'`LIMITSCommand.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

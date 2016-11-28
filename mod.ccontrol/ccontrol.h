@@ -215,35 +215,41 @@ protected:
 
 	shellnbMapType		shellnbMap;
 
-	typedef vector< ccIp6isp* >    ip6ispVectorType;
+	typedef vector< ccIpLisp* >    ipLispVectorType;
 	
-	ip6ispVectorType		ip6ispVector;
+	ipLispVectorType		ipLispVector;
 
-	typedef vector< pair<int, ccIp6nb*> >    ip6nbVectorType;
+	typedef vector< pair<int, ccIpLnb*> >    ipLnbVectorType;
 	
-	ip6nbVectorType		ip6nbVector;
+	ipLnbVectorType		ipLnbVector;
 		
-	//typedef map<ccIp6isp*, int>	ip6ispMapType;
+	//typedef map<ccIpLisp*, int>	ipLispMapType;
 
-	//ip6ispMapType		ip6ispMap;
+	//ipLispMapType		ipLispMap;
 
-	//typedef map<ccIp6nb*, int>	ip6nbMapType;
+	//typedef map<ccIpLnb*, int>	ipLnbMapType;
 
-	//ip6nbMapType		ip6nbMap;
+	//ipLnbMapType		ipLnbMap;
 
-	typedef map<string, int>	ip6clonesMapType;
+	typedef map<string, int>	ipLclonesMapType;
 
-	//ip6clonesMapType		ip6clonesMap;
+	//ipLclonesMapType		ipLclonesMap;
 
-	typedef list< ccIp6nb* >    ip6nbListType;
+	typedef list< ccIpLnb* >    ipLnbListType;
 
-	typedef map<string, ip6nbListType>	ip6numericMapType;
+	typedef map<string, ipLnbListType>	ipLnumericMapType;
 
-	ip6numericMapType		ip6numericMap;
+	ipLnumericMapType		ipLnumericMap;
 
-	typedef pair<ccIp6nb*, int>	ip6retPairType;
+	typedef pair<iClient*, int>	ipLRecentIauthPairType;
 
-	typedef list<ip6retPairType>	ip6retPairListType;
+	typedef list<ipLRecentIauthPairType>	ipLRecentIauthListType;
+
+	ipLRecentIauthListType		ipLRecentIauthList;
+
+	typedef pair<ccIpLnb*, int>	ipLretPairType;
+
+	typedef list<ipLretPairType>	ipLretPairListType;
 
 	typedef map<string,long> 	clientsIpMapType;
 	
@@ -738,33 +744,35 @@ public:
 
 	bool clearShells( iClient * );
 	
-        ccIp6isp* getIp6isp( const string & );
+        ccIpLisp* getIpLisp( const string & );
 
-	ccIp6isp* getIp6ispbyID( const int & );
+	ccIpLisp* getIpLispbyID( const int & );
 
-	ccIp6nb* getIp6nb( const string &, const string & );
+	ccIpLnb* getIpLnb( const string &, const string & );
         
-	bool listIp6Exceptions( iClient * );
+	bool listIpLExceptions( iClient * );
 
-	bool isIp6ClientAllowed( iClient *, ip6retPairListType &, bool);
+	bool isIpLClientAllowed( iClient *, ipLretPairListType &, bool);
 
-	bool ip6DropClient( iClient * );
+	bool ipLDropClient( iClient * );
 
-	bool reloadIp6isp( iClient *, ccIp6isp* );
+	bool reloadIpLisp( iClient *, ccIpLisp* );
 
-	bool insertIp6isp( iClient * , const string& , int, int, const string &, int, int );
+	bool insertIpLisp( iClient * , const string& , int, int, const string &, int, int );
 
-	bool insertIp6nb( iClient * , const string & , int, bool );
+	bool insertIpLnb( iClient * , const string & , int, bool );
 
-	bool delIp6nb( iClient * , const string &, const string&, bool );
+	bool delIpLnb( iClient * , const string &, const string&, bool );
 
-	bool delIp6isp( iClient * , const string & );
+	bool delIpLisp( iClient * , const string & );
 
 	bool clearIsps( iClient * );
 
-	bool ip6cidrChangeCheck(iClient *, ccIp6isp *, int);
+	bool ipLcidrChangeCheck(iClient *, ccIpLisp *, int);
 
-	bool ip6userInfo( iClient *, iClient * );
+	bool ipLuserInfo( iClient *, iClient * );
+
+	size_t iauthXQCheck(iServer*, const string&, const string&);
 
 	ccFloodData *findLogin( const string & );
 
@@ -1002,10 +1010,10 @@ public:
 	typedef exceptionListType::iterator exceptionIterator;
 	typedef shellcoListType::iterator shellcoIterator;
 	typedef shellnbListType::iterator shellnbIterator;
-	typedef ip6ispVectorType::iterator ip6ispIterator;
-	typedef ip6nbVectorType::iterator ip6nbIterator;
-	typedef ip6numericMapType::iterator ip6numericIterator;
-	typedef ip6clonesMapType::iterator ip6clonesMapIterator;
+	typedef ipLispVectorType::iterator ipLispIterator;
+	typedef ipLnbVectorType::iterator ipLnbIterator;
+	typedef ipLnumericMapType::iterator ipLnumericIterator;
+	typedef ipLclonesMapType::iterator ipLclonesMapIterator;
 	
 	exceptionIterator exception_begin() 
 		{ return exceptionList.begin(); }

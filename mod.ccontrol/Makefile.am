@@ -72,7 +72,7 @@ libccontrol_la_SOURCES = ccontrol.cc \
 	WHOISCommand.cc \
 	SHELLSCommand.cc \
 	ANNOUNCECommand.cc \
-	IP6Command.cc
+	LIMITSCommand.cc
 
 libccontrol_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld

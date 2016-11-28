@@ -126,30 +126,30 @@ INVITE		1	****** INVITE COMMAND ******
 INVITE		2	Makes the bot invite you to an invite only channel
 INVITE		3	Syntax: /msg $BOT$ invite <#channel>
 INVITE		4	<#channel> - the channel to invite you to
-IP6		1	****** IP6 COMMAND ******
-IP6		2	Manage IPv6 connections and clone limits
-IP6		3	IP6 commands: addisp, addnetblock, delisp, delnetblock, list, chlimit, chname, chemail, forcecount, active, chccidr, clearall, userinfo
-IP6		4	Syntax for the two main commands:
-IP6		5	1. ADDISP <name> <max connections> <clones cidr> [abuse email]
-IP6		6	2. ADDNETBLOCK <isp> <netblock>
-IP6		7	<clones cidr>: the Cidr you want to check clones on. i.e.: 64
-IP6		8	Since videotron gives /60s to its users instead of /64s, lets see this example:
-IP6		9	Example 1:
-IP6		10	        ADDISP videotron 5 60 abuse@videotron.com
-IP6		11	        ADDNETBLOCK videotron 2607:FA48::/29
-IP6		12	In this example, every client that would match 2607:FA48::/29 would be limited to 5 connections per /60 or would get G-lined.
-IP6		13	Multiple netblocks can be assigned to an isp. For the following examples, let's consider that we do not previously added isps.
-IP6		14	Example 2:
-IP6		15	        ADDISP default64 5 64
-IP6		16	        ADDNETBLOCK default64 0::/0
-IP6		17	After those two commands are sent, all clients would have a limit of 5 connections per /64. 
-IP6		18	However the clients matching a smaller netblock (videotron's /29 above as an example) wouldn't be counted in default64's clone matching.
-IP6		19	Example 3:
-IP6		20	        ADDISP enforce45 250 45
-IP6		21	        ADDNETBLOCK enforce45 0::/0
-IP6		22	        FORCECOUNT enforce45 yes
-IP6		23	With the 3 commands above, clones will be counted per /45 even even if there are other isps matching it, like videotron's /29 above.
-IP6		24	The ACTIVE command will enable/disable glines on an isp. This means that it will count clones, report, but will not issue glines.
+LIMITS		1	****** LIMITS COMMAND ******
+LIMITS		2	Manage IPv4/v6 clone limits
+LIMITS		3	LIMITS commands: addisp, addnetblock, delisp, delnetblock, list, chlimit, chname, chemail, forcecount, active, group, chccidr, clearall, userinfo
+LIMITS		4	Syntax for the two main commands:
+LIMITS		5	1. ADDISP <name> <max connections> <clones cidr> [abuse email]
+LIMITS		6	2. ADDNETBLOCK <isp> <netblock>
+LIMITS		7	<clones cidr>: the Cidr you want to check clones on. i.e.: 64
+LIMITS		8	Since videotron gives /60s to its users instead of /64s, lets see this example:
+LIMITS		9	Example 1:
+LIMITS		10	        ADDISP videotron 5 60 abuse@videotron.com
+LIMITS		11	        ADDNETBLOCK videotron 2607:FA48::/29
+LIMITS		12	In this example, every client that would match 2607:FA48::/29 would be limited to 5 connections per /60 or would get G-lined.
+LIMITS		13	Multiple netblocks can be assigned to an isp. For the following examples, let's consider that we do not previously added isps.
+LIMITS		14	Example 2:
+LIMITS		15	        ADDISP default64 5 64
+LIMITS		16	        ADDNETBLOCK default64 0::/0
+LIMITS		17	After those two commands are sent, all clients would have a limit of 5 connections per /64. 
+LIMITS		18	However the clients matching a smaller netblock (videotron's /29 above as an example) wouldn't be counted in default64's clone matching.
+LIMITS		19	Example 3:
+LIMITS		20	        ADDISP enforce45 250 45
+LIMITS		21	        ADDNETBLOCK enforce45 0::/0
+LIMITS		22	        FORCECOUNT enforce45 yes
+LIMITS		23	With the 3 commands above, clones will be counted per /45 even even if there are other isps matching it, like videotron's /29 above.
+LIMITS		24	The ACTIVE command will enable/disable glines on an isp. This means that it will count clones, report, but will not issue glines.
 JUPE		1	****** JUPE COMMAND ******
 JUPE		2	Jupe a server (prevent it connecting to the network)
 JUPE		3	Syntax: /msg $BOT$ jupe <servername> <reason>
