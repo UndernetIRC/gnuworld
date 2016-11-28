@@ -165,6 +165,12 @@ public:
 	virtual void OnWhois( iClient* sourceClient,
 			iClient* targetClient );
 
+	virtual bool Kick( Channel*, iClient*, const std::string& ) ;
+
+	virtual bool Kick( Channel*, const std::vector<iClient*>&, const std::string& ) ;
+
+	virtual bool Kick( Channel*, const string&,	const std::string& ) ;
+
 	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
 
@@ -527,7 +533,7 @@ public:
     /* Bans & kicks all client belonging to the IP addrees, with a specific level, period, reason */
     bool doInternalBanAndKick(sqlChannel*, iClient*, unsigned short, unsigned int, const string& theReason);
 
-    /* Bans & kicks all client belonging to a specified IP addrees, with a specific level, period, reason */
+    /* Bans & kicks all client belonging to a specified banMask, with a specific level, period, reason */
     bool doInternalBanAndKick(sqlChannel*, const string&, unsigned short, unsigned int, const string&);
 
     /* Suspends a specified user with a specific level, period, reason */
