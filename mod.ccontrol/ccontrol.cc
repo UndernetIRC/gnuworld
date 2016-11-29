@@ -203,7 +203,10 @@ showCGIpsInLogs = atoi(conf.Require("showCGIpsInLogs")->second.c_str());
 
 dbConnectionTimer = atoi(conf.Require("dbinterval")->second.c_str());
 
+StdCloneChecksDisabled = atoi(conf.Require("StdCloneChecksDisabled")->second.c_str());
+
 AnnounceNick = conf.Require("AnnounceNick")->second;
+
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -1571,8 +1574,6 @@ switch( theEvent )
 		const char* Routing = reinterpret_cast< char* >( Data2 );
 		const char* Message = reinterpret_cast< char* >( Data3 );
 		//elog << "ccontrol.cc: XQ> " << theServer->getName() << " " << Routing << " " << Message << endl;
-		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
-		//If it ain't us, ignore the message, the message is probably meant for another client here.
 		StringTokenizer st( Message ) ;
 		if( st.size() < 2 )
         		{
@@ -2458,6 +2459,7 @@ CClonesCIDR << " (will GLINE): *@";
 						}
 					}
 				} // end of if (CClonesCIDR == 24)
+				if (!StdCloneChecksDisabled)
 				if ((clientsIp24MapLastWarn[client_ip] + CClonesTime) <= time(NULL))
 				{
 					if (shellglinecounter == 0)
@@ -2470,6 +2472,7 @@ CClonesCIDR << " (will GLINE): *@";
 
 
 				/* check for auto-gline feature */
+				if (!StdCloneChecksDisabled)
 				if ((CClonesGline) && (shellglinecounter == 0))
 				{
 					sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
@@ -2595,6 +2598,7 @@ CClonesCIDR << " (will GLINE): *@";
 			}
 			*/
 			//START Replacement for shell related part
+			if (!StdCloneChecksDisabled)
 			if ((SKIPTHIS) || (!irc_in_addr_is_ipv4(&NewUser->getIP())))
 			if (/*(!isShellException) && */(CurCIDRConnections > maxCClones) && (CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
 									(CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
@@ -2625,6 +2629,7 @@ CClonesCIDR << " (will GLINE): *@";
 			//END Replacement for shell related part
 			int CurConnections = ++clientsIpMap[client_ip];
 
+			if (!StdCloneChecksDisabled)
 			if ((!isShellException) && (CurConnections > maxClones) && (CurConnections  > getExceptions(NewUser->getUserName()+"@" + client_ip)) &&
 					(CurConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())) && (!DoGline))
 			{
@@ -5119,14 +5124,15 @@ void ccontrol::addGlinedException( const string &Host )
 
 int ccontrol::isGlinedException( const string &Host )
 {
-	for (glinedExceptionListType::iterator ptr = glinedExceptionList.begin(); ptr != glinedExceptionList.end(); ptr++) {
+	for (glinedExceptionListType::iterator ptr = glinedExceptionList.begin(); ptr != glinedExceptionList.end(); ) {
 		if ((::time(0) - (ptr)->second) > 300) {
-			glinedExceptionList.erase(ptr);
+			ptr = glinedExceptionList.erase(ptr);
 			continue;
 		}
 		if (Host == (ptr)->first) {
 			return (ptr)->second;
 		}
+		ptr++;
 	}
 	return 0;
 }

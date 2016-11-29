@@ -1244,10 +1244,12 @@ protected:
 
 	bool			showCGIpsInLogs;
 
+	bool			StdCloneChecksDisabled;
+
 	time_t			dbConnectionTimer;
 
 	string			AnnounceNick;
-	
+
 	string			sqlHost;
 	
 	string			sqlPort;
