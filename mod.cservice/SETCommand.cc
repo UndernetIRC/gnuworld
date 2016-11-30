@@ -1264,13 +1264,13 @@ else
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 					language::set_cmd_status,
-					string("%s for %s is %s")).c_str(),
+					string("%s punishment level on %s is %s")).c_str(),
 					option.c_str(),
 					theChan->getName().c_str(),
 					value.c_str());
 		if (theChan->getFloodNet() > prevFN)
 		{
-			bot->NoticeChannelOps(tmpChan,"Increased %s for %s to %s by %s",
+			bot->NoticeChannelOps(tmpChan,"Increased %s punishment level on %s to %s by %s",
 					option.c_str(),
 					theChan->getName().c_str(),
 					value.c_str(),
@@ -1278,7 +1278,7 @@ else
 		}
 		else if (theChan->getFloodNet() < prevFN)
 		{
-			bot->NoticeChannelOps(tmpChan,"Decreased %s for %s to %s by %s",
+			bot->NoticeChannelOps(tmpChan,"Decreased %s punishment level on %s to %s by %s",
 					option.c_str(),
 					theChan->getName().c_str(),
 					value.c_str(),

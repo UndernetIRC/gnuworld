@@ -961,7 +961,6 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
-	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getFloodNet() > sqlChannel::FLOODNET_NONE)) return;
 	StringTokenizer st(CTCPCommand);
 	string cmd = string_upper(st[0]);
 	string msg = st.assemble(1);
@@ -973,7 +972,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	string glineReason = "Possible flood abuse";
 	if ((cmd == "ACTION") && (sqlChan->getFloodMsg() > 0))
 	{
-		string IP = xIP(Sender->getIP()).GetNumericIP(true);
+		string IP = Channel::createBan(Sender);
 		sqlChan->setCurrentTime(currentTime());
 		sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, msg);
 		unsigned int repeatCount = sqlChan->getRepeatMessageCount(msg).first;
@@ -1031,7 +1030,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	if ((cmd != "ACTION") && (sqlChan->getFloodCTCP() > 0))
 	{
 		kickReason = "### CTCP Flood Protection Triggered ###";
-		string IP = xIP(Sender->getIP()).GetNumericIP(true);
+		string IP = Channel::createBan(Sender);
 		sqlChan->setCurrentTime(currentTime());
 		sqlChan->handleNewMessage(sqlChannel::FLOOD_CTCP, IP, msg);
 		unsigned int repeatCount = sqlChan->getRepeatMessageCount(msg).first;
@@ -1096,14 +1095,13 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	if (!sqlChan->getFloodMsg()) return;
-	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getFloodNet() > sqlChannel::FLOODNET_NONE)) return;
 	unsigned short banLevel = 75;
 	unsigned int banTime = 3 * 3600;
 	unsigned int glineTime = 1 * 3600;
 	string kickReason = "### Message Flood Protection Triggered ###";
 	string repeatReason = "### Channel Repeat Protection Triggered ###";
 	string glineReason = "Possible flood abuse";
-	string IP = xIP(Sender->getIP()).GetNumericIP(true);
+	string IP = Channel::createBan(Sender);
 	sqlChan->setCurrentTime(currentTime());
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
@@ -1167,14 +1165,13 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	if (!sqlChan->getFloodNotice()) return;
-	if (Sender->isModeX() && Sender->isModeR() && (sqlChan->getFloodNet() > sqlChannel::FLOODNET_NONE)) return;
 	unsigned short banLevel = 75;
 	unsigned int banTime = 3 * 3600;
 	unsigned int glineTime = 1 * 3600;
 	string kickReason = "### Notice Flood Protection Triggered ###";
 	string repeatReason = "### Channel Repeat Protection Triggered ###";
 	string glineReason = "Possible flood abuse";
-	string IP = xIP(Sender->getIP()).GetNumericIP(true);
+	string IP = Channel::createBan(Sender);
 	sqlChan->setCurrentTime(currentTime());
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_NOTICE, IP, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
@@ -5887,6 +5884,70 @@ s3	<< getCharYY()
 Write( s3 );
 }
 
+bool cservice::Kick(Channel* theChan, iClient* theClient, const string& reason )
+{
+	return xClient::Kick(theChan, theClient, reason);
+}
+
+bool cservice::Kick(Channel* theChan, const std::vector<iClient*>& theClients, const string& reason )
+{
+	return xClient::Kick(theChan, theClients, reason);
+}
+
+/**
+ * Kick all users from a channel that matches the specified mask, join/part if necessary.
+ */
+bool cservice::Kick( Channel* theChan, const string& mask, const std::string& reason)
+{
+	assert( theChan != NULL ) ;
+
+	if( !isConnected() )
+	{
+		return false ;
+	}
+
+	if ( mask.empty() )
+	{
+		return true ;
+	}
+
+	bool OnChannel = xClient::isOnChannel( theChan ) ;
+	if( !OnChannel )
+	{
+		// Join, giving ourselves ops
+		Join( theChan, string(), 0, true ) ;
+	}
+	else
+	{
+		// Bot is already on the channel
+		ChannelUser* meUser = theChan->findUser( me ) ;
+		assert( meUser != 0 ) ;
+
+		// Make sure we have ops
+		if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+			// The bot does NOT have ops
+			return false ;
+		}
+
+	// The bot has ops
+	}
+	std::vector <iClient*> toBoot;
+	for(Channel::userIterator chanUsers = theChan->userList_begin(); chanUsers != theChan->userList_end(); ++chanUsers)
+	{
+		ChannelUser* tmpUser = chanUsers->second;
+		if (banMatch(mask, tmpUser->getClient()))
+		{
+			/* Don't kick +k things */
+			if (!tmpUser->getClient()->getMode(iClient::MODE_SERVICES))
+			{
+				toBoot.push_back(tmpUser->getClient());
+			}
+		}
+	}
+	return Kick(theChan, toBoot, reason);
+}
+
 void cservice::updateLimits()
 {
 	/*
@@ -6155,7 +6216,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		if (tmpUser->getClient()->getNumericIP() == theClient->getNumericIP())
+		if (xIP(tmpUser->getClient()->getIP()).GetNumericIP(true) == xIP(theClient->getIP()).GetNumericIP(true))
 		{
 			// If the current client is umode +x Here, then the sender theClient as not
 			// so this is a logged clone of his, therefore his hidden address must be protected
@@ -6192,9 +6253,9 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		if (tmpUser->getClient()->getNumericIP() == theClient->getNumericIP())
+		if (xIP(tmpUser->getClient()->getIP()).GetNumericIP(true) == xIP(theClient->getIP()).GetNumericIP(true))
 		{
-			// If the current client is umode +x Here, then the sender theClient as not
+			// If the current client is umode +x Here, then the sender theClient is not
 			// so this is a logged clone of his, therefore his hidden address must be protected
 			if ((tmpUser->getClient()->isModeX()) && (tmpUser->getClient()->isModeR()))
 				continue;
@@ -6210,16 +6271,12 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 }
 
 bool cservice::doInternalBanAndKick(sqlChannel* theChan,
-    const string& IP, unsigned short banLevel, unsigned int banExpire, const string& theReason)
+    const string& banMask, unsigned short banLevel, unsigned int banExpire, const string& theReason)
 {
 	Channel* netChan = Network->findChannel(theChan->getName());
 	/* Even if the channel is currently empty, presumably the sqlChannel exists in the db */
 	if (!netChan)
 	{
-		string banTarget = "*!~*@" + IP;
-		if (IP.find('@') != string::npos)
-			banTarget = "*!" + IP;
-
 		/*
 		 *  Check for duplicates, if none found -
 		 *  add to internal list and commit to the db.
@@ -6229,7 +6286,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		{
 			const sqlBan* theBan = ptr->second;
 
-			if(string_lower(banTarget) == string_lower(theBan->getBanMask()))
+			if(string_lower(banMask) == string_lower(theBan->getBanMask()))
 			{
 				/*
 				 * If this mask is already banned, we're just getting
@@ -6246,7 +6303,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 
 		// TODO: Build a suitable constructor in sqlBan
 		newBan->setChannelID(theChan->getID());
-		newBan->setBanMask(banTarget);
+		newBan->setBanMask(banMask);
 		newBan->setSetBy(getNickName());
 		newBan->setSetTS(currentTime());
 		newBan->setLevel(banLevel);
@@ -6267,11 +6324,10 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		string currIP   = xIP(tmpUser->getClient()->getIP()).GetNumericIP();
-		string currIP64 = xIP(tmpUser->getClient()->getIP()).GetNumericIP(true);
-		if ((IP.compare(currIP) == 0) || (IP.compare(currIP64) == 0))
+		if ((tmpUser->getClient()->isModeX() && tmpUser->getClient()->isModeR()) && (banMask.find(tmpUser->getClient()->getHiddenHostSuffix()) == string::npos))
+			continue;
+		if (banMatch(banMask, tmpUser->getClient()))
 		{
-			// Here we don't have sender, just a specified IP, so everyone covered going to be kickbanned
 			clientsToKick.push_back(tmpUser->getClient());
 		}
 	}
@@ -6419,7 +6475,7 @@ unsigned int cservice::checkFloodnetLevel(sqlChannel* sqlChan, const string& Mes
 			sqlChan->incFloodNet();
 			if (sqlChan->getFloodNet() > currFN)
 			{
-				string FNmessage = TokenStringsParams("Increased floodnet punishment level to \002%s\002 for channel \002%s\002",
+				string FNmessage = TokenStringsParams("Increased floodnet punishment level to \002%s\002 on channel \002%s\002",
 						sqlChan->getFloodNetName(sqlChan->getFloodNet()).c_str(), sqlChan->getName().c_str());
 				NoticeChannelOps(sqlChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
@@ -6466,7 +6522,7 @@ void cservice::checkChannelsFlood()
 			{
 				theChan->decFloodNet();
 				theChan->setLastFloodTime(currentTime());
-				string FNmessage = TokenStringsParams("Relaxed floodnet punishment level to \002%s\002 for channel \002%s\002",
+				string FNmessage = TokenStringsParams("Relaxed floodnet punishment level to \002%s\002 on channel \002%s\002",
 						theChan->getFloodNetName(theChan->getFloodNet()).c_str(), theChan->getName().c_str());
 				NoticeChannelOps(theChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
@@ -8112,6 +8168,8 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			return false;
 		}
 		username = st[1];
+		if (username.compare(0,1,":") == 0)
+			username.erase(0,1);
 		password = st.assemble(2);
 		elog << "cservice::doXQLogin: LOGIN " << username << " " << password << endl;
 	}
@@ -8124,6 +8182,8 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			return false;
 		}
 		username = st[4];
+		if (username.compare(0,1,":") == 0)
+			username.erase(0,1);
 		password = st.assemble(5);
 		ip = st[1];
 		hostname = st[2];
@@ -8138,7 +8198,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	switch(auth_res)
 		{
 		case TOO_EARLY_TOLOGIN:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Unable "
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Unable "
 	                	"to login during reconnection, please try again in "
 		                "%i seconds)",
 	        	        username.c_str(), (loginTime - currentTime()));
@@ -8146,23 +8206,23 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			elog << "cservice::doXQLogin: Auth res = TOO_EARLY_TOLOGIN" << endl;
 			break;
 		case AUTH_FAILED:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Erroneus username)", username.c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Erroneus username)", username.c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_FAILED" << endl;
 			break;
 		case AUTH_UNKNOWN_USER:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s.", username.c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s", username.c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_UNKNOWN_USER" << endl;
 			break;
 		case AUTH_SUSPENDED_USER:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Suspended)", theUser->getUserName().c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Suspended)", theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_SUSPENDED_USER" << endl;
 			break;
 		case AUTH_NO_TOKEN:
 			theUser->incFailedLogins();
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Missing TOTP token)", theUser->getUserName().c_str());
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Missing TOTP token)", theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_NO_TOKEN" << endl;
 			break;
@@ -8171,7 +8231,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			        failed_login_rate = 900;
 			AuthResponse = TokenStringsParams(getResponse(theUser,
 						language::auth_failed,
-						string("AUTHENTICATION FAILED as %s.")).c_str(),
+						string("AUTHENTICATION FAILED as %s")).c_str(),
 				theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);	// <- this will be removed!
 			elog << "cservice::doXQLogin: Auth res = AUTH_INVALID_PASS" << endl;
@@ -8224,7 +8284,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
             theUser->incFailedLogins();
             AuthResponse = TokenStringsParams(getResponse(theUser,
 	                 	language::auth_failed_token,
-	                        string("AUTHENTICATION FAILED as %s. (Invalid Token)")).c_str(),
+	                        string("AUTHENTICATION FAILED as %s (Invalid Token)")).c_str(),
 	                        theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
 			elog << "cservice::doXQLogin: Auth res = AUTH_INVALID_TOKEN" << endl;
@@ -8232,7 +8292,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		case AUTH_FAILED_IPR:
             /* increment failed logins counter */
             theUser->incFailedLogins();
-            AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (IPR)", theUser->getUserName().c_str());
+            AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (IPR)", theUser->getUserName().c_str());
 	                /* notify the relay channel */
 	                logAdminMessage("%s@%s (%s) failed IPR check.",
 	                        ident.c_str(),
@@ -8254,7 +8314,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		case AUTH_ML_EXCEEDED:
             /* increment failed logins counter */
             theUser->incFailedLogins();
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s. (Maximum "
+			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Maximum "
 	                        "concurrent logins exceeded).",
 	                        theUser->getUserName().c_str());
    			doXResponse(theServer, Routing, AuthResponse, true);
