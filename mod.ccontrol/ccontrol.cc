@@ -5240,7 +5240,7 @@ bool ccontrol::getValidCidr( const string& cidrmask, string& newmask )
 	StringTokenizer st(cidrmask, '/');
 	bool isv6 = true;
 
-	elog << "getValidCidr() called with cidrmask = " << cidrmask;
+	elog << "getValidCidr() called with cidrmask = " << cidrmask << " - ipv6 = ";
 	newmask = "invalid";
 	if (st.size() > 2)
 		return false;
@@ -7894,7 +7894,7 @@ for (list<iClient *>::iterator lItr = cList.begin(); lItr != cList.end(); lItr++
 bool status = IpLnb->Delete();
 ipLnbIterator Itr = ipLnbVector.begin();
 while (Itr != ipLnbVector.end()) {
-	if ((Itr->second == IpLnb) && (IpLnb->ipLisp == Itr->second->ipLisp)) {
+	if ((Itr->second->getCidr() == IpLnb->getCidr()) && (IpLnb->ipLisp->getName() == Itr->second->ipLisp->getName())) {
 		Itr = ipLnbVector.erase(Itr);
 	}
 	else
@@ -7916,7 +7916,7 @@ return status;
 bool ccontrol::ipLcidrChangeCheck(iClient* theClient, ccIpLisp *isp, int newcidr)
 {
 int highCidr = 0;
-if ((newcidr > 128) || (newcidr < 30)) {
+if ((newcidr > 128) || (newcidr < 8)) {
 	Notice(theClient, "Invalid cidr range. Must be between 8-128");
 	return false;
 }
@@ -7926,7 +7926,7 @@ if ((isp->isv6() == 0) && (newcidr > 32)) {
 }
 for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++) {
 	ccIpLnb *nb = nptr->second;
-	if ((nb->ipLisp == isp) && (nb->getCidr2() > highCidr))
+	if ((nb->ipLisp->getName() == isp->getName()) && (nb->getCidr2() > highCidr))
 		highCidr = nb->getCidr2();
 }
 if (highCidr > newcidr) {
@@ -7973,7 +7973,7 @@ if (IpLisp == 0) {
 ipLnbIterator ptr = ipLnbVector.begin();
 while (ptr != ipLnbVector.end()) {
 	ipLnbIterator ptr2;
-	if (ptr->second->ipLisp == IpLisp) {
+	if (ptr->second->ipLisp->getName() == IpLisp->getName()) {
 		ptr2 = ptr;
 		ptr2++;
 		if (!delIpLnb(theClient, ptr->second->ipLisp->getName(), ptr->second->getCidr(), false)) {
@@ -8007,7 +8007,7 @@ bool ccontrol::loadExceptions()
 static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions";
 static const char Query2[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active FROM ShellCompanies";
 static const char Query3[] = "SELECT cidr,companyid,AddedBy,AddedOn FROM ShellNetblocks";
-static const char Query4[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,isgroup FROM ipLISPs";
+static const char Query4[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,isgroup FROM ipLISPs ORDER BY id";
 static const char Query5[] = "SELECT cidr,ispid,AddedBy,AddedOn FROM ipLNetblocks";
 
 if(!dbConnected)
