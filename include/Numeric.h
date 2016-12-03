@@ -773,6 +773,8 @@ inline irc_in_addr irc_IPCIDRMinIP(const std::string& IP, unsigned CClonesCIDR =
 	unsigned int i;
 	for (i = 0; i < quot; i++)
 		ircip.in6_16[7-i] = 0;
+	if (CClonesCIDR = 0)  /* We have i=8 here. Not something we want, do we?  */
+		i--;
 	unsigned short ip16 = ntohs(ircip.in6_16[7-i]);
 	ip16 >>= rem;
 	ip16 <<= rem;
