@@ -1324,7 +1324,7 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	string kickReason = "### Message Flood Protection Triggered ###";
 	string repeatReason = "### Channel Repeat Protection Triggered ###";
 	string glineReason = "Possible flood abuse";
-	string IP = xIP(Sender->getIP()).GetNumericIP(true);
+	string IP = Channel::createBan(Sender);
 	sqlChan->setCurrentTime(currentTime());
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
@@ -6216,7 +6216,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		if (xIP(tmpUser->getClient()->getIP()).GetNumericIP(true) == xIP(theClient->getIP()).GetNumericIP(true))
+		if (tmpUser->getClient()->getNumericIP() == theClient->getNumericIP())
 		{
 			// If the current client is umode +x Here, then the sender theClient as not
 			// so this is a logged clone of his, therefore his hidden address must be protected
@@ -6253,7 +6253,7 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		if (xIP(tmpUser->getClient()->getIP()).GetNumericIP(true) == xIP(theClient->getIP()).GetNumericIP(true))
+		if (tmpUser->getClient()->getNumericIP() == theClient->getNumericIP())
 		{
 			// If the current client is umode +x Here, then the sender theClient is not
 			// so this is a logged clone of his, therefore his hidden address must be protected
