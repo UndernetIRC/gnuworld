@@ -5936,7 +5936,10 @@ bool cservice::Kick( Channel* theChan, const string& mask, const std::string& re
 	for(Channel::userIterator chanUsers = theChan->userList_begin(); chanUsers != theChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		if (banMatch(mask, tmpUser->getClient()))
+		// To protect a +x-ed user, if the mask is not a hiddenhost-suffix, then skip (no match)
+		if ((tmpUser->getClient()->isModeX() && tmpUser->getClient()->isModeR()) && (mask.find(tmpUser->getClient()->getHiddenHostSuffix()) == string::npos))
+			continue;
+		if (!match(mask, tmpUser->getClient()))
 		{
 			/* Don't kick +k things */
 			if (!tmpUser->getClient()->getMode(iClient::MODE_SERVICES))
