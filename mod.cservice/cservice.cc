@@ -1112,6 +1112,7 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 			Kick(theChan, Sender, kickReason);
 		if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
 		{
+			//doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
 			doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
 			sqlChan->RemoveFlooderIP(IP);
 		}
@@ -6246,17 +6247,11 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		doSingleBanAndKick(theChan, theClient, banLevel, banExpire, theReason);
 		return true;
 	}
-	// If the flooder client is umode +x, just punish him, and in this way protect his hidden address
-	if ((theClient->isModeX()) && (theClient->isModeR()))
-	{
-		doSingleBanAndKick(theChan, theClient, banLevel, banExpire, theReason);
-		return true;
-	}
 	vector< iClient* > clientsToKick ;
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		if (tmpUser->getClient()->getNumericIP() == theClient->getNumericIP())
+		if (Channel::createBan(tmpUser->getClient()) == Channel::createBan(theClient))
 		{
 			// If the current client is umode +x Here, then the sender theClient is not
 			// so this is a logged clone of his, therefore his hidden address must be protected
@@ -6433,7 +6428,11 @@ bool cservice::KickAllWithFloodMessage(Channel* theChan, const string& Message, 
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		Kick(theChan, *itr, kickMsg);
-		if (clearcount) sqlChan->RemoveFlooderIP(*itr);
+		if (clearcount)
+		{
+			if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+				sqlChan->RemoveFlooderIP(*itr);
+		}
 	}
 	return true;
 }
@@ -6447,7 +6446,12 @@ bool cservice::KickBanAllWithFloodMessage(Channel* theChan, const string& Messag
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		doInternalBanAndKick(sqlChan, *itr, banLevel, banExpire, theReason);
-		sqlChan->RemoveFlooderIP(*itr);
+		/*  ** Race condition fix ** */
+		/* Remove the Flooder IP only if the accumulated listsize is greather than the RepeatCount
+		 * otherwise any remaining items won't be banned on ChannelMessage because they don't reach the RepeatCount to trigger this function
+		 */
+		if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+			sqlChan->RemoveFlooderIP(*itr);
 	}
 	return true;
 }
@@ -6459,7 +6463,8 @@ bool cservice::GlineAllWithFloodMessage(sqlChannel* sqlChan, const string& Messa
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		doInternalGline(*itr, thePeriod, theReason);
-		sqlChan->RemoveFlooderIP(*itr);
+		if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+			sqlChan->RemoveFlooderIP(*itr);
 	}
 	return true;
 }
