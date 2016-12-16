@@ -1075,6 +1075,11 @@ else
 			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
 			return true;
 	    }
+	    if (numValue == 1)
+	    {
+			bot->Notice(theClient, "Value of MESSAGEFLOOD cannot be 1");
+			return true;
+	    }
 		theChan->setFloodMsg(numValue);
 	    theChan->commit();
 	    bot->Notice(theClient,"MESSAGEFLOOD for %s is set to %d",
@@ -1102,6 +1107,11 @@ else
 			bot->Notice(theClient, "Value of NOTICEFLOOD has to be 0-15");
 			return true;
 	    }
+	    if (numValue == 1)
+	    {
+			bot->Notice(theClient, "Value of NOTICEFLOOD cannot be 1");
+			return true;
+	    }
 		theChan->setFloodNotice(numValue);
 	    theChan->commit();
 	    bot->Notice(theClient,"NOTICEFLOOD for %s is set to %d",
@@ -1127,6 +1137,11 @@ else
 	    if (numValue > 15 || numValue < 0)
 	    {
 			bot->Notice(theClient, "Value of CTCPFLOOD has to be 0-15");
+			return true;
+	    }
+	    if (numValue == 1)
+	    {
+			bot->Notice(theClient, "Value of CTCPFLOOD cannot be 1");
 			return true;
 	    }
 		theChan->setFloodCTCP(numValue);
@@ -1196,6 +1211,11 @@ else
             bot->Notice(theClient, "Value of REPEATFLOOD has to be 0-15");
             return true;
         }
+	    if (numValue == 1)
+	    {
+			bot->Notice(theClient, "Value of REPEATFLOOD cannot be 1");
+			return true;
+	    }
 		theChan->setRepeatCount(numValue);
 		theChan->commit();
         bot->Notice(theClient,"REPEATFLOOD for %s is %s",
