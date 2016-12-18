@@ -6507,6 +6507,8 @@ void cservice::checkChannelsFlood()
 			else
 				++itr;
 		}
+		// Reactivate this if wish automatical floodnet relaxation
+		/*
 		if (theChan->getFloodNet() > sqlChannel::FLOODNET_NONE)
 		{
 			time_t lastFloodTime = currentTime() - theChan->getLastFloodTime();
@@ -6520,7 +6522,7 @@ void cservice::checkChannelsFlood()
 				NoticeChannelOps(theChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
 			}
-		}
+		}*/
 		++ptr;
 	}
 	return;
