@@ -1005,7 +1005,15 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 				if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 					KickAllWithFloodMessage(theChan, msg, kickReason, false);
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
+				{
+					repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+					if (repeatCount > sqlChan->getRepeatCount())
+					{
+						doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
+						sqlChan->RemoveFlooderIP(IP);
+					}
 					KickAllWithFloodMessage(theChan, msg, repeatReason, false);
+				}
 			}
 			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 			{
@@ -1063,7 +1071,15 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 				if (sqlChan->getTotalCTCPCount(IP) >= sqlChan->getFloodCTCP())
 					KickAllWithFloodMessage(theChan, msg, kickReason, false);
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
+				{
+					repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+					if (repeatCount > sqlChan->getRepeatCount())
+					{
+						doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
+						sqlChan->RemoveFlooderIP(IP);
+					}
 					KickAllWithFloodMessage(theChan, msg, repeatReason, false);
+				}
 			}
 			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 			{
@@ -1134,7 +1150,15 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
+			{
+				repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+				if (repeatCount > sqlChan->getRepeatCount())
+				{
+					doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
+					sqlChan->RemoveFlooderIP(IP);
+				}
 				KickAllWithFloodMessage(theChan, Message, repeatReason, false);
+			}
 		}
 		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 		{
@@ -1204,7 +1228,15 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 			if (sqlChan->getTotalNoticeCount(IP) >= sqlChan->getFloodNotice())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
+			{
+				repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+				if (repeatCount > sqlChan->getRepeatCount())
+				{
+					doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
+					sqlChan->RemoveFlooderIP(IP);
+				}
 				KickAllWithFloodMessage(theChan, Message, repeatReason, false);
+			}
 		}
 		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 		{
