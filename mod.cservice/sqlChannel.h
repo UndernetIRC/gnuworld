@@ -224,6 +224,9 @@ public:
     inline const FloodNetType& getFloodNet() const
 		{ return floodnet; }
 
+    inline const FloodNetType& getManualFloodNetLevel() const
+		{ return man_floodnet; }
+
 	inline const time_t& 		getLastFloodTime() const
 		{ return last_flood; }
 
@@ -331,6 +334,9 @@ public:
 
 	inline void setFloodNet( const FloodNetType& _floodnet )
 		{ floodnet = _floodnet; }
+
+	inline void setManualFloodNetLevel( const FloodNetType& _man_floodnet )
+		{ man_floodnet = _man_floodnet; }
 
 	inline void incFloodNet()
 	{
@@ -474,6 +480,7 @@ protected:
 	unsigned short	flood_period;
     unsigned short	repeat_count;
     FloodNetType		floodnet;
+    FloodNetType		man_floodnet; //the variable to keep track which floodnet level was set manually
 	string		url ;
 	string		description ;
 	string		comment ;

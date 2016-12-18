@@ -980,6 +980,7 @@ else
 	    	if (!theChan->getFloodPro())
 	    		theChan->setDefaultFloodproValues();
 	    	theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
+	    	theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
 	    }
 	    else if(value == "OFF")
 	    {
@@ -1249,10 +1250,12 @@ else
 		if ((value == "KICK") || (value == "WARNING"))
 		{
 			theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
+			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
 		}
 		else if ((value == "BAN") || (value == "ON"))
 		{
 			theChan->setFloodNet(sqlChannel::FLOODNET_BAN);
+			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_BAN);
 		} /* Currently manual setting of GLINE severity is completely disabled
 		else if (value == "GLINE")
  		{
@@ -1271,6 +1274,7 @@ else
 		else if ((value == "NONE") || (value == "OFF"))
 		{
 			theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
+			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_NONE);
 		}
 		else
 		{
