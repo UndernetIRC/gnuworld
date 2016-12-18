@@ -979,6 +979,7 @@ else
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
 	    	if (!theChan->getFloodPro())
 	    		theChan->setDefaultFloodproValues();
+	    	theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
 	    }
 	    else if(value == "OFF")
 	    {
