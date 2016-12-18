@@ -1112,7 +1112,6 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 			Kick(theChan, Sender, kickReason);
 		if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
 		{
-			//doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
 			doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
 			sqlChan->RemoveFlooderIP(IP);
 		}
@@ -6210,22 +6209,12 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		doSingleBanAndKick(theChan, theClient, banLevel, banExpire, theReason);
 		return true;
 	}
-	// If the flooder client is umode +x, just punish him, and in this way protect his hidden address
-	if ((theClient->isModeX()) && (theClient->isModeR()))
-	{
-		doSingleBanAndKick(theChan, theClient, banLevel, banExpire, theReason);
-		return true;
-	}
 	vector< iClient* > clientsToKick ;
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
-		if (tmpUser->getClient()->getNumericIP() == theClient->getNumericIP())
+		if (Channel::createBan(tmpUser->getClient()) == Channel::createBan(theClient))
 		{
-			// If the current client is umode +x Here, then the sender theClient as not
-			// so this is a logged clone of his, therefore his hidden address must be protected
-			if ((tmpUser->getClient()->isModeX()) && (tmpUser->getClient()->isModeR()))
-				continue;
 			clientsToKick.push_back(tmpUser->getClient());
 		}
 	}
@@ -6253,10 +6242,6 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		ChannelUser* tmpUser = chanUsers->second;
 		if (Channel::createBan(tmpUser->getClient()) == Channel::createBan(theClient))
 		{
-			// If the current client is umode +x Here, then the sender theClient is not
-			// so this is a logged clone of his, therefore his hidden address must be protected
-			if ((tmpUser->getClient()->isModeX()) && (tmpUser->getClient()->isModeR()))
-				continue;
 			clientsToKick.push_back(tmpUser->getClient());
 		}
 	}
@@ -6361,7 +6346,7 @@ bool cservice::doInternalSuspend(sqlChannel* theChan,
 
 bool cservice::doInternalGline(iClient* theClient, const time_t& thePeriod, const string& theReason)
 {
-	string UserHost = /*theClient->getUserName() + "@"*/ "~*@" + theClient->getRealInsecureHost();
+	string UserHost = "~*@" + theClient->getRealInsecureHost();
 	if (theClient->getUserName()[0] != '~')
 		UserHost = theClient->getUserName() + "@" + theClient->getRealInsecureHost();
 	csGline *theGline = findGline(UserHost);
