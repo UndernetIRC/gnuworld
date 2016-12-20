@@ -53,6 +53,7 @@
 #include	"md5hash.h"
 #include	"responses.h"
 #include	"banMatcher.h"
+#include	"sqlUser.h"
 
 #ifdef HAVE_LIBOATH
 extern "C" {
@@ -961,10 +962,14 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
-	// Exempt users with channel access
-	sqlUser* theUser = isAuthed(Sender, true);
-	int level = getEffectiveAccessLevel(theUser, sqlChan, true);
-	if  (level >= 1) return;
+        // Exempt users with channel access
+        sqlUser* theUser = isAuthed(Sender, true);
+        if (theUser)
+        {
+                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                if  (level >= 1) return;
+        }
+
 	// Exempt users who are opped
         ChannelUser* tmpChanUser = theChan->findUser(Sender);
         if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
@@ -1135,8 +1140,12 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 
         // Exempt users with channel access
         sqlUser* theUser = isAuthed(Sender, true);
-        int level = getEffectiveAccessLevel(theUser, sqlChan, true);
-        if  (level >= 1) return;
+        if (theUser)
+        {
+                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                if  (level >= 1) return;
+        }
+
         // Exempt users who are opped
         ChannelUser* tmpChanUser = theChan->findUser(Sender);
         if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
@@ -1229,8 +1238,12 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 
         // Exempt users with channel access
         sqlUser* theUser = isAuthed(Sender, true);
-        int level = getEffectiveAccessLevel(theUser, sqlChan, true);
-        if  (level >= 1) return;
+        if (theUser)
+        {
+                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                if  (level >= 1) return;
+        }
+
         // Exempt users who are opped
         ChannelUser* tmpChanUser = theChan->findUser(Sender);
         if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
@@ -1405,8 +1418,12 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 
         // Exempt users with channel access
         sqlUser* theUser = isAuthed(Sender, true);
-        int level = getEffectiveAccessLevel(theUser, sqlChan, true);
-        if  (level >= 1) return;
+        if (theUser)
+        {
+                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                if  (level >= 1) return;
+        }
+
         // Exempt users who are opped
         ChannelUser* tmpChanUser = theChan->findUser(Sender);
         if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
