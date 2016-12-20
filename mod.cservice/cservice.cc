@@ -1412,10 +1412,25 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	{
 		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 		{
-			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
+			if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
+			{
+				doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
+				sqlChan->RemoveFlooderIP(IP);
+			}
+			repeatCount = sqlChan->getRepeatMessageCount(Message, IP).first;
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
-				KickAllWithFloodMessage(theChan, Message, repeatReason, false);
+			{
+				if (repeatCount == sqlChan->getRepeatCount())
+					Kick(theChan, Sender, repeatReason);
+				if (repeatCount > sqlChan->getRepeatCount())
+				{
+					doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
+					sqlChan->RemoveFlooderIP(IP);
+				}
+			}
+
 		}
 		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 		{
