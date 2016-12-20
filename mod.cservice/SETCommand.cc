@@ -1057,6 +1057,8 @@ else
 			option.c_str());
 		return true;
 	    }
+
+		/* Disable the old ON/OFF response
 	    theChan->commit();
 	    bot->Notice(theClient,
 			bot->getResponse(theUser,
@@ -1065,6 +1067,34 @@ else
 			option.c_str(),
 			theChan->getName().c_str(),
 			theChan->getFlag(sqlChannel::F_FLOODPROGLINE) ? "ON" : "OFF");
+		*/
+
+		theChan->commit();
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s punishment level on %s is %s")).c_str(),
+			option.c_str(),
+			theChan->getName().c_str(),
+			value.c_str());
+		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
+		if (theChan->getFloodNet() > prevFN)
+		{
+			bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
+				option.c_str(),
+				theChan->getName().c_str(),
+				value.c_str(),
+				theUser->getUserName().c_str());
+		}
+		else if (theChan->getFloodNet() < prevFN)
+		{
+			bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
+				option.c_str(),
+				theChan->getName().c_str(),
+				value.c_str(),
+				theUser->getUserName().c_str());
+		}
+
 	    return true;
 	}
 	if ((option == "MSGFLOOD") || (option == "MESSAGEFLOOD") || (option == "PRIVMSGFLOOD"))
@@ -1193,7 +1223,6 @@ else
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
 	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
 	    	theChan->commit();
-			/*
 	    	bot->Notice(theClient,
 	    			bot->getResponse(theUser,
 	    				language::set_cmd_status,
@@ -1201,32 +1230,6 @@ else
 	    			"FLOODPRO",
 	    			theChan->getName().c_str(),
 	    			theChan->getFlag(sqlChannel::F_FLOODPRO) ? "ON" : "OFF");
-			*/
-			theChan->commit();
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::set_cmd_status,
-					string("%s punishment level on %s is %s")).c_str(),
-				option.c_str(),
-				theChan->getName().c_str(),
-				value.c_str());
-			sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
-			if (theChan->getFloodNet() > prevFN)
-			{
-				bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str(),
-					theUser->getUserName().c_str());
-			}
-			else if (theChan->getFloodNet() < prevFN)
-			{
-				bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str(),
-					theUser->getUserName().c_str());
-			}
 	    }
 	    return true;
 	}
