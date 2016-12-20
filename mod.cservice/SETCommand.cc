@@ -1193,6 +1193,7 @@ else
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
 	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
 	    	theChan->commit();
+			/*
 	    	bot->Notice(theClient,
 	    			bot->getResponse(theUser,
 	    				language::set_cmd_status,
@@ -1200,6 +1201,32 @@ else
 	    			"FLOODPRO",
 	    			theChan->getName().c_str(),
 	    			theChan->getFlag(sqlChannel::F_FLOODPRO) ? "ON" : "OFF");
+			*/
+			theChan->commit();
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_cmd_status,
+					string("%s punishment level on %s is %s")).c_str(),
+				option.c_str(),
+				theChan->getName().c_str(),
+				value.c_str());
+			sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
+			if (theChan->getFloodNet() > prevFN)
+			{
+				bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
+					option.c_str(),
+					theChan->getName().c_str(),
+					value.c_str(),
+					theUser->getUserName().c_str());
+			}
+			else if (theChan->getFloodNet() < prevFN)
+			{
+				bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
+					option.c_str(),
+					theChan->getName().c_str(),
+					value.c_str(),
+					theUser->getUserName().c_str());
+			}
 	    }
 	    return true;
 	}
@@ -1235,6 +1262,7 @@ else
 			theChan->getName().c_str(), value.c_str());
 	    return true;
 	}
+	/* Disable direct FLOODNET changes, require via FLOODPRO
 	if (option == "FLOODNET")
 	{
 		if(level < level::set::floodpro)
@@ -1281,7 +1309,7 @@ else
 					string("You do not have enough access!")));
 				return true;
 			}
- 		}*/
+ 		}*/ /*
 		else if ((value == "NONE") || (value == "OFF"))
 		{
 			theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
@@ -1322,6 +1350,7 @@ else
 		}
 		return true;
 	}
+	*/
 #endif
 	if(option == "AUTOTOPIC")
 	{

@@ -194,38 +194,39 @@ bot->Notice(theClient,
 
 if (theChan->getFlag(sqlChannel::F_FLOODPRO))
 {
-    //flagsSet.empty();
-    stringstream floodperiods;
+	//flagsSet.empty();
+	stringstream floodperiods;
 	if (theChan->getFloodNet())
 	{
-		floodperiods << " \002FLOODNET (";
+		floodperiods << " FLOODPRO \002(";
 		if (theChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 			floodperiods << "KICK";
 		if (theChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 			floodperiods << "BAN";
 		if (theChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
 			floodperiods << "GLINE";
-		floodperiods	<< ")\002";
+		floodperiods << ")\002";
 	}
 	if (theChan->getFlag(sqlChannel::F_FLOODPROGLINE))
 		floodperiods << " FLOODPROGLINE";
 	floodperiods
-    //<< std::hex << theChan->getFloodPro()
-    << " FLOODPRO (MSG:"
-    << theChan->getFloodMsg()
-    << ", NOTICE:"
-    << theChan->getFloodNotice()
-    << ", CTCP:"
-    << theChan->getFloodCTCP()
-    << ", PRD:"
-    << theChan->getFloodPeriod()
-    << ", REP:"
-    << theChan->getRepeatCount()
-    << ")"
-    << ends;
+		//<< std::hex << theChan->getFloodPro()
+		<< " -- (MSG:"
+		<< theChan->getFloodMsg()
+		<< ", NOTICE:"
+		<< theChan->getFloodNotice()
+		<< ", CTCP:"
+		<< theChan->getFloodCTCP()
+		<< ", REP:"
+		<< theChan->getRepeatCount()
+		<< ", PERIOD:"
+		<< theChan->getFloodPeriod()
+		<< ")"
+		<< ends;
 
-    bot->Notice(theClient, floodperiods.str().c_str());
+	bot->Notice(theClient, floodperiods.str().c_str());
 }
+
 
 flagsSet.clear();
 
