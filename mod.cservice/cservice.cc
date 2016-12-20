@@ -963,10 +963,10 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
         // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, true);
+        sqlUser* theUser = isAuthed(Sender, false);
         if (theUser)
         {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
                 if  (level >= 1) return;
         }
 
@@ -1139,10 +1139,10 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
         // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, true);
+        sqlUser* theUser = isAuthed(Sender, false);
         if (theUser)
         {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
                 if  (level >= 1) return;
         }
 
@@ -1237,10 +1237,10 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
         // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, true);
+        sqlUser* theUser = isAuthed(Sender, false);
         if (theUser)
         {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
                 if  (level >= 1) return;
         }
 
@@ -1417,10 +1417,10 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
         // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, true);
+        sqlUser* theUser = isAuthed(Sender, false);
         if (theUser)
         {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, true);
+                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
                 if  (level >= 1) return;
         }
 
