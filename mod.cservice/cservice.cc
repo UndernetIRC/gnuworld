@@ -1002,11 +1002,18 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 		{
 			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 			{
-				if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+
+				if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
 					KickAllWithFloodMessage(theChan, msg, kickReason, false);
+				if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
+				{
+					doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
+					sqlChan->RemoveFlooderIP(IP);
+				}
+
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				{
-					repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+					repeatCount = sqlChan->getRepeatMessageCount(msg,IP).first;
 					if (repeatCount > sqlChan->getRepeatCount())
 					{
 						doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
@@ -1015,6 +1022,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 					KickAllWithFloodMessage(theChan, msg, repeatReason, false);
 				}
 			}
+
 			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 			{
 				if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
@@ -1068,11 +1076,17 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 		{
 			if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 			{
-				if (sqlChan->getTotalCTCPCount(IP) >= sqlChan->getFloodCTCP())
+				if (sqlChan->getTotalCTCPCount(IP) == sqlChan->getFloodCTCP())
 					KickAllWithFloodMessage(theChan, msg, kickReason, false);
+				if (sqlChan->getTotalCTCPCount(IP) > sqlChan->getFloodCTCP())
+				{
+					doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
+					sqlChan->RemoveFlooderIP(IP);
+				}
+
 				if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				{
-					repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+					repeatCount = sqlChan->getRepeatMessageCount(msg,IP).first;
 					if (repeatCount > sqlChan->getRepeatCount())
 					{
 						doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
@@ -1147,8 +1161,14 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	{
 		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 		{
-			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
+			if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
+			{
+				doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
+				sqlChan->RemoveFlooderIP(IP);
+			}
+
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 			{
 				repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
@@ -1225,8 +1245,14 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	{
 		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
 		{
-			if (sqlChan->getTotalNoticeCount(IP) >= sqlChan->getFloodNotice())
+			if (sqlChan->getTotalNoticeCount(IP) == sqlChan->getFloodNotice())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
+			if (sqlChan->getTotalNoticeCount(IP) > sqlChan->getFloodNotice())
+			{
+				doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
+				sqlChan->RemoveFlooderIP(IP);
+			}
+
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 			{
 				repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
@@ -1238,6 +1264,7 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 				KickAllWithFloodMessage(theChan, Message, repeatReason, false);
 			}
 		}
+
 		if (sqlChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
 		{
 			if (sqlChan->getTotalNoticeCount(IP) >= sqlChan->getFloodNotice())
@@ -1258,7 +1285,6 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	checkFloodnetLevel(sqlChan, Message);
 	xClient::OnChannelNotice(Sender, theChan, Message);
 }
-
 void cservice::OnCTCP( iClient* theClient, const string& CTCP,
                     const string& Message, bool )
 {
