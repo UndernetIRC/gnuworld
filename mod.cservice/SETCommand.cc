@@ -974,7 +974,7 @@ else
 				string("You do not have enough access!")));
 		return true;
 	    }
-	    if(value == "ON")
+	    if((value == "ON") || (value == "KICK"))
 	    {
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
 	    	if (!theChan->getFloodPro())
@@ -988,19 +988,30 @@ else
 	    	//theChan->setFloodPro(0);
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
 	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
+			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_NONE);
 	    }
+		else if (value == "BAN")
+		{
+			theChan->setFlag(sqlChannel::F_FLOODPRO);
+			if (!theChan->getFloodPro())
+				theChan->setDefaultFloodproValues();
+			theChan->setFloodNet(sqlChannel::FLOODNET_BAN);
+			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_BAN);
+		}
 	    else if ((value == "DEFAULT") || (value == "DEFAULTS"))
 	    {
 	    	theChan->setDefaultFloodproValues();
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
-	    	bot->Notice(theClient, "Default floodpro values has been set for channel %s", theChan->getName().c_str());
+			theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
+			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
+	    	bot->Notice(theClient, "Default FLOODPRO values has been set for channel %s", theChan->getName().c_str());
 	    }
 	    else
 	    {
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
+				string("value of %s must be ON (KICK), BAN, or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
@@ -1068,13 +1079,13 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if(numValue > 255 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
 			return true;
 	    }
 	    if (numValue == 1)
@@ -1100,13 +1111,13 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of NOTICEFLOOD has to be 0-15");
+			bot->Notice(theClient, "Value of NOTICEFLOOD must be 0 or 2-15");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if (numValue > 15 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of NOTICEFLOOD has to be 0-15");
+			bot->Notice(theClient, "Value of NOTICEFLOOD must be 0 or 2-15");
 			return true;
 	    }
 	    if (numValue == 1)
@@ -1132,13 +1143,13 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of CTCPFLOOD has to be 0-15");
+			bot->Notice(theClient, "Value of CTCPFLOOD must be 0 or 2-15");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if (numValue > 15 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of CTCPFLOOD has to be 0-15");
+			bot->Notice(theClient, "Value of CTCPFLOOD must be 0 or 2-15");
 			return true;
 	    }
 	    if (numValue == 1)
@@ -1204,13 +1215,13 @@ else
 	    }
         if (!IsNumeric(value) || value.empty())
         {
-            bot->Notice(theClient, "Value of REPEATFLOOD has to be 0-15");
+            bot->Notice(theClient, "Value of REPEATFLOOD must be be 0 or 2-15");
             return true;
         }
         int numValue = atoi(value.c_str());
         if (numValue > 15 || numValue < 0)
         {
-            bot->Notice(theClient, "Value of REPEATFLOOD has to be 0-15");
+            bot->Notice(theClient, "Value of REPEATFLOOD must be be 0 or 2-15");
             return true;
         }
 	    if (numValue == 1)
