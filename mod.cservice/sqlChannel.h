@@ -439,7 +439,7 @@ public:
     // < total_count, IP_list >
 	typedef std::pair < unsigned int, std::list < string > > repeatIPMapType;
 
-	string getFloodNetName(const FloodNetType& );
+	static string getFloodNetName(const FloodNetType& );
     repeatIPMapType getRepeatMessageCount(const string&, string IP = string());
 	time_t getIPLastTime(const string& );
 	//void setIPLastTime(const string&,);

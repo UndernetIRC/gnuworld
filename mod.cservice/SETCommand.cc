@@ -1025,7 +1025,7 @@ else
 
 		theChan->commit();
 		bot->Notice(theClient, "%s punishment level on %s is %s",
-				option.c_str(), theChan->getName().c_str(), value.c_str());
+				option.c_str(), theChan->getName().c_str(), sqlChannel::getFloodNetName(theChan->getFloodNet()).c_str());
 		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
 		if (theChan->getFloodNet() > prevFN)
 		{
