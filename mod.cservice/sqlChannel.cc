@@ -125,7 +125,7 @@ sqlChannel::sqlChannel(dbHandle* _SQLDb)
    ctcp_period(0),
    flood_period(0),
    repeat_count(0),
-   floodnet(FLOODNET_NONE),
+   floodnet(FLOODNET_KICK),
    man_floodnet(FLOODNET_KICK),
    url(),
    description(),

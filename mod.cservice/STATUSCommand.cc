@@ -209,6 +209,8 @@ if (theChan->getFlag(sqlChannel::F_FLOODPRO))
 	}
 	if (theChan->getFlag(sqlChannel::F_FLOODPROGLINE))
 		floodperiods << " FLOODPROGLINE";
+	if (theChan->getFloodNet() == sqlChannel::FLOODNET_NONE)
+		floodperiods << " FLOODPRO";
 	floodperiods
 		//<< std::hex << theChan->getFloodPro()
 		<< " -- (MSG:"
