@@ -1008,12 +1008,8 @@ else
 	    }
 	    else
 	    {
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_syntax_on_off,
-				string("Value of %s must be ON (KICK), BAN, or OFF")).c_str(),
-			option.c_str());
-		return true;
+	    	bot->Notice(theClient, "Value of %s must be ON (KICK), BAN, or OFF", option.c_str());
+	    	return true;
 	    }
 
 		/* Disable the old ON/OFF response
@@ -1028,13 +1024,8 @@ else
 		*/
 
 		theChan->commit();
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s punishment level on %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			value.c_str());
+		bot->Notice(theClient, "%s punishment level on %s is %s",
+				option.c_str(), theChan->getName().c_str(), value.c_str());
 		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
 		if (theChan->getFloodNet() > prevFN)
 		{
@@ -1100,13 +1091,8 @@ else
 		*/
 
 		theChan->commit();
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s punishment level on %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			value.c_str());
+		bot->Notice(theClient, "%s punishment level on %s is %s",
+			option.c_str(),	theChan->getName().c_str(),	value.c_str());
 		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
 		if (theChan->getFloodNet() > prevFN)
 		{

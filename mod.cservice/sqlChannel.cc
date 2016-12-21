@@ -441,7 +441,8 @@ void sqlChannel::setDefaultFloodproValues()
 	setFloodCTCP(5);
 	setFloodPeriod(15);
 	setRepeatCount(5);
-	setFloodNet(sqlChannel::FLOODNET_NONE);
+	setFloodNet(sqlChannel::FLOODNET_KICK);
+	setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
 }
 
 unsigned int sqlChannel::getTotalMessageCount(const string& IP)
