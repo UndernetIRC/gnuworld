@@ -962,17 +962,20 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
-        // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, false);
-        if (theUser)
-        {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
-                if  (level >= 1) return;
-        }
+    // Exempt users with channel access
+    sqlUser* theUser = isAuthed(Sender, false);
+    if (theUser)
+    {
+            int level = getEffectiveAccessLevel(theUser, sqlChan, false);
+            if  (level >= 1) return;
+    }
 
 	// Exempt users who are opped
-        ChannelUser* tmpChanUser = theChan->findUser(Sender);
-        if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
+    ChannelUser* tmpChanUser = theChan->findUser(Sender);
+	if (tmpChanUser)
+	{
+		if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
+	}
 
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	StringTokenizer st(CTCPCommand);
@@ -1138,18 +1141,20 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
-        // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, false);
-        if (theUser)
-        {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
-                if  (level >= 1) return;
-        }
+    // Exempt users with channel access
+    sqlUser* theUser = isAuthed(Sender, false);
+    if (theUser)
+    {
+            int level = getEffectiveAccessLevel(theUser, sqlChan, false);
+            if  (level >= 1) return;
+    }
 
-        // Exempt users who are opped
-        ChannelUser* tmpChanUser = theChan->findUser(Sender);
-        if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
-
+    // Exempt users who are opped
+    ChannelUser* tmpChanUser = theChan->findUser(Sender);
+	if (tmpChanUser)
+	{
+		if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
+	}
 
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
 	if (!sqlChan->getFloodMsg()) return;
@@ -1236,17 +1241,20 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
-        // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, false);
-        if (theUser)
-        {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
-                if  (level >= 1) return;
-        }
+    // Exempt users with channel access
+    sqlUser* theUser = isAuthed(Sender, false);
+    if (theUser)
+    {
+            int level = getEffectiveAccessLevel(theUser, sqlChan, false);
+            if  (level >= 1) return;
+    }
 
-        // Exempt users who are opped
-        ChannelUser* tmpChanUser = theChan->findUser(Sender);
-        if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
+    // Exempt users who are opped
+    ChannelUser* tmpChanUser = theChan->findUser(Sender);
+	if (tmpChanUser)
+	{
+		if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
+	}
 
 
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
@@ -1416,17 +1424,20 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	if (!sqlChan->getInChan()) return;
 	if (Sender->getMode(iClient::MODE_SERVICES)) return;
 
-        // Exempt users with channel access
-        sqlUser* theUser = isAuthed(Sender, false);
-        if (theUser)
-        {
-                int level = getEffectiveAccessLevel(theUser, sqlChan, false);
-                if  (level >= 1) return;
-        }
+    // Exempt users with channel access
+    sqlUser* theUser = isAuthed(Sender, false);
+    if (theUser)
+    {
+            int level = getEffectiveAccessLevel(theUser, sqlChan, false);
+            if  (level >= 1) return;
+    }
 
-        // Exempt users who are opped
-        ChannelUser* tmpChanUser = theChan->findUser(Sender);
-        if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
+    // Exempt users who are opped
+    ChannelUser* tmpChanUser = theChan->findUser(Sender);
+	if (tmpChanUser)
+	{
+		if (tmpChanUser->getMode(ChannelUser::MODE_O)) return;
+	}
 
 
 	if (!sqlChan->getFlag(sqlChannel::F_FLOODPRO)) return;
