@@ -120,7 +120,7 @@ namespace gnuworld {
     const int oponly = 500;
     const int strictop = 500;
     const int lang = 500;
-    const int floodpro = 450;
+    const int floodpro = 800;
     const int floodnet_gline = 800;
     const int autojoin = 500;
 

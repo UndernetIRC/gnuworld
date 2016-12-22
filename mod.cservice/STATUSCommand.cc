@@ -192,7 +192,8 @@ bot->Notice(theClient,
     bot->getResponse(theUser, language::status_flags,
         string("Flags set: %s")).c_str(),flagsSet.c_str());
 
-if (theChan->getFlag(sqlChannel::F_FLOODPRO))
+if (((level >= level::set::floodpro) || (admLevel)) &&
+		(theChan->getFlag(sqlChannel::F_FLOODPRO)))
 {
 	//flagsSet.empty();
 	stringstream floodperiods;
