@@ -1004,11 +1004,11 @@ else
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
 			theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
 			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
-	    	bot->Notice(theClient, "Default FLOODPRO values has been set for channel %s", theChan->getName().c_str());
+	    	bot->Notice(theClient, "Default FLOODPRO values have been set for channel %s", theChan->getName().c_str());
 	    }
 	    else
 	    {
-	    	bot->Notice(theClient, "Value of %s must be ON (KICK), BAN, or OFF", option.c_str());
+	    	bot->Notice(theClient, "Value of %s must be ON (KICK), BAN, DEFAULT, or OFF", option.c_str());
 	    	return true;
 	    }
 
