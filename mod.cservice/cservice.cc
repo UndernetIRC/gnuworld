@@ -8469,7 +8469,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 					<< endl;
 			return true;
 			break;
-		defult:
+		default:
 			//Should never get here!
 			elog << "Response " << auth_res << " while authenticating!\n";
 			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (due to an error)\n", username.c_str());
