@@ -5549,13 +5549,21 @@ void cservice::doAllBansOnChan(Channel* tmpChan)
 		return;
 	}
 
+	vector<ChannelUser*> tmpList;
 	for (Channel::userIterator chanUsers = tmpChan->userList_begin();
 		chanUsers != tmpChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
+		tmpList.push_back(tmpUser);
+	}
+	for (vector<ChannelUser*>::iterator tItr = tmpList.begin();
+		tItr != tmpList.end(); tItr++)
+	{
+		ChannelUser* tmpUser = *tItr;
 		/* check if this user is banned */
 		checkBansOnJoin(tmpChan, reggedChan, tmpUser->getClient());
 	}
+	tmpList.clear();
 	return;
 }
 
