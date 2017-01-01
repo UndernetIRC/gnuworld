@@ -445,27 +445,27 @@ void sqlChannel::setDefaultFloodproValues()
 	setManualFloodproLevel(sqlChannel::FLOODPRO_KICK);
 }
 
-unsigned int sqlChannel::getTotalMessageCount(const string& IP)
+unsigned int sqlChannel::getTotalMessageCount(const string& Mask)
 {
-	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	chanFloodMapType::iterator itr = chanFloodMap.find(Mask);
 	chanFloodType* theChFlood = itr->second;
 	if (itr != chanFloodMap.end())
 		return theChFlood->getTotalMessageCount();
 	return 0;
 }
 
-unsigned int sqlChannel::getTotalNoticeCount(const string& IP)
+unsigned int sqlChannel::getTotalNoticeCount(const string& Mask)
 {
-	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	chanFloodMapType::iterator itr = chanFloodMap.find(Mask);
 	chanFloodType* theChFlood = itr->second;
 	if (itr != chanFloodMap.end())
 		return theChFlood->getTotalNoticeCount();
 	return 0;
 }
 
-unsigned int sqlChannel::getTotalCTCPCount(const string& IP)
+unsigned int sqlChannel::getTotalCTCPCount(const string& Mask)
 {
-	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	chanFloodMapType::iterator itr = chanFloodMap.find(Mask);
 	chanFloodType* theChFlood = itr->second;
 	if (itr != chanFloodMap.end())
 		return theChFlood->getTotalCTCPCount();
@@ -481,18 +481,18 @@ string sqlChannel::getFloodLevelName(const FloodProLevel& floodLevel)
 	return "NONE";
 }
 
-sqlChannel::repeatIPMapType sqlChannel::getRepeatMessageCount(const string& Message, string IP)
+sqlChannel::repeatMaskMapType sqlChannel::getRepeatMessageCount(const string& Message, string Mask)
 {
 	unsigned int sum = 0;
-	repeatIPMapType res;
-	std::list < string > IPlist;
+	repeatMaskMapType res;
+	std::list < string > MaskList;
 	chanFloodMapType::iterator ptr = chanFloodMap.begin();
 	while (ptr != chanFloodMap.end())
 	{
-		bool incIP = false;
+		bool incMask = false;
 		chanFloodType* currChanFloodMap = ptr->second;
-		// If an IP is specified, means we want to count repetition referring to a single IP
-		if ((!IP.empty()) && (IP != ptr->first))
+		// If a Mask is specified, means we want to count repetition referring to a single Mask
+		if ((!Mask.empty()) && (Mask != ptr->first))
 		{
 			ptr++;
 			continue;
@@ -500,43 +500,43 @@ sqlChannel::repeatIPMapType sqlChannel::getRepeatMessageCount(const string& Mess
 		if (currChanFloodMap->getLastMessage() == Message)
 		{
 			sum += currChanFloodMap->repCount;
-			incIP = true;
+			incMask = true;
 		}
-		if (incIP) IPlist.push_back(ptr->first);
+		if (incMask) MaskList.push_back(ptr->first);
 		ptr++;
 	}
-	//if (IPlist.size() > 1) incFloodNet();
-	res = std::make_pair(sum, IPlist);
+	//if (MaskList.size() > 1) incFloodPro();
+	res = std::make_pair(sum, MaskList);
 	return res;
 }
 
-time_t sqlChannel::getIPLastTime(const string& IP)
+time_t sqlChannel::getMaskLastTime(const string& Mask)
 {
-	if (chanFloodMap.find(IP) != chanFloodMap.end())
-		return chanFloodMap[IP]->getLastTime();
+	if (chanFloodMap.find(Mask) != chanFloodMap.end())
+		return chanFloodMap[Mask]->getLastTime();
 	return (time_t)(0);
 }
 
-//void sqlChannel::setIPLastTime(const string& IP)
+//void sqlChannel::setMaskLastTime(const string& Mask)
 //{
-//	if (chanFloodMap.find(IP) != chanFloodMap.end())
-//		chanFloodMap[IP]->setLastTime(now);
+//	if (chanFloodMap.find(Mask) != chanFloodMap.end())
+//		chanFloodMap[Mask]->setLastTime(now);
 //}
 
-void sqlChannel::RemoveFlooderIP(const string& IP)
+void sqlChannel::RemoveFlooderMask(const string& Mask)
 {
-	if (chanFloodMap.find(IP) != chanFloodMap.end())
+	if (chanFloodMap.find(Mask) != chanFloodMap.end())
 	{
-		//elog << "sqlChannel::RemoveFlooderIP> chanFloodMap.find(" << IP << ") != chanFloodMap.end() ERASING" << endl;
-		delete chanFloodMap[IP];
-		chanFloodMap.erase(IP);
+		//elog << "sqlChannel::RemoveFlooderMask> chanFloodMap.find(" << Mask << ") != chanFloodMap.end() ERASING" << endl;
+		delete chanFloodMap[Mask];
+		chanFloodMap.erase(Mask);
 	}
 }
 
-void sqlChannel::handleNewMessage(const FloodType& floodtype, const string& IP, const string& Message)
+void sqlChannel::handleNewMessage(const FloodType& floodtype, const string& Mask, const string& Message)
 {
 	chanFloodType* chanFlooder;
-	chanFloodMapType::iterator itr = chanFloodMap.find(IP);
+	chanFloodMapType::iterator itr = chanFloodMap.find(Mask);
 	if (itr == chanFloodMap.end())
 	{
 		chanFlooder = new (std::nothrow) chanFloodType();
@@ -559,7 +559,7 @@ void sqlChannel::handleNewMessage(const FloodType& floodtype, const string& IP, 
 			chanFlooder->ctcpFloodMap[Message].first = now;
 			chanFlooder->ctcpFloodMap[Message].second = 1;
 		}
-		chanFloodMap.insert(std::make_pair(IP, chanFlooder));
+		chanFloodMap.insert(std::make_pair(Mask, chanFlooder));
 	}
 	else
 	{
@@ -633,21 +633,21 @@ void sqlChannel::handleNewMessage(const FloodType& floodtype, const string& IP, 
 		chanFlooder->setLastTime(now);
 		chanFlooder->setLastMessage(Message);
 	}
-	if (floodtype == FLOOD_MSG) calcTotalMessageCount(IP);
-	if (floodtype == FLOOD_NOTICE) calcTotalNoticeCount(IP);
-	if (floodtype == FLOOD_CTCP) calcTotalCTCPCount(IP);
+	if (floodtype == FLOOD_MSG) calcTotalMessageCount(Mask);
+	if (floodtype == FLOOD_NOTICE) calcTotalNoticeCount(Mask);
+	if (floodtype == FLOOD_CTCP) calcTotalCTCPCount(Mask);
 }
 
-void sqlChannel::calcTotalMessageCount(const string& IP)
+void sqlChannel::calcTotalMessageCount(const string& Mask)
 {
-	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(IP);
+	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(Mask);
 	if (ptr != chanFloodMap.end())
 	{
 		unsigned int sum = 0;
 		chanFloodType* currChanFloodMap = ptr->second;
 		if ((now - currChanFloodMap->getLastTime()) > (time_t)flood_period)
 		{
-			RemoveFlooderIP(IP);
+			RemoveFlooderMask(Mask);
 			return;
 		}
 		floodMessageType currMessageMap = currChanFloodMap->messageFloodMap;
@@ -666,16 +666,16 @@ void sqlChannel::calcTotalMessageCount(const string& IP)
 	}
 }
 
-void sqlChannel::calcTotalNoticeCount(const string& IP)
+void sqlChannel::calcTotalNoticeCount(const string& Mask)
 {
-	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(IP);
+	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(Mask);
 	if (ptr != chanFloodMap.end())
 	{
 		unsigned int sum = 0;
 		chanFloodType* currChanFloodMap = ptr->second;
 		if ((now - currChanFloodMap->getLastTime()) > (time_t)flood_period)
 		{
-			RemoveFlooderIP(IP);
+			RemoveFlooderMask(Mask);
 			return;
 		}
 		floodMessageType currMessageMap = currChanFloodMap->noticeFloodMap;
@@ -694,16 +694,16 @@ void sqlChannel::calcTotalNoticeCount(const string& IP)
 	}
 }
 
-void sqlChannel::calcTotalCTCPCount(const string& IP)
+void sqlChannel::calcTotalCTCPCount(const string& Mask)
 {
-	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(IP);
+	sqlChannel::chanFloodMapType::iterator ptr = chanFloodMap.find(Mask);
 	if (ptr != chanFloodMap.end())
 	{
 		unsigned int sum = 0;
 		chanFloodType* currChanFloodMap = ptr->second;
 		if ((now - currChanFloodMap->getLastTime()) > (time_t)flood_period)
 		{
-			RemoveFlooderIP(IP);
+			RemoveFlooderMask(Mask);
 			return;
 		}
 		floodMessageType currMessageMap = currChanFloodMap->ctcpFloodMap;

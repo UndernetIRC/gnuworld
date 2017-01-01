@@ -436,14 +436,14 @@ public:
     void setRepeatCount(const unsigned short& );
     void setDefaultFloodproValues();
 
-    // < total_count, IP_list >
-	typedef std::pair < unsigned int, std::list < string > > repeatIPMapType;
+    // < total_count, Mask_list >
+	typedef std::pair < unsigned int, std::list < string > > repeatMaskMapType;
 
 	static string getFloodLevelName(const FloodProLevel& );
-    repeatIPMapType getRepeatMessageCount(const string&, string IP = string());
-	time_t getIPLastTime(const string& );
-	//void setIPLastTime(const string&,);
-	void RemoveFlooderIP(const string&);
+    repeatMaskMapType getRepeatMessageCount(const string&, string Mask = string());
+	time_t getMaskLastTime(const string& );
+	//void setMaskLastTime(const string&,);
+	void RemoveFlooderMask(const string&);
 	void handleNewMessage(const FloodType&, const string&, const string&);
 	void calcTotalMessageCount(const string&);
 	void calcTotalNoticeCount(const string&);
@@ -463,7 +463,7 @@ public:
 	typedef map < int,sqlBan*> sqlBanMapType;
 	sqlBanMapType banList;
 
-	// < repeater_IP, flooder_struct >
+	// < repeater_Mask, flooder_struct >
 	typedef map < string, chanFloodType* > chanFloodMapType;
 	chanFloodMapType chanFloodMap;
 
