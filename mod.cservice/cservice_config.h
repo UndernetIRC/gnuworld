@@ -133,7 +133,7 @@
  * Enable this Under CARREFULL CONSIDERATION, recommended for smaller networks, where admins can
  * take care of possible abuse of the function
  */
-#undef GLINE_ON_FLOODNET
+#undef GLINE_ON_FLOODPRO
 
 
 #endif // __CSERVICE_CONFIG_H

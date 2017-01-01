@@ -125,8 +125,8 @@ sqlChannel::sqlChannel(dbHandle* _SQLDb)
    ctcp_period(0),
    flood_period(0),
    repeat_count(0),
-   floodnet(FLOODNET_KICK),
-   man_floodnet(FLOODNET_KICK),
+   floodlevel(FLOODPRO_KICK),
+   man_floodlevel(FLOODPRO_KICK),
    url(),
    description(),
    comment(),
@@ -441,8 +441,8 @@ void sqlChannel::setDefaultFloodproValues()
 	setFloodCTCP(5);
 	setFloodPeriod(15);
 	setRepeatCount(5);
-	setFloodNet(sqlChannel::FLOODNET_KICK);
-	setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
+	setFloodproLevel(sqlChannel::FLOODPRO_KICK);
+	setManualFloodproLevel(sqlChannel::FLOODPRO_KICK);
 }
 
 unsigned int sqlChannel::getTotalMessageCount(const string& IP)
@@ -472,12 +472,12 @@ unsigned int sqlChannel::getTotalCTCPCount(const string& IP)
 	return 0;
 }
 
-string sqlChannel::getFloodNetName(const FloodNetType& floodType)
+string sqlChannel::getFloodLevelName(const FloodProLevel& floodLevel)
 {
-	if (floodType == FLOODNET_NONE) return "NONE";
-	if (floodType == FLOODNET_KICK) return "KICK";
-	if (floodType == FLOODNET_BAN) return "BAN";
-	if (floodType == FLOODNET_GLINE) return "GLINE";
+	if (floodLevel == FLOODPRO_NONE) return "NONE";
+	if (floodLevel == FLOODPRO_KICK) return "KICK";
+	if (floodLevel == FLOODPRO_BAN) return "BAN";
+	if (floodLevel == FLOODPRO_GLINE) return "GLINE";
 	return "NONE";
 }
 

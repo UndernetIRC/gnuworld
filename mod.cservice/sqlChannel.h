@@ -177,11 +177,11 @@ public:
 		FLOOD_CTCP
 	};
 
-	enum FloodNetType {
-		FLOODNET_NONE,
-		FLOODNET_KICK,	//=WARNING
-		FLOODNET_BAN,
-		FLOODNET_GLINE
+	enum FloodProLevel {
+		FLOODPRO_NONE,
+		FLOODPRO_KICK,	//=WARNING
+		FLOODPRO_BAN,
+		FLOODPRO_GLINE
 	};
 
 	/*
@@ -221,11 +221,11 @@ public:
     inline const unsigned short int& getRepeatCount() const
 		{ return repeat_count ; }
 
-    inline const FloodNetType& getFloodNet() const
-		{ return floodnet; }
+    inline const FloodProLevel& getFloodproLevel() const
+		{ return floodlevel; }
 
-    inline const FloodNetType& getManualFloodNetLevel() const
-		{ return man_floodnet; }
+    inline const FloodProLevel& getManualFloodproLevel() const
+		{ return man_floodlevel; }
 
 	inline const time_t& 		getLastFloodTime() const
 		{ return last_flood; }
@@ -332,32 +332,32 @@ public:
 	inline void setFloodPro( const unsigned int& _flood_pro )
 		{ flood_pro = _flood_pro; }
 
-	inline void setFloodNet( const FloodNetType& _floodnet )
-		{ floodnet = _floodnet; }
+	inline void setFloodproLevel( const FloodProLevel& _floodlevel )
+		{ floodlevel = _floodlevel; }
 
-	inline void setManualFloodNetLevel( const FloodNetType& _man_floodnet )
-		{ man_floodnet = _man_floodnet; }
+	inline void setManualFloodproLevel( const FloodProLevel& _man_floodlevel )
+		{ man_floodlevel = _man_floodlevel; }
 
-	inline void incFloodNet()
+	inline void incFloodPro()
 	{
-		if (floodnet == FLOODNET_NONE)
-			floodnet = FLOODNET_KICK;
-		else if (floodnet == FLOODNET_KICK)
-			floodnet = FLOODNET_BAN;
-#ifdef GLINE_ON_FLOODNET
-		else if ((floodnet == FLOODNET_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
-			floodnet = FLOODNET_GLINE;
+		if (floodlevel == FLOODPRO_NONE)
+			floodlevel = FLOODPRO_KICK;
+		else if (floodlevel == FLOODPRO_KICK)
+			floodlevel = FLOODPRO_BAN;
+#ifdef GLINE_ON_FLOODPRO
+		else if ((floodlevel == FLOODPRO_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
+			floodlevel = FLOODPRO_GLINE;
 #endif
 	}
 
-	inline void decFloodNet()
+	inline void decFloodPro()
 	{
-		if (floodnet == FLOODNET_GLINE)
-			floodnet = FLOODNET_BAN;
-		else if (floodnet == FLOODNET_BAN)
-			floodnet = FLOODNET_KICK;
-		else if (floodnet == FLOODNET_KICK)
-			floodnet = FLOODNET_NONE;
+		if (floodlevel == FLOODPRO_GLINE)
+			floodlevel = FLOODPRO_BAN;
+		else if (floodlevel == FLOODPRO_BAN)
+			floodlevel = FLOODPRO_KICK;
+		else if (floodlevel == FLOODPRO_KICK)
+			floodlevel = FLOODPRO_NONE;
 	}
 
 	inline void setLastFloodTime( const time_t& _last_flood )
@@ -439,7 +439,7 @@ public:
     // < total_count, IP_list >
 	typedef std::pair < unsigned int, std::list < string > > repeatIPMapType;
 
-	static string getFloodNetName(const FloodNetType& );
+	static string getFloodLevelName(const FloodProLevel& );
     repeatIPMapType getRepeatMessageCount(const string&, string IP = string());
 	time_t getIPLastTime(const string& );
 	//void setIPLastTime(const string&,);
@@ -479,8 +479,8 @@ protected:
 	unsigned short	ctcp_period;
 	unsigned short	flood_period;
     unsigned short	repeat_count;
-    FloodNetType		floodnet;
-    FloodNetType		man_floodnet; //the variable to keep track which floodnet level was set manually
+    FloodProLevel		floodlevel;
+    FloodProLevel		man_floodlevel; //the variable to keep track which floodpro level was set manually
 	string		url ;
 	string		description ;
 	string		comment ;
@@ -496,7 +496,7 @@ protected:
 	unsigned int limit_offset;
 	time_t limit_period;
 	time_t last_limit_check;
-	time_t 		last_flood;	//last time when an floodnet measure was taken (kick/ban/gline)
+	time_t 		last_flood;	//last time when an floodpro measure was taken (kick/ban/gline)
 	unsigned int limit_grace;
 	unsigned int limit_max;
 	unsigned int max_bans;

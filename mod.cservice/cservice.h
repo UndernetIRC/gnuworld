@@ -447,7 +447,7 @@ public:
 	int topic_duration;
 
 	unsigned int channelsFloodPeriod;
-	unsigned int floodnetRelaxTime;
+	unsigned int floodproRelaxTime;
 
 	// Timestamp's of when we last checked the database for updates.
 	time_t lastChannelRefresh;
@@ -560,8 +560,8 @@ public:
 	/* Matches DB bans, and kicks supplied user if neccessary */
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
 
-	/* Checking for need to raise the floodnet level. Returns the repetition number. */
-	unsigned int checkFloodnetLevel(sqlChannel*, const string&);
+	/* Checking for need to raise the floodpro level. Returns the repetition number. */
+	unsigned int checkFloodproLevel(sqlChannel*, const string&);
 
 	/* Cleanup the channel flood ip's/clients */
 	void checkChannelsFlood();

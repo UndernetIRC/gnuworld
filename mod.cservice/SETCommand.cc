@@ -964,7 +964,7 @@ else
 	}
 #endif
 #ifdef USE_FLOODPRO
-	if(option == "FLOODPRO")
+	if (option == "FLOODPRO")
 	{
 	    if(level < level::set::floodpro)
 	    {
@@ -974,36 +974,37 @@ else
 				string("You do not have enough access!")));
 		return true;
 	    }
-	    if((value == "ON") || (value == "KICK"))
+		sqlChannel::FloodProLevel prevFN = theChan->getFloodproLevel();
+	    if ((value == "ON") || (value == "KICK"))
 	    {
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
 	    	if (!theChan->getFloodPro())
 	    		theChan->setDefaultFloodproValues();
-	    	theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
-	    	theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_KICK);
+	    	theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_KICK);
 	    }
-	    else if(value == "OFF")
+	    else if (value == "OFF")
 	    {
-	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_NONE);
 	    	//theChan->setFloodPro(0);
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
-	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
-			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_NONE);
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_NONE);
+			theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_NONE);
 	    }
 		else if (value == "BAN")
 		{
 			theChan->setFlag(sqlChannel::F_FLOODPRO);
 			if (!theChan->getFloodPro())
 				theChan->setDefaultFloodproValues();
-			theChan->setFloodNet(sqlChannel::FLOODNET_BAN);
-			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_BAN);
+			theChan->setFloodproLevel(sqlChannel::FLOODPRO_BAN);
+			theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_BAN);
 		}
 	    else if ((value == "DEFAULT") || (value == "DEFAULTS"))
 	    {
 	    	theChan->setDefaultFloodproValues();
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
-			theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
-			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
+			theChan->setFloodproLevel(sqlChannel::FLOODPRO_KICK);
+			theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_KICK);
 	    	bot->Notice(theClient, "Default FLOODPRO values have been set for channel %s", theChan->getName().c_str());
 	    }
 	    else
@@ -1012,22 +1013,10 @@ else
 	    	return true;
 	    }
 
-		/* Disable the old ON/OFF response
 	    theChan->commit();
-	    bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_FLOODPRO) ? "ON" : "OFF");
-		*/
-
-		theChan->commit();
 		bot->Notice(theClient, "%s punishment level on %s is %s",
-				option.c_str(), theChan->getName().c_str(), sqlChannel::getFloodNetName(theChan->getFloodNet()).c_str());
-		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
-		if (theChan->getFloodNet() > prevFN)
+				option.c_str(), theChan->getName().c_str(), sqlChannel::getFloodLevelName(theChan->getFloodproLevel()).c_str());
+		if (theChan->getFloodproLevel() > prevFN)
 		{
 			bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
 				option.c_str(),
@@ -1035,7 +1024,7 @@ else
 				value.c_str(),
 				theUser->getUserName().c_str());
 		}
-		else if (theChan->getFloodNet() < prevFN)
+		else if (theChan->getFloodproLevel() < prevFN)
 		{
 			bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
 				option.c_str(),
@@ -1043,13 +1032,12 @@ else
 				value.c_str(),
 				theUser->getUserName().c_str());
 		}
-
 	    return true;
 	}
 	if (option == "FLOODPROGLINE")
 	{
 		int admLevel = (int)bot->getAdminAccessLevel(theUser);
-		if ((admLevel < level::set::floodnet_gline) && (level < level::set::floodnet_gline))
+		if ((admLevel < level::set::floodpro_gline) && (level < level::set::floodpro_gline))
 		{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
@@ -1057,6 +1045,7 @@ else
 				string("You do not have enough access!")));
 			return true;
 		}
+		sqlChannel::FloodProLevel prevFN = theChan->getFloodproLevel();
 		if (value == "ON")
 		{
 			theChan->setFlag(sqlChannel::F_FLOODPROGLINE);
@@ -1079,22 +1068,10 @@ else
 		return true;
 	    }
 
-		/* Disable the old ON/OFF response
-	    theChan->commit();
-	    bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_FLOODPROGLINE) ? "ON" : "OFF");
-		*/
-
 		theChan->commit();
 		bot->Notice(theClient, "%s punishment level on %s is %s",
 			option.c_str(),	theChan->getName().c_str(),	value.c_str());
-		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
-		if (theChan->getFloodNet() > prevFN)
+		if (theChan->getFloodproLevel() > prevFN)
 		{
 			bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
 				option.c_str(),
@@ -1102,7 +1079,7 @@ else
 				value.c_str(),
 				theUser->getUserName().c_str());
 		}
-		else if (theChan->getFloodNet() < prevFN)
+		else if (theChan->getFloodproLevel() < prevFN)
 		{
 			bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
 				option.c_str(),
@@ -1237,7 +1214,7 @@ else
 	    if (numValue == 0)
 	    {
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
-	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_NONE);
 	    	theChan->commit();
 	    	bot->Notice(theClient,
 	    			bot->getResponse(theUser,
@@ -1281,95 +1258,6 @@ else
 			theChan->getName().c_str(), value.c_str());
 	    return true;
 	}
-	/* Disable direct FLOODNET changes, require via FLOODPRO
-	if (option == "FLOODNET")
-	{
-		if(level < level::set::floodpro)
-		{
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::insuf_access,
-				string("You do not have enough access!")));
-			return true;
-		}
-		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
-		if ((value == "KICK") || (value == "WARNING")
-				|| (value == "ON") || (value == "BAN")
-				|| (value == "GLINE"))
-		{
-			if (!theChan->getFlag(sqlChannel::F_FLOODPRO))
-			{
-				theChan->setFlag(sqlChannel::F_FLOODPRO);
-		    	if (!theChan->getFloodPro())
-		    		theChan->setDefaultFloodproValues();
-			}
-			theChan->setLastFloodTime(bot->currentTime());
-		}
-		if ((value == "KICK") || (value == "WARNING"))
-		{
-			theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
-			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_KICK);
-		}
-		else if ((value == "BAN") || (value == "ON"))
-		{
-			theChan->setFloodNet(sqlChannel::FLOODNET_BAN);
-			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_BAN);
-		} /* Currently manual setting of GLINE severity is completely disabled
-		else if (value == "GLINE")
- 		{
-			short effAccess = bot->getEffectiveAccessLevel(theUser, theChan, true);
-			if (effAccess >= level::set::floodnet_gline)
-				theChan->setFloodNet(sqlChannel::FLOODNET_GLINE);
-			else
-			{
-				bot->Notice(theClient,
-					bot->getResponse(theUser,
-						language::insuf_access,
-					string("You do not have enough access!")));
-				return true;
-			}
- 		}*/ /*
-		else if ((value == "NONE") || (value == "OFF"))
-		{
-			theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
-			theChan->setManualFloodNetLevel(sqlChannel::FLOODNET_NONE);
-		}
-		else
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
-			option.c_str());
-		return true;
-		}
-		theChan->commit();
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-					language::set_cmd_status,
-					string("%s punishment level on %s is %s")).c_str(),
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str());
-		if (theChan->getFloodNet() > prevFN)
-		{
-			bot->NoticeChannelOps(tmpChan,"Increased %s punishment level on %s to %s by %s",
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str(),
-					theUser->getUserName().c_str());
-		}
-		else if (theChan->getFloodNet() < prevFN)
-		{
-			bot->NoticeChannelOps(tmpChan,"Decreased %s punishment level on %s to %s by %s",
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str(),
-					theUser->getUserName().c_str());
-		}
-		return true;
-	}
-	*/
 #endif
 	if(option == "AUTOTOPIC")
 	{

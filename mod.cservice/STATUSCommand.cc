@@ -197,20 +197,20 @@ if (((level >= level::set::floodpro) || (admLevel)) &&
 {
 	//flagsSet.empty();
 	stringstream floodperiods;
-	if (theChan->getFloodNet())
+	if (theChan->getFloodproLevel())
 	{
 		floodperiods << " FLOODPRO \002(";
-		if (theChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
+		if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_KICK)
 			floodperiods << "KICK";
-		if (theChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
+		if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_BAN)
 			floodperiods << "BAN";
-		if (theChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
+		if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_GLINE)
 			floodperiods << "GLINE";
 		floodperiods << ")\002";
 	}
 	if (theChan->getFlag(sqlChannel::F_FLOODPROGLINE))
 		floodperiods << " FLOODPROGLINE";
-	if (theChan->getFloodNet() == sqlChannel::FLOODNET_NONE)
+	if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_NONE)
 		floodperiods << " FLOODPRO";
 	floodperiods
 		//<< std::hex << theChan->getFloodPro()
