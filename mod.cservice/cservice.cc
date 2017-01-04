@@ -3145,9 +3145,6 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->setNoTake(1);
 		newChan->commit();
 
-		//Update this particular channel's levele cache, so our new manager will be inserted in levelscache
-		updateLevels(newChan->getID());
-
 		Join(newChan->getName(), string("+tnR"), newChan->getChannelTS(), true);
 		newChan->setInChan(true);
 		joinCount++;
