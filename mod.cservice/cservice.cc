@@ -3057,6 +3057,7 @@ void cservice::ExpireUsers()
 void cservice::processDBUpdates()
 {
 	logDebugMessage("[DB-UPDATE]: Looking for changes:");
+	checkTrafficPass();
 	updateChannels();
 	updateUsers();
 	updateLevels();
@@ -3558,7 +3559,7 @@ if (timer_id == pending_timerID)
 #endif
 	loadPendingChannelList();
 #ifdef USE_INTERNAL_THE_JUDGE
-	checkTrafficPass();
+	//checkTrafficPass();	// Moved to a faster update_timerID
 	checkObjections();
 	checkAccepts();
 	checkReviews();
