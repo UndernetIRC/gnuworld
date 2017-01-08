@@ -3102,6 +3102,8 @@ dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime").c_str()) - ::time(NULL);
 unsigned int updates = 0;
 unsigned int newchans = 0;
 
+vector<sqlChannel*> commitList;
+
 for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
 	sqlChannelHashType::iterator ptr =
@@ -3143,7 +3145,6 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->setFlag(sqlChannel::F_AUTOJOIN);
 		newChan->setFlag(sqlChannel::F_NOTAKE);
 		newChan->setNoTake(1);
-		newChan->commit();
 
 		Join(newChan->getName(), string("+tnR"), newChan->getChannelTS(), true);
 		newChan->setInChan(true);
@@ -3153,6 +3154,7 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->setRegisteredTS(currentTime());
 		newChan->setChannelMode("+tnR");
 		newChan->setLastUsed(currentTime());
+		commitList.push_back(newChan);
 
 		//Send a welcome notice to the channel
 		if (!welcomeNewChanMessage.empty())
@@ -3168,6 +3170,13 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		//logAdminMessage("Channel %s is now registered.", newChan->getName().c_str());
 		}
 	}
+
+if (!commitList.empty())
+{
+	for (vector<sqlChannel*>::iterator itr = commitList.begin(); itr != commitList.end(); itr++)
+		(*itr)->commit();
+	commitList.clear();
+}
 
 logDebugMessage("[DB-UPDATE]: Refreshed %i channel records, loaded %i new channel(s).",
 	updates, newchans);
