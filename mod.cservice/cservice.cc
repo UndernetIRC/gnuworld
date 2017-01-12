@@ -6616,7 +6616,7 @@ unsigned int cservice::checkFloodproLevel(sqlChannel* sqlChan, const string& Mes
 			sqlChan->incFloodPro();
 			if (sqlChan->getFloodproLevel() > currFN)
 			{
-				string FNmessage = TokenStringsParams("Increased floodpro punishment level to \002%s\002 on channel \002%s\002",
+				string FNmessage = TokenStringsParams("Increased FLOODPRO punishment level to \002%s\002 on channel \002%s\002",
 						sqlChan->getFloodLevelName(sqlChan->getFloodproLevel()).c_str(), sqlChan->getName().c_str());
 				NoticeChannelOps(sqlChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
@@ -6663,7 +6663,7 @@ void cservice::checkChannelsFlood()
 			{
 				theChan->decFloodPro();
 				theChan->setLastFloodTime(currentTime());
-				string FNmessage = TokenStringsParams("Relaxed floodpro punishment level to \002%s\002 on channel \002%s\002",
+				string FNmessage = TokenStringsParams("Relaxed FLOODPRO punishment level to \002%s\002 on channel \002%s\002",
 						theChan->getFloodLevelName(theChan->getFloodproLevel()).c_str(), theChan->getName().c_str());
 				NoticeChannelOps(theChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
