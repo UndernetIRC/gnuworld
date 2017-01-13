@@ -87,7 +87,8 @@ const sqlChannel::flagType sqlChannel::F_NOFORCE   = 0x00400000 ; // Reserved fo
 const sqlChannel::flagType sqlChannel::F_NOVOICE   = 0x00800000 ;
 const sqlChannel::flagType sqlChannel::F_NOTAKE    = 0x01000000 ;
 const sqlChannel::flagType sqlChannel::F_FLOODPRO  = 0x02000000 ;
-const sqlChannel::flagType sqlChannel::F_FLOODPROGLINE  = 0x04000000 ;
+const sqlChannel::flagType sqlChannel::F_FLOODPROGLINE = 0x04000000;
+const sqlChannel::flagType sqlChannel::F_OPLOG = 0x08000000;
 
 const int sqlChannel::EV_MISC     = 1 ;
 const int sqlChannel::EV_JOIN     = 2 ;

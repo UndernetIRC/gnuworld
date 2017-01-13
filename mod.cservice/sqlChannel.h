@@ -139,6 +139,7 @@ public:
 	static const flagType	F_NOTAKE;
 	static const flagType	F_FLOODPRO;
 	static const flagType	F_FLOODPROGLINE;
+	static const flagType	F_OPLOG;
 
 	/*
 	 *   Channel 'Event' Flags, used in the channelog table.

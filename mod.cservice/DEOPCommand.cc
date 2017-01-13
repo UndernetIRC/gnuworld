@@ -259,8 +259,31 @@ while( counter < st2.size())
 	++counter ;
 	} // while()
 
-// deOp them.
-bot->DeOp(tmpChan, deopList);
+
+// Avoid if there are no modes
+if (!deopList.empty())
+{
+	// deOp them.
+	bot->DeOp(tmpChan, deopList);
+
+	// Send action opnotice to channel if OPLOG is enabled
+	if (theChan->getFlag(sqlChannel::F_OPLOG))
+	{
+		string deopStr;
+		vector<iClient*>::iterator itr = deopList.begin();
+		while (itr != deopList.end())
+		{
+			iClient* tmpUser = *itr;
+			deopStr += tmpUser->getNickName().c_str() + string(", ");
+			++itr;
+		}
+		deopStr = deopStr.substr(0, deopStr.length() - 2);
+		bot->NoticeChannelOps(theChan->getName(),
+			"%s (%s) deopped: %s",
+			theClient->getNickName().c_str(), theUser->getUserName().c_str(), deopStr.c_str());
+	}
+}
+
 return true ;
 
 }
