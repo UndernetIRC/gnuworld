@@ -773,12 +773,12 @@ else
 
 	if (option == "OPLOG")
 	{
-		// Check for admin access
-		int admLevel = bot->getAdminAccessLevel(theUser);
-		if (admLevel < level::set::oplog)
+		if (level < level::set::oplog)
 		{
-			// No need to tell users about admin commands.
-			Usage(theClient);
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
 			return true;
 		}
 		if (value == "ON") theChan->setFlag(sqlChannel::F_OPLOG);
