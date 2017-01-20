@@ -68,7 +68,7 @@
  * Set this to make GNUWorld fork into the background when run.
  * default is OFF to maintain original operation
  */
-#undef DAEMON
+#define DAEMON
 
 #ifndef RCSTAG
 #define RCSTAG(tag) static const char rcsId[] = tag

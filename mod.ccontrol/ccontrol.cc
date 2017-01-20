@@ -2490,6 +2490,7 @@ CClonesCIDR << " (will GLINE): *@";
 			/* Comment ipv6-only restriction
 			if (!irc_in_addr_is_ipv4(&NewUser->getIP())) {
 			*/
+			bool isClientDropped = false;
 			ccIpLnb* nb;
 			ipLretPairListType retList;
 			ipLRecentIauthListType::iterator iItr;
@@ -2497,11 +2498,22 @@ CClonesCIDR << " (will GLINE): *@";
 				iClient *tClient = iItr->first;
 				int age = ::time(0) - iItr->second;
 				if (age > 10) {
-					ipLDropClient(tClient);
+					/* Debug */
+					elog << "ccontrol (erase iauth)> numeric = " << tClient->getCharYYXXX();
+					elog << ",    nuh = " << tClient->getNickUserHost();
+					elog << ",    ip = " << xIP(tClient->getIP()).GetNumericIP() << endl;
+					/* End  of Debug */
+					if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP()) 
+						&& (tClient->getIntYY() == NewUser->getIntYY())) {
+						isClientDropped = true;
+					}
 					iItr = ipLRecentIauthList.erase(iItr);
+					ipLDropClient(tClient);
 					delete tClient;
 					continue;
 				}
+				if (isClientDropped)
+					break;
 				if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP()) && (tClient->getIntYY() == NewUser->getIntYY())) {
 					//elog << "ccontrol> handleNewClient(): ipL iauth client match: " << NewUser->getNickUserHost().c_str() << endl;
 					ipLDropClient(tClient);
@@ -8264,6 +8276,7 @@ string base64IP = string(xIP(theIP).GetBase64IP());
 stringstream s;
 s << theServer->getCharYY() << "." << n;
 string yyxxx( s.str() ) ;
+//string yyxxx = theServer->getCharYY() + "---";
 string fullname = st.assemble(5);
 if (fullname.substr(0,1) == ":")
 	fullname = fullname.substr(1);
