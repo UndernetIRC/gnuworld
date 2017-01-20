@@ -316,11 +316,32 @@ for( ; counter < st2.size() ; ++counter )
 	   	} // Not a duplicate.
 	}
 
-// Op them.
-bot->Op(tmpChan, opList);
+// Avoid if there are no modes
+if (!opList.empty())
+{
+	// Op them.
+	bot->Op(tmpChan, opList);
+
+	// Send action opnotice to channel if OPLOG is enabled
+	if (theChan->getFlag(sqlChannel::F_OPLOG))
+	{
+		string opStr;
+		vector<iClient*>::iterator itr = opList.begin();
+		while (itr != opList.end())
+		{
+			iClient* tmpUser = *itr;
+			opStr += tmpUser->getNickName().c_str() + string(", ");
+			++itr;
+		}
+		opStr = opStr.substr(0, opStr.length() - 2);
+		bot->NoticeChannelOps(theChan->getName(),
+			"%s (%s) opped: %s",
+			theClient->getNickName().c_str(), theUser->getUserName().c_str(), opStr.c_str());
+	}
+}
+
 
 return true ;
 }
 
 } // namespace gnuworld.
-

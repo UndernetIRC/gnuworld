@@ -3057,6 +3057,7 @@ void cservice::ExpireUsers()
 void cservice::processDBUpdates()
 {
 	logDebugMessage("[DB-UPDATE]: Looking for changes:");
+	checkTrafficPass();
 	updateChannels();
 	updateUsers();
 	updateLevels();
@@ -3102,6 +3103,8 @@ dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime").c_str()) - ::time(NULL);
 unsigned int updates = 0;
 unsigned int newchans = 0;
 
+vector<sqlChannel*> commitList;
+
 for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
 	sqlChannelHashType::iterator ptr =
@@ -3143,7 +3146,6 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->setFlag(sqlChannel::F_AUTOJOIN);
 		newChan->setFlag(sqlChannel::F_NOTAKE);
 		newChan->setNoTake(1);
-		newChan->commit();
 
 		Join(newChan->getName(), string("+tnR"), newChan->getChannelTS(), true);
 		newChan->setInChan(true);
@@ -3153,6 +3155,7 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->setRegisteredTS(currentTime());
 		newChan->setChannelMode("+tnR");
 		newChan->setLastUsed(currentTime());
+		commitList.push_back(newChan);
 
 		//Send a welcome notice to the channel
 		if (!welcomeNewChanMessage.empty())
@@ -3168,6 +3171,13 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		//logAdminMessage("Channel %s is now registered.", newChan->getName().c_str());
 		}
 	}
+
+if (!commitList.empty())
+{
+	for (vector<sqlChannel*>::iterator itr = commitList.begin(); itr != commitList.end(); itr++)
+		(*itr)->commit();
+	commitList.clear();
+}
 
 logDebugMessage("[DB-UPDATE]: Refreshed %i channel records, loaded %i new channel(s).",
 	updates, newchans);
@@ -3549,7 +3559,7 @@ if (timer_id == pending_timerID)
 #endif
 	loadPendingChannelList();
 #ifdef USE_INTERNAL_THE_JUDGE
-	checkTrafficPass();
+	//checkTrafficPass();	// Moved to a faster update_timerID
 	checkObjections();
 	checkAccepts();
 	checkReviews();
@@ -4514,90 +4524,93 @@ void cservice::checkTrafficPass()
 
 		unsigned int trafficTime = MaxDays * JudgeDaySeconds;
 		time_t elapsedDays = pendingChan->checkStart + time_t(trafficTime);
+		//Check if the channel was visited at least at ONCE by the required MinSupporters count supporters
+		unsigned int actualMinSupporters = (unsigned int)pendingChan->uniqueSupporterList.size();
+		if (actualMinSupporters < MinSupporters)
+		{
+			//rejectReason = "Insuffucient number of supporters that visited the channel";
+			minSupportersPass = false;
+			if (elapsedDays < currentTime())
+				logTheJudgeMessage("Insufficient number of supporters that visited the pending channel %s (%i/%i)",ptr->first.c_str(),actualMinSupporters,MinSupporters);
+		}
+		else // <- if yes, we check if one of the supporters has an insufficient MinSupportersJoin joincount
+		{
+			sqlPendingChannel::trafficListType::iterator ptr2 = pendingChan->uniqueSupporterList.begin();
+			while (ptr2 != pendingChan->uniqueSupporterList.end())
+			{
+				if (ptr2->second->join_count < MinSupportersJoin)
+				{
+					string suppUserName = "\002Error\002";
+					sqlUser* supporterUser = getUserRecord(atoi(ptr2->first));
+					if (supporterUser)
+						suppUserName = supporterUser->getUserName();
+					unsigned int actualMinSupportersJoin = ptr2->second->join_count;
+					minSupportersJoinPass = false;
+					if (elapsedDays < currentTime())
+						logTheJudgeMessage("Insufficient supporter joincount of supporter user %s (%i/%i) on pending channel %s",suppUserName.c_str(),actualMinSupportersJoin,MinSupportersJoin,ptr->first.c_str());
+				}
+				++ptr2;
+			} //end while
+		} //end else
+
+		//Next, we check after general channel activity:
+		//(total) join_count, and the unique_join_count
+		if (pendingChan->unique_join_count < UniqueJoins)
+		{
+			uniqueJoinsPass = false;
+			if (elapsedDays < currentTime())
+				logTheJudgeMessage("Insufficient number of IP's (%i/%i) that visited the pending channel %s",pendingChan->unique_join_count,UniqueJoins,ptr->first.c_str());
+		}
+		if (pendingChan->join_count < Joins)
+		{
+			JoinsPass = false;
+			if (elapsedDays < currentTime())
+				logTheJudgeMessage("Insufficient number of joincounts (%i/%i) that visited the pending channel %s",pendingChan->join_count,Joins,ptr->first.c_str());
+		}
+		//We all passed, so we move the channel to the next Notification phase
+		if ((JoinsPass) && (uniqueJoinsPass) && (minSupportersPass) && (minSupportersJoinPass))
+		{
+			stringstream theQuery;
+			theQuery 	<< "UPDATE pending SET status = '2',"
+						<< "check_start_ts = now()::abstime::int4,"
+						<< "last_updated = now()::abstime::int4 "
+						<< "WHERE channel_id = " << pendingChan->channel_id
+						<< ends;
+			#ifdef LOG_SQL
+				elog	<< "cservice::checkTrafficPass.moveToState2Notification> "
+						<< theQuery.str().c_str()
+						<< endl;
+			#endif
+			if( !SQLDb->Exec(theQuery, true ) )
+			//if( PGRES_TUPLES_OK == status )
+			logDebugMessage("Error on update pending trafficCheck -> notification");
+			else
+			logTheJudgeMessage("Channel %s has passed traffic checking, successfully moved to Notification stage",ptr->first.c_str());
+			pendingChan->commit();
+			ptr->second = NULL;
+			delete(pendingChan);
+			pendingChannelList.erase(ptr++);
+			continue;
+		}
 		if (elapsedDays < currentTime())
 		{
-			//Satisfied or not surely we can stop listening channel events
 			MyUplink->UnRegisterChannelEvent(ptr->first, this);
-			//Check if the channel was visited at least at ONCE by the required MinSupporters count supporters
-			unsigned int actualMinSupporters = (unsigned int)pendingChan->uniqueSupporterList.size();
-			if (actualMinSupporters < MinSupporters)
+			if ((!uniqueJoinsPass) || (!JoinsPass))
+				rejectReason = "Insufficient channel activity";
+			if ((!minSupportersPass) || (!minSupportersJoinPass))
+				rejectReason = "Insufficient supporter activity";
+			if (!rejectReason.empty())
 			{
-				//rejectReason = "Insuffucient number of supporters that visited the channel";
-				minSupportersPass = false;
-				logTheJudgeMessage("Insufficient number of supporters that visited the pending channel %s (%i/%i)",ptr->first.c_str(),actualMinSupporters,MinSupporters);
-			}
-			else // <- if yes, we check if one of the supporters has an insufficient MinSupportersJoin joincount
-			{
-				sqlPendingChannel::trafficListType::iterator ptr2 = pendingChan->uniqueSupporterList.begin();
-				while (ptr2 != pendingChan->uniqueSupporterList.end())
-				{
-					if (ptr2->second->join_count < MinSupportersJoin)
-					{
-						string suppUserName = "\002Error\002";
-						sqlUser* supporterUser = getUserRecord(atoi(ptr2->first));
-						if (supporterUser)
-							suppUserName = supporterUser->getUserName();
-						unsigned int actualMinSupportersJoin = ptr2->second->join_count;
-						minSupportersJoinPass = false;
-						logTheJudgeMessage("Insufficient supporter joincount of supporter user %s (%i/%i) on pending channel %s",suppUserName.c_str(),actualMinSupportersJoin,MinSupportersJoin,ptr->first.c_str());
-					}
-					++ptr2;
-				} //end while
-			} //end else
-
-			//Next, we check after general channel activity:
-			//(total) join_count, and the unique_join_count
-			if (pendingChan->unique_join_count < UniqueJoins)
-			{
-				uniqueJoinsPass = false;
-				logTheJudgeMessage("Insufficient number of IP's (%i/%i) that visited the pending channel %s",pendingChan->unique_join_count,UniqueJoins,ptr->first.c_str());
-			}
-			if (pendingChan->join_count < Joins)
-			{
-				JoinsPass = false;
-				logTheJudgeMessage("Insufficient number of joincounts (%i/%i) that visited the pending channel %s",pendingChan->join_count,Joins,ptr->first.c_str());
-			}
-			//We all passed, so we move the channel to the next Notification phase
-			if ((JoinsPass) && (uniqueJoinsPass) && (minSupportersPass) && (minSupportersJoinPass))
-			{
-				stringstream theQuery;
-				theQuery 	<< "UPDATE pending SET status = '2',"
-							<< "check_start_ts = now()::abstime::int4,"
-							<< "last_updated = now()::abstime::int4 "
-							<< "WHERE channel_id = " << pendingChan->channel_id
-							<< ends;
-				#ifdef LOG_SQL
-					elog	<< "cservice::checkTrafficPass.moveToState2Notification> "
-							<< theQuery.str().c_str()
-							<< endl;
-				#endif
-				if( !SQLDb->Exec(theQuery, true ) )
-				//if( PGRES_TUPLES_OK == status )
-				logDebugMessage("Error on update pending trafficCheck -> notification");
-				else
-				logTheJudgeMessage("Channel %s has passed traffic checking, successfully moved to Notification stage",ptr->first.c_str());
+				RejectChannel(pendingChan->channel_id,rejectReason);
+				logTheJudgeMessage("Rejecting channel %s with reason: %s",ptr->first.c_str(),rejectReason.c_str());
 				pendingChan->commit();
 				ptr->second = NULL;
 				delete(pendingChan);
 				pendingChannelList.erase(ptr++);
 				continue;
 			}
-		} //(elapsedDays < currentTime())
-		if ((!uniqueJoinsPass) || (!JoinsPass))
-			rejectReason = "Insufficient channel activity";
-		if ((!minSupportersPass) || (!minSupportersJoinPass))
-			rejectReason = "Insufficient supporter activity";
-		if (!rejectReason.empty())
-		{
-			RejectChannel(pendingChan->channel_id,rejectReason);
-			logTheJudgeMessage("Rejecting channel %s with reason: %s",ptr->first.c_str(),rejectReason.c_str());
-			pendingChan->commit();
-			ptr->second = NULL;
-			delete(pendingChan);
-			pendingChannelList.erase(ptr++);
 		}
-		else
-			++ptr;
+		++ptr;
 	} /* while() */
 }
 
@@ -6603,7 +6616,7 @@ unsigned int cservice::checkFloodproLevel(sqlChannel* sqlChan, const string& Mes
 			sqlChan->incFloodPro();
 			if (sqlChan->getFloodproLevel() > currFN)
 			{
-				string FNmessage = TokenStringsParams("Increased floodpro punishment level to \002%s\002 on channel \002%s\002",
+				string FNmessage = TokenStringsParams("Increased FLOODPRO punishment level to \002%s\002 on channel \002%s\002",
 						sqlChan->getFloodLevelName(sqlChan->getFloodproLevel()).c_str(), sqlChan->getName().c_str());
 				NoticeChannelOps(sqlChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
@@ -6650,7 +6663,7 @@ void cservice::checkChannelsFlood()
 			{
 				theChan->decFloodPro();
 				theChan->setLastFloodTime(currentTime());
-				string FNmessage = TokenStringsParams("Relaxed floodpro punishment level to \002%s\002 on channel \002%s\002",
+				string FNmessage = TokenStringsParams("Relaxed FLOODPRO punishment level to \002%s\002 on channel \002%s\002",
 						theChan->getFloodLevelName(theChan->getFloodproLevel()).c_str(), theChan->getName().c_str());
 				NoticeChannelOps(theChan->getName(), FNmessage.c_str());
 				logPrivAdminMessage(FNmessage.c_str());
