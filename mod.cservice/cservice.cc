@@ -6558,14 +6558,16 @@ bool cservice::KickAllWithFloodMessage(Channel* theChan, const string& Message, 
 	assert(sqlChan != 0);
 	std::list < string > IPlist = sqlChan->getRepeatMessageCount(Message).second;
 	std::list < string >::iterator itr = IPlist.begin();
+	unsigned int index = 0;
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		Kick(theChan, *itr, kickMsg);
 		if (clearcount)
 		{
-			if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+			if (((unsigned int)IPlist.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
 				sqlChan->RemoveFlooderMask(*itr);
 		}
+		index++;
 	}
 	return true;
 }
@@ -6576,6 +6578,7 @@ bool cservice::KickBanAllWithFloodMessage(Channel* theChan, const string& Messag
 	assert(sqlChan != 0);
 	std::list < string > IPlist = sqlChan->getRepeatMessageCount(Message).second;
 	std::list < string >::iterator itr = IPlist.begin();
+	unsigned int index = 0;
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		doInternalBanAndKick(sqlChan, *itr, banLevel, banExpire, theReason);
@@ -6583,8 +6586,9 @@ bool cservice::KickBanAllWithFloodMessage(Channel* theChan, const string& Messag
 		/* Remove the Flooder IP only if the accumulated listsize is greather than the RepeatCount
 		 * otherwise any remaining items won't be banned on ChannelMessage because they don't reach the RepeatCount to trigger this function
 		 */
-		if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+		if (((unsigned int)IPlist.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
 			sqlChan->RemoveFlooderMask(*itr);
+		index++;
 	}
 	return true;
 }
@@ -6593,11 +6597,13 @@ bool cservice::GlineAllWithFloodMessage(sqlChannel* sqlChan, const string& Messa
 {
 	std::list < string > IPlist = sqlChan->getRepeatMessageCount(Message).second;
 	std::list < string >::iterator itr = IPlist.begin();
+	unsigned int index = 0;
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		doInternalGline(*itr, thePeriod, theReason);
-		if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+		if (((unsigned int)IPlist.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
 			sqlChan->RemoveFlooderMask(*itr);
+		index++;
 	}
 	return true;
 }
