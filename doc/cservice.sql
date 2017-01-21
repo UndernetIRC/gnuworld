@@ -138,11 +138,11 @@ CREATE TABLE channels (
 	mass_deop_pro INT2 NOT NULL DEFAULT 3,
 	flood_pro INT4 NOT NULL DEFAULT '0',
 	url VARCHAR (128),
-	description VARCHAR (128),
+	description VARCHAR (300),
 	-- Any administrative comments that apply globally to this
 	-- channel.
 	comment VARCHAR (300),
-	keywords VARCHAR(128),
+	keywords VARCHAR(300),
 	registered_ts INT4,
 	channel_ts INT4 NOT NULL,
 	channel_mode VARCHAR(26),
@@ -184,7 +184,7 @@ CREATE TABLE bans (
 	set_ts INT4,
 	level INT2,
 	expires INT4,					-- Expiration timestamp.
-	reason VARCHAR (128),
+	reason VARCHAR (300),
 	last_updated INT4 NOT NULL,
 	deleted INT2 DEFAULT '0',
 
