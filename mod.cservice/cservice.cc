@@ -6385,12 +6385,15 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		return true;
 	}
 	vector< iClient* > clientsToKick ;
+	// Add at least the Sender client to the list
+	clientsToKick.push_back(theClient);
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
 		if (Channel::createBan(tmpUser->getClient()) == Channel::createBan(theClient))
-		{
-			clientsToKick.push_back(tmpUser->getClient());
+		{	//Since we above initially added at least the Sender client to the list, we shouldn't add again
+			if (tmpUser->getClient() != theClient)
+				clientsToKick.push_back(tmpUser->getClient());
 		}
 	}
 	if (!clientsToKick.empty())
