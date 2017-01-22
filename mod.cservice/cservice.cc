@@ -6235,6 +6235,79 @@ Write( s );
 theChan->setLastTopic(currentTime());
 }
 
+// This function is used to ban a mask, to who no matching client is currently existing on the channel
+bool cservice::doSingleBan(sqlChannel* theChan,
+    const string& banMask, unsigned short banLevel, unsigned int banExpire, const string& theReason)
+{
+	/*
+	 *  Check to see if this banmask already exists in the
+	 *  channel. (Ugh, and overlapping too.. hmm).
+	 */
+
+	Channel* netChan = Network->findChannel(theChan->getName());
+
+	if (netChan)
+	{
+		stringstream s;
+		s	<< getCharYYXXX()
+			<< " M "
+			<< netChan->getName()
+			<< " +b "
+			<< banMask
+			<< ends;
+
+		Write( s );
+
+		/* remove the ban (even if it doesnt exist, it will return false anyway) */
+		netChan->removeBan(banMask) ;
+		/* set the ban */
+		netChan->setBan(banMask) ;
+	}
+
+	/*
+	 *  Check for duplicates, if none found -
+	 *  add to internal list and commit to the db.
+	 */
+	map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin();
+	while (ptr != theChan->banList.end())
+	{
+		const sqlBan* theBan = ptr->second;
+
+		if(string_lower(banMask) == string_lower(theBan->getBanMask()))
+		{
+			/*
+			 * If this mask is already banned, we're just getting
+			 * lagged info.
+			 */
+			return true;
+		}
+	    ++ptr;
+	}
+
+	/* Create a new Ban record */
+	sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
+	assert( newBan != 0 ) ;
+
+	// TODO: Build a suitable constructor in sqlBan
+	newBan->setChannelID(theChan->getID());
+	newBan->setBanMask(banMask);
+	newBan->setSetBy(getNickName());
+	newBan->setSetTS(currentTime());
+	newBan->setLevel(banLevel);
+
+	newBan->setExpires(banExpire + currentTime());
+	newBan->setReason(theReason);
+
+	/* Insert this new record into the database. */
+	newBan->insertRecord();
+
+	/* Insert to our internal List. */
+	//theChan->banList[newBan->getID()] = newBan;
+	theChan->banList.insert(std::map<int,sqlBan*>::value_type(newBan->getID(),newBan));
+
+	return true ;
+}
+
 bool cservice::doSingleBanAndKick(sqlChannel* theChan,
 		iClient* theClient, unsigned short banLevel, unsigned int banExpire, const string& theReason)
 {
@@ -6470,6 +6543,8 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		for (vector<iClient*>::iterator itr = clientsToKick.begin(); itr != clientsToKick.end(); ++itr)
 			doSingleBanAndKick(theChan, *itr, banLevel, banExpire, theReason);
 	}
+	else	// make sure the ban is set even if no matching client was found on the channel
+		doSingleBan(theChan, banMask, banLevel, banExpire, theReason);
 	return true ;
 }
 

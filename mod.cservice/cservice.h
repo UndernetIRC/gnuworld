@@ -524,6 +524,9 @@ public:
 	/* Automatically updates the floating limit for this channel */
 	void doFloatingLimit(sqlChannel*, Channel*);
 
+	/* This function is used to ban a mask, to who no matching client is currently existing on the channel */
+	bool doSingleBan(sqlChannel* theChan, const string& banMask, unsigned short banLevel, unsigned int banExpire, const string& theReason);
+
 	/* Bans and kick just one client, with level, period, reason */
 	bool doSingleBanAndKick(sqlChannel*, iClient*, unsigned short, unsigned int, const string& theReason);
 
