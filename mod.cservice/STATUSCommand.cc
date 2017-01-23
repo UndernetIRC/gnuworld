@@ -188,7 +188,7 @@ if (((level >= level::set::notake) || (admLevel)) &&
         (theChan->getFlag(sqlChannel::F_NOTAKE)))
 {
     flagsSet += "NOTAKE (REV:";
-    if (theChan->getNoTake() == 1) flagsSet += "IGNORE)";
+    if (theChan->getNoTake() == 1) flagsSet += "NONE)";
     if (theChan->getNoTake() == 2) flagsSet += "BAN)";
     if (theChan->getNoTake() == 3) flagsSet += "SUSPEND)";
 }
