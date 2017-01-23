@@ -137,12 +137,14 @@ namespace gnuworld {
     const int caution = 501;
     const int vacation = 501;
     const int mia = 800;
+	const int noforce = 1000;
   }
 
   namespace immune {
     const int massdeop = 450;
     const int suspendop = 450; // Immune from op'ing a suspended user.
     const int floodpro = 501;
+	const int noforce = 1000;
   }
 
   namespace admin {

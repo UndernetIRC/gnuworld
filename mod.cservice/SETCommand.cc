@@ -739,6 +739,83 @@ else
 	    return true;
 	}
 
+	/*
+	* Check the "NOFORCE" status first, so admin's can bypas to turn it OFF :)
+	*/
+
+	if (option == "NOFORCE")
+	{
+		// Check for admin access
+		int admLevel = bot->getAdminAccessLevel(theUser);
+		if (admLevel == 0) {
+			// No need to tell users about admin commands.
+			Usage(theClient);
+			return true;
+		}
+		if (admLevel < level::set::noforce)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("Sorry, you have insufficient access to perform that command.")));
+			return false;
+		}
+		if (value == "ON") theChan->setFlag(sqlChannel::F_NOFORCE);
+		else if (value == "OFF") theChan->removeFlag(sqlChannel::F_NOFORCE);
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_cmd_syntax_on_off,
+					string("value of %s must be ON or OFF")).c_str(),
+				option.c_str());
+			return true;
+		}
+		theChan->commit();
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s for %s is %s")).c_str(),
+			option.c_str(),
+			theChan->getName().c_str(),
+			theChan->getFlag(sqlChannel::F_NOFORCE) ? "ON" : "OFF");
+
+		//TODO?
+		//bot->writeChannelLog(theChan, theClient, sqlChannel::EV_NOFORCE, "");
+
+		if (value == "ON") {
+			for (sqlChannel::forceMapType::const_iterator ptr = theChan->forceMap.begin();
+				ptr != theChan->forceMap.end(); ++ptr)
+			{
+				// Look up this username in the cache.
+				cservice::sqlUserHashType::iterator ptr2 = bot->sqlUserCache.find(ptr->second.second);
+				sqlUser* AdminUser = ptr2->second;
+				int ForceLevel = ptr->second.first;
+
+				//Now Remove force access who is not privileged :)
+				if (ForceLevel < level::immune::noforce)
+				{
+					bot->noticeAllAuthedClients(AdminUser,
+						bot->getResponse(AdminUser,
+							language::set_cmd_status,
+							string("%s for %s is %s")).c_str(),
+						option.c_str(),
+						theChan->getName().c_str(), "ON");
+
+					theChan->forceMap.erase(AdminUser->getID());
+
+					bot->noticeAllAuthedClients(AdminUser,
+						bot->getResponse(AdminUser,
+							language::rem_temp_access,
+							string("Removed your temporary access of %i from channel %s")).c_str(),
+						ForceLevel, theChan->getName().c_str());
+				}
+			} //for cycle
+		} //if (value == ON)
+
+		return true;
+	}
+
     if(option == "MIA")
     {
         // Check for admin access

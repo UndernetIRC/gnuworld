@@ -232,6 +232,7 @@ namespace gnuworld
 		const int unsusp_reason =			194;
 
 		// Allow for merge of other features
+		// chan_noforce
 
 		const int welcome_max_len = 205;
 		const int welcome_cleared = 206;
