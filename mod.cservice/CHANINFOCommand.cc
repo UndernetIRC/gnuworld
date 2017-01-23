@@ -791,7 +791,7 @@ if (!theChan->getWelcome().empty())
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::welcome_status,
-			string("WELCOME: %s")).c_str(),
+			string("Welcome: %s")).c_str(),
 		theChan->getWelcome().c_str());
 	}
 
