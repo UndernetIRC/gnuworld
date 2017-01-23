@@ -1439,21 +1439,21 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	string kickReason = "### Message Flood Protection Triggered ###";
 	string repeatReason = "### Channel Repeat Protection Triggered ###";
 	string glineReason = "Possible flood abuse";
-	string IP = Channel::createBan(Sender);
+	string Mask = Channel::createBan(Sender);
 	sqlChan->setCurrentTime(currentTime());
-	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, Message);
+	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, Mask, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
 
 	if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_NONE)
 	{
-		if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
+		if (sqlChan->getTotalMessageCount(Mask) == sqlChan->getFloodMsg())
 			Kick(theChan, Sender, kickReason);
-		if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
+		if (sqlChan->getTotalMessageCount(Mask) > sqlChan->getFloodMsg())
 		{
 			doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
-			sqlChan->RemoveFlooderMask(IP);
+			sqlChan->RemoveFlooderMask(Mask);
 		}
-		repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+		repeatCount = sqlChan->getRepeatMessageCount(Message,Mask).first;
 		if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 		{
 			if (repeatCount == sqlChan->getRepeatCount())
@@ -1461,7 +1461,7 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 			if (repeatCount > sqlChan->getRepeatCount())
 			{
 				doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
-				sqlChan->RemoveFlooderMask(IP);
+				sqlChan->RemoveFlooderMask(Mask);
 			}
 		}
 	}
@@ -1469,14 +1469,14 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	{
 		if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_KICK)
 		{
-			if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(Mask) == sqlChan->getFloodMsg())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
-			if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(Mask) > sqlChan->getFloodMsg())
 			{
 				doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
-				sqlChan->RemoveFlooderMask(IP);
+				sqlChan->RemoveFlooderMask(Mask);
 			}
-			repeatCount = sqlChan->getRepeatMessageCount(Message, IP).first;
+			repeatCount = sqlChan->getRepeatMessageCount(Message, Mask).first;
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 			{
 				if (repeatCount == sqlChan->getRepeatCount())
@@ -1484,25 +1484,25 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 				if (repeatCount > sqlChan->getRepeatCount())
 				{
 					doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
-					sqlChan->RemoveFlooderMask(IP);
+					sqlChan->RemoveFlooderMask(Mask);
 				}
 			}
 
 		}
 		if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_BAN)
 		{
-			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(Mask) >= sqlChan->getFloodMsg())
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, kickReason);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, repeatReason);
 		}
 		if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_GLINE)
 		{
-			if ((sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+			if ((sqlChan->getTotalMessageCount(Mask) >= sqlChan->getFloodMsg())
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 				GlineAllWithFloodMessage(sqlChan, Message, time_t(glineTime), glineReason);
 		}
-		if ((sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+		if ((sqlChan->getTotalMessageCount(Mask) >= sqlChan->getFloodMsg())
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 			sqlChan->setLastFloodTime(currentTime());
 	}
