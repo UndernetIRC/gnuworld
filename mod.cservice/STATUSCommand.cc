@@ -181,8 +181,12 @@ if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC ";
 if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
 
 if (((level >= level::set::oplog) || (admLevel)) &&
-(theChan->getFlag(sqlChannel::F_OPLOG)))
-flagsSet += "OPLOG ";
+	(theChan->getFlag(sqlChannel::F_OPLOG)))
+		flagsSet += "OPLOG ";
+
+/* NOFORCE flag for protected channels */
+if ((admLevel) && (theChan->getFlag(sqlChannel::F_NOFORCE)))
+	flagsSet += "NOFORCE ";
 
 if (((level >= level::set::notake) || (admLevel)) &&
         (theChan->getFlag(sqlChannel::F_NOTAKE)))
