@@ -1531,7 +1531,7 @@ else
                                         string("You do not have enough access!")));
 			return true;
 	    }
-	    if (strlen(url.c_str()) > 128) // Gator - changed to 75
+	    if (strlen(url.c_str()) > 128) // URL max now 128
 	    {
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
@@ -1579,12 +1579,12 @@ else
                                string("You do not have enough access!")));
 		return true;
 	    }
-	    if(strlen(value.c_str()) > 80) // is 80 ok as an max keywords length?
+	    if(strlen(keywords.c_str()) > 300) // keywords now 300
 	    {
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::keywords_max_len,
-				string("The string of keywords cannot exceed 80 chars!")));
+				string("The string of keywords cannot exceed %i chars!")).c_str(), 300);
 		return true;
 	    }
 	    theChan->setKeywords(keywords);
