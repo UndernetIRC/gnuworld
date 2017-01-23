@@ -243,6 +243,9 @@ public:
 	inline const string&		getKeywords() const
 		{ return keywords ; }
 
+	inline const string&		getWelcome() const
+		{ return welcome ; }
+
 	inline const time_t&		getRegisteredTS() const
 		{ return registered_ts ; }
 
@@ -376,6 +379,9 @@ public:
 	inline void setKeywords( const string& _keywords )
 		{ keywords = _keywords; }
 
+	inline void setWelcome(const string& _welcome)
+		{ welcome = _welcome; }
+
 	inline void setRegisteredTS( const time_t& _registered_ts )
 		{ registered_ts = _registered_ts; }
 
@@ -486,6 +492,7 @@ protected:
 	string		description ;
 	string		comment ;
 	string		keywords  ;
+	string		welcome ;
 	time_t		registered_ts ;
 	time_t		channel_ts ;
 	string		channel_mode ;
