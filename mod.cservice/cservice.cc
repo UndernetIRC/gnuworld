@@ -5774,6 +5774,15 @@ switch( whichEvent )
 			break;
 			}
 
+#ifdef USE_WELCOME
+		if (strlen(reggedChan->getWelcome().c_str()) > 0)
+		{
+			Notice(theClient, "(%s) %s",
+				theChan->getName().c_str(),
+				reggedChan->getWelcome().c_str());
+		}
+#endif
+
 		/* Is it time to set an autotopic? */
 		if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) &&
 			(reggedChan->getLastTopic()

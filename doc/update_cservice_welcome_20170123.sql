@@ -1,0 +1,1 @@
+ALTER TABLE channels ADD COLUMN welcome VARCHAR(300) DEFAULT '';

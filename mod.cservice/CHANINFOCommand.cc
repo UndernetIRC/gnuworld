@@ -786,6 +786,16 @@ if( !theChan->getURL().empty() )
 		theChan->getURL().c_str());
 	}
 
+if (!theChan->getWelcome().empty())
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::welcome_status,
+			string("WELCOME for %s is: %s")).c_str(),
+		theChan->getName().c_str(),
+		theChan->getWelcome().c_str());
+	}
+
 if (theChan->getFlag(sqlChannel::F_TEMP))
 	{
 	bot->Notice(theClient, "\002This channel has a temporary manager.\002");

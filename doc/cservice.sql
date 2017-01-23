@@ -166,6 +166,8 @@ CREATE TABLE channels (
 --   if set to 0, use global setting - there is NO unlimited option.
 	max_bans INT4 DEFAULT '0',
 
+	welcome VARCHAR(300) DEFAULT '',
+
 	PRIMARY KEY (id)
 );
 
