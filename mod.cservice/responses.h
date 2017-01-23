@@ -232,11 +232,12 @@ namespace gnuworld
 		const int unsusp_reason =			194;
 
 		// Allow for merge of other features
-		// chan_noforce
 
 		const int welcome_max_len = 205;
 		const int welcome_cleared = 206;
 		const int welcome_status = 207;
+
+		const int chan_noforce = 208;
 
 		const int greeting = 				9998;
 		const int motd =					9999;
