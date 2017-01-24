@@ -8622,7 +8622,6 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		<< account << " "
 		<< firstOpped << " " 
 		<< lastOpped << " "
-		<< firstOpped << " "
 		<< lastNick << endl;
 
 	/*	Now we do the actual work to insert scores to SQL DB
