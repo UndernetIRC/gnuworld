@@ -8660,7 +8660,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 			queryString << "SELECT user_id FROM pending_chanfix_scores WHERE user_id="
 				<< tmpUser->getID()
 				<< " AND channel_id=(SELECT id FROM channels WHER lower(name)='"
-				<< strlwr(scoreChan)
+				<< string_lower(scoreChan)
 				<< "'"
 				<< ends;
 #ifdef LOG_SQL
@@ -8686,9 +8686,9 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 						<< ",'"
 						<< account
 						<< "','"
-						<< first_opped
+						<< firstOpped
 						<< "','"
-						<< last_opped
+						<< lastOpped
 						<< "')"
 						<< ends;
 				} else {
