@@ -8654,7 +8654,8 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		else {
 			// Pending channel found -- have we inserted this user & chan combo before?
 			sqlChannel* tmpChan = getChannelRecord(st[1]);
-			ChannelUser* tmpChanUser = tmpChan->findUser(account);
+			Channel* theChan = getChannelRecord(st[1]);
+			ChannelUser* tmpChanUser = theChan->findUser(account);
 			sqlUser* tmpUser = isAuthed(tmpChanUser->getClient(), false);
 			stringstream queryString;
 			queryString << "SELECT channel_id FROM pending_chanfix_scores WHERE user_id="
@@ -8672,10 +8673,10 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 			if (SQLDb->Exec(queryString, true))
 				//if (PGRES_TUPLES_OK == status)
 			{
+				stringstream updateQuery;
 				if (SQLDb->Tuples() < 1)
 				{
 					// no rows returned -- need to INSERT
-					stringstream updateQuery;
 					updateQuery << "INSERT INTO pending_chanfix_scores "
 						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped) VALUES("
 						<< tmpChan->getID()
