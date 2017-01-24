@@ -3843,7 +3843,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 
 		// XREPLY 
 		xResponse = TokenStringsParams("OPLIST %s %3d. %4d  %s -- %s / %s%s%s%s%s%s",
-			st[1],
+			st[1].c_str(),
 			opCount,
 			(curOp->getPoints() + curOp->getBonus()),
 			curOp->getAccount().c_str(), firstop.c_str(),
