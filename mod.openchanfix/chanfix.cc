@@ -1095,11 +1095,11 @@ switch(whichEvent)
 		string Command = string_upper(st[0]);
 		if (Command == "OPLIST")
 		{
-			doXQOplist(theServer, Routing, Message);
+			chanfix::doXQOplist(theServer, Routing, Message);
 		}
 		else if (Command == "SCORE")
 		{
-			doXQScore(theServer, Routing, Message);
+			chanfix::doXQScore(theServer, Routing, Message);
 		}
 		break;
 	}
@@ -3689,6 +3689,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 	StringTokenizer st(Message);
 	all = true;
 	days = false;
+	string xResponse = string();
 
 	if (st.size() < 2) {
 		elog << "chanfix::doXQOplist> OPLIST insufficient parameters" << endl;
