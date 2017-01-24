@@ -8630,8 +8630,6 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 			2). Only INSERT if (channel_id,user_id) pair does not exist,
 			otherwise we UPDATE
 	*/
-
-	
 	stringstream queryString;
 	queryString << "SELECT name,status FROM channels,pending WHERE lower(name)='"
 		<< string_lower(scoreChan)
@@ -8649,10 +8647,11 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 	{
 		if (SQLDb->Tuples() < 1)
 		{
-			// no rows returned - no pending record
+			// No rows returned - no pending record
 			elog << "cservice::doXROplist> no pending channel found: " << scoreChan << endl;
 			return false;
-		} else {
+		}
+		else {
 			// Pending channel found -- have we inserted this user & chan combo before?
 			sqlChannel* theChan = bot->getChannelRecord(st[1]);
 			ChannelUser* tmpChanUser = tmpChan->findUser(account);
@@ -8694,7 +8693,8 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 						<< lastOpped
 						<< "')"
 						<< ends;
-				} else {
+				}
+				else {
 					// rows returned -- need to UPDATE
 					int chanID = atoi(SQLDb->GetValue(0, 1).c_str());
 					stringstream updateQuery;
@@ -8728,6 +8728,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 
 				// send to SQL
 				SQLDb->Exec(updateQuery);
+			} // successful query
 		} // end score exist lookup query
 	} // end pending chan lookup query
 	return true;
