@@ -3695,10 +3695,10 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 		elog << "chanfix::doXQOplist> OPLIST insufficient parameters" << endl;
 		return false;
 	}
-	sqlChannel* theChan = bot->getChannelRecord(st[1]);
+	sqlChannel* theChan = getChannelRecord(st[1]);
 	elog << "chanfix::doXQLogin: OPLIST " << st[1] << endl;
 
-	chanfix::chanOpsType myOps = bot->getMyOps(st[1]);
+	chanfix::chanOpsType myOps = getMyOps(st[1]);
 	if (myOps.empty()) {
 		// Send back the 'NO' response (no scores)
 		xResponse = TokenStringsParams("NO");
@@ -3707,7 +3707,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 			// TODO -- XREPLY with number of notes against channel?
 
 			/* Perhaps use a mask so we can return these in a single message */
-			if (bot->isTempBlocked(theChan->getChannel()))
+			if (isTempBlocked(theChan->getChannel()))
 				// XREPLY with 'TEMPBLOCKED' indicator
 				xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
@@ -3720,7 +3720,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 				xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
 		}
-		return;
+		return true;
 	}
 	unsigned int oCnt = myOps.size();
 
@@ -3736,7 +3736,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 			// TODO -- XREPLY with number of notes against channel?
 
 			/* Perhaps use a mask so we can return these in a single message */
-			if (bot->isTempBlocked(theChan->getChannel()))
+			if (isTempBlocked(theChan->getChannel()))
 				// XREPLY with 'TEMPBLOCKED' indicator
 				xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
@@ -3749,7 +3749,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 				xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
 		}
-		return;
+		return true;
 	}
 	if (oCnt > OPCOUNT && !all) {
 		// 'OPCOUNT' unique op accounts in channel
@@ -3774,7 +3774,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 	std::string lastop;
 	std::string nickName;
 	std::stringstream dayString;
-	time_t oldestTS = bot->currentTime();
+	time_t oldestTS = currentTime();
 
 	// Find oldest first op timestamp -- what for?
 	for (chanfix::chanOpsType::iterator chOp = myOps.begin();
@@ -3789,11 +3789,11 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 		opPtr != myOps.end() && (all || opCount < OPCOUNT); opPtr++) {
 		curOp = *opPtr;
 		opCount++;
-		firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
-		lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
-		inChan = bot->accountIsOnChan(st[1], curOp->getAccount());
+		firstop = tsToDateTime(curOp->getTimeFirstOpped(), false);
+		lastop = tsToDateTime(curOp->getTimeLastOpped(), true);
+		inChan = accountIsOnChan(st[1], curOp->getAccount());
 		if (inChan)
-			nickName = bot->getChanNickName(st[1], curOp->getAccount());
+			nickName = getChanNickName(st[1], curOp->getAccount());
 
 		if (days) {
 			dayString.str("");
@@ -3847,7 +3847,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 		// TODO -- XREPLY with number of notes against channel?
 
 		/* Perhaps use a mask so we can return these in a single message */
-		if (bot->isTempBlocked(theChan->getChannel()))
+		if (isTempBlocked(theChan->getChannel()))
 			// XREPLY with 'TEMPBLOCKED' indicator
 		else if (theChan->getFlag(sqlChannel::F_BLOCKED))
 			// XREPLY with 'BLOCKED' indicator
@@ -3856,7 +3856,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 	}
 
 	// End of OPLIST
-	return;
+	return true;
 }
 
 bool chanfix::doXResponse(iServer* theServer, const string& Routing, const string& Message)
