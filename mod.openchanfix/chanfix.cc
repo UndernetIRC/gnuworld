@@ -3708,17 +3708,23 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 
 			/* Perhaps use a mask so we can return these in a single message */
 			if (isTempBlocked(theChan->getChannel()))
+			{
 				// XREPLY with 'TEMPBLOCKED' indicator
 				xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
+			}
 			else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+			{
 				// XREPLY with 'BLOCKED' indicator
 				xResponse = TokenStringsParams("BLOCKED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
+			}
 			else if (theChan->getFlag(sqlChannel::F_ALERT))
+			{
 				// XREPLY with 'ALERTED' indicator
 				xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
+			}
 		}
 		return true;
 	}
@@ -3737,21 +3743,28 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 
 			/* Perhaps use a mask so we can return these in a single message */
 			if (isTempBlocked(theChan->getChannel()))
+			{
 				// XREPLY with 'TEMPBLOCKED' indicator
 				xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
+			}
 			else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+			{
 				// XREPLY with 'BLOCKED' indicator
 				xResponse = TokenStringsParams("BLOCKED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
+			}
 			else if (theChan->getFlag(sqlChannel::F_ALERT))
+			{
 				// XREPLY with 'ALERTED' indicator
 				xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
 				doXResponse(theServer, Routing, xResponse);
+			}
 		}
 		return true;
 	}
-	if (oCnt > OPCOUNT && !all) {
+	if (oCnt > OPCOUNT && !all)
+	{
 		// 'OPCOUNT' unique op accounts in channel
 		xResponse = TokenStringsParams("OPCOUNT %d", OPCOUNT);
 		doXResponse(theServer, Routing, xResponse);
@@ -3848,11 +3861,23 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 
 		/* Perhaps use a mask so we can return these in a single message */
 		if (isTempBlocked(theChan->getChannel()))
+		{
 			// XREPLY with 'TEMPBLOCKED' indicator
+			xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
+			doXResponse(theServer, Routing, xResponse);
+		}
 		else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+		{
 			// XREPLY with 'BLOCKED' indicator
+			xResponse = TokenStringsParams("BLOCKED %s", st[1].c_str());
+			doXResponse(theServer, Routing, xResponse);
+		}
 		else if (theChan->getFlag(sqlChannel::F_ALERT))
+		{
 			// XREPLY with 'ALERTED' indicator
+			xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
+			doXResponse(theServer, Routing, xResponse);
+		}
 	}
 
 	// End of OPLIST
