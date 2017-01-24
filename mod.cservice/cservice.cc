@@ -8634,7 +8634,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 	queryString << "SELECT name,status FROM channels,pending WHERE lower(name)='"
 		<< string_lower(scoreChan)
 		<< "'"
-		<< " AND channels.id = pending.channel_id" // TODO -- check specific status?
+		<< " AND channels.id = pending.channel_id"
 		<< ends;
 #ifdef LOG_SQL
 	elog << "cservice::doXROplist::sqlQuery> "
@@ -8657,11 +8657,11 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 			ChannelUser* tmpChanUser = tmpChan->findUser(account);
 			sqlUser* tmpUser = isAuthed(tmpChanUser->getClient(), false);
 			stringstream queryString;
-			queryString << "SELECT user_id FROM pending_chanfix_scores WHERE user_id="
+			queryString << "SELECT channel_id FROM pending_chanfix_scores WHERE user_id="
 				<< tmpUser->getID()
 				<< " AND channel_id=(SELECT id FROM channels WHER lower(name)='"
 				<< string_lower(scoreChan)
-				<< "'"
+				<< "')"
 				<< ends;
 #ifdef LOG_SQL
 			elog << "cservice::doXROplist::sqlQuery> "
@@ -8678,7 +8678,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 					stringstream updateQuery;
 					updateQuery << "INSERT INTO pending_chanfix_scores "
 						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped) VALUES("
-						<< theChan->getID()
+						<< tmpChan->getID()
 						<< ", "
 						<< tmpUser->getID()
 						<< ", "
@@ -8696,7 +8696,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 				}
 				else {
 					// rows returned -- need to UPDATE
-					int chanID = atoi(SQLDb->GetValue(0, 1).c_str());
+					int chanID = atoi(SQLDb->GetValue(0, 0).c_str());
 					stringstream updateQuery;
 					updateQuery << "UPDATE pending_chanfix_scores SET "
 						<< "rank="
