@@ -3684,7 +3684,7 @@ int chanfix::getNewScore( sqlChanOp* chOp, time_t oldestTS )
 
 bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string& Message)
 {
-	// AB XQ Az :OPLIST <chan>
+	// AB XQ Az BlAAB :OPLIST <chan>
 	elog << "chanfix::doXQOplist: Routing: " << Routing << " Message: " << Message << "\n";
 	StringTokenizer st(Message);
 	bool all = true;
@@ -3696,7 +3696,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 		return false;
 	}
 	sqlChannel* theChan = getChannelRecord(st[1]);
-	elog << "chanfix::doXQLogin: OPLIST " << st[1] << endl;
+	elog << "chanfix::doXQOplist: OPLIST " << st[1] << endl;
 
 	chanfix::chanOpsType myOps = getMyOps(st[1]);
 	if (myOps.empty()) {
@@ -3808,6 +3808,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 		if (inChan)
 			nickName = getChanNickName(st[1], curOp->getAccount());
 
+		// TODO -- we probably don't care about '-days' data for XREPLY
 		if (days) {
 			dayString.str("");
 

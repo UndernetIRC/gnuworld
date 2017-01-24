@@ -5137,6 +5137,28 @@ switch( theEvent )
 			}
 		break;
 		}
+	case EVT_XREPLY:
+	{
+		iServer* theServer = static_cast< iServer* >(data1);
+		const char* Routing = reinterpret_cast< char* >(data2);
+		const char* Message = reinterpret_cast< char* >(data3);
+		elog << "CSERVICE.CC: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
+		//If it ain't us, ignore the message, the message is probably meant for another client here.
+		StringTokenizer st(Message);
+		if (st.size() < 2)
+		{
+			// No command or data supplied
+			break;
+		}
+		string Command = string_upper(st[0]);
+		if (Command == "OPLIST")
+		{
+			// Process the channel OPLIST data from mod.openchanfix
+			doXROplist(theServer, Routing, Message);
+		}
+		break;
+	}
 	case EVT_ACCOUNT:
 		{
 		iClient* tmpUser = static_cast< iClient* >( data1 ) ;
@@ -8572,6 +8594,141 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 elog << "cservice::doXQLogin: FAILED login for " << username << endl;
 
 return true;
+}
+
+bool cservice::doXROplist(iServer* theServer, const string& Routing, const string& Message)
+{
+	// AB XQ Az iauth:15_d :OPLIST #empfoo
+	elog << "cservice::doXQLogin: Routing: " << Routing << " Message: " << Message << "\n";
+	StringTokenizer st(Message);
+
+	if (st.size() < 6)
+	{
+		elog << "cservice::doXROplist> OPLIST insufficient response parameters" << endl;
+		return false;
+	}
+	string scoreChan = st[1];
+	string rank = st[2];
+	string score = st[3];
+	string account st[4]
+	string firstOpped = st[5];
+	string lastOpped = st[6];
+	string lastNick = st[7];	// ... but may not be online anymore
+
+	elog << "cservice::doXROplist: OPLIST " 
+		<< scoreChan << " " 
+		<< rank << " " 
+		<< score << " " 
+		<< account << " "
+		<< firstOpped << " " 
+		<< lastOpped << " "
+		<< firstOpped << " "
+		<< lastNick << endl;
+
+	/*	Now we do the actual work to insert scores to SQL DB
+		Rules:
+			1). Only do work for channels with a pending application? (we only send XQUERY for these)
+			2). Only INSERT if (channel_id,user_id) pair does not exist,
+			otherwise we UPDATE
+	*/
+
+	
+	stringstream queryString;
+	queryString << "SELECT name,status FROM channels,pending WHERE lower(name)='"
+		<< string_lower(scoreChan)
+		<< "'"
+		<< " AND channels.id = pending.channel_id" // TODO -- check specific status?
+		<< ends;
+#ifdef LOG_SQL
+	elog << "cservice::doXROplist::sqlQuery> "
+		<< queryString.str().c_str()
+		<< endl;
+#endif
+
+	if (SQLDb->Exec(queryString, true))
+		//if (PGRES_TUPLES_OK == status)
+	{
+		if (SQLDb->Tuples() < 1)
+		{
+			// no rows returned - no pending record
+			elog << "cservice::doXROplist> no pending channel found: " << scoreChan << endl;
+			return false;
+		} else {
+			// Pending channel found -- have we inserted this user & chan combo before?
+			sqlUser* tmpUser account;
+			sqlChannel* tmpChan scoreChan;
+			stringstream queryString;
+			queryString << "SELECT user_id FROM pending_chanfix_scores WHERE user_id="
+				<< tmpUser->getID()
+				<< " AND channel_id=(SELECT id FROM channels WHER lower(name)='"
+				<< strlwr(scoreChan)
+				<< "'"
+				<< ends;
+#ifdef LOG_SQL
+			elog << "cservice::doXROplist::sqlQuery> "
+				<< queryString.str().c_str()
+				<< endl;
+#endif
+
+			if (SQLDb->Exec(queryString, true))
+				//if (PGRES_TUPLES_OK == status)
+			{
+				if (SQLDb->Tuples() < 1)
+				{
+					// no rows returned -- need to INSERT
+					stringstream updateQuery;
+					updateQuery << "INSERT INTO pending_chanfix_scores (channel_id,"
+						<< "user_id,rank,score,account,first_opped,last_opped) VALUES("
+						<< tmpUser->getID()
+						<< ","
+						<< rank
+						<< ","
+						<< score
+						<< ",'"
+						<< account
+						<< "','"
+						<< first_opped
+						<< "','"
+						<< last_opped
+						<< "')"
+						<< ends;
+				} else {
+					// rows returned -- need to UPDATE
+					int chanID = atoi(SQLDb->GetValue(0, 1).c_str());
+					stringstream updateQuery;
+					updateQuery << "UPDATE pending_chanfix_scores SET "
+						<< "rank="
+						<< rank
+						<< ","
+						<< " score="
+						<< score
+						<< ","
+						<< " first_opped='"
+						<< firstOpped
+						<< "',"
+						<< " last_opped='"
+						<< lastOpped
+						<< "',"
+						<< " last_updated=,now()::abstime::int4"
+						<< " WHERE user_id="
+						<< tmpUser->getID()
+						<< " AND channel_id='"
+						<< chanID
+						<< "'"
+						<< ends;
+				}
+
+#ifdef LOG_SQL
+				elog << "cservice::doXROplist::sqlQuery> "
+					<< updateQuery.str().c_str()
+					<< endl;
+#endif
+
+				// send to SQL
+				SQLDb->Exec(updateQuery);
+		} // end score exist lookup query
+	} // end pending chan lookup query
+	return true;
 }
 
 struct autoOpData {
