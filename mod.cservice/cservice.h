@@ -306,6 +306,9 @@ public:
 
 	bool doXResponse(iServer* , const string&, const string&, bool kill = false);
 
+	/* Handles OPLIST data XREPLY from mod.openchanfix */
+	bool doXROplist(iServer*, const string&, const string&);
+
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.
 	typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType ;
