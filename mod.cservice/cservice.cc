@@ -5122,7 +5122,7 @@ switch( theEvent )
 		iServer* theServer = static_cast< iServer* >( data1 );
 		const char* Routing = reinterpret_cast< char* >( data2 );
 		const char* Message = reinterpret_cast< char* >( data3 );
-		elog << "CSERVICE.CC: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		elog << "CSERVICE.CC XQUERY: " << theServer->getName() << " " << Routing << " " << Message << endl;
 		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
 		//If it ain't us, ignore the message, the message is probably meant for another client here.
 		StringTokenizer st( Message ) ;
@@ -5139,11 +5139,11 @@ switch( theEvent )
 		break;
 		}
 	case EVT_XREPLY:
-	{
+		{
 		iServer* theServer = static_cast< iServer* >(data1);
 		const char* Routing = reinterpret_cast< char* >(data2);
 		const char* Message = reinterpret_cast< char* >(data3);
-		elog << "CSERVICE.CC: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		elog << "CSERVICE.CC XREPLY: " << theServer->getName() << " " << Routing << " " << Message << endl;
 		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
 		//If it ain't us, ignore the message, the message is probably meant for another client here.
 		StringTokenizer st(Message);
@@ -5159,7 +5159,7 @@ switch( theEvent )
 			doXROplist(theServer, Routing, Message);
 		}
 		break;
-	}
+		}
 	case EVT_ACCOUNT:
 		{
 		iClient* tmpUser = static_cast< iClient* >( data1 ) ;
@@ -8657,9 +8657,9 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 			sqlChannel* tmpChan = getChannelRecord(st[1]);
 			sqlUser* tmpUser = getUserRecord(account);
 			stringstream queryString;
-			queryString << "SELECT channel_id FROM pending_chanfix_scores WHERE user_id="
+			queryString << "SELECT channel_id FROM pending_chanfix_scores WHERE user_id='"
 				<< tmpUser->getID()
-				<< " AND channel_id=(SELECT id FROM channels WHER lower(name)='"
+				<< "' AND channel_id=(SELECT id FROM channels WHER lower(name)='"
 				<< string_lower(scoreChan)
 				<< "')"
 				<< ends;
@@ -8677,15 +8677,15 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 				{
 					// no rows returned -- need to INSERT
 					updateQuery << "INSERT INTO pending_chanfix_scores "
-						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped) VALUES("
+						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped) VALUES('"
 						<< tmpChan->getID()
-						<< ", "
+						<< "', '"
 						<< tmpUser->getID()
-						<< ", "
+						<< "', '"
 						<< rank
-						<< ", "
+						<< "', '"
 						<< score
-						<< ", '"
+						<< "', '"
 						<< account
 						<< "', '"
 						<< firstOpped
@@ -8699,12 +8699,12 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 					int chanID = atoi(SQLDb->GetValue(0, 0).c_str());
 					stringstream updateQuery;
 					updateQuery << "UPDATE pending_chanfix_scores SET "
-						<< "rank="
+						<< "rank='"
 						<< rank
-						<< ","
-						<< " score="
+						<< "', "
+						<< " score='"
 						<< score
-						<< ","
+						<< "', "
 						<< " first_opped='"
 						<< firstOpped
 						<< "',"
@@ -8712,9 +8712,9 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 						<< lastOpped
 						<< "',"
 						<< " last_updated=,now()::abstime::int4"
-						<< " WHERE user_id="
+						<< " WHERE user_id='"
 						<< tmpUser->getID()
-						<< " AND channel_id='"
+						<< "' AND channel_id='"
 						<< chanID
 						<< "'"
 						<< ends;
