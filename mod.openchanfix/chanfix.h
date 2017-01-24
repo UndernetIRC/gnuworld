@@ -315,6 +315,11 @@ public:
 	bool serverNotice( Channel*, const char*, ... );
 	bool serverNotice( Channel*, const std::string& );
 
+	/* XQUERY support */
+	bool doXQOplist(iServer*, const string&, const string&);
+	bool doXQScore(iServer*, const string&, const string&);
+	bool doXResponse(iServer*, const string&, const string&);
+
 	/*
 	 * Send private messages or notices to authenticated users
 	 * By default, send notices

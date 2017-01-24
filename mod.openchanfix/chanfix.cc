@@ -1095,11 +1095,11 @@ switch(whichEvent)
 		string Command = string_upper(st[0]);
 		if (Command == "OPLIST")
 		{
-			chanfix::doXQOplist(theServer, Routing, Message);
+			doXQOplist(theServer, Routing, Message);
 		}
 		else if (Command == "SCORE")
 		{
-			chanfix::doXQScore(theServer, Routing, Message);
+			doXQScore(theServer, Routing, Message);
 		}
 		break;
 	}
