@@ -203,6 +203,7 @@ MyUplink->RegisterEvent( EVT_NICK, this );
 MyUplink->RegisterEvent( EVT_ACCOUNT, this );
 MyUplink->RegisterEvent( EVT_BURST_ACK, this );
 MyUplink->RegisterEvent( EVT_XQUERY, this );
+MyUplink->RegisterEvent( EVT_XREPLY, this );
 MyUplink->RegisterEvent( EVT_GLINE , this );
 MyUplink->RegisterEvent( EVT_REMGLINE , this );
 
@@ -8654,9 +8655,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		else {
 			// Pending channel found -- have we inserted this user & chan combo before?
 			sqlChannel* tmpChan = getChannelRecord(st[1]);
-			Channel* theChan = getChannelRecord(st[1]);
-			ChannelUser* tmpChanUser = theChan->findUser(account);
-			sqlUser* tmpUser = isAuthed(tmpChanUser->getClient(), false);
+			sqlUser* tmpUser = getUserRecord(account);
 			stringstream queryString;
 			queryString << "SELECT channel_id FROM pending_chanfix_scores WHERE user_id="
 				<< tmpUser->getID()
