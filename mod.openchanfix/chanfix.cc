@@ -3687,8 +3687,8 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 	// AB XQ Az :OPLIST <chan>
 	elog << "chanfix::doXQOplist: Routing: " << Routing << " Message: " << Message << "\n";
 	StringTokenizer st(Message);
-	all = true;
-	days = false;
+	bool all = true;
+	bool days = false;
 	string xResponse = string();
 
 	if (st.size() < 2) {
