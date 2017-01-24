@@ -8610,7 +8610,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 	string scoreChan = st[1];
 	string rank = st[2];
 	string score = st[3];
-	string account st[4];
+	string account = st[4];
 	string firstOpped = st[5];
 	string lastOpped = st[6];
 	string lastNick = st[7];	// ... but may not be online anymore
