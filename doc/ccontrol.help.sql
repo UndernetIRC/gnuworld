@@ -148,8 +148,17 @@ LIMITS		19	Example 3:
 LIMITS		20	        ADDISP enforce45 250 45
 LIMITS		21	        ADDNETBLOCK enforce45 0::/0
 LIMITS		22	        FORCECOUNT enforce45 yes
-LIMITS		23	With the 3 commands above, clones will be counted per /45 even even if there are other isps matching it, like videotron's /29 above.
+LIMITS		23	With the 3 commands above, clones will be counted per /45 even if there are other isps matching it, like videotron's /29 above.
 LIMITS		24	The ACTIVE command will enable/disable glines on an isp. This means that it will count clones, report, but will not issue glines.
+LIMITS		25	Example 4:
+LIMITS		26	ADDISP NewShell 5 64 abuse@NewShell.org
+LIMITS		27	ADDNETBLOCK NewShell 2607:3f00:12:7::/64
+LIMITS		28	ADDNETBLOCK NewShell 2607:3f00:12:8::/64
+LIMITS		29	ADDNETBLOCK NewShell 2607:3f00:12:9::/64
+LIMITS		30	GROUP NewShell yes
+LIMITS		31	In this example, we add multiple netblocks to the same ISP, each netblock is limited to 5 connections per /64.
+LIMITS		32	GROUP ISP yes|no  command, will disable the 5 connections per /64 limit from the above example and will instead count the sum of all clients that
+LIMITS		33 	match the three netblocks associated with ISP NewShell. In other words, the limit will be 5 total for all three netblocks.
 JUPE		1	****** JUPE COMMAND ******
 JUPE		2	Jupe a server (prevent it connecting to the network)
 JUPE		3	Syntax: /msg $BOT$ jupe <servername> <reason>
