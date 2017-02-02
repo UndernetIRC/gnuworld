@@ -203,6 +203,7 @@ MyUplink->RegisterEvent( EVT_NICK, this );
 MyUplink->RegisterEvent( EVT_ACCOUNT, this );
 MyUplink->RegisterEvent( EVT_BURST_ACK, this );
 MyUplink->RegisterEvent( EVT_XQUERY, this );
+MyUplink->RegisterEvent( EVT_XREPLY, this );
 MyUplink->RegisterEvent( EVT_GLINE , this );
 MyUplink->RegisterEvent( EVT_REMGLINE , this );
 
