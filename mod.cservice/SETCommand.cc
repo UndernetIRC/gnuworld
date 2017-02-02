@@ -739,6 +739,83 @@ else
 	    return true;
 	}
 
+	/*
+	* Check the "NOFORCE" status first, so admin's can bypas to turn it OFF :)
+	*/
+
+	if (option == "NOFORCE")
+	{
+		// Check for admin access
+		int admLevel = bot->getAdminAccessLevel(theUser);
+		if (admLevel == 0) {
+			// No need to tell users about admin commands.
+			Usage(theClient);
+			return true;
+		}
+		if (admLevel < level::set::noforce)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("Sorry, you have insufficient access to perform that command.")));
+			return false;
+		}
+		if (value == "ON") theChan->setFlag(sqlChannel::F_NOFORCE);
+		else if (value == "OFF") theChan->removeFlag(sqlChannel::F_NOFORCE);
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_cmd_syntax_on_off,
+					string("value of %s must be ON or OFF")).c_str(),
+				option.c_str());
+			return true;
+		}
+		theChan->commit();
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s for %s is %s")).c_str(),
+			option.c_str(),
+			theChan->getName().c_str(),
+			theChan->getFlag(sqlChannel::F_NOFORCE) ? "ON" : "OFF");
+
+		//TODO?
+		//bot->writeChannelLog(theChan, theClient, sqlChannel::EV_NOFORCE, "");
+
+		if (value == "ON") {
+			for (sqlChannel::forceMapType::const_iterator ptr = theChan->forceMap.begin();
+				ptr != theChan->forceMap.end(); ++ptr)
+			{
+				// Look up this username in the cache.
+				cservice::sqlUserHashType::iterator ptr2 = bot->sqlUserCache.find(ptr->second.second);
+				sqlUser* AdminUser = ptr2->second;
+				int ForceLevel = ptr->second.first;
+
+				//Now Remove force access who is not privileged :)
+				if (ForceLevel < level::immune::noforce)
+				{
+					bot->noticeAllAuthedClients(AdminUser,
+						bot->getResponse(AdminUser,
+							language::set_cmd_status,
+							string("%s for %s is %s")).c_str(),
+						option.c_str(),
+						theChan->getName().c_str(), "ON");
+
+					theChan->forceMap.erase(AdminUser->getID());
+
+					bot->noticeAllAuthedClients(AdminUser,
+						bot->getResponse(AdminUser,
+							language::rem_temp_access,
+							string("Removed your temporary access of %i from channel %s")).c_str(),
+						ForceLevel, theChan->getName().c_str());
+				}
+			} //for cycle
+		} //if (value == ON)
+
+		return true;
+	}
+
     if(option == "MIA")
     {
         // Check for admin access
@@ -1531,7 +1608,7 @@ else
                                         string("You do not have enough access!")));
 			return true;
 	    }
-	    if (strlen(url.c_str()) > 128) // Gator - changed to 75
+	    if (strlen(url.c_str()) > 128) // URL max now 128
 	    {
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
@@ -1579,12 +1656,12 @@ else
                                string("You do not have enough access!")));
 		return true;
 	    }
-	    if(strlen(value.c_str()) > 80) // is 80 ok as an max keywords length?
+	    if(strlen(keywords.c_str()) > 300) // keywords now 300
 	    {
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::keywords_max_len,
-				string("The string of keywords cannot exceed 80 chars!")));
+				string("The string of keywords cannot exceed %i chars!")).c_str(), 300);
 		return true;
 	    }
 	    theChan->setKeywords(keywords);
@@ -1597,6 +1674,54 @@ else
 			keywords.c_str());
 	    return true;
 	}
+
+#ifdef USE_WELCOME
+	if (option == "WELCOME")
+	{
+		string welcome;
+		if (st.size() > 3)
+			welcome = st.assemble(3);
+		if (level < level::set::welcome)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
+			return true;
+		}
+		if (strlen(welcome.c_str()) > 300)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::welcome_max_len,
+					string("The WELCOME can be a maximum of 300 chars!")));
+			return true;
+		}
+
+		if ((string_upper(welcome) == "OFF") || (welcome == ""))
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::welcome_cleared,
+					string("WELCOME for %s is cleared.")).c_str(),
+				theChan->getName().c_str());
+			theChan->setWelcome("");
+			theChan->commit();
+		}
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::welcome_status,
+					string("WELCOME for %s is: %s")).c_str(),
+				theChan->getName().c_str(),
+				welcome.c_str());
+			theChan->setWelcome(welcome);
+			theChan->commit();
+		}
+		return true;
+	}
+#endif
 
 	if(option == "MODE")
 	{

@@ -35,12 +35,12 @@ ALTER TABLE users_lastseen ALTER COLUMN last_ip TYPE inet USING last_ip::inet;
 -- Empus (2016.10.18)
 ALTER TABLE variables ADD COLUMN hint text;
 
-# -- fix reference to 'MASSDEOP' for MASSDEOPPRO
+-- fix reference to 'MASSDEOP' for MASSDEOPPRO
 UPDATE help SET contents = replace(contents, 'MASSDEOP', 'MASSDEOPPRO') WHERE topic='SET' and language_id IN (1, 8);
 UPDATE help SET contents = replace(contents, 'MASSDEOPPROPRO', 'MASSDEOPPRO') WHERE topic IN ('SET', 'SET MASSDEOP');
 UPDATE help SET topic='SET MASSDEOPPRO' WHERE topic='SET MASSDEOP';
 
-# -- support for new login history tracking (in SCANHOST command)
+-- support for new login history tracking (in SCANHOST command)
 CREATE TABLE user_sec_history (
         user_id INT4 NOT NULL,
         user_name TEXT NOT NULL,
@@ -49,3 +49,10 @@ CREATE TABLE user_sec_history (
         hostmask VARCHAR( 256 ) NOT NULL,
         timestamp INT4 NOT NULL
 );
+
+-- extend length of keywords & description columns
+ALTER TABLE channels ALTER COLUMN keywords TYPE varchar(300);
+ALTER TABLE channels ALTER COLUMN description TYPE varchar(300);
+
+-- extend length of channel ban reason
+ALTER TABLE bans ALTER COLUMN reason TYPE varchar(300);

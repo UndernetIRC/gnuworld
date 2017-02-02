@@ -112,6 +112,14 @@ bot->Notice(theClient,
 	    string("%s: Cleared channel modes.")).c_str(),
 		theChan->getName().c_str());
 
+// Send action opnotice to channel if OPLOG is enabled
+if (theChan->getFlag(sqlChannel::F_OPLOG))
+{
+	bot->NoticeChannelOps(theChan->getName(),
+		"%s (%s) cleared channel modes.",
+		theClient->getNickName().c_str(), theUser->getUserName().c_str());
+}
+
 return true ;
 }
 

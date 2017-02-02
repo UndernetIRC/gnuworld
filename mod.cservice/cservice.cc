@@ -1439,21 +1439,21 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	string kickReason = "### Message Flood Protection Triggered ###";
 	string repeatReason = "### Channel Repeat Protection Triggered ###";
 	string glineReason = "Possible flood abuse";
-	string IP = Channel::createBan(Sender);
+	string Mask = Channel::createBan(Sender);
 	sqlChan->setCurrentTime(currentTime());
-	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, IP, Message);
+	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, Mask, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
 
 	if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_NONE)
 	{
-		if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
+		if (sqlChan->getTotalMessageCount(Mask) == sqlChan->getFloodMsg())
 			Kick(theChan, Sender, kickReason);
-		if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
+		if (sqlChan->getTotalMessageCount(Mask) > sqlChan->getFloodMsg())
 		{
 			doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
-			sqlChan->RemoveFlooderMask(IP);
+			sqlChan->RemoveFlooderMask(Mask);
 		}
-		repeatCount = sqlChan->getRepeatMessageCount(Message,IP).first;
+		repeatCount = sqlChan->getRepeatMessageCount(Message,Mask).first;
 		if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 		{
 			if (repeatCount == sqlChan->getRepeatCount())
@@ -1461,7 +1461,7 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 			if (repeatCount > sqlChan->getRepeatCount())
 			{
 				doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
-				sqlChan->RemoveFlooderMask(IP);
+				sqlChan->RemoveFlooderMask(Mask);
 			}
 		}
 	}
@@ -1469,14 +1469,14 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 	{
 		if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_KICK)
 		{
-			if (sqlChan->getTotalMessageCount(IP) == sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(Mask) == sqlChan->getFloodMsg())
 				KickAllWithFloodMessage(theChan, Message, kickReason, false);
-			if (sqlChan->getTotalMessageCount(IP) > sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(Mask) > sqlChan->getFloodMsg())
 			{
 				doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, kickReason);
-				sqlChan->RemoveFlooderMask(IP);
+				sqlChan->RemoveFlooderMask(Mask);
 			}
-			repeatCount = sqlChan->getRepeatMessageCount(Message, IP).first;
+			repeatCount = sqlChan->getRepeatMessageCount(Message, Mask).first;
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 			{
 				if (repeatCount == sqlChan->getRepeatCount())
@@ -1484,25 +1484,25 @@ void cservice::handleChannelPart( iClient* Sender, Channel* theChan, const strin
 				if (repeatCount > sqlChan->getRepeatCount())
 				{
 					doInternalBanAndKick(sqlChan, Sender, banLevel, banTime, repeatReason);
-					sqlChan->RemoveFlooderMask(IP);
+					sqlChan->RemoveFlooderMask(Mask);
 				}
 			}
 
 		}
 		if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_BAN)
 		{
-			if (sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+			if (sqlChan->getTotalMessageCount(Mask) >= sqlChan->getFloodMsg())
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, kickReason);
 			if ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount()))
 				KickBanAllWithFloodMessage(theChan, Message, banLevel, banTime, repeatReason);
 		}
 		if (sqlChan->getFloodproLevel() == sqlChannel::FLOODPRO_GLINE)
 		{
-			if ((sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+			if ((sqlChan->getTotalMessageCount(Mask) >= sqlChan->getFloodMsg())
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 				GlineAllWithFloodMessage(sqlChan, Message, time_t(glineTime), glineReason);
 		}
-		if ((sqlChan->getTotalMessageCount(IP) >= sqlChan->getFloodMsg())
+		if ((sqlChan->getTotalMessageCount(Mask) >= sqlChan->getFloodMsg())
 				|| ((sqlChan->getRepeatCount() > 0) && (repeatCount >= sqlChan->getRepeatCount())))
 			sqlChan->setLastFloodTime(currentTime());
 	}
@@ -5774,6 +5774,15 @@ switch( whichEvent )
 			break;
 			}
 
+#ifdef USE_WELCOME
+		if (strlen(reggedChan->getWelcome().c_str()) > 0)
+		{
+			Notice(theClient, "(%s) %s",
+				theChan->getName().c_str(),
+				reggedChan->getWelcome().c_str());
+		}
+#endif
+
 		/* Is it time to set an autotopic? */
 		if (reggedChan->getFlag(sqlChannel::F_AUTOTOPIC) &&
 			(reggedChan->getLastTopic()
@@ -6235,6 +6244,79 @@ Write( s );
 theChan->setLastTopic(currentTime());
 }
 
+// This function is used to ban a mask, to who no matching client is currently existing on the channel
+bool cservice::doSingleBan(sqlChannel* theChan,
+    const string& banMask, unsigned short banLevel, unsigned int banExpire, const string& theReason)
+{
+	/*
+	 *  Check to see if this banmask already exists in the
+	 *  channel. (Ugh, and overlapping too.. hmm).
+	 */
+
+	Channel* netChan = Network->findChannel(theChan->getName());
+
+	if (netChan)
+	{
+		stringstream s;
+		s	<< getCharYYXXX()
+			<< " M "
+			<< netChan->getName()
+			<< " +b "
+			<< banMask
+			<< ends;
+
+		Write( s );
+
+		/* remove the ban (even if it doesnt exist, it will return false anyway) */
+		netChan->removeBan(banMask) ;
+		/* set the ban */
+		netChan->setBan(banMask) ;
+	}
+
+	/*
+	 *  Check for duplicates, if none found -
+	 *  add to internal list and commit to the db.
+	 */
+	map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin();
+	while (ptr != theChan->banList.end())
+	{
+		const sqlBan* theBan = ptr->second;
+
+		if(string_lower(banMask) == string_lower(theBan->getBanMask()))
+		{
+			/*
+			 * If this mask is already banned, we're just getting
+			 * lagged info.
+			 */
+			return true;
+		}
+	    ++ptr;
+	}
+
+	/* Create a new Ban record */
+	sqlBan* newBan = new (std::nothrow) sqlBan(SQLDb);
+	assert( newBan != 0 ) ;
+
+	// TODO: Build a suitable constructor in sqlBan
+	newBan->setChannelID(theChan->getID());
+	newBan->setBanMask(banMask);
+	newBan->setSetBy(getNickName());
+	newBan->setSetTS(currentTime());
+	newBan->setLevel(banLevel);
+
+	newBan->setExpires(banExpire + currentTime());
+	newBan->setReason(theReason);
+
+	/* Insert this new record into the database. */
+	newBan->insertRecord();
+
+	/* Insert to our internal List. */
+	//theChan->banList[newBan->getID()] = newBan;
+	theChan->banList.insert(std::map<int,sqlBan*>::value_type(newBan->getID(),newBan));
+
+	return true ;
+}
+
 bool cservice::doSingleBanAndKick(sqlChannel* theChan,
 		iClient* theClient, unsigned short banLevel, unsigned int banExpire, const string& theReason)
 {
@@ -6385,12 +6467,15 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		return true;
 	}
 	vector< iClient* > clientsToKick ;
+	// Add at least the Sender client to the list
+	clientsToKick.push_back(theClient);
 	for (Channel::userIterator chanUsers = netChan->userList_begin(); chanUsers != netChan->userList_end(); ++chanUsers)
 	{
 		ChannelUser* tmpUser = chanUsers->second;
 		if (Channel::createBan(tmpUser->getClient()) == Channel::createBan(theClient))
-		{
-			clientsToKick.push_back(tmpUser->getClient());
+		{	//Since we above initially added at least the Sender client to the list, we shouldn't add again
+			if (tmpUser->getClient() != theClient)
+				clientsToKick.push_back(tmpUser->getClient());
 		}
 	}
 	if (!clientsToKick.empty())
@@ -6467,6 +6552,8 @@ bool cservice::doInternalBanAndKick(sqlChannel* theChan,
 		for (vector<iClient*>::iterator itr = clientsToKick.begin(); itr != clientsToKick.end(); ++itr)
 			doSingleBanAndKick(theChan, *itr, banLevel, banExpire, theReason);
 	}
+	else	// make sure the ban is set even if no matching client was found on the channel
+		doSingleBan(theChan, banMask, banLevel, banExpire, theReason);
 	return true ;
 }
 
@@ -6558,14 +6645,16 @@ bool cservice::KickAllWithFloodMessage(Channel* theChan, const string& Message, 
 	assert(sqlChan != 0);
 	std::list < string > IPlist = sqlChan->getRepeatMessageCount(Message).second;
 	std::list < string >::iterator itr = IPlist.begin();
+	unsigned int index = 0;
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		Kick(theChan, *itr, kickMsg);
 		if (clearcount)
 		{
-			if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+			if (((unsigned int)IPlist.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
 				sqlChan->RemoveFlooderMask(*itr);
 		}
+		index++;
 	}
 	return true;
 }
@@ -6576,6 +6665,7 @@ bool cservice::KickBanAllWithFloodMessage(Channel* theChan, const string& Messag
 	assert(sqlChan != 0);
 	std::list < string > IPlist = sqlChan->getRepeatMessageCount(Message).second;
 	std::list < string >::iterator itr = IPlist.begin();
+	unsigned int index = 0;
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		doInternalBanAndKick(sqlChan, *itr, banLevel, banExpire, theReason);
@@ -6583,8 +6673,9 @@ bool cservice::KickBanAllWithFloodMessage(Channel* theChan, const string& Messag
 		/* Remove the Flooder IP only if the accumulated listsize is greather than the RepeatCount
 		 * otherwise any remaining items won't be banned on ChannelMessage because they don't reach the RepeatCount to trigger this function
 		 */
-		if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+		if (((unsigned int)IPlist.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
 			sqlChan->RemoveFlooderMask(*itr);
+		index++;
 	}
 	return true;
 }
@@ -6593,11 +6684,13 @@ bool cservice::GlineAllWithFloodMessage(sqlChannel* sqlChan, const string& Messa
 {
 	std::list < string > IPlist = sqlChan->getRepeatMessageCount(Message).second;
 	std::list < string >::iterator itr = IPlist.begin();
+	unsigned int index = 0;
 	for ( ; itr != IPlist.end(); itr++)
 	{
 		doInternalGline(*itr, thePeriod, theReason);
-		if ((unsigned int)IPlist.size() > (unsigned int)sqlChan->getRepeatCount())
+		if (((unsigned int)IPlist.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
 			sqlChan->RemoveFlooderMask(*itr);
+		index++;
 	}
 	return true;
 }

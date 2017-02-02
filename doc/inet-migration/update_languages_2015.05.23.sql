@@ -436,11 +436,13 @@ INSERT INTO translations (language_id,response_id,text,last_updated,deleted)
 VALUES(22,194,'UNSUSPENDED - %s',31337,0);
 
 -- Update channel description and URL length to a new value
-
 UPDATE translations SET text = REPLACE(text, '80', '%i') WHERE response_id=106;
 UPDATE translations SET text = REPLACE(text, '75', '%i') WHERE response_id=109;
 
 -- Update ban reason length
-
 UPDATE translations SET text = REPLACE(text, '128', '%i') WHERE response_id=21;
+
+-- Update keywords length
+UPDATE translations SET text = REPLACE(text, '80', '%i') WHERE response_id=112;
+
 
