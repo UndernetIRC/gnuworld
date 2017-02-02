@@ -2502,7 +2502,7 @@ CClonesCIDR << " (will GLINE): *@";
 					elog << "ccontrol (erase iauth)> numeric = " << tClient->getCharYYXXX();
 					elog << ",    nuh = " << tClient->getNickUserHost();
 					elog << ",    ip = " << xIP(tClient->getIP()).GetNumericIP() << endl;
-					/* End  of Debug */
+					 /* End  of Debug */
 					if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP()) 
 						&& (tClient->getIntYY() == NewUser->getIntYY())) {
 						isClientDropped = true;
@@ -8264,25 +8264,28 @@ if( st.size() < 6 )
 	return 0;
 }
 
-static int n = 99;
-n++;
-if (n > 999999)
-	n = 100;
+static unsigned int iauthIncVar = 99;
+iauthIncVar++;
+if (iauthIncVar > 250000)
+	iauthIncVar = 100;
+
+char XXX[4];
+inttobase64( XXX, iauthIncVar, 3 ) ;
+XXX[3] = 0;
+string yyxxx = MyUplink->getCharYY() + XXX;
+
 string IP = st[3];
 
 irc_in_addr theIP;
 ipmask_parse(IP.c_str(), &theIP, NULL);
 string base64IP = string(xIP(theIP).GetBase64IP());
-stringstream s;
-s << theServer->getCharYY() << "." << n;
-string yyxxx( s.str() ) ;
-//string yyxxx = theServer->getCharYY() + "---";
 string fullname = st.assemble(5);
 if (fullname.substr(0,1) == ":")
 	fullname = fullname.substr(1);
 
 iClient* newClient = new (std::nothrow) iClient(
-		theServer->getIntYY(),
+		//theServer->getIntYY(),
+		MyUplink->getIntYY(), // use own numeric instead
 		yyxxx,
 		st[1],
 		st[2],
