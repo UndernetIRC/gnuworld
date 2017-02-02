@@ -566,7 +566,7 @@ public:
 	/* Checking for need to raise the floodpro level. Returns the repetition number. */
 	unsigned int checkFloodproLevel(sqlChannel*, const string&);
 
-	/* Cleanup the channel flood ip's/clients */
+	/* Cleanup the channel flood masks/clients */
 	void checkChannelsFlood();
 
 	time_t currentTime() const ;

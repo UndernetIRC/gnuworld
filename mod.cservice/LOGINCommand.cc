@@ -233,7 +233,7 @@ switch(auth_res)
 		break;
 	case cservice::AUTH_SUCCEEDED:
 		break;
-	defult:
+	default:
 		//Should never get here!
 		elog << "Response " << auth_res << " while authenticating!\n";
 		bot->Notice(theClient,"AUTHENTICATION FAILED as %s (due to an error)\n",st[1].c_str());

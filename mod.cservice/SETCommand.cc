@@ -1210,18 +1210,13 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if(numValue > 255 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
-			return true;
-	    }
-	    if (numValue == 1)
-	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD cannot be 1");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
 			return true;
 	    }
 		theChan->setFloodMsg(numValue);
@@ -1242,18 +1237,13 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of NOTICEFLOOD must be 0 or 2-15");
+			bot->Notice(theClient, "Value of NOTICEFLOOD has to be 0-15");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if (numValue > 15 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of NOTICEFLOOD must be 0 or 2-15");
-			return true;
-	    }
-	    if (numValue == 1)
-	    {
-			bot->Notice(theClient, "Value of NOTICEFLOOD cannot be 1");
+			bot->Notice(theClient, "Value of NOTICEFLOOD has to be 0-15");
 			return true;
 	    }
 		theChan->setFloodNotice(numValue);
@@ -1274,18 +1264,13 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of CTCPFLOOD must be 0 or 2-15");
+			bot->Notice(theClient, "Value of CTCPFLOOD has to be 0-15");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if (numValue > 15 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of CTCPFLOOD must be 0 or 2-15");
-			return true;
-	    }
-	    if (numValue == 1)
-	    {
-			bot->Notice(theClient, "Value of CTCPFLOOD cannot be 1");
+			bot->Notice(theClient, "Value of CTCPFLOOD has to be 0-15");
 			return true;
 	    }
 		theChan->setFloodCTCP(numValue);
