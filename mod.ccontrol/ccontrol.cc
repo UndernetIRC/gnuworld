@@ -2498,28 +2498,30 @@ CClonesCIDR << " (will GLINE): *@";
 				iClient *tClient = iItr->first;
 				int age = ::time(0) - iItr->second;
 				if (age > 10) {
-					/* Debug */
-					elog << "ccontrol (erase iauth)> numeric = " << tClient->getCharYYXXX();
-					elog << ",    nuh = " << tClient->getNickUserHost();
-					elog << ",    ip = " << xIP(tClient->getIP()).GetNumericIP() << endl;
-					 /* End  of Debug */
-					if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP()) 
-						&& (tClient->getIntYY() == NewUser->getIntYY())) {
-						isClientDropped = true;
+					if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP())) {
+						StringTokenizer st(tClient->getDescription());
+						//assert(st.size() > 1);
+						if (!strncmp(st[0].c_str(), NewUser->getCharYY().c_str(), 2)) {
+								isClientDropped = true;
+						}
 					}
-					iItr = ipLRecentIauthList.erase(iItr);
 					ipLDropClient(tClient);
+					iItr = ipLRecentIauthList.erase(iItr);
 					delete tClient;
 					continue;
 				}
 				if (isClientDropped)
 					break;
-				if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP()) && (tClient->getIntYY() == NewUser->getIntYY())) {
-					//elog << "ccontrol> handleNewClient(): ipL iauth client match: " << NewUser->getNickUserHost().c_str() << endl;
-					ipLDropClient(tClient);
-					iItr = ipLRecentIauthList.erase(iItr);
-					delete tClient;
-					break;
+				if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP())) {
+					StringTokenizer st(tClient->getDescription());
+					//assert(st.size() > 1);
+					if (!strncmp(st[0].c_str(), NewUser->getCharYY().c_str(), 2)) {
+						//elog << "ccontrol> handleNewClient(): ipL iauth client match: " << NewUser->getNickUserHost().c_str() << endl;
+						ipLDropClient(tClient);
+						iItr = ipLRecentIauthList.erase(iItr);
+						delete tClient;
+						break;
+					}
 				}
 				iItr++;
 			}
@@ -8282,6 +8284,7 @@ string base64IP = string(xIP(theIP).GetBase64IP());
 string fullname = st.assemble(5);
 if (fullname.substr(0,1) == ":")
 	fullname = fullname.substr(1);
+fullname = theServer->getCharYY() + " " + fullname;
 
 iClient* newClient = new (std::nothrow) iClient(
 		//theServer->getIntYY(),
