@@ -989,6 +989,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 	{
 		string Mask = Channel::createBan(Sender);
 		sqlChan->setCurrentTime(currentTime());
+		sqlChan->ExpireMessagesForChannel(sqlChan);
 		sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, Mask, msg);
 		unsigned int repeatCount = sqlChan->getRepeatMessageCount(msg).first;
 
@@ -1063,6 +1064,7 @@ void cservice::OnChannelCTCP( iClient* Sender, Channel* theChan, const string& C
 		kickReason = "### CTCP Flood Protection Triggered ###";
 		string Mask = Channel::createBan(Sender);
 		sqlChan->setCurrentTime(currentTime());
+		sqlChan->ExpireMessagesForChannel(sqlChan);
 		sqlChan->handleNewMessage(sqlChannel::FLOOD_CTCP, Mask, msg);
 		unsigned int repeatCount = sqlChan->getRepeatMessageCount(msg).first;
 
@@ -1161,6 +1163,7 @@ void cservice::OnChannelMessage( iClient* Sender, Channel* theChan, const std::s
 	string glineReason = "Possible flood abuse";
 	string Mask = Channel::createBan(Sender);
 	sqlChan->setCurrentTime(currentTime());
+	sqlChan->ExpireMessagesForChannel(sqlChan);
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_MSG, Mask, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
 
@@ -1258,6 +1261,7 @@ void cservice::OnChannelNotice( iClient* Sender, Channel* theChan, const std::st
 	string glineReason = "Possible flood abuse";
 	string Mask = Channel::createBan(Sender);
 	sqlChan->setCurrentTime(currentTime());
+	sqlChan->ExpireMessagesForChannel(sqlChan);
 	sqlChan->handleNewMessage(sqlChannel::FLOOD_NOTICE, Mask, Message);
 	unsigned int repeatCount = sqlChan->getRepeatMessageCount(Message).first;
 
@@ -6664,17 +6668,17 @@ bool cservice::KickBanAllWithFloodMessage(Channel* theChan, const string& Messag
 {
 	sqlChannel* sqlChan = getChannelRecord(theChan->getName());
 	assert(sqlChan != 0);
-	std::list < string > IPlist = sqlChan->getRepeatMessageCount(Message).second;
-	std::list < string >::iterator itr = IPlist.begin();
+	std::list < string > MaskList = sqlChan->getRepeatMessageCount(Message).second;
+	std::list < string >::iterator itr = MaskList.begin();
 	unsigned int index = 0;
-	for ( ; itr != IPlist.end(); itr++)
+	for ( ; itr != MaskList.end(); itr++)
 	{
 		doInternalBanAndKick(sqlChan, *itr, banLevel, banExpire, theReason);
 		/*  ** Race condition fix ** */
 		/* Remove the Flooder IP only if the accumulated listsize is greather than the RepeatCount
 		 * otherwise any remaining items won't be banned on ChannelMessage because they don't reach the RepeatCount to trigger this function
 		 */
-		if (((unsigned int)IPlist.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
+		if (((unsigned int)MaskList.size() - index) >= (unsigned int)sqlChan->getRepeatCount())
 			sqlChan->RemoveFlooderMask(*itr);
 		index++;
 	}
@@ -6740,7 +6744,7 @@ void cservice::checkChannelsFlood()
 				++itr;
 				continue;
 			}
-			//theChan->ExpireMessagesForIP(itr->first, currentTime());
+			//theChan->ExpireMessagesForMask(itr->first, currentTime());
 			time_t lastTime = currentTime() - iplasttime;
 			if ((lastTime) > (time_t)theChan->getFloodPeriod())
 			{

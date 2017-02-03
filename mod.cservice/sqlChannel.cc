@@ -726,6 +726,29 @@ void sqlChannel::calcTotalCTCPCount(const string& Mask)
 	}
 }
 
+void sqlChannel::ExpireMessagesForChannel(sqlChannel* theChan)
+{
+	sqlChannel::chanFloodMapType::iterator itr = theChan->chanFloodMap.begin();
+	while (itr != theChan->chanFloodMap.end())
+	{
+		time_t iplasttime = theChan->getMaskLastTime(itr->first);
+		if (!iplasttime)
+		{
+			++itr;
+			continue;
+		}
+		//theChan->ExpireMessagesForMask(itr->first, currentTime());
+		time_t lastTime = now - iplasttime;
+		if ((lastTime) > (time_t)theChan->getFloodPeriod())
+		{
+			theChan->RemoveFlooderMask(itr++->first);
+		}
+		else
+			++itr;
+	}
+	return;
+}
+
 sqlChannel::~sqlChannel()
 {
 	/* TODO: Clean up bans */
