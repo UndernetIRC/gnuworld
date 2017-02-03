@@ -1210,13 +1210,18 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if(numValue > 255 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
+			return true;
+	    }
+	    if (numValue == 1)
+	    {
+			bot->Notice(theClient, "Value of MESSAGEFLOOD cannot be 1");
 			return true;
 	    }
 		theChan->setFloodMsg(numValue);
