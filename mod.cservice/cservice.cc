@@ -5821,12 +5821,6 @@ switch( whichEvent )
 		/* Auto voice? */
 		if (theLevel->getFlag(sqlLevel::F_AUTOVOICE))
 		{
-			if (!(accessLevel >= level::voice))
-			{
-				theLevel->removeFlag(sqlLevel::F_AUTOVOICE);
-				theLevel->commit();
-				break;
-			}
 			if (!reggedChan->getFlag(sqlChannel::F_NOVOICE))
 				Voice(theChan, theClient);
 			break;
@@ -5850,11 +5844,6 @@ switch( whichEvent )
 		/* Next, see if they have auto op set. */
 		if (theLevel->getFlag(sqlLevel::F_AUTOOP))
 			{
-			if (!(accessLevel >= level::op)) {
-				theLevel->removeFlag(sqlLevel::F_AUTOOP);
-				theLevel->commit();
-				break;
-			}
 			Op(theChan, theClient);
 			break;
 			}
