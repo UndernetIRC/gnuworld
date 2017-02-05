@@ -3568,7 +3568,8 @@ if (timer_id == pending_timerID)
 	checkObjections();
 	checkAccepts();
 	checkReviews();
-	checkPendingCleanups();
+	cleanUpReviews();
+	cleanUpPendings();
 //-------------------------
 	ExpireUsers();	//(not The Judge member)
 //-------------------------
@@ -4740,10 +4741,66 @@ void cservice::checkAccepts()
 	acceptList.clear();
 }
 
+void cservice::checkReviews()
+{
+	std::vector<std::pair<std::pair<int,string>, std::pair<string, char> > > acceptList;
+	stringstream theQuery;
+	theQuery	<< "SELECT channels.name,channels.id,users.user_name,pending.reviewed FROM channels,pending,users "
+				<< "WHERE channels.id = pending.channel_id "
+				<< "AND pending.status = 8 "
+				<< "AND users.id = manager_id"
+				<< ends;
+
+	if (!SQLDb->Exec(theQuery, true))
+	{
+		logDebugMessage("Error on Judge.checkReviewsQuery");
+		#ifdef LOG_SQL
+			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+			elog    << "Judge.checkReviewsQuery> SQL Error: "
+					<< SQLDb->ErrorMessage()
+					<< endl ;
+		#endif
+			return;
+	}
+	else if (SQLDb->Tuples() != 0)
+	{
+		//logTheJudgeMessage("List of completed applications:");
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+			string chanName = SQLDb->GetValue(i,0);
+			int chanId = atoi(SQLDb->GetValue(i,1));
+			string mngrUser = SQLDb->GetValue(i,2);
+			char acc = (char)SQLDb->GetValue(i,3)[0];
+			acceptList.push_back(std::make_pair(std::make_pair(chanId,chanName),std::make_pair(mngrUser,acc)));
+			//logTheJudgeMessage(chanName.c_str());
+		}
+	}
+	if (!acceptList.empty())
+	for (unsigned int i=0; i<acceptList.size(); i++ )
+	{
+		sqlUser* mgrUsr = getUserRecord(acceptList[i].second.first.c_str());
+		bool reviewed = false;
+		if (acceptList[i].second.second == 'Y')
+			reviewed = true;
+		if (reviewed)
+		{
+			AcceptChannel(acceptList[i].first.first,"ACCEPTED");
+			if (sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
+			{
+				logAdminMessage("%s (The Judge) has registered %s to %s", getInstance()->getNickName().c_str(),
+						acceptList[i].first.second.c_str(), mgrUsr->getUserName().c_str());
+				NoteAllAuthedClients(mgrUsr,"Your channel application of %s is Accepted", acceptList[i].first.second.c_str());
+			} else
+				logDebugMessage("(The Judge) FAILED to sqlRegisterChannel");
+		}
+	}
+	acceptList.clear();
+}
+
 /**
  * After a time we clenup any "never" reviewed channel
  */
-void cservice::checkReviews()
+void cservice::cleanUpReviews()
 {
 	if (!ReviewsExpireTime) return;
 	std::vector<std::pair<std::pair<int,string>, string> > reviewList;
@@ -4759,10 +4816,10 @@ void cservice::checkReviews()
 
 	if (!SQLDb->Exec(theQuery, true))
 	{
-		logDebugMessage("Error on Judge.reviewQuery");
+		logDebugMessage("Error on Judge.cleanUpReviewsQuery");
 	    #ifdef LOG_SQL
 	            //elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-	            elog    << "Judge.reviewQuery> SQL Error: "
+	            elog    << "Judge.cleanUpReviewsQuery> SQL Error: "
 	                    << SQLDb->ErrorMessage()
 	                    << endl ;
 	    #endif
@@ -4792,7 +4849,7 @@ void cservice::checkReviews()
 
 // After a time, we cleanup the database from old application datas: pending channels, supporters, etc
 //But this applies *only* for Accepted OR Rejected channels !
-void cservice::checkPendingCleanups()
+void cservice::cleanUpPendings()
 {
 	//If PendingsExpireTime == 0 than feature is disabled
 	if (!PendingsExpireTime) return;

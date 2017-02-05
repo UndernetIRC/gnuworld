@@ -435,7 +435,8 @@ public:
 	void checkObjections();
 	void checkAccepts();
 	void checkReviews();
-	void checkPendingCleanups();
+	void cleanUpReviews();
+	void cleanUpPendings();
 	void loadIncompleteChanRegs();
 
 	/* End of The Judge */
