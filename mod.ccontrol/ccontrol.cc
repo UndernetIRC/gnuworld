@@ -7529,7 +7529,7 @@ for (ipLnbListType::iterator nptr = ipLnbList.begin(); nptr != ipLnbList.end(); 
 	}
 
 }
-Notice(theClient, "--- End of ipL infos ---");
+Notice(theClient, "--- End of limits infos ---");
 return true;
 }
 bool ccontrol::ipLDropClient( iClient *theClient )
