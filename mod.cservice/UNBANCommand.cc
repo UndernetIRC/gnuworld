@@ -296,6 +296,12 @@ bot->Notice(theClient,
 		string("Removed %i bans that matched %s")).c_str(),
 	banCount, banTarget.c_str());
 
+// Send action opnotice to channel if OPLOG is enabled
+if (theChan->getFlag(sqlChannel::F_OPLOG))
+	bot->NoticeChannelOps(theChan->getName(),
+		"%s (%s) removed %i bans that matched %s",
+		theClient->getNickName().c_str(), theUser->getUserName().c_str(), banCount, banTarget.c_str());
+
 return true;
 
 }

@@ -739,38 +739,146 @@ else
 	    return true;
 	}
 
-        if(option == "MIA")
+	/*
+	* Check the "NOFORCE" status first, so admin's can bypas to turn it OFF :)
+	*/
+
+	if (option == "NOFORCE")
+	{
+		// Check for admin access
+		int admLevel = bot->getAdminAccessLevel(theUser);
+		if (admLevel == 0) {
+			// No need to tell users about admin commands.
+			Usage(theClient);
+			return true;
+		}
+		if (admLevel < level::set::noforce)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("Sorry, you have insufficient access to perform that command.")));
+			return false;
+		}
+		if (value == "ON") theChan->setFlag(sqlChannel::F_NOFORCE);
+		else if (value == "OFF") theChan->removeFlag(sqlChannel::F_NOFORCE);
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_cmd_syntax_on_off,
+					string("value of %s must be ON or OFF")).c_str(),
+				option.c_str());
+			return true;
+		}
+		theChan->commit();
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s for %s is %s")).c_str(),
+			option.c_str(),
+			theChan->getName().c_str(),
+			theChan->getFlag(sqlChannel::F_NOFORCE) ? "ON" : "OFF");
+
+		//TODO?
+		//bot->writeChannelLog(theChan, theClient, sqlChannel::EV_NOFORCE, "");
+
+		if (value == "ON") {
+			for (sqlChannel::forceMapType::const_iterator ptr = theChan->forceMap.begin();
+				ptr != theChan->forceMap.end(); ++ptr)
+			{
+				// Look up this username in the cache.
+				cservice::sqlUserHashType::iterator ptr2 = bot->sqlUserCache.find(ptr->second.second);
+				sqlUser* AdminUser = ptr2->second;
+				int ForceLevel = ptr->second.first;
+
+				//Now Remove force access who is not privileged :)
+				if (ForceLevel < level::immune::noforce)
+				{
+					bot->noticeAllAuthedClients(AdminUser,
+						bot->getResponse(AdminUser,
+							language::set_cmd_status,
+							string("%s for %s is %s")).c_str(),
+						option.c_str(),
+						theChan->getName().c_str(), "ON");
+
+					theChan->forceMap.erase(AdminUser->getID());
+
+					bot->noticeAllAuthedClients(AdminUser,
+						bot->getResponse(AdminUser,
+							language::rem_temp_access,
+							string("Removed your temporary access of %i from channel %s")).c_str(),
+						ForceLevel, theChan->getName().c_str());
+				}
+			} //for cycle
+		} //if (value == ON)
+
+		return true;
+	}
+
+    if(option == "MIA")
+    {
+        // Check for admin access
+        int admLevel = bot->getAdminAccessLevel(theUser);
+        if(admLevel < level::set::mia)
         {
-            // Check for admin access
-            int admLevel = bot->getAdminAccessLevel(theUser);
-            if(admLevel < level::set::mia)
-            {
-                        // No need to tell users about admin commands.
-                        Usage(theClient);
-                        return true;
-            }
-            if(value == "ON") theChan->setFlag(sqlChannel::F_MIA);
-            else if(value == "OFF") theChan->removeFlag(sqlChannel::F_MIA);
-            else
-            {
-                bot->Notice(theClient,
-                        bot->getResponse(theUser,
-                                language::set_cmd_syntax_on_off,
-                                string("value of %s must be ON or OFF")).c_str(),
-                        option.c_str());
-                return true;
-            }
-            theChan->commit();
+                    // No need to tell users about admin commands.
+                    Usage(theClient);
+                    return true;
+        }
+        if(value == "ON") theChan->setFlag(sqlChannel::F_MIA);
+        else if(value == "OFF") theChan->removeFlag(sqlChannel::F_MIA);
+        else
+        {
             bot->Notice(theClient,
-                        bot->getResponse(theUser,
-                                language::set_cmd_status,
-                                string("%s for %s is %s")).c_str(),
-                        option.c_str(),
-                        theChan->getName().c_str(),
-                        theChan->getFlag(sqlChannel::F_MIA) ? "ON" : "OFF");
+                    bot->getResponse(theUser,
+                            language::set_cmd_syntax_on_off,
+                            string("value of %s must be ON or OFF")).c_str(),
+                    option.c_str());
             return true;
         }
+        theChan->commit();
+        bot->Notice(theClient,
+                    bot->getResponse(theUser,
+                            language::set_cmd_status,
+                            string("%s for %s is %s")).c_str(),
+                    option.c_str(),
+                    theChan->getName().c_str(),
+                    theChan->getFlag(sqlChannel::F_MIA) ? "ON" : "OFF");
+        return true;
+    }
 
+	if (option == "OPLOG")
+	{
+		if (level < level::set::oplog)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
+			return true;
+		}
+		if (value == "ON") theChan->setFlag(sqlChannel::F_OPLOG);
+		else if (value == "OFF") theChan->removeFlag(sqlChannel::F_OPLOG);
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_cmd_syntax_on_off,
+					string("value of %s must be ON or OFF")).c_str(),
+				option.c_str());
+			return true;
+		}
+		theChan->commit();
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s for %s is %s")).c_str(),
+			option.c_str(),
+			theChan->getName().c_str(),
+			theChan->getFlag(sqlChannel::F_OPLOG) ? "ON" : "OFF");
+		return true;
+	}
 
 	if(option == "NOOP")
 	{
@@ -964,7 +1072,7 @@ else
 	}
 #endif
 #ifdef USE_FLOODPRO
-	if(option == "FLOODPRO")
+	if (option == "FLOODPRO")
 	{
 	    if(level < level::set::floodpro)
 	    {
@@ -974,48 +1082,70 @@ else
 				string("You do not have enough access!")));
 		return true;
 	    }
-	    if(value == "ON")
+		sqlChannel::FloodProLevel prevFN = theChan->getFloodproLevel();
+	    if ((value == "ON") || (value == "KICK"))
 	    {
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
 	    	if (!theChan->getFloodPro())
 	    		theChan->setDefaultFloodproValues();
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_KICK);
+	    	theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_KICK);
 	    }
-	    else if(value == "OFF")
+	    else if (value == "OFF")
 	    {
-	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_NONE);
 	    	//theChan->setFloodPro(0);
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
-	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_NONE);
+			theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_NONE);
 	    }
+		else if (value == "BAN")
+		{
+			theChan->setFlag(sqlChannel::F_FLOODPRO);
+			if (!theChan->getFloodPro())
+				theChan->setDefaultFloodproValues();
+			theChan->setFloodproLevel(sqlChannel::FLOODPRO_BAN);
+			theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_BAN);
+		}
 	    else if ((value == "DEFAULT") || (value == "DEFAULTS"))
 	    {
 	    	theChan->setDefaultFloodproValues();
 	    	theChan->setFlag(sqlChannel::F_FLOODPRO);
-	    	bot->Notice(theClient, "Default floodpro values has been set for channel %s", theChan->getName().c_str());
+			theChan->setFloodproLevel(sqlChannel::FLOODPRO_KICK);
+			theChan->setManualFloodproLevel(sqlChannel::FLOODPRO_KICK);
+	    	bot->Notice(theClient, "Default FLOODPRO values have been set for channel %s", theChan->getName().c_str());
 	    }
 	    else
 	    {
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
-			option.c_str());
-		return true;
+	    	bot->Notice(theClient, "Value of %s must be ON (KICK), BAN, DEFAULT, or OFF", option.c_str());
+	    	return true;
 	    }
+
 	    theChan->commit();
-	    bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_FLOODPRO) ? "ON" : "OFF");
+		bot->Notice(theClient, "%s punishment level on %s is %s",
+				option.c_str(), theChan->getName().c_str(), sqlChannel::getFloodLevelName(theChan->getFloodproLevel()).c_str());
+		if (theChan->getFloodproLevel() > prevFN)
+		{
+			bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
+				option.c_str(),
+				theChan->getName().c_str(),
+				value.c_str(),
+				theUser->getUserName().c_str());
+		}
+		else if (theChan->getFloodproLevel() < prevFN)
+		{
+			bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
+				option.c_str(),
+				theChan->getName().c_str(),
+				value.c_str(),
+				theUser->getUserName().c_str());
+		}
 	    return true;
 	}
 	if (option == "FLOODPROGLINE")
 	{
 		int admLevel = (int)bot->getAdminAccessLevel(theUser);
-		if ((admLevel < level::set::floodnet_gline) && (level < level::set::floodnet_gline))
+		if ((admLevel < level::set::floodpro_gline) && (level < level::set::floodpro_gline))
 		{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
@@ -1023,6 +1153,7 @@ else
 				string("You do not have enough access!")));
 			return true;
 		}
+		sqlChannel::FloodProLevel prevFN = theChan->getFloodproLevel();
 		if (value == "ON")
 		{
 			theChan->setFlag(sqlChannel::F_FLOODPROGLINE);
@@ -1040,18 +1171,31 @@ else
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
+				string("Value of %s must be ON or OFF")).c_str(),
 			option.c_str());
 		return true;
 	    }
-	    theChan->commit();
-	    bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_status,
-				string("%s for %s is %s")).c_str(),
-			option.c_str(),
-			theChan->getName().c_str(),
-			theChan->getFlag(sqlChannel::F_FLOODPROGLINE) ? "ON" : "OFF");
+
+		theChan->commit();
+		bot->Notice(theClient, "%s punishment level on %s is %s",
+			option.c_str(),	theChan->getName().c_str(),	value.c_str());
+		if (theChan->getFloodproLevel() > prevFN)
+		{
+			bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
+				option.c_str(),
+				theChan->getName().c_str(),
+				value.c_str(),
+				theUser->getUserName().c_str());
+		}
+		else if (theChan->getFloodproLevel() < prevFN)
+		{
+			bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
+				option.c_str(),
+				theChan->getName().c_str(),
+				value.c_str(),
+				theUser->getUserName().c_str());
+		}
+
 	    return true;
 	}
 	if ((option == "MSGFLOOD") || (option == "MESSAGEFLOOD") || (option == "PRIVMSGFLOOD"))
@@ -1066,13 +1210,18 @@ else
 	    }
 	    if (!IsNumeric(value) || value.empty())
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
 			return true;
 	    }
 	    int numValue = atoi(value.c_str());
 	    if(numValue > 255 || numValue < 0)
 	    {
-			bot->Notice(theClient, "Value of MESSAGEFLOOD has to be 0-255");
+			bot->Notice(theClient, "Value of MESSAGEFLOOD must be 0 or 2-255");
+			return true;
+	    }
+	    if (numValue == 1)
+	    {
+			bot->Notice(theClient, "Value of MESSAGEFLOOD cannot be 1");
 			return true;
 	    }
 		theChan->setFloodMsg(numValue);
@@ -1163,7 +1312,7 @@ else
 	    if (numValue == 0)
 	    {
 	    	theChan->removeFlag(sqlChannel::F_FLOODPRO);
-	    	theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
+	    	theChan->setFloodproLevel(sqlChannel::FLOODPRO_NONE);
 	    	theChan->commit();
 	    	bot->Notice(theClient,
 	    			bot->getResponse(theUser,
@@ -1187,104 +1336,25 @@ else
 	    }
         if (!IsNumeric(value) || value.empty())
         {
-            bot->Notice(theClient, "Value of REPEATFLOOD has to be 0-15");
+            bot->Notice(theClient, "Value of REPEATFLOOD must be be 0 or 2-15");
             return true;
         }
         int numValue = atoi(value.c_str());
         if (numValue > 15 || numValue < 0)
         {
-            bot->Notice(theClient, "Value of REPEATFLOOD has to be 0-15");
+            bot->Notice(theClient, "Value of REPEATFLOOD must be be 0 or 2-15");
             return true;
         }
+	    if (numValue == 1)
+	    {
+			bot->Notice(theClient, "Value of REPEATFLOOD cannot be 1");
+			return true;
+	    }
 		theChan->setRepeatCount(numValue);
 		theChan->commit();
         bot->Notice(theClient,"REPEATFLOOD for %s is %s",
 			theChan->getName().c_str(), value.c_str());
 	    return true;
-	}
-	if (option == "FLOODNET")
-	{
-		if(level < level::set::floodpro)
-		{
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::insuf_access,
-				string("You do not have enough access!")));
-			return true;
-		}
-		sqlChannel::FloodNetType prevFN = theChan->getFloodNet();
-		if ((value == "KICK") || (value == "WARNING")
-				|| (value == "ON") || (value == "BAN")
-				|| (value == "GLINE"))
-		{
-			if (!theChan->getFlag(sqlChannel::F_FLOODPRO))
-			{
-				theChan->setFlag(sqlChannel::F_FLOODPRO);
-		    	if (!theChan->getFloodPro())
-		    		theChan->setDefaultFloodproValues();
-			}
-			theChan->setLastFloodTime(bot->currentTime());
-		}
-		if ((value == "KICK") || (value == "WARNING"))
-		{
-			theChan->setFloodNet(sqlChannel::FLOODNET_KICK);
-		}
-		else if ((value == "BAN") || (value == "ON"))
-		{
-			theChan->setFloodNet(sqlChannel::FLOODNET_BAN);
-		} /* Currently manual setting of GLINE severity is completely disabled
-		else if (value == "GLINE")
- 		{
-			short effAccess = bot->getEffectiveAccessLevel(theUser, theChan, true);
-			if (effAccess >= level::set::floodnet_gline)
-				theChan->setFloodNet(sqlChannel::FLOODNET_GLINE);
-			else
-			{
-				bot->Notice(theClient,
-					bot->getResponse(theUser,
-						language::insuf_access,
-					string("You do not have enough access!")));
-				return true;
-			}
- 		}*/
-		else if ((value == "NONE") || (value == "OFF"))
-		{
-			theChan->setFloodNet(sqlChannel::FLOODNET_NONE);
-		}
-		else
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::set_cmd_syntax_on_off,
-				string("value of %s must be ON or OFF")).c_str(),
-			option.c_str());
-		return true;
-		}
-		theChan->commit();
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-					language::set_cmd_status,
-					string("%s punishment level on %s is %s")).c_str(),
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str());
-		if (theChan->getFloodNet() > prevFN)
-		{
-			bot->NoticeChannelOps(tmpChan,"Increased %s punishment level on %s to %s by %s",
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str(),
-					theUser->getUserName().c_str());
-		}
-		else if (theChan->getFloodNet() < prevFN)
-		{
-			bot->NoticeChannelOps(tmpChan,"Decreased %s punishment level on %s to %s by %s",
-					option.c_str(),
-					theChan->getName().c_str(),
-					value.c_str(),
-					theUser->getUserName().c_str());
-		}
-		return true;
 	}
 #endif
 	if(option == "AUTOTOPIC")
@@ -1528,7 +1598,7 @@ else
                                         string("You do not have enough access!")));
 			return true;
 	    }
-	    if (strlen(url.c_str()) > 128) // Gator - changed to 75
+	    if (strlen(url.c_str()) > 128) // URL max now 128
 	    {
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
@@ -1576,12 +1646,12 @@ else
                                string("You do not have enough access!")));
 		return true;
 	    }
-	    if(strlen(value.c_str()) > 80) // is 80 ok as an max keywords length?
+	    if(strlen(keywords.c_str()) > 300) // keywords now 300
 	    {
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::keywords_max_len,
-				string("The string of keywords cannot exceed 80 chars!")));
+				string("The string of keywords cannot exceed %i chars!")).c_str(), 300);
 		return true;
 	    }
 	    theChan->setKeywords(keywords);
@@ -1594,6 +1664,54 @@ else
 			keywords.c_str());
 	    return true;
 	}
+
+#ifdef USE_WELCOME
+	if (option == "WELCOME")
+	{
+		string welcome;
+		if (st.size() > 3)
+			welcome = st.assemble(3);
+		if (level < level::set::welcome)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
+			return true;
+		}
+		if (strlen(welcome.c_str()) > 300)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::welcome_max_len,
+					string("The WELCOME can be a maximum of 300 chars!")));
+			return true;
+		}
+
+		if ((string_upper(welcome) == "OFF") || (welcome == ""))
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::welcome_cleared,
+					string("WELCOME for %s is cleared.")).c_str(),
+				theChan->getName().c_str());
+			theChan->setWelcome("");
+			theChan->commit();
+		}
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::welcome_status,
+					string("WELCOME for %s is: %s")).c_str(),
+				theChan->getName().c_str(),
+				welcome.c_str());
+			theChan->setWelcome(welcome);
+			theChan->commit();
+		}
+		return true;
+	}
+#endif
 
 	if(option == "MODE")
 	{

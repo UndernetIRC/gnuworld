@@ -85,6 +85,11 @@
  */
 #undef ALLOW_HELLO
 
+ /**
+ * Define this if you want to enable the WELCOME feature.
+ */
+#define USE_WELCOME
+
 /**
  * Define this if you want the IP restriction to default to REJECT when no
  * entries are in the SQL table.  Default setting allows login from any IP
@@ -133,7 +138,7 @@
  * Enable this Under CARREFULL CONSIDERATION, recommended for smaller networks, where admins can
  * take care of possible abuse of the function
  */
-#undef GLINE_ON_FLOODNET
+#undef GLINE_ON_FLOODPRO
 
 
 #endif // __CSERVICE_CONFIG_H

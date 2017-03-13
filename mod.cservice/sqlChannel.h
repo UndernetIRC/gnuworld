@@ -139,6 +139,7 @@ public:
 	static const flagType	F_NOTAKE;
 	static const flagType	F_FLOODPRO;
 	static const flagType	F_FLOODPROGLINE;
+	static const flagType	F_OPLOG;
 
 	/*
 	 *   Channel 'Event' Flags, used in the channelog table.
@@ -177,11 +178,11 @@ public:
 		FLOOD_CTCP
 	};
 
-	enum FloodNetType {
-		FLOODNET_NONE,
-		FLOODNET_KICK,	//=WARNING
-		FLOODNET_BAN,
-		FLOODNET_GLINE
+	enum FloodProLevel {
+		FLOODPRO_NONE,
+		FLOODPRO_KICK,	//=WARNING
+		FLOODPRO_BAN,
+		FLOODPRO_GLINE
 	};
 
 	/*
@@ -221,8 +222,11 @@ public:
     inline const unsigned short int& getRepeatCount() const
 		{ return repeat_count ; }
 
-    inline const FloodNetType& getFloodNet() const
-		{ return floodnet; }
+    inline const FloodProLevel& getFloodproLevel() const
+		{ return floodlevel; }
+
+    inline const FloodProLevel& getManualFloodproLevel() const
+		{ return man_floodlevel; }
 
 	inline const time_t& 		getLastFloodTime() const
 		{ return last_flood; }
@@ -238,6 +242,9 @@ public:
 
 	inline const string&		getKeywords() const
 		{ return keywords ; }
+
+	inline const string&		getWelcome() const
+		{ return welcome ; }
 
 	inline const time_t&		getRegisteredTS() const
 		{ return registered_ts ; }
@@ -329,29 +336,32 @@ public:
 	inline void setFloodPro( const unsigned int& _flood_pro )
 		{ flood_pro = _flood_pro; }
 
-	inline void setFloodNet( const FloodNetType& _floodnet )
-		{ floodnet = _floodnet; }
+	inline void setFloodproLevel( const FloodProLevel& _floodlevel )
+		{ floodlevel = _floodlevel; }
 
-	inline void incFloodNet()
+	inline void setManualFloodproLevel( const FloodProLevel& _man_floodlevel )
+		{ man_floodlevel = _man_floodlevel; }
+
+	inline void incFloodPro()
 	{
-		if (floodnet == FLOODNET_NONE)
-			floodnet = FLOODNET_KICK;
-		else if (floodnet == FLOODNET_KICK)
-			floodnet = FLOODNET_BAN;
-#ifdef GLINE_ON_FLOODNET
-		else if ((floodnet == FLOODNET_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
-			floodnet = FLOODNET_GLINE;
+		if (floodlevel == FLOODPRO_NONE)
+			floodlevel = FLOODPRO_KICK;
+		else if (floodlevel == FLOODPRO_KICK)
+			floodlevel = FLOODPRO_BAN;
+#ifdef GLINE_ON_FLOODPRO
+		else if ((floodlevel == FLOODPRO_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
+			floodlevel = FLOODPRO_GLINE;
 #endif
 	}
 
-	inline void decFloodNet()
+	inline void decFloodPro()
 	{
-		if (floodnet == FLOODNET_GLINE)
-			floodnet = FLOODNET_BAN;
-		else if (floodnet == FLOODNET_BAN)
-			floodnet = FLOODNET_KICK;
-		else if (floodnet == FLOODNET_KICK)
-			floodnet = FLOODNET_NONE;
+		if (floodlevel == FLOODPRO_GLINE)
+			floodlevel = FLOODPRO_BAN;
+		else if (floodlevel == FLOODPRO_BAN)
+			floodlevel = FLOODPRO_KICK;
+		else if (floodlevel == FLOODPRO_KICK)
+			floodlevel = FLOODPRO_NONE;
 	}
 
 	inline void setLastFloodTime( const time_t& _last_flood )
@@ -368,6 +378,9 @@ public:
 
 	inline void setKeywords( const string& _keywords )
 		{ keywords = _keywords; }
+
+	inline void setWelcome(const string& _welcome)
+		{ welcome = _welcome; }
 
 	inline void setRegisteredTS( const time_t& _registered_ts )
 		{ registered_ts = _registered_ts; }
@@ -430,18 +443,19 @@ public:
     void setRepeatCount(const unsigned short& );
     void setDefaultFloodproValues();
 
-    // < total_count, IP_list >
-	typedef std::pair < unsigned int, std::list < string > > repeatIPMapType;
+    // < total_count, Mask_list >
+	typedef std::pair < unsigned int, std::list < string > > repeatMaskMapType;
 
-	string getFloodNetName(const FloodNetType& );
-    repeatIPMapType getRepeatMessageCount(const string&, string IP = string());
-	time_t getIPLastTime(const string& );
-	//void setIPLastTime(const string&,);
-	void RemoveFlooderIP(const string&);
+	static string getFloodLevelName(const FloodProLevel& );
+    repeatMaskMapType getRepeatMessageCount(const string&, string Mask = string());
+	time_t getMaskLastTime(const string& );
+	//void setMaskLastTime(const string&,);
+	void RemoveFlooderMask(const string&);
 	void handleNewMessage(const FloodType&, const string&, const string&);
 	void calcTotalMessageCount(const string&);
 	void calcTotalNoticeCount(const string&);
 	void calcTotalCTCPCount(const string&);
+	void ExpireMessagesForChannel(sqlChannel*);
 
 public:
 	/*
@@ -457,7 +471,7 @@ public:
 	typedef map < int,sqlBan*> sqlBanMapType;
 	sqlBanMapType banList;
 
-	// < repeater_IP, flooder_struct >
+	// < repeater_Mask, flooder_struct >
 	typedef map < string, chanFloodType* > chanFloodMapType;
 	chanFloodMapType chanFloodMap;
 
@@ -473,11 +487,13 @@ protected:
 	unsigned short	ctcp_period;
 	unsigned short	flood_period;
     unsigned short	repeat_count;
-    FloodNetType		floodnet;
+    FloodProLevel		floodlevel;
+    FloodProLevel		man_floodlevel; //the variable to keep track which floodpro level was set manually
 	string		url ;
 	string		description ;
 	string		comment ;
 	string		keywords  ;
+	string		welcome ;
 	time_t		registered_ts ;
 	time_t		channel_ts ;
 	string		channel_mode ;
@@ -489,7 +505,7 @@ protected:
 	unsigned int limit_offset;
 	time_t limit_period;
 	time_t last_limit_check;
-	time_t 		last_flood;	//last time when an floodnet measure was taken (kick/ban/gline)
+	time_t 		last_flood;	//last time when an floodpro measure was taken (kick/ban/gline)
 	unsigned int limit_grace;
 	unsigned int limit_max;
 	unsigned int max_bans;

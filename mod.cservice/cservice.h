@@ -435,7 +435,8 @@ public:
 	void checkObjections();
 	void checkAccepts();
 	void checkReviews();
-	void checkPendingCleanups();
+	void cleanUpReviews();
+	void cleanUpPendings();
 	void loadIncompleteChanRegs();
 
 	/* End of The Judge */
@@ -447,7 +448,7 @@ public:
 	int topic_duration;
 
 	unsigned int channelsFloodPeriod;
-	unsigned int floodnetRelaxTime;
+	unsigned int floodproRelaxTime;
 
 	// Timestamp's of when we last checked the database for updates.
 	time_t lastChannelRefresh;
@@ -524,6 +525,9 @@ public:
 	/* Automatically updates the floating limit for this channel */
 	void doFloatingLimit(sqlChannel*, Channel*);
 
+	/* This function is used to ban a mask, to who no matching client is currently existing on the channel */
+	bool doSingleBan(sqlChannel* theChan, const string& banMask, unsigned short banLevel, unsigned int banExpire, const string& theReason);
+
 	/* Bans and kick just one client, with level, period, reason */
 	bool doSingleBanAndKick(sqlChannel*, iClient*, unsigned short, unsigned int, const string& theReason);
 
@@ -560,10 +564,10 @@ public:
 	/* Matches DB bans, and kicks supplied user if neccessary */
 	bool checkBansOnJoin( Channel*, sqlChannel* , iClient* );
 
-	/* Checking for need to raise the floodnet level. Returns the repetition number. */
-	unsigned int checkFloodnetLevel(sqlChannel*, const string&);
+	/* Checking for need to raise the floodpro level. Returns the repetition number. */
+	unsigned int checkFloodproLevel(sqlChannel*, const string&);
 
-	/* Cleanup the channel flood ip's/clients */
+	/* Cleanup the channel flood masks/clients */
 	void checkChannelsFlood();
 
 	time_t currentTime() const ;

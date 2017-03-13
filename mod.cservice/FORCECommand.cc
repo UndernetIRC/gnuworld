@@ -87,6 +87,17 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
+	// Check for NOFORCE flag
+	if ((theChan->getFlag(sqlChannel::F_NOFORCE)) && (admLevel < level::immune::noforce))
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::chan_noforce,
+				string("The NOFORCE flag is set on %s")).c_str(),
+			st[1].c_str());
+		return false;
+	}
+
  	/*
 	 * Add an entry to this channel records 'Force List'.
 	 * This list is checked in getEffectiveAccess(), and will return

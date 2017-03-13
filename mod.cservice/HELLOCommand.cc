@@ -8,12 +8,16 @@
 #include	"ip.h"
 #include	"Network.h"
 #include	"cservice.h"
+#include	"dbHandle.h"
 
 const char HELLOCommand_cc_rcsId[] = "$Id: HELLOCommand.cc,v 1.1 2005/04/03 22:11:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
 using std::string ;
+using std::endl ;
+using std::ends ;
+using std::stringstream ;
 
 bool HELLOCommand::Exec( iClient* theClient, const string& Message )
 {
@@ -146,11 +150,28 @@ if(strcasecmp(st[2], st[3]))
         bot->Notice(theClient, "E-mail addresses don't match!");
         return false;
 	}
-
 /*
- * TODO: Check this email address doesn't already exist in 
- * the database!
+ * Ensure this e-mail address is not already used
  */
+stringstream theQuery;
+theQuery	<< "SELECT id FROM users WHERE lower(email) = '"
+			<< st[2]
+			<< "'"
+			<< ends;
+if (!bot->SQLDb->Exec(theQuery, true))
+{
+	bot->logDebugMessage("SQL error on HELLOCommand, matching e-mail address");
+#ifdef LOG_SQL
+	elog 	<< "HELLOCommand> SQL Error: "
+			<< bot->SQLDb->ErrorMessage()
+			<< endl;
+#endif
+	return false;
+} else if (bot->SQLDb->Tuples() != 0)
+{
+	bot->Notice(theClient, "E-mail address already used by an existing user.");
+	return false;
+} // No match found for e-mail address, OK to proceed
 
 /*
  * We need to give this user a password

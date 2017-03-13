@@ -179,11 +179,20 @@ if (theChan->getFlag(sqlChannel::F_NOOP)) flagsSet += "NOOP ";
 if (theChan->getFlag(sqlChannel::F_NOVOICE)) flagsSet += "NOVOICE ";
 if (theChan->getFlag(sqlChannel::F_AUTOTOPIC)) flagsSet += "AUTOTOPIC ";
 if (theChan->getFlag(sqlChannel::F_AUTOJOIN)) flagsSet += "AUTOJOIN ";
+
+if (((level >= level::set::oplog) || (admLevel)) &&
+	(theChan->getFlag(sqlChannel::F_OPLOG)))
+		flagsSet += "OPLOG ";
+
+/* NOFORCE flag for protected channels */
+if ((admLevel) && (theChan->getFlag(sqlChannel::F_NOFORCE)))
+	flagsSet += "NOFORCE ";
+
 if (((level >= level::set::notake) || (admLevel)) &&
         (theChan->getFlag(sqlChannel::F_NOTAKE)))
 {
     flagsSet += "NOTAKE (REV:";
-    if (theChan->getNoTake() == 1) flagsSet += "IGNORE)";
+    if (theChan->getNoTake() == 1) flagsSet += "NONE)";
     if (theChan->getNoTake() == 2) flagsSet += "BAN)";
     if (theChan->getNoTake() == 3) flagsSet += "SUSPEND)";
 }
@@ -192,40 +201,44 @@ bot->Notice(theClient,
     bot->getResponse(theUser, language::status_flags,
         string("Flags set: %s")).c_str(),flagsSet.c_str());
 
-if (theChan->getFlag(sqlChannel::F_FLOODPRO))
+if (((level >= level::set::floodpro) || (admLevel)) &&
+		(theChan->getFlag(sqlChannel::F_FLOODPRO)))
 {
-    //flagsSet.empty();
-    stringstream floodperiods;
-	if (theChan->getFloodNet())
+	//flagsSet.empty();
+	stringstream floodperiods;
+	if (theChan->getFloodproLevel())
 	{
-		floodperiods << " \002FLOODNET (";
-		if (theChan->getFloodNet() == sqlChannel::FLOODNET_KICK)
+		floodperiods << " FLOODPRO \002(";
+		if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_KICK)
 			floodperiods << "KICK";
-		if (theChan->getFloodNet() == sqlChannel::FLOODNET_BAN)
+		if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_BAN)
 			floodperiods << "BAN";
-		if (theChan->getFloodNet() == sqlChannel::FLOODNET_GLINE)
+		if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_GLINE)
 			floodperiods << "GLINE";
-		floodperiods	<< ")\002";
+		floodperiods << ")\002";
 	}
 	if (theChan->getFlag(sqlChannel::F_FLOODPROGLINE))
 		floodperiods << " FLOODPROGLINE";
+	if (theChan->getFloodproLevel() == sqlChannel::FLOODPRO_NONE)
+		floodperiods << " FLOODPRO";
 	floodperiods
-    //<< std::hex << theChan->getFloodPro()
-    << " FLOODPRO (MSG:"
-    << theChan->getFloodMsg()
-    << ", NOTICE:"
-    << theChan->getFloodNotice()
-    << ", CTCP:"
-    << theChan->getFloodCTCP()
-    << ", PRD:"
-    << theChan->getFloodPeriod()
-    << ", REP:"
-    << theChan->getRepeatCount()
-    << ")"
-    << ends;
+		//<< std::hex << theChan->getFloodPro()
+		<< " -- (MSG:"
+		<< theChan->getFloodMsg()
+		<< ", NOTICE:"
+		<< theChan->getFloodNotice()
+		<< ", CTCP:"
+		<< theChan->getFloodCTCP()
+		<< ", REP:"
+		<< theChan->getRepeatCount()
+		<< ", PERIOD:"
+		<< theChan->getFloodPeriod()
+		<< ")"
+		<< ends;
 
-    bot->Notice(theClient, floodperiods.str().c_str());
+	bot->Notice(theClient, floodperiods.str().c_str());
 }
+
 
 flagsSet.clear();
 

@@ -355,16 +355,6 @@ if (command == "AUTOMODE")
 
 	if (string_upper(st[4]) == "OP")
 	{
-		if (targetLevel < level::op)
-		{
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::insuff_aop,
-				string("Target user %s on channel %s has insufficient access for an automode OP")).c_str(),
-			targetUser->getUserName().c_str(),
-			theChan->getName().c_str());
-			return false;
-		}
 		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 		aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
 		aLevel->setFlag(sqlLevel::F_AUTOOP);
@@ -384,17 +374,6 @@ if (command == "AUTOMODE")
 
 	if (string_upper(st[4]) == "VOICE")
 	{
-		if (targetLevel < level::voice)
-		{
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::insuff_avoice,
-					string("Target user %s on channel %s has insufficient access for an automode VOICE")).c_str(),
-				targetUser->getUserName().c_str(),
-				theChan->getName().c_str());
-			return false;
-		}
-
 		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 		aLevel->removeFlag(sqlLevel::F_AUTOOP);
 		aLevel->setFlag(sqlLevel::F_AUTOVOICE);
