@@ -278,11 +278,53 @@ else if(!strcasecmp(st[1].c_str(),"chccidr"))
 			bot->Notice(theClient,"%s is now checking clones on /%ds. Limit: %d", IpLisp->getName().c_str(), atoi(st[3].c_str()), IpLisp->getLimit());
 		}
 	}
+else if(!strcasecmp(st[1].c_str(),"chilimit"))
+	{
+	if(st.size() < 4) 
+		{
+		bot->Notice(theClient,"SYNTAX: CHILIMIT <isp> <ident limit>");
+		return true;
+		}
+	if(atoi(st[3].c_str()) < 1) 
+		{
+		bot->Notice(theClient,"The limit must be > 0");
+		return true;
+		}
+	if(st[2].size() > 32)
+		{
+		bot->Notice(theClient,"Isp can't exceed 32 characters");
+		return true;
+		}
+	IpLisp = bot->getIpLisp(st[2]);
+	
+	if (IpLisp == 0)
+		{
+		bot->Notice(theClient,"Isp not found.");
+		return true;
+		}
+	else
+		{
+		IpLisp->setIdentLimit(atoi(st[3].c_str()));
+		IpLisp->setModOn(::time(0));
+		IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+		if (!IpLisp->updateData()) 
+			{
+			bot->Notice(theClient, "SQL insertion failed.");
+			}
+		else
+			bot->Notice(theClient,"New Ident limit for %s is now %d", IpLisp->getName().c_str(), IpLisp->getIdentLimit());
+		}
+	}
 else if(!strcasecmp(st[1].c_str(),"chlimit"))
 	{
 	if(st.size() < 4) 
 		{
 		bot->Notice(theClient,"SYNTAX: CHLIMIT <isp> <limit>");
+		return true;
+		}
+	if(atoi(st[3].c_str()) < 1) 
+		{
+		bot->Notice(theClient,"The limit must be > 0");
 		return true;
 		}
 	if(st[2].size() > 32)

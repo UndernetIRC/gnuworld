@@ -251,6 +251,18 @@ protected:
 
 	typedef list<ipLretPairType>	ipLretPairListType;
 
+	struct ipLretStruct {
+		ccIpLnb *nb;
+		int count;
+		int limit;
+		char type;
+		string mask;
+	};
+	
+	typedef struct ipLretStruct ipLretStructType;
+
+	typedef list<ipLretStructType>	ipLretStructListType;
+
 	typedef map<string,long> 	clientsIpMapType;
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
@@ -752,7 +764,8 @@ public:
         
 	bool listIpLExceptions( iClient * );
 
-	bool isIpLClientAllowed( iClient *, ipLretPairListType &, bool);
+	//bool isIpLClientAllowed( iClient *, ipLretPairListType &, bool);
+	bool isIpLClientAllowed( iClient *, ipLretStructListType &, bool);
 
 	bool ipLDropClient( iClient * );
 

@@ -287,6 +287,9 @@ public:
 	inline const int&		getLimit() const
 		{ return maxlimit; }
 	
+	inline const int&		getIdentLimit() const
+		{ return maxIdentlimit; }
+	
 	inline const string&		getEmail() const
 		{ return email; }
 	
@@ -313,6 +316,9 @@ public:
 		
 	inline void		setLimit( const int _maxlimit ) 
 		{  maxlimit = _maxlimit; }
+	
+	inline void		setIdentLimit( const int _maxIdentlimit ) 
+		{  maxIdentlimit = _maxIdentlimit; }
 	
 	inline void		setID( const int _id ) 
 		{  id = _id; }
@@ -363,6 +369,9 @@ public:
 	
 	static unsigned int numAllocated;
 
+	ipLclonesMapType 	ipLidentclonesMap;
+
+
 protected:
 	
 	int		id;
@@ -373,6 +382,7 @@ protected:
 	string 		email;
 	int		clonecidr;
 	int 		maxlimit;
+	int 		maxIdentlimit;
 	int		count;
 	int		active;
 	string 		AddedBy;
@@ -423,6 +433,9 @@ public:
 	inline const int& 		getLimit() const
 			{ return ipLisp->getLimit(); }
 
+	inline const int& 		getIdentLimit() const
+			{ return ipLisp->getIdentLimit(); }
+
 	inline const string&		getAddedBy() const
 		{ return AddedBy; }
 		
@@ -456,6 +469,7 @@ public:
 	bool		Delete();
 
 	ipLclonesMapType 	ipLclonesMap;
+
 
 	ccIpLisp*	ipLisp;
 	

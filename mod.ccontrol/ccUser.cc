@@ -74,7 +74,7 @@ ccUser::ccUser(dbHandle* _SQLDb)
    SQLDb( _SQLDb ),
    PassChangeTS(0)
 {
-+numAllocated;
+++numAllocated;
 }
 
 ccUser::~ccUser()
