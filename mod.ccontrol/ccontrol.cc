@@ -7596,17 +7596,18 @@ for (ipLnbListType::iterator nptr = ipLnbList.begin(); nptr != ipLnbList.end(); 
 	string userip = theClient->getUserName() + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
 	if (this->getIntYY() == theClient->getIntYY()) /* This is a not-yet fully connected iauth client. */
 		itr = nb->ipLisp->ipLidentclonesMap.end();
-	else
-		itr = nb->ipLisp->ipLidentclonesMap.find(userip);
-	if (itr != nb->ipLisp->ipLidentclonesMap.end()) {
-		if (itr->second <= 1) {
-			nb->ipLisp->ipLidentclonesMap.erase(itr);
-		}
-		else
-			itr->second--;
-	}
 	else {
-		elog << "ccontrol::ipLDropClient> bug: Did we really get here? Line #" << __LINE__ << endl;
+		itr = nb->ipLisp->ipLidentclonesMap.find(userip);
+		if (itr != nb->ipLisp->ipLidentclonesMap.end()) {
+			if (itr->second <= 1) {
+				nb->ipLisp->ipLidentclonesMap.erase(itr);
+			}
+			else
+				itr->second--;
+		}
+		else {
+			elog << "ccontrol::ipLDropClient> bug: Did we really get here? Line #" << __LINE__ << endl;
+		}
 	}
 }
 return true;
