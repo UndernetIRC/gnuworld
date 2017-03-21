@@ -88,7 +88,7 @@
  /**
  * Define this if you want to enable the WELCOME feature.
  */
-#define USE_WELCOME
+#undef USE_WELCOME
 
 /**
  * Define this if you want the IP restriction to default to REJECT when no
