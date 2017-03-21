@@ -8654,12 +8654,14 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		}
 		else {
 			// Pending channel found -- have we inserted this user & chan combo before?
-			sqlChannel* tmpChan = getChannelRecord(st[1]);
+			sqlChannel* tmpChan = getChannelRecord(scoreChan);
 			sqlUser* tmpUser = getUserRecord(account);
+			unsigned int userID = tmpUser->getID();
+			unsigned int chanID = tmpChan->getID();
 			stringstream queryString;
 			queryString << "SELECT channel_id FROM pending_chanfix_scores WHERE user_id='"
-				<< tmpUser->getID()
-				<< "' AND channel_id=(SELECT id FROM channels WHER lower(name)='"
+				<< userID
+				<< "' AND channel_id=(SELECT id FROM channels WHERE lower(name)='"
 				<< string_lower(scoreChan)
 				<< "')"
 				<< ends;
@@ -8678,9 +8680,9 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 					// no rows returned -- need to INSERT
 					updateQuery << "INSERT INTO pending_chanfix_scores "
 						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped) VALUES('"
-						<< tmpChan->getID()
+						<< chanID
 						<< "', '"
-						<< tmpUser->getID()
+						<< userID
 						<< "', '"
 						<< rank
 						<< "', '"
@@ -8713,7 +8715,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 						<< "',"
 						<< " last_updated=,now()::abstime::int4"
 						<< " WHERE user_id='"
-						<< tmpUser->getID()
+						<< userID
 						<< "' AND channel_id='"
 						<< chanID
 						<< "'"
