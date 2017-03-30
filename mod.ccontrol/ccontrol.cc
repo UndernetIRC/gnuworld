@@ -2148,8 +2148,8 @@ theUser->setLastAuthNumeric(theClient->getCharYYXXX());
 if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser))) {
 	std::string Numeric = getUplink()->getCharYY();
 	Write("%s OM %s :+o", Numeric.c_str(), theClient->getCharYYXXX().c_str());
-	theClient->setModeO();
-	getUplink()->PostEvent(EVT_OPER, static_cast< void* >(theClient));
+	//theClient->setModeO();
+	//getUplink()->PostEvent(EVT_OPER, static_cast< void* >(theClient));
 	MsgChanLog("(%s) - %s - REMOTE OPER (+o)\n", theUser->getUserName().c_str(),
 		theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
 }
