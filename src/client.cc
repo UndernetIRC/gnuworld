@@ -2567,6 +2567,16 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			modeVector.push_back( make_pair( false,
 				Channel::MODE_D ) ) ;
 			break;
+		case 'c':  // new u2.10.12.15 mode to prevent chan colours
+			theChan->removeMode(Channel::MODE_C);
+			modeVector.push_back(make_pair(false,
+				Channel::MODE_C));
+			break;
+		case 'C':  // new u2.10.12.15 mode to prevent chan CTCPs (except ACTION)
+			theChan->removeMode(Channel::MODE_CTCP);
+			modeVector.push_back(make_pair(false,
+				Channel::MODE_CTCP));
+			break;
 		case 'A':  // Apass for oplevels
 			if (theChan->getMode(Channel::MODE_A))
 				{

@@ -223,6 +223,14 @@ if( '+' == Param[ whichToken ][ 0 ] )
 				modeVector.push_back( make_pair(
 					true, Channel::MODE_D ) ) ;
 				break ;
+			case 'c':
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_C ) ) ;
+				break ;
+			case 'C':
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_CTCP ) ) ;
+				break ;
  			case 'l':
 				theServer->OnChannelModeL( theChan, true, 
 					0,

@@ -141,6 +141,20 @@ for( std::string::size_type i = 0 ; i < Modes.size() ; i++ )
 //				<< "msg_CM> Doing CLEAR_MODED"
 //				<< endl;
 			break ;
+		case 'c':
+			modeVector.push_back(make_pair(
+				false, Channel::MODE_C));
+			//			elog	<< tmpChan->getName()
+			//				<< "msg_CM> Doing CLEAR_MODE_C"
+			//				<< endl;
+			break;
+		case 'C':
+			modeVector.push_back(make_pair(
+				false, Channel::MODE_CTCP));
+			//			elog	<< tmpChan->getName()
+			//				<< "msg_CM> Doing CLEAR_MODE_CTCP"
+			//				<< endl;
+			break;
 		case 'm':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_M ) ) ;
