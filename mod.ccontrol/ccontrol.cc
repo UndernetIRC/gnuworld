@@ -7746,7 +7746,7 @@ for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++
 				ipLretStruct.nb = nb;
 				ipLretStruct.type = 'u';
 				ipLretStruct.mask = userip;
-				ipLretStruct.count = itr->second;
+				ipLretStruct.count = iitr->second;
 				ipLretStruct.limit = nb->getIdentLimit();
 				retList.push_back(ipLretStruct);
 			}
