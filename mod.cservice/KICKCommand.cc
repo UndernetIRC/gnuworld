@@ -126,16 +126,11 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 				if( (match(st[2], tmpUser->getClient()->getNickUserHost()) == 0) ||
 					(match(st[2], tmpUser->getClient()->getRealNickUserHost()) == 0) )
 				{
-					/* Don't kick +k things */
-					if (!tmpUser->getClient()->getMode(iClient::MODE_SERVICES))
-						toBoot.push_back(tmpUser->getClient());
-					else
+					/* Don't kick +k things */                                      /* Don't kick ourselves */
+					if ((tmpUser->getClient()->getMode(iClient::MODE_SERVICES)) || (tmpUser->getClient() == theClient))
 						takeMembersCount--;
-					/* Don't kick ourselves */
-					if (tmpUser->getClient() != theClient)
-						toBoot.push_back(tmpUser->getClient());
 					else
-						takeMembersCount--;
+						toBoot.push_back(tmpUser->getClient());
 				}
 			}
 		}

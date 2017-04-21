@@ -90,9 +90,9 @@ if(Chan)
 
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)
-	doModes = "obklim";
+	doModes = "obklimrD";
 else if(!strcasecmp(string_upper(st[ 2 ]),"ALL"))
-	doModes = "obklimnspt";
+	doModes = "obklimnsptrDCc";
 else if(!strcasecmp(string_upper(st [ 2]),"-d"))
 	Desynch = true;
 else	

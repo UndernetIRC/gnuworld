@@ -1727,6 +1727,20 @@ list<const Channel*> xNetwork::getChannelsWithModes(const string& modes) const
 							foundMatch = false;
 						}
 						break;
+				case 'c':	/* new u2.10.12.15 mode to prevent chan colours */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_C))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_C)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'C':	/* new u2.10.12.15 mode to prevent chan CTCPs (except ACTION) */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_CTCP))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_CTCP)))
+						{
+							foundMatch = false;
+						}
+						break;
 				case 'A':	/* Apass for oplevels */
 						if ((!modeflag && cptr->second->getMode(Channel::MODE_A))
 							|| (modeflag && !cptr->second->getMode(Channel::MODE_A)))
