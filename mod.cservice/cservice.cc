@@ -6269,12 +6269,6 @@ void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
 void cservice::doAutoTopic(sqlChannel* theChan)
 {
 
-/* Quickly drop out if nothing is set.. */
-if ( theChan->getDescription().empty() && theChan->getURL().empty() )
-	{
-	return;
-	}
-
 string extra ;
 if( !theChan->getURL().empty() )
 	{
