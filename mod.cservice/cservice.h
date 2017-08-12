@@ -668,6 +668,12 @@ public:
 
 	void cacheExpireLevels();
 
+	/*
+	 * Process any pending reop requests by the bot.
+	 */
+	void performReops();
+
+
 	bool deleteUserFromTable(unsigned int, const string&);
 	bool wipeUser(unsigned int, bool);
 

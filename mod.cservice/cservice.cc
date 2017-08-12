@@ -2956,6 +2956,23 @@ void cservice::cacheExpireLevels()
 	logDebugMessage("Channel Level cache-cleanup complete.");
 }
 
+void cservice::performReops()
+{
+	for (xNetwork::channelIterator itr = Network->channels_begin(); itr != Network->channels_end(); itr++)
+	{
+		Channel* tmpChan = itr->second;
+		ChannelUser* tmpBotUser = tmpChan->findUser(getInstance());
+		if (!tmpBotUser)
+		{
+			continue;
+		}
+
+		// If the bot has no op, op it
+		if (tmpChan && !tmpBotUser->getMode(ChannelUser::MODE_O))
+			doTheRightThing(tmpChan);
+	}
+}
+
 bool cservice::deleteUserFromTable(unsigned int userId, const string& table)
 {
 	/* We can safely do this, because the user is so long seen
@@ -3455,6 +3472,7 @@ if (timer_id == limit_timerID)
 if (timer_id == dBconnection_timerID)
 	{
 	checkDbConnectionStatus();
+	performReops();
 
 	/* Refresh Timers */
 	time_t theTime = time(NULL) + connectCheckFreq;
@@ -3657,48 +3675,8 @@ if (timer_id == pendingNotif_timerID)
 #endif
 		return;
 	}
-	// Check if we are already opped ...
-	ChannelUser* tmpChanUser;
-	tmpChanUser = tmpChan->findUser(me);
 
-	/* Don't op ourself if we're already opped.. */
-	if (tmpChanUser && !tmpChanUser->getMode(ChannelUser::MODE_O))
-		{
-		stringstream s;
-		s	<< MyUplink->getCharYY()
-			<< " M "
-			<< tmpChan->getName()
-			<< " +o "
-			<< getCharYYXXX()
-			<< " "
-			<< tmpChan->getCreationTime()
-			<< ends;
-
-		Write( s );
-
-		/*
-		 *  Update the channel state.
-		 */
-		tmpChanUser->setMode(ChannelUser::MODE_O);
-		}
-	/*
-	 *  If STRICTOP or NOOP is set, do the 'right thing'.
-	 */
-	sqlChannel* theChan = getChannelRecord(tmpChan->getName());
-	if (theChan)
-	{
-		/*
-		 * Send default modes.
-		 */
-		if (theChan->getChannelMode() != "")
-			{
-				/* use the xServer::Mode code to set these modes */
-				MyUplink->Mode(this, tmpChan, theChan->getChannelMode().c_str(), std::string() );
-			}
-		//Let's do then all the right things :)
-		doTheRightThing(tmpChan);
-	}
-	return;
+	doTheRightThing(tmpChan);
  }
 
 /**
@@ -5647,9 +5625,40 @@ void cservice::doTheRightThing(Channel* tmpChan)
 	}
 
 	ChannelUser* tmpBotUser = tmpChan->findUser(getInstance());
-	if (!tmpBotUser || !tmpBotUser->getMode(ChannelUser::MODE_O))
+	if (!tmpBotUser)
 	{
 		return;
+	}
+
+	// If the bot has no op, op it
+	if (tmpChan && !tmpBotUser->getMode(ChannelUser::MODE_O))
+	{
+		// Make sure +R is also set for the channel
+		MyUplink->Mode(NULL, tmpChan, "+R", std::string());
+
+		if (reggedChan->getInChan())
+		{
+			stringstream s;
+			s	<< MyUplink->getCharYY()
+				<< " M "
+				<< tmpChan->getName()
+				<< " +o "
+				<< getCharYYXXX()
+				<< " "
+				<< tmpChan->getCreationTime()
+				<< ends;
+
+			Write( s );
+
+			tmpBotUser->setMode(ChannelUser::MODE_O);
+
+			if (reggedChan->getChannelMode() != "")
+			{
+				MyUplink->Mode(this, tmpChan, reggedChan->getChannelMode().c_str(), std::string() );
+			}
+
+			logDebugMessage("Performed reop for channel %s", tmpChan->getName().c_str());
+		}
 	}
 
 	doAllBansOnChan(tmpChan);
@@ -5668,6 +5677,7 @@ void cservice::doTheRightThing(Channel* tmpChan)
 	}
 	return;
 }
+
 /**
  * Handler for registered channel events.
  * Performs a number of functions, autoop, autovoice, bankicks, etc.
