@@ -402,8 +402,9 @@ public:
 	unsigned int NoRegDaysOnNOSupport;
 	unsigned int RejectAppOnUserFraud;
 	//int AcceptOnTrafficPass = 1;
-	unsigned int ReviewOnObject;
-	unsigned int ReviewOnCompleted;
+	unsigned int RequireReview;
+	unsigned int DecideOnObject;
+	unsigned int DecideOnCompleted;
 	unsigned int ReviewsExpireTime;
 	unsigned int PendingsExpireTime;
 	unsigned int MaxDays;

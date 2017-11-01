@@ -4600,7 +4600,7 @@ void cservice::checkTrafficPass()
 
 void cservice::checkObjections()
 {
-	if (!ReviewOnObject) return;
+	if (!DecideOnObject) return;
 	std::vector<std::pair<std::pair<int,string>, string> > objectList;
 	unsigned int notifTime = NotifyDays * JudgeDaySeconds;
 	int actualChan = 0;
@@ -4698,13 +4698,13 @@ void cservice::checkAccepts()
 		bool reviewed = false;
 		if (acceptList[i].second.second == 'Y')
 			reviewed = true;
-		if (ReviewOnCompleted && !reviewed)
+		if (DecideOnCompleted || (reviewed == false && RequireReview))
 		{
 			ReviewChannel(acceptList[i].first.first);
 			logTheJudgeMessage("Channel application %s completed, moved to 'Ready to review'",acceptList[i].first.second.c_str());
 			NoteAllAuthedClients(mgrUsr,"Your channel application of %s is now in 'Ready to review'", acceptList[i].first.second.c_str());
 		}
-		else
+		else if ((reviewed == true || !RequireReview) && !DecideOnCompleted)
 		{
 			AcceptChannel(acceptList[i].first.first,"ACCEPTED");
 			if (sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
@@ -4726,7 +4726,8 @@ void cservice::checkReviews()
 	theQuery	<< "SELECT channels.name,channels.id,users.user_name,pending.reviewed FROM channels,pending,users "
 				<< "WHERE channels.id = pending.channel_id "
 				<< "AND pending.status = 8 "
-				<< "AND users.id = manager_id"
+				<< "AND users.id = manager_id "
+				<< "AND NOT EXISTS (SELECT pending.channel_id FROM pending,objections WHERE pending.channel_id = objections.channel_id)"
 				<< ends;
 
 	if (!SQLDb->Exec(theQuery, true))
@@ -4760,7 +4761,7 @@ void cservice::checkReviews()
 		bool reviewed = false;
 		if (acceptList[i].second.second == 'Y')
 			reviewed = true;
-		if (reviewed)
+                if ((reviewed == true || !RequireReview) && !DecideOnCompleted)
 		{
 			AcceptChannel(acceptList[i].first.first,"ACCEPTED");
 			if (sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
@@ -8244,8 +8245,9 @@ void cservice::loadConfigVariables()
 	NoRegDaysOnNOSupport = atoi((cserviceConfig->Require( "noreg_days_on_nosupport" )->second).c_str());
 	RejectAppOnUserFraud = atoi((cserviceConfig->Require( "reject_app_on_userfraud" )->second).c_str());
 	//int AcceptOnTrafficPass = 1;
-	ReviewOnObject = atoi((cserviceConfig->Require( "review_on_object" )->second).c_str());
-	ReviewOnCompleted = atoi((cserviceConfig->Require( "review_on_complete" )->second).c_str());
+	RequireReview = atoi((cserviceConfig->Require( "require_review" )->second).c_str());
+	DecideOnObject = atoi((cserviceConfig->Require( "decide_on_object" )->second).c_str());
+	DecideOnCompleted = atoi((cserviceConfig->Require( "decide_on_complete" )->second).c_str());
 	ReviewsExpireTime = atoi((cserviceConfig->Require( "reviews_expire_time" )->second).c_str());
 	PendingsExpireTime = atoi((cserviceConfig->Require( "pendings_expire_time" )->second).c_str());
 	MaxDays = atoi((cserviceConfig->Require( "max_days" )->second).c_str());
