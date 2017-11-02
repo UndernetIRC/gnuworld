@@ -616,36 +616,67 @@ if( !theChan )
 			}
 		}
 		SuppDataList.clear();
-		// check for any objections
-		int objCount = 0;
-		theQuery.str("");
-		theQuery << "SELECT count(*) FROM objections WHERE channel_id="
-				<< chanID
-				<< ends;
-		if (!bot->SQLDb->Exec(theQuery, true))
+                // check for any objections
+                int objCount = 0;
+                theQuery.str("");
+                theQuery << "SELECT count(*) FROM objections WHERE channel_id="
+                                << chanID
+				<< " AND admin_only='N'"
+                                << ends;
+                if (!bot->SQLDb->Exec(theQuery, true))
+                {
+                        bot->logDebugMessage("Error on CHANINFO.objections user objections query");
+                        #ifdef LOG_SQL
+                        //elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+                        elog << "CHANINFO.objections user objections query> SQL Error: "
+                             << bot->SQLDb->ErrorMessage()
+                             << endl ;
+                        #endif
+                }
+                if (bot->SQLDb->Tuples() > 0)
+                        objCount = atoi(bot->SQLDb->GetValue(0,0));
+
+           	// check for any admin comments
+		int comCount = 0;
+		if (adminAccess > 0)
 		{
-			bot->logDebugMessage("Error on CHANINFO.objections query");
-			#ifdef LOG_SQL
-			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-			elog << "CHANINFO.objections query> SQL Error: "
-			     << bot->SQLDb->ErrorMessage()
-			     << endl ;
-			#endif
+	                theQuery.str("");
+        	        theQuery << "SELECT count(*) FROM objections WHERE channel_id="
+                	                << chanID
+					<< " AND admin_only='Y'"
+                        	        << ends;
+                	if (!bot->SQLDb->Exec(theQuery, true))
+                	{
+                        	bot->logDebugMessage("Error on CHANINFO.objections admin comment query");
+                        	#ifdef LOG_SQL
+                        	//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+                        	elog << "CHANINFO.objections admin comment query> SQL Error: "
+                             	<< bot->SQLDb->ErrorMessage()
+                             	<< endl ;
+                        	#endif
+                	}
+                	if (bot->SQLDb->Tuples() > 0)
+                        	comCount = atoi(bot->SQLDb->GetValue(0,0));
 		}
-		if (bot->SQLDb->Tuples() > 0)
-			objCount = atoi(bot->SQLDb->GetValue(0,0));
-		
-		// output additional information if user is admin, supporter, or applicant)
-		if (showsupplist)
-		{
-			bot->Notice(theClient,"Application posted on: %s",ctime(&posted));
-			if ((status == 9) && (adminAccess > 0))
-				bot->Notice(theClient,"Decision: %s",decision.c_str());
-			bot->Notice(theClient,supplist.c_str());
-			if (objCount > 0)
-				bot->Notice(theClient,"Objections: %i",objCount);
-			return true;
-		}
+                
+                // output additional information if user is admin, supporter, or applicant)
+                if (showsupplist)
+                {
+                        bot->Notice(theClient,"Application posted on: %s",ctime(&posted));
+                        if ((status == 9) && (adminAccess > 0))
+                                bot->Notice(theClient,"Decision: %s",decision.c_str());
+                        bot->Notice(theClient,supplist.c_str());
+			if (adminAccess > 0)
+			{
+				if (objCount > 0 || comCount > 0)
+				{
+					bot->Notice(theClient,"Objections: %i -- Admin Comments: %i", objCount, comCount);
+				}
+			}
+                        else if (objCount > 0)
+                                bot->Notice(theClient,"Objections: %i",objCount);
+                        return true;
+                }
 	return true;
 	}
 	else
