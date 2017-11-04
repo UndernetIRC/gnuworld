@@ -268,15 +268,20 @@ noreg_days_on_nosupport = 1
 
 reject_app_on_userfraud = 1
 
-# If the value is 1 enabled, and the channel has any objection, 
-# the registration will be 'interrupted' waiting for an admin's review
+# If the value is 1 enabled then all channels at a minimum require an admin to Mark As Reviewed
+# before application can be fully processed by TheJudge
 
-review_on_object = 0
+require_review = 1
 
-# If the value is 1 enabled, after all successful registration stages will be no automatical accept
-# will set to 'Ready to review' stage, waiting for an admin's final decision/accept. 
+# If the value is 1 enabled, any channel application with admin comments of objectsions will
+# require manual decision accept/reject by an admin
 
-review_on_complete = 1;
+decide_on_object = 1
+
+# If the value is 1 enabled, after all successful registration stages there will be no automatic accepts.
+# Channel will be left at to 'Ready to review' stage, waiting for an admin's final decision to accept/reject
+
+decide_on_complete = 0
 
 # After how many days will be a channel automatically rejected
 # when it was no decision made by an admin for a 'Ready to review' channel
