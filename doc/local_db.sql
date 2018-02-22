@@ -1,5 +1,4 @@
 ------------------------------------------------------------------------------------
--- "$Id: local_db.sql,v 1.19 2002/12/27 00:51:39 nighty Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
 -- .. if you wonder why some tables have moved and you have them here when
@@ -10,147 +9,246 @@
 --
 -- nighty <nighty@undernet.org>
 
-CREATE TABLE webcookies (
-        user_id INT4,
-        cookie VARCHAR(32) UNIQUE,
-        expire INT4,
-	tz_setting VARCHAR(255) DEFAULT '',
-	is_admin INT2 DEFAULT 0
+CREATE TABLE custom_cookies (
+    user_id integer,
+    session_time integer
 );
-
-CREATE INDEX webcookies_user_id_idx ON webcookies(user_id);
-CREATE INDEX webcookies_cookie_idx ON webcookies(cookie);
-CREATE INDEX webcookies_expire_idx ON webcookies(expire);
-
-
---
--- IP_CHECK lock IPs after 3 attempts (failed) in wheter "login" or "forgotten password" sections.
--- to reduce the load on the db host.
---
 
 CREATE TABLE exclusions (
-   excluded varchar(15) DEFAULT '0.0.0.0' NOT NULL,
-   CONSTRAINT exclusions_pkey PRIMARY KEY (excluded)
+    excluded character varying(40) DEFAULT '0.0.0.0'::character varying NOT NULL
 );
 
-CREATE  INDEX exclusions_excluded_key ON exclusions (excluded);
+CREATE TABLE gfxcodes (
+    code character varying(25) NOT NULL,
+    crc character varying(128) NOT NULL,
+    expire integer NOT NULL
+);
+
+CREATE TABLE ip_restrict (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    allowmask character varying(255) NOT NULL,
+    allowrange1 integer NOT NULL,
+    allowrange2 integer NOT NULL,
+    added integer NOT NULL,
+    added_by integer NOT NULL,
+    type integer NOT NULL
+);
+
+CREATE SEQUENCE ip_restrict_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
 CREATE TABLE ips (
-   ipnum varchar(15) DEFAULT '0.0.0.0' NOT NULL,
-   user_name varchar(20) NOT NULL,
-   expiration int4 NOT NULL,
-   hit_counts int4,
-   set_on int4 NOT NULL,
-   CONSTRAINT ips_pkey PRIMARY KEY (expiration, ipnum, user_name)
+    ipnum character varying(255) DEFAULT '0.0.0.0'::character varying NOT NULL,
+    user_name character varying(20) NOT NULL,
+    expiration integer NOT NULL,
+    hit_counts integer,
+    set_on integer NOT NULL
 );
 
-CREATE  INDEX hit_counts_ips_key ON ips (hit_counts);
-CREATE  INDEX ips_expiration_key ON ips (expiration);
-CREATE  INDEX ips_set_on_key ON ips (set_on);
-CREATE  INDEX ips_ipnum_key ON ips (ipnum);
-CREATE  INDEX ips_user_name_key ON ips (user_name);
+CREATE TABLE logmsg (
+    ts integer,
+    name character varying(128),
+    event integer,
+    message text
+);
 
 CREATE TABLE newu_ipcheck (
-   ts int4 NOT NULL,
-   ip varchar(15) DEFAULT '0.0.0.0' NOT NULL,
-   expiration int4 NOT NULL,
-   CONSTRAINT newu_ipcheck_pkeys PRIMARY KEY (ip)
+    ts integer NOT NULL,
+    ip inet NOT NULL,
+    expiration integer NOT NULL
 );
 
-CREATE INDEX newu_ipcheck_ts ON newu_ipcheck (ts);
-CREATE INDEX newu_ipcheck_ip ON newu_ipcheck (ip);
-CREATE INDEX newu_ipcheck_expiration ON newu_ipcheck (expiration);
-
-
-CREATE TABLE gfxcodes (
-	code	VARCHAR(25) NOT NULL,
-	crc	VARCHAR(128) NOT NULL,
-	expire	INT NOT NULL
-);
-CREATE INDEX gfxcodes_idx ON gfxcodes(code,crc,expire);
-
+CREATE SEQUENCE nickserv_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 CREATE TABLE themes (
-	id	SERIAL,
-	name	VARCHAR(50) NOT NULL,
-	tstart	VARCHAR(5) DEFAULT '01/01' NOT NULL,
-	tend	VARCHAR(5) DEFAULT '12/31' NOT NULL,
-	created_ts	INT4 NOT NULL,
-	created_by	INT4 DEFAULT 0 NOT NULL,
-
-	sub_dir	VARCHAR(128) NOT NULL, -- Must be a real directory name, alone, with no slashes or spaces or weird chars.
-				       -- This will indicate in which [...]gnuworld/docs/website/themes/data/<sub_dir> the themes files will be found.
-
-	left_bgcolor	VARCHAR(6) NOT NULL,
-	left_bgimage	VARCHAR(255) DEFAULT '' NOT NULL,
-	left_textcolor	VARCHAR(6) NOT NULL,
-	left_linkcolor	VARCHAR(6) NOT NULL,
-	left_linkover	VARCHAR(6) NOT NULL, -- Visable on Internet Explorer Only.
-
-	left_loadavg0	VARCHAR(6) NOT NULL, -- LoadAvg color when status is "OK" (<5)
-	left_loadavg1	VARCHAR(6) NOT NULL, -- LoadAvg color when status is "HEAVY" (>=5 && <=15)
-	left_loadavg2	VARCHAR(6) NOT NULL, -- LoadAvg color when status is "CRITICAL" (>15)
-
-	top_bgcolor	VARCHAR(6) NOT NULL,
-	top_bgimage	VARCHAR(255) DEFAULT '' NOT NULL,
-	top_logo	VARCHAR(255) NOT NULL,
-
-	bottom_bgcolor	VARCHAR(6) NOT NULL,
-	bottom_bgimage	VARCHAR(255) DEFAULT '' NOT NULL,
-	bottom_textcolor	VARCHAR(6) NOT NULL,
-	bottom_linkcolor	VARCHAR(6) NOT NULL,
-	bottom_linkover	VARCHAR(6) NOT NULL, -- Visable on Internet Explorer Only.
-
-	main_bgcolor	VARCHAR(6) NOT NULL,
-	main_bgimage	VARCHAR(255) DEFAULT '' NOT NULL,
-	main_textcolor	VARCHAR(6) NOT NULL,
-	main_textlight	VARCHAR(6) NOT NULL,
-	main_linkcolor	VARCHAR(6) NOT NULL,
-	main_linkover	VARCHAR(6) NOT NULL, -- Visable on Internet Explorer Only.
-	main_warnmsg	VARCHAR(6) NOT NULL, -- Color of some warning message, usually those you put in red, but depends on other colors ;P
-	main_no		VARCHAR(6) NOT NULL, -- color of word 'No'.
-	main_yes	VARCHAR(6) NOT NULL, -- color of word 'Yes'.
-
-	main_appst0	VARCHAR(6) NOT NULL, -- color for application in (Incoming (status = 0)).
-	main_appst1	VARCHAR(6) NOT NULL, -- color for application in (Pending (traffic check) (status = 1)).
-	main_appst2	VARCHAR(6) NOT NULL, -- color for application in (Pending (notification) (status = 2)).
-	main_appst3	VARCHAR(6) NOT NULL, -- color for application in (Accepted (status = 3)).
-	main_appst4	VARCHAR(6) NOT NULL, -- color for application in (Cancelled (status = 4)).
-
-	main_appst8	VARCHAR(6) NOT NULL, -- color for application in (Ready for review (status = 8)).
-	main_appst9	VARCHAR(6) NOT NULL, -- color for application in (Rejected (status = 9)).
-
-	main_vlinkcolor	VARCHAR(6) NOT NULL, -- color for links that need to be displayed as 'visited'.
-
-	main_support	VARCHAR(6) NOT NULL, -- color for a person supporting the channel in "view_app"
-	main_nonsupport	VARCHAR(6) NOT NULL, -- color for a person NOT supporting the channel in "view_app"
-	main_notyet	VARCHAR(6) NOT NULL, -- color for a person that has made no choice regarding support in "view_app"
-
-	main_frauduser	VARCHAR(6) NOT NULL, -- color for Fraud Usernames representation
-
-	main_xat_revert	VARCHAR(6) NOT NULL,
-	main_xat_goperm	VARCHAR(6) NOT NULL,
-	main_xat_deny	VARCHAR(6) NOT NULL,
-	main_xat_accept	VARCHAR(6) NOT NULL,
-
-	main_acl_create	VARCHAR(6) NOT NULL,
-	main_acl_edit	VARCHAR(6) NOT NULL,
-
-	table_bgcolor	VARCHAR(6) NOT NULL,
-	table_bgimage	VARCHAR(255) DEFAULT '' NOT NULL,
-	table_headcolor	VARCHAR(6) NOT NULL,
-	table_headtextcolor VARCHAR(6) NOT NULL,
-	table_sepcolor VARCHAR(6) NOT NULL,
-	table_septextcolor VARCHAR(6) NOT NULL,
-	table_tr_enlighten	VARCHAR(6) NOT NULL,
-	table_tr_enlighten2	VARCHAR(6) NOT NULL,
-	table_tr_enlighten3	VARCHAR(6) NOT NULL,
-	table_headimage	VARCHAR(255) DEFAULT '' NOT NULL,
-
-	PRIMARY KEY (name)
-
+    id integer DEFAULT nextval(('"themes_id_seq"'::text)::regclass) NOT NULL,
+    name character varying(50) NOT NULL,
+    tstart character varying(5) DEFAULT '01/01'::character varying NOT NULL,
+    tend character varying(5) DEFAULT '12/31'::character varying NOT NULL,
+    created_ts integer NOT NULL,
+    created_by integer DEFAULT 0 NOT NULL,
+    sub_dir character varying(128) NOT NULL,
+    left_bgcolor character varying(6) NOT NULL,
+    left_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    left_textcolor character varying(6) NOT NULL,
+    left_linkcolor character varying(6) NOT NULL,
+    left_linkover character varying(6) NOT NULL,
+    left_loadavg0 character varying(6) NOT NULL,
+    left_loadavg1 character varying(6) NOT NULL,
+    left_loadavg2 character varying(6) NOT NULL,
+    top_bgcolor character varying(6) NOT NULL,
+    top_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    top_logo character varying(255) NOT NULL,
+    bottom_bgcolor character varying(6) NOT NULL,
+    bottom_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    bottom_textcolor character varying(6) NOT NULL,
+    bottom_linkcolor character varying(6) NOT NULL,
+    bottom_linkover character varying(6) NOT NULL,
+    main_bgcolor character varying(6) NOT NULL,
+    main_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    main_textcolor character varying(6) NOT NULL,
+    main_textlight character varying(6) NOT NULL,
+    main_linkcolor character varying(6) NOT NULL,
+    main_linkover character varying(6) NOT NULL,
+    main_warnmsg character varying(6) NOT NULL,
+    main_no character varying(6) NOT NULL,
+    main_yes character varying(6) NOT NULL,
+    main_appst0 character varying(6) NOT NULL,
+    main_appst1 character varying(6) NOT NULL,
+    main_appst2 character varying(6) NOT NULL,
+    main_appst3 character varying(6) NOT NULL,
+    main_appst4 character varying(6) NOT NULL,
+    main_appst8 character varying(6) NOT NULL,
+    main_appst9 character varying(6) NOT NULL,
+    main_vlinkcolor character varying(6) NOT NULL,
+    main_support character varying(6) NOT NULL,
+    main_nonsupport character varying(6) NOT NULL,
+    main_notyet character varying(6) NOT NULL,
+    main_frauduser character varying(6) NOT NULL,
+    main_xat_revert character varying(6) NOT NULL,
+    main_xat_goperm character varying(6) NOT NULL,
+    main_xat_deny character varying(6) NOT NULL,
+    main_xat_accept character varying(6) NOT NULL,
+    main_acl_create character varying(6) NOT NULL,
+    main_acl_edit character varying(6) NOT NULL,
+    table_bgcolor character varying(6) NOT NULL,
+    table_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    table_headcolor character varying(6) NOT NULL,
+    table_headtextcolor character varying(6) NOT NULL,
+    table_sepcolor character varying(6) NOT NULL,
+    table_septextcolor character varying(6) NOT NULL,
+    table_tr_enlighten character varying(6) NOT NULL,
+    table_tr_enlighten2 character varying(6) NOT NULL,
+    table_tr_enlighten3 character varying(6) NOT NULL,
+    table_headimage character varying(255) DEFAULT ''::character varying NOT NULL
 );
+
+
+CREATE SEQUENCE themes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE totp_ips (
+    ipnum character varying(255),
+    user_name character varying(20),
+    expiration integer,
+    hit_counts integer,
+    set_on integer
+);
+
+CREATE TABLE types (
+    id integer DEFAULT nextval(('types_id_seq'::text)::regclass) NOT NULL,
+    label character varying(128) NOT NULL
+);
+
+CREATE SEQUENCE types_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+CREATE TABLE userlogmsg (
+    ts integer,
+    name character varying(128),
+    event integer,
+    message text,
+    last_updated integer
+);
+
+CREATE TABLE users (
+    id integer DEFAULT nextval(('users_id_seq'::text)::regclass) NOT NULL,
+    username character varying(20) NOT NULL,
+    real_name character varying(128) DEFAULT ''::character varying NOT NULL,
+    url character varying(255) DEFAULT ''::character varying NOT NULL,
+    type integer DEFAULT 7 NOT NULL,
+    picture character varying(50) DEFAULT 'undernet.jpg'::character varying NOT NULL,
+    uniqid character varying(50) NOT NULL,
+    location character varying(128),
+    is_alumni integer
+);
+
+CREATE SEQUENCE users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+CREATE TABLE webcookies (
+    user_id integer,
+    cookie character varying(32),
+    expire integer,
+    tz_setting character varying(255) DEFAULT ''::character varying,
+    is_admin smallint DEFAULT 0,
+    totp_cookie character varying(40)
+);
+
+
+ALTER TABLE ONLY ip_restrict ALTER COLUMN id SET DEFAULT nextval('ip_restrict_id_seq'::regclass);
+ALTER TABLE ONLY exclusions
+    ADD CONSTRAINT exclusions_pkey PRIMARY KEY (excluded);
+ALTER TABLE ONLY ips
+    ADD CONSTRAINT ips_pkey PRIMARY KEY (expiration, ipnum, user_name);
+ALTER TABLE ONLY newu_ipcheck
+    ADD CONSTRAINT newu_ipcheck_pkeys PRIMARY KEY (ip);
+ALTER TABLE ONLY custom_cookies
+    ADD CONSTRAINT one_user UNIQUE (user_id);
+ALTER TABLE ONLY themes
+    ADD CONSTRAINT themes_pkey PRIMARY KEY (name);
+ALTER TABLE ONLY types
+    ADD CONSTRAINT types_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+CREATE INDEX exclusions_excluded_key ON exclusions USING btree (excluded);
+CREATE INDEX gfxcodes_code_idx ON gfxcodes USING btree (code);
+CREATE INDEX gfxcodes_crc_idx ON gfxcodes USING btree (crc);
+CREATE INDEX gfxcodes_exp_idx ON gfxcodes USING btree (expire);
+CREATE INDEX hit_counts_ips_key ON ips USING btree (hit_counts);
+CREATE INDEX ip_restrict_idx ON ip_restrict USING btree (user_id, type);
+CREATE INDEX ip_restrict_uidx ON ip_restrict USING btree (user_id);
+CREATE INDEX ips_expiration_key ON ips USING btree (expiration);
+CREATE INDEX ips_ipnum_key ON ips USING btree (ipnum);
+CREATE INDEX ips_set_on_key ON ips USING btree (set_on);
+CREATE INDEX ips_user_name_key ON ips USING btree (user_name);
+CREATE INDEX logmsg_idx_name ON logmsg USING btree (name);
+CREATE INDEX logmsg_idx_namevt ON logmsg USING btree (name, event);
+CREATE INDEX newu_ipcheck_expiration ON newu_ipcheck USING btree (expiration);
+CREATE INDEX newu_ipcheck_ip ON newu_ipcheck USING btree (ip);
+CREATE INDEX newu_ipcheck_ts ON newu_ipcheck USING btree (ts);
+CREATE UNIQUE INDEX themes_id_key ON themes USING btree (id);
+CREATE INDEX types_id_key ON types USING btree (id);
+CREATE INDEX ulogmsg_idx_name ON userlogmsg USING btree (name);
+CREATE INDEX ulogmsg_idx_namevt ON userlogmsg USING btree (name, event);
+CREATE INDEX users_id_key ON users USING btree (id);
+CREATE INDEX users_type_key ON users USING btree (type);
+CREATE INDEX webcook_ce_idx ON webcookies USING btree (cookie, expire);
+CREATE INDEX webcook_cu_idx ON webcookies USING btree (cookie, user_id);
+CREATE INDEX webcook_ia_idx ON webcookies USING btree (is_admin);
+CREATE INDEX webcookies_cookie_idx ON webcookies USING btree (cookie);
+CREATE UNIQUE INDEX webcookies_cookie_key ON webcookies USING btree (cookie);
+CREATE INDEX webcookies_expire_idx ON webcookies USING btree (expire);
+CREATE INDEX webcookies_user_id_idx ON webcookies USING btree (user_id);
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_type_fkey FOREIGN KEY (type) REFERENCES types(id);
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_type_fkey1 FOREIGN KEY (type) REFERENCES types(id);
 
 INSERT INTO themes VALUES (
 -- head
@@ -236,4 +334,3 @@ INSERT INTO themes VALUES (
 ''
 
 );
-
