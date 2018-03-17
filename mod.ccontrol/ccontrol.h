@@ -692,6 +692,8 @@ public:
 	bool refreshSuspention();
 	
 	bool refreshGlines();
+
+	bool refreshIauthEntries();
 	
 	void queueGline(ccGline* , bool = true);
 	

@@ -1832,6 +1832,7 @@ else if (timer_id == expiredTimer)
 	refreshGlines();
 	refreshIgnores();
 	refreshSuspention();
+	refreshIauthEntries();
 	expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,
 		this,NULL);
 	}
@@ -6110,6 +6111,21 @@ if(TotalFound > 0)
 
 return true;
 
+}
+
+bool ccontrol::refreshIauthEntries()
+{
+ipLRecentIauthListType::iterator iItr;
+for (iItr = ipLRecentIauthList.begin(); iItr != ipLRecentIauthList.end(); ) {
+	iClient *tClient = iItr->first;
+	int age = ::time(0) - iItr->second;
+	if (age > 10) {
+		ipLDropClient(tClient);
+		iItr = ipLRecentIauthList.erase(iItr);
+		delete tClient;
+	}
+}
+return true;
 }
 
 void ccontrol::listGlines( iClient *theClient, string Mask )
