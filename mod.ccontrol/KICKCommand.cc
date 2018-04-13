@@ -119,12 +119,9 @@ if( bot->isOperChan( chanName ) )
 	bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
 	return true ;
 	}
+
 //Its not an oper channel 
-bot->Join( chanName, string(), 0, true ) ;
-
-bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
-
-bot->Part( chanName ) ;
+bot->Kick( theChan, Target, st.assemble(3), true) ;
 
 return true ;
 }

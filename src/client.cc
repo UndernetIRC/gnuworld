@@ -1954,7 +1954,8 @@ return true ;
 }
 
 bool xClient::Kick( Channel* theChan, iClient* theClient,
-	const string& reason )
+	const string& reason,
+	bool modeAsServer)
 {
 assert( theChan != NULL ) ;
 assert( theClient != NULL ) ;
@@ -1975,12 +1976,12 @@ if( NULL == theChan->findUser( theClient ) )
 	}
 
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel )
+if( !OnChannel && !modeAsServer)
 	{
 	// Join, giving ourselves ops
 	Join( theChan, string(), 0, true ) ;
 	}
-else
+else if (!modeAsServer)
 	{
 	// Bot already on channel
 	// Make sure we have ops
@@ -1996,8 +1997,10 @@ else
 	// The bot has ops
 	}
 
+string SendAs = modeAsServer ? getCharYY() : getCharYYXXX();
+
 stringstream s ;
-s	<< getCharYYXXX() << " K "
+s	<< SendAs << " K "
 	<< theChan->getName() << ' '
 	<< theClient->getCharYYXXX() << " :"
 	<< reason ;
@@ -2041,7 +2044,7 @@ if (destChanUser != NULL)
 
 } else elog << "xClient::Kick> destChanUser == NULL !!" << endl;
 
-if( !OnChannel )
+if( !OnChannel && !modeAsServer)
 	{
 	Part( theChan ) ;
 	}
@@ -2057,7 +2060,8 @@ return true ;
 
 bool xClient::Kick( Channel* theChan,
 	const std::vector< iClient* >& theClients,
-	const string& reason )
+	const string& reason,
+	bool modeAsServer)
 {
 assert( theChan != NULL ) ;
 
@@ -2072,12 +2076,12 @@ if( theClients.empty() )
 	}
 
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel )
+if( !OnChannel && !modeAsServer)
 	{
 	// Join, giving ourselves ops
 	Join( theChan, string(), 0, true ) ;
 	}
-else
+else if (!modeAsServer)
 	{
 	// Bot is already on the channel
 	ChannelUser* meUser = theChan->findUser( me ) ;
@@ -2116,8 +2120,10 @@ for( std::vector< iClient* >::const_iterator ptr = theClients.begin() ;
 		continue ;
 		}
 
+	string SendAs = modeAsServer ? getCharYY() : getCharYYXXX();
+
 	stringstream s ;
-	s	<< getCharYYXXX() << " K "
+	s	<< SendAs << " K "
 		<< theChan->getName() << ' '
 		<< (*ptr)->getCharYYXXX() << " :"
 		<< reason ;
@@ -2164,7 +2170,7 @@ for( std::vector< iClient* >::const_iterator ptr = theClients.begin() ;
 	} else elog << "xClient::Kick[]> destChanUser == NULL !!" << endl;
 	}
 
-if( !OnChannel )
+if( !OnChannel && !modeAsServer)
 	{
 	Part( theChan ) ;
 	}
@@ -2180,7 +2186,8 @@ return true ;
 
 bool xClient::Kick( Channel* theChan,
 	const string& IP,
-	const string& reason )
+	const string& reason,
+	bool modeAsServer)
 {
 assert( theChan != NULL ) ;
 
@@ -2195,12 +2202,12 @@ if ( IP.empty() )
 	}
 
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel )
+if( !OnChannel && modeAsServer)
 	{
 	// Join, giving ourselves ops
 	Join( theChan, string(), 0, true ) ;
 	}
-else
+else if (!modeAsServer)
 	{
 	// Bot is already on the channel
 	ChannelUser* meUser = theChan->findUser( me ) ;
@@ -2238,7 +2245,7 @@ else
 			}
 		}
 	}
-	return Kick(theChan, toBoot, reason);
+	return Kick(theChan, toBoot, reason, modeAsServer);
 }
 
 bool xClient::Join( const string& chanName,
