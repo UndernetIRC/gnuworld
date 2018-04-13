@@ -418,12 +418,19 @@ void cservice::BurstChannels()
 	sqlChannel* theChan = (ptr)->second;
 
 	/* we're now interested in registered channels even if we're not in it... */
-	if(theChan->getName() == "*")
+	if (theChan->getName() == "*")
 	{	//Do not do anything for the admins channel
 		++ptr;
 		continue;
 	}
 	
+	/* The channel is purged */
+	if (theChan->getRegisteredTS() == 0)
+	{
+		++ptr;
+		continue;
+	}
+
 	MyUplink->RegisterChannelEvent( theChan->getName(), this ) ;
 
 	tmpChan = Network->findChannel(theChan->getName());
@@ -1715,7 +1722,7 @@ return 0;
 /**
  *  Locates a channel record by 'id', the channel name.
  */
-sqlChannel* cservice::getChannelRecord(const string& id)
+sqlChannel* cservice::getChannelRecord(const string& id, bool historysearch)
 {
 
 /*
@@ -1723,14 +1730,18 @@ sqlChannel* cservice::getChannelRecord(const string& id)
  */
 
 sqlChannelHashType::iterator ptr = sqlChannelCache.find(id);
-if(ptr != sqlChannelCache.end())
-	{
+if (ptr != sqlChannelCache.end())
+{
 	channelCacheHits++;
 	ptr->second->setLastUsed(currentTime());
 
 	// Return the channel to the caller
-	return ptr->second ;
-	}
+	if (historysearch && ptr->second->getRegisteredTS() == 0)
+		return ptr->second;
+
+	if (!historysearch && ptr->second->getRegisteredTS() > 0)
+		return ptr->second;
+}
 
 /*
  *  We didn't find anything in the cache.
@@ -1742,7 +1753,7 @@ return 0;
 /**
  *  Loads a channel from the cache by 'id'.
  */
-sqlChannel* cservice::getChannelRecord(int id)
+sqlChannel* cservice::getChannelRecord(int id, bool historysearch)
 {
 
 /*
@@ -1750,14 +1761,18 @@ sqlChannel* cservice::getChannelRecord(int id)
  */
 
 sqlChannelIDHashType::iterator ptr = sqlChannelIDCache.find(id);
-if(ptr != sqlChannelIDCache.end())
-	{
+if (ptr != sqlChannelIDCache.end())
+{
 	channelCacheHits++;
 	ptr->second->setLastUsed(currentTime());
 
 	// Return the channel to the caller
-	return ptr->second ;
-	}
+	if (historysearch && ptr->second->getRegisteredTS() == 0)
+		return ptr->second;
+
+	if (!historysearch && ptr->second->getRegisteredTS() > 0)
+		return ptr->second;
+}
 
 /*
  *  We didn't find anything in the cache.
@@ -1765,7 +1780,6 @@ if(ptr != sqlChannelIDCache.end())
 
 return 0;
 }
-
 
 sqlLevel* cservice::getLevelRecord( sqlUser* theUser, sqlChannel* theChan )
 {
@@ -3096,7 +3110,7 @@ theQuery	<< "SELECT "
 			<< ",now()::abstime::int4 as db_unixtime FROM "
 			<< "channels WHERE last_updated >= "
 			<< lastChannelRefresh
-			<< " AND registered_ts <> 0"
+			//<< " AND registered_ts <> 0"
 			<< ends;
 
 #ifdef LOG_SQL
@@ -4053,123 +4067,116 @@ bool cservice::AcceptChannel(unsigned int chanId, const string& reason)
 	} else if (SQLDb->Tuples() != 0) return true; else return false;
 }
 
-/*
- * Create the new channel and insert it into the cache.
- * If the channel exists on IRC, grab the creation timestamp
- * and use this as the channel_ts in the Db.
- */
 bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const string& chanName)
 {
+	sqlUser* theUser = isAuthed(theClient, true);
+	if (!theUser) return false;
+
 	unsigned int channel_ts = 0;
 	Channel* tmpChan = Network->findChannel(chanName);
 	channel_ts = tmpChan ? tmpChan->getCreationTime() : ::time(NULL);
 
-	sqlChannel* newChan = new (std::nothrow) sqlChannel(SQLDb);
+	bool isUnclaimed = false;
+	sqlChannel* newChan = getChannelRecord(chanName, true);
+	if (newChan)
+		isUnclaimed = true;
+	if (!isUnclaimed)
+	{
+		newChan = new (std::nothrow) sqlChannel(SQLDb);
+	}
 	newChan->setName(chanName);
 	newChan->setChannelTS(channel_ts);
 	newChan->setRegisteredTS(currentTime());
 	newChan->setChannelMode("+tnR");
 	newChan->setLastUsed(currentTime());
-
-	sqlUser* theUser = isAuthed(theClient, false);
-
-	/*
-	 *  If this channel exists in the database (without a registered_ts set),
-	 *  then it is currently unclaimed. This register command will
-	 *  update the timestamp, and proceed to adduser.
-	 */
-
-	stringstream checkQuery;
-	checkQuery  << "SELECT id FROM channels WHERE "
-				<< "registered_ts = 0 AND lower(name) = '"
-				<< escapeSQLChars(string_lower(chanName))
-				<< "'"
-				<< ends;
-
-#ifdef LOG_SQL
-	elog << "sqlRegisterChannelQuery> " << checkQuery.str().c_str() << endl;
-#endif
-
-	bool isUnclaimed = false;
-	if (SQLDb->Exec(checkQuery, true))
-//	if ((status = bot->SQLDb->Exec(checkQuery.str().c_str())) == PGRES_TUPLES_OK)
+	newChan->setFlag(sqlChannel::F_AUTOJOIN);
+	newChan->setFlag(sqlChannel::F_NOTAKE);
+	newChan->setNoTake(1);
+	if (!isUnclaimed)
 	{
-		if (SQLDb->Tuples() > 0) isUnclaimed = true;
-	}
-	if (isUnclaimed)
-	{
-		/*
-		 *  Quick query to set registered_ts back for this chan.
-		 */
-		stringstream reclaimQuery;
-		reclaimQuery    << "UPDATE channels SET registered_ts = now()::abstime::int4,"
-						<< " last_updated = now()::abstime::int4, "
-						<< " flags = 0, description = '', url = '', comment = '', keywords = '', channel_mode = '+tnR' "
-						<< " WHERE lower(name) = '"
-						<< escapeSQLChars(string_lower(chanName))
-						<< "'"
-						<< ends;
-#ifdef LOG_SQL
-		elog << "sqlRegChannReclaimQuery> " << reclaimQuery.str().c_str() << endl;
-#endif
-
-		if (!SQLDb->Exec(reclaimQuery)) return false;
-	}
-	else /* We perform a normal registration. */
-	{
+		// Here we get the assigned Id by the database
 		newChan->insertRecord();
-	}
-	/*
-	 *  Now add the target chap at 500 in the new channel. To do this, we need to know
-	 *  the db assigned channel id of the newly created channel :/
-	 */
-	stringstream idQuery;
-	idQuery		<< "SELECT id FROM channels WHERE "
-				<< "lower(name) = '"
-				<< escapeSQLChars(string_lower(chanName))
-				<< "'"
-				<< ends;
-
-#ifdef LOG_SQL
-	elog << "sqlRegChannidQuery> " << idQuery.str().c_str() << endl;
-#endif
-
-	unsigned int theId = 0;
-
-	if (SQLDb->Exec(idQuery, true))
-//	if ((status = bot->SQLDb->Exec(idQuery.str().c_str())) ==
-//PGRES_TUPLES_OK)
-	{
-		if (SQLDb->Tuples() > 0)
-		{
-			theId = atoi(SQLDb->GetValue(0, 0));
-			newChan->setID(theId);
-
-			sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
-			sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
-			pendingChannelListType::iterator ptr = pendingChannelList.find(chanName);
-			if (ptr != pendingChannelList.end())
-			{
-				sqlPendingChannel* pendingChan = ptr->second;
-				pendingChan->commit();
-				ptr->second = NULL;
-				delete(pendingChan);
-				pendingChannelList.erase(ptr);
-			}
-		}
-		else
-		{
-			/*
-			 * If we can't find the channel in the db, something has gone
-			 * horribly wrong.
-			 */
-			return false;
-		}
+		newChan->loadData(newChan->getName());
+		sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
+		sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 	}
 	else
+		newChan->commit();
+
+	// First delete previous levels
+	stringstream theQuery ;
+
+	theQuery	<< "DELETE FROM levels WHERE channel_id = "
+				<< newChan->getID()
+				<< ends;
+
+	#ifdef LOG_SQL
+	elog	<< "sqlQuery> "
+			<< theQuery.str().c_str()
+			<< endl;
+	#endif
+
+	if( !SQLDb->Exec(theQuery ) )
+	//if( status != PGRES_COMMAND_OK )
+		{
+		elog	<< "REGISTER> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
+		return false ;
+		}
+
+	/*
+	 * Delete Level records for this channel.
+	 */
+	cservice::sqlLevelHashType::const_iterator lvlptr = sqlLevelCache.begin();
+	cservice::sqlLevelHashType::key_type lvlPair;
+
+	while (lvlptr != sqlLevelCache.end())
 	{
-		return false;
+		sqlLevel* tmpLevel = lvlptr->second;
+		unsigned int channel_id = lvlptr->first.second;
+
+		if (channel_id == newChan->getID())
+		{
+			lvlPair = lvlptr->first;
+
+	#ifdef LOG_DEBUG
+			elog << "REGISTERCommand> Purging Level Record for: " << lvlPair.second << " (UID: " << lvlPair.first << ")" << endl;
+	#endif
+
+			++lvlptr;
+			sqlLevelCache.erase(lvlPair);
+
+			delete(tmpLevel);
+		} else
+		{
+			++lvlptr;
+		}
 	}
+
+	cservice::pendingChannelListType::iterator ptr = pendingChannelList.find(newChan->getName());
+	if (ptr != pendingChannelList.end())
+	{
+		sqlPendingChannel* pendingChan = ptr->second;
+		pendingChan->commit();
+		ptr->second = NULL;
+		delete(pendingChan);
+		pendingChannelList.erase(ptr);
+	}
+
+	logAdminMessage("%s (%s) has registered %s to %s", theClient->getNickName().c_str(),
+		theUser->getUserName().c_str(), chanName.c_str(), mngrUsr->getUserName().c_str());
+	Notice(theClient,
+		getResponse(theUser,
+			language::regged_chan,
+			string("Registered channel %s")).c_str(),
+			newChan->getName().c_str());
+
+	/*
+	 *  Finally, commit a channellog entry.
+	 */
+	writeChannelLog(newChan, theClient, sqlChannel::EV_REGISTER, "to " + mngrUsr->getUserName());
+
 	/*
 	 * Create the new manager.
 	 */
@@ -4189,58 +4196,34 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		newManager->setLastModifBy("(" + theUser->getUserName() + ") " + theClient->getNickUserHost());
 	}
 	newManager->setLastModif(currentTime());
+
 	if (!newManager->insertRecord())
-	{
-	validResponseString = "Couldn't automatically add the level 500 Manager, check if doesn't already exist.";
-	logTheJudgeMessage(validResponseString.c_str());
+		{
+			Notice(theClient, "Couldn't automatically add the level 500 Manager, check it doesn't already exist.");
 			delete(newManager);
-			return false;
-	}
+			return (false);
+		}
 
 	/*
 	 * Insert this new 500 into the level cache.
 	 */
-
 	pair<int, int> thePair( newManager->getUserId(), newManager->getChannelId());
 	sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newManager));
 
-	/* set channel mode R - tmpChan is created further above */
-	stringstream tmpTS;
-	tmpTS << channel_ts;
-	string channelTS = tmpTS.str();
-
-	if (tmpChan)
-		getUplink()->Mode(NULL, tmpChan, string("+R"), channelTS );
-	getUplink()->RegisterChannelEvent(chanName.c_str(),this);
-	writeChannelLog(newChan, theClient, sqlChannel::EV_REGISTER, "to " + mngrUsr->getUserName());
-
-	newChan->setFlag(sqlChannel::F_AUTOJOIN);
-	newChan->setFlag(sqlChannel::F_NOTAKE);
-	newChan->setNoTake(1);
-	newChan->commit();
-
-	//Update this particular channel's levele cache, so our new manager will be inserted in levelscache
-	//updateLevels(newChan->getID());
-
+	getUplink()->RegisterChannelEvent(chanName, this);
 	Join(newChan->getName(), string("+tnR"), newChan->getChannelTS(), true);
 	newChan->setInChan(true);
 	joinCount++;
-	//Very probably this is already done by the webpage
-	//writeChannelLog(newChan, getInstance(), sqlChannel::EV_JOIN, "Channel Registered");
-
-	//newChan->setRegisteredTS(currentTime());
-	//newChan->setChannelMode("+tnR");
-	//newChan->setLastUsed(currentTime());
 
 	//Send a welcome notice to the channel
 	if (!welcomeNewChanMessage.empty())
-		xClient::Notice(newChan->getName(), TokenStringsParams(welcomeNewChanMessage.c_str(), newChan->getName().c_str()).c_str());
+		Notice(newChan->getName(), TokenStringsParams(welcomeNewChanMessage.c_str(), newChan->getName().c_str()).c_str());
 
 	//Set a welcome topic of the new channel, only if the actual topic is empty
 #ifdef TOPIC_TRACK
 	if (!welcomeNewChanTopic.empty())
 	if (tmpChan && tmpChan->getTopic().empty())
-		xClient::Topic(tmpChan, welcomeNewChanTopic);
+		Topic(tmpChan, welcomeNewChanTopic);
 #endif
 
 	return true;
@@ -6872,7 +6855,7 @@ SQLDb->Exec(theLog);
  *  It returns a blank string if none found.
  */
 const string cservice::getLastChannelEvent(sqlChannel* theChannel,
-	unsigned short eventType, unsigned int& eventTime)
+	unsigned short eventType, time_t eventTime)
 {
 	unsigned int ts;
 	stringstream queryString;
@@ -6882,7 +6865,7 @@ const string cservice::getLastChannelEvent(sqlChannel* theChannel,
 	else
 		ts = eventTime;
 
-	queryString	<< "SELECT message FROM channellog WHERE "
+	queryString	<< "SELECT ts, message FROM channellog WHERE "
 			<< "channelid = "
 			<< theChannel->getID()
 			<< " AND event = "
@@ -6902,7 +6885,10 @@ const string cservice::getLastChannelEvent(sqlChannel* theChannel,
 	{
 		if (SQLDb->Tuples() < 1)
 			return "";
-		string reason = SQLDb->GetValue(0, 0);
+		time_t purgeTime = atoi(SQLDb->GetValue(0, 0));
+		string timeStr = (string)ctime(&purgeTime);
+		timeStr.erase(timeStr.length() - 1);
+		string reason = "[" + timeStr + "] " + SQLDb->GetValue(0, 1);
 		return reason;
 	}
 	return "";
@@ -7541,8 +7527,8 @@ void cservice::preloadChannelCache()
 {
 stringstream theQuery;
 theQuery	<< "SELECT " << sql::channel_fields
-			<< " FROM channels WHERE "
-			<< "registered_ts <> 0"
+			<< " FROM channels"
+			//<< " WHERE registered_ts <> 0"
 			<< ends;
 
 elog	<< "*** [CMaster::preloadChannelCache]: Loading all registered channel records: "

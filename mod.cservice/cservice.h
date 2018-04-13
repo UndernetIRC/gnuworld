@@ -185,7 +185,7 @@ public:
 
 	/* get last channel event for specific timestamp */
 	const string getLastChannelEvent(sqlChannel* theChannel,
-		unsigned short eventType, unsigned int& eventTime);
+		unsigned short eventType, time_t eventTime);
 
 	typedef commandMapType::const_iterator constCommandIterator ;
 	constCommandIterator command_begin() const
@@ -265,8 +265,8 @@ public:
 	unsigned short isForced(sqlChannel*, sqlUser*);
 
 	/* Fetch a channel record for a channel. */
-	sqlChannel* getChannelRecord( const string& );
-	sqlChannel* getChannelRecord( int );
+	sqlChannel* getChannelRecord(const string&, bool historysearch = false);
+	sqlChannel* getChannelRecord(int, bool historysearch = false);
 
 	/* Fetch a access level record for a user/channel combo. */
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);

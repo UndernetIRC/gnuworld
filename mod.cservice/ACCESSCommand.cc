@@ -79,17 +79,35 @@ if (!theUser)
 	return false;
 }
 
+bool historysearch = false;
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan)
-	{
+if (!theChan && !bot->getAdminAccessLevel(theUser))
+{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::chan_not_reg).c_str(),
 		st[1].c_str()
 		);
 	return false;
+}
+else if (!theChan && bot->getAdminAccessLevel(theUser))
+{
+	theChan = bot->getChannelRecord(st[1], true);
+	if (!theChan)
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::chan_not_reg).c_str(),
+			st[1].c_str()
+			);
+		return false;
 	}
-
+	else
+	{
+		historysearch = true;
+	}
+}
 /* Don't let ordinary people view * accesses */
 if (theChan->getName() == "*")
 	{
@@ -348,6 +366,9 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 			}
 
 		results++;
+
+		if (historysearch)
+			bot->Notice(theClient, "\002   *** Access history search results ***\002");
 
 		bot->Notice(theClient,
 			bot->getResponse(theUser, language::user_access_is).c_str(),

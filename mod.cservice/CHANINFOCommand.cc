@@ -447,6 +447,20 @@ stringstream theQuery;
 sqlUser* theUser = tmpUser;
 Channel* tmpChan = Network->findChannel(st[1]);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
+if (!theChan && adminAccess)
+{
+	theChan = bot->getChannelRecord(st[1], true);
+	if (theChan)
+	{
+		string purgeReason = bot->getLastChannelEvent(theChan, sqlChannel::EV_PURGE, bot->currentTime());
+		if (!purgeReason.empty())
+		{
+			bot->Notice(theClient, "\002   *** Last purge history result ***\002");
+			bot->Notice(theClient, purgeReason.c_str());
+			theChan = NULL;
+		}
+	}
+}
 if( !theChan )
 	{
 	unsigned int lastdays = (unsigned int)bot->currentTime() - ((unsigned int)bot->daySeconds*bot->PendingsExpireTime);
