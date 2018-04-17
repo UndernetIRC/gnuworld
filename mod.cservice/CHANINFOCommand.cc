@@ -457,6 +457,7 @@ if (!theChan && adminAccess)
 		{
 			bot->Notice(theClient, "\002   *** Last purge history result ***\002");
 			bot->Notice(theClient, purgeReason.c_str());
+			delete theChan;
 			theChan = NULL;
 		}
 	}
