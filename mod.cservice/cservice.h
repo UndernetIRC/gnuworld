@@ -653,8 +653,7 @@ public:
 
 	void cacheExpireUsers();
 
-	//TODO: Enable this when sure!
-	void wipeNeverLoggedUsers();
+	void fixUsersLastSeen();
 
 	/*
 	 *  Expire Ban records, only if the channel

@@ -2853,10 +2853,7 @@ void cservice::cacheExpireUsers()
 		updateCount);
 }
 
-/*
- * TODO: Enable this when sure
- */
-void cservice::wipeNeverLoggedUsers()
+void cservice::fixUsersLastSeen()
 {
 	typedef vector <std::pair < unsigned int, string > > uidVectorType;
 	uidVectorType uidVector;
@@ -2868,7 +2865,7 @@ void cservice::wipeNeverLoggedUsers()
 
 	if (!SQLDb->Exec(queryString, true))
 	{
-		logDebugMessage("Error on cservice::wipeNeverLoggedUsers");
+		logDebugMessage("Error on cservice::fixUsersLastSeen");
 #ifdef LOG_SQL
 		//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
 		elog 	<< "cservice::fixUsersLastSeenIDQuery> SQL Error: "
@@ -2895,31 +2892,43 @@ void cservice::wipeNeverLoggedUsers()
 		{
 #ifdef LOG_SQL
 			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-			elog 	<< "cservice::wipeNeverLoggedUsers> SQL Error: "
+			elog 	<< "cservice::fixUsersLastSeen> SQL Error: "
 					<< SQLDb->ErrorMessage()
 					<< endl ;
-			logDebugMessage("Error on cservice::wipeNeverLoggedUsers");
+			logDebugMessage("Error on cservice::fixUsersLastSeen");
 #endif
 			return;
 		}
 		if (SQLDb->Tuples() == 0)	// <- meaning no last_seen data entry at all in 'users_lastseen' table
 		{
-			sqlUser* wipeUser = getUserRecord((int)uidVector.at(i).first);
-			if (wipeUser)
-			{	//If the loaded user has no last_updated data, set it here, and for this 'round' leave alone
-				if (wipeUser->getLastUpdated() == 0)
-				{
-					wipeUser->commit(this->getInstance());
-					continue;
-				}
-				else //this is 'second round', this user had a fixed a last_updated info, but still has no last_seen data, so something is wrong with this user, hopefully need to be wiped
-					toFixVector.push_back(uidVector.at(i).first);
+			sqlUser* fixUser = getUserRecord((int)uidVector.at(i).first);
+			if (!fixUser)
+			{
+				elog 	<< "cservice::fixUsersLastSeen> ERROR: fixUser" << uidVector.at(i).second << "(" << uidVector.at(i).first << ") not found with getUserRecord()" << endl;
+				continue;
 			}
+			// Here we give 24 hours for any newly created users to log in, also for other never logged in users.
+			stringstream insertQuery;
+			insertQuery	<< "INSERT INTO users_lastseen (user_id,"
+					<< "last_seen,last_updated) VALUES("
+					<< fixUser->getID()
+					<< ","
+					<< currentTime() - UsersExpireDBDays + 86400
+					<< ",now()::abstime::int4)"
+					<< ends;
+			if (!SQLDb->Exec(insertQuery))
+			{
+#ifdef LOG_SQL
+			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+			elog 	<< "cservice::fixUsersLastSeen> SQL Error: "
+					<< SQLDb->ErrorMessage()
+					<< endl ;
+			logDebugMessage("Error on cservice::fixUsersLastSeen");
+#endif
+			}
+			logDebugMessage("Fixed last_seen data for username %s", fixUser->getUserName().c_str());
 		}
 	}
-	logDebugMessage("Beginning to wipe %i users:",(int)toFixVector.size());
-	for (size_t i=0; i<toFixVector.size(); i++)
-		wipeUser(toFixVector.at(i),false);
 	logDebugMessage("Completed.");
 }
 
@@ -3520,8 +3529,7 @@ if (timer_id == cache_timerID)
 	cacheExpireUsers();
 	cacheExpireLevels();
 
-	//TODO: Activate this when sure!
-	//wipeNeverLoggedUsers();
+	fixUsersLastSeen();
 
 	/* Refresh Timer */
 	time_t theTime = time(NULL) + cacheInterval;
