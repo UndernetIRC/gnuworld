@@ -653,8 +653,6 @@ public:
 
 	void cacheExpireUsers();
 
-	void fixUsersLastSeen();
-
 	/*
 	 *  Expire Ban records, only if the channel
 	 *  record is 'idle'.

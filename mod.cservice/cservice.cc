@@ -2853,85 +2853,6 @@ void cservice::cacheExpireUsers()
 		updateCount);
 }
 
-void cservice::fixUsersLastSeen()
-{
-	typedef vector <std::pair < unsigned int, string > > uidVectorType;
-	uidVectorType uidVector;
-	vector <unsigned int> toFixVector;
-
-	stringstream queryString;
-	queryString	<< "SELECT id,user_name FROM users"
-				<< ends;
-
-	if (!SQLDb->Exec(queryString, true))
-	{
-		logDebugMessage("Error on cservice::fixUsersLastSeen");
-#ifdef LOG_SQL
-		//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-		elog 	<< "cservice::fixUsersLastSeenIDQuery> SQL Error: "
-				<< SQLDb->ErrorMessage()
-				<< endl ;
-#endif
-		return;
-	}
-	for (unsigned int i = 0; i < SQLDb->Tuples(); i++)
-		uidVector.push_back(uidVectorType::value_type(atoi(SQLDb->GetValue(i,0).c_str()),SQLDb->GetValue(i,1).c_str()));
-
-	if (uidVector.empty()) return;
-
-	logDebugMessage("Total usercount to check for NeverLoggedUsers: %i",(int)uidVector.size());
-
-	for (size_t i=0; i<uidVector.size(); i++)
-	{
-		queryString.str("");
-		queryString	<< "SELECT last_seen FROM users_lastseen WHERE user_id="
-					<< uidVector.at(i).first
-					<< ends;
-
-		if (!SQLDb->Exec(queryString, true))
-		{
-#ifdef LOG_SQL
-			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-			elog 	<< "cservice::fixUsersLastSeen> SQL Error: "
-					<< SQLDb->ErrorMessage()
-					<< endl ;
-			logDebugMessage("Error on cservice::fixUsersLastSeen");
-#endif
-			return;
-		}
-		if (SQLDb->Tuples() == 0)	// <- meaning no last_seen data entry at all in 'users_lastseen' table
-		{
-			sqlUser* fixUser = getUserRecord((int)uidVector.at(i).first);
-			if (!fixUser)
-			{
-				elog 	<< "cservice::fixUsersLastSeen> ERROR: fixUser" << uidVector.at(i).second << "(" << uidVector.at(i).first << ") not found with getUserRecord()" << endl;
-				continue;
-			}
-			// Here we give 24 hours for any newly created users to log in, also for other never logged in users.
-			stringstream insertQuery;
-			insertQuery	<< "INSERT INTO users_lastseen (user_id,"
-					<< "last_seen,last_updated) VALUES("
-					<< fixUser->getID()
-					<< ","
-					<< currentTime() - UsersExpireDBDays + 86400
-					<< ",now()::abstime::int4)"
-					<< ends;
-			if (!SQLDb->Exec(insertQuery))
-			{
-#ifdef LOG_SQL
-			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-			elog 	<< "cservice::fixUsersLastSeen> SQL Error: "
-					<< SQLDb->ErrorMessage()
-					<< endl ;
-			logDebugMessage("Error on cservice::fixUsersLastSeen");
-#endif
-			}
-			logDebugMessage("Fixed last_seen data for username %s", fixUser->getUserName().c_str());
-		}
-	}
-	logDebugMessage("Completed.");
-}
-
 void cservice::cacheExpireLevels()
 {
 	logDebugMessage("Beginning Channel Level-cache cleanup:");
@@ -3009,6 +2930,7 @@ bool cservice::deleteUserFromTable(unsigned int userId, const string& table)
 	queryString << "DELETE FROM " << table << " WHERE " << userIdStr << " = "
     	 		<< userId
         		<< endl;
+
     if (!SQLDb->Exec(queryString,true))
     {
     	logDebugMessage("wipeUser FAILED to delete user %i from %s",userId,table.c_str());
@@ -3028,10 +2950,19 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	sqlUser* tmpUser = getUserRecord(userId);
 	assert(tmpUser != 0);
 	string removeKey;
+	time_t last_seen = 0;
 	bool deleted = false;
 	if (tmpUser->getFlag(sqlUser::F_NOPURGE))
 	{
 		goto cacheclean;
+	}
+	if (expired)
+	{
+		if (tmpUser->getPostFormsTS() > currentTime())
+		{
+			return false;
+		}
+		last_seen = tmpUser->getLastSeen();
 	}
 	deleteUserFromTable(userId,"acl");
 	deleteUserFromTable(userId,"levels");
@@ -3050,7 +2981,13 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 
 	deleted = true;
 
-	if (expired) logAdminMessage("User %s (%s) has expired",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
+	if (expired)
+	{
+		if (last_seen > 0)
+			logAdminMessage("User %s (%s) has expired",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
+		else
+			logAdminMessage("User %s (%s) has expired (Never logged in)",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
+	}
 	else logDebugMessage("Deleted(wipeUser) %s (%i) from the database.", tmpUser->getUserName().c_str(),userId);
 
 	cacheclean:
@@ -3075,6 +3012,7 @@ void cservice::ExpireUsers()
 				<< currentTime()-UsersExpireDBDays
 				<< " AND last_seen > 0"
 				<< ends;
+
 	if( !SQLDb->Exec(queryString, true ))
 	{
 	   logDebugMessage("An Error occured while retrieve database information on USERS-EXPIRE query");
@@ -3088,6 +3026,20 @@ void cservice::ExpireUsers()
 	vector <unsigned int> UserIDs;
 	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		UserIDs.push_back(atoi(SQLDb->GetValue(i,0).c_str()));
+
+	// Now all the users who are not present in users_lastseen table
+	queryString.str(std::string());
+	queryString	<< "SELECT id FROM users WHERE id NOT IN (SELECT user_id FROM users_lastseen)"
+				<< ends;
+
+	if( !SQLDb->Exec(queryString, true ))
+	{
+	   logDebugMessage("ExpireUser SQL Error: %s", SQLDb->ErrorMessage().c_str());
+	   return;
+	}
+	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
+		UserIDs.push_back(atoi(SQLDb->GetValue(i,0).c_str()));
+
 	for (unsigned int i = 0 ; i < UserIDs.size(); i++)
 	    if (wipeUser(UserIDs.at(i),true)) ++usersCount;
     UserIDs.clear();
@@ -3528,8 +3480,6 @@ if (timer_id == cache_timerID)
 	{
 	cacheExpireUsers();
 	cacheExpireLevels();
-
-	fixUsersLastSeen();
 
 	/* Refresh Timer */
 	time_t theTime = time(NULL) + cacheInterval;
