@@ -72,7 +72,6 @@ sqlUser::sqlUser(dbHandle* _SQLDb)
    flags( 0 ),
    last_used( 0 ),
    instantiated_ts( ::time(NULL) ),
-   post_forms( 0 ),
    signup_ts( 0 ),
    email(),
    verifdata(),
@@ -199,14 +198,13 @@ language_id = atoi(SQLDb->GetValue(row, 4));
 flags = atoi(SQLDb->GetValue(row, 5));
 last_updated_by = SQLDb->GetValue(row, 6);
 last_updated = atoi(SQLDb->GetValue(row, 7));
-post_forms = atoi(SQLDb->GetValue(row, 8));
-signup_ts = atoi(SQLDb->GetValue(row, 9));
-email = SQLDb->GetValue(row, 10);
-maxlogins = atoi(SQLDb->GetValue(row, 11));
-verifdata = SQLDb->GetValue(row, 12);
+signup_ts = atoi(SQLDb->GetValue(row, 8));
+email = SQLDb->GetValue(row, 9);
+maxlogins = atoi(SQLDb->GetValue(row, 10));
+verifdata = SQLDb->GetValue(row, 11);
 failed_logins = 0;
 failed_login_ts = 0;
-totp_key = SQLDb->GetValue(row, 13);
+totp_key = SQLDb->GetValue(row, 12);
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
 }

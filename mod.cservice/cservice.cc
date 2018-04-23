@@ -2958,7 +2958,7 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	}
 	if (expired)
 	{
-		if (tmpUser->getPostFormsTS() > currentTime())
+		if (tmpUser->getSignupTS() + neverLoggedInUsersExpireTime > currentTime())
 		{
 			return false;
 		}
@@ -8181,6 +8181,7 @@ void cservice::loadConfigVariables()
 	floodproRelaxTime = atoi((cserviceConfig->Require( "floodpro_relaxtime" )->second).c_str());
 	MAXnotes = atoi((cserviceConfig->Require( "max_notes" )->second).c_str());
 	topic_duration = atoi((cserviceConfig->Require( "topic_duration" )->second).c_str());
+	neverLoggedInUsersExpireTime = atoi((cserviceConfig->Require( "neverloggedin_users_expiretime" )->second).c_str());
 	UsersExpireDBDays = atoi((cserviceConfig->Require( "users_expire_days" )->second).c_str());
 	daySeconds = atoi((cserviceConfig->Require( "day_seconds" )->second).c_str());
 	// * The Judge related variables * //

@@ -389,6 +389,9 @@ public:
 	 * be notified that it is so. */
 	int pendingNotifPeriod;
 
+	/* After how much seconds should expire any newly created never logged in user */
+	int neverLoggedInUsersExpireTime;
+
 	/* Duration in days, after the system purge unlogged users */
 	int UsersExpireDBDays;
 

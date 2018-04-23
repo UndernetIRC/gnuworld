@@ -102,9 +102,6 @@ public:
 	inline const time_t&		getInstantiatedTS() const
 		{ return instantiated_ts ; }
 
-	inline const time_t&		getPostFormsTS() const
-		{ return post_forms ; }
-
 	inline const time_t&		getSignupTS() const
 		{ return signup_ts ; }
 
@@ -187,9 +184,6 @@ public:
 	inline void setInstantiatedTS( const time_t& _instantiated_ts)
 		{ instantiated_ts = _instantiated_ts; }
 
-	inline void setPostFormsTS( const time_t& _post_forms )
-		{ post_forms = _post_forms; }
-
 	inline void setSignUpTS( const time_t& _signup_ts )
 		{ signup_ts = _signup_ts; }
 
@@ -263,7 +257,6 @@ protected:
 	time_t		last_updated ;
 	time_t		last_used;
 	time_t		instantiated_ts;
-	time_t		post_forms;
 	time_t		signup_ts;
 	std::string	email ;
 	std::string	verifdata;

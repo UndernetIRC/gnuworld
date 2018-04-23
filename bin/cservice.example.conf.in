@@ -237,6 +237,10 @@ welcome_newchan_message = Congratulations! Channel %s has been registered!
 
 welcome_newchan_topic = *** Congratulations! Your channel application has been accepted! ***
 
+# After how much seconds should expire any newly created never logged in user
+
+neverloggedin_users_expiretime = 21600
+
 # Days to expire users
 # 0 = never expire
 
