@@ -165,11 +165,11 @@ public:
 	virtual void OnWhois( iClient* sourceClient,
 			iClient* targetClient );
 
-	virtual bool Kick( Channel*, iClient*, const std::string& ) ;
+	virtual bool Kick( Channel*, iClient*, const std::string&, bool modeAsServer = false ) ;
 
-	virtual bool Kick( Channel*, const std::vector<iClient*>&, const std::string& ) ;
+	virtual bool Kick( Channel*, const std::vector<iClient*>&, const std::string&, bool modeAsServer = false ) ;
 
-	virtual bool Kick( Channel*, const string&,	const std::string& ) ;
+	virtual bool Kick( Channel*, const string&,	const std::string&, bool modeAsServer = false ) ;
 
 	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
