@@ -6044,20 +6044,20 @@ s3	<< getCharYY()
 Write( s3 );
 }
 
-bool cservice::Kick(Channel* theChan, iClient* theClient, const string& reason )
+bool cservice::Kick(Channel* theChan, iClient* theClient, const string& reason, bool modeAsServer)
 {
-	return xClient::Kick(theChan, theClient, reason);
+	return xClient::Kick(theChan, theClient, reason, modeAsServer);
 }
 
-bool cservice::Kick(Channel* theChan, const std::vector<iClient*>& theClients, const string& reason )
+bool cservice::Kick(Channel* theChan, const std::vector<iClient*>& theClients, const string& reason, bool modeAsServer)
 {
-	return xClient::Kick(theChan, theClients, reason);
+	return xClient::Kick(theChan, theClients, reason, modeAsServer);
 }
 
 /**
  * Kick all users from a channel that matches the specified mask, join/part if necessary.
  */
-bool cservice::Kick( Channel* theChan, const string& mask, const std::string& reason)
+bool cservice::Kick( Channel* theChan, const string& mask, const std::string& reason, bool modeAsServer)
 {
 	assert( theChan != NULL ) ;
 
@@ -6108,7 +6108,7 @@ bool cservice::Kick( Channel* theChan, const string& mask, const std::string& re
 			}
 		}
 	}
-	return Kick(theChan, toBoot, reason);
+	return Kick(theChan, toBoot, reason, modeAsServer);
 }
 
 void cservice::updateLimits()
