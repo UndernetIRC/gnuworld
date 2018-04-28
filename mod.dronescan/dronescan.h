@@ -110,7 +110,7 @@ public:
 			bool ) ;
 
 	/** When we are being detached by the xServer */
-	virtual void OnDetach() ;
+	virtual void OnDetach(const std::string& = std::string( "Server Shutdown")) ;
 
 	/** Receive our own timed events. */
 	virtual void OnTimer( const xServer::timerID& , void* ) ;

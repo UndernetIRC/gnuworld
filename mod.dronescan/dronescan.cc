@@ -631,7 +631,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 
 
 /** Clean up after ourselves */
-void dronescan::OnDetach()
+void dronescan::OnDetach(const std::string& message)
 {
 /* We need to delete() anything we have new()d
  * Currently this is:
@@ -683,7 +683,7 @@ if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
 }
 
 /* Done! */
-
+xClient::OnDetach(message);
 }
 
 
