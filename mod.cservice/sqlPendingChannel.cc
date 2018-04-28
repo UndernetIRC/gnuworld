@@ -39,9 +39,6 @@
 #include	"sqlPendingChannel.h"
 #include	"sqlPendingTraffic.h"
  
-const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.10 2007/08/28 16:10:12 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ; 

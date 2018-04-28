@@ -18,16 +18,12 @@
  *
  * $Id: VERIFYCommand.cc,v 1.24 2005/11/17 01:37:13 kewlio Exp $
  */
-
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
-
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.24 2005/11/17 01:37:13 kewlio Exp $" ;
 
 namespace gnuworld
 {

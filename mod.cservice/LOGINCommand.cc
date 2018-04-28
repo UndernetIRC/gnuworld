@@ -24,7 +24,6 @@
 #include	<iostream>
 #include	<iomanip>
 #include	<inttypes.h>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -35,8 +34,6 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 #include	"ip.h"
-
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.67 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {

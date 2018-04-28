@@ -25,10 +25,7 @@
 #include	<fstream>
 #include	<sstream>
 #include	<string>
-
 #include	"ELog.h"
-
-const char rcsId[] = "$Id: ELog.cc,v 1.8 2005/02/20 15:49:21 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

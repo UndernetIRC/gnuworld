@@ -51,8 +51,6 @@
 using std::map ;
 using std::vector ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.21 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::map ;

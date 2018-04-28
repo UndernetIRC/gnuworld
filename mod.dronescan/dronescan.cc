@@ -820,7 +820,9 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))) ? true : false;
 				if (isoktogline)
 					isoktogline2 = true;
+#ifdef ENABLE_LOG4CPLUS
 				int numOfUsernames = 0;
+#endif
 				if((joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
 			    joinPartIt->second.numOfParts >= jcMinJoinToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))
 				{
@@ -1619,7 +1621,7 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 		//	<<
 		snprintf(buf, 511, "[%u] (%4u) %s +%s %s",
 			failed,
-			theChannel->size(),
+			(unsigned int)theChannel->size(),
 			theChannel->getName().c_str(),
 			chanStat.str().c_str(),
 			chanParams.str().c_str());

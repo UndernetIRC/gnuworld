@@ -25,18 +25,13 @@
 #include	<sstream>
 #include	<string>
 #include	<iostream>
-
 #include	<cstring>
-
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlBan.h"
 #include	"constants.h"
 #include	"cservice.h"
 #include	"cservice_config.h"
-
-const char sqlBan_h_rcsId[] = __SQLBAN_H ;
-const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.11 2009/06/25 19:05:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {

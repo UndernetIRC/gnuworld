@@ -36,8 +36,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char DEOPCommand_cc_rcsId[] = "$Id: DEOPCommand.cc,v 1.13 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::map ;

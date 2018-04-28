@@ -42,11 +42,8 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.29 2010/04/10 18:56:06 danielaustin Exp $" ;
-
 namespace gnuworld
 {
-
 using std::pair ;
 using std::endl ;
 using std::ends ;

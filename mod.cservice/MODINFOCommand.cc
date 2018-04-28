@@ -38,8 +38,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.24 2010/04/10 19:49:57 danielaustin Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

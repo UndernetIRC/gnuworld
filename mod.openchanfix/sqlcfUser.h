@@ -68,13 +68,13 @@ public:
 	inline const std::string& getUserName() const
 		{ return user_name; }
 
-	inline const int getCreated() const
+	inline int getCreated() const
 		{ return created; }
 
-	inline const time_t getLastSeen() const
+	inline time_t getLastSeen() const
 		{ return last_seen; }
 
-	inline const time_t getLastUpdated() const
+	inline time_t getLastUpdated() const
 		{ return last_updated; }
 
 	inline const std::string& getLastUpdatedBy() const
@@ -92,13 +92,13 @@ public:
 	inline const flagType&		getFlags() const
 		{ return flags ; }
 
-	inline const bool getIsSuspended() const
+	inline bool getIsSuspended() const
 		{ return isSuspended; }
 
-	inline const bool getUseNotice() const
+	inline bool getUseNotice() const
 		{ return useNotice; }
 
-	inline const bool getNeedOper() const
+	inline bool getNeedOper() const
 		{ return needOper; }
 		
 	inline const hostListType& getHostList() const

@@ -51,7 +51,6 @@ ccServer* CurServer = 0;
 string Msg;
 char tNum[512];
 std::stringstream s;
-int count = 0;
 
 for (ccontrol::serversconstiterator ptr = bot->serversMap_begin() ; 
 	ptr != bot->serversMap_end();++ptr)

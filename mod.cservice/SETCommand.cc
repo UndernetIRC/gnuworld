@@ -51,7 +51,6 @@ extern "C" {
 #include <liboath/oath.h>
 }
 #endif
-const char SETCommand_cc_rcsId[] = "$Id: SETCommand.cc,v 1.64 2008/04/16 20:34:44 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -222,6 +221,61 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 			return true;
 		}
 
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_syntax_on_off,
+				string("value of %s must be ON or OFF")).c_str(),
+			option.c_str());
+	        return true;
+	}
+
+	if (option == "NOPURGE")
+	{
+		int admLevel = bot->getAdminAccessLevel(theUser);
+		if (!admLevel)
+		{
+			/* not an admin, return unknown command */
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+				language::invalid_option,
+				string("Invalid option.")));
+			return true;
+		}
+		sqlUser* targetUser = theUser;
+		if ((value != "ON") && (value != "OFF"))
+		{
+			targetUser = bot->getUserRecord(st[2]);
+			if (!targetUser)
+			{
+				bot->Notice(theClient,
+					bot->getResponse(theUser,
+						language::not_registered,
+						string("The user %s doesn't appear to be registered.")).c_str(),
+					st[2].c_str());
+				return true;
+			}
+			if (st.size() < 4)
+			{
+				bot->Notice(theClient,"SYNTAX: SET NOPURGE user ON|OFF");
+				return false;
+			}
+			else
+				value = string_upper(st[3]);
+		}
+		if (value == "ON")
+		{
+			targetUser->setFlag(sqlUser::F_NOPURGE);
+			targetUser->commit(theClient);
+			bot->Notice(theClient,"NOPURGE setting for %s is now ON", targetUser->getUserName().c_str());
+			return true;
+		}
+		if (value == "OFF")
+		{
+			targetUser->removeFlag(sqlUser::F_NOPURGE);
+			targetUser->commit(theClient);
+			bot->Notice(theClient,"NOPURGE setting for %s is now OFF", targetUser->getUserName().c_str());
+			return true;
+		}
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 				language::set_cmd_syntax_on_off,

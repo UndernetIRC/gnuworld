@@ -20,15 +20,11 @@
  */
 
 #include	<string>
-
 #include	<cstdio>
 #include	<cstdlib>
-
 #include	"match.h"
 #include	"misc.h"
-#include        "StringTokenizer.h"
-
-const char rcsId[] = "$Id: match.cc,v 1.10 2007/09/13 02:00:45 dan_karrels Exp $" ;
+#include	"StringTokenizer.h"
 
 namespace gnuworld
 {

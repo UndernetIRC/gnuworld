@@ -30,8 +30,6 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char REMIGNORECommand_cc_rcsId[] = "$Id: REMIGNORECommand.cc,v 1.10 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::endl ;

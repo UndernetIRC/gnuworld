@@ -43,11 +43,8 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.50 2009/06/09 15:40:29 mrbean_ Exp $" ;
-
 namespace gnuworld
 {
-
 using std::endl ;
 using std::ends ;
 using std::stringstream ;

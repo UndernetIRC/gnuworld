@@ -23,8 +23,6 @@
 #include	<universe.h>
 #include	"sqlUser.h"
 
-const char AICommand_cc_rcsId[] = "$Id: AI.cc,v 1.2 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 

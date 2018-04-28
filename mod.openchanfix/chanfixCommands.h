@@ -54,10 +54,10 @@ public:
 	inline const std::string& getHelp() const
 		{ return help; }
 
-	inline const std::string::size_type getNumParams() const
+	inline std::string::size_type getNumParams() const
 		{ return numParams; }
 
-	inline const unsigned short int getRequiredFlags() const
+	inline unsigned short int getRequiredFlags() const
 		{ return requiredFlags; }
 
 protected:

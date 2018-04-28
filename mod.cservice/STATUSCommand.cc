@@ -18,11 +18,9 @@
  *
  * $Id: STATUSCommand.cc,v 1.48 2007/12/26 20:38:57 kewlio Exp $
  */
-
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -30,8 +28,6 @@
 #include	"responses.h"
 #include	"Network.h"
 #include	"cservice_config.h"
-
-const char STATUSCommand_cc_rcsId[] = "$Id: STATUSCommand.cc,v 1.48 2007/12/26 20:38:57 kewlio Exp $" ;
 
 namespace gnuworld
 {

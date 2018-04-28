@@ -218,7 +218,7 @@ public:
 	inline dbHandle *getSqlDb()
 		{ return SQLDb; }
 
-	inline const DS_STATE getCurrentState()
+	inline DS_STATE getCurrentState()
 		{ return currentState; }
 		
 	inline int GetGlineQueueSize()

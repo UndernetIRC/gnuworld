@@ -26,15 +26,10 @@
 #include	<arpa/inet.h>
 #include	<sys/socket.h>
 #include	<netdb.h>
-
 #include	<string>
-
 #include	<cstring>
-
 #include	"Connection.h"
 #include	"Buffer.h"
-
-const char rcsId[] = "$Id: Connection.cc,v 1.5 2004/01/07 18:33:42 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

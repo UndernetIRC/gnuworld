@@ -25,12 +25,10 @@
  *
  * $Id: REGISTERCommand.cc,v 1.24 2009/07/31 07:29:13 mrbean_ Exp $
  */
-
 #include	<map>
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -38,8 +36,6 @@
 #include	"dbHandle.h"
 #include	"Network.h"
 #include	"responses.h"
-
-const char REGISTERCommand_cc_rcsId[] = "$Id: REGISTERCommand.cc,v 1.24 2009/07/31 07:29:13 mrbean_ Exp $" ;
 
 namespace gnuworld
 {

@@ -20,14 +20,11 @@
  */
 
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
-
-const char SHOWCOMMANDSCommand_cc_rcsId[] = "$Id: SHOWCOMMANDSCommand.cc,v 1.30 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {

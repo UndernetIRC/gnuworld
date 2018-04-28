@@ -22,12 +22,9 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
-
-const char SUPPORTCommand_cc_rcsId[] = "$Id: SUPPORTCommand.cc,v 1.9 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

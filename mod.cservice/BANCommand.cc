@@ -53,7 +53,6 @@
 #include	"ip.h"
 #include	"banMatcher.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.49 2009/06/25 19:05:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {

@@ -25,18 +25,13 @@
  *
  * $Id: JOINCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $
  */
-
-
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
-
-const char JOINCommand_cc_rcsId[] = "$Id: JOINCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $" ;
 
 namespace gnuworld
 {

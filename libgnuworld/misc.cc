@@ -35,8 +35,6 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: misc.cc,v 1.6 2007/12/27 20:45:15 kewlio Exp $" ;
-
 namespace gnuworld
 {
 /**

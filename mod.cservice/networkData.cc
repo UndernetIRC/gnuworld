@@ -34,9 +34,6 @@
 #include	"misc.h"
 #include	"networkData.h" 
 
-const char networkData_h_rcsId[] = __NETWORKDATA_H ;
-const char networkData_cc_rcsId[] = "$Id: networkData.cc,v 1.9 2005/12/27 13:27:59 kewlio Exp $" ;
-
 namespace gnuworld
 {
 

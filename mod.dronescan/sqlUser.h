@@ -43,19 +43,19 @@ public:
 	inline const string& getUserName() const
 		{ return user_name; }
 
-	inline const int getCreated() const
+	inline int getCreated() const
 		{ return created; }
 
-	inline const unsigned int getLastSeen() const
+	inline unsigned int getLastSeen() const
 		{ return last_seen; }
 
 	inline const string& getLastUpdatedBy() const
 		{ return last_updated_by; }
 
-	inline const unsigned int getLastUpdated() const
+	inline unsigned int getLastUpdated() const
 		{ return last_updated; }
 
-	inline const unsigned int getAccess() const
+	inline unsigned int getAccess() const
 		{ return access; }
 
 	/* Mutators */
@@ -82,7 +82,7 @@ public:
 		{ flags = _flags; }
 
 	/* Convenience functions for flags */
-	inline const bool isSuspended() const
+	inline bool isSuspended() const
 		{ return (flags & F_SUSPENDED); }
 
 

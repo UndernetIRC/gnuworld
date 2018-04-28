@@ -36,9 +36,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-using std::map ;
-
-const char DEVOICECommand_cc_rcsId[] = "$Id: DEVOICECommand.cc,v 1.10 2003/06/28 01:21:20 dan_karrels Exp $" ;
+using std::map;
 
 namespace gnuworld
 {

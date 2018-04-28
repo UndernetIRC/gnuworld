@@ -134,7 +134,7 @@ if (!isRequesterScoreHighEnough)
 }
 
 // Is there anyone opped on the chan with a score >= 2000?
-std:string nickName;
+std::string nickName;
 for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
      opPtr != myOps.end(); opPtr++) {
   curOp = *opPtr;

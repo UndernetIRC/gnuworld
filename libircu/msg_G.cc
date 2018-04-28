@@ -111,7 +111,7 @@ else
 	s += tStr.substr(1,string::npos) ;
 	s += " " ;
 
-	double remoteTSDouble = ::atof( params[ 1 ] + 1 ) ;
+//	double remoteTSDouble = ::atof( params[ 1 ] + 1 ) ;
 
 //	elog	<< "remoteTSDouble: "
 //		<< ((int) remoteTSDouble)

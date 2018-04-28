@@ -104,8 +104,7 @@ bot->SendTo(theClient,
 
 int who = RUSAGE_SELF;
 struct rusage usage;
-int ret;
-ret = getrusage(who, &usage);
+getrusage(who, &usage);
 bot->SendTo(theClient,
 	std::string("Memory Usage (kB): %ld").c_str(), usage.ru_maxrss);
 

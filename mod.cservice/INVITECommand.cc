@@ -36,8 +36,6 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char INVITECommand_cc_rcsId[] = "$Id: INVITECommand.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 

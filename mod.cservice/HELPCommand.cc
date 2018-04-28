@@ -31,11 +31,8 @@
 #include	"cservice.h"
 #include 	"responses.h"
 
-const char HELPCommand_cc_rcsId[] = "$Id: HELPCommand.cc,v 1.5 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
-
 using namespace gnuworld;
 
 bool HELPCommand::Exec( iClient* theClient, const string& Message )

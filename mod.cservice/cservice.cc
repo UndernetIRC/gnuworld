@@ -2877,7 +2877,7 @@ void cservice::cacheExpireLevels()
 		 * If so, we might want to part and turn off autojoin.. etc.
 		 */
 
-		if ( ((currentTime() - theChan->getLastUsed()) >= partIdleChan)
+		if ( ((unsigned int)(currentTime() - theChan->getLastUsed()) >= partIdleChan)
 			&& theChan->getInChan()
 			&& !theChan->getFlag(sqlChannel::F_SPECIAL) )
 		{
@@ -6561,11 +6561,11 @@ bool cservice::doInternalSuspend(sqlChannel* theChan,
 	if (theUser)
 	{
 		sqlLevel* accessRec = getLevelRecord(theUser, theChan);
-		if (accessRec && (accessRec->getSuspendExpire() < (currentTime() + suspExpire)))
+		if (accessRec && (accessRec->getSuspendExpire() < (currentTime() + (time_t)suspExpire)))
 		{
 			if (accessRec->getSuspendLevel() < suspLevel)
 				accessRec->setSuspendLevel(suspLevel);
-			accessRec->setSuspendExpire(currentTime() + suspExpire);
+			accessRec->setSuspendExpire(currentTime() + (time_t)suspExpire);
 			accessRec->setSuspendBy(getNickName());
 			accessRec->setLastModif(currentTime());
 			accessRec->setLastModifBy(getInstance()->getNickUserHost());

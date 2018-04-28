@@ -44,8 +44,6 @@
 #include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.62 2009/06/09 15:40:29 mrbean_ Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

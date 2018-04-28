@@ -36,7 +36,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SERVNOTICECommand_cc_rcsId[] = "$Id: SERVNOTICECommand.cc,v 1.5 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -28,8 +28,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.16 2005/12/05 17:32:15 kewlio Exp $" ;
-
 namespace gnuworld
 {
 using namespace gnuworld;

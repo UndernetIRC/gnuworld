@@ -34,8 +34,6 @@
 #include	"Network.h"
 #include	"responses.h"
 
-const char SAYCommand_cc_rcsId[] = "$Id: SAYCommand.cc,v 1.9 2005/12/01 04:04:59 kewlio Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

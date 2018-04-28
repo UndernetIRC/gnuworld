@@ -50,8 +50,6 @@
 
 using std::map ;
 
-const char OPCommand_cc_rcsId[] = "$Id: OPCommand.cc,v 1.29 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

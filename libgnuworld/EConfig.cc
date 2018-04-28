@@ -38,7 +38,6 @@
 #include	"ELog.h"
 #include	"misc.h"
 
-const char rcsId[] = "$Id: EConfig.cc,v 1.9 2005/10/01 13:13:55 kewlio Exp $" ;
 
 namespace gnuworld
 {

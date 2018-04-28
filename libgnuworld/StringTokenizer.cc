@@ -24,11 +24,8 @@
 #include	<new>
 #include	<vector>
 #include	<string>
-
 #include	<cassert>
 #include	"StringTokenizer.h"
-
-const char rcsId[] = "$Id: StringTokenizer.cc,v 1.7 2005/02/20 15:49:21 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -180,13 +177,13 @@ string retMe ;
 retMe.reserve( totalChars() ) ;
 
 // continue while there are more tokens to concatenate
-for( size_type i = start ; i < end ; i++ )
+for( size_type i = start ; i < (size_type)end ; i++ )
 	{
 	// Add this token to the returning string
 	retMe += array[ i ] ;
 
 	// If there is another token, put a delimiter here
-	if( (i + 1) < end )
+	if( (i + 1) < (size_type)end )
 		{
 		retMe += delimiter ;
 		}

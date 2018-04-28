@@ -38,8 +38,6 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.16 2008/04/16 20:34:39 danielaustin Exp $" ;
-
 namespace gnuworld
 {
 using std::endl ;

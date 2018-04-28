@@ -413,7 +413,6 @@ while( keepRunning )
 	// If there are timers waiting, this variable will be set to
 	// true.  A value of false means that no timers are pending,
 	// and that Poll() can block indefinitely.
-	bool setTimers = false ;
 
 	long seconds = -1 ;
 	time_t now = ::time( 0 ) ;
@@ -425,7 +424,6 @@ while( keepRunning )
 
                 // Yes, set select() timeout to time at which
                 // the nearest timer will expire
-                setTimers = true ;
 
 		// Set tv.tv_sec to the duration (in seconds) until
 		// the first timer will expire.

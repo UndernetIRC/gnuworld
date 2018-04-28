@@ -29,7 +29,6 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -38,8 +37,6 @@
 #include	"Network.h"
 #include	"responses.h"
 #include	"cservice_config.h"
-
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.22 2008/04/16 20:34:40 danielaustin Exp $" ;
 
 namespace gnuworld
 {

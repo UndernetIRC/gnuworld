@@ -57,8 +57,6 @@
 #include	<inttypes.h>
 #include	"md5hash.h"
 
-const char rcsId[] = "$Id: md5hash.cc,v 1.3 2005/11/16 21:40:37 kewlio Exp $" ;
-
 namespace gnuworld
 {
 

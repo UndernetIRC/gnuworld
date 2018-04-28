@@ -27,19 +27,14 @@
  */
 
 #include	<string>
-
 #include	<ctime>
-
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"levels.h"
-//#include	"match.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 #include	"time.h"
 #include	"banMatcher.h"
-
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.15 2007/08/07 21:22:29 kewlio Exp $" ;
 
 namespace gnuworld
 {

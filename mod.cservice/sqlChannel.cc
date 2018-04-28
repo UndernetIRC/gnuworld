@@ -26,13 +26,10 @@
  *
  * $Id: sqlChannel.cc,v 1.43 2007/08/28 16:10:12 dan_karrels Exp $
  */
-
 #include	<sstream>
 #include	<string>
 #include	<iostream>
-
 #include	<cstring>
-
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlChannel.h"
@@ -41,12 +38,8 @@
 #include	"cservice_config.h"
 #include	"dbHandle.h"
 
-const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.43 2007/08/28 16:10:12 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
-
 using std::string ;
 using std::endl ;
 using std::stringstream ;
