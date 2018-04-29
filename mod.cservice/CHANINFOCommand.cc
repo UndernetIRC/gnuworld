@@ -161,6 +161,14 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		if (theUser->getFlag(sqlUser::F_NOADMIN))
 			flagsSet += "DISABLEAUTH ";
 	}
+	else if (tmpUser == theUser)
+	{
+		if (theUser->getFlag(sqlUser::F_NOPURGE))
+			flagsSet += "NOPURGE ";
+		if (theUser->getFlag(sqlUser::F_ALUMNI))
+			flagsSet += "ALUMNI ";
+	}
+
 	if (adminAccess || (tmpUser == theUser))
 	{
 		if (theUser->getFlag(sqlUser::F_TOTP_REQ_IPR))
