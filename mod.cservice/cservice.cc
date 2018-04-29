@@ -2866,6 +2866,13 @@ void cservice::cacheExpireLevels()
 	while (ptr != sqlChannelCache.end())
 	{
 		sqlChannel* theChan = (ptr)->second;
+
+		/* The channel is purged */
+		if (theChan->getRegisteredTS() == 0)
+		{
+			++ptr;
+			continue;
+		}
 		if(theChan->forceMap.size() > 0)
 		{
 			logDebugMessage("Clearing out %i FORCE(s) from channel %s",
@@ -6122,6 +6129,13 @@ void cservice::updateLimits()
 	 	{
 		sqlChannel* theChan = (ptr)->second;
 
+		/* The channel is purged */
+		if (theChan->getRegisteredTS() == 0)
+		{
+			++ptr;
+			continue;
+		}
+
 		/*
 		 * Don't have the Floating Limit flag set?
 		 */
@@ -6722,6 +6736,14 @@ void cservice::checkChannelsFlood()
 	while (ptr != sqlChannelCache.end())
 	{
 		sqlChannel* theChan = (ptr)->second;
+
+		/* The channel is purged */
+		if (theChan->getRegisteredTS() == 0)
+		{
+			++ptr;
+			continue;
+		}
+
 		if ((theChan->getName() == "*") || (!theChan->getFlag(sqlChannel::F_FLOODPRO)))
 		{
 			++ptr;
