@@ -328,6 +328,9 @@ if (matchString[0] == '=')
 			}
 		}
 	}
+if (historysearch)
+	bot->Notice(theClient, "\002   *** Access history search results ***\002");
+
 
 
 for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
@@ -363,9 +366,6 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 			}
 
 		results++;
-
-		if (historysearch)
-			bot->Notice(theClient, "\002   *** Access history search results ***\002");
 
 		bot->Notice(theClient,
 			bot->getResponse(theUser, language::user_access_is).c_str(),
