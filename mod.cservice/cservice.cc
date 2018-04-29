@@ -3582,7 +3582,7 @@ if (timer_id == pendingNotif_timerID)
 	theQuery	<<  "SELECT channels.name,channels.id,pending.created_ts"
 				<< " FROM pending,channels"
 				<< " WHERE channels.id = pending.channel_id"
-				<< " AND pending.status = 2;"
+				<< " AND pending.status IN (2, 8);"
 				<< ends;
 
 #ifdef LOG_SQL
