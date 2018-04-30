@@ -8196,6 +8196,7 @@ void cservice::loadConfigVariables()
 	expireInterval = atoi((cserviceConfig->Require( "expire_interval" )->second).c_str());
 	cacheInterval = atoi((cserviceConfig->Require( "cache_interval" )->second).c_str());
 	webrelayPeriod = atoi((cserviceConfig->Require( "webrelay_interval" )->second).c_str());
+	locMessage = cserviceConfig->Require( "loc_message" )->second;
 	input_flood = atoi((cserviceConfig->Require( "input_flood" )->second).c_str());
 	output_flood = atoi((cserviceConfig->Require( "output_flood" )->second).c_str());
 	flood_duration = atoi((cserviceConfig->Require( "flood_duration" )->second).c_str());
@@ -8422,7 +8423,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		if (st.size() < 3)
 		{
 			elog << "cservice::doXQLogin> LOGIN insufficient parameters" << endl;
-			doXResponse(theServer, Routing, "Insufficient login-on-connect (LoC) parameters", true);
+			doXResponse(theServer, Routing, locMessage.c_str(), true);
 			return false;
 		}
 		username = st[1];
@@ -8436,7 +8437,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		if (st.size() < 6)
 		{
 			elog << "cservice::doXQLogin> LOGIN2 insufficient parameters" << endl;
-			doXResponse(theServer, Routing, "Insufficient login-on-connect (LoC) parameters", true);
+			doXResponse(theServer, Routing, locMessage.c_str(), true);
 			return false;
 		}
 		username = st[4];

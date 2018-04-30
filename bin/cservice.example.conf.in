@@ -205,6 +205,11 @@ command_logfile = cs.log
 #
 hello_block_period = 3600
 
+# Message when login-on-connect (LoC) parameters are incorrect
+# Used with iauthd-c: https://github.com/UndernetIRC/iauthd-c
+#
+loc_message = Insufficient login-on-connect (LoC) parameters - see www.undernet.org/loc/ for help
+
 #
 # What is the period (in seconds) in which we will check for
 # new webrelay messages

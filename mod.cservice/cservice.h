@@ -375,6 +375,9 @@ public:
 	/* Interval at which we check for new webrelay messages. */
 	int webrelayPeriod;
 
+	/* Message for iauthd-c when login-on-connect params are wrong */
+	string locMessage;
+
 	/* Duration in seconds at which an idle user/chan/level/ban
 	 * record should be purged from the cache. */
 	int idleUserPeriod;
