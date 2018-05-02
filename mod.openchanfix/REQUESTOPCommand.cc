@@ -23,15 +23,11 @@
  *
  * $Id: REQUESTOPCommand.cc,v 1.2 2008/01/16 02:03:39 buzlip01 Exp $
  */
-
 #include "gnuworld_config.h"
 #include "Network.h"
-
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-
-RCSTAG("$Id: REQUESTOPCommand.cc,v 1.2 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {

@@ -21,15 +21,11 @@
  */
 
 #include	<string>
-
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: LISTHOSTSCommand.cc,v 1.14 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

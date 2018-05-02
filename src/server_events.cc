@@ -39,8 +39,6 @@
 #include	"iClient.h"
 #include	"ELog.h"
 
-RCSTAG( "$Id: server_events.cc,v 1.3 2005/09/29 17:40:06 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

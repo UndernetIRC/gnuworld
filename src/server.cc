@@ -71,8 +71,6 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.226 2010/08/31 21:16:46 denspike Exp $" ) ;
-
 namespace gnuworld
 {
 

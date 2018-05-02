@@ -34,8 +34,6 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccGline.cc,v 1.22 2007/08/28 16:10:06 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
 

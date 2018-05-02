@@ -23,16 +23,12 @@
  *
  * $Id: WHOISCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
-
 #include "gnuworld_config.h"
 #include "Network.h"
-
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
-
-RCSTAG("$Id: WHOISCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {

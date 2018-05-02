@@ -28,8 +28,6 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: MAXUSERSCommand.cc,v 1.7 2006/09/26 17:35:59 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

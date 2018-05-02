@@ -56,10 +56,10 @@
 #include	"misc.h"
 #include	"Network.h"
 #include	"ELog.h"
-#include        "ccUser.h"
+#include	"ccUser.h"
 #include	"dbHandle.h"
 #include	"ccontrol.h"
-#include        "server.h"
+#include	"server.h"
 #include 	"Constants.h"
 #include	"commLevels.h"
 #include	"ccFloodData.h"
@@ -68,11 +68,8 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.243 2010/09/12 20:28:24 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::ends ;
 using std::stringstream ;
 using std::string ;

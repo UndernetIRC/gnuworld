@@ -37,8 +37,6 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-RCSTAG("$Id: SCORECommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $");
-
 namespace gnuworld
 {
 namespace cf

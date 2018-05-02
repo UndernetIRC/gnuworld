@@ -21,14 +21,11 @@
  */
 
 #include	<string>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: SAYCommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

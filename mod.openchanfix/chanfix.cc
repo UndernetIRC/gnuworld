@@ -62,8 +62,6 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.16 2010/03/04 04:24:11 hidden1 Exp $");
-
 namespace gnuworld
 {
 
@@ -768,8 +766,6 @@ if (Command == "DCC") {
   DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.1 [compiled " __DATE__ " " __TIME__ "]");
 } else if (Command == "WHODUNIT?") {
   DoCTCP(theClient, CTCP, "reed, ULtimaTe_, Compy, SiRVulcaN, Hidden");
-} else if (Command == "SUBVERSION") {
-  DoCTCP(theClient, CTCP, rcsId);
 } else if (Command == "GENDER") {
   DoCTCP(theClient, CTCP, "Gender pending vote, but for now I'll be whatever you want!");
 }

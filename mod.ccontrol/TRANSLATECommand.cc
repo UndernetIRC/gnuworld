@@ -19,23 +19,17 @@
  *
  * $Id: TRANSLATECommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $
  */
-
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: TRANSLATECommand.cc,v 1.14 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld

@@ -44,11 +44,9 @@
 #include	"iClient.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.12 2008/04/16 20:29:37 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
-
 using std::pair ;
 using std::make_pair ;
 using std::string ;

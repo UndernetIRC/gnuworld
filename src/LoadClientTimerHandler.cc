@@ -27,8 +27,6 @@
 #include	"ELog.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LoadClientTimerHandler.cc,v 1.11 2005/01/12 03:50:37 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
 

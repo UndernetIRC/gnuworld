@@ -20,13 +20,11 @@
  *
  * $Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $
  */
-
 #include	<new>
 #include	<map>
 #include	<string>
 #include	<iostream>
 #include	<sstream>
-
 #include	"Channel.h"
 #include	"iClient.h"
 #include	"ChannelUser.h"
@@ -37,11 +35,8 @@
 #include	"match.h"
 #include	"server.h"
 
-RCSTAG("$Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $") ;
-
 namespace gnuworld
 {
-
 using std::vector ;
 using std::string ;
 using std::endl ;

@@ -21,14 +21,10 @@
  */
 
 #include	<string>
-
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: LISTIGNORESCommand.cc,v 1.10 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

@@ -70,8 +70,4 @@
  */
 #define DAEMON
 
-#ifndef RCSTAG
-#define RCSTAG(tag) static const char rcsId[] = tag
-#endif
-
 #endif /* __GNUWORLD_CONFIG_H */

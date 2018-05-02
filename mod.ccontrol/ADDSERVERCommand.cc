@@ -28,8 +28,6 @@
 #include	"Network.h"
 #include	"Constants.h"
 
-RCSTAG( "$Id: ADDSERVERCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

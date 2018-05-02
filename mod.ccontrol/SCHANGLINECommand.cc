@@ -19,13 +19,10 @@
  *
  * $Id: SCHANGLINECommand.cc,v 1.5 2009/06/06 07:53:34 hidden1 Exp $
  */
-
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 #include	<map>
-
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -35,24 +32,19 @@
 #include	"ip.h"
 #include	"ELog.h"
 #include	"Gline.h"
-//#include	"gline.h"
 #include 	"time.h"
 #include	"ccUser.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SCHANGLINECommand.cc,v 1.5 2009/06/06 07:53:34 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string;
 
 // Input: changline #blah reason
 //
 // Output: C GL * +*@lamer.net 3600 :Banned (*@lamer) ...
 //
-
 namespace uworld
 {
 

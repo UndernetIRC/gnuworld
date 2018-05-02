@@ -45,8 +45,6 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.78 2008/04/16 20:29:38 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
 

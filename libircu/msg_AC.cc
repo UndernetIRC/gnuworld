@@ -31,8 +31,6 @@
 #include	"iClient.h"
 #include	"ELog.h"
 
-RCSTAG( "$Id: msg_AC.cc,v 1.9 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
 

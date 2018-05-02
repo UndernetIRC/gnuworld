@@ -19,13 +19,10 @@
  *
  * $Id: UNJUPECommand.cc,v 1.3 2006/09/26 17:36:01 kewlio Exp $
  */
-
 #include	<new>
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"iServer.h"
 #include	"CControlCommands.h"
@@ -34,11 +31,8 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: UNJUPECommand.cc,v 1.3 2006/09/26 17:36:01 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld

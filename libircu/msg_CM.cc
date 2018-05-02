@@ -34,11 +34,8 @@
 #include	"ELog.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_CM.cc,v 1.11 2008/04/16 20:29:37 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::pair ;
 using std::make_pair ;
 using std::endl ;

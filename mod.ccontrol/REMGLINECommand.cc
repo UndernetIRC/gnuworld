@@ -21,17 +21,13 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: REMGLINECommand.cc,v 1.27 2009/06/14 01:29:54 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

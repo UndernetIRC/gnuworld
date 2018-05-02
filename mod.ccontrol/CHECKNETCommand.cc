@@ -30,8 +30,6 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHECKNETCommand.cc,v 1.20 2009/07/26 23:55:52 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
 

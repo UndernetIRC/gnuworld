@@ -21,7 +21,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -31,8 +31,6 @@
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: LISTCommand.cc,v 1.24 2008/08/06 19:35:58 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

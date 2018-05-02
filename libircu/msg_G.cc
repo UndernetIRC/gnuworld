@@ -37,11 +37,8 @@
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
 
-RCSTAG( "$Id: msg_G.cc,v 1.8 2009/07/25 18:12:34 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 using std::endl ;
 using std::stringstream ;

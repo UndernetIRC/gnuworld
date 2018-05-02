@@ -21,7 +21,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -32,8 +32,6 @@
 #include	"gnuworld_config.h"
 #include	"ccException.h"
 #include	"Network.h"
-
-RCSTAG( "$Id: LIMITSCommand.cc,v 1.3 2008/12/28 12:21:15 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

@@ -23,7 +23,6 @@
 #include	<set>
 #include	<string>
 #include	<vector>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -31,8 +30,6 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: OPCommand.cc,v 1.16 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

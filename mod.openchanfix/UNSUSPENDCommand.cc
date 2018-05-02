@@ -23,15 +23,11 @@
  *
  * $Id: UNSUSPENDCommand.cc,v 1.5 2008/01/16 02:03:39 buzlip01 Exp $
  */
-
 #include "gnuworld_config.h"
-
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
-
-RCSTAG("$Id: UNSUSPENDCommand.cc,v 1.5 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {

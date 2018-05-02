@@ -33,19 +33,16 @@
 
 #include	"chanfix.h"
 #include	"chanfixCommands.h"
-#include        "defs.h"
-#include        "responses.h"
-#include        "sqlChanOp.h"
-#include        "sqlChannel.h"
-#include        "sqlcfUser.h"
-
-#include        "Network.h"
+#include	"defs.h"
+#include	"responses.h"
+#include	"sqlChanOp.h"
+#include	"sqlChannel.h"
+#include	"sqlcfUser.h"
+#include	"Network.h"
 #include	"iClient.h"
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.4 2008/01/16 02:03:37 buzlip01 Exp $" ) ;
 
 namespace gnuworld
 {

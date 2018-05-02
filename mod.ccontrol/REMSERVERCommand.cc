@@ -21,12 +21,10 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 #include	<sstream>
 #include	<iostream>
-
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -35,11 +33,8 @@
 #include	"gnuworld_config.h"
 #include	"dbHandle.h"
 
-RCSTAG( "$Id: REMSERVERCommand.cc,v 1.14 2007/08/28 16:10:03 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::endl ;
 using std::ends ;
 using std::stringstream ;

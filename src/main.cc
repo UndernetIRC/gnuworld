@@ -52,8 +52,6 @@
 #include <log4cplus/logger.h>
 #endif
 
-RCSTAG( "$Id: main.cc,v 1.67 2007/09/01 20:16:56 mrbean_ Exp $" ) ;
-
 // main() must be in the global namespace
 using namespace gnuworld ;
 

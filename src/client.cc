@@ -47,8 +47,6 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.89 2008/04/16 20:29:39 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
 

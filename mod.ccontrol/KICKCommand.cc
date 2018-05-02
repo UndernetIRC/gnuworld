@@ -21,7 +21,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -32,8 +32,6 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: KICKCommand.cc,v 1.15 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

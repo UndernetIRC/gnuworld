@@ -19,16 +19,13 @@
  *
  * $Id: stats.cc,v 1.31 2005/01/12 03:50:37 dan_karrels Exp $
  */
-
 #include	<list>
 #include	<string>
 #include	<map>
 #include	<sstream>
 #include	<iostream>
 #include	<iomanip>
-
 #include	<ctime>
-
 #include	"stats.h"
 #include	"iClient.h"
 #include	"server.h"
@@ -39,8 +36,6 @@
 #include	"Network.h"
 #include	"gnuworld_config.h"
 #include	"misc.h"
-
-RCSTAG( "$Id: stats.cc,v 1.31 2005/01/12 03:50:37 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -21,17 +21,13 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
-#include        "Network.h"
+#include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: REMUSERCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

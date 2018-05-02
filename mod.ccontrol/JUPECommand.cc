@@ -22,7 +22,7 @@
 
 #include	<new>
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -33,8 +33,6 @@
 #include	"Network.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: JUPECommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

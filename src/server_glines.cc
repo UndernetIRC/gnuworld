@@ -31,13 +31,10 @@
 #include	<vector>
 #include	<sstream>
 #include	<iostream>
-
 #include	"server.h"
 #include	"Network.h"
 #include	"Gline.h"
 #include	"ELog.h"
-
-RCSTAG( "$Id: server_glines.cc,v 1.3 2007/12/14 03:06:10 isomer Exp $" ) ;
 
 namespace gnuworld
 {

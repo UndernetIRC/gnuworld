@@ -35,8 +35,6 @@
 #include	"gnuworld_config.h"
 #include	"StringTokenizer.h"
 
-RCSTAG( "$Id: ccException.cc,v 1.17 2008/12/27 23:34:31 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
 

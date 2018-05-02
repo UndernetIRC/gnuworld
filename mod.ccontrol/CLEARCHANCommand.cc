@@ -22,7 +22,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip>
+#include	<iomanip>
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -30,8 +30,6 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.26 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
