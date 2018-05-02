@@ -2290,6 +2290,14 @@ const string cservice::getHelpMessage(sqlUser* theUser, string topic)
 	helpTableType::iterator ptr = helpTable.find(thePair);
 	if (ptr != helpTable.end())
 		return ptr->second;
+	else // the user forgot to ask with SET keyword
+	{
+		topic = "SET " + topic;
+		thePair.second = topic;
+		ptr = helpTable.find(thePair);
+		if (ptr != helpTable.end())
+			return ptr->second;
+	}
 
 	if (lang_id != 1)
 		return getHelpMessage(NULL, topic);
