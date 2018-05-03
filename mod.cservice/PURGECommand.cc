@@ -266,7 +266,8 @@ if (tmpChan)
 bot->Part(theChan->getName());
 bot->joinCount--;
 
-//delete(theChan);
+bot->sqlChannelCache.erase(theChan->getName());
+delete(theChan);
 
 return true ;
 }

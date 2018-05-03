@@ -280,6 +280,13 @@ theQuery	<< queryHeader
 		<< endl;
 #endif
 
+// If theChan is no needed after this point, better to delete it now
+if (historysearch)
+{
+	delete theChan;
+	theChan = NULL;
+}
+
 /*
  *  All done, display the output. (Only fetch 15 results).
  */
@@ -328,10 +335,9 @@ if (matchString[0] == '=')
 			}
 		}
 	}
+
 if (historysearch)
 	bot->Notice(theClient, "\002   *** Access history search results ***\002");
-
-
 
 for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{

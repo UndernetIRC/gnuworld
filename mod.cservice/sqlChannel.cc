@@ -163,8 +163,8 @@ bool sqlChannel::loadData(const string& channelName)
 stringstream queryString ;
 queryString	<< "SELECT "
 		<< sql::channel_fields
-		<< " FROM channels WHERE registered_ts <> 0"
-		<< " AND lower(name) = '"
+		//<< " FROM channels WHERE registered_ts <> 0 AND lower(name) = '"
+		<< " FROM channels WHERE lower(name) = '"
 		<< escapeSQLChars(string_lower(channelName))
 		<< "'"
 		<< ends ;
@@ -210,7 +210,8 @@ bool sqlChannel::loadData(int channelID)
 stringstream queryString;
 queryString	<< "SELECT "
 		<< sql::channel_fields
-		<< " FROM channels WHERE registered_ts <> 0 AND id = "
+		//<< " FROM channels WHERE registered_ts <> 0 AND id = "
+		<< " FROM channels WHERE id = "
 		<< channelID
 		<< ends ;
 

@@ -1736,11 +1736,16 @@ if (ptr != sqlChannelCache.end())
 	ptr->second->setLastUsed(currentTime());
 
 	// Return the channel to the caller
-	if (historysearch && ptr->second->getRegisteredTS() == 0)
-		return ptr->second;
-
-	if (!historysearch && ptr->second->getRegisteredTS() > 0)
-		return ptr->second;
+	return ptr->second;
+}
+else if (historysearch)
+{
+	sqlChannel* tempHistoryChan = new (std::nothrow) sqlChannel(SQLDb);
+	assert( tempHistoryChan != 0 ) ;
+	if (tempHistoryChan->loadData(id))
+		return tempHistoryChan;
+	else
+		return NULL;
 }
 
 /*
@@ -1767,11 +1772,16 @@ if (ptr != sqlChannelIDCache.end())
 	ptr->second->setLastUsed(currentTime());
 
 	// Return the channel to the caller
-	if (historysearch && ptr->second->getRegisteredTS() == 0)
-		return ptr->second;
-
-	if (!historysearch && ptr->second->getRegisteredTS() > 0)
-		return ptr->second;
+	return ptr->second;
+}
+else if (historysearch)
+{
+	sqlChannel* tempHistoryChan = new (std::nothrow) sqlChannel(SQLDb);
+	assert( tempHistoryChan != 0 ) ;
+	if (tempHistoryChan->loadData(id))
+		return tempHistoryChan;
+	else
+		return NULL;
 }
 
 /*
@@ -4070,11 +4080,12 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		// Here we get the assigned Id by the database
 		newChan->insertRecord();
 		newChan->loadData(newChan->getName());
-		sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
-		sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 	}
 	else
 		newChan->commit();
+
+	sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
+	sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 
 	// First delete previous levels
 	stringstream theQuery ;
@@ -7516,7 +7527,7 @@ void cservice::preloadChannelCache()
 stringstream theQuery;
 theQuery	<< "SELECT " << sql::channel_fields
 			<< " FROM channels"
-			//<< " WHERE registered_ts <> 0"
+			<< " WHERE registered_ts <> 0"
 			<< ends;
 
 elog	<< "*** [CMaster::preloadChannelCache]: Loading all registered channel records: "
