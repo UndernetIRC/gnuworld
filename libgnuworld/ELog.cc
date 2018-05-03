@@ -25,6 +25,7 @@
 #include	<fstream>
 #include	<sstream>
 #include	<string>
+#include	<ctime>
 #include	"ELog.h"
 
 namespace gnuworld
@@ -39,12 +40,14 @@ ELog	elog ;
 
 ELog::ELog()
  : outStream( 0 ),
-   logFile( false )
+   logFile( false ),
+   newline(true)
 {}
 
 ELog::ELog( const string& fileName )
  : outStream( 0 ),
-   logFile( false )
+   logFile( false ),
+   newline(true)
 {
 openFile( fileName ) ;
 }
@@ -89,6 +92,7 @@ if( logFile )
 	outFile	<< var ;
 	}
 if( outStream ) *outStream << var ;
+newline = true;
 return *this ;
 }
 
@@ -99,7 +103,19 @@ if( logFile )
 	outFile	<< var ;
 	}
 if( outStream ) *outStream << var ;
+newline = true;
 return *this ;
+}
+
+std::string ELog::getLocalTime()
+{
+	  time_t theTime;
+	  time(&theTime);  /* get current time; same as: theTime = time(NULL)  */
+	  struct tm* timeinfo = localtime(&theTime);
+	  char buffer[10] = {0};
+
+	  std::strftime(buffer,10,"%H:%M:%S",timeinfo);
+	  return string("[" + string(buffer) + "] ");
 }
 
 } // namespace gnuworld
