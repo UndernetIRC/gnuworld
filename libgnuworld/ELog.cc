@@ -112,9 +112,9 @@ std::string ELog::getLocalTime()
 	  time_t theTime;
 	  time(&theTime);  /* get current time; same as: theTime = time(NULL)  */
 	  struct tm* timeinfo = localtime(&theTime);
-	  char buffer[10] = {0};
+	  char buffer[20] = {0};
 
-	  std::strftime(buffer,10,"%H:%M:%S",timeinfo);
+	  std::strftime(buffer,20,"%Y-%m-%d %H:%M:%S",timeinfo);
 	  return string("[" + string(buffer) + "] ");
 }
 
