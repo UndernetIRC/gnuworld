@@ -3096,7 +3096,7 @@ theQuery	<< "SELECT "
 			<< ",now()::abstime::int4 as db_unixtime FROM "
 			<< "channels WHERE last_updated >= "
 			<< lastChannelRefresh
-			//<< " AND registered_ts <> 0"
+			<< " AND registered_ts <> 0"
 			<< ends;
 
 #ifdef LOG_SQL
