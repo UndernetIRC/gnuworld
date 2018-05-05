@@ -38,8 +38,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char MODINFOCommand_cc_rcsId[] = "$Id: MODINFOCommand.cc,v 1.24 2010/04/10 19:49:57 danielaustin Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;
@@ -292,6 +290,17 @@ if (command == "ACCESS")
 	aLevel->setAccess(newAccess);
 	aLevel->setLastModif(bot->currentTime());
 	aLevel->setLastModifBy( string( "(" + theUser->getUserName() + ") " +theClient->getNickUserHost() ) );
+	/* When modinfo access, it's proper to forget about unsuspend reason */
+	if ((aLevel->getSuspendExpire() == 0) && (aLevel->getSuspendReason() != ""))
+		aLevel->setSuspendReason(string());
+	if ((aLevel->getFlag(sqlLevel::F_AUTOVOICE)) && (newAccess < level::voice))
+		aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
+	if ((aLevel->getFlag(sqlLevel::F_AUTOOP)) && (newAccess < level::op))
+		aLevel->removeFlag(sqlLevel::F_AUTOOP);
+	if ((theChan->getUserFlags() == 2) && (newAccess >= level::voice) && (!aLevel->getFlag(sqlLevel::F_AUTOVOICE)))
+		aLevel->setFlag(sqlLevel::F_AUTOVOICE);
+	if ((theChan->getUserFlags() == 1) && (newAccess >= level::op) && (!aLevel->getFlag(sqlLevel::F_AUTOOP)))
+		aLevel->setFlag(sqlLevel::F_AUTOOP);
 
 	aLevel->commit();
 
@@ -302,6 +311,15 @@ if (command == "ACCESS")
 		targetUser->getUserName().c_str(),
 		theChan->getName().c_str(),
 		newAccess);
+	if (targetUser != theUser)
+			bot->NoteAllAuthedClients(targetUser, bot->getResponse(targetUser,language::acc_modif,string("Your access on %s has been modified from %i to %i")).c_str(), theChan->getName().c_str(), targetLevel, newAccess);
+	// Announce the manager about the new access change
+	if (level < 500)
+	{
+		string theMessage = TokenStringsParams("%s modified %s's access on channel %s from %i to %i",
+				theUser->getUserName().c_str(), targetUser->getUserName().c_str(), theChan->getName().c_str(),targetLevel, newAccess);
+		bot->NoteChannelManager(theChan, theMessage.c_str());
+	}
 	} // if( command == "ACCESS" )
 
 if (command == "AUTOMODE")
@@ -334,7 +352,7 @@ if (command == "AUTOMODE")
 	 */
 
 	if (string_upper(st[4]) == "OP")
-		{
+	{
 		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 		aLevel->removeFlag(sqlLevel::F_AUTOVOICE);
 		aLevel->setFlag(sqlLevel::F_AUTOOP);
@@ -350,10 +368,10 @@ if (command == "AUTOMODE")
 			theChan->getName().c_str());
 
 		return false;
-		}
+	}
 
 	if (string_upper(st[4]) == "VOICE")
-		{
+	{
 		sqlLevel* aLevel = bot->getLevelRecord(targetUser, theChan);
 		aLevel->removeFlag(sqlLevel::F_AUTOOP);
 		aLevel->setFlag(sqlLevel::F_AUTOVOICE);
@@ -368,7 +386,7 @@ if (command == "AUTOMODE")
 			targetUser->getUserName().c_str(),
 			theChan->getName().c_str());
 		return false;
-		}
+	}
 
 	if (string_upper(st[4]) == "NONE")
 		{

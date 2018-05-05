@@ -20,13 +20,11 @@
  *
  * $Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $
  */
-
 #include	<new>
 #include	<map>
 #include	<string>
 #include	<iostream>
 #include	<sstream>
-
 #include	"Channel.h"
 #include	"iClient.h"
 #include	"ChannelUser.h"
@@ -36,13 +34,9 @@
 #include	"ELog.h"
 #include	"match.h"
 #include	"server.h"
-#include	"ConnectionManager.h"
-
-RCSTAG("$Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $") ;
 
 namespace gnuworld
 {
-
 using std::vector ;
 using std::string ;
 using std::endl ;
@@ -61,6 +55,8 @@ const Channel::modeType Channel::MODE_D = 0x200 ;
 const Channel::modeType Channel::MODE_A = 0x400 ;
 const Channel::modeType Channel::MODE_U = 0x800 ;
 const Channel::modeType Channel::MODE_REG = 0x1000 ;
+const Channel::modeType Channel::MODE_C = 0x2000;
+const Channel::modeType Channel::MODE_CTCP = 0x4000;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -487,6 +483,9 @@ if( modes & MODE_I )	modeString += 'i' ;
 if( modes & MODE_R )	modeString += 'r' ;
 if( modes & MODE_REG )	modeString += 'R' ;
 if( modes & MODE_D )	modeString += 'D' ;
+if (modes & MODE_C)		modeString += 'c';
+if (modes & MODE_CTCP)	modeString += 'C';
+
 
 if( modes & MODE_K )
 	{
@@ -523,47 +522,12 @@ return (modeString + ' ' + argString) ;
 
 string Channel::createBan( const iClient* theClient )
 {
-assert( theClient != 0 ) ;
+	assert( theClient != 0 ) ;
 
-string theBan = "*!*" ;
-
-// If we're +x, don't bother with the user name either.
-if(!theClient->isModeX())
-	{
-	// Don't include the '~'
-	if( (theClient->getUserName().size() >= 2) &&
-		('~' == theClient->getUserName()[ 0 ]) )
-		{
-		theBan += theClient->getUserName().c_str() + 1 ;
-		}
-	else if( !theClient->getUserName().empty() )
-		{
-		theBan += theClient->getUserName() ;
-		}
-	}
-
-theBan += '@' ;
-
-StringTokenizer st( theClient->getInsecureHost(), '.' ) ;
-if( ConnectionManager::isIpAddress( theClient->getInsecureHost() ) )
-	{
-	theBan += st[ 0 ] + '.' ;
-	theBan += st[ 1 ] + '.' ;
-	theBan += st[ 2 ] + ".*" ;
-	}
-else
-	{
-	if( (2 == st.size()) || theClient->isModeX() )
-		{
-		theBan += theClient->getInsecureHost() ;
-		}
+	if ((theClient->isModeX()) && (theClient->isModeR()))
+		return "*!*@" + theClient->getInsecureHost();
 	else
-		{
-		theBan += "*." + st.assemble( 1 ) ;
-		}
-	}
-
-return theBan ;
+		return createBanMask(theClient->getNickUserHost());
 }
 
 void Channel::removeAllModes()

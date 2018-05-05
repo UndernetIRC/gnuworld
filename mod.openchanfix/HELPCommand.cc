@@ -23,16 +23,12 @@
  *
  * $Id: HELPCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
-
 #include "gnuworld_config.h"
-
 #include "chanfix.h"
 #include "chanfixCommands.h"
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
-
-RCSTAG("$Id: HELPCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $");
 
 namespace gnuworld
 {

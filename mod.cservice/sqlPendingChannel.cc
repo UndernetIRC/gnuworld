@@ -39,9 +39,6 @@
 #include	"sqlPendingChannel.h"
 #include	"sqlPendingTraffic.h"
  
-const char sqlPendingChannel_h_rcsId[] = __SQLPENDINGCHANNEL_H ;
-const char sqlPendingChannel_cc_rcsId[] = "$Id: sqlPendingChannel.cc,v 1.10 2007/08/28 16:10:12 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ; 
@@ -53,6 +50,7 @@ sqlPendingChannel::sqlPendingChannel(dbHandle* _SQLDb)
 :channel_id(0), 
 join_count(0),
 unique_join_count(0),
+initialised(false),
 SQLDb(_SQLDb)
 { 
 }
@@ -70,7 +68,15 @@ sqlPendingChannel::~sqlPendingChannel()
 			sqlPendingTraffic* toDie = ptr->second;
 //			elog << "Autocleanup of Traffic record for #" << toDie->ip_number << endl;
 			delete(toDie);
-		} 
+		}
+
+	for(trafficListType::iterator ptr = uniqueSupporterList.begin();
+		ptr !=  uniqueSupporterList.end(); ++ptr)
+		{
+			sqlPendingTraffic* toDie = ptr->second;
+//			elog << "Autocleanup of Traffic record for #" << toDie->ip_number << endl;
+			delete(toDie);
+		}
 }	
 
 void sqlPendingChannel::loadTrafficCache()
@@ -94,7 +100,7 @@ if( SQLDb->Exec(theQuery, true ) )
 	{
 	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{ 
-			unsigned int theIp = atoi(SQLDb->GetValue(i, 0));
+			string theIp = SQLDb->GetValue(i, 0);
 //			elog << "IP: " << theIp << endl;
 
 			sqlPendingTraffic* trafRecord = new sqlPendingTraffic(SQLDb);
@@ -103,10 +109,37 @@ if( SQLDb->Exec(theQuery, true ) )
 			trafRecord->channel_id = channel_id; 
 
 			trafficList.insert(trafficListType::value_type(theIp, trafRecord));
-
 		}
 	}
+}
 
+void sqlPendingChannel::loadSupportersTraffic()
+{
+	stringstream theQuery;
+	theQuery 	<< "SELECT user_id,join_count FROM supporters"
+				<< " WHERE channel_id = " << channel_id
+				<< ends;
+
+	#ifdef LOG_SQL
+		elog	<< "sqlPendingChannel::loadUniqueTrafficCache> "
+			<< theQuery.str().c_str()
+			<< endl;
+	#endif
+
+	if( SQLDb->Exec(theQuery, true ) )
+	//if( PGRES_TUPLES_OK == status )
+	{
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+			string userId = SQLDb->GetValue(i, 0);
+			sqlPendingTraffic* trafRecord = new sqlPendingTraffic(SQLDb);
+			trafRecord->ip_number = userId;
+			trafRecord->join_count = atoi(SQLDb->GetValue(i, 1));
+			trafRecord->channel_id = channel_id;
+
+			uniqueSupporterList.insert(trafficListType::value_type(userId, trafRecord));
+		}
+	}
 }
 
 bool sqlPendingChannel::commit()
@@ -134,7 +167,8 @@ unique_join_count = trafficList.size();
 stringstream queryString; 
 queryString << "UPDATE pending SET "
 			<< "join_count = " << join_count << ", "
-			<< "unique_join_count = " << unique_join_count
+			<< "unique_join_count = " << unique_join_count << ", "
+			<< "first_init = '" << ((initialised == true) ? 'Y' : 'N') << "'"
 			<< " WHERE channel_id = " 
 			<< channel_id
 			<< ends;
@@ -160,12 +194,12 @@ if( !SQLDb->Exec(queryString ) )
 	 *  Next, iterate over the supporters and commit those details.
 	 */
 
-	for(supporterListType::iterator ptr = supporterList.begin();
-		ptr !=  supporterList.end(); ++ptr)
-		{ 
- }
+	//for(supporterListType::iterator ptr = supporterList.begin();
+	//	ptr !=  supporterList.end(); ++ptr)
+	//	{
+	//	}
  
-		return true;
+	return true;
 }
 
 

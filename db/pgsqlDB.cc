@@ -33,12 +33,8 @@
 #include	"gnuworldDB.h"
 #include	"pgsqlDB.h"
 
-const char pgsqlDB_cc_rcsId[] = "$Id: pgsqlDB.cc,v 1.5 2009/07/25 16:59:48 mrbean_ Exp $" ;
-const char pgsqlDB_h_rcsId[] = __PGSQLDB_H ;
-
 namespace gnuworld
 {
-
 using std::cout ;
 using std::endl ;
 using std::ends ;

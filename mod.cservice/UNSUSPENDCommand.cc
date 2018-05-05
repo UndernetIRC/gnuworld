@@ -25,18 +25,14 @@
  *
  * $Id: UNSUSPENDCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $
  */
-
 #include	<iostream>
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
-
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -106,6 +102,9 @@ if ((st[1][0] != '#') && (st[1][0] != '*'))
 	targetUser->commit(theClient);
 	bot->Notice(theClient, "%s has been unsuspended.",
 		targetUser->getUserName().c_str());
+
+	bot->updateUserLevels(targetUser);
+	bot->NoteAllAuthedClients(targetUser,"Your user account's global suspension has been cancelled.");
 
 	targetUser->writeEvent(sqlUser::EV_UNSUSPEND, theUser, "");
 
@@ -194,12 +193,21 @@ if ((aLevel->getAccess()) >= level)
  */
 
 if (aLevel->getSuspendLevel() > level)
-	{
+{
 	bot->Notice(theClient,
 		"Cannot unsuspend a user that was suspended at a higher level than your own access.");
 	return false;
+}
+string reason = "No reason supplied";
+if (st.size() >= 4)
+{
+	reason = st.assemble(3);
+	if ((reason.size() < 2) || (reason.size() > 300))
+	{
+		bot->Notice(theClient, bot->getResponse(theUser,language::reason_must).c_str(),2,300);
+		return false;
 	}
-
+}
 aLevel->setSuspendExpire(0);
 aLevel->setSuspendBy(string());
 aLevel->setLastModif(bot->currentTime());
@@ -207,7 +215,7 @@ aLevel->setLastModifBy( string( "("
 	+ theUser->getUserName()
 	+ ") "
 	+ theClient->getNickUserHost() ) );
-
+aLevel->setSuspendReason(string());
 if( !aLevel->commit() )
 	{
 	bot->Notice( theClient,
@@ -222,6 +230,17 @@ bot->Notice(theClient,
 		language::susp_cancelled,
 		string("SUSPENSION for %s is cancelled")).c_str(),
 	Target->getUserName().c_str());
+if (Target != theUser)
+{
+	bot->NoteAllAuthedClients(Target, bot->getResponse(Target,language::acc_unsusp).c_str(), theChan->getName().c_str());
+	// Announce the manager about the new access change
+	if (level < 500)
+	{
+		string theMessage = TokenStringsParams("%s unsuspended %s's access on channel %s",
+				theUser->getUserName().c_str(), Target->getUserName().c_str(), theChan->getName().c_str());
+		bot->NoteChannelManager(theChan, theMessage.c_str());
+	}
+}
 
 return true;
 }

@@ -32,8 +32,6 @@
 #include	"Channel.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_T.cc,v 1.8 2005/06/20 11:26:33 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

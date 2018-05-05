@@ -35,11 +35,8 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccServer.cc,v 1.18 2009/08/06 02:59:24 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ; 
 using std::endl ; 
 using std::stringstream ;

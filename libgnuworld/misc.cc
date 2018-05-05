@@ -29,15 +29,14 @@
 #include	<cstdarg>
 #include	<cstring>
 
-#include	"misc.h"
+#include	<sstream>
 
-const char rcsId[] = "$Id: misc.cc,v 1.6 2007/12/27 20:45:15 kewlio Exp $" ;
+#include	"misc.h"
+#include	"StringTokenizer.h"
+#include	"ELog.h"
 
 namespace gnuworld
 {
-
-using std::string ;
-
 /**
  * Create a string and copy into it (Key), but convert to all
  * lower case.
@@ -204,6 +203,317 @@ return atoi(Length.c_str()) * Units;
 int atoi( const std::string& val )
 {
 return ::atoi( val.c_str() ) ;
+}
+
+string itoa(int n)
+{
+	string Result;
+	std::ostringstream convert;
+	convert << n;
+	Result = convert.str();
+	return Result;
+}
+
+string extractNick(const string& NickUserHostIP)
+{
+	StringTokenizer st( NickUserHostIP, '!' ) ;
+
+	// Make sure there are exactly two tokens
+	if( st.size() != 2 )
+		return string("");
+
+	return st[0];
+}
+
+string extractUser(const string& NickUserHostIP)
+{
+	string NickUser = extractNickUser(NickUserHostIP);
+
+	StringTokenizer st( NickUser, '!' ) ;
+
+	if( st.size() != 2 )
+		return string("");
+
+	return st[1];
+}
+
+string extractNickUser(const std::string& NickUserHostIP)
+{
+	StringTokenizer st( NickUserHostIP, '@' ) ;
+
+	if( st.size() != 2 )
+		return string("");
+
+	return st[0];
+}
+
+string extractHostIP(const string& NickUserHostIP)
+{
+	StringTokenizer st( NickUserHostIP, '@' ) ;
+
+	if( st.size() != 2 )
+		return string("");
+
+	return st[1];
+}
+
+bool validUserMask(const string& userMask)
+{
+	// Check that a '@' exists
+	StringTokenizer st( userMask, '@' ) ;
+
+	if (st.size() != 2)
+	{
+		return false ;
+	}
+
+	// Check that a '!' exists
+	StringTokenizer st1( st[0], '!' ) ;
+	if (st1.size() != 2)
+	{
+		return false ;
+	}
+
+	// Be sure that the hostname is no more than 255 characters
+	if( st[ 1 ].size() > 255 )
+	{
+		return false ;
+	}
+
+	// Tests have passed
+	return true ;
+}
+
+bool validCIDRLength(const string& address)
+{
+	string hostip = extractHostIP(address);
+	irc_in_addr ip;
+	unsigned char ipmask_len;
+	if (!ipmask_parse(hostip.c_str(), &ip, &ipmask_len))
+		return true;
+	if ((ipmask_len > 0) && (ipmask_len < 32))
+		return false;
+	else
+		return true;
+}
+
+/* If the address is only a hostip/cidr OR an empty string --> will return unchanged
+ * If any wildcard or '!' or '@' found will complete to valid form
+ */
+string fixAddress(const string& address)
+{
+	if (address.empty())
+		return address;
+
+	bool checksafe = false;
+
+	string fixaddr = address;
+
+	if ((fixaddr[0] == '@') || (fixaddr[0] == '!'))
+	{
+		fixaddr = "*" + fixaddr;
+		checksafe = true;
+	}
+	if (fixaddr[fixaddr.size()-1] == '@')
+	{
+		fixaddr = fixaddr + "*";
+		checksafe = true;
+	}
+
+	StringTokenizer st( fixaddr, '@' ) ;
+	if (st.size() < 2)
+	{
+		irc_in_addr ip;
+		unsigned char ipmask_len;
+		if (!ipmask_parse(address.c_str(), &ip, &ipmask_len))
+			return address;
+		else
+			fixaddr = "*!*@" + address;
+	}
+
+	//If a CIDR is specified, help out and calculate the correct address
+	string fixIpHost = extractHostIP(fixaddr);
+	if (fixIpHost.find('/') != string::npos)
+	{
+		fixToCIDR64(fixIpHost);
+		fixaddr = extractNickUser(fixaddr) + "@" + fixIpHost;
+	}
+
+	if (validUserMask(fixaddr))
+	{
+		if (((fixaddr == "*!*@*") || (fixaddr == "*!~*@*")) && (checksafe))
+			return address;
+		return fixaddr;
+	}
+
+	string nick = extractNick(st[0]);
+	if (nick.empty())
+	{
+		if ((fixaddr[0] != '*') && (fixaddr[0] != '~'))
+			fixaddr = "*!*" + fixaddr;
+		else
+			fixaddr = "*!" + fixaddr;
+		checksafe = true;
+	}
+	if (((fixaddr == "*!*@*") || (fixaddr == "*!~*@*")) && (checksafe))
+		return address;
+	return fixaddr;
+}
+
+bool isUserHost(const string& address)
+{
+	std::size_t atpos = address.find('@');
+	if (atpos == string::npos)
+		return false;
+	return true;
+}
+
+unsigned char fixToCIDR64(string& strIP)
+{
+	irc_in_addr ip;
+	unsigned char ipmask_len;
+	if (!ipmask_parse(strIP.c_str(), &ip, &ipmask_len))
+		return 0;
+
+	bool IsIPv4 = irc_in_addr_is_ipv4(&ip);
+	string::size_type pos = strIP.find('/');
+	strIP = strIP.substr(0, pos);
+
+	// Re-enable this, if want to force to always /64
+	//if ((ipmask_len > 64) && (!IsIPv4))
+	//	ipmask_len = 64;
+
+	//Instead of the above rule, if we have an ipv6 address, and no '/' present,
+	//then the address is default truncated to /64
+	if (((ipmask_len > 64) && (!IsIPv4)) && (pos == string::npos))
+		ipmask_len = 64;
+
+	if (((ipmask_len >= 16) && (!IsIPv4)) || ((ipmask_len >= 96) && (IsIPv4)))
+	{
+		strIP = IPCIDRMinIP(strIP.c_str(), unsigned(ipmask_len));
+		if (IsIPv4)
+		{ //adjust to 32 bit, if we have a IPv4/32 we don't want to show /32
+			if (ipmask_len < 128)
+				strIP += '/' + itoa(unsigned(ipmask_len) - 96);
+		}
+		else
+		{ //also, if ipv6/128, don't show the /128
+			if (ipmask_len < 128)
+				strIP += '/' + itoa(unsigned(ipmask_len));
+		}
+	}
+	return ipmask_len;
+}
+
+string fixToCIDR64(const string& strIP)
+{
+	string fixIP = strIP;
+	fixToCIDR64(fixIP);
+	return fixIP;
+}
+
+string createBanMask(const string& address)
+{
+	if (!isUserHost(address))
+		return address;
+
+	string nick = extractNick(address);
+	string ident = extractUser(address);
+	string hostip = extractHostIP(address);
+
+	if (!nick.empty()) nick = "*!";
+
+	if ('~' == ident[0])
+		ident = "~*";
+
+	if (hostip.find(':') != string::npos)
+		hostip = createClass(hostip);
+
+	return nick + ident +'@'+ hostip;
+}
+
+string createClass(const string& address, bool wildcard)
+{
+	string fixaddr;
+	bool isUserAddr = isUserHost(address);
+	if (isUserAddr)
+		fixaddr = extractHostIP(address);
+	else
+		fixaddr = address;
+	unsigned char ipmask_len;
+	irc_in_addr ip;
+	if (ipmask_parse(fixaddr.c_str(), &ip, &ipmask_len))
+	{
+		if (irc_in_addr_is_ipv4(&ip))
+		{
+			if (wildcard)
+			{
+				StringTokenizer st24(fixaddr, '.');
+				fixaddr  = st24[0] + '.';
+				fixaddr += st24[1] + '.';
+				fixaddr += st24[2] + ".*";
+			}
+			else
+				fixaddr += "/24";
+			if (isUserAddr)
+				fixaddr = extractNickUser(address) + '@' + fixaddr;
+			return fixaddr;
+		}
+		else
+		{
+			fixaddr = fixToCIDR64(fixaddr.c_str());
+			if (isUserAddr)
+				fixaddr = extractNickUser(address) + '@' + fixaddr;
+			return fixaddr;
+		}
+	}
+	else //host address case
+	{
+		StringTokenizer st(fixaddr, '.');
+		if (st.size() < 2)
+			return address;
+		fixaddr = "*." + st.assemble(1);
+		if (isUserAddr)
+			fixaddr = extractNickUser(address) + '@' + fixaddr;
+		return fixaddr;
+	}
+}
+
+const string prettyDuration( int duration )
+{
+	if (duration == 0)
+		return "Never";
+
+// Pretty format a 'duration' in seconds to
+// x day(s), xx:xx:xx.
+
+char tmpBuf[ 64 ] = {0};
+
+int	res = ::time(NULL) - duration,
+	secs = res % 60,
+	mins = (res / 60) % 60,
+	hours = (res / 3600) % 24,
+	days = (res / 86400) ;
+
+sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
+	days,
+	(days == 1 ? "" : "s"),
+	hours,
+	mins,
+	secs );
+
+return string( tmpBuf ) ;
+}
+
+const string TokenStringsParams(const char* format,...)
+{
+	char buf[ 1024 ] = { 0 } ;
+	va_list _list ;
+
+	va_start( _list, format ) ;
+	vsnprintf( buf, 1024, format, _list ) ;
+	va_end( _list ) ;
+	return string(buf);
 }
 
 } // namespace gnuworld

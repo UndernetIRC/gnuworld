@@ -51,8 +51,6 @@
 using std::map ;
 using std::vector ;
 
-const char VOICECommand_cc_rcsId[] = "$Id: VOICECommand.cc,v 1.21 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::map ;
@@ -122,6 +120,19 @@ if (!tmpChan)
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser, language::chan_is_empty).c_str(),
+		theChan->getName().c_str());
+	return false;
+	}
+
+/*
+ *  If the NOVOICE flag is set, we aren't allowed to voice anyone.
+ */
+if(theChan->getFlag(sqlChannel::F_NOVOICE))
+	{
+	bot->Notice(theClient,
+		bot->getResponse(theUser,
+			language::novoice_set,
+			string("The NOVOICE flag is set on %s")).c_str(),
 		theChan->getName().c_str());
 	return false;
 	}
@@ -242,8 +253,32 @@ while (counter < st2.size())
 	counter++;
 	}
 
-// Voice them.
-bot->Voice(tmpChan, voiceList);
+
+// Avoid if there are no modes
+if (!voiceList.empty())
+{
+	// Voice them.
+	bot->Voice(tmpChan, voiceList);
+
+	// Send action opnotice to channel if OPLOG is enabled
+	if (theChan->getFlag(sqlChannel::F_OPLOG))
+	{
+		string voiceStr;
+		vector<iClient*>::iterator itr = voiceList.begin();
+		while (itr != voiceList.end())
+		{
+			iClient* tmpUser = *itr;
+			voiceStr += tmpUser->getNickName().c_str() + string(", ");
+			++itr;
+		}
+		voiceStr = voiceStr.substr(0, voiceStr.length() - 2);
+		bot->NoticeChannelOps(theChan->getName(),
+			"%s (%s) voiced: %s",
+			theClient->getNickName().c_str(), theUser->getUserName().c_str(), voiceStr.c_str());
+	}
+}
+
+
 return true ;
 }
 

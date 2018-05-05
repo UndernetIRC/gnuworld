@@ -35,7 +35,6 @@
 #include	"gnuworld_config.h"
 #include	"Network.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.38 2007/05/26 09:41:24 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -82,6 +81,7 @@ iClient::iClient( const unsigned int& /* _uplink */,
 {
 setModes( _mode ) ;
 customDataMap = 0 ;
+numericIP = xIP( IP ).GetNumericIP();
 }
 
 iClient::iClient( const unsigned int& /* _uplink */,
@@ -124,6 +124,7 @@ iClient::iClient( const unsigned int& /* _uplink */,
 #endif
 setModes( _mode ) ;
 customDataMap = 0 ;
+numericIP = xIP( IP ).GetNumericIP();
 }
 
 iClient::~iClient()
@@ -324,12 +325,13 @@ if( std::find( channelList.begin(), channelList.end(), theChan )
 
 // Add the channel to the channelList
 channelList.push_front( theChan ) ;
-#ifdef TOPIC_TRACK
-	/* initialise the topic data if topic_track is enabled */
-	theChan->setTopicTS(0);
-	theChan->setTopicWhoSet("");
-	theChan->setTopic("");
-#endif
+//So far this clears all the time topic
+//#ifdef TOPIC_TRACK
+//	/* initialise the topic data if topic_track is enabled */
+//	theChan->setTopicTS(0);
+//	theChan->setTopicWhoSet("");
+//	theChan->setTopic("");
+//#endif
 return true ;
 }
 

@@ -27,6 +27,7 @@
 #define __IP_H "$Id: ip.h,v 1.7 2004/01/07 03:08:29 dan_karrels Exp $"
 
 #include	<string>
+#include	"Numeric.h"
 
 namespace gnuworld
 {
@@ -47,18 +48,9 @@ public:
 	xIP( const std::string& IP, bool Base64 = false ) ;
 
 	/**
- 	 * Construct an xIP instance given an IP in long int format.
+ 	 * Construct an xIP instance given an IP in irc_in_addr struct format.
 	 */
-	xIP( const unsigned int& IP ) ;
-
-	/**
-	 * Construct an xIP instance given the four octets of
-	 * an IP address.
-	 */
-	xIP( const unsigned int& a,
-		const unsigned int& b,
-		const unsigned int& c,
-		const unsigned int& d ) ;
+	xIP( const irc_in_addr& IP ) ;
 
 	/**
 	 * Copy constructor.
@@ -71,29 +63,14 @@ public:
 	~xIP() {}
 
 	/**
-	 * Retrieve the IP in dotted decimals format.
-	 * This method invoked ::gethostbyaddr(), so might be slower.
+	 * Retrieve the IP in xxx.xxx.xxx.xxx/xx:xx::xx:xx character array format.
 	 */
-	std::string	GetIP() const ;
+	std::string	GetNumericIP(bool fixedToCIDR64 = false) const ;
 
 	/**
-	 * Retrieve the IP in xxx.xxx.xxx.xxx character array format.
+	 * Retrieve the IP as an irc_in_addr struct.
 	 */
-	std::string	GetNumericIP() const ;
-
-	/**
-	 * Retrieve the IP as an unsigned int.
-	 */
-	const unsigned int& GetLongIP() const ;
-
-	/**
-	 * Place into the four variables passed to this method the
-	 * four octets of the IP.
-	 */
-	void GetIP( unsigned int& a,
-		unsigned int& b,
-		unsigned int& c,
-		unsigned int& d ) const ;
+	const irc_in_addr& GetLongIP() const ;
 
 	/**
 	 * Return a character array representation of the base 64
@@ -101,12 +78,17 @@ public:
 	 */
 	std::string	GetBase64IP() const ;
 
+	/**
+	 * Get the 32 bit integer representation of a current IPv4 address.
+	 */
+	unsigned int getIP32() const;
+
 protected:
 
 	/**
 	 * The IP number itself.
 	 */
-	unsigned int	IP ;
+	irc_in_addr	IP;
 
 } ;
 

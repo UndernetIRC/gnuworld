@@ -27,16 +27,14 @@
  * $Id: BANLISTCommand.cc,v 1.20 2003/12/04 11:22:10 mrbean_ Exp $
  */
 
-#include        <string>
+#include	<string>
 
-#include        "StringTokenizer.h"
-#include        "cservice.h"
-#include        "Network.h"
-#include        "levels.h"
-#include        "responses.h"
+#include	"StringTokenizer.h"
+#include	"cservice.h"
+#include	"Network.h"
+#include	"levels.h"
+#include	"responses.h"
 #include	"sqlBan.h"
-
-const char BANLISTCommand_cc_rcsId[] = "$Id: BANLISTCommand.cc,v 1.20 2003/12/04 11:22:10 mrbean_ Exp $" ;
 
 namespace gnuworld
 {

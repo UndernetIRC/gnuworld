@@ -52,7 +52,6 @@
 #include	"Buffer.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: ConnectionManager.cc,v 1.20 2007/09/25 16:57:54 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

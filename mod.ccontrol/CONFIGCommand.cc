@@ -27,8 +27,6 @@
 #include	"gnuworld_config.h"
 #include	"ccontrol_generic.h"	/* for Duration() and Ago() */
 
-RCSTAG( "$Id: CONFIGCommand.cc,v 1.14 2008/01/03 04:26:22 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 
@@ -89,21 +87,46 @@ for(unsigned int  pos =1; pos < st.size() ;)
 			}
 		pos+=2;
 		}
-        else if(!strcasecmp(st[pos],"-CClonesCIDR"))
+        else if(!strcasecmp(st[pos],"-CClonesCIDR24"))
                 {
                 if(st.size() < pos +2)
                         {
-                        bot->Notice(theClient,"-CClonesCIDR must get the CIDR Size");
+                        bot->Notice(theClient,"-CClonesCIDR24 must get the CIDR24 Size");
                         return true;
                         }
                 if((atoi(st[pos+1].c_str())<16) || (atoi(st[pos+1].c_str())>31))
                         {
-                        bot->Notice(theClient,"-CClonesCIDR must have a CIDR Size in the range 16-32");
+                        bot->Notice(theClient,"-CClonesCIDR24 must have a CIDR Size in the range 16-32");
                         return true;
                         }
-                if(!bot->updateMisc("CClonesCIDR",atoi(st[pos+1].c_str())))
+                if(!bot->updateMisc("CClonesCIDR24",atoi(st[pos+1].c_str())))
                         {
-                        bot->MsgChanLog("Error while updating the CIDR size for clones in the db!\n");
+                        bot->MsgChanLog("Error while updating the CIDR24 size for clones in the db!\n");
+                        }
+                else
+                        {
+                        bot->Notice(theClient,"%s was successfully updated to %s",
+                                st[pos].c_str(),st[pos+1].c_str());
+                        bot->Notice(theClient,"This change requires you to restart the service IMMEDIATELY or "
+                                "unexpected results will occur!");
+                        }
+                pos+=2;
+                }
+        else if(!strcasecmp(st[pos],"-CClonesCIDR48"))
+                {
+                if(st.size() < pos +2)
+                        {
+                        bot->Notice(theClient,"-CClonesCIDR48 must get the CIDR48 Size");
+                        return true;
+                        }
+                if((atoi(st[pos+1].c_str())<16) || (atoi(st[pos+1].c_str())>63))
+                        {
+                        bot->Notice(theClient,"-CClonesCIDR48 must have a CIDR Size in the range 16-64");
+                        return true;
+                        }
+                if(!bot->updateMisc("CClonesCIDR48",atoi(st[pos+1].c_str())))
+                        {
+                        bot->MsgChanLog("Error while updating the CIDR48 size for clones in the db!\n");
                         }
                 else
                         {

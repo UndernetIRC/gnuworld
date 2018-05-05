@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 #
 # $Id: enc_pass.sh,v 1.5 2003/07/14 10:35:44 nighty Exp $
 #
@@ -23,7 +23,8 @@ fi
 echo -n "Cleartext password : "
 read -se CTPASS
 echo ""
-ENCPART=`echo -n $GENSALT$CTPASS | md5sum | cut -f1 -d' '`
+#ENCPART=`echo -n $GENSALT$CTPASS | md5sum | cut -f1 -d' '`
+ENCPART=`md5 -s $GENSALT$CTPASS`
 echo "----> SALT       : $GENSALT"
 echo "----> ENCODED    : $ENCPART"
 echo "----> CRYPT PASS : $GENSALT$ENCPART"

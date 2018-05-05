@@ -26,6 +26,7 @@
 #include	<iostream>
 #include	<fstream>
 #include	<string>
+#include	<time.h>
 
 namespace gnuworld
 {
@@ -60,6 +61,8 @@ protected:
 	 * True if logging to an output file.
 	 */
 	bool		logFile ;
+
+	bool		newline;
 
 public:
 
@@ -116,6 +119,11 @@ public:
 	inline void setStream( std::ostream* newStream )
 		{ outStream = newStream ; }
 
+	/*
+	 * Get local time in [hh:mm:ss] format
+	 */
+	std::string getLocalTime();
+
 	/**
 	 * Output the endl function.
 	 */
@@ -132,8 +140,21 @@ public:
 	template< typename T >
 	ELog& operator<<( const T& var )
 		{
-		if( logFile )	outFile << var ;
-		if( outStream )	*outStream << var ;
+		if (logFile)
+		{
+			if (newline)
+				outFile << getLocalTime() << var;
+			else
+				outFile << var;
+		}
+		if (outStream)
+		{
+			if (newline)
+				*outStream << getLocalTime() << var;
+			else
+				*outStream << var;
+		}
+		newline = false;
 		return *this ;
 		}
 

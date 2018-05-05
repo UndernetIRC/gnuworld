@@ -25,21 +25,13 @@
 #include	<sstream>
 #include	<string>
 #include	<iostream>
-
 #include	<cstring>
-
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlBan.h"
 #include	"constants.h"
 #include	"cservice.h"
 #include	"cservice_config.h"
-#include	"nickUserCidr.h"
-#include	"HostBanMatcher.h"
-#include	"CIDRBanMatcher.h"
-
-const char sqlBan_h_rcsId[] = __SQLBAN_H ;
-const char sqlBan_cc_rcsId[] = "$Id: sqlBan.cc,v 1.11 2009/06/25 19:05:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -61,8 +53,6 @@ sqlBan::sqlBan(dbHandle* _SQLDb)
     last_updated(0),
     SQLDb(_SQLDb)
 {
-	matcher = NULL;
-	
 }
 
 void sqlBan::setAllMembers(int row)
@@ -81,7 +71,6 @@ level = atoi(SQLDb->GetValue(row, 5));
 expires = atoi(SQLDb->GetValue(row, 6));
 reason = SQLDb->GetValue(row, 7);
 last_updated = atoi(SQLDb->GetValue(row, 8));
-initMatcher();
 }
 
 bool sqlBan::commit()
@@ -200,26 +189,8 @@ if( !SQLDb->Exec(queryString ) )
 return true ;
 }
 
-void sqlBan::initMatcher()
-{
-	if(matcher)
-		delete matcher;
-	
-	xNickUserCIDR cidr = xNickUserCIDR(banmask);
-	if(cidr.GetValid())
-	{
-		matcher = new CIDRBanMatcher(banmask);
-	} else {
-		matcher = new HostBanMatcher(banmask);
-	}
-}
-
 sqlBan::~sqlBan()
 {
-	if(matcher)
-		delete matcher;
 }
-
-
 
 } // Namespace gnuworld.

@@ -44,11 +44,9 @@
 #include	"iClient.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_B.cc,v 1.12 2008/04/16 20:29:37 danielaustin Exp $" ) ;
 
 namespace gnuworld
 {
-
 using std::pair ;
 using std::make_pair ;
 using std::string ;
@@ -222,6 +220,14 @@ if( '+' == Param[ whichToken ][ 0 ] )
 			case 'D':
 				modeVector.push_back( make_pair(
 					true, Channel::MODE_D ) ) ;
+				break ;
+			case 'c':
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_C ) ) ;
+				break ;
+			case 'C':
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_CTCP ) ) ;
 				break ;
  			case 'l':
 				theServer->OnChannelModeL( theChan, true, 

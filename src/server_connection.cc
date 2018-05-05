@@ -67,8 +67,6 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server_connection.cc,v 1.4 2006/12/22 06:41:45 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 
@@ -94,6 +92,9 @@ Version = 10 ;
 // Set ourselves as a service.
 me->setService() ;
 
+// Set ourselves as IPv6.
+me->setIPv6() ;
+
 // Initialize the connection time variable to current time.
 ConnectionTime = ::time( NULL ) ;
 
@@ -110,7 +111,7 @@ elog	<< "*** Connected to "
 WriteDuringBurst( "PASS :%s\n", Password.c_str() ) ;
 
 // Send our server information.
-WriteDuringBurst( "SERVER %s %d %d %d J%02d %s +s :%s\n",
+WriteDuringBurst( "SERVER %s %d %d %d J%02d %s +s6 :%s\n",
 	        ServerName.c_str(),
 		1,
 		StartTime,

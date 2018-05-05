@@ -24,7 +24,7 @@
 #include	<sstream>
 #include	<string>
 #include	<iostream>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -34,8 +34,6 @@
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: LASTCOMCommand.cc,v 1.18 2009/03/17 09:50:58 denspike Exp $" ) ;
 
 namespace gnuworld
 {

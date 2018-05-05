@@ -21,20 +21,15 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMSGLINECommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld
@@ -50,32 +45,46 @@ if( st.size() < 2 )
 	Usage( theClient ) ;
 	return true ;
 	}
-bot->MsgChanLog("REMSGLINE %s\n",st.assemble(1).c_str());
 
-if(st[1].substr(0,1) == "#")
+StringTokenizer::size_type pos = 1 ;
+
+string cmdStr = "REMSGLINE ";
+
+bool ForceRemove = (!strcasecmp(st[pos],"-fr"));
+if (ForceRemove && (st.size() < 3))
+{
+	Usage(theClient);
+	return true;
+}
+
+if (ForceRemove)
+{
+	cmdStr += "-fr ";
+	pos++;
+}
+
+if(st[pos].substr(0,1) == "#")
 	{
 	bot->Notice(theClient,"Please use REMGCHAN to remove a BADCHAN gline");
 	return false;
 	}
-ccGline *tmpGline;
-bool realName = false;
-if(st[1].substr(0,1) != "$")
-    tmpGline = bot->findGline(st[1]);
-else
-	{    
-	tmpGline = bot->findRealGline(st[1]);
-	realName = true;
-	}
-if(tmpGline != NULL)
-	{
-	if(!tmpGline->Delete())
-		bot->MsgChanLog("Error while removing gline for host %s from the database\n",
-			st[1].c_str());
-	bot->remGline(tmpGline);
-	delete tmpGline;
-	}	
-server->removeGline(st[1],bot);
-bot->Notice( theClient, "Removal of gline (%s) succeeded\n",st[1].c_str() ) ;
+string Ident = extractNickUser(st[pos]);
+string Hostname = extractHostIP(st[pos]);
+if (Ident.empty())
+	Hostname = st[pos];
+string sgHost;
+//If CIDR mask is specified, help out and calculate the CIDR address
+if (Hostname.find('/') != string::npos)
+	fixToCIDR64(Hostname);
+if (!Ident.empty())
+	sgHost = Ident +'@'+ Hostname;
+else 
+	sgHost = Hostname;
+cmdStr += sgHost;
+bot->removeAllMatchingGlines(sgHost, ForceRemove);
+bot->MsgChanLog("%s\n",cmdStr.c_str());
+bot->Notice( theClient, "Removal of gline (%s) succeeded\n",sgHost.c_str() ) ;
+
 return true ;
 }
 

@@ -43,17 +43,14 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.50 2009/06/09 15:40:29 mrbean_ Exp $" ;
-
 namespace gnuworld
 {
-
 using std::endl ;
 using std::ends ;
 using std::stringstream ;
 using std::string ;
 
-static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users_lastseen.last_seen,levels.suspend_expires,levels.last_modif,levels.last_modif_by,levels.suspend_level FROM levels,channels,users,users_lastseen ";
+static const char* queryHeader =    "SELECT channels.name,users.user_name,levels.access,levels.flags,users_lastseen.last_seen,levels.suspend_expires,levels.last_modif,levels.last_modif_by,levels.suspend_level,levels.suspend_reason FROM levels,channels,users,users_lastseen ";
 static const char* queryCondition = "WHERE levels.channel_id=channels.id AND levels.user_id=users.id AND users.id=users_lastseen.user_id ";
 static const char* queryFooter =    "ORDER BY levels.access DESC;";
 
@@ -79,17 +76,35 @@ if (!theUser)
 	return false;
 }
 
+bool historysearch = false;
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan)
-	{
+if (!theChan && !bot->getAdminAccessLevel(theUser))
+{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::chan_not_reg).c_str(),
 		st[1].c_str()
 		);
 	return false;
+}
+else if (!theChan && bot->getAdminAccessLevel(theUser))
+{
+	theChan = bot->getChannelRecord(st[1], true);
+	if (!theChan)
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::chan_not_reg).c_str(),
+			st[1].c_str()
+			);
+		return false;
 	}
-
+	else
+	{
+		historysearch = true;
+	}
+}
 /* Don't let ordinary people view * accesses */
 if (theChan->getName() == "*")
 	{
@@ -265,6 +280,13 @@ theQuery	<< queryHeader
 		<< endl;
 #endif
 
+// If theChan is no needed after this point, better to delete it now
+if (historysearch)
+{
+	delete theChan;
+	theChan = NULL;
+}
+
 /*
  *  All done, display the output. (Only fetch 15 results).
  */
@@ -314,6 +336,8 @@ if (matchString[0] == '=')
 		}
 	}
 
+if (historysearch)
+	bot->Notice(theClient, "\002   *** Access history search results ***\002");
 
 for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{
@@ -361,22 +385,26 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 			bot->SQLDb->GetValue(i, 0).c_str(),
 			autoMode.c_str());
 
-		if( suspend_expires > bot->currentTime() )
-			{
-			unsigned int suspendLevel = atoi(bot->SQLDb->GetValue(i, 8));
+		unsigned int suspendLevel = atoi(bot->SQLDb->GetValue(i, 8));
+		string suspReason = bot->SQLDb->GetValue(i,9);
 
+		if( suspend_expires > bot->currentTime() )
+		{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::suspend_expires_in).c_str(),
-				bot->prettyDuration(suspend_expires_f).c_str(),
-				suspendLevel
-				);
-			}
+				prettyDuration(suspend_expires_f).c_str(),
+				suspendLevel);
+			bot->Notice(theClient,bot->getResponse(theUser,
+					language::susp_reason,string("Reason: %s")).c_str(),suspReason.c_str());
+		}
+		else if ((suspReason != "") && (suspend_expires == 0))
+			bot->Notice(theClient,bot->getResponse(theUser,
+				language::unsusp_reason,string("UNSUSPENDED - %s")).c_str(),suspReason.c_str());
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 					language::last_seen).c_str(),
-			bot->prettyDuration(duration).c_str()
-		);
+			prettyDuration(duration).c_str());
 
 		if(modif)
 			{

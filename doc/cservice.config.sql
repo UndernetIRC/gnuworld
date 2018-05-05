@@ -2,7 +2,9 @@
 -- Default configuration entries for CMaster bot.
 
 INSERT INTO variables (var_name,contents,last_updated,hint)
-VALUES ('REQUIRED_SUPPORTERS', '10', now()::abstime::int4, 'Required supporters for an application');
+VALUES ('REQUIRED_SUPPORTERS', '5', now()::abstime::int4, 'Required supporters for an application');
+INSERT INTO variables (var_name,contents,last_updated,hint)
+VALUES ('MAX_BAN_REASON_LENGTH', '300', now()::abstime::int4, 'Maximum length for ban reason.');
 INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('MAX_BANS', '300', now()::abstime::int4, 'Maximum bans per channel');
 INSERT INTO variables (var_name,contents,last_updated,hint)
@@ -18,7 +20,7 @@ VALUES ('FAILED_LOGINS_RATE', '900', now()::abstime::int4, 'Time between alerts 
 INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('MAX_FAILED_LOGINS', '20', now()::abstime::int4, 'Maximum failed logins per client');
 INSERT INTO variables (var_name,contents,last_updated,hint)
-VALUES ('MAX_BAN_DURATION', '8640000', now()::abstime::int4, 'Maximum ban duration (in seconds)');
+VALUES ('MAX_BAN_DURATION', '31536000', now()::abstime::int4, 'Maximum ban duration (in seconds)');
 INSERT INTO variables (var_name,contents,last_updated,hint)
 VALUES ('LOGINS_FROM_SAME_IP', '0', now()::abstime::int4, 'Maximum logins from same IP when maxlogins=1');
 INSERT INTO variables (var_name,contents,last_updated,hint)

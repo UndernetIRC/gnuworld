@@ -26,8 +26,6 @@
 #include	"cservice.h"
 #include 	"responses.h"
 
-const char MOTDCommand_cc_rcsId[] = "$Id: MOTDCommand.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

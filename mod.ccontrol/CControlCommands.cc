@@ -28,8 +28,6 @@
 #include	"iClient.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CControlCommands.cc,v 1.16 2005/01/12 03:50:28 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
 

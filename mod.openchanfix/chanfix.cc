@@ -62,8 +62,6 @@
 #include	<boost/thread/thread.hpp>
 #endif /* CHANFIX_HAVE_BOOST_THREAD */
 
-RCSTAG("$Id: chanfix.cc,v 1.16 2010/03/04 04:24:11 hidden1 Exp $");
-
 namespace gnuworld
 {
 
@@ -765,11 +763,9 @@ if (Command == "DCC") {
 } else if (Command == "PING" || Command == "ECHO") {
   DoCTCP(theClient, CTCP, Message);
 } else if (Command == "VERSION") {
-  DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.1 [compiled "__DATE__" "__TIME__"]");
+  DoCTCP(theClient, CTCP, "Evilnet Development -- mod.openchanfix v2.1 [compiled " __DATE__ " " __TIME__ "]");
 } else if (Command == "WHODUNIT?") {
   DoCTCP(theClient, CTCP, "reed, ULtimaTe_, Compy, SiRVulcaN, Hidden");
-} else if (Command == "SUBVERSION") {
-  DoCTCP(theClient, CTCP, rcsId);
 } else if (Command == "GENDER") {
   DoCTCP(theClient, CTCP, "Gender pending vote, but for now I'll be whatever you want!");
 }
@@ -1850,7 +1846,7 @@ for (xNetwork::serverIterator ptr = Network->servers_begin();
 return;
 }
 
-const int chanfix::getLastFix(sqlChannel* theChan)
+int chanfix::getLastFix(sqlChannel* theChan)
 {
 /* Get a connection instance to our backend */
 dbHandle* cacheCon = localDBHandle;
@@ -2165,7 +2161,7 @@ chanStatus      << "* Channel Status for "
 		<< netChan->getName() << ": "
 		<< netChan->banList_size()
                 << " bans -- Restrictive Modes: +"
-		<< chanModes
+		<< chanModes.str().c_str()
                 ;
 
 SendTo(theClient, chanStatus.str().c_str());
@@ -2267,7 +2263,6 @@ bool chanfix::shouldCJoin(sqlChannel* sqlChan, bool autofix)
 {
 bool joinchan = false;
 int maxScore;
-time_t lastattempt;
 time_t fixstart;
 
 /* coder notes (mostly so i dont forget -sirv)
@@ -2275,7 +2270,6 @@ time_t fixstart;
  * these times will need to be set as temp vars in sqlChan
  */
 fixstart = currentTime();
-lastattempt = currentTime();
 
 Channel* netChan = Network->findChannel(sqlChan->getChannel());
 if (!netChan) return joinchan;
@@ -2697,6 +2691,8 @@ return false;
 
 bool chanfix::canScoreChan(Channel* theChan)
 {
+	if (!theChan)
+		return false;
   // Lets leave this and just return 'true' since we're allowing +R channels to be scored
   /*
    * for (Channel::const_userIterator ptr = theChan->userList_begin();
@@ -2878,7 +2874,7 @@ else
 return std::string(datetimestring);
 }
 
-const int chanfix::getCurrentGMTHour()
+int chanfix::getCurrentGMTHour()
 {
 time_t rawtime;
 tm * ptm;
@@ -3160,8 +3156,7 @@ void chanfix::printResourceStats()
 {
   int who = RUSAGE_SELF;
   struct rusage usage;
-  int ret;
-  ret = getrusage(who, &usage);
+  getrusage(who, &usage);
   logDebugMessage("Max. resident size used by chanfix (kB): %ld", usage.ru_maxrss);
 }
 

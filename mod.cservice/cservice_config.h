@@ -60,49 +60,85 @@
  * Do you want NEWPASS command or not?
  */
 
-#define USE_NEWPASS
+#undef USE_NEWPASS
 
 /**
  * Do you want to use the Noteserv functionality?
  */
 
-#define USE_NOTES
+#undef USE_NOTES
 
 /**
  * Do you want silly oper-type people to mess around with channels?
  */
 
-#define USE_OPERPARTJOIN
+#undef USE_OPERPARTJOIN
 
 /**
  * Do you want users to have the ability to set their own MAXLOGINS setting?
  */
 
-#define USE_SETMAXLOGINS
+#undef USE_SETMAXLOGINS
 
 /**
  * Define this if you want to enable the HELLO command.
  */
-#define ALLOW_HELLO
+#undef ALLOW_HELLO
+
+ /**
+ * Define this if you want to enable the WELCOME feature.
+ */
+#undef USE_WELCOME
 
 /**
  * Define this if you want the IP restriction to default to REJECT when no
  * entries are in the SQL table.  Default setting allows login from any IP
  * if there are no entries for the username in the SQL table.
  */
-#undef IPR_DEFAULT_REJECT
+#define IPR_DEFAULT_REJECT
 
 /**
  * Define this if you want to enable the 'cs.log' file (log of all commands
  * including login) - Default is to NOT enable the log as it poses a security
  * risk (it contains passwords)
  */
-#undef USE_COMMAND_LOG
+#define USE_COMMAND_LOG
 
 /**
  * Define this if you want TOTP authentication, note you must have liboath
  * installed, and configure --with-liboath for totp to work
  */
 #undef TOTP_AUTH_ENABLED
+
+/**
+ * Define this if you want channel registration process to be handled internally within gnuworld
+ * otherwise you can use external script
+ */
+#define USE_INTERNAL_THE_JUDGE
+
+/**
+ * Enable NOVOICE channel flag and function?
+ * Prevents anyone voiced on a channel having this flag enabled
+ */
+#undef USE_NOVOICE
+
+/**
+ * Define this if you want to enable NOTAKE channel flag for your network,
+ * it will report and prevent any 'take over' attempt: banning through X the *!*@* mask
+ */
+#define USE_NOTAKE
+
+/**
+ * Enable FLOODNET channel flag and function?
+ * Protection against mass channel messages, channel notices, channel CTCP's
+ */
+#define USE_FLOODPRO
+
+/*
+ * Enable this Under CARREFULL CONSIDERATION, recommended for smaller networks, where admins can
+ * take care of possible abuse of the function
+ */
+#undef GLINE_ON_FLOODPRO
+
 
 #endif // __CSERVICE_CONFIG_H

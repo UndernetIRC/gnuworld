@@ -7,7 +7,8 @@ libcservice_la_LDFLAGS = -module -export-dynamic -L$(top_builddir)/db \
 libcservice_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
 
-libcservice_la_SOURCES = cservice.cc \
+libcservice_la_SOURCES = banMatcher.cc \
+        cservice.cc \
 	networkData.cc \
 	sqlChannel.cc \
 	sqlUser.cc \
@@ -71,9 +72,7 @@ libcservice_la_SOURCES = cservice.cc \
 	UNSUSPENDCommand.cc \
 	VERIFYCommand.cc \
 	VOICECommand.cc \
-	WHITELISTCommand.cc \
-	CIDRBanMatcher.cc \
-	HostBanMatcher.cc
+	WHITELISTCommand.cc
 
 EXTRA_DIST = banMatcher.h \
 	constants.h \

@@ -631,7 +631,7 @@ void dronescan::OnPrivateMessage( iClient* theClient,
 
 
 /** Clean up after ourselves */
-void dronescan::OnDetach()
+void dronescan::OnDetach(const std::string& message)
 {
 /* We need to delete() anything we have new()d
  * Currently this is:
@@ -683,7 +683,7 @@ if(!MyUplink->UnRegisterTimer(tidClearJoinCounter, 0) ||
 }
 
 /* Done! */
-
+xClient::OnDetach(message);
 }
 
 
@@ -820,7 +820,9 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))) ? true : false;
 				if (isoktogline)
 					isoktogline2 = true;
+#ifdef ENABLE_LOG4CPLUS
 				int numOfUsernames = 0;
+#endif
 				if((joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
 			    joinPartIt->second.numOfParts >= jcMinJoinToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))
 				{
@@ -845,7 +847,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 							if (isoktogline == true)
 								{
 								clients.push_back(theClient->getNickName() + "!" + theClient->getUserName() +"@"
-									+ xIP(theClient->getIP()).GetNumericIP() + " " + theClient->getDescription());
+									+ xIP(theClient->getIP()).GetNumericIP(true) + " " + theClient->getDescription());
 									
 								}
 							}
@@ -859,7 +861,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 						tempNames.str("");
 						if (isoktogline == true)
 								{
-								glineData* theGline = new (std::nothrow) glineData("*@" +joinPartIt->first,jcGlineReason,jcGlineLength);
+								glineData* theGline = new (std::nothrow) glineData("*@" + fixToCIDR64(joinPartIt->first),jcGlineReason,jcGlineLength);
 								assert(theGline != 0);
 								glined.push_back(std::pair<glineData*,std::list<std::string> >(theGline,clients));
 								clientcount += clients.size();
@@ -1619,7 +1621,7 @@ bool dronescan::checkChannel( const Channel *theChannel , const iClient *theClie
 		//	<<
 		snprintf(buf, 511, "[%u] (%4u) %s +%s %s",
 			failed,
-			theChannel->size(),
+			(unsigned int)theChannel->size(),
 			theChannel->getName().c_str(),
 			chanStat.str().c_str(),
 			chanParams.str().c_str());

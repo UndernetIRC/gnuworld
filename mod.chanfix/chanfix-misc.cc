@@ -48,7 +48,7 @@ void chanfix::log(const logging::loglevel& level, const char* format, ... )
 void chanfix::log(const logging::loglevel& level,
 	const std::string& message)
 {
-	if( 0 == confLogLevel & level ) { return; }
+	if( 0 == (confLogLevel & level) ) { return; }
 
 	/* Check our logging channel exists */
 	Channel *logChannel = Network->findChannel(confConsoleChannel);

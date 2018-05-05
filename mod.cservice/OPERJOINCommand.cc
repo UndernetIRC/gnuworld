@@ -38,8 +38,6 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char OPERJOINCommand_cc_rcsId[] = "$Id: OPERJOINCommand.cc,v 1.16 2008/04/16 20:34:39 danielaustin Exp $" ;
-
 namespace gnuworld
 {
 using std::endl ;
@@ -112,12 +110,8 @@ theChan->setInChan(true);
 bot->Join(theChan->getName(),
 	theChan->getChannelMode(),
 	theChan->getChannelTS(),
-	false);
+	true);
 bot->joinCount++;
-
-/* Whack this reop on the Q */
-bot->reopQ.insert(cservice::reopQType::value_type(theChan->getName(),
-	bot->currentTime() + 15) );
 
 if (tmpChan)
 	{
@@ -131,9 +125,9 @@ if (tmpChan)
 		}
 	}
 
-return true;
-
 #endif // USE_OPERPARTJOIN
+
+return true;
 
 }
 

@@ -61,17 +61,13 @@
  * TOPIC_TRACK
  * Set if you want gnuworld to track topics in the network channels
  */
-#undef TOPIC_TRACK
+#define TOPIC_TRACK
 
 /**
  * DAEMON
  * Set this to make GNUWorld fork into the background when run.
  * default is OFF to maintain original operation
  */
-#undef DAEMON
-
-#ifndef RCSTAG
-#define RCSTAG(tag) static const char rcsId[] = tag
-#endif
+#define DAEMON
 
 #endif /* __GNUWORLD_CONFIG_H */

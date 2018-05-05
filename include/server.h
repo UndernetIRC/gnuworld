@@ -530,6 +530,13 @@ public:
 	virtual bool	Notice( iClient*, const std::string& ) ;
 
 	/**
+	 * Sent a notice to a channel as the server.
+	 */
+	virtual bool	serverNotice( Channel*, const char*, ... ) ;
+
+	virtual bool	serverNotice( Channel*, const std::string& ) ;
+
+	/**
 	 * Sending XQuery and XReply as a server to a server.
 	 */
         virtual bool    XQuery( iServer*, const std::string&, const std::string& ) ;

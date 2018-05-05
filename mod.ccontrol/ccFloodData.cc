@@ -31,8 +31,6 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccFloodData.cc,v 1.8 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
 

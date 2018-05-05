@@ -25,10 +25,8 @@
 #include	<sstream>
 #include	<string>
 #include	<iostream>
-
 #include	<cstring>
 #include	<ctime>
-
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlLevel.h"
@@ -38,12 +36,9 @@
 #include	"cservice.h"
 #include	"cservice_config.h"
 
-const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.18 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using std::endl ;
 using std::ends ;
@@ -65,6 +60,7 @@ sqlLevel::sqlLevel(dbHandle* _SQLDb)
  suspend_expires(0),
  suspend_level(0),
  suspend_by(),
+ suspend_reason(),
  added(0),
  added_by(),
  last_modif(::time(NULL)),
@@ -145,6 +141,7 @@ added_by = SQLDb->GetValue(row, 8);
 last_modif = atoi(SQLDb->GetValue(row, 9));
 last_modif_by = SQLDb->GetValue(row, 10);
 last_updated = atoi(SQLDb->GetValue(row, 11));
+suspend_reason = SQLDb->GetValue(row, 12);
 }
 
 bool sqlLevel::commit()
@@ -163,6 +160,7 @@ queryString	<< queryHeader
 		<< "suspend_expires = " << suspend_expires << ", "
 		<< "suspend_level = " << suspend_level << ", "
 		<< "suspend_by = '" << escapeSQLChars(suspend_by) << "', "
+		<< "suspend_reason = '" << escapeSQLChars(suspend_reason) << "', "
 		<< "added = " << added << ", "
 		<< "added_by = '" << escapeSQLChars(added_by) << "', "
 		<< "last_modif = " << last_modif << ", "

@@ -35,21 +35,17 @@ bool RANGETest::isNormal( const Channel *theChannel )
 	double maxEntropy, minEntropy;
 	maxEntropy = minEntropy = 0;
 
-	bool hasOp = false;
-
 	Channel::const_userIterator chanItr = theChannel->userList_begin();
 
-	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
-		{
+	for ( ; chanItr != theChannel->userList_end() ; ++chanItr )
+	{
 		iClient *targetClient = chanItr->second->getClient();
 
 		double userEntropy = bot->calculateEntropy(targetClient);
 
-		if(userEntropy < minEntropy || minEntropy == 0) minEntropy = userEntropy;
-		if(userEntropy > maxEntropy) maxEntropy = userEntropy;
-
-		if(chanItr->second->isModeO()) hasOp = true;
-		}
+		if (userEntropy < minEntropy || minEntropy == 0) minEntropy = userEntropy;
+		if (userEntropy > maxEntropy) maxEntropy = userEntropy;
+	}
 
 	if((maxEntropy - minEntropy) > channelRange)
 		return true;

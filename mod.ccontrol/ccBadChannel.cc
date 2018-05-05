@@ -26,11 +26,8 @@
 #include 	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccBadChannel.cc,v 1.7 2007/08/28 16:10:03 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld

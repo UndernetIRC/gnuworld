@@ -28,8 +28,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char FORCECommand_cc_rcsId[] = "$Id: FORCECommand.cc,v 1.16 2005/12/05 17:32:15 kewlio Exp $" ;
-
 namespace gnuworld
 {
 using namespace gnuworld;
@@ -83,6 +81,17 @@ bool FORCECommand::Exec( iClient* theClient, const string& Message )
 			bot->getResponse(theUser,
 				language::chan_not_reg,
 				string("Sorry, %s isn't registered with me.")).c_str(),
+			st[1].c_str());
+		return false;
+	}
+
+	// Check for NOFORCE flag
+	if ((theChan->getFlag(sqlChannel::F_NOFORCE)) && (admLevel < level::immune::noforce))
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::chan_noforce,
+				string("The NOFORCE flag is set on %s")).c_str(),
 			st[1].c_str());
 		return false;
 	}

@@ -106,6 +106,12 @@ public:
 	/// Bit representing channel mode +D
 	static const modeType	MODE_D ;
 
+	/// Bit representing channel mode +c
+	static const modeType	MODE_C;
+
+	/// Bit representing channel mode +C
+	static const modeType	MODE_CTCP;
+
 	/// Bit representing channel mode +A
 	static const modeType	MODE_A ;
 
@@ -389,7 +395,10 @@ public:
 	inline userIterator userList_end()
 		{ return userList.end() ; }
 
-	/**
+
+	inline size_type userList_size()
+		{ return userList.size() ; }
+/**
 	 * Retrieve a const iterator to the beginning of
 	 * this channel's user structure.
 	 */

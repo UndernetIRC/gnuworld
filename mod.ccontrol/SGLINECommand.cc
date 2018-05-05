@@ -19,12 +19,9 @@
  *
  * $Id: SGLINECommand.cc,v 1.15 2009/05/16 07:47:23 danielaustin Exp $
  */
-
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -36,11 +33,8 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.15 2009/05/16 07:47:23 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 // Input: sgline *@blah.net reason
@@ -62,18 +56,22 @@ if(st.size() < 4)
         return true ;
         }
 StringTokenizer::size_type pos = 1 ;
+
+string cmdStr = "SGLINE ";
+
 bool RealName = (!strcasecmp(st[pos],"-rn"));
-if(RealName && (st.size() < 5))
+if (RealName && (st.size() < 5))
 	{
 	Usage(theClient);
 	return true;
 	}
 
+if (RealName) cmdStr += "-rn ";
+
 string RealHost;
 
-
 ccUser* tmpUser = bot->IsAuth(theClient);
-bot->MsgChanLog("SGLINE %s\n",st.assemble(1).c_str());
+//bot->MsgChanLog("SGLINE %s\n",st.assemble(1).c_str());
 
 if(!RealName &&(string::npos != st[pos].find_first_of('#')))
 	{
@@ -173,10 +171,11 @@ unsigned int Users;
 string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
 StringTokenizer ReasonTokenizer ( st.assemble( pos + ResStart ), '|');
 string Reason = ReasonTokenizer[0];
+string sgHost = st[pos];
 
 if(!RealName)
 	{
-	int gCheck = bot->checkSGline(st[pos],gLength,Users);
+	int gCheck = bot->checkSGline(sgHost,gLength,Users);
 
 	if(gCheck & gline::NEG_TIME)
 		{
@@ -209,6 +208,16 @@ if(!RealName)
 		bot->Notice(theClient,"illegal host");
 		Ok = false;
 		}
+	string hostName = sgHost.substr(sgHost.find('@')+1);
+	if (hostName.find('/') != string::npos) 
+		{
+		string tCidr;
+		if (!bot->getValidCidr(hostName, tCidr))
+			{
+			bot->Notice(theClient, "Unwanted cidr format: %s  -  Suggestion: %s", hostName.c_str(), tCidr.c_str());
+			Ok = false;
+			}
+		}
 	if(!Ok)
 		{
 		bot->Notice(theClient,"Please fix all of the above, and try again");
@@ -240,14 +249,15 @@ if(Reason.size() > gline::MAX_REASON_LENGTH)
 	string("[") + Us + "] " + Reason,
 	//st.assemble( pos + ResStart ) + "[" + Us + "]",
 	gLength , bot) ;*/
-ccGline *TmpGline = bot->findGline(st[pos]);
+
+ccGline *TmpGline = bot->findGline(sgHost);	
 bool Up = false;
 
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
 if(!RealName)
-	TmpGline->setHost(bot->removeSqlChars(st [ pos ]));
+	TmpGline->setHost(bot->removeSqlChars(sgHost));
 else
 	TmpGline->setHost(RealHost);
 TmpGline->setExpires(::time(0) + gLength);
@@ -268,6 +278,11 @@ else
 	bot->addGline(TmpGline);
 	}
 
+if(!RealName)
+	cmdStr += sgHost + " " + st.assemble(2);
+else
+	cmdStr += sgHost + " " + st.assemble(3);
+bot->MsgChanLog(cmdStr.c_str());
 return true ;
 }
 

@@ -23,19 +23,14 @@
  *
  * $Id: USERSCORESCommand.cc,v 1.3 2010/03/04 04:24:11 hidden1 Exp $
  */
-
 #include <sstream>
 #include <vector>
-
 #include "gnuworld_config.h"
-
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
-
-RCSTAG("$Id: USERSCORESCommand.cc,v 1.3 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {

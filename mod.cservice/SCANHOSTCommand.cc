@@ -28,6 +28,7 @@
 
 #include        <string>
 #include        <sstream>
+#include        <iomanip>
 
 #include        "StringTokenizer.h"
 #include        "cservice.h"
@@ -43,23 +44,26 @@ using std::endl ;
 using std::ends ;
 using std::stringstream ;
 
+struct scanHostData
+{
+	string user_id;
+	string command;
+	string ip;
+	string hostmask;
+	string timestamp;
+};
+
 bool SCANHOSTCommand::Exec( iClient* theClient, const string& Message )
 {
 
 bot->incStat("COMMANDS.SCANHOST");
 
 StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-        {
-        Usage(theClient);
-        return true;
-        }
-
-bool showAll = false;
-
-if(st.size() > 2)
-	if(!strcasecmp(st[2],"-all"))
-		showAll = true;
+if ((st.size() < 2) || (st.size() == 3))
+{
+	Usage(theClient);
+    return true;
+}
 
 /*
  *  Fetch the sqlUser record attached to this client. If there isn't one,
@@ -87,16 +91,63 @@ if (level < level::scanhost)
         }
 
 string host = string_lower(st[1]);
+string option = "-sort";
+string value = "time";
+string sortby = "timestamp";
+bool desc = false;
+string limto = " LIMIT 50";
+bool showHelp = false;
+
+StringTokenizer::const_iterator ptr = st.begin();
+while (ptr != st.end())
+{
+	option = string_lower(*ptr);
+	if (++ptr != st.end())
+		value = string_lower(*ptr);
+	if (option == "-sort")
+	{
+			 if (value == "user") sortby = "user_name";
+		else if (value == "cmd")  sortby = "command";
+		else if (value == "host") sortby = "hostmask";
+		else if (value == "ip")   sortby = "ip";
+		else if (value == "time") sortby = "timestamp";
+		else showHelp = true;
+	}
+	if (option == "-order")
+	{
+			 if (value == "asc") desc = false;
+		else if (value == "desc") desc = true;
+		else showHelp = true;
+	}
+	if (option == "-max")
+	{
+		if ((IsNumeric(value)) && (value[0] != '-'))
+			limto = " LIMIT " + value;
+		else
+		{
+			limto = " LIMIT 15";
+			bot->Notice(theClient,"Invalid number provided, using default value 15");
+		}
+	}
+	if (showHelp)
+	{
+		Usage(theClient);
+		return true;
+	}
+	ptr++;
+}
+//Special case: for timestamp ordering we want inverse
+if (sortby == "timestamp")
+	desc = !desc;
 
 stringstream scanhostQuery;
-scanhostQuery << "SELECT users.user_name, users_lastseen.last_hostmask, users_lastseen.last_ip FROM users, users_lastseen WHERE "
-                << "users.id = users_lastseen.user_id AND "
-		<< "(lower(users_lastseen.last_hostmask) LIKE '" << escapeSQLChars(searchSQL(host)) << "'"
-		<< " OR lower(users_lastseen.last_ip) LIKE '" << escapeSQLChars(searchSQL(host)) << "') LIMIT 50"
-                << ends;
+scanhostQuery << "SELECT user_id, user_name, command, ip, hostmask, timestamp FROM user_sec_history WHERE "
+		<< "(hostmask ILIKE '" << escapeSQLChars(searchSQL(host)) << "'"
+		<< ") OR (ip ILIKE '" << escapeSQLChars(searchSQL(host)) << "') ORDER BY " << sortby << limto
+		<< ends;
 
 #ifdef LOG_SQL
-	elog	<< "SCANHOST::sqlQuery> "
+	elog	<< "cservice::SCANHOST::sqlQuery> "
 		<< scanhostQuery.str()
 		<< endl;
 #endif
@@ -104,7 +155,7 @@ scanhostQuery << "SELECT users.user_name, users_lastseen.last_hostmask, users_la
 if( !bot->SQLDb->Exec( scanhostQuery, true ) )
 //if( PGRES_TUPLES_OK != status )
         {
-        elog    << "SCANHOST> SQL Error: "
+        elog    << "cservice::SCANHOST> SQL Error: "
                 << bot->SQLDb->ErrorMessage()
                 << endl ;
         return false ;
@@ -112,20 +163,20 @@ if( !bot->SQLDb->Exec( scanhostQuery, true ) )
 
 bot->Notice(theClient,"Found %i matches", bot->SQLDb->Tuples());
 
-if( bot->SQLDb->Tuples() >= 50 )
-	{
+if (bot->SQLDb->Tuples() >= 50)
+{
 	bot->Notice(theClient, "More than 50 matches were found, please visit the website.");
 	return false;
-	}
+}
 
-if((bot->SQLDb->Tuples() > 15) && (!showAll))
-	{
-	bot->Notice(theClient, "More than 15 matches were found without the use of -all, please visit the website.");
+if (bot->SQLDb->Tuples() > 15)
+{
+	bot->Notice(theClient, "More than 15 matches were found without the use of -max n, please visit the website.");
 	return false;
-	}
+}
 
 /* use this to store the SQL result set (querying later would overwrite the results */
-typedef std::map< std::string, std::string > scanResultsType;
+typedef std::list< std::pair < string, scanHostData> > scanResultsType;
 scanResultsType scanResults;
 /* counter for matches not displayed */
 int matchCount = 0;
@@ -133,9 +184,17 @@ int matchCount = 0;
 /* store the results in the map defined above */
 for (unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 {
-	string username = bot->SQLDb->GetValue(i, 0);
-	string lasthost = bot->SQLDb->GetValue(i, 1) + " - Last IP: " + bot->SQLDb->GetValue(i, 2);
-	scanResults.insert( std::make_pair(username, lasthost));
+	string username 	= bot->SQLDb->GetValue(i, 1);
+	scanHostData current;
+	current.user_id 	= bot->SQLDb->GetValue(i, 0);
+	current.command 	= bot->SQLDb->GetValue(i, 2);
+	current.ip 			= bot->SQLDb->GetValue(i, 3);
+	current.hostmask	= bot->SQLDb->GetValue(i, 4);
+	current.timestamp 	= bot->prettyDuration(atoi(bot->SQLDb->GetValue(i, 5))) + " ago.";
+	if (desc)
+		scanResults.push_front(std::make_pair(username, current));
+	else
+		scanResults.push_back(std::make_pair(username, current));
 }
 
 /* use this for each user record (below) */
@@ -145,7 +204,6 @@ for (scanResultsType::const_iterator Itr = scanResults.begin();
 	Itr != scanResults.end(); ++Itr)
 {
 	string username = Itr->first;
-	string lasthost = Itr->second;
 
 	/* check each user's access for purposes of IP hiding ONLY */
 	sqlUser* tmpUser = bot->getUserRecord(username);
@@ -176,10 +234,19 @@ for (scanResultsType::const_iterator Itr = scanResults.begin();
 			matchCount++;
 		} else {
 			/* display entry */
-			bot->Notice(theClient, "Username: %s -- Last hostmask: %s",
-				username.c_str(), lasthost.c_str());
+			stringstream s;
+			s	<< "user: "
+				<< username
+				<< " (" << Itr->second.user_id << ")"
+				<< " -- cmd: " << Itr->second.command
+				<< " -- host: " << Itr->second.hostmask
+				<< " -- ip: " << Itr->second.ip
+				<< " -- when: " << Itr->second.timestamp
+				<< ends;
+
+			bot->Notice(theClient, s.str());
 		}
-        }
+	}
 }
 
 /* if we have not displayed any users due to IP hiding, explain here */

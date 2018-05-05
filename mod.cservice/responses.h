@@ -218,6 +218,27 @@ namespace gnuworld
 		const int following_clients_auth = 		180;
 		const int suspend_if_not_you = 			181;
 		const int account_unusable_suspendme = 		182;
+		const int is_cservice_alumni = 		183;
+		const int novoice_set =				184;
+		const int acc_susp =				185;
+		const int acc_unsusp =				186;
+		const int acc_new =					187;
+		const int acc_modif =				188;
+		const int acc_rem =					189;
+		const int insuff_avoice =			190;
+		const int insuff_aop =			191;
+		const int reason_must =			192;
+		const int susp_reason =			193;
+		const int unsusp_reason =			194;
+
+		// Allow for merge of other features
+
+		const int welcome_max_len = 205;
+		const int welcome_cleared = 206;
+		const int welcome_status = 207;
+
+		const int chan_noforce = 208;
+
 		const int greeting = 				9998;
 		const int motd =					9999;
 	}

@@ -47,8 +47,6 @@
 #include	"ELog.h"
 #include	"events.h"
 
-RCSTAG("$Id: client.cc,v 1.89 2008/04/16 20:29:39 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
 
@@ -600,6 +598,73 @@ if( isConnected() && Message && Message[ 0 ] != 0 )
 		buffer ) ;
 	}
 return false ;
+}
+
+bool xClient::NoticeChannelOps( const Channel* theChan, const char* Message, ... )
+{
+	assert( theChan != 0 ) ;
+
+	if( isConnected() && Message && Message[ 0 ] != 0 )
+	{
+		char buffer[ 1024 ] ;
+		memset( buffer, 0, 1024 ) ;
+		va_list list;
+
+		va_start(list, Message);
+		vsnprintf(buffer, 1024, Message, list);
+		va_end(list);
+
+		for (Channel::const_userIterator chanUsers = theChan->userList_begin();
+			chanUsers != theChan->userList_end(); ++chanUsers)
+		{
+			ChannelUser* tmpUser = chanUsers->second;
+			if (tmpUser->isModeO())
+			{
+				if (!MyUplink->Write("%s O %s :@%s: %s\r\n",
+						getCharYYXXX().c_str(),
+						tmpUser->getClient()->getCharYYXXX().c_str(),
+						theChan->getName().c_str(),
+						buffer))
+					return false;
+			}
+		}
+	}
+	return true ;
+}
+
+bool xClient::NoticeChannelOps( const string& chanName, const char* Message, ... )
+{
+	Channel* theChan = Network->findChannel(chanName) ;
+	if (0 == theChan)
+	{
+		return false ;
+	}
+	if( isConnected() && Message && Message[ 0 ] != 0 )
+	{
+		char buffer[ 1024 ] ;
+		memset( buffer, 0, 1024 ) ;
+		va_list list;
+
+		va_start(list, Message);
+		vsnprintf(buffer, 1024, Message, list);
+		va_end(list);
+
+		for (Channel::const_userIterator chanUsers = theChan->userList_begin();
+			chanUsers != theChan->userList_end(); ++chanUsers)
+		{
+			ChannelUser* tmpUser = chanUsers->second;
+			if (tmpUser->isModeO())
+			{
+				if (!MyUplink->Write("%s O %s :@%s: %s\r\n",
+						getCharYYXXX().c_str(),
+						tmpUser->getClient()->getCharYYXXX().c_str(),
+						theChan->getName().c_str(),
+						buffer))
+					return false;
+			}
+		}
+	}
+	return true ;
 }
 
 bool xClient::Message( const Channel* theChan, const char* Message, ... )
@@ -1887,7 +1952,8 @@ return true ;
 }
 
 bool xClient::Kick( Channel* theChan, iClient* theClient,
-	const string& reason )
+	const string& reason,
+	bool modeAsServer)
 {
 assert( theChan != NULL ) ;
 assert( theClient != NULL ) ;
@@ -1908,12 +1974,12 @@ if( NULL == theChan->findUser( theClient ) )
 	}
 
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel )
+if( !OnChannel && !modeAsServer)
 	{
 	// Join, giving ourselves ops
 	Join( theChan, string(), 0, true ) ;
 	}
-else
+else if (!modeAsServer)
 	{
 	// Bot already on channel
 	// Make sure we have ops
@@ -1929,25 +1995,71 @@ else
 	// The bot has ops
 	}
 
+string SendAs = modeAsServer ? getCharYY() : getCharYYXXX();
+
 stringstream s ;
-s	<< getCharYYXXX() << " K "
+s	<< SendAs << " K "
 	<< theChan->getName() << ' '
 	<< theClient->getCharYYXXX() << " :"
 	<< reason ;
 
 Write( s ) ;
 
-if( !OnChannel )
+// On a network with more than 2 servers, the chances are greater
+// that the two clients will be on different servers...thus,
+// initialize localKick to false here.
+bool localKick = false ;
+
+// Check to see if the source and destination user are
+// on the same server.
+if (theClient->getIntYY() == this->getIntYY())
+{
+	// Local kick
+	localKick = true ;
+}
+/*
+ * Remove/cleanup now the client, an eventual later part message from a server will be ignored anyway
+ * In this way any own (fake)clients will be cleaned up too
+ */
+ChannelUser* destChanUser = theChan->findUser( theClient ) ;
+if (destChanUser != NULL)
+{
+	theChan->removeUser( theClient ) ;
+
+	// Deallocate the ChannelUser
+	delete destChanUser ; destChanUser = 0 ;
+
+	// Remove the channel information from the client's internal channel structure
+	if (!theClient->removeChannel(theChan))
+	{
+		elog	<< "xClient::Kick> Unable to remove channel "
+			<< theChan->getName()
+			<< " from the iClient "
+			<< *theClient
+			<< endl ;
+	}
+	MyUplink->PostChannelKick(theChan, getInstance(), theClient, reason, localKick) ;
+
+} else elog << "xClient::Kick> destChanUser == NULL !!" << endl;
+
+if( !OnChannel && !modeAsServer)
 	{
 	Part( theChan ) ;
 	}
-
+// Any users or services clients left in the channel?
+if (theChan->empty())
+{
+	// Nope, remove the channel
+	delete Network->removeChannel( theChan->getName() ) ;
+	// TODO: Post event
+}
 return true ;
 }
 
 bool xClient::Kick( Channel* theChan,
 	const std::vector< iClient* >& theClients,
-	const string& reason )
+	const string& reason,
+	bool modeAsServer)
 {
 assert( theChan != NULL ) ;
 
@@ -1962,12 +2074,12 @@ if( theClients.empty() )
 	}
 
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel )
+if( !OnChannel && !modeAsServer)
 	{
 	// Join, giving ourselves ops
 	Join( theChan, string(), 0, true ) ;
 	}
-else
+else if (!modeAsServer)
 	{
 	// Bot is already on the channel
 	ChannelUser* meUser = theChan->findUser( me ) ;
@@ -2006,21 +2118,132 @@ for( std::vector< iClient* >::const_iterator ptr = theClients.begin() ;
 		continue ;
 		}
 
+	string SendAs = modeAsServer ? getCharYY() : getCharYYXXX();
+
 	stringstream s ;
-	s	<< getCharYYXXX() << " K "
+	s	<< SendAs << " K "
 		<< theChan->getName() << ' '
 		<< (*ptr)->getCharYYXXX() << " :"
 		<< reason ;
 
 	Write( s ) ;
+
+	iClient* theClient = *ptr;
+
+	// On a network with more than 2 servers, the chances are greater
+	// that the two clients will be on different servers...thus,
+	// initialize localKick to false here.
+	bool localKick = false ;
+
+	// Check to see if the source and destination user are
+	// on the same server.
+	if (theClient->getIntYY() == this->getIntYY())
+	{
+		// Local kick
+		localKick = true ;
+	}
+	/*
+	 * Remove/cleanup now the client, an eventual later part message from a server will be ignored anyway
+	 * In this way any own (fake)clients will be cleaned up too
+	 */
+	ChannelUser* destChanUser = theChan->findUser( theClient ) ;
+	if (destChanUser != NULL)
+	{
+		theChan->removeUser( theClient ) ;
+
+		// Deallocate the ChannelUser
+		delete destChanUser ; destChanUser = 0 ;
+
+		// Remove the channel information from the client's internal channel structure
+		if (!theClient->removeChannel(theChan))
+		{
+			elog	<< "xClient::Kick[]> Unable to remove channel "
+				<< theChan->getName()
+				<< " from the iClient "
+				<< *theClient
+				<< endl ;
+		}
+		MyUplink->PostChannelKick(theChan, getInstance(), theClient, reason, localKick) ;
+
+	} else elog << "xClient::Kick[]> destChanUser == NULL !!" << endl;
 	}
 
-if( !OnChannel )
+if( !OnChannel && !modeAsServer)
 	{
 	Part( theChan ) ;
 	}
-
+// Any users or services clients left in the channel?
+if (theChan->empty())
+{
+	// Nope, remove the channel
+	delete Network->removeChannel( theChan->getName() ) ;
+	// TODO: Post event
+}
 return true ;
+}
+
+bool xClient::Kick( Channel* theChan,
+	const string& IP,
+	const string& reason,
+	bool modeAsServer)
+{
+assert( theChan != NULL ) ;
+
+if( !isConnected() )
+	{
+	return false ;
+	}
+
+if ( IP.empty() )
+	{
+	return true ;
+	}
+
+bool OnChannel = isOnChannel( theChan ) ;
+if( !OnChannel && modeAsServer)
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else if (!modeAsServer)
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	assert( meUser != 0 ) ;
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
+	}
+	std::vector <iClient*> toBoot;
+	for(Channel::userIterator chanUsers = theChan->userList_begin(); chanUsers != theChan->userList_end(); ++chanUsers)
+	{
+		ChannelUser* tmpUser = chanUsers->second;
+		string currIP = xIP(tmpUser->getClient()->getIP()).GetNumericIP();
+		string currIP64 = xIP(tmpUser->getClient()->getIP()).GetNumericIP(true);
+		/* Idented and unidented clients need to be handled separately
+		 * In case of floodpro kick, IP can be in format of ident@ip !
+		 */
+		if (IP.find('@') != string::npos)
+		{
+			currIP = tmpUser->getUserName() + "@" + currIP;
+			currIP64 = tmpUser->getUserName() + "@" + currIP64;
+		}
+		if ((!IP.compare(currIP)) || (!IP.compare(currIP64)))
+		{
+			/* Don't kick +k things */
+			if (!tmpUser->getClient()->getMode(iClient::MODE_SERVICES))
+			{
+				toBoot.push_back(tmpUser->getClient());
+			}
+		}
+	}
+	return Kick(theChan, toBoot, reason, modeAsServer);
 }
 
 bool xClient::Join( const string& chanName,
@@ -2029,8 +2252,8 @@ bool xClient::Join( const string& chanName,
 	bool getOps )
 {
 Channel* theChan = Network->findChannel(chanName);
-return theChan ? Join(theChan,chanModes,joinTime,getOps) : 
-    MyUplink->JoinChannel(this,chanName,chanModes,joinTime,getOps); 
+return theChan ? Join(theChan,chanModes,joinTime,getOps) :
+    MyUplink->JoinChannel(this,chanName,chanModes,joinTime,getOps);
 }
 
 bool xClient::Join( Channel* theChan,
@@ -2166,15 +2389,16 @@ addChan( theChan ) ;
 
 void xClient::OnJoin( const string& chanName )
 {
-Channel* theChan = Network->findChannel( chanName ) ;
-if( NULL == theChan )
-	{
-	elog	<< "xClient::OnJoin> Failed to find channel: "
-		<< chanName
-		<< endl ;
-	return ;
-	}
-OnJoin( theChan ) ;
+	//elog << "xClient::OnJoin " << chanName << endl;
+	Channel* theChan = Network->findChannel( chanName ) ;
+	if( NULL == theChan )
+		{
+		elog	<< "xClient::OnJoin> Failed to find channel: "
+			<< chanName
+			<< endl ;
+		return ;
+		}
+	OnJoin( theChan ) ;
 }
 
 void xClient::OnPart( Channel* theChan )
@@ -2347,6 +2571,16 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			theChan->removeMode(Channel::MODE_D);
 			modeVector.push_back( make_pair( false,
 				Channel::MODE_D ) ) ;
+			break;
+		case 'c':  // new u2.10.12.15 mode to prevent chan colours
+			theChan->removeMode(Channel::MODE_C);
+			modeVector.push_back(make_pair(false,
+				Channel::MODE_C));
+			break;
+		case 'C':  // new u2.10.12.15 mode to prevent chan CTCPs (except ACTION)
+			theChan->removeMode(Channel::MODE_CTCP);
+			modeVector.push_back(make_pair(false,
+				Channel::MODE_CTCP));
 			break;
 		case 'A':  // Apass for oplevels
 			if (theChan->getMode(Channel::MODE_A))

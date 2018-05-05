@@ -21,17 +21,13 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: REMOPERCHANCommand.cc,v 1.12 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

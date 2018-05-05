@@ -23,16 +23,12 @@
  *
  * $Id: WHOFLAGCommand.cc,v 1.1 2006/12/22 03:11:44 buzlip01 Exp $
  */
- 
 #include "gnuworld_config.h"
-
 #include "chanfix.h"
 #include "Network.h"
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
-
-RCSTAG("");
 
 namespace gnuworld
 {

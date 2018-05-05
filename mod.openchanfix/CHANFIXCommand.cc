@@ -23,15 +23,11 @@
  *
  * $Id: CHANFIXCommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $
  */
-
 #include "gnuworld_config.h"
 #include "Network.h"
-
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
-
-RCSTAG("$Id: CHANFIXCommand.cc,v 1.7 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {

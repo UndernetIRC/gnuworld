@@ -16,29 +16,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: banMatcher.h,v 1.3 2009/06/25 19:59:05 mrbean_ Exp $
+ * banMatcher.h, v2.0 2013.10.28 -- Seven
  */
 
 #ifndef __BANMATCHER_H
 #define __BANMATCHER_H "$Id: banMatcher.h,v 1.3 2009/06/25 19:59:05 mrbean_ Exp $"
 
 #include	<string>
-#include	<ctime>
 #include	"iClient.h"
  
 using std::string ;
 
 namespace gnuworld
 { 
- 
-class banMatcher
-{
+	bool banMatch(const string&, const string&) ;
 
-public:
-	virtual bool matches(iClient*) = 0;
-	
-	virtual ~banMatcher(){}
-} ;
+	bool banMatch( const string&, const iClient*) ;
+}
 
-} 
 #endif // __BANMATCHER_H

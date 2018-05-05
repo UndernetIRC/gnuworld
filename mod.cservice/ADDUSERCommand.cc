@@ -42,11 +42,8 @@
 #include	"responses.h"
 #include	"cservice_config.h"
 
-const char ADDUSERCommand_cc_rcsId[] = "$Id: ADDUSERCommand.cc,v 1.29 2010/04/10 18:56:06 danielaustin Exp $" ;
-
 namespace gnuworld
 {
-
 using std::pair ;
 using std::endl ;
 using std::ends ;
@@ -214,7 +211,7 @@ theQuery	<< queryHeader
 
 if( bot->SQLDb->Exec(theQuery ) )
 //if( PGRES_COMMAND_OK == status )
-	{
+{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::add_success).c_str(),
@@ -222,6 +219,11 @@ if( bot->SQLDb->Exec(theQuery ) )
 		theChan->getName().c_str(),
 		targetAccess);
 
+	if (targetUser != theUser)
+		bot->NoteAllAuthedClients(targetUser,bot->getResponse(targetUser,
+			language::acc_new,
+			string("You have been added to channel %s with access level %i")).c_str(),
+				theChan->getName().c_str(), targetAccess);
 	/*
 	 * Add this new record to the level cache.
 	 */
@@ -243,11 +245,18 @@ if( bot->SQLDb->Exec(theQuery ) )
 	 *  "If they where added to *, set their invisible flag" (Ace).
 	 */
 	if (theChan->getName() == "*")
-		{
+	{
 		targetUser->setFlag(sqlUser::F_INVIS);
 		targetUser->commit(theClient);
-		}
 	}
+	// Announce the manager about the new access change
+	if (level < 500)
+	{
+		string theMessage = TokenStringsParams("%s added %s to channel %s with access level %i",
+				theUser->getUserName().c_str(), targetUser->getUserName().c_str(), theChan->getName().c_str(), targetAccess);
+		bot->NoteChannelManager(theChan, theMessage.c_str());
+	}
+}
 else
 	{
 	bot->dbErrorMessage(theClient);

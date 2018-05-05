@@ -39,7 +39,7 @@ public:
 	bool commit();
 
 	unsigned int channel_id; 
-	unsigned int ip_number;
+	string ip_number;
 	unsigned int join_count; 
 
 	dbHandle*	SQLDb;

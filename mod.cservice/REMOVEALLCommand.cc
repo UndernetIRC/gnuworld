@@ -33,8 +33,6 @@
 #include	"levels.h"
 #include	"cservice_config.h"
 
-const char REMOVEALLCommand_cc_rcsId[] = "$Id: REMOVEALLCommand.cc,v 1.7 2007/08/28 16:10:11 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::pair ;

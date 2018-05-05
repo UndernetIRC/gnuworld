@@ -21,10 +21,8 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -32,11 +30,8 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: NEWPASSCommand.cc,v 1.24 2009/07/25 18:12:34 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld

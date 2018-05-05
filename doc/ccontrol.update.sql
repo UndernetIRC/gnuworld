@@ -123,8 +123,9 @@
 --  update opers set access = (access | 2097152);
 
 -- 2009/07/24 Add GETLAG and LastPassChangeTS to opers
--- alter TABLE opers add LastPassChangeTS INT4 NOT NULL DEFAULT '0';
--- alter TABLE opers add GetLAG BOOLEAN NOT NULL DEFAULT 'n';
+
+--alter TABLE opers add LastPassChangeTS INT4 NOT NULL DEFAULT '0';
+--alter TABLE opers add GetLAG BOOLEAN NOT NULL DEFAULT 'n';
 
 
 -- 2016/04/17 Added Single Sign On Support and ability to /oper from anywhere
@@ -134,4 +135,30 @@ alter TABLE opers add Ssooo BOOLEAN NOT NULL DEFAULT 't';
 alter TABLE opers add Account VARCHAR(128);
 alter TABLE opers add AccountTS INT4 NOT NULL DEFAULT '0';
 
+-- 2016/08/27 Tables for connection limits management
+CREATE TABLE ipLISPs (
+        id SERIAL,
+        name VARCHAR(200) UNIQUE NOT NULL,
+        email VARCHAR(200) NOT NULL,
+        clonecidr int4 NOT NULL DEFAULT 0,
+        maxlimit int4 NOT NULL DEFAULT 0,
+        forcecount int4 NOT NULL DEFAULT 0,
+        active int4 NOT NULL DEFAULT 1,
+        isgroup int4 NOT NULL DEFAULT 0,
+        addedby VARCHAR(200) NOT NULL,
+        addedon int4 NOT NULL,
+        lastmodby VARCHAR(200) NOT NULL,
+        lastmodon int4 NOT NULL
+        );
+
+CREATE TABLE ipLNetblocks (
+        ispid int4 NOT NULL,
+        cidr VARCHAR(50) NOT NULL,
+        addedby VARCHAR(200) NOT NULL,
+        addedon int4 NOT NULL
+        );
+
+
+-- 2017-02-09 Adding row for connection limits system
+alter TABLE ipLISPs add maxidentlimit int4 NOT NULL DEFAULT '0';
 

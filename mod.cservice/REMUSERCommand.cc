@@ -31,15 +31,13 @@
 #include	<string>
 #include	<utility>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"dbHandle.h"
 #include	"responses.h"
-
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.19 2010/04/10 18:56:06 danielaustin Exp $" ;
+#include	"Network.h"
 
 namespace gnuworld
 {
@@ -194,6 +192,13 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 				language::removed_user,
 				string("Removed user %s from %s")).c_str(),
 			targetUser->getUserName().c_str(), theChan->getName().c_str());
+		if (targetUser != theUser)
+			bot->NoteAllAuthedClients(targetUser, bot->getResponse(targetUser,language::acc_rem).c_str(), theChan->getName().c_str());
+		if ((theChan->getName() == "*") && (targetUser == theUser))
+		{
+			bot->Notice(theClient,"CSC is You!! YOU CAN NEVER ESCAPE!");
+			//bot->Notice(theClient,"I will always remember you!");
+		}
 	} else {
 		bot->dbErrorMessage(theClient);
  	}
@@ -204,6 +209,19 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	thePair = std::make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
 	bot->sqlLevelCache.erase(thePair);
 	delete(tmpLevel);
+	
+	// If strictop is set, the client has no longer right for op
+	Channel* tmpChan = Network->findChannel(theChan->getName());
+	if ((tmpChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)))
+	        bot->deopSuspendedOnChan(tmpChan,targetUser);
+
+	// Announce the manager about the new access change
+	if (level < 500)
+	{
+		string theMessage = TokenStringsParams("%s removed %s from channel %s",
+				theUser->getUserName().c_str(), targetUser->getUserName().c_str(), theChan->getName().c_str());
+		bot->NoteChannelManager(theChan, theMessage.c_str());
+	}
 
 	return true ;
 }

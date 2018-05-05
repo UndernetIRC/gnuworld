@@ -25,13 +25,11 @@
  */
 
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char SHUTDOWNCommand_cc_rcsId[] = "$Id: SHUTDOWNCommand.cc,v 1.8 2005/01/08 23:33:42 dan_karrels Exp $" ;
 namespace gnuworld
 {
 using std::string ;

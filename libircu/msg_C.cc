@@ -40,11 +40,9 @@
 #include	"ChannelUser.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_C.cc,v 1.10 2007/03/16 15:31:28 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
-
 using std::pair ;
 using std::string ;
 using std::endl ;

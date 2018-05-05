@@ -54,6 +54,7 @@ const sqlUser::flagType sqlUser::F_ALUMNI =		0x80 ;
 const sqlUser::flagType sqlUser::F_OPER =		0x100 ;
 const sqlUser::flagType sqlUser::F_NOADDUSER =		0x200 ;
 const sqlUser::flagType sqlUser::F_TOTP_ENABLED = 	0x400;
+const sqlUser::flagType sqlUser::F_TOTP_REQ_IPR =       0x800;
 
 const unsigned int sqlUser::EV_SUSPEND		= 1;
 const unsigned int sqlUser::EV_UNSUSPEND	= 2;
@@ -71,7 +72,9 @@ sqlUser::sqlUser(dbHandle* _SQLDb)
    flags( 0 ),
    last_used( 0 ),
    instantiated_ts( ::time(NULL) ),
+   signup_ts( 0 ),
    email(),
+   verifdata(),
    last_hostmask(),
    maxlogins(0),
    last_note(0),
@@ -195,11 +198,13 @@ language_id = atoi(SQLDb->GetValue(row, 4));
 flags = atoi(SQLDb->GetValue(row, 5));
 last_updated_by = SQLDb->GetValue(row, 6);
 last_updated = atoi(SQLDb->GetValue(row, 7));
-email = SQLDb->GetValue(row, 8);
-maxlogins = atoi(SQLDb->GetValue(row, 9));
+signup_ts = atoi(SQLDb->GetValue(row, 8));
+email = SQLDb->GetValue(row, 9);
+maxlogins = atoi(SQLDb->GetValue(row, 10));
+verifdata = SQLDb->GetValue(row, 11);
 failed_logins = 0;
 failed_login_ts = 0;
-totp_key = SQLDb->GetValue(row, 10);
+totp_key = SQLDb->GetValue(row, 12);
 /* Fetch the "Last Seen" time from the users_lastseen table. */
 
 }
@@ -350,20 +355,20 @@ queryString	<< "SELECT last_seen"
 
 if( SQLDb->Exec(queryString, true ) )
 //if( PGRES_TUPLES_OK == status )
-	{
+{
 	/*
 	 *  If the user doesn't exist, we won't get any rows back.
 	 */
 
 	if(SQLDb->Tuples() < 1)
-		{
+	{
 		return (false);
-		}
+	}
 
 	last_seen = atoi(SQLDb->GetValue(0, 0));
 
 	return (last_seen);
-	}
+}
 
 return (false);
 
@@ -519,7 +524,7 @@ bool sqlUser::Insert()
  */
 static const char* queryHeader =  "INSERT INTO users "
 	"(user_name,password,language_id,flags,last_updated_by,last_"
-	"updated,email) VALUES ('";
+	"updated,post_forms,signup_ts,email) VALUES ('";
 
 stringstream queryString;
 queryString	<< queryHeader
@@ -530,6 +535,8 @@ queryString	<< queryHeader
 		<< 0 << ",'"
 		<< escapeSQLChars(last_updated_by)
 		<< "',"
+		<< "now()::abstime::int4,"
+		<< "(now()::abstime::int4 + 432000),"
 		<< "now()::abstime::int4,'"
 		<< escapeSQLChars(email)
 		<< "')"

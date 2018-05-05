@@ -30,17 +30,15 @@
  * $Id: KICKCommand.cc,v 1.11 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include        <string>
+#include	<string>
 
-#include        "StringTokenizer.h"
-#include        "ELog.h"
-#include        "cservice.h"
-#include        "Network.h"
-#include        "levels.h"
-#include        "responses.h"
-#include		"match.h"
-
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.11 2003/06/28 01:21:20 dan_karrels Exp $" ;
+#include	"StringTokenizer.h"
+#include	"ELog.h"
+#include	"cservice.h"
+#include	"Network.h"
+#include	"levels.h"
+#include	"responses.h"
+#include	"match.h"
 
 namespace gnuworld
 {
@@ -112,24 +110,32 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 	 */
 
 	vector <iClient*> toBoot;
+	unsigned int takeMembersCount = (unsigned int)tmpChan->userList_size();
 
-	if((bot->validUserMask(st[2])) && (level >= level::masskick))
+	if ((validUserMask(st[2])) && (level >= level::masskick))
 	{
-		/* Loop over all channel members, and match who to kick. */
-
-		for(Channel::userIterator chanUsers = tmpChan->userList_begin(); chanUsers != tmpChan->userList_end(); ++chanUsers)
+		if (validCIDRLength(st[2]))
 		{
-			ChannelUser* tmpUser = chanUsers->second;
-
-			if( (match(st[2], tmpUser->getClient()->getNickUserHost()) == 0) ||
-			    (match(st[2], tmpUser->getClient()->getRealNickUserHost()) == 0) )
+			/* Loop over all channel members, and match who to kick. */
+			for(Channel::userIterator chanUsers = tmpChan->userList_begin(); chanUsers != tmpChan->userList_end(); ++chanUsers)
 			{
-				/* Don't kick +k things */
-				if ( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) && tmpUser->getClient() != theClient )
+				ChannelUser* tmpUser = chanUsers->second;
+
+				if( (match(st[2], tmpUser->getClient()->getNickUserHost()) == 0) ||
+					(match(st[2], tmpUser->getClient()->getRealNickUserHost()) == 0) )
 				{
-					toBoot.push_back(tmpUser->getClient());
+					/* Don't kick +k things */                                      /* Don't kick ourselves */
+					if ((tmpUser->getClient()->getMode(iClient::MODE_SERVICES)) || (tmpUser->getClient() == theClient))
+						takeMembersCount--;
+					else
+						toBoot.push_back(tmpUser->getClient());
 				}
 			}
+		}
+		else	// <- not a valid cidr range
+		{
+			bot->Notice(theClient, "CIDR range for %s is too wide, maximum allowed is /32", st[2].c_str());
+			return false;
 		}
 
 	} else {
@@ -171,6 +177,33 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 
 		toBoot.push_back(target);
 	}
+
+	/*                                       */
+	/* 	  ***   Take Over Protection   ***   */
+	/*                                       */
+	bool allmatched = false;
+	if ((takeMembersCount > 1) && (takeMembersCount == (unsigned int)toBoot.size()))
+		allmatched = true;
+
+	if (level < 500)
+	if (allmatched && validUserMask(st[2]) && (theChan->getFlag(sqlChannel::F_NOTAKE)))
+	{
+		string theMessage = TokenStringsParams("Take over attempt by %s (%s) on channel %s with kickmask %s",
+				theClient->getNickName().c_str(), theUser->getUserName().c_str(), theChan->getName().c_str(), st[2].c_str());
+		bot->NoteChannelManager(theChan, theMessage.c_str());
+		//If revenge is Ignore then return
+		if (theChan->getNoTake() == 1) return true;
+		unsigned short banLevel = (unsigned short)level::set::notake;
+		unsigned int banExpire = 7 * 86400;
+		string banReason = "### Take Over Protection Triggered ###";
+		string suspendReason = "\002*** TAKE OVER ATTEMPT ***\002";
+		if (theChan->getNoTake() > 1)
+			bot->doInternalBanAndKick(theChan, theClient, banLevel, banExpire, banReason);
+		if (theChan->getNoTake() > 2)
+			bot->doInternalSuspend(theChan, theClient, banLevel, banExpire, suspendReason);
+		return true;
+	}
+	// *** End of Take Over Protection part **** //
 
 	if (toBoot.size() == 0)
 	{

@@ -40,6 +40,73 @@ using std::string ;
 using std::map ;
 using std::vector ;
 
+//	< Message < time, count > >
+typedef map < string, std::pair < time_t, unsigned int > > floodMessageType;
+
+class chanFloodType
+{
+private:
+	time_t last_time;
+	string last_message;
+	unsigned int msgCount;
+	unsigned int noticeCount;
+	unsigned int ctcpCount;
+	time_t now;
+
+public:
+
+	unsigned int repCount;
+
+	floodMessageType messageFloodMap;
+	floodMessageType noticeFloodMap;
+	floodMessageType ctcpFloodMap;
+
+	void setCurrentTime(const time_t&);
+
+	void calcTotalMessageCount(const string&);
+	void calcTotalNoticeCount(const string&);
+	void calcTotalCTCPCount(const string&);
+
+	inline const time_t& getLastTime()
+		{ return last_time; }
+
+	inline void setLastTime(const time_t& _last_time)
+		{ last_time = _last_time; }
+
+	inline const string& getLastMessage()
+		{ return last_message; }
+
+	inline void setLastMessage(const string& _last_message)
+		{ last_message = _last_message; }
+
+	inline const unsigned int& getRepCount()
+		{ return repCount; }
+
+	inline void setRepCount(const unsigned int& _repCount)
+		{ repCount = _repCount; }
+
+	inline const unsigned int& getTotalMessageCount()
+		{ return msgCount; }
+
+	inline void setTotalMessageCount(const unsigned int& _msgCount)
+		{ msgCount = _msgCount; }
+
+	inline const unsigned int& getTotalNoticeCount()
+		{ return noticeCount; }
+
+	inline void setTotalNoticeCount(const unsigned int& _noticeCount)
+		{ noticeCount = _noticeCount; }
+
+	inline const unsigned int& getTotalCTCPCount()
+		{ return ctcpCount; }
+
+	inline void setTotalCTCPCount(const unsigned int& _ctcpCount)
+		{ ctcpCount = _ctcpCount; }
+
+	chanFloodType();
+	virtual ~chanFloodType();
+};
+
 class sqlChannel
 {
 
@@ -68,6 +135,11 @@ public:
 	static const flagType	F_FLOATLIM;
 	static const flagType	F_MIA;		// MIA review tag
 	static const flagType	F_NOFORCE; // Reserved for use by Planetarion.
+	static const flagType	F_NOVOICE;
+	static const flagType	F_NOTAKE;
+	static const flagType	F_FLOODPRO;
+	static const flagType	F_FLOODPROGLINE;
+	static const flagType	F_OPLOG;
 
 	/*
 	 *   Channel 'Event' Flags, used in the channelog table.
@@ -100,6 +172,19 @@ public:
 	static const int	EV_SUSPEND;
 	static const int	EV_UNSUSPEND;
 
+	enum FloodType {
+		FLOOD_MSG,
+		FLOOD_NOTICE,
+		FLOOD_CTCP
+	};
+
+	enum FloodProLevel {
+		FLOODPRO_NONE,
+		FLOODPRO_KICK,	//=WARNING
+		FLOODPRO_BAN,
+		FLOODPRO_GLINE
+	};
+
 	/*
 	 *  Methods to get data atrributes.
 	 */
@@ -119,8 +204,32 @@ public:
 	inline const unsigned short int& getMassDeopPro() const
 		{ return mass_deop_pro ; }
 
-	inline const unsigned short int& getFloodPro() const
+	inline const unsigned int& getFloodPro() const
 		{ return flood_pro ; }
+
+	inline const unsigned short& getFloodMsg() const
+		{ return msg_period ; }
+
+	inline const unsigned short int& getFloodNotice() const
+		{ return notice_period ; }
+
+	inline const unsigned short int& getFloodCTCP() const
+		{ return ctcp_period ; }
+
+	inline const unsigned short int& getFloodPeriod() const
+		{ return flood_period ; }
+
+    inline const unsigned short int& getRepeatCount() const
+		{ return repeat_count ; }
+
+    inline const FloodProLevel& getFloodproLevel() const
+		{ return floodlevel; }
+
+    inline const FloodProLevel& getManualFloodproLevel() const
+		{ return man_floodlevel; }
+
+	inline const time_t& 		getLastFloodTime() const
+		{ return last_flood; }
 
 	inline const string&		getURL() const
 		{ return url ; }
@@ -133,6 +242,9 @@ public:
 
 	inline const string&		getKeywords() const
 		{ return keywords ; }
+
+	inline const string&		getWelcome() const
+		{ return welcome ; }
 
 	inline const time_t&		getRegisteredTS() const
 		{ return registered_ts ; }
@@ -175,6 +287,16 @@ public:
 
 	inline const unsigned int& getMaxBans() const
 		{ return max_bans ; }
+
+	inline const unsigned int& getNoTake() const
+		{ return no_take ; }
+
+	unsigned int getTotalMessageCount(const string& );
+
+	unsigned int getTotalNoticeCount(const string&);
+
+	unsigned int getTotalCTCPCount(const string&);
+
 	/**
 	 * Load channel data from the backend using the channel name as
 	 * a key.
@@ -211,8 +333,39 @@ public:
 	inline void setMassDeopPro( const unsigned short int& _mass_deop_pro )
 		{ mass_deop_pro = _mass_deop_pro; }
 
-	inline void setFloodPro( const unsigned short int& _flood_pro )
+	inline void setFloodPro( const unsigned int& _flood_pro )
 		{ flood_pro = _flood_pro; }
+
+	inline void setFloodproLevel( const FloodProLevel& _floodlevel )
+		{ floodlevel = _floodlevel; }
+
+	inline void setManualFloodproLevel( const FloodProLevel& _man_floodlevel )
+		{ man_floodlevel = _man_floodlevel; }
+
+	inline void incFloodPro()
+	{
+		if (floodlevel == FLOODPRO_NONE)
+			floodlevel = FLOODPRO_KICK;
+		else if (floodlevel == FLOODPRO_KICK)
+			floodlevel = FLOODPRO_BAN;
+#ifdef GLINE_ON_FLOODPRO
+		else if ((floodlevel == FLOODPRO_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
+			floodlevel = FLOODPRO_GLINE;
+#endif
+	}
+
+	inline void decFloodPro()
+	{
+		if (floodlevel == FLOODPRO_GLINE)
+			floodlevel = FLOODPRO_BAN;
+		else if (floodlevel == FLOODPRO_BAN)
+			floodlevel = FLOODPRO_KICK;
+		else if (floodlevel == FLOODPRO_KICK)
+			floodlevel = FLOODPRO_NONE;
+	}
+
+	inline void setLastFloodTime( const time_t& _last_flood )
+		{ last_flood = _last_flood; }
 
 	inline void setURL( const string& _url )
 		{ url = _url; }
@@ -225,6 +378,9 @@ public:
 
 	inline void setKeywords( const string& _keywords )
 		{ keywords = _keywords; }
+
+	inline void setWelcome(const string& _welcome)
+		{ welcome = _welcome; }
 
 	inline void setRegisteredTS( const time_t& _registered_ts )
 		{ registered_ts = _registered_ts; }
@@ -265,6 +421,12 @@ public:
 	inline void setMaxBans( const unsigned int& _max_bans )
 		{ max_bans = _max_bans; }
 
+	inline void setNoTake( const unsigned int& _no_take )
+		{ no_take = _no_take; }
+
+	inline void setCurrentTime(const time_t& _now )
+		{ now = _now; }
+
 	/**
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
@@ -272,6 +434,28 @@ public:
 	bool commit();
 	bool insertRecord();
 	void setAllMembers(int);
+
+	void setAllFlood();
+	void setFloodMsg(const unsigned short& );
+	void setFloodNotice(const unsigned short& );
+	void setFloodCTCP(const unsigned short& );
+	void setFloodPeriod(const unsigned short& );
+    void setRepeatCount(const unsigned short& );
+    void setDefaultFloodproValues();
+
+    // < total_count, Mask_list >
+	typedef std::pair < unsigned int, std::list < string > > repeatMaskMapType;
+
+	static string getFloodLevelName(const FloodProLevel& );
+    repeatMaskMapType getRepeatMessageCount(const string&, string Mask = string());
+	time_t getMaskLastTime(const string& );
+	//void setMaskLastTime(const string&,);
+	void RemoveFlooderMask(const string&);
+	void handleNewMessage(const FloodType&, const string&, const string&);
+	void calcTotalMessageCount(const string&);
+	void calcTotalNoticeCount(const string&);
+	void calcTotalCTCPCount(const string&);
+	void ExpireMessagesForChannel(sqlChannel*);
 
 public:
 	/*
@@ -287,17 +471,29 @@ public:
 	typedef map < int,sqlBan*> sqlBanMapType;
 	sqlBanMapType banList;
 
+	// < repeater_Mask, flooder_struct >
+	typedef map < string, chanFloodType* > chanFloodMapType;
+	chanFloodMapType chanFloodMap;
+
 protected:
 
 	unsigned int	id ;
 	string		name ;
 	flagType	flags ;
 	unsigned short	mass_deop_pro ;
-	unsigned short	flood_pro ;
+	unsigned int	flood_pro ;
+	unsigned short	msg_period;
+	unsigned short	notice_period;
+	unsigned short	ctcp_period;
+	unsigned short	flood_period;
+    unsigned short	repeat_count;
+    FloodProLevel		floodlevel;
+    FloodProLevel		man_floodlevel; //the variable to keep track which floodpro level was set manually
 	string		url ;
 	string		description ;
 	string		comment ;
 	string		keywords  ;
+	string		welcome ;
 	time_t		registered_ts ;
 	time_t		channel_ts ;
 	string		channel_mode ;
@@ -309,9 +505,12 @@ protected:
 	unsigned int limit_offset;
 	time_t limit_period;
 	time_t last_limit_check;
+	time_t 		last_flood;	//last time when an floodpro measure was taken (kick/ban/gline)
 	unsigned int limit_grace;
 	unsigned int limit_max;
 	unsigned int max_bans;
+	unsigned int no_take;
+	time_t		now;
 
 	dbHandle*	SQLDb;
 

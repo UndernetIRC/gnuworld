@@ -264,6 +264,16 @@ public:
 	virtual bool	Replace( iterator itr,
 		const std::string& newValue ) ;
 
+	/*
+	 * Clear valueMap
+	 */
+	virtual void Clear();
+
+	/**
+	 * Open the input file.
+	 */
+	virtual bool	openConfigFile();
+
 	/**
 	 * Debugging function for outputting the entire map to
 	 * an output stream.

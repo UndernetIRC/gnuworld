@@ -20,25 +20,64 @@
  */
 
 #include	<string>
-
 #include	<cstdio>
 #include	<cstdlib>
-
 #include	"match.h"
-#include	"ConnectionManager.h"
-
-const char rcsId[] = "$Id: match.cc,v 1.10 2007/09/13 02:00:45 dan_karrels Exp $" ;
+#include	"misc.h"
+#include	"StringTokenizer.h"
 
 namespace gnuworld
 {
 
-int match( const std::string& s1, const std::string& s2 )
+int match( const string& s1, const string& s2 )
 {
-if( s1.empty() || s2.empty() )
+	if( s1.empty() || s2.empty() )
 	{
-	return 1 ;
+		return 1 ;
 	}
-return match( s1.c_str(), s2.c_str() ) ;
+
+	//Handle just two plainAddress! Withouth any nick!user part!
+	if (!isUserHost(s1) && !isUserHost(s2))
+	{
+		if (match(s1.c_str(), s2.c_str()) == 0)
+			return 0;
+	}
+
+	// Address checking, first we try to pass the address from the nick!user part ...
+	if (isUserHost(s1) && isUserHost(s2))
+	{
+		if (match(extractNick(s1).c_str(), extractNick(s2).c_str()))
+			return 1;
+
+		if (match(extractUser(s1).c_str(), extractUser(s2).c_str()))
+			return 1;
+		/* If passed, we deal only with the hostip part, and because match() handles cidr addresses too
+		 * our matching is complete.
+		 */
+		if (match(extractHostIP(s1).c_str(), extractHostIP(s2).c_str()) == 0)
+			return 0;
+	}
+	return 1;
+}
+
+int match(const string& mask, const iClient* theClient)
+{
+	if (!isUserHost(mask))
+		return 1;
+
+	if (match(extractNick(mask).c_str(), theClient->getNickName().c_str()))
+		return 1;
+
+	if (match(extractUser(mask).c_str(), theClient->getUserName().c_str()))
+		return 1;
+
+	// But now we match with realhost too
+	if ((match(extractHostIP(mask), theClient->getRealInsecureHost()) == 0)
+			|| (match(extractHostIP(mask), theClient->getInsecureHost()) == 0)
+			|| (match(extractHostIP(mask), theClient->getNumericIP()) == 0))
+		return 0;
+
+	return 1;
 }
 
 /*
@@ -64,83 +103,24 @@ int match(const char *mask, const char *string)
   const char *m = mask, *s = string;
   char ch;
   const char *bm, *bs;          /* Will be reg anyway on a decent CPU/compiler */
-  bool isIP = true, isCIDR = false;
-  char CIDRip[16];
-  int i = 0, CIDRmask = 0, dots = 0;
-  int client_addr[4] = { 0 };
-  unsigned long mask_ip, client_ip;
 
-  /* check if the mask is a CIDR mask (also if it's an IP) */
-  while ((ch = *m++))
-  {
-     if (ch == '.')
-     {
-	dots++;
-	if (dots > 3)
-	{
-		isIP = false;	/* more than 3 dots, can't be an IP */
-		break;		/* no point continuing the check as we have the info we want */
-	}
-     }
-     if (ch == '/')
-     {
-        isCIDR = true;
-        break;			/* break, preserving location of the slash in m */
-     }
-     if (i <= 15)
-     {
-        CIDRip[i] = ch;
-        i++;
-     }
-     if (isIP && ((ch > '9') || (ch < '0')) && (ch != '.'))
-     {
-	/* not an IP */
-	isIP = false;
-	isCIDR = false;
-	break;
-     }
-  }
+  irc_in_addr ipmask;
+  irc_in_addr ipstring;
+  int ipmask_valid;
+  int ipstring_valid;
+  unsigned char ipmask_len;
+  unsigned char ipstring_len;
 
-  if (!isIP)
-    isCIDR = false;		/* if it's not an IP, it can't be a CIDR mask! */
- 
-  if (isCIDR)
+  /* Checking and parsing any possible ipv4/ipv6 address. */
+  ipmask_valid = ipmask_parse(mask, &ipmask, &ipmask_len);
+  ipstring_valid = ipmask_parse(string, &ipstring, &ipstring_len);
+
+  if ((ipmask_valid) && (ipstring_valid))
   {
-     /* we have a CIDR mask, deal with it as such */
-     /* we can only match CIDR masks against IPs - check for an IP */
-     if (ConnectionManager::isIpAddress(string))
-     {
-        /* ok, it's an IP - compute masks etc */
-        CIDRip[i] = '\0';
-        CIDRmask = atoi(m);
-        /* convert IP into integer */
-        i = sscanf(CIDRip, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
-        mask_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
-        i = sscanf(string, "%d.%d.%d.%d", &client_addr[0], &client_addr[1], &client_addr[2], &client_addr[3]);
-        client_ip = ntohl((client_addr[0]) | (client_addr[1] << 8) | (client_addr[2] << 16) | (client_addr[3] << 24));
-        /* time to compare them */
-        for (i = 0; i < (32 - CIDRmask); i++)
-        {
-           /* right shift  to drop off the insignificant bits */
-           mask_ip >>= 1;
-           client_ip >>= 1;
-        }
-        for (i = 0; i < (32 - CIDRmask); i++)
-        {
-           /* left shift to restore the ip, but with insignificant bits = 0 */
-           mask_ip <<= 1;
-           client_ip <<= 1;
-        }
-        if (client_ip == mask_ip)
-        {
-           /* cidr matches */
-           return 0;
-        } else {
-           /* cidr doesnt match */
-           return 1;
-        }
-        return 1;
-     }
+	if (ipmask_check(&ipstring, &ipmask, ipmask_len))
+		return 0;
+	else
+		return 1;
   }
 
   m = mask;
@@ -220,6 +200,337 @@ break_while:
   return 0;
 }
 
+/* ircu's match() function
+ * I renamed this as smatch() function, coming from 'simple string match'
+ * to not get in trouble with gnuworld's 'boosted' match() function.
+ * I use this for performance considerations, and optional further usage. (Seven)
+ */
+
+/*
+ * Compare if a given string (name) matches the given
+ * mask (which can contain wild cards: '*' - match any
+ * number of chars, '?' - match any single character.
+ *
+ * return  0, if match
+ *         1, if no match
+ *
+ *  Originally by Douglas A Lewis (dalewis@acsu.buffalo.edu)
+ *  Rewritten by Timothy Vogelsang (netski), net@astrolink.org
+ */
+
+/** Check a string against a mask.
+ * This test checks using traditional IRC wildcards only: '*' means
+ * match zero or more characters of any type; '?' means match exactly
+ * one character of any type.  A backslash escapes the next character
+ * so that a wildcard may be matched exactly.
+ * @param[in] mask Wildcard-containing mask.
+ * @param[in] name String to check against \a mask.
+ * @return Zero if \a mask matches \a name, non-zero if no match.
+ */
+int smatch(const char *mask, const char *name)
+{
+  const char *m = mask, *n = name;
+  const char *m_tmp = mask, *n_tmp = name;
+  int star_p;
+
+  for (;;) switch (*m) {
+  case '\0':
+    if (!*n)
+      return 0;
+  backtrack:
+    if (m_tmp == mask)
+      return 1;
+    m = m_tmp;
+    n = ++n_tmp;
+    if (*n == '\0')
+      return 1;
+    break;
+  case '\\':
+    if ((m[1] == '*') || (m[1] == '?'))
+      m++;
+    goto normal_character;
+  case '*': case '?':
+    for (star_p = 0; ; m++) {
+      if (*m == '*')
+        star_p = 1;
+      else if (*m == '?') {
+        if (!*n++)
+          goto backtrack;
+      } else break;
+    }
+    if (star_p) {
+      if (!*m)
+        return 0;
+      m_tmp = m;
+      for (n_tmp = n; *n && ToLower(*n) != ToLower(*m); n++) ;
+    }
+    /* and fall through */
+  default:
+  normal_character:
+    if (!*n)
+      return *m != '\0';
+    if (ToLower(*m) != ToLower(*n))
+      goto backtrack;
+    m++;
+    n++;
+    break;
+  }
+}
+
+/* casematch method, I simply removed all ToLower's ... (Seven) */
+int casematch(const char *mask, const char *string)
+{
+  const char *m = mask, *s = string;
+  char ch;
+  const char *bm, *bs;          /* Will be reg anyway on a decent CPU/compiler */
+
+  m = mask;
+
+  /* Process the "head" of the mask, if any */
+  while ((ch = *m++) && (ch != '*'))
+    switch (ch)
+    {
+      case '\\':
+        if (*m == '?' || *m == '*')
+          ch = *m++;
+      default:
+        if ((*s) != (ch))
+          return 1;
+      case '?':
+        if (!*s++)
+          return 1;
+    };
+  if (!ch)
+    return *s;
+
+  /* We got a star: quickly find if/where we match the next char */
+got_star:
+  bm = m;                       /* Next try rollback here */
+  while ((ch = *m++))
+    switch (ch)
+    {
+      case '?':
+        if (!*s++)
+          return 1;
+      case '*':
+        bm = m;
+        continue;               /* while */
+      case '\\':
+        if (*m == '?' || *m == '*')
+          ch = *m++;
+      default:
+        goto break_while;       /* C is structured ? */
+    };
+break_while:
+  if (!ch)
+    return 0;                   /* mask ends with '*', we got it */
+  //ch = ToLower(ch);
+  while ((*s++) != ch)
+    if (!*s)
+      return 1;
+  bs = s;                       /* Next try start from here */
+
+  /* Check the rest of the "chunk" */
+  while ((ch = *m++))
+  {
+    switch (ch)
+    {
+      case '*':
+        goto got_star;
+      case '\\':
+        if (*m == '?' || *m == '*')
+          ch = *m++;
+      default:
+        if ((*s) != (ch))
+        {
+          m = bm;
+          s = bs;
+          goto got_star;
+        };
+      case '?':
+        if (!*s++)
+          return 1;
+    };
+  };
+  if (*s)
+  {
+    m = bm;
+    s = bs;
+    goto got_star;
+  };
+  return 0;
+}
+
+int casematch( const std::string& s1, const std::string& s2 )
+{
+if( s1.empty() || s2.empty() )
+	{
+	return 1 ;
+	}
+return casematch( s1.c_str(), s2.c_str() ) ;
+}
+
+/* ircu's mask match */
+/* Also for any possible further usage I inserted this function too. (Seven) */
+/*
+ * mmatch()
+ *
+ * Written by Run (carlo@runaway.xs4all.nl), 25-10-96
+ *
+ *
+ * From: Carlo Wood <carlo@runaway.xs4all.nl>
+ * Message-Id: <199609021026.MAA02393@runaway.xs4all.nl>
+ * Subject: [C-Com] Analysis for `mmatch' (was: gline4 problem)
+ * To: coder-com@mail.undernet.org (coder committee)
+ * Date: Mon, 2 Sep 1996 12:26:01 +0200 (MET DST)
+ *
+ * We need a new function `mmatch(const char *old_mask, const char *new_mask)'
+ * which returns `true' likewise the current `match' (start with copying it),
+ * but which treats '*' and '?' in `new_mask' differently (not "\*" and "\?" !)
+ * as follows:  a '*' in `new_mask' does not match a '?' in `old_mask' and
+ * a '?' in `new_mask' does not match a '\?' in `old_mask'.
+ * And ofcourse... a '*' in `new_mask' does not match a '\*' in `old_mask'...
+ * And last but not least, '\?' and '\*' in `new_mask' now become one character.
+ */
+
+/** Compares one mask against another.
+ * One wildcard mask may be said to be a superset of another if the
+ * set of strings matched by the first is a proper superset of the set
+ * of strings matched by the second.  In practical terms, this means
+ * that the second is made redundant by the first.
+ *
+ * The logic for this test is similar to that in match(), but a
+ * backslash in old_mask only matches a backslash in new_mask (and
+ * requires the next character to match exactly), and -- after
+ * contiguous runs of wildcards are logically collapsed -- a '?' in
+ * old_mask does not match a '*' in new_mask.
+ *
+ * @param[in] old_mask One wildcard mask.
+ * @param[in] new_mask Another wildcard mask.
+ * @return Zero if \a old_mask is a superset of \a new_mask, non-zero otherwise.
+ */
+int mmatch(const char *old_mask, const char *new_mask)
+{
+  const char *m = old_mask;
+  const char *n = new_mask;
+  const char *ma = m;
+  const char *na = n;
+  int wild = 0;
+  int mq = 0, nq = 0;
+
+  while (1)
+  {
+    if (*m == '*')
+    {
+      while (*m == '*')
+        m++;
+      wild = 1;
+      ma = m;
+      na = n;
+    }
+
+    if (!*m)
+    {
+      if (!*n)
+        return 0;
+      for (m--; (m > old_mask) && (*m == '?'); m--)
+        ;
+      if ((*m == '*') && (m > old_mask) && (m[-1] != '\\'))
+        return 0;
+      if (!wild)
+        return 1;
+      m = ma;
+
+      /* Added to `mmatch' : Because '\?' and '\*' now is one character: */
+      if ((*na == '\\') && ((na[1] == '*') || (na[1] == '?')))
+        ++na;
+
+      n = ++na;
+    }
+    else if (!*n)
+    {
+      while (*m == '*')
+        m++;
+      return (*m != 0);
+    }
+    if ((*m == '\\') && ((m[1] == '*') || (m[1] == '?')))
+    {
+      m++;
+      mq = 1;
+    }
+    else
+      mq = 0;
+
+    /* Added to `mmatch' : Because '\?' and '\*' now is one character: */
+    if ((*n == '\\') && ((n[1] == '*') || (n[1] == '?')))
+    {
+      n++;
+      nq = 1;
+    }
+    else
+      nq = 0;
+
+/*
+ * This `if' has been changed compared to match() to do the following:
+ * Match when:
+ *   old (m)         new (n)         boolean expression
+ *    *               any             (*m == '*' && !mq) ||
+ *    ?               any except '*'  (*m == '?' && !mq && (*n != '*' || nq)) ||
+ * any except * or ?  same as m       (!((*m == '*' || *m == '?') && !mq) &&
+ *                                      ToLower(*m) == ToLower(*n) &&
+ *                                        !((mq && !nq) || (!mq && nq)))
+ *
+ * Here `any' also includes \* and \? !
+ *
+ * After reworking the boolean expressions, we get:
+ * (Optimized to use boolean short-circuits, with most frequently occurring
+ *  cases upfront (which took 2 hours!)).
+ */
+   if ((*m == '*' && !mq) ||
+        ((!mq || nq) && ToLower(*m) == ToLower(*n)) ||
+        (*m == '?' && !mq && (*n != '*' || nq)))
+    {
+      if (*m)
+        m++;
+      if (*n)
+        n++;
+    }
+    else
+    {
+      if (!wild)
+        return 1;
+      m = ma;
+
+      /* Added to `mmatch' : Because '\?' and '\*' now is one character: */
+      if ((*na == '\\') && ((na[1] == '*') || (na[1] == '?')))
+        ++na;
+
+      n = ++na;
+    }
+  }
+}
+
+/** Test whether an address matches the most significant bits of a mask.
+ * @param[in] addr Address to test.
+ * @param[in] mask Address to test against.
+ * @param[in] bits Number of bits to test.
+ * @return 0 on mismatch, 1 if bits < 128 and all bits match; -1 if
+ * bits == 128 and all bits match.
+ */
+int ipmask_check(const struct irc_in_addr *addr, const struct irc_in_addr *mask, unsigned char bits)
+{
+  int k;
+
+  for (k = 0; k < 8; k++) {
+    if (bits < 16)
+      return !(htons(addr->in6_16[k] ^ mask->in6_16[k]) >> (16-bits));
+    if (addr->in6_16[k] != mask->in6_16[k])
+      return 0;
+    if (!(bits -= 16))
+      return 1;
+  }
+  return -1;
+}
 /*
  * collapse()
  * Collapse a pattern string into minimal components.
@@ -792,5 +1103,97 @@ int mmexec(const char *wcm, int wminlen, const char *rcm, int rminlen)
   }
   return 1;                     /* Auch... something left out ? Fail */
 }
+
+//int addrMatch(const string& mask, const string& address)
+//{
+//	// A two step checking, first we try to pass the address from the nick!user part ...
+//	if (isUserHost(mask) && isUserHost(address))
+//	{
+//		if (match(extractNickUser(mask), extractNickUser(address)))
+//			return 1;
+//
+//		/* If passed, we deal only with the hostip part, and because match() handles cidr addresses too
+//		 * our matching is complete.
+//		 */
+//		if (match(extractHostIP(mask), extractHostIP(address)) == 0)
+//			return 0;
+//	}
+//	//Handle just two (cidr)addresses
+//	if (match(mask, address) == 0)
+//		return 0;
+//
+//	return 1;
+//}
+
+//int addrMatch(const string& mask, const iClient* theClient)
+//{
+//	if (!isUserHost(mask))
+//		return false;
+//
+//	// Again, checking after nick!user part matching ...
+//	if (match(extractNickUser(mask),theClient->getNickUser()))
+//		return 1;
+//
+//	// But now we match with realhost too
+//	if ((match(extractHostIP(mask), theClient->getRealInsecureHost()) == 0)
+//			|| (match(mask, theClient->getNumericIP()) == 0))
+//		return 0;
+//
+//	return 1;
+//}
+
+/*
+ * An attempt to cover as much possible variations of a 'matching all mask'
+ */
+int matchall(const std::string& mask)
+{
+	for (unsigned int i = 0; i < mask.length(); i++)
+	{
+		char c = mask[i];
+		if ((c != '*') && (c != '?') && (c != '.') && (c != '!') && (c != '@') && (c != '~'))
+			return 1;
+	}
+	return 0;
+}
+
+
+/* This function is written to allow cidr matching between two CIDR addresses,
+ * regardless of which one was supplied first.
+ * Exemple: match(10.10.10.0/24, 10.0.0.0/8) wouldn't return a positive match,
+ * 	    match(10.0.0.0/8, 10.10.10.0/24) *would* return a positive match,
+ *
+ * this function will return a positive match (return 0) for both queries
+ */
+int cidrmatch(const char *mask1, const char *mask2)
+{
+	StringTokenizer st1(mask1, '/');
+	StringTokenizer st2(mask2, '/');
+	unsigned char c1, c2;
+	
+	if (st1.size() < 2)
+		c1 = -1;
+	else
+		c1 = atoi(st1[1]);
+
+	if (st2.size() < 2)
+		c2 = -1;
+	else
+		c2 = atoi(st2[1]);
+
+
+	if (c2 > c1)
+		return match(mask1, mask2);
+	else
+		return match(mask2, mask1);
+}
+
+int cidrmatch(const string& s1, const string& s2)
+{
+	if (s1.empty() || s2.empty())
+		return 1;
+	
+	return cidrmatch(s1.c_str(), s2.c_str());
+}
+
 
 } // namespace gnuworld

@@ -20,7 +20,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 #include	<map>
 
 #include	<cstdlib>
@@ -39,8 +39,6 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: GLINECommand.cc,v 1.64 2009/06/09 05:55:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -74,8 +72,6 @@ time_t gLength = bot->getDefaultGlineLength() ;
 
 ccUser* tmpUser = bot->IsAuth(theClient);
 
-bot->MsgChanLog("GLINE %s\n",st.assemble(1).c_str());
-
 if(st[pos].substr(0,1) == "#")
 {
 	bot->Notice(theClient, "Please use the CHANGLINE command to gline channels");
@@ -94,62 +90,50 @@ string hostName;
 		bot->Notice(theClient,"Please use SGLINE to set this gline");
 		return true;
 		}
-	string::size_type atPos = st[ pos ].find_first_of( '@' ) ;
-	if( string::npos == atPos )
+	string gHost = st[pos];
+	if (!isUserHost(gHost))
+	{
+		iClient* tClient = Network->findNick(st[pos]);
+		if(!tClient)
 		{
-			
-		if((atPos = st [ pos ].find_first_of('.')) == string::npos) 
-			{
-			// user has probably specified a nickname (asked by isomer:P)
-			iClient* tClient = Network->findNick(st[pos]);
-			if(!tClient)
-				{
-				bot->Notice( theClient, "i can't find '%s' online, "
-					    "please specify a host instead",
-						st[pos].c_str());
-				return true ;
-				}
-			else   //Ohhh neat we found our target, lets grab his ip
-				{
-				userName = tClient->getUserName();
-				if(userName[0] == '~')
-					{
-					userName = "~*";
-					}
-				hostName = xIP(tClient->getIP()).GetNumericIP();
-				string newMsg = "GLINE mask for " + st[pos] + " is " + userName + "@" + hostName;
-				bot->MsgChanLog("%s\n",newMsg.c_str());
+			bot->Notice( theClient, "I can't find '%s' online, "
+				    "please specify a host instead",
+					gHost.c_str());
+			return true ;
+		}
+		else //Ohhh neat we found our target, lets grab his ip
+		{
+			userName = tClient->getUserName();
+			if(userName[0] == '~')
+				userName = "~*";
+			hostName = xIP(tClient->getIP()).GetNumericIP();
+			fixToCIDR64(hostName);
+			string newMsg = "GLINE mask for " + gHost + " is " + userName + "@" + hostName;
+			bot->MsgChanLog("%s\n",newMsg.c_str());
+			gHost = userName + "@" + hostName;
 #ifndef LOGTOHD
-				if(tmpUser)
-					bot->DailyLog(tmpUser,"%s",newMsg.c_str());
-				else
-		    			bot->DailyLog(theClient,"%s",newMsg.c_str());
+			if(tmpUser)
+				bot->DailyLog(tmpUser,"%s",newMsg.c_str());
+			else
+				bot->DailyLog(theClient,"%s",newMsg.c_str());
 #else
-				ccLog* newLog = new (std::nothrow) ccLog();
-				newLog->Time = ::time(0);
-				newLog->Desc = newMsg.c_str();
-				newLog->Host = theClient->getRealNickUserHost().c_str();
-				if(tmpUser)
-					newLog->User = tmpUser->getUserName().c_str();
-				else
-					newLog->User = "Unknown";			
-				newLog->CommandName = "GLINE";
-				bot->DailyLog(newLog);
+			ccLog* newLog = new (std::nothrow) ccLog();
+			newLog->Time = ::time(0);
+			newLog->Desc = newMsg.c_str();
+			newLog->Host = theClient->getRealNickUserHost().c_str();
+			if(tmpUser)
+				newLog->User = tmpUser->getUserName().c_str();
+			else
+				newLog->User = "Unknown";
+			newLog->CommandName = "GLINE";
+			bot->DailyLog(newLog);
 #endif
-				}
-			}
-		else
-			{
-			//user  forgot to add *@ so lets add it for him
-			userName = "*";
-			hostName = st[ pos  ];
-			}
 		}
-	else
-		{
-		userName = st[ pos ].substr( 0, atPos ) ;
-		hostName = st[ pos ].substr( atPos + 1 ) ;
-		}
+	}	//isUserHost(gHost)
+	else	// fix @ip to-> *@ip
+		if (gHost[0] == '@')
+			gHost = '*' + gHost;
+
 unsigned int ResStart = 2;
 if (IsTimeSpec(st[2]))
 {
@@ -160,8 +144,10 @@ if (IsTimeSpec(st[2]))
 }
 	
 string nickUserHost = theClient->getRealNickUserHost() ;
-	
+//string gHost = userName + "@" + hostName;
 	unsigned int Users;
+	int gCheck = bot->checkGline(gHost,gLength,Users);
+	hostName = gHost.substr(gHost.find('@')+1);
 	if(!tmpUser)
 		{
 		if((string::npos != hostName.find_first_of("*")) 
@@ -171,11 +157,10 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 			bot->Notice(theClient,"You must login to issue this gline!");
 			return true;
 			}
-		Users = Network->countMatchingRealUserHost(string(userName + "@" + hostName));
+		Users = Network->countMatchingRealUserHost(gHost);
 		}
 	else
 		{
-		int gCheck = bot->checkGline(string(userName + "@" + hostName),gLength,Users);
 		if(gCheck & gline::NEG_TIME)
 			{
 			bot->Notice(theClient,"You can't gline for a negative amount of time.");
@@ -245,25 +230,34 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 			}
 		if((gCheck & gline::HUH_IS_IP_OF_OPER) && (Ok))
 			{
-			if (bot->isGlinedException(userName + "@" + hostName) > 0) {
+			if (bot->isGlinedException(gHost) > 0) {
 				bot->Notice(theClient,"There is someone who previously opered from that host. G-line sent (forced)");
 			}
 			else {
 				bot->Notice(theClient,"There is someone who previously opered from that host (%s). Send the gline again to force.", bot->getLastNUHOfOperFromIP(hostName).c_str());
-				bot->addGlinedException(userName + "@" + hostName);
+				bot->addGlinedException(gHost);
 				Ok = false;
 			}
 			}
 		if((gCheck & gline::HUH_IS_EXCEPTION) && (Ok))
 			{
-			if (bot->isGlinedException(userName + "@" + hostName) > 0) {
+			if (bot->isGlinedException(gHost) > 0) {
 				bot->Notice(theClient,"There is an exception for that host. G-line sent (forced)");
 			}
 			else {
 				bot->Notice(theClient,"There is an exception for that host. Send the gline again to force.");
-				bot->addGlinedException(userName + "@" + hostName);
+				bot->addGlinedException(gHost);
 				Ok = false;
 			}
+			}
+		if (hostName.find('/') != string::npos) 
+			{
+			string tCidr;
+			if (!bot->getValidCidr(hostName, tCidr))
+				{
+				bot->Notice(theClient, "Unwanted cidr format: %s  -  Suggestion: %s", hostName.c_str(), tCidr.c_str());
+				Ok = false;
+				}
 			}
 		if(!Ok)
 			{
@@ -288,13 +282,13 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 		string("[") + Us + "] " + Reason,
 		//Reason + "[" + Us + "]",
 		gLength ,::time(0),bot) ;*/
-	ccGline *TmpGline = bot->findGline(userName + "@" + hostName);
+	ccGline *TmpGline = bot->findGline(gHost);
 	bool Up = false;
 	
 	if(TmpGline)
 		Up =  true;	
 	else TmpGline = new ccGline(bot->SQLDb);
-	TmpGline->setHost(userName + "@" + hostName);
+	TmpGline->setHost(gHost);
 	TmpGline->setExpires(unsigned(::time(0) + gLength));
 	TmpGline->setAddedBy(nickUserHost);
 	TmpGline->setReason(Reason);
@@ -312,6 +306,8 @@ string nickUserHost = theClient->getRealNickUserHost() ;
 		TmpGline->loadData(TmpGline->getHost());
 		bot->addGline(TmpGline);
 		}
+
+	bot->MsgChanLog("GLINE %s %s\n",gHost.c_str(), st.assemble(2).c_str());
 
 	return true;
 

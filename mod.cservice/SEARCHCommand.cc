@@ -30,7 +30,6 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -39,11 +38,8 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char SEARCHCommand_cc_rcsId[] = "$Id: SEARCHCommand.cc,v 1.11 2007/08/28 16:10:11 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
-
 using std::string ;
 using std::endl ;
 using std::ends ;

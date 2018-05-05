@@ -21,10 +21,8 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -32,11 +30,8 @@
 #include	"gnuworld_config.h"
 #include	"ccException.h"
 
-RCSTAG( "$Id: SHELLSCommand.cc,v 1.3 2008/12/28 12:21:15 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld
@@ -226,6 +221,15 @@ else if(!strcasecmp(st[1].c_str(),"delcompany"))
 	}
 else if(!strcasecmp(st[1].c_str(),"clearall"))
 	{
+	if (st.size() < 3) {
+		bot->Notice(theClient, "Are you sure? Use CLEARALL -f");
+		return true;
+	}
+	if (strcasecmp(st[2].c_str(),"-f")) {
+		bot->Notice(theClient, "Are you sure? Use CLEARALL -f");
+		return true;
+	}
+
 	if(bot->clearShells(theClient))
 		{
 		bot->Notice(theClient,"Successfully deleted all shell companies");

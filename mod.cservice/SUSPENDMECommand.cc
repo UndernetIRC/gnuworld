@@ -29,8 +29,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char SUSPENDMECommand_cc_rcsId[] = "$Id: SUSPENDMECommand.cc,v 1.4 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;
@@ -85,6 +83,8 @@ theUser->writeEvent(sqlUser::EV_SUSPEND, theUser, "Self-Suspension");
 
 bot->logAdminMessage("%s (%s) has globally suspended their own account.",
 	theClient->getNickUserHost().c_str(), theUser->getUserName().c_str());
+
+bot->InsertUserHistory(theClient, "SUSPENDME");
 
 return false;
 }

@@ -18,16 +18,12 @@
  *
  * $Id: VERIFYCommand.cc,v 1.24 2005/11/17 01:37:13 kewlio Exp $
  */
-
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
-
-const char VERIFYCommand_cc_rcsId[] = "$Id: VERIFYCommand.cc,v 1.24 2005/11/17 01:37:13 kewlio Exp $" ;
 
 namespace gnuworld
 {
@@ -101,10 +97,10 @@ if (!theUser)
 	}
 
 sqlChannel* theChan = bot->getChannelRecord(bot->coderChan);
-if (!theChan)
-	{
-	return true;
-	}
+//if (!theChan)
+//	{
+//	return true;
+//	}
 
 // TODO: Move all the levels to constants in levels.h
 
@@ -127,6 +123,21 @@ if ( (0 == level) && (0 == cLevel) )
 		extra.c_str());
 	return false;
 	}
+
+if (level >= level::admin::base)
+{
+	if (theUser->getFlag(sqlUser::F_ALUMNI))
+	{
+	bot->Notice(theClient,
+			bot->getResponse(tmpUser,
+				language::is_cservice_alumni,
+				string("%s is a member of the CService Alumni%s and logged in as %s")).c_str(),
+			target->getNickUserHost().c_str(),
+			extra.c_str(),
+			theUser->getUserName().c_str());
+	return true;
+	}
+}
 
 if ((level >= level::admin::base) && (level <= level::admin::helper))
 	{

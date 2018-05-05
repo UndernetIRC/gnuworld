@@ -35,8 +35,6 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char PARTCommand_cc_rcsId[] = "$Id: PARTCommand.cc,v 1.17 2008/04/16 20:34:40 danielaustin Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

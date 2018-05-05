@@ -20,14 +20,11 @@
  */
 
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
-
-const char REHASHCommand_cc_rcsId[] = "$Id: REHASHCommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -99,8 +96,6 @@ if (level < level::rehash_coder)
         return false;
 }
 
-
-
 if (option == "CONFIG")
 	{
 		bot->configTable.clear();
@@ -109,6 +104,15 @@ if (option == "CONFIG")
 			bot->configTable.size());
 		// TODO: Free up the memory allocated in building this table ;)
 	}
+
+if (option == "VARIABLES")
+{
+	bot->clearConfigVariables();
+	bot->parseConfigFile();
+	bot->loadConfigVariables();
+	bot->Notice(theClient, "Done. Red %i configuration variables.",
+		bot->getConfigVariableSize());
+}
 
 return true ;
 }

@@ -66,16 +66,17 @@ CONFIG		4	<option> may be:
 CONFIG		5	-GTime <duration> - default gline time (accepts friendly times e.g. 900s, 30m, 3h, 1d)
 CONFIG		6	-VClones <amount> - threshold for warning about virtual (realname) clones
 CONFIG		7	-Clones <amount> - threshold for clones on a single IP
-CONFIG		8	-CClones <amount> - threshold for CIDR clones (see below)
-CONFIG		9	-CClonesCIDR <size> - CIDR bit length for clones (0-32)
-CONFIG		10	-CClonesGline <Yes|No> - auto-gline for CIDR clones flag
-CONFIG		11	-CClonesGTime <duration> - gline duration for CIDR clones (accepts friendly times)
-CONFIG		12	-IClones <amount> - threshold for CIDR ident clones
-CONFIG		13	-IClonesGline <Yes|No> - auto-gline for CIDR ident clones flag
-CONFIG		14	-CClonesTime <duration> - time between clone warnings to msglog (accepts friendly times)
-CONFIG		15	-GBCount <count> - number of glines to set at once
-CONFIG		16	-GBInterval <duration> - time between setting gline bursts (accepts friendly times)
-CONFIG		17	-SGline <Yes|No> - Save glines flag
+CONFIG		8	-CClones <amount> - threshold for CIDR clones (see below) for both IPv4 and IPv6!
+CONFIG		9	-CClonesCIDR24 <size> - CIDR bit length for IPv4 clones (16-32)
+CONFIG		10	-CClonesCIDR48 <size> - CIDR bit length for IPv6 clones (16-64)
+CONFIG		11	-CClonesGline <Yes|No> - auto-gline for CIDR clones flag
+CONFIG		12	-CClonesGTime <duration> - gline duration for CIDR clones (accepts friendly times)
+CONFIG		13	-IClones <amount> - threshold for CIDR ident clones
+CONFIG		14	-IClonesGline <Yes|No> - auto-gline for CIDR ident clones flag
+CONFIG		15	-CClonesTime <duration> - time between clone warnings to msglog (accepts friendly times)
+CONFIG		16	-GBCount <count> - number of glines to set at once
+CONFIG		17	-GBInterval <duration> - time between setting gline bursts (accepts friendly times)
+CONFIG		18	-SGline <Yes|No> - Save glines flag
 DEAUTH		1	****** DEAUTH COMMAND ******
 DEAUTH		2	Deauthenticates you from the bot
 DEAUTH		3	Syntax: /msg $BOT$ deauth
@@ -125,6 +126,39 @@ INVITE		1	****** INVITE COMMAND ******
 INVITE		2	Makes the bot invite you to an invite only channel
 INVITE		3	Syntax: /msg $BOT$ invite <#channel>
 INVITE		4	<#channel> - the channel to invite you to
+LIMITS		1	****** LIMITS COMMAND ******
+LIMITS		2	Manage IPv4/v6 clone limits
+LIMITS		3	LIMITS commands: addisp, addnetblock, delisp, delnetblock, list, chlimit, chname, chemail, forcecount, active, group, chccidr, clearall, userinfo
+LIMITS		4	Syntax for the two main commands:
+LIMITS		5	1. ADDISP <name> <max connections> <clones cidr> [abuse email]
+LIMITS		6	2. ADDNETBLOCK <isp> <netblock>
+LIMITS		7	<clones cidr>: the Cidr you want to check clones on. i.e.: 64
+LIMITS		8	Since videotron gives /60s to its users instead of /64s, lets see this example:
+LIMITS		9	Example 1:
+LIMITS		10	        ADDISP videotron 5 60 abuse@videotron.com
+LIMITS		11	        ADDNETBLOCK videotron 2607:FA48::/29
+LIMITS		12	In this example, every client that would match 2607:FA48::/29 would be limited to 5 connections per /60 or would get G-lined.
+LIMITS		13	Multiple netblocks can be assigned to an isp. For the following examples, let's consider that we do not previously added isps.
+LIMITS		14	Example 2:
+LIMITS		15	        ADDISP default64 5 64
+LIMITS		16	        ADDNETBLOCK default64 0::/0
+LIMITS		17	After those two commands are sent, all clients would have a limit of 5 connections per /64. 
+LIMITS		18	However the clients matching a smaller netblock (videotron's /29 above as an example) wouldn't be counted in default64's clone matching.
+LIMITS		19	Example 3:
+LIMITS		20	        ADDISP enforce45 250 45
+LIMITS		21	        ADDNETBLOCK enforce45 0::/0
+LIMITS		22	        FORCECOUNT enforce45 yes
+LIMITS		23	With the 3 commands above, clones will be counted per /45 even if there are other isps matching it, like videotron's /29 above.
+LIMITS		24	The ACTIVE command will enable/disable glines on an isp. This means that it will count clones, report, but will not issue glines.
+LIMITS		25	Example 4:
+LIMITS		26	ADDISP NewShell 5 64 abuse@NewShell.org
+LIMITS		27	ADDNETBLOCK NewShell 2607:3f00:12:7::/64
+LIMITS		28	ADDNETBLOCK NewShell 2607:3f00:12:8::/64
+LIMITS		29	ADDNETBLOCK NewShell 2607:3f00:12:9::/64
+LIMITS		30	GROUP NewShell yes
+LIMITS		31	In this example, we add multiple netblocks to the same ISP, each netblock is limited to 5 connections per /64.
+LIMITS		32	GROUP ISP yes|no  command, will disable the 5 connections per /64 limit from the above example and will instead count the sum of all clients that
+LIMITS		33 	match the three netblocks associated with ISP NewShell. In other words, the limit will be 5 total for all three netblocks.
 JUPE		1	****** JUPE COMMAND ******
 JUPE		2	Jupe a server (prevent it connecting to the network)
 JUPE		3	Syntax: /msg $BOT$ jupe <servername> <reason>
@@ -247,8 +281,9 @@ REMSERVER		3	Syntax: /msg $BOT$ remserver <server name>
 REMSERVER		4	NOTE: use with caution!
 REMSGLINE		1	****** REMSGLINE COMMAND ******
 REMSGLINE		2	Removes an SGLINE from the network
-REMSGLINE		3	Syntax: /msg $BOT$ remsgline <user@host>
-REMSGLINE		4	<user@host> - the user@host to remove from the sgline list
+REMSGLINE		3	Syntax: /msg $BOT$ remsgline [-fr] <user@host>
+REMSGLINE		4	-fr - Removes all the matching and the specified gline, otherwise just the specified gline.
+REMSGLINE		5	<user@host> - the user@host to remove from the sgline list
 REMUSER		1	****** REMOVEOPER COMMAND ******
 REMUSER		2	Removes an oper from the bot's access list
 REMUSER		3	Syntax: /msg $BOT$ remuser <username>

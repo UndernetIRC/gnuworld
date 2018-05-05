@@ -37,20 +37,21 @@
 namespace gnuworld
 {
 
+using std::string ;
 /**
  * Return 0 if the two strings are equivalent, according to
  * case insensitive searches.
  * Otherwise, it returns the comparison between
  * s1 and s2.
  */
-int strcasecmp( const std::string&, const std::string& ) ;
+int strcasecmp( const string&, const string& ) ;
 
 /**
  * Case insensitive comparison struct for use by STL structures/algorithms.
  */
 struct noCaseCompare
 {
-inline bool operator()( const std::string& lhs, const std::string& rhs ) const
+inline bool operator()( const string& lhs, const string& rhs ) const
 	{
 	return (strcasecmp( lhs, rhs ) < 0) ;
 	}
@@ -58,11 +59,11 @@ inline bool operator()( const std::string& lhs, const std::string& rhs ) const
 
 /**
  * A case insensitive binary predicate comparator for two
- * std::string's.
+ * string's.
  */
 struct eqstr
 {
-inline bool operator()( const std::string& s1, const std::string& s2 ) const
+inline bool operator()( const string& s1, const string& s2 ) const
 	{
 	return (0 == strcasecmp( s1, s2 )) ;
 	}
@@ -75,15 +76,15 @@ inline bool operator()( const std::string& s1, const std::string& s2 ) const
  */
 struct eHash
 {
-inline size_t operator()( const std::string& s ) const
+inline size_t operator()( const string& s ) const
 	{
 	if( s.empty() )
 		{
 		return 0 ;
 		}
 
-	register size_t __h = 0 ;
-	for ( register const char* ptr = s.c_str() ; *ptr ; ++ptr )
+	size_t __h = 0 ;
+	for ( const char* ptr = s.c_str() ; *ptr ; ++ptr )
 		{
 		__h = (5 * __h) + tolower( *ptr ) ;
 		}
@@ -97,7 +98,7 @@ inline size_t operator()( const std::string& s ) const
  */
 struct Match
 {
-inline bool operator()( const std::string& lhs, const std::string& rhs ) const
+inline bool operator()( const string& lhs, const string& rhs ) const
 	{
 	return (match( lhs, rhs ) < 0) ;
 	}
@@ -107,44 +108,91 @@ inline bool operator()( const std::string& lhs, const std::string& rhs ) const
  * Return a copy of a given C++ string, whose characters
  * are all lower case.
  */
-std::string string_lower( const std::string& ) ;
+string string_lower( const string& ) ;
 
 /**
  * Return a copy of a given C++ string, whose
  * characters are all upper case.
  */
-std::string string_upper( const std::string& ) ;
+string string_upper( const string& ) ;
 
 /**
  * Convert all characters of a given C++ string to
  * lower case.
  */
-void string_tolower( std::string& ) ;
+void string_tolower( string& ) ;
 
 /**
  * Convert all characters of a given C++ string to
  * upper case.
  */
-void string_toupper( std::string& ) ;
+void string_toupper( string& ) ;
 
 /**
  * Examine a given C++ string and return true if it contains
  * a time specification, return false otherwise.
  */
-bool IsTimeSpec( const std::string& ) ;
+bool IsTimeSpec( const string& ) ;
 
 /**
  * Examine a given C++ string and return true if it contains
  * all numeric characters, return false otherwise.
  */
-bool IsNumeric( const std::string& ) ;
+bool IsNumeric( const string& ) ;
 
 /**
  * Returns the time which is given as #<d/h/m/s> as seconds
  */
-time_t extractTime( std::string Length, unsigned int defaultUnits ) ;
+time_t extractTime( string Length, unsigned int defaultUnits ) ;
 
-int atoi( const std::string& ) ;
+int atoi( const string& ) ;
+
+/* itoa:  convert n to characters in s */
+string itoa(int n);
+
+/**
+ * Extract the parts of a *valid* nick!user@hostip address
+ */
+string extractNick( const string& ) ;
+
+string extractUser( const string& ) ;
+
+string extractNickUser( const string& ) ;
+
+string extractHostIP( const string& ) ;
+
+// Check for valid hostmask.
+bool validUserMask(const string& );
+
+bool validCIDRLength(const string& );
+
+string fixAddress( const string& );
+
+//Check if we have !at least! a *@hostip format
+bool isUserHost( const string& );
+
+/* Truncate a > /64 IPv6 address to a /64 cidr address
+ * or creates a between /32 - /64 valid cidr address
+ */
+unsigned char fixToCIDR64(string& );
+
+//Same as above, just returns the fixed address. Easier to use many times
+string fixToCIDR64(const string& );
+
+//Constructs a 'generally valid' banmask for a [nick!]user@hostip address
+string createBanMask(const string& );
+
+/* Create a 24/64 cidr address (optionally wildcarded)
+ * for an IPv4 or IPv6 address, or for a hostname
+ * If the parameter is a user@host it will be returned correspondingly
+ */
+string createClass(const string&, bool wildcard = false);
+
+/* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
+const string prettyDuration( int ) ;
+
+/* General assemble parameters into one result string */
+const string TokenStringsParams(const char*, ...);
 
 } // namespace gnuworld
 

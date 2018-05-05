@@ -29,18 +29,15 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
-#include        "iServer.h"
+#include	"iServer.h"
 #include	"Network.h"
-#include        "server.h"
+#include	"server.h"
 #include	"ccUser.h"
 #include	"misc.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: LEARNNETCommand.cc,v 1.16 2006/09/26 17:35:58 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld

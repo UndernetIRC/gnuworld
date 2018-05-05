@@ -32,15 +32,12 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"levels.h"
 #include	"responses.h"
 #include	"Network.h"
-
-const char TOPICCommand_cc_rcsId[] = "$Id: TOPICCommand.cc,v 1.13 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

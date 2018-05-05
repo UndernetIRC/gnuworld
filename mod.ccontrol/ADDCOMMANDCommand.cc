@@ -25,10 +25,8 @@
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
-#include        "ccUser.h"
+#include	"ccUser.h"
 #include	"misc.h"
-
-RCSTAG( "$Id: ADDCOMMANDCommand.cc,v 1.31 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

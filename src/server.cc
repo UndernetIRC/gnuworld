@@ -47,6 +47,7 @@
 #include	<cassert>
 #include	<cerrno>
 #include	<csignal>
+#include	<cstdarg>
 
 #include	"gnuworld_config.h"
 #include	"misc.h"
@@ -69,8 +70,6 @@
 #include	"ConnectionManager.h"
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
-
-RCSTAG( "$Id: server.cc,v 1.226 2010/08/31 21:16:46 denspike Exp $" ) ;
 
 namespace gnuworld
 {
@@ -1773,6 +1772,18 @@ if( !chanModes.empty() &&
 				else
 					theChan->removeMode( Channel::MODE_D ) ;
 				break ;
+			case 'c':
+				if (plus)
+					theChan->setMode(Channel::MODE_C);
+				else
+					theChan->removeMode(Channel::MODE_C);
+				break;
+			case 'C':
+				if (plus)
+					theChan->setMode(Channel::MODE_CTCP);
+				else
+					theChan->removeMode(Channel::MODE_CTCP);
+				break;
 
 			// TODO: Finish with polarity
 			// TODO: Add in support for modes b,v,o
@@ -1898,6 +1909,7 @@ PostChannelEvent( EVT_JOIN, theChan,
 	static_cast< void* >( theIClient ),
 	static_cast< void* >( theChanUser ) ) ;
 
+theClient->OnJoin(theChan->getName());
 return true ;
 }
 
@@ -2027,6 +2039,14 @@ if( theChan->getMode( Channel::MODE_REG ) )
 if( theChan->getMode( Channel::MODE_D ) )
 	{
 	modeVector.push_back( make_pair( false, Channel::MODE_D ) ) ;
+	}
+if( theChan->getMode( Channel::MODE_C ) )
+	{
+	modeVector.push_back( make_pair( false, Channel::MODE_C ) ) ;
+	}
+if( theChan->getMode( Channel::MODE_CTCP ) )
+	{
+	modeVector.push_back( make_pair( false, Channel::MODE_CTCP ) ) ;
 	}
 if( theChan->getMode( Channel::MODE_L ) )
 	{
@@ -2189,6 +2209,8 @@ chanModes[ 'R' ] = Channel::MODE_REG ;
 chanModes[ 's' ] = Channel::MODE_S ;
 chanModes[ 't' ] = Channel::MODE_T ;
 chanModes[ 'D' ] = Channel::MODE_D ;
+chanModes[ 'C' ] = Channel::MODE_C ;
+chanModes[ 'CTCP' ] = Channel::MODE_CTCP ;
 
 // This vector is used for argument-less types that can be passed
 // to OnChannelMode()
@@ -3212,6 +3234,12 @@ for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ;
 		case 'D':
 			theChan->setMode( Channel::MODE_D ) ;
 			break ;
+		case 'c':
+			theChan->setMode(Channel::MODE_C);
+			break;
+		case 'C':
+			theChan->setMode(Channel::MODE_CTCP);
+			break;
 		case 'k':
 			{
 			if( argPos >= st.size() )
@@ -3364,6 +3392,48 @@ s	<< getCharYY()
 	<< " :"
 	<< message ;
 return Write( s.str() ) ;
+}
+
+bool xServer::serverNotice( Channel* theChan, const char* format, ... )
+{
+	assert( theChan != 0 ) ;
+
+	char buf[ 1024 ] = { 0 } ;
+	va_list _list ;
+
+	va_start( _list, format ) ;
+	vsnprintf( buf, 1024, format, _list ) ;
+	va_end( _list ) ;
+
+	stringstream s;
+	s	<< getCharYY()
+		<< " O "
+		<< theChan->getName()
+		<< " :"
+		<< buf
+		<< ends;
+
+	return Write( s );
+}
+
+bool xServer::serverNotice( Channel* theChan, const string& Message)
+{
+	assert( theChan != 0 ) ;
+
+	if( Message.empty() || !isConnected() )
+	{
+		return false ;
+	}
+
+	stringstream s;
+	s	<< getCharYY()
+		<< " O "
+		<< theChan->getName()
+		<< " :"
+		<< Message
+		<< ends;
+
+	return Write( s );
 }
 
 bool xServer::XReply (iServer* theServer, const string& Routing,

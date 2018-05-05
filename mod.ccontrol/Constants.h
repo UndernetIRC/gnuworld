@@ -48,7 +48,6 @@ namespace User
 const unsigned int MaxName = 32;
 static const char Query[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers";
 }
-
 namespace gline
 {
 const unsigned int GLINE_OK =0x01;

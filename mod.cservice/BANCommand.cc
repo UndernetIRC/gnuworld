@@ -51,9 +51,8 @@
 #include	"responses.h"
 #include	"match.h"
 #include	"ip.h"
-#include	"cidr.h"
+#include	"banMatcher.h"
 
-const char BANCommand_cc_rcsId[] = "$Id: BANCommand.cc,v 1.49 2009/06/25 19:05:23 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -146,7 +145,7 @@ if(!tmpBotUser->getMode(ChannelUser::MODE_O))
 		}
 
 int oCount = 0;
-unsigned int banTime = (3*3600);
+int banTime = (3*3600);
 int banLevel = 75;
 string banReason = "No Reason";
 
@@ -254,9 +253,9 @@ if(banLevel < 1 || banLevel > level || 500 < banLevel)
 	return true;
 	}
 
-if(banTime < 300 || banTime > bot->getConfigVar("MAX_BAN_DURATION")->asInt())
+if ((banTime < 0) || ((banTime < 300) && (banTime > 0)) || banTime > (int)bot->getConfigVar("MAX_BAN_DURATION")->asInt())
 	{
-	int maxbanhours = (bot->getConfigVar("MAX_BAN_DURATION")->asInt() / 3600);
+	int maxbanhours = ((int)bot->getConfigVar("MAX_BAN_DURATION")->asInt() / 86400);
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 		language::ban_duration).c_str(),
@@ -265,13 +264,13 @@ if(banTime < 300 || banTime > bot->getConfigVar("MAX_BAN_DURATION")->asInt())
 	return true;
 	}
 
+int max_ban_reason_length = (int)bot->getConfigVar("MAX_BAN_REASON_LENGTH")->asInt();
 // TODO: Violation of the rule of numbers
-if(banReason.size() > 128)
+if((int)banReason.size() > max_ban_reason_length)
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
-		language::ban_reason_size).c_str()
-	);
+		language::ban_reason_size).c_str(),max_ban_reason_length);
 	return true;
 	}
 
@@ -302,7 +301,6 @@ if (max_bans > 0)
 		bot->Notice(theClient, "Sorry, The channel banlist is full (%i bans)",
 			ban_count);
 		return true;
-
 	}
 }
 
@@ -312,51 +310,57 @@ StringTokenizer::size_type counter = 0;
 //int max_multibans = bot->getConfigVar("MAX_MULTIBANS")->asInt();
 int max_multibans = 10;
 
-if (st2.size() > max_multibans)
+if ((int)st2.size() > max_multibans)
 	{
 	bot->Notice(theClient, "Sorry, you can only add %i bans with one BAN command.",
 			max_multibans);
 	return true;
 	}
 
-if ((st2.size() + ban_count) > max_bans)
+if (((int)st2.size() + ban_count) > max_bans)
 	{
 	bot->Notice(theClient, "Sorry, the channel banlist is full (%i set, adding %i, maximum %i)",
-		ban_count, st2.size(), max_bans);
+		ban_count, (int)st2.size(), max_bans);
 	return true;
 	}
 
 
 for( ; counter < st2.size() ; counter++ ) {
-string banTarget = st2[counter];
-elog << "ST " << counter << ": " << st2[counter] << endl;
+string banTarget = fixAddress(st2[counter]);
+elog << "cservice::BANCommand> ST " << counter << ": " << banTarget << endl;
 
-bool isNick = bot->validUserMask( banTarget ) ? false : true ;
+bool isNick = validUserMask( banTarget ) ? false : true ;
 
 if( isNick )
-	{
+{
 	iClient* aNick = Network->findNick(banTarget);
 	if(!aNick)
 		{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
 			language::cant_find_on_chan).c_str(),
-			st2[counter].c_str(), theChan->getName().c_str()
+			banTarget.c_str(), theChan->getName().c_str()
 		);
 		continue;
 		}
 
 	/* Ban and kick this user */
 	banTarget = Channel::createBan(aNick);
+}
+else
+{
+	// Validate any eventual cidr range
+	if (!validCIDRLength(st2[counter]))
+	{
+		bot->Notice(theClient, "CIDR range for %s is too wide, maximum allowed is /32", st2[counter].c_str());
+		continue;
 	}
+}
 
 /*
  *  Get a list of all bans on this channel, try and match this ban and
  *  find overlapping bans.
  */
-
-xCIDR cidr = xCIDR(banTarget);
-
 std::map < int,sqlBan* >::iterator ptr = theChan->banList.begin();
 vector <sqlBan*> oldBans;
 
@@ -375,8 +379,6 @@ while (ptr != theChan->banList.end())
 		break;
 		}
 
-	if(!cidr.GetValid())
-		{
 		/*
 		 * Overlapping ban? We just remove the ban from our internal tables, as
 		 * setting this ban to ircu will cause a default removal of overlapping
@@ -384,7 +386,7 @@ while (ptr != theChan->banList.end())
 		 */
 
 		// Matched overlapping ban.
-		if(match(banTarget, theBan->getBanMask()) == 0)
+		if (banMatch(banTarget, theBan->getBanMask()))
 			{
 			// If we have access to remove the overlapper..
 			if (theBan->getLevel() <= level)
@@ -394,7 +396,7 @@ while (ptr != theChan->banList.end())
 				}
 			}
 		// More specific ban?
-		else if ( match(theBan->getBanMask(), banTarget) == 0)
+		else if (banMatch(theBan->getBanMask(), banTarget))
 			{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
@@ -404,7 +406,6 @@ while (ptr != theChan->banList.end())
 			break;
 			}
 		// Carry on regardless.
-		} //cidr.GetValid
 	++ptr;
 	} // while()
 
@@ -474,29 +475,61 @@ newBan->setBanMask(banTarget);
 newBan->setSetBy(theUser->getUserName());
 newBan->setSetTS(bot->currentTime());
 newBan->setLevel(banLevel);
-newBan->setExpires(banTime+bot->currentTime());
+//Leave 0 to 0, meaning a permanent ban.
+if (banTime > 0)
+	banTime = banTime + bot->currentTime();
+newBan->setExpires(banTime);
 newBan->setReason(banReason);
 
 vector< iClient* > clientsToKick ;
+unsigned int takeMembersCount = (unsigned int)theChannel->userList_size();
 
 for(Channel::userIterator chanUsers = theChannel->userList_begin();
 	chanUsers != theChannel->userList_end(); ++chanUsers)
-	{
+{
 	ChannelUser* tmpUser = chanUsers->second;
 	/*
 	 *  Iterate over channel members, find a match and boot them..
 	 */
-	
-	if( newBan->getMatcher()->matches(tmpUser->getClient()) )
-		{
-		/* Don't kick +k things */
-		if( !tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
-			{
-			clientsToKick.push_back(tmpUser->getClient());
-			}
-		}
-	} // for()
+	/* Don't kick +k things */
+	if (tmpUser->getClient()->getMode(iClient::MODE_SERVICES) )
+	{
+		takeMembersCount--;
+		continue;
+	}
+	if (banMatch(newBan->getBanMask(), tmpUser->getClient()))
+	{
+		clientsToKick.push_back(tmpUser->getClient());
+	}
+} // for()
 
+/*                                       */
+/* 	  ***   Take Over Protection   ***   */
+/*                                       */
+bool allmatched = false;
+if ((takeMembersCount > 1) && (takeMembersCount == (unsigned int)clientsToKick.size()))
+	allmatched = true;
+
+if (level < 500)
+if (allmatched && validUserMask(banTarget) && ((banLevel >= 75) && (theChan->getFlag(sqlChannel::F_NOTAKE))))
+{
+	string theMessage = TokenStringsParams("Take over attempt by %s (%s) on channel %s with banmask %s",
+			theClient->getNickName().c_str(), theUser->getUserName().c_str(), theChan->getName().c_str(), banTarget.c_str());
+	bot->NoteChannelManager(theChan, theMessage.c_str());
+	//If revenge is Ignore then return
+	if (theChan->getNoTake() == 1) return true;
+	unsigned short banLevel = (unsigned short)level::set::notake;
+	unsigned int banExpire = 7 * 86400;
+		banReason = "### Take Over Protection Triggered ###";
+	string suspendReason = "\002*** TAKE OVER ATTEMPT ***\002";
+	if (theChan->getNoTake() > 1)
+		bot->doInternalBanAndKick(theChan, theClient, banLevel, banExpire, banReason);
+	if (theChan->getNoTake() > 2)
+		bot->doInternalSuspend(theChan, theClient, banLevel, banExpire, suspendReason);
+	delete newBan;
+	return true;
+}
+// *** End of Take Over Protection part **** //
 
 /*
  * If this ban level is < 75, we don't kick the user, we simply don't

@@ -24,6 +24,7 @@ nickname = X
 username = cservice
 hostname = undernet.org
 userdescription = For help type: /msg X help
+# Important: remove 'd' deaf mode if you intend to enable cservice FLOODPRO
 mode = +idk
 
 #
@@ -84,6 +85,24 @@ input_flood = 30
 output_flood = 20480
 
 #
+# Frequency in seconds to sample after clients channel flood
+#
+
+channels_flood_period = 30
+
+#
+# After how many seconds of absence of flood activity should reduce the FLOODNET value
+# Eg. 300 = 5 minutes. 
+
+floodpro_relaxtime = 300
+
+#
+# How many not(ic)es will be stored for an offline user 
+# 0 is disallowed, 7 will be used
+
+max_notes = 7;
+
+#
 # Minimum duration at which to set a topic in a non idle channel.
 # (Seconds).
 #
@@ -104,10 +123,16 @@ expire_interval = 3600
 cache_interval = 3600
 
 #
-# How often to notify/commit changes to Pending channels.
+# How often to commit changes to Pending channels.
 # (Seconds).
 
-pending_duration = 1800
+pending_duration = 180
+
+#
+# How often to notify changes of Pending channels.
+# (Seconds).
+
+pending_notif_duration = 1800
 
 #
 # How often to check if the connection to the backend has
@@ -180,6 +205,11 @@ command_logfile = cs.log
 #
 hello_block_period = 3600
 
+# Message when login-on-connect (LoC) parameters are incorrect
+# Used with iauthd-c: https://github.com/UndernetIRC/iauthd-c
+#
+loc_message = Insufficient login-on-connect (LoC) parameters - see www.undernet.org/loc/ for help
+
 #
 # What is the period (in seconds) in which we will check for
 # new webrelay messages
@@ -201,3 +231,112 @@ part_idle_chan = 172800
 
 enable_totp = 0
 
+# A welcome message for a newly accepted channel
+# For empty use '' and it means disabled
+
+welcome_newchan_message = Congratulations! Channel %s has been registered!
+
+# A welcome topic for a newly accepted channel
+# For empty use '' and it means disabled. Applies only on empty channel topic.
+# TOPIC_TRACK must be #define in \include\gnuworld_config.h
+
+welcome_newchan_topic = *** Congratulations! Your channel application has been accepted! ***
+
+# After how much seconds should expire any newly created never logged in user
+
+neverloggedin_users_expiretime = 21600
+
+# Days to expire users
+# 0 = never expire
+
+users_expire_days = 60
+
+# Day length in seconds - refers to users expiration
+
+day_seconds = 86400
+
+#              #               #
+#  *** The Judge settings ***  #
+#              #               #
+
+# Required supporters
+
+required_supporters = 5
+
+# Length of a day in seconds
+
+judge_day_seconds = 3600
+
+# If somebody supports with a 'NO' answer, the channel will be set as noreg
+# for the specified number of days
+
+noreg_days_on_nosupport = 1
+
+# If one of the supporters gets marked as Fraud during channel registration, 
+# the channel will be rejected automatically if the value is '1' enabled
+
+reject_app_on_userfraud = 1
+
+# If the value is 1 enabled then all channels at a minimum require an admin to Mark As Reviewed
+# before application can be fully processed by TheJudge
+
+require_review = 1
+
+# If the value is 1 enabled, any channel application with admin comments of objectsions will
+# require manual decision accept/reject by an admin
+
+decide_on_object = 1
+
+# If the value is 1 enabled, after all successful registration stages there will be no automatic accepts.
+# Channel will be left at to 'Ready to review' stage, waiting for an admin's final decision to accept/reject
+
+decide_on_complete = 0
+
+# After how many days will be a channel automatically rejected
+# when it was no decision made by an admin for a 'Ready to review' channel
+
+reviews_expire_time = 100
+
+# After some days, we cleanup the database from old application datas: pending channels, supporters, etc
+# But this applies *only* for Accepted OR Rejected channels!
+
+pendings_expire_time = 30
+
+# The length of the traffic checking period.
+
+max_days = 2
+
+# The number of unique IP addresses that must visit the channel during traffic checking
+
+unique_joins = 3
+
+# The total number of joins needed in traffick checking. This is a full sum.
+
+joins = 5
+
+# The number of supporters required to have at least 1 joincount during traffic checking.
+# This value is less or equal than required_supporters
+
+min_supporters = 3
+
+# The minimum joincount required for each supporter during traffic checking.
+# If any supporter has a lower joincount than this value, will result in a reject.
+
+min_supporters_joins = 1
+
+# Number of days for notification
+
+notify_days = 1
+
+# Number of days waiting for supporters confirmation
+
+support_days = 1
+
+# Reviewer's user_id
+
+reviewer_id = 1
+
+# Where to log application channel's stages, and other The Judge announces.
+# if set to 0 will log to debug channel, otherwise to admin channel
+
+log_to_admin_console = 1;

@@ -38,7 +38,6 @@
 #include	"Signal.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: Signal.cc,v 1.11 2007/09/13 02:00:45 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

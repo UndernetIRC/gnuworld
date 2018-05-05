@@ -23,14 +23,10 @@
  *
  * $Id: REHASHCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
-
 #include	"gnuworld_config.h"
 #include	"StringTokenizer.h"
-
 #include	"chanfix.h"
 #include	"responses.h"
-
-RCSTAG("$Id: REHASHCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $");
 
 namespace gnuworld
 {

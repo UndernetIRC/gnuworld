@@ -18,15 +18,12 @@
  *
  * $Id: STATSCommand.cc,v 1.7 2003/08/09 23:15:35 dan_karrels Exp $
  */
-
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"Network.h"
 
-const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.7 2003/08/09 23:15:35 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -87,8 +84,8 @@ if( st.size() >= 2 )
 			sqlPendingChannel::trafficListType::iterator tPtr = tmpPending->trafficList.begin();
 			for( ; tPtr != tmpPending->trafficList.end() ; ++tPtr )
 				{
-				bot->Notice(theClient, " - IP #: %i (Channel ID: %i) (Join Count: %i)",
-					tPtr->second->ip_number, tPtr->second->channel_id, tPtr->second->join_count);
+				bot->Notice(theClient, " - IP #: %s (Channel ID: %i) (Join Count: %i)",
+					tPtr->second->ip_number.c_str(), tPtr->second->channel_id, tPtr->second->join_count);
 				}
 		} else {
 			bot->Notice(theClient, "Channel doesn't have a pending application.");

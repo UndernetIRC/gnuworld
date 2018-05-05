@@ -178,6 +178,12 @@ public:
 		{ return realInsecureHost ;}
 
 	/**
+	 * Retrieve a string of the form: nick!user for this user.
+	 */
+	inline const std::string getNickUser() const
+		{ return (nickName + '!' + userName) ; }
+
+	/**
 	 * Retrieve a string of the form: nick!user@host for this user.
 	 */
 	inline const std::string getNickUserHost() const
@@ -281,13 +287,16 @@ public:
 		{ return connectTime ; }
 
 	/**
-	 * Retrieve the iClient's IP.  A network byte ordered
-	 * one-word mask is returned.
-	 * TODO: Make sure that a word is 32 bits, adjusting where
-	 * necessary for > 32bit architectures.
+	 * Retrieve the iClient's IP. Network byte ordered
 	 */
-	inline const unsigned int& getIP() const
+	inline const irc_in_addr& getIP() const
 		{ return IP ; }
+
+	/*
+	 * Cut down all the numeric conversions, get it directly
+	 */
+	inline const std::string& getNumericIP() const
+		{ return numericIP ; }
 
 	/**
 	 * Obtain const iterator to beginning of this user's channel
@@ -631,10 +640,15 @@ protected:
 	std::string	userName ;
 
 	/**
-	 * This client's 32 bit IP, stored in
+	 * This client's 128 bit IP, stored in
 	 * network (bigendian) byte order.
 	 */
-	unsigned int	IP ;
+	irc_in_addr	IP ;
+
+	/*
+	 * Converted to string, for smoother usage everywhere
+	 */
+	std::string	numericIP;
 
 	/**
 	 * This client's hostname as it appears to network users.

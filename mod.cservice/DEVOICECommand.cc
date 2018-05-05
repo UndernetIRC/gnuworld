@@ -36,9 +36,7 @@
 #include	"levels.h"
 #include	"responses.h"
 
-using std::map ;
-
-const char DEVOICECommand_cc_rcsId[] = "$Id: DEVOICECommand.cc,v 1.10 2003/06/28 01:21:20 dan_karrels Exp $" ;
+using std::map;
 
 namespace gnuworld
 {
@@ -206,8 +204,30 @@ bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 		counter++;
 	}
 
-	// devoice them.
-	bot->DeVoice(tmpChan, devoiceList);
+	// Avoid if there are no modes
+	if (!devoiceList.empty())
+	{
+		// devoice them.
+		bot->DeVoice(tmpChan, devoiceList);
+
+		// Send action opnotice to channel if OPLOG is enabled
+		if (theChan->getFlag(sqlChannel::F_OPLOG))
+		{
+			string devoiceStr;
+			vector<iClient*>::iterator itr = devoiceList.begin();
+			while (itr != devoiceList.end())
+			{
+				iClient* tmpUser = *itr;
+				devoiceStr += tmpUser->getNickName().c_str() + string(", ");
+				++itr;
+			}
+			devoiceStr = devoiceStr.substr(0, devoiceStr.length() - 2);
+			bot->NoticeChannelOps(theChan->getName(),
+				"%s (%s) devoiced: %s",
+				theClient->getNickName().c_str(), theUser->getUserName().c_str(), devoiceStr.c_str());
+		}
+	}
+
 	return true ;
 }
 

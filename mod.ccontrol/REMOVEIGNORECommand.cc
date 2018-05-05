@@ -21,17 +21,13 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Network.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: REMOVEIGNORECommand.cc,v 1.11 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

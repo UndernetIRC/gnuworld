@@ -30,7 +30,7 @@ COPY "translations" FROM stdin;
 1	17	AUTHENTICATION FAILED as %s (Invalid Password)	31337	0
 1	18	I'm not in that channel!	31337	0
 1	19	Invalid banlevel range. Valid range is 1-%i.	31337	0
-1	20	Invalid ban duration. Your ban duration can be a maximum of %d hours.	31337	0
+1	20	Invalid ban duration. Your ban duration can be a maximum of %d days.	31337	0
 1	21	Ban reason cannot exceed 128 chars	31337	0
 1	22	Specified ban is already in my banlist!	31337	0
 1	23	The ban %s is already covered by %s	31337	0
@@ -116,10 +116,10 @@ COPY "translations" FROM stdin;
 1	103	MASSDEOPPRO for %s is set to %d	31337	0
 1	104	value of FLOODPRO has to be 0-7	31337	0
 1	105	FLOODPRO for %s is set to %d	31337	0
-1	106	The DESCRIPTION can be a maximum of 80 chars!	31337	0
+1	106	The DESCRIPTION can be a maximum of %i chars!	31337	0
 1	107	DESCRIPTION for %s is cleared.	31337	0
 1	108	DESCRIPTION for %s is: %s	31337	0
-1	109	The URL can be a maximum of 75 chars!	31337	0
+1	109	The URL can be a maximum of %i chars!	31337	0
 1	110	URL for %s is cleared.	31337	0
 1	111	URL for %s is: %s	31337	0
 1	112	The string of keywords cannot exceed 80 chars!	31337	0
@@ -187,6 +187,17 @@ COPY "translations" FROM stdin;
 1	175	Your NOADDUSER setting is now OFF.	31337	0
 1	176	There were %d failed login attempts since your last successful login.	31337	0
 1	177	AUTHENTICATION FAILED as %s (Exceeded maximum login failures for this session)	31337	0
+1	184	The NOVOICE flag is set on %s	31337	0
+1	185	Your access on %s has been suspended.	31337	0
+1	186	Your suspension on %s has been cancelled.	31337	0
+1	187	You have been added to channel %s with access level %i	31337	0
+1	188	Your access on %s has been modified from %i to %i	31337	0
+1	189	Your access from %s has been removed.	31337	0
+1	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+1	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+1	192	Your reason must be %i - %i characters long.	31337	0
+1	193	Reason: %s	31337	0
+1	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- French language definition.
@@ -214,7 +225,7 @@ COPY "translations" FROM stdin;
 2	17	AUTHENTIFICATION REFUSÉE pour %s (Mot de passe Invalide)	31337	0
 2	18	Je ne suis pas dans ce canal!!	31337	0
 2	19	Niveau de ban invalide. Niveau valide: entre 1 et %i.	31337	0
-2	20	Durée du ban invalide. La durée maximale est de %d heures.	31337	0
+2	20	Durée du ban invalide. La durée maximale est de %d journé.	31337	0
 2	21	La raison d'un ban ne peut dépasser 128 caractères.	31337	0
 2	22	Ce ban est déjà dans ma liste!	31337	0
 2	23	Le ban %s est dejà couvert par %s	31337	0
@@ -300,10 +311,10 @@ COPY "translations" FROM stdin;
 2	103	MASSDEOPPRO de %s a été configuré à %d	31337	0
 2	104	La valeur de FLOODPRO doit être comprise entre 0 et 7	31337	0
 2	105	FLOODPRO de %s a été configuré à %d	31337	0
-2	106	La DESCRIPTION ne doit pas dépasser 80 caractères.	31337	0
+2	106	La DESCRIPTION ne doit pas dépasser %i caractères.	31337	0
 2	107	La DESCRIPTION de %s a été éffacée.	31337	0
 2	108	La DESCRIPTION de %s est: %s	31337	0
-2	109	L'URL ne doit pas dépasser 75 caractères.	31337	0
+2	109	L'URL ne doit pas dépasser %i caractères.	31337	0
 2	110	L'URL de %s a été effacée.	31337	0
 2	111	L'URL de %s est: %s	31337	0
 2	112	Les KEYWORDS (Mots-Clés) ne doivent pas dépasser 80 caractères.	31337	0
@@ -364,6 +375,17 @@ COPY "translations" FROM stdin;
 2	168	Cette commande est réservée aux Opérateurs IRC	31337	0
 2	169	Je ne suis pas op sur %s	31337	0
 2	170	%s pour %i minutes	31337	0
+2	184	The NOVOICE flag is set on %s	31337	0
+2	185	Your access on %s has been suspended.	31337	0
+2	186	Your suspension on %s has been cancelled.	31337	0
+2	187	You have been added to channel %s with access level %i	31337	0
+2	188	Your access on %s has been modified from %i to %i	31337	0
+2	189	Your access from %s has been removed.	31337	0
+2	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+2	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+2	192	Your reason must be %i - %i characters long.	31337	0
+2	193	Reason: %s	31337	0
+2	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Danish language definition.
@@ -389,7 +411,7 @@ COPY "translations" FROM stdin;
 3	17	AUTORISATION MISLYKKEDES som %s (Ugyldigt Kodeord)	31337	0
 3	18	Jeg er ikke i den kanal!	31337	0
 3	19	Ugyldigt banlevel område. Gyldigt område er 1-%i.	31337	0
-3	20	Ugyldigt ban varighed. Din ban varighed kan max bestå af %d timer.	31337	0
+3	20	Ugyldigt ban varighed. Din ban varighed kan max bestå af %d dage.	31337	0
 3	21	Ban grund kan ikke overtræde 128 karaktere	31337	0
 3	22	Specifiseret ban er allerede i min banliste!	31337	0
 3	23	Ban'et %s er allerede dækket af %s	31337	0
@@ -475,10 +497,10 @@ COPY "translations" FROM stdin;
 3	103	MASSDEOPPRO for %s er sat til %d	31337	0
 3	104	Værdi af FLOODPRO skal være 0-7	31337	0
 3	105	FLOODPRO for %s er sat til %d	31337	0
-3	106	DESKRIPTION kan max have 80 karaktere!	31337	0
+3	106	DESKRIPTION kan max have %i karaktere!	31337	0
 3	107	DESKRIPTION for %s er fjernet.	31337	0
 3	108	DESKRIPTION for %s er: %s	31337	0
-3	109	URL'en kan max have 75 karaktere!	31337	0
+3	109	URL'en kan max have %i karaktere!	31337	0
 3	110	URL for %s er fjernet.	31337	0
 3	111	URL for %s er: %s	31337	0
 3	112	Strengen af nøgleord kan ikke overtræde 80 karaktere!	31337	0
@@ -539,6 +561,389 @@ COPY "translations" FROM stdin;
 3	168	Denne kommando er reserveeret til IRC Operatører	31337	0
 3	169	Jeg er ikke op'et på %s	31337	0
 3	170	%s for %i minuter	31337	0
+3	184	The NOVOICE flag is set on %s	31337	0
+3	185	Your access on %s has been suspended.	31337	0
+3	186	Your suspension on %s has been cancelled.	31337	0
+3	187	You have been added to channel %s with access level %i	31337	0
+3	188	Your access on %s has been modified from %i to %i	31337	0
+3	189	Your access from %s has been removed.	31337	0
+3	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+3	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+3	192	Your reason must be %i - %i characters long.	31337	0
+3	193	Reason: %s	31337	0
+3	194	UNSUSPENDED - %s	31337	0
+\.
+
+-- Dutch language definition.
+-- 9/2/02 - Eagle-One (Ken Geboers) <Eagle-One@pandora.be>.
+
+COPY "translations" FROM stdin;
+4	1	Sorry, je bent reeds ingelogd als %s	31337	0
+4	2	VERIFICATIE SUCCESVOL als %s	31337	0
+4	3	Sorry, je hebt te weinig toegang om dat commando uit te voeren	31337	0
+4	4	Sorry, het kanaal %s is leeg	31337	0
+4	5	Ik zie %s nergens	31337	0
+4	6	Ik kan %s niet vinden in kanaal %s	31337	0
+4	7	Het kanaal %s lijkt niet geregistreerd te zijn	31337	0
+4	8	Je hebt operator status gekregen van %s (%s)	31337	0
+4	9	Je hebt voice status gekregen van %s (%s)	31337	0
+4	10	%s: Je bent niet in dat kanaal	31337	0
+4	11	%s heeft reeds operator status in %s	31337	0
+4	12	%s heeft reeds voice status in %s	31337	0
+4	13	Je operator status is weggenomen door %s (%s)	31337	0
+4	14	Je voice status is weggenomen door %s (%s)	31337	0
+4	15	%s heeft geen operator status in %s	31337	0
+4	16	%s heeft geen voice status in %s	31337	0
+4	17	VERIFICATIE MISLUKT als %s (ongeldig wachtwoord)	31337	0
+4	18	Ik ben niet in dat kanaal!	31337	0
+4	19	Ongeldig banniveau. Geldige breedte is 1-%i.	31337	0
+4	20	Ongeldige banlengte. Je banlengte kan maximum %d uur dagen.	31337	0
+4	21	Banreden kan de 128 karakters niet overschrijden	31337	0
+4	22	Gespecifiëerde ban staat reeds in mijn banlijst!	31337	0
+4	23	De ban %s wordt reeds gedekt door %s	31337	0
+4	24	Ongeldig minimum niveau.	31337	0
+4	25	Ongeldig maximum niveau.	31337	0
+4	26	GEBRUIKER: %s TOEGANG: %s %s	31337	0
+4	27	KANAAL: %s -- AUTOMODE: %s	31337	0
+4	28	LAATST AANGEPAST: %s (%s geleden)	31337	0
+4	29	** GESCHORST ** - vervalt in %s (Niveau %i)	31337	0
+4	30	LAATST GEZIEN: %s geleden.	31337	0
+4	31	Er zijn meer dan %d bijhorende records.	31337	0
+4	32	Gelieve uw zoekopdracht te beperken.	31337	0
+4	33	Einde toegangslijst	31337	0
+4	34	Geen bijhorende records!	31337	0
+4	35	Kan geen gebruiker toevoegen met gelijke of hogere toegang dan die van jou.	31337	0
+4	36	Ongeldig toegangsniveau.	31337	0
+4	37	%s is reeds toegevoegd aan %s met toegangsniveau %i.	31337	0
+4	38	Gebruiker %s toegevoegd aan %s met toegangsniveau %i	31337	0
+4	39	Er ging iets mis: %s	31337	0
+4	40	%s: Einde van de banlijst	31337	0
+4	41	Onmogelijk om de details van de gebruiker te zien (Onzichtbaar)	31337	0
+4	42	Informatie over: %s (%i)	31337	0
+4	43	Momenteel ingelogd als: %s	31337	0
+4	44	URL: %s	31337	0
+4	45	Taal: %i	31337	0
+4	46	Kanalen: %s	31337	0
+4	47	Invoer Flood Points: %i	31337	0
+4	48	Uitvoer Flood (Bytes): %i	31337	0
+4	49	%s is geregistreerd door:	31337	0
+4	50	%s - laatst gezien: %s geleden	31337	0
+4	51	Omschr: %s	31337	0
+4	52	Mij flooden? Ik ga niet meer naar jou luisteren :p	31337	0
+4	53	Ik denk dat ik je een beetje te veel data heb gestuurd, ik ga je voor een tijdje negeren.	31337	0
+4	54	Onvolledig commando	31337	0
+4	55	Om %s te gebruiken, moet je /msg %s@%s gebruiken	31337	0
+4	56	Sorry, je moet ingelogd zijn om dit commando te gebruiken.	31337	0
+4	57	Het kanaal %s is geschorst door een CService Administrator.	31337	0
+4	58	Je toegang in %s is geschorst.	31337	0
+4	59	De NOOP instelling is geactiveerd in %s	31337	0
+4	60	De STRICTOP instelling is geactiveerd in %s	31337	0
+4	61	Je hebt zojuist bij meer dan %i mensen de operator status weggenomen	31337	0
+4	62	SYNTAXIS: %s	31337	0
+4	63	Tijdelijk je toegang in %s verhoogd naar %i	31337	0
+4	64	%s is geregistreerd.	31337	0
+4	65	%s is niet geregistreerd.	31337	0
+4	66	Ik denk niet dat %s dat zou appreciëren.	31337	0
+4	67	\002*** Banlijst voor kanaal %s ***\002	31337	0
+4	68	%s %s Niveau: %i	31337	0
+4	69	TOEGEVOEGD DOOR: %s (%s)	31337	0
+4	70	SINDS: %s	31337	0
+4	71	VERVALT: %s	31337	0
+4	72	\002*** EINDE ***\002	31337	0
+4	73	Ik weet niet wie %s is.	31337	0
+4	74	Je bent niet meer ingelogd bij mij.	31337	0
+4	75	%s schijnt geen toegang te hebben in %s.	31337	0
+4	76	Kan geen gebruiker aanpassen met gelijke of hogere toegang dan die van jou.	31337	0
+4	77	Kan geen gebruiker een hogere of gelijke toegang geven dan die van jou.	31337	0
+4	78	%s\'s toegangsniveau aangepast in kanaal %s naar %i	31337	0
+4	79	AUTOMODE van %s aangepast naar OP in kanaal %s	31337	0
+4	80	AUTOMODE van %s aangepast naar VOICE in kanaal %s	31337	0
+4	81	AUTOMODE van %s aangepast naar NONE in kanaal %s	31337	0
+4	82	Je wachtwoord kan niet je gebruikersnaam of actuele nick zijn - syntaxis is: NEWPASS <nieuw wachtwoord>	31337	0
+4	83	Wachtwoord succesvol veranderd.	31337	0
+4	84	De NOOP instelling is geactiveerd in %s	31337	0
+4	85	De STRICTOP instelling is geactiveerd in %s (en %s is niet ingelogd)	31337	0
+4	86	De STRICTOP instelling is geactiveerd in %s (en %s heeft niet genoeg toegang)	31337	0
+4	87	Kanaal %s verwijderd	31337	0
+4	88	%s is reeds bij mij geregistreerd.	31337	0
+4	89	Ongeldige kanaalnaam.	31337	0
+4	90	Kanaal %s geregistreerd	31337	0
+4	91	%s verwijderd uit mijn stilzwijgenlijst	31337	0
+4	92	Kan %s niet in mijn stilzwijgenlijst vinden	31337	0
+4	93	Kan geen gebruiker verwijderen met een hogere of gelijke toegang dan die van jou	31337	0
+4	94	Je kan jezelf niet verwijderen uit een kanaal dat je bezit	31337	0
+4	95	Gebruiker %s verwijderd uit %s	31337	0
+4	96	Je INVISIBLE instelling staat nu AAN	31337	0
+4	97	Je INVISIBLE instelling staat nu AF	31337	0
+4	98	%s voor %s is %s	31337	0
+4	99	waarde van %s moet ON of OFF zijn	31337	0
+4	100	Ongeldige USERFLAGS instelling. Juiste waarden zijn: NONE, OP, VOICE.	31337	0
+4	101	USERFLAGS voor %s is %s	31337	0
+4	102	Waarde van MASSDEOPPRO moet zijn: 0-7	31337	0
+4	103	MASSDEOPPRO voor %s is gezet op %d	31337	0
+4	104	Waarde van FLOODPRO moet zijn: 0-7	31337	0
+4	105	FLOODPRO voor %s is gezet op %d	31337	0
+4	106	De DESCRIPTION mag maximum %i karakters zijn!	31337	0
+4	107	DESCRIPTION voor %s is leeggemaakt.	31337	0
+4	108	DESCRIPTION voor %s is: %s	31337	0
+4	109	De URL mag maximum %i karakters zijn!	31337	0
+4	110	URL voor %s is leeggemaakt.	31337	0
+4	111	URL voor %s is: %s	31337	0
+4	112	De reeks sleutelwoorden mag de 80 karakters niet overschrijden!	31337	0
+4	113	KEYWORDS voor %s zijn: %s	31337	0
+4	114	Taal is gewijzigd naar %s.	31337	0
+4	115	ERROR: Ongeldige taal-selectie.	31337	0
+4	116	Kan kanaal %s niet vinden op het netwerk!	31337	0
+4	117	ERROR: Ongeldige kanaal-instelling.	31337	0
+4	118	Negeerlijst:	31337	0
+4	119	Negeerlijst is leeg	31337	0
+4	120	-- Einde van negeerlijst	31337	0
+4	121	CMaster kanaal Services interne status:	31337	0
+4	122	[        Kanaal Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
+4	123	[     Gebruiker Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
+4	124	[Toegangsniveau Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
+4	125	[           Ban Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
+4	126	Laatst ontvangen User NOTIFY: %i	31337	0
+4	127	Laatst ontvangen Kanaal NOTIFY: %i	31337	0
+4	128	Laatst ontvangen Niveau NOTIFY: %i	31337	0
+4	129	Laatst ontvangen Ban NOTIFY: %i	31337	0
+4	130	Gebruikelijke toegewezen data containers: %i	31337	0
+4	131	\002Uptime:\002 %s	31337	0
+4	132	Kanaal %s heeft %d gebruikers (%i operators)	31337	0
+4	133	Modes zijn: %s	31337	0
+4	134	Gebruikte instellingen: %s	31337	0
+4	135	Kan geen gebruiker schorsen met een gelijke of hogere toegang dan die van jou.	31337	0
+4	136	Ongeldige tijdseenheden	31337	0
+4	137	Ongeldige schorslengte.	31337	0
+4	138	SCHORSING voor %s is geannuleerd	31337	0
+4	139	%s is is reeds geschorst in %s	31337	0
+4	140	SCHORSING voor %s zal vervallen in %s	31337	0
+4	141	ERROR: Topic mag de 145 karakters niet overschrijden	31337	0
+4	142	Je hebt onvoldoende toegang om de ban %s uit %s\'s database te verwijderen	31337	0
+4	143	%i ban(s) verwijderd die overeenkwam(en) met %s	31337	0
+4	144	Je tijdelijke toegang van %i in kanaal %s verwijderd	31337	0
+4	145	Je schijnt geen geforceerde toegang in %s te hebben, misschien is hij vervallen?	31337	0
+4	146	%s is niet geschorst in %s	31337	0
+4	147	%s is een IRCoperator	31337	0
+4	148	%s is NIET ingelogd.	31337	0
+4	149	%s is ingelogd als %s%s	31337	0
+4	150	%s is een Officiële CService Vertegenwoordiger%s en is ingelogd als %s	31337	0
+4	151	%s is een Officiële CService Administrator%s en is ingelogd als %s	31337	0
+4	152	%s is een Officiële CService Ontwikkelaar%s en is ingelogd als %s	31337	0
+4	153	Er zijn meer dan %i records die overeenstemmen met [%s]	31337	0
+4	154	Gelieve je zoekopdracht te beperken	31337	0
+4	155	Geen overeenkomstige records voor [%s]	31337	0
+4	156	%s: Kanaalmodes zijn gereset.	31337	0
+4	158	Ongeldige optie.	31337	0
+4	159	%s is een Officiële Undernet Service Bot	31337	0
+4	160	%s is een Officiële Coder-Com Vertegenwoordiger%s en is ingelogd als %s	31337	0
+4	161	%s is een Officiële Coder-Com Medewerker%s en is ingelogd als %s	31337	0
+4	162	%s is een Officiële Coder-Com Ontwikkelaar%s en is ingelogd als %s	31337	0
+4	163	%s is een Officiële Coder-Com Veteraan%s en is ingelogd als %s	31337	0
+4	164	 en een IRCoperator	31337	0
+4	165	Ban %s toegevoegd aan %s met niveau %i	31337	0
+4	166	%s: banlijst is leeg.	31337	0
+4	167	Ik ben reeds in dat kanaal!	31337	0
+4	168	Dit commando is enkel voor IRCoperators	31337	0
+4	169	Ik heb geen operator status in %s	31337	0
+4	170	%s voor %i minuten	31337	0
+4	184	The NOVOICE flag is set on %s	31337	0
+4	185	Your access on %s has been suspended.	31337	0
+4	186	Your suspension on %s has been cancelled.	31337	0
+4	187	You have been added to channel %s with access level %i	31337	0
+4	188	Your access on %s has been modified from %i to %i	31337	0
+4	189	Your access from %s has been removed.	31337	0
+4	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+4	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+4	192	Your reason must be %i - %i characters long.	31337	0
+4	193	Reason: %s	31337	0
+4	194	UNSUSPENDED - %s	31337	0
+\.
+
+-- German language definition.
+-- 16/8/2002 volta <volta2@gmx.de>
+
+COPY "translations" FROM stdin;
+5	1	Verzeihung, aber du bist schon eingeloggt als %s	31337	0
+5	2	AUTHENTIFIKATION ERFOLGREICH als %s	31337	0
+5	3	Verzeihung, aber du hast nicht genug Berechtigung um diesen Befehl auszuführen	31337	0
+5	4	Verzeihung, aber der Channel %s ist leer	31337	0
+5	5	Ich sehe %s nirgendswo	31337	0
+5	6	Ich kann %s nicht im Channel %s finden	31337	0
+5	7	Der Channel %s scheint nicht registriert zu sein	31337	0
+5	8	Du wurdest von %s (%s) in %s geopt	31337	0
+5	9	Du wurdest von %s (%s) in %s gevoict	31337	0
+5	10	%s: Du bist nicht in diesen Channel	31337	0
+5	11	%s ist bereits Op in %s	31337	0
+5	12	%s ist bereits Voice in %s	31337	0
+5	13	Du wurdest von %s (%s) in %s gedeopt	31337	0
+5	14	Du wurdest von %s (%s) in %s gedevoict	31337	0
+5	15	%s ist nicht Op in %s	31337	0
+5	16	%s ist nicht Voice in %s	31337	0
+5	17	AUTHENTIFIKATION FEHLGESCHLAGEN als %s (Falsches Passwort)	31337	0
+5	18	Ich bin nicht in diesem Channel!	31337	0
+5	19	Ungültiges Banlevel. Gültig ist 1-%i.	31337	0
+5	20	Ungültige Banzeit. Deine Bandauer kann maximal %d Tage sein.	31337	0
+5	21	Bangrund darf nicht 128 Zeichen überschreiten	31337	0
+5	22	Spezifizierter Ban ist bereits in der Banliste!	31337	0
+5	23	Der Ban %s ist bereits eingedeckt von %s	31337	0
+5	24	Ungültiges Minimallevel.	31337	0
+5	25	Ungültiges Maximallevel.	31337	0
+5	26	BENUTZER: %s LEVEL: %s %s	31337	0
+5	27	CHANNEL: %s -- AUTOMODE: %s	31337	0
+5	28	ZULETZT VERÄNDERT: %s (vor %s)	31337	0
+5	29	** SUSPENDIERT ** - Verfällt in %s (Level %i)	31337	0
+5	30	ZULETZT GESEHEN: vor %s.	31337	0
+5	31	Es gibt mehr als %d passende Einträge.	31337	0
+5	32	Bitte begrenze deine Anfrage.	31337	0
+5	33	Ende der Benutzerliste	31337	0
+5	34	Kein passender Eintrag!	31337	0
+5	35	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes hinzufügen.	31337	0
+5	36	Ungültiges Berechtigungslevel.	31337	0
+5	37	%s ist bereits in der Benutzerliste von %s mit Level %i.	31337	0
+5	38	Habe Benutzer %s in %s mit Level %i hinzugefügt	31337	0
+5	39	Irgendetwas lief falsch: %s	31337	0
+5	40	%s: Ende der Banliste	31337	0
+5	41	Nicht in der Lage die Benutzerdetails zu zeigen (unsichtbar)	31337	0
+5	42	Informationen über: %s (%i)	31337	0
+5	43	Zur Zeit eingeloggt via: %s	31337	0
+5	44	URL: %s	31337	0
+5	45	Sprache: %i	31337	0
+5	46	Channels: %s	31337	0
+5	47	Eingabefloodpunkte: %i	31337	0
+5	48	Ausgabeflood (Bytes): %i	31337	0
+5	49	%s ist registriert von:	31337	0
+5	50	%s - zuletzt gesehen: vor %s	31337	0
+5	51	Beschreibung: %s	31337	0
+5	52	Du willst mich flooden? Ich werde dir nicht weiter zuhören	31337	0
+5	53	Ich glaube ich habe dir zu viele Daten geschickt. Ich werde dich eine Weile lang ignorieren.	31337	0
+5	54	Unvollständiger Befehl	31337	0
+5	55	Um %s zu benutzen, musst du mir via /msg %s@%s schreiben	31337	0
+5	56	Verzeihung, aber du musst eingeloggt sein um diesen Befehl zu benutzen.	31337	0
+5	57	Der Channel %s wurde von einen CService Administrator suspendiert.	31337	0
+5	58	Deine Berechtigung in %s wurde suspendiert.	31337	0
+5	59	Die NOOP Einstellung wurde in %s gesetzt	31337	0
+5	60	Die STRICTOP Einstellung ist in %s gesetzt	31337	0
+5	61	Du hast gerade mehr als %i User gedeopt	31337	0
+5	62	SYNTAX: %s	31337	0
+5	63	Habe deine Berechtigung in %s vorübergehend auf %i erhöht	31337	0
+5	64	%s ist registriert.	31337	0
+5	65	%s ist nicht registriert.	31337	0
+5	66	Ich denke nicht, daß %s dies schätzen würde.	31337	0
+5	67	\002*** Banliste für den Channel %s ***\002	31337	0
+5	68	%s %s Level: %i	31337	0
+5	69	HINZUGEFÜGT VON: %s (%s)	31337	0
+5	70	SEIT: %s	31337	0
+5	71	VERFÄLLT: %s	31337	0
+5	72	\002*** ENDE ***\002	31337	0
+5	73	Ich weiß nicht wer %s ist.	31337	0
+5	74	Du bist nicht mehr bei mir authentifiziert.	31337	0
+5	75	%s scheint keine Berechtigung in %s zu haben.	31337	0
+5	76	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes modifizieren.	31337	0
+5	77	Kann keinen Benutzer ein gleiches oder höheres Level als dein eigenes geben.	31337	0
+5	78	Habe %s's Berechtigungslevel im Channel %s zu %i modifizert	31337	0
+5	79	Habe AUTOMODE für %s auf OP im Channel %s gesetzt	31337	0
+5	80	Habe AUTOMODE für %s auf VOICE im Channel %s gesetzt	31337	0
+5	81	Habe AUTOMODE für %s auf NONE im Channel %s gesetzt	31337	0
+5	82	Dein Passwort kann nicht dein Username oder aktueller Nickname sein - Syntax ist: NEWPASS <neues Passwort>	31337	0
+5	83	Passwort wurde erfolgreich geändert.	31337	0
+5	84	Die NOOP Einstellung ist in %s gesetzt	31337	0
+5	85	Die STRICTOP Einstellung ist in %s gesetzt (und %s ist nicht authentifiziert)	31337	0
+5	86	Die STRICTOP Einstellung ist in %s gesetzt (und %s hat nicht genügend Berechtigung)	31337	0
+5	87	Habe Channel %s bereinigt	31337	0
+5	88	%s ist bereits mit mir registriert.	31337	0
+5	89	Ungültiger Channelname.	31337	0
+5	90	Habe Channel %s registriert	31337	0
+5	91	Habe %s von meiner Silenceliste entfernt	31337	0
+5	92	Kann %s nicht in meiner Silenceliste finden	31337	0
+5	93	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes entfernen	31337	0
+5	94	Du kannst dich nicht selbst von einen Channel entfernen, den du selber besitzt	31337	0
+5	95	Habe Benutzer %s von %s entfernt	31337	0
+5	96	Deine INVISIBLE Einstellung ist jetzt AN.	31337	0
+5	97	Deine INVISIBLE Einstellung ist jetzt AUS.	31337	0
+5	98	%s für %s ist %s	31337	0
+5	99	Wert für %s muß ON oder OFF sein.	31337	0
+5	100	Ungültige USERFLAG Einstellung. Korrekte Werte sind NONE, OP, VOICE.	31337	0
+5	101	USERFLAGS für %s ist %s	31337	0
+5	102	Wert für MASSDEOPPRO muß 0-7 sein	31337	0
+5	103	MASSDEOPPRO für %s ist auf %d gesetzt	31337	0
+5	104	Wert für FLOODPRO muß 0-7 sein	31337	0
+5	105	FLOODPRO für %s ist auf %d gesetzt	31337	0
+5	106	DESCRIPTION kann maximal %i Zeichen sein!	31337	0
+5	107	DESCRIPTION für %s wurde gelöscht.	31337	0
+5	108	DESCRIPTION für %s ist: %s	31337	0
+5	109	URL kann maximal %i Zeichen sein!	31337	0
+5	110	URL für %s wurde gelöscht.	31337	0
+5	111	URL für %s ist: %s	31337	0
+5	112	Die Zeichenkette der Schlüsselwörter darf nicht 80 Zeichen überschreiten!	31337	0
+5	113	KEYWORDS für %s sind: %s	31337	0
+5	114	Sprache wurde auf %s gesetzt.	31337	0
+5	115	FEHLER: Ungültige Sprachwahl.	31337	0
+5	116	Kann Channel %s nicht auf dem Netzwerk lokalisieren!	31337	0
+5	117	FEHLER: Ungültige Channeleinstellung.	31337	0
+5	118	Ignoreliste:	31337	0
+5	119	Ignoreliste ist leer	31337	0
+5	120	-- Ende der Ignoreliste	31337	0
+5	121	CMaster Channel Services interner Status:	31337	0
+5	122	[           Channel Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
+5	123	[              User Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
+5	124	[Berechtigungslevel Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
+5	125	[               Ban Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
+5	126	Letzte empfangene Benutzerbenachrichtigung: %i	31337	0
+5	127	Letzte empfangene Channelbenachrichtigung: %i	31337	0
+5	128	Letzte empfangene Levelbenachrichtigung: %i	31337	0
+5	129	Letzte empfangene Banbenachrichtigung: %i	31337	0
+5	130	Vordefinierte Datencontainer zugewiesen: %i	31337	0
+5	131	\002Uptime:\002 %s	31337	0
+5	132	Channel %s hat %d User (%i Operatoren)	31337	0
+5	133	Mode ist: %s	31337	0
+5	134	Einstellungen: %s	31337	0
+5	135	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes suspendieren	31337	0
+5	136	Ungültige Zeiteinheiten	31337	0
+5	137	Ungültige Suspendierungslänge.	31337	0
+5	138	SUSPENDIERUNG für %s wurde aufgehoben	31337	0
+5	139	%s ist bereits suspendiert in %s	31337	0
+5	140	SUSPENDIERUNG für %s wird in %s verfallen	31337	0
+5	141	FEHLER: Topic darf nicht 145 Zeichen überschreiten	31337	0
+5	142	Du hast nicht genug Berechtigung um den Ban %s von %s's Database zu entfernen	31337	0
+5	143	Habe %i Bans entfernt, die auf %s zutrafen	31337	0
+5	144	Habe deine vorübergehende Berechtigung von %i vom Channel %s entfernt	31337	0
+5	145	Es scheint so als hättest du keine erzwungene Berechtigung in %s, vielleicht ist sie verfallen?	31337	0
+5	146	%s ist nicht suspendiert in %s	31337	0
+5	147	%s ist ein IRC Operator	31337	0
+5	148	%s ist NICHT eingeloggt.	31337	0
+5	149	%s ist eingeloggt als %s%s	31337	0
+5	150	%s ist ein offizieller CService Vertreter%s und eingeloggt als %s	31337	0
+5	151	%s ist ein offizieller CService Administrator%s und eingeloggt als %s	31337	0
+5	152	%s ist ein offizieller CService Entwickler%s und eingeloggt als %s	31337	0
+5	153	Es gibt mehr als %i passende Einträge [%s]	31337	0
+5	154	Bitte begrenze deine Suchmaske	31337	0
+5	155	Keine passenden Einträge für [%s]	31337	0
+5	156	%s: Habe Channelmodes gelöscht.	31337	0
+5	158	Ungültige Option.	31337	0
+5	159	%s ist ein offizieller Undernet Service Bot.	31337	0
+5	160	%s ist ein offizieller Coder-Com Vertreter%s und eingeloggt als %s	31337	0
+5	161	%s ist ein offizieller Coder-Com Mitarbeiter%s und eingeloggt als %s	31337	0
+5	162	%s ist ein offizieller Coder-Com Entwickler%s und eingeloggt als %s	31337	0
+5	163	%s ist ein offizieller Coder-Com Dienstältester%s und eingeloggt als %s	31337	0
+5	164	 und ein IRC Operator	31337	0
+5	165	Habe den ban %s zu %s mit Level %i hinzugefügt	31337	0
+5	166	%s: Banliste ist leer.	31337	0
+5	167	Ich bin bereits in diesen Channel!	31337	0
+5	168	Dieser Befehl ist für IRC Operatoren reserviert	31337	0
+5	169	Ich bin nicht geopt in %s	31337	0
+5	170	%s für %i Minuten	31337	0
+5	184	The NOVOICE flag is set on %s	31337	0
+5	185	Your access on %s has been suspended.	31337	0
+5	186	Your suspension on %s has been cancelled.	31337	0
+5	187	You have been added to channel %s with access level %i	31337	0
+5	188	Your access on %s has been modified from %i to %i	31337	0
+5	189	Your access from %s has been removed.	31337	0
+5	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+5	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+5	192	Your reason must be %i - %i characters long.	31337	0
+5	193	Reason: %s	31337	0
+5	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Portuguese language definition.
@@ -564,7 +969,7 @@ COPY "translations" FROM stdin;
 6	17	FALHA NA AUTENTICAÇÃO como %s (Senha inválida)	31337	0
 6	18	Eu não estou neste canal!	31337	0
 6	19	Escala inválida de nívelban. Escala válida é 1-%i.	31337	0
-6	20	Duração de ban inválida. Sua duração de ban aplicada pode ser de no máximo %d horas.	31337	0
+6	20	Duração de ban inválida. Sua duração de ban aplicada pode ser de no máximo %d dias.	31337	0
 6	21	Motivo do ban não exceder 128 characteres	31337	0
 6	22	O ban especificado já está na banlist!	31337	0
 6	23	O ban %s já está coberto por %s	31337	0
@@ -650,10 +1055,10 @@ COPY "translations" FROM stdin;
 6	103	MASSDEOPPRO para %s é ajustado a %d	31337	0
 6	104	o valor de FLOODPRO tem que ser de 0-7	31337	0
 6	105	FLOODPRO para %s é ajustado a %d	31337	0
-6	106	A DESCRIÇÃO pode ter no máximo 80 caracteres!	31337	0
+6	106	A DESCRIÇÃO pode ter no máximo %i caracteres!	31337	0
 6	107	DESCRIÇÃO para %s foi apagada.	31337	0
 6	108	DESCRIÇÃO para %s é: %s	31337	0
-6	109	A URL pode ter no máximo 75 caracteres!	31337	0
+6	109	A URL pode ter no máximo %i caracteres!	31337	0
 6	110	URL para %s foi apagada.	31337	0
 6	111	URL para %s é: %s	31337	0
 6	112	A linha de keywords não pode exceder 80 caracteres!	31337	0
@@ -714,6 +1119,17 @@ COPY "translations" FROM stdin;
 6	168	Este comando é reservado para IRC Operators	31337	0
 6	169	Eu não tenho op no %s	31337	0
 6	170	%s para %i minutos	31337	0
+6	184	The NOVOICE flag is set on %s	31337	0
+6	185	Your access on %s has been suspended.	31337	0
+6	186	Your suspension on %s has been cancelled.	31337	0
+6	187	You have been added to channel %s with access level %i	31337	0
+6	188	Your access on %s has been modified from %i to %i	31337	0
+6	189	Your access from %s has been removed.	31337	0
+6	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+6	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+6	192	Your reason must be %i - %i characters long.	31337	0
+6	193	Reason: %s	31337	0
+6	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Italian language definition.
@@ -740,7 +1156,7 @@ COPY "translations" FROM stdin;
 7	17	AUTENTICAZIONE FALLITA come %s (Password non valida)	31337	0
 7	18	Non mi trovo in quel canale!	31337	0
 7	19	Range del livello del ban non valido. Il range valido è compreso tra 1 e %i.	31337	0
-7	20	Durata del ban non valida. La durata massima di un ban può essere di %d ore.	31337	0
+7	20	Durata del ban non valida. La durata massima di un ban può essere di %d giorni.	31337	0
 7	21	Il motivo del ban non può superare i 128 caratteri	31337	0
 7	22	Il ban specificato è già presente nella mia lista dei ban!	31337	0
 7	23	Il ban %s è già coperto da %s	31337	0
@@ -826,10 +1242,10 @@ COPY "translations" FROM stdin;
 7	103	MASSDEOPPRO per %s è impostato a %d	31337	0
 7	104	il valore di FLOODPRO dev'essere compreso tra 0 e 7 inclusi	31337	0
 7	105	FLOODPRO per %s è impostato a %d	31337	0
-7	106	La DESCRIPTION non può superare gli 80 caratteri.	31337	0
+7	106	La DESCRIPTION non può superare gli %i caratteri.	31337	0
 7	107	La DESCRIPTION per %s è stata cancellata.	31337	0
 7	108	La DESCRIPTION per %s è: %s	31337	0
-7	109	L'URL non può superare i 75 caratteri.	31337	0
+7	109	L'URL non può superare i %i caratteri.	31337	0
 7	110	L'URL per %s è stata cancellata.	31337	0
 7	111	L'URL per %s è: %s	31337	0
 7	112	La stringa contenente le parole chiave non può superare gli 80 caratteri.	31337	0
@@ -886,6 +1302,17 @@ COPY "translations" FROM stdin;
 7	165	Aggiunto il ban %s a %s con livello %i	31337	0
 7	166	%s: lista dei ban vuota.	31337	0
 7	167	Sono già in quel canale!	31337	0
+7	184	The NOVOICE flag is set on %s	31337	0
+7	185	Your access on %s has been suspended.	31337	0
+7	186	Your suspension on %s has been cancelled.	31337	0
+7	187	You have been added to channel %s with access level %i	31337	0
+7	188	Your access on %s has been modified from %i to %i	31337	0
+7	189	Your access from %s has been removed.	31337	0
+7	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+7	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+7	192	Your reason must be %i - %i characters long.	31337	0
+7	193	Reason: %s	31337	0
+7	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Romanian language definition.
@@ -913,7 +1340,7 @@ COPY "translations" FROM stdin;
 8	17	AUTENTIFICARE ESUATA ca %s (parola incorecta)	31337	0
 8	18	Nu sunt pe canal!	31337	0
 8	19	Nivelul de ban e incorect. Domeniul admis este 1-%i.	31337	0
-8	20	Durata banului e incorecta. Poti da ban pe o durata maxima de %d de ore.	31337	0
+8	20	Durata banului e incorecta. Poti da ban pe o durata maxima de %d de zile.	31337	0
 8	21	Motivul banului nu poate depasi 128 de caractere.	31337	0
 8	22	Respectivul ban e deja pe lista!	31337	0
 8	23	Banul pe %s e deja sub incidenta banului pe %s	31337	0
@@ -999,10 +1426,10 @@ COPY "translations" FROM stdin;
 8	103	MASSDEOPPRO pentru %s este %d	31337	0
 8	104	valoarea pentru FLOODPRO trebuie sa fie 0-7	31337	0
 8	105	FLOODPRO pentru %s este %d	31337	0
-8	106	DESCRIPTION poate sa aiba maxim 80 de caractere!	31337	0
+8	106	DESCRIPTION poate sa aiba maxim %i de caractere!	31337	0
 8	107	Am sters DESCRIPTION pentru %s	31337	0
 8	108	DESCRIPTION pentru %s este: %s	31337	0
-8	109	URL poate sa aiba maxim 75 de caractere!	31337	0
+8	109	URL poate sa aiba maxim %i de caractere!	31337	0
 8	110	Am sters URL pentru %s	31337	0
 8	111	URL pentru %s este: %s	31337	0
 8	112	Sirul de cuvinte cheie nu poate depasi 80 de caractere!	31337	0
@@ -1063,6 +1490,17 @@ COPY "translations" FROM stdin;
 8	168	Aceasta comanda este rezervata pentru IRCopi	31337	0
 8	169	Nu sunt operator pe %s	31337	0
 8	170	%s pentru %i minute	31337	0
+8	184	Flag-ul NOVOICE e activ pe %s	31337	0
+8	185	Accesul tau pe %s este suspendat.	31337	0
+8	186	Suspendarea ta pe %s a fost anulat.	31337	0
+8	187	Ai fost adaugat pe canalul %s cu nivelul de acces %i	31337	0
+8	188	Nivelul tau de acces pe %s a fost modificat de la %i la %i	31337	0
+8	189	Accesul tau de pe %s a fost inlaturat.	31337	0
+8	190	Userul target %s pe canalul %s nu are acces suficient pentru un automode VOICE	31337	0
+8	191	Userul target %s pe canalul %s nu are acces suficient pentru un automode OP	31337	0
+8	192	Motivul poate sa aiba o lungime de caractere intre %i si %i	31337	0
+8	193	Motivul: %s	31337	0
+8	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Catalan language definition.
@@ -1088,7 +1526,7 @@ COPY "translations" FROM stdin;
 9	17	AUTENTICACIÓ FALLIDA com a %s (Contrasenya no vàlida).	31337	0
 9	18	No sóc pas a aquest canal!	31337	0
 9	19	Nivell de bandeig no vàlid. Els nivells vàlids són entre 1-%i.	31337	0
-9	20	Durada de bandeig no vàlida . La durada màxima del bandeig és de %d hores.	31337	0
+9	20	Durada de bandeig no vàlida . La durada màxima del bandeig és de %d dia.	31337	0
 9	21	La raó del ban no pot excedir de 128 caràcters.	31337	0
 9	22	El bandeig especificat ja és a la meva llista!	31337	0
 9	23	El bandeig %s ja queda cobert per %s	31337	0
@@ -1174,10 +1612,10 @@ COPY "translations" FROM stdin;
 9	103	MASSDEOPPRO per %s s'ha fixat a %d.	31337	0
 9	104	el valor de FLOODPRO ha d'estar entre 0-7.	31337	0
 9	105	FLOODPRO per %s s'ha fixat a %d.	31337	0
-9	106	DESCRIPTION pot tenir fins a 80 caràcters com a màxim!	31337	0
+9	106	DESCRIPTION pot tenir fins a %i caràcters com a màxim!	31337	0
 9	107	La DESCRIPTION de %s ha estat esborrada.	31337	0
 9	108	DESCRIPTION de %s és: %s	31337	0
-9	109	URL pot tenir fins a 75 caràcters com a màxim!	31337	0
+9	109	URL pot tenir fins a %i caràcters com a màxim!	31337	0
 9	110	La URL de %s ha estat esborrada.	31337	0
 9	111	La URL de %s és: %s	31337	0
 9	112	KEYWORDS pot tenir fins a 80 caràcters com a màxim!	31337	0
@@ -1238,6 +1676,17 @@ COPY "translations" FROM stdin;
 9	168	Aquesta comanda és reservada per a Operador/es d'IRC.	31337	0
 9	169	No tinc pas op a %s	31337	0
 9	170	%s durant %i minuts.	31337	0
+9	184	The NOVOICE flag is set on %s	31337	0
+9	185	Your access on %s has been suspended.	31337	0
+9	186	Your suspension on %s has been cancelled.	31337	0
+9	187	You have been added to channel %s with access level %i	31337	0
+9	188	Your access on %s has been modified from %i to %i	31337	0
+9	189	Your access from %s has been removed.	31337	0
+9	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+9	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+9	192	Your reason must be %i - %i characters long.	31337	0
+9	193	Reason: %s	31337	0
+9	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Spanish language definition.
@@ -1263,7 +1712,7 @@ COPY "translations" FROM stdin;
 10	17	AUTENTIFICACIÓN FALLIDA como %s (Contraseña no válida).	31337	0
 10	18	No estoy en ese canal!	31337	0
 10	19	Nivel de ban no válido. El intervalo válido es 1-%i.	31337	0
-10	20	Duración de ban no válida. La duración de ban máxima es de %d horas.	31337	0
+10	20	Duración de ban no válida. La duración de ban máxima es de %d día.	31337	0
 10	21	El motivo del ban no puede superar los 128 caracteres.	31337	0
 10	22	El ban especificado ya está en mi lista de bans!	31337	0
 10	23	El ban %s ya está cubierto por %s	31337	0
@@ -1349,10 +1798,10 @@ COPY "translations" FROM stdin;
 10	103	MASSDEOPPRO en %s se ha establecido en %d.	31337	0
 10	104	el valor de FLOODPRO tiene que estar entre 0-7.	31337	0
 10	105	FLOODPRO en %s se ha establecido en %d.	31337	0
-10	106	DESCRIPTION puede contener un máximo de 80 caracteres!	31337	0
+10	106	DESCRIPTION puede contener un máximo de %i caracteres!	31337	0
 10	107	La DESCRIPTION de %s ha sido borrada.	31337	0
 10	108	La DESCRIPTION de %s es: %s	31337	0
-10	109	URL puede contener un máximo de 75 caracteres!	31337	0
+10	109	URL puede contener un máximo de %i caracteres!	31337	0
 10	110	la URL de %s ha sido borrada.	31337	0
 10	111	La URL de %s es: %s	31337	0
 10	112	la cadena de KEYWORDS puede contener un máximo de 80 caracteres!	31337	0
@@ -1413,6 +1862,17 @@ COPY "translations" FROM stdin;
 10	168	Esta orden está reservada para Operadores/as de IRC.	31337	0
 10	169	No tengo op en %s	31337	0
 10	170	%s durante %i minutos.	31337	0
+10	184	The NOVOICE flag is set on %s	31337	0
+10	185	Your access on %s has been suspended.	31337	0
+10	186	Your suspension on %s has been cancelled.	31337	0
+10	187	You have been added to channel %s with access level %i	31337	0
+10	188	Your access on %s has been modified from %i to %i	31337	0
+10	189	Your access from %s has been removed.	31337	0
+10	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+10	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+10	192	Your reason must be %i - %i characters long.	31337	0
+10	193	Reason: %s	31337	0
+10	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Hungarian language definition.
@@ -1439,7 +1899,7 @@ COPY "translations" FROM stdin;
 11	17	AZONOSITAS SIKERTELEN a(z) %s felhasznaloi nev alatt (Hibas Jelszo)	31337	0
 11	18	Nem vagyok azon a csatornan!	31337	0
 11	19	Ervenytelen ban szint, 1-%i kozott valaszthatsz.	31337	0
-11	20	Ervenytelen ban idotartalom. Maximum %d orat hasznalhatsz.	31337	0
+11	20	Ervenytelen ban idotartalom. Maximum %d napot hasznalhatsz.	31337	0
 11	21	A Ban indokban maximum csak 128 betut addhatsz meg.	31337	0
 11	22	A megjelolt ban mar benne van a banlistaban!	31337	0
 11	23	A(z) %s bant mar a letezo %s ban magaba vonja!	31337	0
@@ -1525,10 +1985,10 @@ COPY "translations" FROM stdin;
 11	103	A(z) %s csatorna MASSDEOPPRO opciojanak az erteke %d	31337	0
 11	104	A FLOODPRO erteke 0-7 kozott kell legyen	31337	0
 11	105	A(z) %s csatorna FLOODPRO opciojanak erteke %d	31337	0
-11	106	A KORULIRAS maximum 80 betus lehet!	31337	0
+11	106	A KORULIRAS maximum %i betus lehet!	31337	0
 11	107	A(z) %s csatorna KORULIRASA letorolve.	31337	0
 11	108	A(z) %s csatorna KORULIRASA: %s	31337	0
-11	109	Az URL maximum 75 betus lehet!	31337	0
+11	109	Az URL maximum %i betus lehet!	31337	0
 11	110	A(z) %s csatorna URL-je letorolve.	31337	0
 11	111	A(z) %s csatorna URL-je: %s	31337	0
 11	112	A csatorna kulcsszavainak hossza nem lehet tobb mint 80 betu!	31337	0
@@ -1589,6 +2049,17 @@ COPY "translations" FROM stdin;
 11	168	Ezt a parancsot csak IRC Operatorok hasznalhatjak.	31337	0
 11	169	Nem vagyok op a(z) %s csatornan	31337	0
 11	170	%s %i percre	31337	0
+11	184	A NOVOICE flag aktiv a(z) %s csatornan	31337	0
+11	185	A jogod a %s csatornan fel lett fuggesztve.	31337	0
+11	186	A felfuggesztesed a %s csatornan vissza lett vonva.	31337	0
+11	187	Hozza lettel adva a(z) %s csatornahoz %i joggal.	31337	0
+11	188	A jogod a %s csatornan %i -rol %i -ra(re) lett modositva.	31337	0
+11	189	A jogod a %s csatornarol el lett tavolitva.	31337	0
+11	190	A celuser %s -nak(nek) a(z) %s csatornan nincs eleg joga egy automod VOICE -hoz.	31337	0
+11	191	A celuser %s -nak(nek) a(z) %s csatornan nincs eleg joga egy automod OP -hoz.	31337	0
+11	192	Az indok %i es %i karakter hosszusagu lehet.	31337	0
+11	193	Indok: %s	31337	0
+11	194	FELFUGGESZTVE VOLT - %s	31337	0
 \.
 
 -- Turkish language definition.
@@ -1615,7 +2086,7 @@ COPY "translations" FROM stdin;
 12	17	%s kanalýnda TANIMLAMA BAÞARISIZ (Geçersiz Þifre)	31337	0
 12	18	Ben o kanalda deðilim!	31337	0
 12	19	Geçersiz yasaklama-seviye dizisi. Geçerli dizi 1-%i olmalý.	31337	0
-12	20	Geçersiz yasaklama süresi. Sizin yasaklama süreniz en fazla %d saat olabilir.	31337	0
+12	20	Geçersiz yasaklama süresi. Sizin yasaklama süreniz en fazla %d günler olabilir.	31337	0
 12	21	Yasaklama sebebi 128 karakteri aþmamalýdýr	31337	0
 12	22	Belirtilen yasaklama zaten benim yasaklýlar listemde!	31337	0
 12	23	%s yasaklamasý zaten %s ile kapsanmýþ durumda	31337	0
@@ -1701,10 +2172,10 @@ COPY "translations" FROM stdin;
 12	103	MASSDEOPPRO %s kanalý için %d yapýldý	31337	0
 12	104	FLOODPRO için deðer 0-7 olmalý	31337	0
 12	105	FLOODPRO %s kanalý için %d yapýldý	31337	0
-12	106	KANAL TANIMI en fazla 80 karakter olabilir	31337	0
+12	106	KANAL TANIMI en fazla %i karakter olabilir	31337	0
 12	107	%s için KANAL TANIMI silindi.	31337	0
 12	108	%s için KANAL TANIMI: %s	31337	0
-12	109	Site adý en fazla 75 karakter olabilir!	31337	0
+12	109	Site adý en fazla %i karakter olabilir!	31337	0
 12	110	%s için site adý silindi.	31337	0
 12	111	%s için site adý: %s	31337	0
 12	112	Anahtar kelimeler için dizgi 80 karakteri aþamaz!	31337	0
@@ -1765,6 +2236,17 @@ COPY "translations" FROM stdin;
 12	168	Bu komut IRC operatörlere ait	31337	0
 12	169	%s kanalýnda operatörlük yetkim yok	31337	0
 12	170	%s için %i dakika	31337	0
+12	184	The NOVOICE flag is set on %s	31337	0
+12	185	Your access on %s has been suspended.	31337	0
+12	186	Your suspension on %s has been cancelled.	31337	0
+12	187	You have been added to channel %s with access level %i	31337	0
+12	188	Your access on %s has been modified from %i to %i	31337	0
+12	189	Your access from %s has been removed.	31337	0
+12	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+12	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+12	192	Your reason must be %i - %i characters long.	31337	0
+12	193	Reason: %s	31337	0
+12	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Norwegian Language Definition.
@@ -1793,7 +2275,7 @@ COPY "translations" FROM stdin;
 13	17	INNLOGGING FEILET som %s (Feil passord)	31337	0
 13	18	Jeg er ikke i den kanalen!	31337	0
 13	19	Ugyldig banlevel. Må være 1-%i.	31337	0
-13	20	Ugyldig ban varighet. Den kan maksimum være %d timer.	31337	0
+13	20	Ugyldig ban varighet. Den kan maksimum være %d dager.	31337	0
 13	21	Ban grunn kan ikke overstige 128 tegn	31337	0
 13	22	Den spesifiserte bannen er allerede i min banliste!	31337	0
 13	23	Bannen %s er allerede dekket av %s	31337	0
@@ -1879,10 +2361,10 @@ COPY "translations" FROM stdin;
 13	103	MASSDEOPPRO for %s er satt til %d	31337	0
 13	104	Verdien til FLOODPRO må være 0-7	31337	0
 13	105	FLOODPRO for %s er satt til %d	31337	0
-13	106	BESKRIVELSE kan maksimalt være 80 tegn!	31337	0
+13	106	BESKRIVELSE kan maksimalt være %i tegn!	31337	0
 13	107	BESKRIVELSE for %s er slettet.	31337	0
 13	108	BESKRIVELSE for %s er: %s	31337	0
-13	109	URL kan maksimum være 75 tegn!	31337	0
+13	109	URL kan maksimum være %i tegn!	31337	0
 13	110	URL for %s er slettet.	31337	0
 13	111	URL for %s er: %s	31337	0
 13	112	KEYWORDS kan ikke overstige 80 tegn!	31337	0
@@ -1943,6 +2425,17 @@ COPY "translations" FROM stdin;
 13	168	Denne kommandoen er reservert for IRC operatører	31337	0
 13	169	Jeg er ikke operatør på %s	31337	0
 13	170	%s for %i minutter	31337	0
+13	184	The NOVOICE flag is set on %s	31337	0
+13	185	Your access on %s has been suspended.	31337	0
+13	186	Your suspension on %s has been cancelled.	31337	0
+13	187	You have been added to channel %s with access level %i	31337	0
+13	188	Your access on %s has been modified from %i to %i	31337	0
+13	189	Your access from %s has been removed.	31337	0
+13	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+13	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+13	192	Your reason must be %i - %i characters long.	31337	0
+13	193	Reason: %s	31337	0
+13	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Arabic Language Definition.
@@ -2055,10 +2548,10 @@ COPY "translations" FROM stdin;
 14	103	MASSDEOPPRO li %s ta7akama fihi ila %d	31337	0
 14	104	9imatou  FLOODPRO yajibou ane takouna bayne 0-7	31337	0
 14	105	FLOODPRO %s ta7akama fihi ila %d	31337	0
-14	106	Al wasfou la yajibou ane yata3ada 80 7arfane.	31337	0
+14	106	Al wasfou la yajibou ane yata3ada %i 7arfane.	31337	0
 14	107	Wasaf %s ouzila.	31337	0
 14	108	Wasf %s houa: %s	31337	0
-14	109	Al URL la yajibou ana yata3ada 75 7arfane.	31337	0
+14	109	Al URL la yajibou ana yata3ada %i 7arfane.	31337	0
 14	110	Al URL li %s ouzila.	31337	0
 14	111	Al URL li %s houa: %s	31337	0
 14	112	Al KEYWORDS (Alkalimatou almiftahe) la yajibou ane tata3ada 80 7arfane.	31337	0
@@ -2111,6 +2604,17 @@ COPY "translations" FROM stdin;
 14	168	hada al amre moukhassasse li IRC Operators	31337	0
 14	169	Ana lastou op fi %s	31337	0
 14	170	%s ila %i da9i9a	31337	0
+14	184	The NOVOICE flag is set on %s	31337	0
+14	185	Your access on %s has been suspended.	31337	0
+14	186	Your suspension on %s has been cancelled.	31337	0
+14	187	You have been added to channel %s with access level %i	31337	0
+14	188	Your access on %s has been modified from %i to %i	31337	0
+14	189	Your access from %s has been removed.	31337	0
+14	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+14	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+14	192	Your reason must be %i - %i characters long.	31337	0
+14	193	Reason: %s	31337	0
+14	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Hebrew	 language definition.
@@ -2223,10 +2727,10 @@ COPY "translations" FROM stdin;
 15	103	%s îåâãøéí ì %d îàñ-ãéàåô-ôøå	31337	0
 15	104	òøëéé ôìåãôøå öøéëéí ìäéåú áéï 7-0	31337	0
 15	105	%s îåâãøéí ì %d òøëéé ôìåãôøå	31337	0
-15	106	äúéàåø àéðå éëåì ìäéåú îòáø ì 180 úååéí!	31337	0
+15	106	äúéàåø àéðå éëåì ìäéåú îòáø ì %i úååéí!	31337	0
 15	107	äúéàåø ðîç÷ %s 	31337	0
 15	108	%s äåà %s äúéàåø ì	31337	0
-15	109	äëúåáú àéðä éëåìä ìäéåú îòáø ì 75 úååéí!	31337	0
+15	109	äëúåáú àéðä éëåìä ìäéåú îòáø ì %i úååéí!	31337	0
 15	110	ðîç÷ä %s äëúåáú ì	31337	0
 15	111	%s äëúåáú ì %s	31337	0
 15	112	îçøåæú äàåúéåú àéððä éëåìä ìäéåú îòáø ì 80 úååéí!	31337	0
@@ -2287,6 +2791,17 @@ COPY "translations" FROM stdin;
 15	168	ø÷ îôòìé äùøú éëåìéí ìäùúîù áô÷åãä æå.	31337	0
 15	169	%s àéï ìé àåô á	31337	0
 15	170	%s ã÷åú ì %i	31337	0
+15	184	The NOVOICE flag is set on %s	31337	0
+15	185	Your access on %s has been suspended.	31337	0
+15	186	Your suspension on %s has been cancelled.	31337	0
+15	187	You have been added to channel %s with access level %i	31337	0
+15	188	Your access on %s has been modified from %i to %i	31337	0
+15	189	Your access from %s has been removed.	31337	0
+15	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+15	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+15	192	Your reason must be %i - %i characters long.	31337	0
+15	193	Reason: %s	31337	0
+15	194	UNSUSPENDED - %s	31337	0
 \.
 
 -- Macedonian language definition.
@@ -2398,10 +2913,10 @@ COPY "translations" FROM stdin;
 16	103	MASSDEOPPRO za %s e postaven na %d	31337	0
 16	104	podesuvanjeto za FLOODPRO mora da bide 0-7	31337	0
 16	105	FLOODPRO za %s e postaven na %d	31337	0
-16	106	OPISOT moze da bide maksimum 80 bukvi !	31337	0
+16	106	OPISOT moze da bide maksimum %i bukvi !	31337	0
 16	107	OPISOT za %s e iscisten.	31337	0
 16	108	OPISOT za %s e: %s	31337	0
-16	109	WEB Stranata moze da bide maksimum 75 bukvi!	31337	0
+16	109	WEB Stranata moze da bide maksimum %i bukvi!	31337	0
 16	110	WEB Stranata na %s e iscistena.	31337	0
 16	111	WEB Stranata na %s e: %s	31337	0
 16	112	Podesuvanjeto na klucnite zborovi nemoze da bide poveke od 80 bukvi!	31337	0
@@ -2462,4 +2977,213 @@ COPY "translations" FROM stdin;
 16	168	Taa komanda e rezervirana za IRC Operatori	31337	0
 16	169	Nemam op na %s	31337	0
 16	170	%s za %i minuti	31337	0
+16	184	The NOVOICE flag is set on %s	31337	0
+16	185	Your access on %s has been suspended.	31337	0
+16	186	Your suspension on %s has been cancelled.	31337	0
+16	187	You have been added to channel %s with access level %i	31337	0
+16	188	Your access on %s has been modified from %i to %i	31337	0
+16	189	Your access from %s has been removed.	31337	0
+16	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+16	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+16	192	Your reason must be %i - %i characters long.	31337	0
+16	193	Reason: %s	31337	0
+16	194	UNSUSPENDED - %s	31337	0
+\.
+
+-- Star Wars Language
+-- 2015
+
+COPY "translations" FROM stdin;
+22	1	You must unlearn what you have learnt. You are already dark sided as %s	31337	0
+22	2	AUTHENTICATION SUCCESSFUL as %s. May the force be with you.	31337	0
+22	3	The force in you is not strong enough to perform that command	31337	0
+22	4	Sorry, the deathstar %s is empty	31337	0
+22	5	I cannot locate %s anywhere in this galaxy	31337	0
+22	6	I cannot locate %s on deathstar %s	31337	0
+22	7	The deathstar %s doesn't appear to be registered	31337	0
+22	8	You're recruited to the dark side by %s (%s) on %s	31337	0
+22	9	You're promoted to storm trooper by %s (%s) on %s	31337	0
+22	10	%s: You are not aboard that deathstar	31337	0
+22	11	%s is already a dark sider in %s	31337	0
+22	12	%s is already a storm trooper in %s	31337	0
+22	13	The power of the dark side you know not, therefore you're annihilated  by %s (%s) on %	31337	0
+22	14	I find your lack of faith disturbing, you're demoted from storm trooper by %s (%s) on %s	31337	0
+22	15	%s is not dark sided in %s	31337	0
+22	16	%s is not a storm trooper in %s	31337	0
+22	17	Acces to the force as %s is denied (Invalid Force Code)	31337	0
+22	18	I'm not in that deathstar!	31337	0
+22	19	Invalid destruction level range. Valid range is 1-%i.	31337	0
+22	20	Invalid destruction duration. The destruction duration can be a maximum of %d days.	31337	0
+22	21	Destruction reason cannot exceed 128 chars	31337	0
+22	22	Specified destructor is already in my war path	31337	0
+22	23	The destructor %s is already covered by %s	31337	0
+22	24	Invalid minimum level.	31337	0
+22	25	Invalid maximum level.	31337	0
+22	26	FORCEKEEPER: %s FORCE LEVEL: %s %s	31337	0
+22	27	DEATHSTAR: %s -- AUTOMODE: %s	31337	0
+22	28	LAST MODIFIED: %s (%s ago)	31337	0
+22	29	** EXTERMINATED ** - Returns in %s (Level %i)	31337	0
+22	30	LAST SEEN: %s ago.	31337	0
+22	31	There are more than %d matching entries.	31337	0
+22	32	Please restrict your query.	31337	0
+22	33	End of the force list	31337	0
+22	34	No match!	31337	0
+22	35	Cannot add a forcekeeper with equal or higher force level than your own.	31337	0
+22	36	Invalid force level.	31337	0
+22	37	%s is already a forcekeeper on %s with force Level %i	31337	0
+22	38	Added forcekeeper %s to %s at force level %i	31337	0
+22	39	Something went wrong. Learn the ways of the force you must!: %s	31337	0
+22	40	%s: End of destruction list	31337	0
+22	41	Unable to view forcekeeper details (Invisible)	31337	0
+22	42	Forcekeeper Information: %s (%i)	31337	0
+22	43	Currently dark sided as: %s	31337	0  
+22	44	URL: %	31337	0
+22	45	Language: %i	31337	0
+22	46	Deathstars: %s	31337	0
+22	47	Input Flood Points: %i	31337	0
+22	48	Ouput Flood (Bytes): %i	31337	0
+22	49	%s is Ruled by:	31337	0
+22	50	%s - last seen: %s ago	31337	0
+22	51	Desc: %s	31337	0
+22	52	Flood me will you? Listen to you not, ignore you I shall!	31337	0
+22	53	I think I've sent you a little too much data, I'm going to ignore you for a while.	31337	0
+22	54	Incomplete command	31337	0
+22	55	To use %s, you must /msg %s@%s	31337	0
+22	56	Dark sided you must be, to use this command.	31337	0
+22	57	The deathstar %s has been terminated by a Jedi Knight!.	31337	0
+22	58	Your access on %s has been terminated.	31337	0
+22	59	The NOOP flag is set on %s	31337	0
+22	60	The STRICTOP flag is set on %s	31337	0
+22	61	You just annihalated more than %i people from the dark side	31337	0
+22	62	SYNTAX: %s	31337	0
+22	63	Temporarily increased your force level on deathstar %s to %i	31337	0
+22	64	%s is registered.	31337	0
+22	65	%s is not registered.	31337	0
+22	66	Your powers are weak old man %s. Do or do not, there is no try	31337	0
+22	67	\002*** Destruction List for channel %s ***\002	31337	0
+22	68	%s %s Level: %i	31337	0
+22	69	TERMINATED BY: %s (%s)	31337	0
+22	70	SINCE: %s	31337	0
+22	71	TERMINATED: %s	31337	0
+22	72	\002*** END ***\002	31337	0
+22	73	I don't know who %s is	31337	0
+22	74	You are not dark sided with me anymore	31337	0
+22	75	%s doesn't appear to have access in %s	31337	0
+22	76	Cannot modify a forcekeeper with equal or more power than you	31337	0
+22	77	Cannot give a forcekeeper stronger or equal power to your own.	31337	0
+22	78	Modified %s's access level on deathstar %s to %i	31337	0
+22	79	Set AUTOMODE to Dark-Sider for %s on deathstar %s	31337	0
+22	80	Set AUTOMODE to Storm Trooper for %s on deathstar %s	31337	0
+22	81	Set AUTOMODE to Padawan for %s on deathstar %s	31337	0
+22	82	Your passphrase cannot be your username or current nick - syntax is: NEWPASS <new passphrase>	31337	0
+22	83	Password successfully changed.	31337	0
+22	84	The NOOP flag is set on %s	31337	0
+22	85	The STRICTOP flag is set on %s (and %s isn't dark sided)	31337	0
+22	86	The STRICTOP flag is set on %s (and %s the force isn't strong enough in this warrior)	31337	0
+22	87	Pulverised deathstar %s	31337	0
+22	88	%s is already registered with me.	31337	0
+22	89	Invalid deathstar name.	31337	0
+22	90	Constructed deathstar %s	31337	0
+22	91	Removed %s from my stronghold list	31337	0
+22	92	Couldn't find %s in my stronghold list	31337	0
+22	93	Cannot destroy a lightsaber with equal or a stronger force than your own	31337	0
+22	94	You can't remove yourself from a deathstar that you rule	31337	0
+22	95	Removed forcekeeper %s from %s	31337	0
+22	96	Your CLOAK setting is now ON.	31337	0
+22	97	Your CLOAK setting is now OFF.	31337	0
+22	98	%s for %s is %s	31337	0
+22	99	Value of %s must be ON or OFF	31337	0
+22	100	Invalid FORCEKEEPERFLAGS setting. Correct values are NONE, OP or VOICE.	31337	0
+22	101	FORCEKEEPERFLAGS for %s is %s	31337	0
+22	102	Value of MASSDEOPPRO has to be 0-7	31337	0
+22	103	MASSDEOPPRO for %s is set to %d	31337	0
+22	104	Value of FLOODPRO has to be 0-7	31337	0
+22	105	FLOODPRO for %s is set to %d	31337	0
+22	106	The DESCRIPTION can be a maximum of %i chars!	31337	0
+22	107	DESCRIPTION for %s is cleared.	31337	0
+22	108	DESCRIPTION for %s is: %s	31337	0
+22	109	The URL can be a maximum of %i chars!	31337	0
+22	110	URL for %s is cleared.	31337	0
+22	111	URL for %s is: %s	31337	0
+22	112	The string of keywords cannot exceed 80 chars!	31337	0
+22	113	KEYWORDS for %s are: %s	31337	0
+22	114	LANGUAGE is set to %s.	31337	0
+22	115	ERROR: Invalid LANGUAGE selection.	31337	0
+22	116	Cannot locate deathstar %s anywhere in the galaxy	31337	0
+22	117	ERROR: Invalid deathstar setting	31337	0
+22	118	Stronghold list:	31337	0
+22	119	Stronghold list is empty	31337	0
+22	120	-- End of Stronghold List	31337	0
+22	121	CMaster Deathstar Services internal status:	31337	0
+22	122	[  Deathstar Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+22	123	[Forcekeeper Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+22	124	[Force Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+22	125	[        Destruction Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+22	126	Last received Forcekeeper notify: %i	31337	0
+22	127	Last received Deathstar notify: %i	31337	0
+22	128	Last received Force Level notify: %i	31337	0
+22	129	Last received Destruction notify: %i	31337	0
+22	130	Custom data containers allocated: %i	31337	0
+22	131	\002Uptime:\002 %s	31337	0
+22	132	Deathstar %s has %d users (%i operators)	31337	0
+22	133	Mode is: %s	31337	0
+22	134	Flags set: %s	31337	0
+22	135	Cannot destroy a forcekeeper with an equal or stronger force than your own.	31337	0
+22	136	bogus time units	31337	0
+22	137	Invalid destruction duration.	31337	0
+22	138	A glorious day for you it is %s, your termination is cancelled	31337	0
+22	139	%s is already destroyed on %s	31337	0
+22	140	**ATTENTION!** Destruction of forcekeeper %s will expire in %s	31337	0
+22	141	ERROR: Mission statement cannot exceed 145 chars	31337	0
+22	142	You have insufficient force level to remove the destructor %s from %s's database	31337	0
+22	143	Removed %i destructors that matched %s	31337	0
+22	144	Removed your temporary access of %i from deathstar %s	31337	0
+22	145	You don't appear to have a forced access in %s, perhaps it expired?	31337	0
+22	146	%s isn't destroyed on %s	31337	0
+22	147	%s is an Enemy Bounty Hunter	31337	0
+22	148	%s is not dark sided, they must learn the ways of the force!.	31337	0
+22	149	%s is dark sided as %s%s	31337	0
+22	150	%s is an Accomplished Jedi Apprentice%s and dark sided as %s	31337	0
+22	151	%s is a Deadly and Feared Jedi Knight%s and dark sided as %s	31337	0
+22	152	%s is a Jedi Force Creator%s and dark sided as %s	31337	0
+22	153	There are more than %i entries matching [%s]	31337	0
+22	154	Please restrict your search mask	31337	0
+22	155	No matching entries for [%s]	31337	0
+22	156	%s: Cleared deathstar modes.	31337	0
+22	158	Invalid option	31337	0
+22	159	%s is an Official Undernet Sith Lord	31337	0
+22	160	%s is an Official Coder-Com Jedi-Force Apprentice%s and logged in as %s	31337	0
+22	161	%s is an Official Coder-Com Jedi-Force Contributer%s and logged in as %s	31337	0
+22	162	%s is an Official Coder-Com Jedi-Force Creator%s and logged in as %s	31337	0
+22	163	%s is an Official Coder-Com Master Jedi-Force Creator%s and logged in as %s	31337	0
+22	164	 and an Enemy Bounty Hunter	31337	0
+22	165	Added destructor %s to %s at level %i	31337	0
+22	166	%s: destruction list is empty.	31337	0
+22	167	I'm already in that deathstar!	31337	0
+22	168	This command is reserved to Enemy Bounty Hunters	31337	0
+22	169	I'm not opped in %s	31337	0
+22	170	%s for %i minutes	31337	0
+22	171	I'm not a dark-sider in %s	31337	0
+22	172	Keywords: %s	31337	0
+22	173	%s does not wish to board deathstars at this time.	31337	0
+22	174	Your FORCEBLOCKER defense shield is now ON.	31337	0
+22	175	Your FORCEBLOCKER defense shield is now OFF.	31337	0
+22	176	There were %d failed attempts to join the dark side since your last successful crossover.	31337	0
+22	177	Learn the ways of the force you must %s (Allies, you already have)	31337	0
+22	178	Set INVITE on login %s for deathstar %s	31337	0
+22	179	AUTHENTICATION FAILED as %s. (Invalid Token)	31337	0
+22	180	The following clients are currently dark sided as %s:	31337	0
+22	181	If any of these clients are not you, your account may have been compromised. If you wish to suspend all your access as a precautionary measure, type '/msg X@channels.undernet.org suspendme <password>'	31337	0
+22	182	*** NOTE: You will NOT be able to use your account after you issue this command, until you contact a CService Administrator to resolve the problem: /join #usernames	31337	0
+22	184	The NOVOICE flag is set on %s	31337	0
+22	185	Your access on %s has been suspended.	31337	0
+22	186	Your suspension on %s has been cancelled.	31337	0
+22	187	You have been added to channel %s with access level %i	31337	0
+22	188	Your access on %s has been modified from %i to %i	31337	0
+22	189	Your access from %s has been removed.	31337	0
+22	190	Target user %s on channel %s has insufficient access for an automode VOICE	31337	0
+22	191	Target user %s on channel %s has insufficient access for an automode OP	31337	0
+22	192	Your reason must be %i - %i characters long.	31337	0
+22	193	Reason: %s	31337	0
+22	194	UNSUSPENDED - %s	31337	0
 \.

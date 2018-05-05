@@ -22,14 +22,11 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: LISTOPERCHANSCommand.cc,v 1.9 2005/01/12 03:50:29 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

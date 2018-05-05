@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 # You can change the above to the good path to your "bash" binary if needed
 #
 # $Id: Manager1K.sh,v 1.4 2003/07/14 10:35:44 nighty Exp $

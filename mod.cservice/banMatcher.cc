@@ -1,5 +1,5 @@
 /**
- * banMatcher.h
+ * banMatcher.cc
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,49 +16,46 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
  * USA.
  *
- * $Id: HostBanMatcher.cc,v 1.1 2009/06/25 19:05:23 mrbean_ Exp $
+ * banMatcher.cc, v2.0 2013.10.28 -- Seven
  */
 
-#include	<string>
-#include	"HostBanMatcher.h"
-#include	"ip.h"
-#include	"match.h"
- 
+#include	"banMatcher.h"
+#include	"misc.h"
+
 using std::string ;
 
 namespace gnuworld
-{ 
- 
-	
-	HostBanMatcher::HostBanMatcher(const string& mask) : banMask(mask)
+{
+	bool banMatch(const string& banMask, const string& address)
 	{
-			
+		/* If we don't have at least a user@hostip at both side
+		 * it means we don't match a ban
+		 */
+		if ((!isUserHost(banMask)) || (!isUserHost(address)))
+			return false;
+
+		if (match(banMask, address))
+			return false;
+
+		return true;
 	}
-	
-	bool HostBanMatcher::matches(iClient* theClient) 
+
+	bool banMatch(const string& banMask, const iClient* theClient)
 	{
-		string authbanmask = theClient->getNickName() + "!" + theClient->getUserName();
-		authbanmask += "@" + theClient->getAccount() + theClient->getHiddenHostSuffix();
+		if (!isUserHost(banMask))
+			return false;
+
+		if (!match(banMask, theClient))
+			return true;
+
+		string authmask = theClient->getNickName() + "!" + theClient->getUserName();
+		authmask += "@" + theClient->getAccount() + theClient->getHiddenHostSuffix();
 		if (theClient->isModeR() && !theClient->isModeX())
 		{
 			/* client is authed, check our constructed hidden host against them */
-			if ((match(banMask, authbanmask)) == 0)
+			if (match(banMask, authmask) == 0)
 				return true;
 		}
-
-		string nickuserip = theClient->getNickName() + "!" + theClient->getUserName();
-		nickuserip += "@" + xIP(theClient->getIP()).GetNumericIP();
-		
-		if( (match(banMask,theClient->getNickUserHost()) == 0) ||
-				(0 == match( banMask,theClient->getRealNickUserHost())) ||
-				(0 == match( banMask, nickuserip)) )
-		{
-			return true;
-		}
 		return false;
-	} 
-}
-
-
- 
-
+	}
+} //namespace gnuworld

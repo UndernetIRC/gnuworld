@@ -27,8 +27,6 @@
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 
-RCSTAG( "$Id: ADDOPERCHANCommand.cc,v 1.12 2006/09/26 17:35:57 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

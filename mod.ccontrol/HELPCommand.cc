@@ -21,7 +21,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -30,8 +30,6 @@
 #include	"StringTokenizer.h"
 #include	"commLevels.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: HELPCommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

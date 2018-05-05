@@ -33,8 +33,6 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_RI.cc,v 1.4 2010/07/12 18:14:47 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
 

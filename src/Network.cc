@@ -45,8 +45,6 @@
 #include	"ip.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: Network.cc,v 1.78 2008/04/16 20:29:38 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
 
@@ -1723,6 +1721,20 @@ list<const Channel*> xNetwork::getChannelsWithModes(const string& modes) const
 				case 'D':	/* new .12 mode for large channels */
 						if ((!modeflag && cptr->second->getMode(Channel::MODE_D))
 							|| (modeflag && !cptr->second->getMode(Channel::MODE_D)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'c':	/* new u2.10.12.15 mode to prevent chan colours */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_C))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_C)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'C':	/* new u2.10.12.15 mode to prevent chan CTCPs (except ACTION) */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_CTCP))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_CTCP)))
 						{
 							foundMatch = false;
 						}

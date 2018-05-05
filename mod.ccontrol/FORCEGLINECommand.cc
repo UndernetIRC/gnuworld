@@ -20,7 +20,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -34,8 +34,6 @@
 #include	"ELog.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.39 2009/06/09 05:55:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {
@@ -64,13 +62,15 @@ if( st.size() < 3 )
 StringTokenizer::size_type pos = 1 ;
 
 bool Forced = false;
+string cmdStr = "FORCEGLINE ";
 
 ccUser* tmpUser = bot->IsAuth(theClient);
-bot->MsgChanLog("FORCEGLINE %s\n",st.assemble(1).c_str());
+//bot->MsgChanLog("FORCEGLINE %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[pos],"-fu"))
 	{
 	Forced = true;
 	pos++;
+	cmdStr += "-fu ";
 	if( st.size() < 4 )
 		{
 		Usage( theClient ) ;
@@ -125,7 +125,10 @@ if((Forced) && (tmpUser->getType() < operLevel::SMTLEVEL))
 	}
 	
 unsigned int Users;
-int gCheck = bot->checkGline(st[pos],gLength,Users);
+string gHost = st[pos];
+int gCheck = bot->checkGline(gHost,gLength,Users);
+hostName = gHost;
+cmdStr += gHost + " " + st.assemble(pos+1);
 
 if(gCheck & gline::NEG_TIME)
 	{
@@ -241,6 +244,17 @@ if(gCheck & gline::FORCE_NEEDED_WILDTIME)
 	,theClient->getNickName().c_str()
 	,gline::MGLINE_WILD_TIME);
 	}*/
+string Cidr = hostName.substr(hostName.find('@')+1);
+
+if (Cidr.find('/') != string::npos) 
+	{
+	string tCidr;
+	if (!bot->getValidCidr(Cidr, tCidr))
+		{
+		bot->Notice(theClient, "Unwanted cidr format: %s  -  Suggestion: %s", Cidr.c_str(), tCidr.c_str());
+		Ok = false;
+		}
+	}
 if(!Ok)
 	{
 	bot->Notice(theClient,"Please fix all of the above, and try again");
@@ -272,13 +286,13 @@ if(Reason.size() > gline::MAX_REASON_LENGTH)
 	//st.assemble( pos + ResStart ) + "[" + Us + "]",
 	gLength , bot) ;*/
 
-ccGline *TmpGline = bot->findGline(st[pos]);
+ccGline *TmpGline = bot->findGline(gHost);
 bool Up = false;
 
 if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
-TmpGline->setHost(st [ pos ]);
+TmpGline->setHost(gHost);
 TmpGline->setExpires(unsigned(::time(0) + gLength));
 TmpGline->setAddedBy(nickUserHost);
 TmpGline->setReason(Reason);
@@ -297,6 +311,7 @@ else
 	bot->addGline(TmpGline);
 	}
 
+bot->MsgChanLog(cmdStr.c_str());
 return true ;
 }
 

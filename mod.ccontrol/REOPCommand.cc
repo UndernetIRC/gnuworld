@@ -19,11 +19,8 @@
  *
  * $Id: REOPCommand.cc,v 1.7 2006/09/26 17:36:01 kewlio Exp $
  */
-
 #include	<string>
-
 #include	<cstdlib>
-
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -31,8 +28,6 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: REOPCommand.cc,v 1.7 2006/09/26 17:36:01 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

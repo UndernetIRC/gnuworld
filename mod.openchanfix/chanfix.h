@@ -234,7 +234,7 @@ public:
 	void checkNetwork();
 	void checkChannelServiceLink(iServer*, const eventType&);
 	void findChannelService();
-	const int getLastFix(sqlChannel*);
+	int getLastFix(sqlChannel*);
 
 	void insertop(sqlChanOp*, sqlChannel*);
 	bool findop(sqlChanOp*, sqlChannel*);
@@ -307,7 +307,7 @@ public:
 	
 	const std::string getChanNickName(const std::string&, const std::string&);
 
-	const int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
+	int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 
 	char *convertToAscTime(time_t);
 

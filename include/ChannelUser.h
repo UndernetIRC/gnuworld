@@ -25,6 +25,8 @@
 
 #include	<string>
 
+#include	"Numeric.h"
+
 #include	"ELog.h"
 
 namespace gnuworld
@@ -160,7 +162,7 @@ public:
 	/**
 	 * Retrieve this channel user's IP.
 	 */
-	const unsigned int& getIP() const ;
+	const irc_in_addr& getIP() const ;
 
 	/**
 	 * Retrieve this channel user's integer representation

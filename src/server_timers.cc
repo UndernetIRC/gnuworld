@@ -25,16 +25,12 @@
  *
  * $Id: server_timers.cc,v 1.1 2005/01/07 00:10:46 dan_karrels Exp $
  */
-
 #include	<stack>
 #include	<map>
 #include	<iostream>
-
 #include	"server.h"
 #include	"ELog.h"
 #include	"ServerTimerHandlers.h"
-
-RCSTAG( "$Id: server_timers.cc,v 1.1 2005/01/07 00:10:46 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

@@ -23,17 +23,12 @@
  *
  * $Id: USETCommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $
  */
-
 #include	<string>
-
 #include	"gnuworld_config.h"
 #include	"StringTokenizer.h"
-
 #include	"chanfix.h"
 #include	"responses.h"
 #include	"sqlcfUser.h"
-
-RCSTAG("$Id: USETCommand.cc,v 1.6 2008/01/16 02:03:39 buzlip01 Exp $");
 
 namespace gnuworld
 {

@@ -114,11 +114,16 @@ namespace gnuworld {
 
     const int desc = 450;
     const int mode = 450;
+	const int welcome = 450;
+    const int notake = 500;
+    const int novoice = 450;
     const int noop = 500;
     const int oponly = 500;
     const int strictop = 500;
     const int lang = 500;
-    const int floodpro = 500;
+	const int oplog = 500;
+    const int floodpro = 450;
+    const int floodpro_gline = 800;
     const int autojoin = 500;
 
     const int nopurge = 501;
@@ -132,12 +137,14 @@ namespace gnuworld {
     const int caution = 501;
     const int vacation = 501;
     const int mia = 800;
+	const int noforce = 1000;
   }
 
   namespace immune {
     const int massdeop = 450;
     const int suspendop = 450; // Immune from op'ing a suspended user.
     const int floodpro = 501;
+	const int noforce = 1000;
   }
 
   namespace admin {

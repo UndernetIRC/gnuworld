@@ -31,16 +31,12 @@
 #include	"iServer.h"
 #include	"events.h"
 #include	"Network.h"
-
 #include	"ELog.h"
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_D.cc,v 1.5 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 using std::endl ;
 

@@ -35,9 +35,6 @@
 #include	"cservice_config.h"
 #include	"sqlPendingTraffic.h"
  
-const char sqlPendingTraffic_h_rcsId[] = __SQLPENDINGTRAFFIC_H ;
-const char sqlPendingTraffic_cc_rcsId[] = "$Id: sqlPendingTraffic.cc,v 1.5 2007/08/28 16:10:12 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ; 
@@ -47,7 +44,7 @@ using std::stringstream ;
 
 sqlPendingTraffic::sqlPendingTraffic(dbHandle* _SQLDb)
 :channel_id(0),
-ip_number(0),
+ip_number(string()),
 join_count(0),
 SQLDb(_SQLDb)
 { 
@@ -55,12 +52,12 @@ SQLDb(_SQLDb)
 
 bool sqlPendingTraffic::insertRecord()
 { 
-int theip_number = ip_number;
+string theip_number = ip_number;
  
 stringstream queryString;
 queryString << "INSERT INTO pending_traffic (channel_id, ip_number, join_count) VALUES ("
-			<< channel_id << ", "
-			<< theip_number << ", "
+			<< channel_id << ", '"
+			<< theip_number << "', "
 			<< join_count << ")"
 			<< ends;
 
@@ -85,7 +82,7 @@ if( !SQLDb->Exec(queryString ) )
 
 bool sqlPendingTraffic::commit()
 {
-	int theip_number = ip_number;
+	string theip_number = ip_number;
 	
 	stringstream queryString; 
 	queryString << "UPDATE pending_traffic SET "
@@ -93,8 +90,9 @@ bool sqlPendingTraffic::commit()
 				<< join_count
 				<< " WHERE channel_id = "
 				<< channel_id
-				<< " AND ip_number = "
+				<< " AND ip_number = '"
 				<< theip_number
+				<< "'"
 				<< ends;
 	
 	#ifdef LOG_SQL

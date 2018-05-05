@@ -35,8 +35,6 @@
 #include	"gnuworld_config.h"
 #include	"StringTokenizer.h"
 
-RCSTAG( "$Id: ccException.cc,v 1.17 2008/12/27 23:34:31 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
 
@@ -52,6 +50,8 @@ namespace uworld
 unsigned int ccException::numAllocated = 0;
 unsigned int ccShellco::numAllocated = 0;
 unsigned int ccShellnb::numAllocated = 0;
+unsigned int ccIpLnb::numAllocated = 0;
+unsigned int ccIpLisp::numAllocated = 0;
 
 ccException::ccException(dbHandle* _SQLDb)
  : Host(string()),
@@ -70,6 +70,16 @@ ccException::~ccException()
 }
 
 void ccShellnb::setCidr( const string& _cidr )
+{
+cidr = _cidr;
+StringTokenizer st(cidr,'/');
+if (st.size() == 2) {
+	cidr1 = st[0];
+	cidr2 = atoi(st[1].c_str());
+}
+}
+
+void ccIpLnb::setCidr( const string& _cidr )
 {
 cidr = _cidr;
 StringTokenizer st(cidr,'/');
@@ -549,6 +559,286 @@ bool ccShellnb::set24Mask()
 
 	str24 = string(client_ip);
 	return true;
+}
+
+ccIpLisp::ccIpLisp(dbHandle* _SQLDb)
+{
+	++numAllocated;
+	maxlimit = 0;
+	maxIdentlimit = 0;
+	active = 1;
+	v6 = 2;
+	AddedOn = ::time(0);
+	ModOn = ::time(0);
+	SQLDb = _SQLDb;
+	count = 0;
+	email = "N/A";
+	clonecidr = 64;
+	forcecount = 0;
+}
+
+
+ccIpLisp::~ccIpLisp()
+{
+	--numAllocated;
+}
+
+ccIpLnb::ccIpLnb(dbHandle* _SQLDb)
+{
+	++numAllocated;
+	ipLisp = 0;
+	AddedOn = ::time(0);
+	SQLDb = _SQLDb;
+	ipLispid = 0;
+	cidr2 = 128;
+	count = 0;
+}
+
+
+ccIpLnb::~ccIpLnb()
+{
+	--numAllocated;
+}
+
+
+int ccIpLisp::loadData(const string& Name)
+{
+int i = 0;
+static const char Main[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,isgroup,maxidentlimit FROM ipLISPs WHERE name = '";
+
+if((!dbConnected) || !(SQLDb))
+	{
+	return false;
+	}
+
+stringstream theQuery;
+theQuery	<< Main
+		<< ccontrol::removeSqlChars(Name)
+		<< "'"
+		<< ends;
+
+elog	<< "ccIpLisp::loadData> "
+	<< theQuery.str().c_str()
+	<< endl; 
+
+// TODO: Isn't this impossible?
+if( !SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
+//if( (PGRES_TUPLES_OK != status) && (SQLDb->Tuples() > 0) )
+	{
+	return false;
+	}
+
+setName(SQLDb->GetValue(i,0));
+setID(atoi(SQLDb->GetValue(i,1).c_str()));
+setAddedBy(SQLDb->GetValue(i,2)) ;
+setAddedOn(static_cast< time_t >(
+	atoi( SQLDb->GetValue(i,3).c_str() ) )) ;
+setModBy(SQLDb->GetValue(i,4)) ;
+setModOn(static_cast< time_t >(
+	atoi( SQLDb->GetValue(i,5).c_str() ) )) ;
+setLimit(atoi(SQLDb->GetValue(i,6).c_str()));
+setActive(atoi(SQLDb->GetValue(i,7).c_str()));
+setEmail(SQLDb->GetValue(i,8));
+setCloneCidr(atoi(SQLDb->GetValue(i,9).c_str()));
+setForcecount(atoi(SQLDb->GetValue(i,10).c_str()));
+setGroup(atoi(SQLDb->GetValue(i,11).c_str()));
+setIdentLimit(atoi(SQLDb->GetValue(i,12).c_str()));
+
+theQuery.str("");
+
+return true;
+
+}
+
+
+int ccIpLisp::updateData()
+{
+static const char *Main = "UPDATE ipLISPs SET AddedBy = '";
+
+if(!dbConnected)	
+	{
+	return false;
+	}
+
+stringstream theQuery;
+theQuery	<< Main
+		<< ccontrol::removeSqlChars(AddedBy)
+		<< "', maxlimit = "
+		<< maxlimit
+		<< ", maxidentlimit = "
+		<< maxIdentlimit
+		<< ", addedon = "
+		<< AddedOn
+		<< ", active = "
+		<< active
+		<< ", lastmodon = "
+		<< ModOn
+		<< ", clonecidr = "
+		<< clonecidr
+		<< ", forcecount = "
+		<< forcecount
+		<< ", isgroup = "
+		<< group
+		<< ", lastmodby = '"
+		<< ccontrol::removeSqlChars(ModBy)
+		<< "', email = '"
+		<< ccontrol::removeSqlChars(email)
+		<< "', name = '"
+		<< ccontrol::removeSqlChars(Name)
+		<< "' WHERE id = " 
+		<< id
+		<<  ends;
+
+elog	<< "ccIpLisp::Update> "
+	<< theQuery.str().c_str()
+	<< endl; 
+
+if( SQLDb->Exec( theQuery ) )
+//if( PGRES_COMMAND_OK == status ) 
+	{
+	return true;
+	}
+else
+	{
+	elog	<< "ccIpLisp::Update> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;
+	}
+
+}
+
+bool ccIpLisp::Insert()
+{
+static const char *quer = "INSERT INTO ipLISPs(name,maxlimit,maxidentlimit,addedby,addedon,lastmodby,lastmodon,email,clonecidr,forcecount,isgroup) VALUES ('";
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
+stringstream query;
+query		<< quer
+		<< ccontrol::removeSqlChars(Name) << "',"
+		<< maxlimit
+		<< "," << maxIdentlimit
+		<< ",'" << ccontrol::removeSqlChars(AddedBy)
+		<< "'," << AddedOn
+		<< ",'" << ccontrol::removeSqlChars(ModBy)
+		<< "'," << ModOn
+		<< ",'" << ccontrol::removeSqlChars(email)
+		<< "'," << clonecidr
+		<< "," << forcecount
+		<< "," << group
+		<< ")" << ends;
+
+elog	<< "ccIpLisp::Insert> "
+	<< query.str().c_str()
+	<< endl; 
+
+if( !SQLDb->Exec( query ) )
+//if(PGRES_COMMAND_OK != status)
+	{
+	elog	<< "ccIpLisp::Insert> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false ;
+	}
+return true ;
+//return (PGRES_COMMAND_OK == status) ;
+}
+
+bool ccIpLnb::Insert()
+{
+static const char *quer = "INSERT INTO ipLNetblocks(cidr,ispid,addedby,addedon) VALUES ('";
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
+stringstream query;
+query		<< quer
+		<< ccontrol::removeSqlChars(cidr) << "',"
+		<< ipLispid
+		<< ",'" << ccontrol::removeSqlChars(AddedBy)
+		<< "'," << AddedOn
+		<< ")" << ends;
+
+elog	<< "ccIpLnb::Insert> "
+	<< query.str().c_str()
+	<< endl; 
+
+if( !SQLDb->Exec( query ) )
+//if(PGRES_COMMAND_OK != status)
+	{
+	elog	<< "ccIpLnb::Insert> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false ;
+	}
+return true ;
+//return (PGRES_COMMAND_OK == status) ;
+}
+
+bool ccIpLisp::Delete()
+{
+static const char *quer = "DELETE FROM ipLISPs WHERE name = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
+stringstream query;
+query		<< quer
+		<< ccontrol::removeSqlChars(Name) << "'"
+		<< ends;
+
+elog 		<< "ccIpLisp::delException> "
+		<< query.str().c_str()
+		<< endl ;
+
+if( !SQLDb->Exec( query ) )
+//if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccIpLisp::findException> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;		    
+	}
+return true;
+}
+
+bool ccIpLnb::Delete()
+{
+static const char *quer = "DELETE FROM ipLNetblocks WHERE cidr = '";
+
+if(!dbConnected)
+	{
+	return false;
+	}
+
+stringstream query;
+query		<< quer
+		<< ccontrol::removeSqlChars(cidr) << "'"
+		<< " and ispid = "
+		<< ipLispid
+		<< ends;
+
+elog 		<< "ccIpLnb::delException> "
+		<< query.str().c_str()
+		<< endl ;
+
+if( !SQLDb->Exec( query ) )
+//if( PGRES_COMMAND_OK != status )
+	{
+	elog	<< "ccIpLnb::findException> SQL Failure: "
+		<< SQLDb->ErrorMessage()
+		<< endl ;
+	return false;		    
+	}
+return true;
 }
 
 

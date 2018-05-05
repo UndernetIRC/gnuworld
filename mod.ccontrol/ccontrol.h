@@ -215,6 +215,54 @@ protected:
 
 	shellnbMapType		shellnbMap;
 
+	typedef vector< ccIpLisp* >    ipLispVectorType;
+	
+	ipLispVectorType		ipLispVector;
+
+	typedef vector< pair<int, ccIpLnb*> >    ipLnbVectorType;
+	
+	ipLnbVectorType		ipLnbVector;
+		
+	//typedef map<ccIpLisp*, int>	ipLispMapType;
+
+	//ipLispMapType		ipLispMap;
+
+	//typedef map<ccIpLnb*, int>	ipLnbMapType;
+
+	//ipLnbMapType		ipLnbMap;
+
+	typedef map<string, int>	ipLclonesMapType;
+
+	//ipLclonesMapType		ipLclonesMap;
+
+	typedef list< ccIpLnb* >    ipLnbListType;
+
+	typedef map<string, ipLnbListType>	ipLnumericMapType;
+
+	ipLnumericMapType		ipLnumericMap;
+
+	typedef pair<iClient*, int>	ipLRecentIauthPairType;
+
+	typedef list<ipLRecentIauthPairType>	ipLRecentIauthListType;
+
+	ipLRecentIauthListType		ipLRecentIauthList;
+
+	typedef pair<ccIpLnb*, int>	ipLretPairType;
+
+	typedef list<ipLretPairType>	ipLretPairListType;
+
+	struct ipLretStruct {
+		ccIpLnb *nb;
+		int count;
+		int limit;
+		char type;
+		string mask;
+	};
+	
+	typedef struct ipLretStruct ipLretStructType;
+
+	typedef list<ipLretStructType>	ipLretStructListType;
+
 	typedef map<string,long> 	clientsIpMapType;
 	
 	typedef clientsIpMapType::iterator clientsIpIterator;
@@ -357,13 +405,13 @@ public:
 	 * channel.
 	 */
 	virtual bool Join( const string&, const string& = string(),
-		time_t = 0, bool = false) ;
+			const time_t& = 0, bool = false) ;
 
 	/**
 	 * This method will cause this client to part the given channel,
 	 * if it is already on that channel.
 	 */
-	virtual bool Part( const string& ) ;
+	virtual bool Part( const string& , const string& = string()) ;
 
 	/**
 	 * This method will register a given command handler, removing
@@ -480,11 +528,6 @@ public:
 	static string CryptPass( const string& );
 
 	/**
-	 * This method will check if a mask is valid
-	 */
-	virtual bool validUserMask(const string& userMask) const ;
-
-	/**
 	 * This method will add a host to a client
 	 */
         bool AddHost( ccUser* , const string& host );
@@ -536,6 +579,22 @@ public:
 
 	/**
 	 * This method will attempt to load an oper info from the database
+	 * based on the user account
+	 */
+	ccUser *GetOperByAC( const string& );
+
+	/**
+	 * This method will add an account to accountsMap
+	 */
+	bool accountsMapAdd (ccUser*, const string&);
+
+	/**
+	 * This method will remove an account from accountsMap
+	 */
+	bool accountsMapDel (const string&);
+
+	/**
+	 * This method will attempt to load an oper info from the database
 	 * based on the user id
 	 */
 	ccUser *GetOper( unsigned int );
@@ -570,9 +629,20 @@ public:
 
 	ccGline* findMatchingRNGline( const iClient* );
 
+	//TODO Eventually merge these three functions, update it's dependencies
 	ccGline* findGline( const string& );
 
 	ccGline* findRealGline( const string& );
+
+	ccGline* findGlineAndRealGline( const string& );
+
+	vector< ccGline* > findAllMatchingGlines(const string& );
+
+	/*
+	 * Remove matching glines from mod.ccontrol's glines list, from 'gnuworld server' gline list
+	 * and also send gline remove messages to the network.
+	 */
+	bool removeAllMatchingGlines( const string& , bool );
 
 	/**
 	 * This method logs the bot commands to the message channel
@@ -613,12 +683,23 @@ public:
 	 */
 	bool MailReport(const char *, const char *);
 
+	/*
+	 * checkGline functions for IPv4 and hostnames
+	 */
+	int checkGline4(string &,unsigned int ,unsigned int &);
+
+	int checkSGline4(string &,unsigned int ,unsigned int &);
+
+	//Checkgline functions only for IPv6
+	int checkGline6(string &,unsigned int ,unsigned int &);
+
+	int checkSGline6(string &,unsigned int ,unsigned int &);
 	/**
 	 * This method checks the gline paramerters for valid time/host
 	 */
-	int checkGline(const string ,unsigned int ,unsigned int &);
+	int checkGline(string &,unsigned int ,unsigned int &);
 
-	int checkSGline(const string ,unsigned int ,unsigned int &);
+	int checkSGline(string &,unsigned int ,unsigned int &);
 
 	bool isSuspended(ccUser *);
 	
@@ -627,6 +708,8 @@ public:
 	bool refreshSuspention();
 	
 	bool refreshGlines();
+
+	bool refreshIauthEntries();
 	
 	void queueGline(ccGline* , bool = true);
 	
@@ -671,6 +754,8 @@ public:
 	ccShellnb* getShellnb( const string & );
 
 	bool isValidCidr( const string & );
+
+	bool getValidCidr( const string &, string &  );
 	
 	bool isCidrMatch( const string & , const string & );
 	
@@ -689,6 +774,37 @@ public:
 
 	bool clearShells( iClient * );
 	
+        ccIpLisp* getIpLisp( const string & );
+
+	ccIpLisp* getIpLispbyID( const int & );
+
+	ccIpLnb* getIpLnb( const string &, const string & );
+        
+	bool listIpLExceptions( iClient * );
+
+	//bool isIpLClientAllowed( iClient *, ipLretPairListType &, bool);
+	bool isIpLClientAllowed( iClient *, ipLretStructListType &, bool);
+
+	bool ipLDropClient( iClient * );
+
+	bool reloadIpLisp( iClient *, ccIpLisp* );
+
+	bool insertIpLisp( iClient * , const string& , int, int, const string &, int, int );
+
+	bool insertIpLnb( iClient * , const string & , int, bool );
+
+	bool delIpLnb( iClient * , const string &, const string&, bool );
+
+	bool delIpLisp( iClient * , const string & );
+
+	bool clearIsps( iClient * );
+
+	bool ipLcidrChangeCheck(iClient *, ccIpLisp *, int);
+
+	bool ipLuserInfo( iClient *, iClient * );
+
+	size_t iauthXQCheck(iServer*, const string&, const string&);
+
 	ccFloodData *findLogin( const string & );
 
 	void removeLogin( ccFloodData * );
@@ -925,6 +1041,10 @@ public:
 	typedef exceptionListType::iterator exceptionIterator;
 	typedef shellcoListType::iterator shellcoIterator;
 	typedef shellnbListType::iterator shellnbIterator;
+	typedef ipLispVectorType::iterator ipLispIterator;
+	typedef ipLnbVectorType::iterator ipLnbIterator;
+	typedef ipLnumericMapType::iterator ipLnumericIterator;
+	typedef ipLclonesMapType::iterator ipLclonesMapIterator;
 	
 	exceptionIterator exception_begin() 
 		{ return exceptionList.begin(); }
@@ -934,7 +1054,7 @@ public:
 	
 	clientsIpMapType		clientsIpMap;
 
-	opersIPMapType				opersIPMap;
+	opersIPMapType			opersIPMap;
 	
 	clientsIpIterator clientsIp_begin()
 		{ return clientsIpMap.begin(); }
@@ -1037,6 +1157,13 @@ public:
 
 	gnuworld::xServer::timerID timeCheck;
 
+	struct sort_pred {
+		bool operator()(const std::pair<string,int> &left, const std::pair<string,int> &right) {
+			return left.second < right.second;
+		}
+	};
+
+
 protected:
 
 	/**
@@ -1126,7 +1253,9 @@ protected:
 
 	int			maxCClones;
 
-	int			CClonesCIDR;
+	int			CClonesCIDR24;
+
+	int			CClonesCIDR48;
 
 	int			CClonesTime;
 
@@ -1146,10 +1275,12 @@ protected:
 
 	bool			showCGIpsInLogs;
 
+	bool			StdCloneChecksDisabled;
+
 	time_t			dbConnectionTimer;
 
 	string			AnnounceNick;
-	
+
 	string			sqlHost;
 	
 	string			sqlPort;
@@ -1177,7 +1308,8 @@ protected:
 	unsigned int 		glineBurstCount; 
 	
 	bool			saveGlines;
-	
+
+
 } ; 
 
 extern bool dbConnected;

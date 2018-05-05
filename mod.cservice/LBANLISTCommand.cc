@@ -27,18 +27,14 @@
  */
 
 #include	<string>
-
 #include	<ctime>
-
 #include	"StringTokenizer.h"
 #include	"cservice.h"
 #include	"levels.h"
-#include	"match.h"
 #include	"responses.h"
 #include	"cservice_config.h"
 #include	"time.h"
-
-const char LBANLISTCommand_cc_rcsId[] = "$Id: LBANLISTCommand.cc,v 1.15 2007/08/07 21:22:29 kewlio Exp $" ;
+#include	"banMatcher.h"
 
 namespace gnuworld
 {
@@ -104,11 +100,11 @@ time_t ban_expires_f = 0;
 for( std::map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin() ; ptr != theChan->banList.end() ; ++ptr )
 	{
 	const sqlBan* theBan = ptr->second;
-
+	ban_expires = theBan->getExpires();
 	/* If its expired.. just don't show it - it'll be removed soon ;) */
-	if (theBan->getExpires() >= bot->currentTime())
+	if ((ban_expires >= bot->currentTime()) || (ban_expires == 0))
 		{
-		if (match(st[2], theBan->getBanMask()) == 0)
+		if (!match(fixAddress(st[2]), theBan->getBanMask()))
 			{
 			results++;
 			/* escape the loop if we exceed our ban limit */
@@ -116,10 +112,13 @@ for( std::map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin() ; pt
 			{
 				break;
 			}
-			ban_expires = theBan->getExpires();
-			ban_expires_d = ban_expires - bot->currentTime();
-			ban_expires_f = bot->currentTime() - ban_expires_d;
-
+			if (ban_expires > 0)
+			{
+				ban_expires_d = ban_expires - bot->currentTime();
+				ban_expires_f = bot->currentTime() - ban_expires_d;
+			}
+			else
+				ban_expires_f = 0;
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::lban_entry,

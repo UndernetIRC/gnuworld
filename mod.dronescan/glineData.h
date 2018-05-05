@@ -40,7 +40,7 @@ public:
 	inline const std::string getReason() const
 		{ return reason; }
 
-	inline const time_t getExpires() const
+	inline time_t getExpires() const
 		{ return expires; }
 
 

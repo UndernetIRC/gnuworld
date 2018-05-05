@@ -38,8 +38,6 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.13 2005/11/17 19:08:08 kewlio Exp $" ;
-
 namespace gnuworld
 {
 using std::endl ;
@@ -111,6 +109,14 @@ bot->Notice(theClient,
 	    language::modeclear_done,
 	    string("%s: Cleared channel modes.")).c_str(),
 		theChan->getName().c_str());
+
+// Send action opnotice to channel if OPLOG is enabled
+if (theChan->getFlag(sqlChannel::F_OPLOG))
+{
+	bot->NoticeChannelOps(theChan->getName(),
+		"%s (%s) cleared channel modes.",
+		theClient->getNickName().c_str(), theUser->getUserName().c_str());
+}
 
 return true ;
 }

@@ -19,16 +19,11 @@
  *
  * $Id: ChannelUser.cc,v 1.10 2009/07/26 18:30:37 mrbean_ Exp $
  */
-
 #include	<string>
 #include	<vector>
-
 #include	<cassert>
-
 #include	"iClient.h"
 #include	"ChannelUser.h"
-
-RCSTAG("$Id: ChannelUser.cc,v 1.10 2009/07/26 18:30:37 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {
@@ -64,7 +59,7 @@ const string& ChannelUser::getHostName() const
 return theClient->getInsecureHost() ;
 }
 
-const unsigned int& ChannelUser::getIP() const
+const irc_in_addr& ChannelUser::getIP() const
 {
 return theClient->getIP() ;
 }

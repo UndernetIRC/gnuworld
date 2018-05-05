@@ -1,0 +1,80 @@
+#
+# Use this script to convert the mod.cservice tables to use 'inet' datatype:
+#       pending_traffic
+#       ip_restrict
+#
+# In the case of ip_restrict (IPR) entries the script will attempt to convert
+# hostnames to IPs, wildcards or ranges to CIDR notation. DNS and masks are not
+# longer permitted.
+#
+#
+# - Empus <empus@undernet.org>
+#
+
+
+# INSTALL & USE INSTRUCTIONS BELOW
+
+# Requires python
+
+	sudo pkg install python
+
+
+# Install python pip
+
+	sudo pkg install py27-pip-8.1.2
+
+
+# Add pg_config to PATH
+
+	export PATH=$PATH:/usr/local/pgsql/bin
+
+
+# Add pgsql library to LD_LIBRARY
+
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/pgsql/lib
+
+
+# Install python lirbary: psycopg2
+
+	sudo pip install psycopg2
+
+
+# Install python library: netaddr
+
+	sudo pip install netaddr
+
+
+# Usage: ./ipconvert.py -h <host> -d <database> -u <user> >> converted.sql
+
+	./ipconvert.py -d cmaster >> converted.sql
+
+
+# Analyze the output file before passing to pgsql appropriately. ie:
+
+	/usr/local/pgsql/bin/psql cmaster -a -f converted.sql
+
+
+# Update multiple tables to support new features
+
+	/usr/local/pgsql/bin/psql cmaster -a -f update_cservice-20161018.sql
+
+
+# Update the mod.ccontrol's help, with the new remsgline "-fr" forceremove option possibility
+
+	/usr/local/pgsql/bin/psql ccontrol -a -f update_ccontrol.help-2013.12.14.sql
+
+
+# Update bans for the extended 365 days ban, and 0 for permanent ban, we apply:
+
+	/usr/local/pgsql/bin/psql cmaster -a -f update_variables_20150518.sql
+	/usr/local/pgsql/bin/psql cmaster -a -f update_languages_2015.05.23.sql
+
+
+# Adding the new StarWars language:
+
+	/usr/local/pgsql/bin/psql cmaster -a -f language_starwars.sql
+
+# Adding the channel WELCOME message feature
+
+	/usr/local/pgsql/bin/psql cmaster -a -f update_welcome-20170321.sql
+	

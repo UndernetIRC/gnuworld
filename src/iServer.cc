@@ -30,8 +30,6 @@
 #include	"gnuworld_config.h"
 #include	"NetworkTarget.h"
 
-RCSTAG( "$Id: iServer.cc,v 1.11 2006/12/22 06:41:45 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

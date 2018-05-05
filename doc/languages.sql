@@ -24,4 +24,5 @@ COPY "languages" FROM stdin;
 19	GR	Greek	31337	0
 20	SV	Svenska	31337	0
 21	CH	Christmas	31337	0
+22	SW	StarWars	31337	0
 \.
