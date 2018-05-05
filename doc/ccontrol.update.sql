@@ -123,6 +123,7 @@
 --  update opers set access = (access | 2097152);
 
 -- 2009/07/24 Add GETLAG and LastPassChangeTS to opers
+
 --alter TABLE opers add LastPassChangeTS INT4 NOT NULL DEFAULT '0';
 --alter TABLE opers add GetLAG BOOLEAN NOT NULL DEFAULT 'n';
 
@@ -160,3 +161,4 @@ CREATE TABLE ipLNetblocks (
 
 -- 2017-02-09 Adding row for connection limits system
 alter TABLE ipLISPs add maxidentlimit int4 NOT NULL DEFAULT '0';
+

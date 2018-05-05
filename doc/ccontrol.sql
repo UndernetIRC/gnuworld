@@ -1,8 +1,8 @@
 -- "$Id: ccontrol.sql,v 1.34 2009/07/25 18:12:33 hidden1 Exp $"
 
-
 -- 2016-04-17 : Hidden
 -- Added Single Sign On + /oper anywhere support
+
 -- 2009-01-16 : Spike
 -- Merged ShellCompanies and ShellNetblocks tables in.
 

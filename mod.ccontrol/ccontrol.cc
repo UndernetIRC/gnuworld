@@ -2154,6 +2154,7 @@ if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser)))
 } 
 
 
+
 /*
  * Note: All elogs with ccontrol::handleNewClient> can be/are considered for debugging
  */
@@ -2193,6 +2194,7 @@ if (NewUser->isOper())
 if (NewUser->isModeR()) {
 	handleAC(NewUser);
 }
+
 if(dbConnected)
 	{
 	string tIP = xIP( NewUser->getIP()).GetNumericIP();
@@ -2922,7 +2924,6 @@ theQuery	<< Main
 		<< "," << (Oper->getAutoOp() ? "'t'" : "'n'")
 		<< ",'" << removeSqlChars(Oper->getAccount())
 		<< "'," << "0"
-
 		<< ")"
 		<< ends;
 
@@ -2952,6 +2953,7 @@ return true;
 bool ccontrol::accountsMapDel (const string& AC)
 {
 accountsMapType::iterator it = accountsMap.find(AC);
+//if (GetOperByAC(AC) != NULL) {
 if (it != accountsMap.end()) {
 	accountsMap.erase(it);
 	//accountsMap.erase(AC);
