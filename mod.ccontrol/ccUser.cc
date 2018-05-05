@@ -33,11 +33,8 @@
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccUser.cc,v 1.22 2009/07/26 18:30:38 mrbean_ Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ; 
 using std::endl ; 
 using std::stringstream ;
@@ -74,7 +71,7 @@ ccUser::ccUser(dbHandle* _SQLDb)
    SQLDb( _SQLDb ),
    PassChangeTS(0)
 {
-+numAllocated;
+++numAllocated;
 }
 
 ccUser::~ccUser()

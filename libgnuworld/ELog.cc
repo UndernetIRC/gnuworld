@@ -25,10 +25,8 @@
 #include	<fstream>
 #include	<sstream>
 #include	<string>
-
+#include	<ctime>
 #include	"ELog.h"
-
-const char rcsId[] = "$Id: ELog.cc,v 1.8 2005/02/20 15:49:21 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -42,12 +40,14 @@ ELog	elog ;
 
 ELog::ELog()
  : outStream( 0 ),
-   logFile( false )
+   logFile( false ),
+   newline(true)
 {}
 
 ELog::ELog( const string& fileName )
  : outStream( 0 ),
-   logFile( false )
+   logFile( false ),
+   newline(true)
 {
 openFile( fileName ) ;
 }
@@ -92,6 +92,7 @@ if( logFile )
 	outFile	<< var ;
 	}
 if( outStream ) *outStream << var ;
+newline = true;
 return *this ;
 }
 
@@ -102,7 +103,19 @@ if( logFile )
 	outFile	<< var ;
 	}
 if( outStream ) *outStream << var ;
+newline = true;
 return *this ;
+}
+
+std::string ELog::getLocalTime()
+{
+	  time_t theTime;
+	  time(&theTime);  /* get current time; same as: theTime = time(NULL)  */
+	  struct tm* timeinfo = localtime(&theTime);
+	  char buffer[20] = {0};
+
+	  std::strftime(buffer,20,"%Y-%m-%d %H:%M:%S",timeinfo);
+	  return string("[" + string(buffer) + "] ");
 }
 
 } // namespace gnuworld

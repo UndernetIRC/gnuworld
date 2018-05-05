@@ -33,8 +33,6 @@
 #include	"ServerCommandHandler.h"
 #include	"StringTokenizer.h"
 
-RCSTAG( "$Id: msg_O.cc,v 1.10 2005/03/25 03:07:29 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
 

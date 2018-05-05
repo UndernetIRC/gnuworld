@@ -56,10 +56,10 @@
 #include	"misc.h"
 #include	"Network.h"
 #include	"ELog.h"
-#include        "ccUser.h"
+#include	"ccUser.h"
 #include	"dbHandle.h"
 #include	"ccontrol.h"
-#include        "server.h"
+#include	"server.h"
 #include 	"Constants.h"
 #include	"commLevels.h"
 #include	"ccFloodData.h"
@@ -68,11 +68,8 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccontrol.cc,v 1.243 2010/09/12 20:28:24 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::ends ;
 using std::stringstream ;
 using std::string ;
@@ -656,7 +653,7 @@ RegisterCommand( new SHELLSCommand( this, "SHELLS",
 	operLevel::OPERLEVEL,
 	true ) ) ;
 RegisterCommand( new LIMITSCommand( this, "LIMITS",
-	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chname / chemail / forcecount / active / group / chccidr / clearall / userinfo)",
+	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chilimit / chname / chemail / forcecount / active / group / chccidr / clearall / userinfo)",
 	true,
 	commandLevel::flg_LIMITS,
 	false,
@@ -854,19 +851,7 @@ else
 	elog << "Failed!!!" << endl;
 	}
 
-elog << "Loading exceptions ....... ";
-if(loadExceptions())
-	{
-	elog << "Done!" << endl;
-	}
-else
-	{
-	elog	<< "Error while loading exceptions!!!! ,"
-		<< " shutting down"
-		<< endl;
-	::exit(1);
-	}
-	
+
 elog << "Loading users ............ ";
 if(loadUsers())
 	{
@@ -895,6 +880,19 @@ if(!loadMisc())
 	{
 	glineBurstInterval = 5;
 	glineBurstCount = 5;
+	}
+	
+elog << "Loading exceptions ....... ";
+if(loadExceptions())
+	{
+	elog << "Done!" << endl;
+	}
+else
+	{
+	elog	<< "Error while loading exceptions!!!! ,"
+		<< " shutting down"
+		<< endl;
+	::exit(1);
 	}
 	
 connectCount = 0;
@@ -1831,6 +1829,7 @@ else if (timer_id == expiredTimer)
 	refreshGlines();
 	refreshIgnores();
 	refreshSuspention();
+	refreshIauthEntries();
 	expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,
 		this,NULL);
 	}
@@ -2147,8 +2146,8 @@ theUser->setLastAuthNumeric(theClient->getCharYYXXX());
 if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser))) {
 	std::string Numeric = getUplink()->getCharYY();
 	Write("%s OM %s :+o", Numeric.c_str(), theClient->getCharYYXXX().c_str());
-	theClient->setModeO();
-	getUplink()->PostEvent(EVT_OPER, static_cast< void* >(theClient));
+	//theClient->setModeO();
+	//getUplink()->PostEvent(EVT_OPER, static_cast< void* >(theClient));
 	MsgChanLog("(%s) - %s - REMOTE OPER (+o)\n", theUser->getUserName().c_str(),
 		theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
 }
@@ -2492,70 +2491,99 @@ CClonesCIDR << " (will GLINE): *@";
 			*/
 			bool isClientDropped = false;
 			ccIpLnb* nb;
-			ipLretPairListType retList;
+			ipLretStructListType retList;
+			
 			ipLRecentIauthListType::iterator iItr;
 			for (iItr = ipLRecentIauthList.begin(); iItr != ipLRecentIauthList.end(); ) {
 				iClient *tClient = iItr->first;
 				int age = ::time(0) - iItr->second;
 				if (age > 10) {
-					/* Debug */
-					elog << "ccontrol (erase iauth)> numeric = " << tClient->getCharYYXXX();
-					elog << ",    nuh = " << tClient->getNickUserHost();
-					elog << ",    ip = " << xIP(tClient->getIP()).GetNumericIP() << endl;
-					/* End  of Debug */
-					if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP()) 
-						&& (tClient->getIntYY() == NewUser->getIntYY())) {
-						isClientDropped = true;
+					if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP())) {
+						StringTokenizer st(tClient->getDescription());
+						//assert(st.size() > 1);
+						if (!strncmp(st[0].c_str(), NewUser->getCharYY().c_str(), 2)) {
+								isClientDropped = true;
+						}
 					}
-					iItr = ipLRecentIauthList.erase(iItr);
 					ipLDropClient(tClient);
+					iItr = ipLRecentIauthList.erase(iItr);
 					delete tClient;
 					continue;
 				}
 				if (isClientDropped)
 					break;
-				if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP()) && (tClient->getIntYY() == NewUser->getIntYY())) {
-					//elog << "ccontrol> handleNewClient(): ipL iauth client match: " << NewUser->getNickUserHost().c_str() << endl;
-					ipLDropClient(tClient);
-					iItr = ipLRecentIauthList.erase(iItr);
-					delete tClient;
-					break;
+				if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP())) {
+					StringTokenizer st(tClient->getDescription());
+					//assert(st.size() > 1);
+					if (!strncmp(st[0].c_str(), NewUser->getCharYY().c_str(), 2)) {
+						//elog << "ccontrol> handleNewClient(): ipL iauth client match: " << NewUser->getNickUserHost().c_str() << endl;
+						ipLDropClient(tClient);
+						iItr = ipLRecentIauthList.erase(iItr);
+						delete tClient;
+						break;
+					}
 				}
 				iItr++;
 			}
 			bool ipLRetVal = isIpLClientAllowed(NewUser, retList, true);
-			for (ipLretPairListType::iterator lItr = retList.begin(); lItr != retList.end(); lItr++) {
+			for (ipLretStructListType::iterator lItr = retList.begin(); lItr != retList.end(); lItr++) {
 				string netblock, nbstring;
-				nb = lItr->first;
-				int ipLconncount = lItr->second;
-				ipLRetVal = ipLconncount > nb->getLimit() ? false : true;
+				ipLretStruct rs = *lItr;
+				nb = rs.nb;
+				int ipLconncount = rs.count;
+				bool isUserban = rs.type == 'u' ? true : false;
+				string user = "*";
+				if (isUserban) {
+					StringTokenizer st(rs.mask, '@');
+					assert(st.size() > 0);
+					user = st[0];
+				}
+				ipLRetVal = ipLconncount > rs.limit ? false : true;
 				int tcidr = is_ipv4 ? nb->getCloneCidr() + 96 : nb->getCloneCidr();
 				bool group = false;
+				nbstring = rs.mask;
 				if (nb->ipLisp->isGroup()) {
 					group = true;
 					netblock = nb->getCidr();
-					nbstring = nb->ipLisp->getName();
 					//elog << "ccontrol::handleNewClient> group nb=" << netblock << ", nbstring=" << nbstring
-					//	<< " (" << ipLconncount << "/" << nb->getLimit() << endl;
+					//	<< " (" << ipLconncount << "/" << rs.limit << endl;
 				}
 				else {
 					netblock = IPCIDRMinIP(tIP, tcidr) + "/" + std::to_string(nb->getCloneCidr());
-					nbstring = netblock;
 				}
 				if ((clientsIp24MapLastWarn[nbstring] + CClonesTime) <= time(NULL)) {
-					if (group) {
-						MsgChanLog("Excessive connections (%d/%d) from GROUP %s [ref: %s] (will%s GLINE)\n",
-							ipLconncount, nb->getLimit(), nb->ipLisp->getName().c_str(),
-							nb->getCidr().c_str(), !ipLRetVal && nb->isActive()  ? "" : " _NOT_");
+					if (isUserban && nb->isActive()) {
+						/* Don't bother reporting excessive connections for user@ clones we're not gonna gline */
+						if (group) {
+							MsgChanLog("Excessive CIDR ident clones (%d/%d) for user %s@ in GROUP %s [ref: %s] (will%s GLINE)\n",
+								ipLconncount, rs.limit, user.c_str(), nb->ipLisp->getName().c_str(),
+								nb->getCidr().c_str(), nb->isActive()  ? "" : " _NOT_");
+
+						}
+						else {	
+							MsgChanLog("Excessive CIDR ident clones (%d/%d) for %s [ref: %s] (will%s GLINE)\n",
+								ipLconncount, rs.limit, rs.mask.c_str(),
+								nb->getCidr().c_str(), nb->isActive()  ? "" : " _NOT_");
+
+						}
+						clientsIp24MapLastWarn[nbstring] = time(NULL);
 					}
-					else {
-						MsgChanLog("Excessive connections (%d/%d) from subnet *@%s [ref: %s' %s] (will%s GLINE)\n",
-							ipLconncount, nb->getLimit(), netblock.c_str(), nb->ipLisp->getName().c_str(),
-							nb->getCidr().c_str(), !ipLRetVal && nb->isActive()  ? "" : " _NOT_");
+					else if (!isUserban) {
+						if (group) {
+							MsgChanLog("Excessive connections (%d/%d) from GROUP %s [ref: %s] (will%s GLINE)\n",
+								ipLconncount, rs.limit, nb->ipLisp->getName().c_str(),
+								nb->getCidr().c_str(), !ipLRetVal && nb->isActive()  ? "" : " _NOT_");
+						}
+						else {
+							MsgChanLog("Excessive connections (%d/%d) from subnet *@%s [ref: %s's %s] (will%s GLINE)\n",
+								ipLconncount, rs.limit, netblock.c_str(), nb->ipLisp->getName().c_str(),
+								nb->getCidr().c_str(), !ipLRetVal && nb->isActive()  ? "" : " _NOT_");
+						}
+						clientsIp24MapLastWarn[nbstring] = time(NULL);
 					}
-					clientsIp24MapLastWarn[nbstring] = time(NULL);
 				}
 
+				string netblocks;
 				/* check for auto-gline feature */
 				if (!ipLRetVal && nb->isActive()) {
 					ccIpLnb *original_nb = nb;
@@ -2566,14 +2594,34 @@ CClonesCIDR << " (will GLINE): *@";
 								continue;
 							netblock = nb->getCidr();
 						}
-						sprintf(Log,"Glining *@%s for excessive connections (%d/%d) [ref: %s' %s]",
-							netblock.c_str(), ipLconncount, nb->getLimit(), 
-							nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
-						sprintf(GlineMask,"*@%s", netblock.c_str());
+						if (rs.type == 'i') {
+							sprintf(Log,"Glining *@%s for excessive connections (%d/%d) [ref: %s's %s]",
+								netblock.c_str(), ipLconncount, rs.limit, 
+								nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
+							sprintf(GlineMask,"*@%s", netblock.c_str());
+						}
+						else if (rs.type == 'u') {
+							sprintf(Log,"Glining %s@%s for excessive connections (%d/%d) [ref: %s's %s]",
+								user.c_str(), netblock.c_str(), ipLconncount, rs.limit, 
+								nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
+							sprintf(GlineMask,"%s@%s", user.c_str(), netblock.c_str());
+						}
+						else {
+							elog << "mod.ccontrol> ccontrol.cc bug line " << __LINE__ << endl;
+							exit(0);
+						}
+							
 						AffectedUsers = ipLconncount;
 						/* set the gline reason */
-						sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive connections",AffectedUsers,
-							group ? string("[" + nb->ipLisp->getName() + "] ").c_str() : "");
+						if (isUserban) {
+							sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive IDENT connections (%s@)",
+								AffectedUsers, group ? string("[" + nb->ipLisp->getName() + "] ").c_str() : "",
+								user.c_str());
+						}
+						else {
+							sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive connections",
+								AffectedUsers, group ? string("[" + nb->ipLisp->getName() + "] ").c_str() : "");
+						}
 						gDuration = CClonesGTime;
 						iClient* theClient = Network->findClient(this->getCharYYXXX());
 #ifndef LOGTOHD
@@ -4172,10 +4220,13 @@ int ccontrol::checkGline4(string &Host,unsigned int Len,unsigned int &Affected)
 	if (ipmask_len < 120)   //(120 = 128 - 8)
 		retMe |= gline::HUH_NO_HOST;  //Its too wide
 
+	if (ipmask_len < 128)
+		IsWildcard = true;
+
 	//If we have a '/' character then we surely have a cidr or wildcard
 	if (Hostname.find('/') != string::npos)
 	{
-		//if (IsWildcard)
+		if (IsWildcard)
 			retMe |= gline::FORCE_NEEDED_HOST;
 		if ((ipmask_len < 112) && (!IsWildcard)) //(112 = 128 - 16)
 			retMe |= gline::BAD_CIDRLEN;
@@ -4190,7 +4241,7 @@ int ccontrol::checkGline4(string &Host,unsigned int Len,unsigned int &Affected)
 		retMe |=  gline::FU_NEEDED_TIME;
 	if(Len >  gline::MGLINE_TIME)
 		retMe |=  gline::FORCE_NEEDED_TIME;
-	if (ipmask_len > 0) //we have a 'wildcard' gline
+	if (IsWildcard) //we have a 'wildcard' gline
 	{  //Need to check the Ident now
 		bool hasId = false;
 		for(string::size_type pos = 0; pos < Ident.size();++pos)
@@ -6059,6 +6110,21 @@ return true;
 
 }
 
+bool ccontrol::refreshIauthEntries()
+{
+ipLRecentIauthListType::iterator iItr;
+for (iItr = ipLRecentIauthList.begin(); iItr != ipLRecentIauthList.end(); ) {
+	iClient *tClient = iItr->first;
+	int age = ::time(0) - iItr->second;
+	if (age > 10) {
+		ipLDropClient(tClient);
+		iItr = ipLRecentIauthList.erase(iItr);
+		delete tClient;
+	}
+}
+return true;
+}
+
 void ccontrol::listGlines( iClient *theClient, string Mask )
 {
 
@@ -7395,6 +7461,7 @@ tempIpLisp->setForcecount(Forcecount);
 tempIpLisp->setActive(Active);
 tempIpLisp->setGroup(0);
 tempIpLisp->setv6(2);
+tempIpLisp->setIdentLimit(maxIClones);
 //Update	the database, and the internal list
 if(!tempIpLisp->Insert())
 	{
@@ -7448,18 +7515,34 @@ for (ipLnbListType::iterator nptr = ipLnbList.begin(); nptr != ipLnbList.end(); 
 	int tclonecidr = clonecidr;
 	if (nb->getCidr().find(':') == string::npos)
 		tclonecidr += 96;
-	string m = IPCIDRMinIP(ip, tclonecidr) + "/" + std::to_string(clonecidr);
-	ipLclonesMapIterator itr = nb->ipLclonesMap.find(m);
-	if (itr != nb->ipLclonesMap.end()) {
-		Notice(theClient, "%s: %d/%d connections for %s (ref: %s)", 
-			nb->ipLisp->getName().c_str(), itr->second, nb->getLimit(), m.c_str(), 
-			nb->getCidr().c_str());
+	string m;
+	if (nb->ipLisp->isGroup())
+		m = nb->getCidr();
+	else
+		m = IPCIDRMinIP(ip, tclonecidr) + "/" + std::to_string(clonecidr);
+	string userip = target->getUserName() + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
+	int identCount = 0;
+	int identLimit = 0;
+	ipLclonesMapIterator itr = nb->ipLisp->ipLidentclonesMap.find(userip);
+	if (itr != nb->ipLisp->ipLidentclonesMap.end()) {
+		identCount = itr->second;
+		identLimit = nb->getIdentLimit();
 	}
 	else {
-		elog << "ccontrol::ipLuserInfo> bug: Did we really get here?" << endl;
+		elog << "ccontrol::ipLuserInfo> bug: Did we really get here? Line #" << __LINE__ << endl;
 	}
+	itr = nb->ipLclonesMap.find(m);
+	if (itr != nb->ipLclonesMap.end()) {
+		Notice(theClient, "%s: %d/%d connections for %s (ref: %s) - %d/%d connections for %s", 
+			nb->ipLisp->getName().c_str(), itr->second, nb->getLimit(), m.c_str(), 
+			nb->getCidr().c_str(), identCount, identLimit, userip.c_str());
+	}
+	else {
+		elog << "ccontrol::ipLuserInfo> bug: Did we really get here? Line #" << __LINE__ << endl;
+	}
+
 }
-Notice(theClient, "--- End of ipL infos ---");
+Notice(theClient, "--- End of limits infos ---");
 return true;
 }
 bool ccontrol::ipLDropClient( iClient *theClient )
@@ -7517,16 +7600,34 @@ for (ipLnbListType::iterator nptr = ipLnbList.begin(); nptr != ipLnbList.end(); 
 			itr->second--;
 	}
 	else {
-		elog << "ccontrol::ipLDropClient> bug: Did we really get here?" << endl;
+		elog << "ccontrol::ipLDropClient> bug: Did we really get here? Line #" << __LINE__ << endl;
 		nb->incCount(-1);
 		nb->ipLisp->incCount(-1);
+	}
+
+
+	string userip = theClient->getUserName() + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
+	if (this->getIntYY() == theClient->getIntYY()) /* This is a not-yet fully connected iauth client. */
+		itr = nb->ipLisp->ipLidentclonesMap.end();
+	else {
+		itr = nb->ipLisp->ipLidentclonesMap.find(userip);
+		if (itr != nb->ipLisp->ipLidentclonesMap.end()) {
+			if (itr->second <= 1) {
+				nb->ipLisp->ipLidentclonesMap.erase(itr);
+			}
+			else
+				itr->second--;
+		}
+		else {
+			elog << "ccontrol::ipLDropClient> bug: Did we really get here? Line #" << __LINE__ << endl;
+		}
 	}
 }
 return true;
 }
 
 
-bool ccontrol::isIpLClientAllowed( iClient *theClient, ipLretPairListType& retList, bool incCount)
+bool ccontrol::isIpLClientAllowed( iClient *theClient, ipLretStructListType& retList, bool incCount)
  /* returns false if no more clients are allowed, not counting the new one if incCount is true
  */
 {
@@ -7535,6 +7636,7 @@ int numLeft = 1000000;
 int clonecidr;
 string ip = xIP(theClient->getIP()).GetNumericIP();
 ipLnbListType ipLnbList;
+ipLretStructType ipLretStruct;
 int widestCidr = 129;
 int smallestCidr = 0;
 int isv6 = 1;
@@ -7593,10 +7695,17 @@ for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++
 				nb->ipLisp->incCount(1);
 			}
 			if (t <= 0) {
-				if (nb->ipLisp->isGroup())
-					retList.push_back(std::make_pair(nb, nb->ipLisp->getCount()));
-				else
-					retList.push_back(std::make_pair(nb, itr->second));
+				ipLretStruct.nb = nb;
+				ipLretStruct.type = 'i';
+				ipLretStruct.mask = "*@" + m;
+				ipLretStruct.limit = nb->getLimit();
+				if (nb->ipLisp->isGroup()) {
+					ipLretStruct.count = nb->ipLisp->getCount();
+				}
+				else {
+					ipLretStruct.count = itr->second;
+				}
+				retList.push_back(ipLretStruct);
 			}
 		}
 		else if (incCount) {
@@ -7611,9 +7720,16 @@ for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++
 					}
 					numLeft = t;
 				}
-				if (t <= 0) {
-						retList.push_back(std::make_pair(nb, nb->ipLisp->getCount()+1));
-				}
+			}
+			else
+				t = nb->getLimit();
+			if (t <= 0) {
+				ipLretStruct.nb = nb;
+				ipLretStruct.type = 'i';
+				ipLretStruct.mask = "*@" + m;
+				ipLretStruct.limit = nb->getLimit();
+				ipLretStruct.count = nb->ipLisp->isGroup() ? (nb->ipLisp->getCount() + 1) : 1;
+				retList.push_back(ipLretStruct);
 			}
 			nb->incCount(1);
 			nb->ipLisp->incCount(1);
@@ -7626,6 +7742,45 @@ for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++
 		}
 		if ((nb->getCidr2() > smallestCidr) && (nb->isActive()))
 			smallestCidr = nb->getCidr2();
+
+		string userip = theClient->getUserName() + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
+		ipLclonesMapIterator iitr = nb->ipLisp->ipLidentclonesMap.find(userip);
+		if (theClient->getIntYY() == getUplink()->getIntYY()) {
+			/* It's a virtually not-yet-connected client from iauth, don't count user ident clones */
+		}
+		else if (iitr != nb->ipLisp->ipLidentclonesMap.end()) {
+			int t;
+			t = nb->getIdentLimit() - iitr->second;
+
+			if (incCount) {
+				iitr->second++;
+			}
+			if ((t <= 0) && (nb->getIdentLimit() > 0)) {
+				ipLretStruct.nb = nb;
+				ipLretStruct.type = 'u';
+				ipLretStruct.mask = userip;
+				ipLretStruct.count = iitr->second;
+				ipLretStruct.limit = nb->getIdentLimit();
+				retList.push_back(ipLretStruct);
+			}
+		}
+		else if (incCount) {
+			//elog << "D> " << nb->ipLisp->getName() << ": nb->getLimit()=" << nb->getLimit() 
+			//	<< ", nb->ipLisp->getCount()=" << nb->ipLisp->getCount() << endl;
+			int t;
+			t = nb->getIdentLimit();
+			if ((t <= 0) && (nb->getIdentLimit() > 0)) {
+				ipLretStruct.nb = nb;
+				ipLretStruct.type = 'u';
+				ipLretStruct.mask = userip;
+				ipLretStruct.count = 1;
+				ipLretStruct.limit = nb->getIdentLimit();
+				retList.push_back(ipLretStruct);
+			}
+			nb->ipLisp->ipLidentclonesMap.insert(ipLclonesMapType::value_type(userip, 1));
+			//elog << "LIMITS DEBUG: ipLclonesMap insert for " << nb->getCidr() << " (/" << nb->getCloneCidr() << "): "
+			//	<< m << endl; 
+		}
 	}
 }
 if (incCount) 
@@ -7635,7 +7790,6 @@ return (numLeft > 0 ? true : false);
 
 bool ccontrol::insertIpLnb( iClient *theClient , const string& Cidr, int Isp, bool silent )
 {
-int count=0;
 int reassignedcount=0;
 StringTokenizer st(Cidr,'/');
 
@@ -7771,7 +7925,7 @@ for( xNetwork::const_clientIterator cItr = Network->clients_begin() ; cItr != Ne
 	const string tIP = xIP(tmpClient->getIP()).GetNumericIP();
 	if (match(tempIpLnb->getCidr(), tIP) == 0) {
 		ipLDropClient(tmpClient);
-		ipLretPairListType retList;
+		ipLretStructListType retList;
 		isIpLClientAllowed(tmpClient, retList, true);
 		/* 
 		 * The following code design is broken, because it currently does not give the ability
@@ -7779,55 +7933,6 @@ for( xNetwork::const_clientIterator cItr = Network->clients_begin() ; cItr != Ne
 		 * reconnect it" solution instead.
 		 */
 		continue;  /* don't execute below */
-		ipLnumericIterator numItr = ipLnumericMap.find(tmpClient->getCharYYXXX());
-		if (numItr == ipLnumericMap.end())
-			continue;
-		int highCidr = 0;
-		bool eraseMe = false;
-		ccIpLnb *tnb;
-		ipLnbListType nbList = numItr->second;
-		for (ipLnbListType::iterator nbItr = nbList.begin() ; nbItr != nbList.end() ; nbItr++ ) {
-			tnb = *nbItr;
-			if ((tnb->getCidr2() > highCidr) && (tnb->isActive()))
-				highCidr = tnb->getCidr2();
-		}
-		for (ipLnbListType::iterator nbItr = nbList.begin() ; nbItr != nbList.end() ; ) {
-			tnb = *nbItr;
-			if ((tempIpLnb->getCidr2() > tnb->getCidr2()) && (!tnb->ipLisp->isForcecount())) {
-				eraseMe = true;
-				for (ipLclonesMapType::iterator clonesItr = tnb->ipLclonesMap.begin() ; 
-						clonesItr != tnb->ipLclonesMap.end() ;  ) {
-					if (cidrmatch(clonesItr->first, tempIpLnb->getCidr()) == 0) {
-						reassignedcount += clonesItr->second;
-						tnb->incCount(clonesItr->second * -1);
-						tnb->ipLisp->incCount(clonesItr->second * -1);
-						clonesItr = tnb->ipLclonesMap.erase(clonesItr);
-					}
-					else
-						clonesItr++;
-				}
-			}
-			if (eraseMe)
-				nbItr = nbList.erase(nbItr);
-			else
-				nbItr++;
-		}
-		if ((tempIpLnb->getCidr2() >= highCidr) || (tempIpLnb->isForcecount() == true)) {
-			count++;
-			tempIpLnb->incCount(1);
-			tempIpLnb->ipLisp->incCount(1);
-			numItr->second.push_back(tempIpLnb);
-			int tclonecidr = tempIpLnb->getCloneCidr();
-			if (tIP.find(':') == string::npos)
-				tclonecidr += 96;
-			string m = IPCIDRMinIP(tIP, tclonecidr) + "/" + std::to_string(tempIpLnb->getCloneCidr());
-			ipLclonesMapIterator clonesItr = tempIpLnb->ipLclonesMap.find(m);
-			if (clonesItr != tempIpLnb->ipLclonesMap.end()) {
-				clonesItr->second++;
-			}
-			else
-				tempIpLnb->ipLclonesMap.insert(ipLclonesMapType::value_type(m, 1));
-		}
 	}
 }
 if (!silent) {
@@ -7917,7 +8022,7 @@ if (!silent)
 	Notice(theClient, "There were %c%d users%c online associated with %s's %s", 2, cList.size(), 2, tIspName.c_str(), IpLnb->getCidr().c_str());
 delete IpLnb;
 for (list<iClient *>::iterator lItr = cList.begin(); lItr != cList.end(); lItr++) {
-	ipLretPairListType retList;
+	ipLretStructListType retList;
 	isIpLClientAllowed(*lItr, retList, true);
 }
 
@@ -8019,7 +8124,7 @@ bool ccontrol::loadExceptions()
 static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions";
 static const char Query2[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active FROM ShellCompanies";
 static const char Query3[] = "SELECT cidr,companyid,AddedBy,AddedOn FROM ShellNetblocks";
-static const char Query4[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,isgroup FROM ipLISPs ORDER BY id";
+static const char Query4[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,isgroup,maxidentlimit FROM ipLISPs ORDER BY id";
 static const char Query5[] = "SELECT cidr,ispid,AddedBy,AddedOn FROM ipLNetblocks";
 
 if(!dbConnected)
@@ -8196,6 +8301,8 @@ for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempIpLisp->setCloneCidr(atoi(SQLDb->GetValue(i,9).c_str()));
 	tempIpLisp->setForcecount(atoi(SQLDb->GetValue(i,10).c_str()));
 	tempIpLisp->setGroup(atoi(SQLDb->GetValue(i,11).c_str()));
+	tempIpLisp->setIdentLimit(atoi(SQLDb->GetValue(i,12).c_str()));
+	
 	ipLispVector.push_back(tempIpLisp);
 	}
 
@@ -8264,25 +8371,29 @@ if( st.size() < 6 )
 	return 0;
 }
 
-static int n = 99;
-n++;
-if (n > 999999)
-	n = 100;
+static unsigned int iauthIncVar = 99;
+iauthIncVar++;
+if (iauthIncVar > 250000)
+	iauthIncVar = 100;
+
+char XXX[4];
+inttobase64( XXX, iauthIncVar, 3 ) ;
+XXX[3] = 0;
+string yyxxx = MyUplink->getCharYY() + XXX;
+
 string IP = st[3];
 
 irc_in_addr theIP;
 ipmask_parse(IP.c_str(), &theIP, NULL);
 string base64IP = string(xIP(theIP).GetBase64IP());
-stringstream s;
-s << theServer->getCharYY() << "." << n;
-string yyxxx( s.str() ) ;
-//string yyxxx = theServer->getCharYY() + "---";
 string fullname = st.assemble(5);
 if (fullname.substr(0,1) == ":")
 	fullname = fullname.substr(1);
+fullname = theServer->getCharYY() + " " + fullname;
 
 iClient* newClient = new (std::nothrow) iClient(
-		theServer->getIntYY(),
+		//theServer->getIntYY(),
+		MyUplink->getIntYY(), // use own numeric instead
 		yyxxx,
 		st[1],
 		st[2],
@@ -8296,7 +8407,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		::time( 0 ) ) ;
 assert( newClient != 0 );
 
-ipLretPairListType retList;
+ipLretStructListType retList;
 bool ipLRetVal = isIpLClientAllowed(newClient, retList, true);
 
 string response;

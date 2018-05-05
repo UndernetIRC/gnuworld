@@ -33,8 +33,6 @@
 #include	"networkData.h"
 #include	"cservice_config.h"
 
-const char NEWPASSCommand_cc_rcsId[] = "$Id: NEWPASSCommand.cc,v 1.17 2005/11/17 22:20:57 kewlio Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

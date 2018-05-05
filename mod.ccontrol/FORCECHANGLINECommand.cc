@@ -41,8 +41,6 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: FORCECHANGLINECommand.cc,v 1.5 2009/06/06 07:53:34 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
 

@@ -27,8 +27,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char ADDCOMMENTCommand_cc_rcsId[] = "$Id: ADDCOMMENTCommand.cc,v 1.4 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

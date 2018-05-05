@@ -20,19 +20,14 @@
  */
 
 #include	<string>
-
 #include	"cservice.h"
-//#include	"sqlUser.h"
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"levels.h"
 #include	"responses.h"
 
-const char QUOTECommand_cc_rcsId[] = "$Id: QUOTECommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 bool QUOTECommand::Exec( iClient* theClient, const string& Message )

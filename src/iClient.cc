@@ -35,7 +35,6 @@
 #include	"gnuworld_config.h"
 #include	"Network.h"
 
-RCSTAG( "$Id: iClient.cc,v 1.38 2007/05/26 09:41:24 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {

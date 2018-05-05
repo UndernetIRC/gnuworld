@@ -57,13 +57,13 @@ public:
 	inline const std::string& getName() const
 		{ return name; }
 	
-	inline const bool getJoinFlooded() const 
+	inline bool getJoinFlooded() const
 		{ return joinFlooded; }
 
-	inline const unsigned int getNumOfJoins() const
+	inline unsigned int getNumOfJoins() const
 		{ return numOfJoins; }
 		
-	inline const unsigned int getNumOfParts() const
+	inline unsigned int getNumOfParts() const
 		{ return numOfParts; }
 
 	inline const joinPartMapIterator joinPartBegin() const
@@ -97,7 +97,7 @@ public:
 	inline void setLastJoinFlood( time_t _lastJoinFlood)
 		{ lastJoinFlood = _lastJoinFlood; }
 	
-	inline const time_t getLastJoinFlood() const
+	inline time_t getLastJoinFlood() const
 		{ return lastJoinFlood; }
 		
 	void addJoin(iClient*);

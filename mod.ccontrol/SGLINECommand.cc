@@ -19,12 +19,9 @@
  *
  * $Id: SGLINECommand.cc,v 1.15 2009/05/16 07:47:23 danielaustin Exp $
  */
-
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -36,11 +33,8 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SGLINECommand.cc,v 1.15 2009/05/16 07:47:23 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 // Input: sgline *@blah.net reason

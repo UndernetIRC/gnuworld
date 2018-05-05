@@ -20,7 +20,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 #include	<map>
 
 #include	<cstdlib>
@@ -39,8 +39,6 @@
 #include	"ccUser.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: GLINECommand.cc,v 1.64 2009/06/09 05:55:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

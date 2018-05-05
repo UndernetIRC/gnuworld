@@ -35,9 +35,6 @@
 #include	"cservice_config.h"
 #include	"sqlPendingTraffic.h"
  
-const char sqlPendingTraffic_h_rcsId[] = __SQLPENDINGTRAFFIC_H ;
-const char sqlPendingTraffic_cc_rcsId[] = "$Id: sqlPendingTraffic.cc,v 1.5 2007/08/28 16:10:12 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ; 

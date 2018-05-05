@@ -205,6 +205,11 @@ command_logfile = cs.log
 #
 hello_block_period = 3600
 
+# Message when login-on-connect (LoC) parameters are incorrect
+# Used with iauthd-c: https://github.com/UndernetIRC/iauthd-c
+#
+loc_message = Insufficient login-on-connect (LoC) parameters - see www.undernet.org/loc/ for help
+
 #
 # What is the period (in seconds) in which we will check for
 # new webrelay messages
@@ -237,6 +242,10 @@ welcome_newchan_message = Congratulations! Channel %s has been registered!
 
 welcome_newchan_topic = *** Congratulations! Your channel application has been accepted! ***
 
+# After how much seconds should expire any newly created never logged in user
+
+neverloggedin_users_expiretime = 21600
+
 # Days to expire users
 # 0 = never expire
 
@@ -268,15 +277,20 @@ noreg_days_on_nosupport = 1
 
 reject_app_on_userfraud = 1
 
-# If the value is 1 enabled, and the channel has any objection, 
-# the registration will be 'interrupted' waiting for an admin's review
+# If the value is 1 enabled then all channels at a minimum require an admin to Mark As Reviewed
+# before application can be fully processed by TheJudge
 
-review_on_object = 0
+require_review = 1
 
-# If the value is 1 enabled, after all successful registration stages will be no automatical accept
-# will set to 'Ready to review' stage, waiting for an admin's final decision/accept. 
+# If the value is 1 enabled, any channel application with admin comments of objectsions will
+# require manual decision accept/reject by an admin
 
-review_on_complete = 1;
+decide_on_object = 1
+
+# If the value is 1 enabled, after all successful registration stages there will be no automatic accepts.
+# Channel will be left at to 'Ready to review' stage, waiting for an admin's final decision to accept/reject
+
+decide_on_complete = 0
 
 # After how many days will be a channel automatically rejected
 # when it was no decision made by an admin for a 'Ready to review' channel

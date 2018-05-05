@@ -29,8 +29,6 @@
 
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ccLog.cc,v 1.10 2007/09/12 13:36:02 kewlio Exp $" ) ;
-
 using namespace std;
 
 namespace gnuworld

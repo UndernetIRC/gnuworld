@@ -19,22 +19,16 @@
  *
  * $Id: SUSPENDCommand.cc,v 1.15 2006/09/26 17:36:01 kewlio Exp $
  */
-
 #include	<string>
-
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"ccUser.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: SUSPENDCommand.cc,v 1.15 2006/09/26 17:36:01 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld

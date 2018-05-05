@@ -26,13 +26,10 @@
  *
  * $Id: sqlChannel.cc,v 1.43 2007/08/28 16:10:12 dan_karrels Exp $
  */
-
 #include	<sstream>
 #include	<string>
 #include	<iostream>
-
 #include	<cstring>
-
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlChannel.h"
@@ -41,12 +38,8 @@
 #include	"cservice_config.h"
 #include	"dbHandle.h"
 
-const char sqlChannel_h_rcsId[] = __SQLCHANNEL_H ;
-const char sqlChannel_cc_rcsId[] = "$Id: sqlChannel.cc,v 1.43 2007/08/28 16:10:12 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
-
 using std::string ;
 using std::endl ;
 using std::stringstream ;
@@ -170,8 +163,8 @@ bool sqlChannel::loadData(const string& channelName)
 stringstream queryString ;
 queryString	<< "SELECT "
 		<< sql::channel_fields
-		<< " FROM channels WHERE registered_ts <> 0"
-		<< " AND lower(name) = '"
+		//<< " FROM channels WHERE registered_ts <> 0 AND lower(name) = '"
+		<< " FROM channels WHERE lower(name) = '"
 		<< escapeSQLChars(string_lower(channelName))
 		<< "'"
 		<< ends ;
@@ -217,7 +210,8 @@ bool sqlChannel::loadData(int channelID)
 stringstream queryString;
 queryString	<< "SELECT "
 		<< sql::channel_fields
-		<< " FROM channels WHERE registered_ts <> 0 AND id = "
+		//<< " FROM channels WHERE registered_ts <> 0 AND id = "
+		<< " FROM channels WHERE id = "
 		<< channelID
 		<< ends ;
 
@@ -724,6 +718,29 @@ void sqlChannel::calcTotalCTCPCount(const string& Mask)
 		}
 		currChanFloodMap->setTotalCTCPCount(sum);
 	}
+}
+
+void sqlChannel::ExpireMessagesForChannel(sqlChannel* theChan)
+{
+	sqlChannel::chanFloodMapType::iterator itr = theChan->chanFloodMap.begin();
+	while (itr != theChan->chanFloodMap.end())
+	{
+		time_t iplasttime = theChan->getMaskLastTime(itr->first);
+		if (!iplasttime)
+		{
+			++itr;
+			continue;
+		}
+		//theChan->ExpireMessagesForMask(itr->first, currentTime());
+		time_t lastTime = now - iplasttime;
+		if ((lastTime) > (time_t)theChan->getFloodPeriod())
+		{
+			theChan->RemoveFlooderMask(itr++->first);
+		}
+		else
+			++itr;
+	}
+	return;
 }
 
 sqlChannel::~sqlChannel()

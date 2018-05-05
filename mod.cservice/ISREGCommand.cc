@@ -26,8 +26,6 @@
 #include	"cservice.h"
 #include	"responses.h"
 
-const char ISREGCommand_cc_rcsId[] = "$Id: ISREGCommand.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 

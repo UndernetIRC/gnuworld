@@ -19,12 +19,9 @@
  *
  * $Id: USERINFOCommand.cc,v 1.13 2009/07/25 18:12:34 hidden1 Exp $
  */
-
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -34,8 +31,6 @@
 #include	"Network.h"
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: USERINFOCommand.cc,v 1.13 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

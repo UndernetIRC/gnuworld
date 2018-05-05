@@ -177,6 +177,7 @@ CREATE TABLE ipLISPs (
         email VARCHAR(200) NOT NULL,
         clonecidr int4 NOT NULL DEFAULT 0,
         maxlimit int4 NOT NULL DEFAULT 0,
+        maxidentlimit int4 NOT NULL DEFAULT 0,
 	forcecount int4 NOT NULL DEFAULT 0,
         active int4 NOT NULL DEFAULT 1,
         isgroup int4 NOT NULL DEFAULT 0,

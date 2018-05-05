@@ -74,4 +74,7 @@
 
 	/usr/local/pgsql/bin/psql cmaster -a -f language_starwars.sql
 
+# Adding the channel WELCOME message feature
 
+	/usr/local/pgsql/bin/psql cmaster -a -f update_welcome-20170321.sql
+	

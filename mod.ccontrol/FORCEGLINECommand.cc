@@ -20,7 +20,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -34,8 +34,6 @@
 #include	"ELog.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: FORCEGLINECommand.cc,v 1.39 2009/06/09 05:55:55 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

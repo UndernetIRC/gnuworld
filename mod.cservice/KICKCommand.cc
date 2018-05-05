@@ -30,17 +30,15 @@
  * $Id: KICKCommand.cc,v 1.11 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include        <string>
+#include	<string>
 
-#include        "StringTokenizer.h"
-#include        "ELog.h"
-#include        "cservice.h"
-#include        "Network.h"
-#include        "levels.h"
-#include        "responses.h"
+#include	"StringTokenizer.h"
+#include	"ELog.h"
+#include	"cservice.h"
+#include	"Network.h"
+#include	"levels.h"
+#include	"responses.h"
 #include	"match.h"
-
-const char KICKCommand_cc_rcsId[] = "$Id: KICKCommand.cc,v 1.11 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {
@@ -126,16 +124,11 @@ bool KICKCommand::Exec( iClient* theClient, const string& Message )
 				if( (match(st[2], tmpUser->getClient()->getNickUserHost()) == 0) ||
 					(match(st[2], tmpUser->getClient()->getRealNickUserHost()) == 0) )
 				{
-					/* Don't kick +k things */
-					if (!tmpUser->getClient()->getMode(iClient::MODE_SERVICES))
-						toBoot.push_back(tmpUser->getClient());
-					else
+					/* Don't kick +k things */                                      /* Don't kick ourselves */
+					if ((tmpUser->getClient()->getMode(iClient::MODE_SERVICES)) || (tmpUser->getClient() == theClient))
 						takeMembersCount--;
-					/* Don't kick ourselves */
-					if (tmpUser->getClient() != theClient)
-						toBoot.push_back(tmpUser->getClient());
 					else
-						takeMembersCount--;
+						toBoot.push_back(tmpUser->getClient());
 				}
 			}
 		}

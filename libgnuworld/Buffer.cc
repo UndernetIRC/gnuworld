@@ -22,10 +22,7 @@
  */
 
 #include	<string>
-
 #include	"Buffer.h"
-
-const char rcsId[] = "$Id: Buffer.cc,v 1.6 2003/07/20 14:13:15 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

@@ -31,8 +31,6 @@
 #include 	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ANNOUNCECommand.cc,v 1.2 2009/06/13 06:43:34 hidden1 Exp $" ) ;
-
 namespace gnuworld
 {
 

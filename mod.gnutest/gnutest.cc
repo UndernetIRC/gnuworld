@@ -18,20 +18,16 @@
  *
  * $Id: gnutest.cc,v 1.26 2005/01/17 23:09:53 dan_karrels Exp $
  */
-
 #include	<map>
 #include	<string>
 #include	<iostream>
 #include	<sstream>
-
 #include	"client.h"
 #include	"gnutest.h"
 #include	"iClient.h"
 #include	"StringTokenizer.h"
 #include	"EConfig.h"
 #include	"Network.h"
-
-RCSTAG("$Id: gnutest.cc,v 1.26 2005/01/17 23:09:53 dan_karrels Exp $");
 
 namespace gnuworld
 {

@@ -20,13 +20,10 @@
  */
 
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"Network.h"
 #include	"cservice.h"
-
-const char RANDOMCommand_cc_rcsId[] = "$Id: RANDOMCommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

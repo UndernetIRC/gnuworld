@@ -34,8 +34,6 @@
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: DEOPCommand.cc,v 1.16 2006/09/26 17:35:58 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

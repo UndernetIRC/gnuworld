@@ -39,8 +39,6 @@
 #include	"match.h"
 #include	"banMatcher.h"
 
-const char UNBANCommand_cc_rcsId[] = "$Id: UNBANCommand.cc,v 1.22 2009/06/25 19:05:23 mrbean_ Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

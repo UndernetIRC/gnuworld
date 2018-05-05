@@ -455,6 +455,7 @@ public:
 	void calcTotalMessageCount(const string&);
 	void calcTotalNoticeCount(const string&);
 	void calcTotalCTCPCount(const string&);
+	void ExpireMessagesForChannel(sqlChannel*);
 
 public:
 	/*

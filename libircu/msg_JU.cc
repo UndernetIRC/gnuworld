@@ -28,11 +28,8 @@
 #include	"xparameters.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_JU.cc,v 1.9 2010/09/20 17:36:25 denspike Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::endl;
 
 CREATE_HANDLER(msg_JU)

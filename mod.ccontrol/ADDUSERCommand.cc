@@ -34,8 +34,6 @@
 #include	"Constants.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: ADDUSERCommand.cc,v 1.21 2006/09/26 17:35:58 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

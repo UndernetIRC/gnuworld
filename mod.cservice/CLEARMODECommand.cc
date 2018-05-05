@@ -38,8 +38,6 @@
 #include	"responses.h"
 #include	"Network.h"
 
-const char CLEARMODECommand_cc_rcsId[] = "$Id: CLEARMODECommand.cc,v 1.13 2005/11/17 19:08:08 kewlio Exp $" ;
-
 namespace gnuworld
 {
 using std::endl ;

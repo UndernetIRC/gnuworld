@@ -24,7 +24,6 @@
 #include	<iostream>
 #include	<iomanip>
 #include	<inttypes.h>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -35,8 +34,6 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 #include	"ip.h"
-
-const char LOGINCommand_cc_rcsId[] = "$Id: LOGINCommand.cc,v 1.67 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
@@ -233,7 +230,7 @@ switch(auth_res)
 		break;
 	case cservice::AUTH_SUCCEEDED:
 		break;
-	defult:
+	default:
 		//Should never get here!
 		elog << "Response " << auth_res << " while authenticating!\n";
 		bot->Notice(theClient,"AUTHENTICATION FAILED as %s (due to an error)\n",st[1].c_str());

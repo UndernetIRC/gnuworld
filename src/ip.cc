@@ -39,8 +39,6 @@
 #include	"gnuworld_config.h"
 #include	"misc.h"
 
-RCSTAG( "$Id: ip.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
-
 namespace gnuworld
 {
 

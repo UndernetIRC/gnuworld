@@ -25,10 +25,8 @@
 #include	<sstream>
 #include	<string>
 #include	<iostream>
-
 #include	<cstring>
 #include	<ctime>
-
 #include	"ELog.h"
 #include	"misc.h"
 #include	"sqlLevel.h"
@@ -38,12 +36,9 @@
 #include	"cservice.h"
 #include	"cservice_config.h"
 
-const char sqlLevel_h_rcsId[] = __SQLLEVEL_H ;
-const char sqlLevel_cc_rcsId[] = "$Id: sqlLevel.cc,v 1.18 2009/06/09 15:40:29 mrbean_ Exp $" ;
 
 namespace gnuworld
 {
-
 using std::string ;
 using std::endl ;
 using std::ends ;

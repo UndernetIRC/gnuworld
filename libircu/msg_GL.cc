@@ -33,11 +33,8 @@
 #include	"ELog.h"
 #include	"xparameters.h"
 
-RCSTAG( "$Id: msg_GL.cc,v 1.9 2009/08/01 08:32:21 mrbean_ Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::endl ;
 
 CREATE_HANDLER(msg_GL)

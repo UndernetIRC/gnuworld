@@ -83,8 +83,8 @@ inline size_t operator()( const string& s ) const
 		return 0 ;
 		}
 
-	register size_t __h = 0 ;
-	for ( register const char* ptr = s.c_str() ; *ptr ; ++ptr )
+	size_t __h = 0 ;
+	for ( const char* ptr = s.c_str() ; *ptr ; ++ptr )
 		{
 		__h = (5 * __h) + tolower( *ptr ) ;
 		}

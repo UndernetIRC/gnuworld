@@ -18,15 +18,12 @@
  *
  * $Id: STATSCommand.cc,v 1.7 2003/08/09 23:15:35 dan_karrels Exp $
  */
-
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"Network.h"
 
-const char STATSCommand_cc_rcsId[] = "$Id: STATSCommand.cc,v 1.7 2003/08/09 23:15:35 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

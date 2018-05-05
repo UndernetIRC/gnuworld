@@ -21,7 +21,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -31,8 +31,6 @@
 #include	"Constants.h"
 #include	"Network.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: INVITECommand.cc,v 1.21 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

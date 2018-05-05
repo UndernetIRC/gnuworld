@@ -22,11 +22,7 @@
  */
 
 #include	<string>
-
 #include	"gnuworldDB.h"
-
-const char gnuworldDB_cc_rcsId[] = "$Id: gnuworldDB.cc,v 1.5 2008/01/02 23:32:17 kewlio Exp $" ;
-const char gnuworldDB_h_rcsId[] = __GNUWORLDDB_H ;
 
 namespace gnuworld
 {

@@ -543,19 +543,18 @@ public:
 	/**
 	 * Kick a user from a channel, join/part if necessary.
 	 */
-	virtual bool	Kick( Channel*, iClient*, const std::string& ) ;
+	virtual bool	Kick( Channel*, iClient*, const std::string&, bool modeAsServer = false);
 
 	/**
 	 * Kick several users from a channel, join/part if necessary.
 	 */
-	virtual bool	Kick( Channel*, const std::vector< iClient* >&,
-				const std::string& ) ;
+	virtual bool	Kick( Channel*, const std::vector< iClient* >&,	const std::string&, bool modeAsServer = false);
 
 	/**
 	 * Kick all users from a channel that matches the specified IP, join/part if necessary.
 	 */
 	virtual bool	Kick( Channel*, const string&,
-				const std::string& ) ;
+				const std::string&, bool modeAsServer = false ) ;
 
 	/**
 	 * Set the topic in a channel, joining, opping, and parting

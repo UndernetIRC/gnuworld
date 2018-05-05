@@ -21,15 +21,12 @@
  */
 
 #include	<string>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: NOMODECommand.cc,v 1.8 2006/09/26 17:36:00 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

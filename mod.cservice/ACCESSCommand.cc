@@ -43,11 +43,8 @@
 #include	"cservice_config.h"
 #include	"Network.h"
 
-const char ACCESSCommand_cc_rcsId[] = "$Id: ACCESSCommand.cc,v 1.50 2009/06/09 15:40:29 mrbean_ Exp $" ;
-
 namespace gnuworld
 {
-
 using std::endl ;
 using std::ends ;
 using std::stringstream ;
@@ -79,17 +76,35 @@ if (!theUser)
 	return false;
 }
 
+bool historysearch = false;
+
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan)
-	{
+if (!theChan && !bot->getAdminAccessLevel(theUser))
+{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::chan_not_reg).c_str(),
 		st[1].c_str()
 		);
 	return false;
+}
+else if (!theChan && bot->getAdminAccessLevel(theUser))
+{
+	theChan = bot->getChannelRecord(st[1], true);
+	if (!theChan)
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::chan_not_reg).c_str(),
+			st[1].c_str()
+			);
+		return false;
 	}
-
+	else
+	{
+		historysearch = true;
+	}
+}
 /* Don't let ordinary people view * accesses */
 if (theChan->getName() == "*")
 	{
@@ -265,6 +280,13 @@ theQuery	<< queryHeader
 		<< endl;
 #endif
 
+// If theChan is no needed after this point, better to delete it now
+if (historysearch)
+{
+	delete theChan;
+	theChan = NULL;
+}
+
 /*
  *  All done, display the output. (Only fetch 15 results).
  */
@@ -314,6 +336,8 @@ if (matchString[0] == '=')
 		}
 	}
 
+if (historysearch)
+	bot->Notice(theClient, "\002   *** Access history search results ***\002");
 
 for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	{

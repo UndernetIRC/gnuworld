@@ -20,13 +20,11 @@
  *
  * $Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $
  */
-
 #include	<new>
 #include	<map>
 #include	<string>
 #include	<iostream>
 #include	<sstream>
-
 #include	"Channel.h"
 #include	"iClient.h"
 #include	"ChannelUser.h"
@@ -37,11 +35,8 @@
 #include	"match.h"
 #include	"server.h"
 
-RCSTAG("$Id: Channel.cc,v 1.55 2008/04/16 20:29:37 danielaustin Exp $") ;
-
 namespace gnuworld
 {
-
 using std::vector ;
 using std::string ;
 using std::endl ;
@@ -60,6 +55,8 @@ const Channel::modeType Channel::MODE_D = 0x200 ;
 const Channel::modeType Channel::MODE_A = 0x400 ;
 const Channel::modeType Channel::MODE_U = 0x800 ;
 const Channel::modeType Channel::MODE_REG = 0x1000 ;
+const Channel::modeType Channel::MODE_C = 0x2000;
+const Channel::modeType Channel::MODE_CTCP = 0x4000;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -486,6 +483,9 @@ if( modes & MODE_I )	modeString += 'i' ;
 if( modes & MODE_R )	modeString += 'r' ;
 if( modes & MODE_REG )	modeString += 'R' ;
 if( modes & MODE_D )	modeString += 'D' ;
+if (modes & MODE_C)		modeString += 'c';
+if (modes & MODE_CTCP)	modeString += 'C';
+
 
 if( modes & MODE_K )
 	{

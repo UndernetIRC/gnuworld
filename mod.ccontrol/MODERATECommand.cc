@@ -21,9 +21,7 @@
  */
 
 #include	<string>
-
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -31,8 +29,6 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: MODERATECommand.cc,v 1.16 2006/09/26 17:35:59 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

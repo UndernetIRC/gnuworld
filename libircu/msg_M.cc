@@ -39,8 +39,6 @@
 #include	"StringTokenizer.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_M.cc,v 1.14 2008/04/16 20:29:37 danielaustin Exp $" ) ;
-
 namespace gnuworld
 {
 
@@ -213,6 +211,14 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 		case 'D':
 			modeVector.push_back(
 				make_pair( polarity, Channel::MODE_D ) ) ;
+			break;
+		case 'c':
+			modeVector.push_back(
+				make_pair(polarity, Channel::MODE_C));
+			break;
+		case 'C':
+			modeVector.push_back(
+				make_pair(polarity, Channel::MODE_CTCP));
 			break;
 
 		// Channel mode l only has an argument if

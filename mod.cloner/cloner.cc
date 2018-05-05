@@ -43,8 +43,6 @@
 #include	"misc.h"
 #include	"ELog.h"
 
-RCSTAG("$Id: cloner.cc,v 1.36 2005/01/12 04:36:45 dan_karrels Exp $");
-
 namespace gnuworld
 {
 

@@ -27,8 +27,6 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-const char rcsId[] = "$Id: ConnectionHandler.cc,v 1.3 2003/08/05 01:59:14 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 

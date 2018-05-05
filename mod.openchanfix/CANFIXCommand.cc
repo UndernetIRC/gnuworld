@@ -23,17 +23,13 @@
  *
  * $Id: CANFIXCommand.cc,v 1.2 2010/03/04 04:24:11 hidden1 Exp $
  */
-
 #include "gnuworld_config.h"
 #include "Network.h"
-
 #include "chanfix.h"
 #include "responses.h"
 #include "StringTokenizer.h"
 #include "sqlChannel.h"
 #include "sqlChanOp.h"
-
-RCSTAG("$Id: CANFIXCommand.cc,v 1.2 2010/03/04 04:24:11 hidden1 Exp $");
 
 namespace gnuworld
 {

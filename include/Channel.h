@@ -106,6 +106,12 @@ public:
 	/// Bit representing channel mode +D
 	static const modeType	MODE_D ;
 
+	/// Bit representing channel mode +c
+	static const modeType	MODE_C;
+
+	/// Bit representing channel mode +C
+	static const modeType	MODE_CTCP;
+
 	/// Bit representing channel mode +A
 	static const modeType	MODE_A ;
 

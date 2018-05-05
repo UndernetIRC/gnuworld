@@ -32,11 +32,8 @@
 #include	"Network.h"
 #include	"ServerCommandHandler.h"
 
-RCSTAG( "$Id: msg_I.cc,v 1.7 2007/04/18 10:23:39 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::endl ;
 
 CREATE_HANDLER(msg_I)

@@ -30,8 +30,6 @@
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: CHANINFOCommand.cc,v 1.20 2007/11/05 10:04:23 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

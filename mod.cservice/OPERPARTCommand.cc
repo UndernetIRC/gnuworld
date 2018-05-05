@@ -38,8 +38,6 @@
 #include	"Network.h"
 #include	"cservice_config.h"
 
-const char OPERPARTCommand_cc_rcsId[] = "$Id: OPERPARTCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $" ;
-
 namespace gnuworld
 {
 using std::endl ;

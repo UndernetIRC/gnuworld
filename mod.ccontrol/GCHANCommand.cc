@@ -21,7 +21,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -38,8 +38,6 @@
 #include 	"time.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: GCHANCommand.cc,v 1.17 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

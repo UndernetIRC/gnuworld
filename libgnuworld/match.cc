@@ -20,15 +20,11 @@
  */
 
 #include	<string>
-
 #include	<cstdio>
 #include	<cstdlib>
-
 #include	"match.h"
 #include	"misc.h"
-#include        "StringTokenizer.h"
-
-const char rcsId[] = "$Id: match.cc,v 1.10 2007/09/13 02:00:45 dan_karrels Exp $" ;
+#include	"StringTokenizer.h"
 
 namespace gnuworld
 {
@@ -250,11 +246,9 @@ int smatch(const char *mask, const char *name)
       return 1;
     break;
   case '\\':
-    m++;
-    /* allow escaping to force capitalization */
-    if (*m++ != *n++)
-      goto backtrack;
-    break;
+    if ((m[1] == '*') || (m[1] == '?'))
+      m++;
+    goto normal_character;
   case '*': case '?':
     for (star_p = 0; ; m++) {
       if (*m == '*')
@@ -267,18 +261,12 @@ int smatch(const char *mask, const char *name)
     if (star_p) {
       if (!*m)
         return 0;
-      else if (*m == '\\') {
-        m_tmp = ++m;
-        if (!*m)
-          return 1;
-        for (n_tmp = n; *n && *n != *m; n++) ;
-      } else {
-        m_tmp = m;
-        for (n_tmp = n; *n && ToLower(*n) != ToLower(*m); n++) ;
-      }
+      m_tmp = m;
+      for (n_tmp = n; *n && ToLower(*n) != ToLower(*m); n++) ;
     }
     /* and fall through */
   default:
+  normal_character:
     if (!*n)
       return *m != '\0';
     if (ToLower(*m) != ToLower(*n))

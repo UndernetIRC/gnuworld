@@ -27,8 +27,6 @@
 #include	"levels.h"
 #include	"responses.h"
 
-const char UNFORCECommand_cc_rcsId[] = "$Id: UNFORCECommand.cc,v 1.10 2005/12/05 17:32:15 kewlio Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;

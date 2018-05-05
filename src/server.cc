@@ -71,8 +71,6 @@
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
 
-RCSTAG( "$Id: server.cc,v 1.226 2010/08/31 21:16:46 denspike Exp $" ) ;
-
 namespace gnuworld
 {
 
@@ -1774,6 +1772,18 @@ if( !chanModes.empty() &&
 				else
 					theChan->removeMode( Channel::MODE_D ) ;
 				break ;
+			case 'c':
+				if (plus)
+					theChan->setMode(Channel::MODE_C);
+				else
+					theChan->removeMode(Channel::MODE_C);
+				break;
+			case 'C':
+				if (plus)
+					theChan->setMode(Channel::MODE_CTCP);
+				else
+					theChan->removeMode(Channel::MODE_CTCP);
+				break;
 
 			// TODO: Finish with polarity
 			// TODO: Add in support for modes b,v,o
@@ -2030,6 +2040,14 @@ if( theChan->getMode( Channel::MODE_D ) )
 	{
 	modeVector.push_back( make_pair( false, Channel::MODE_D ) ) ;
 	}
+if( theChan->getMode( Channel::MODE_C ) )
+	{
+	modeVector.push_back( make_pair( false, Channel::MODE_C ) ) ;
+	}
+if( theChan->getMode( Channel::MODE_CTCP ) )
+	{
+	modeVector.push_back( make_pair( false, Channel::MODE_CTCP ) ) ;
+	}
 if( theChan->getMode( Channel::MODE_L ) )
 	{
 	OnChannelModeL( theChan, false, 0, 0 ) ;
@@ -2191,6 +2209,8 @@ chanModes[ 'R' ] = Channel::MODE_REG ;
 chanModes[ 's' ] = Channel::MODE_S ;
 chanModes[ 't' ] = Channel::MODE_T ;
 chanModes[ 'D' ] = Channel::MODE_D ;
+chanModes[ 'C' ] = Channel::MODE_C ;
+chanModes[ 'CTCP' ] = Channel::MODE_CTCP ;
 
 // This vector is used for argument-less types that can be passed
 // to OnChannelMode()
@@ -3214,6 +3234,12 @@ for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ;
 		case 'D':
 			theChan->setMode( Channel::MODE_D ) ;
 			break ;
+		case 'c':
+			theChan->setMode(Channel::MODE_C);
+			break;
+		case 'C':
+			theChan->setMode(Channel::MODE_CTCP);
+			break;
 		case 'k':
 			{
 			if( argPos >= st.size() )

@@ -50,7 +50,7 @@ COPY "translations" FROM stdin;
 22	41	Unable to view forcekeeper details (Invisible)	31337	0
 22	42	Forcekeeper Information: %s (%i)	31337	0
 22	43	Currently dark sided as: %s	31337	0  
-22	44	URL: %	31337	0
+22	44	URL: %s	31337	0
 22	45	Language: %i	31337	0
 22	46	Deathstars: %s	31337	0
 22	47	Input Flood Points: %i	31337	0

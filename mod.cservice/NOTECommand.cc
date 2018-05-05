@@ -23,14 +23,11 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"Network.h"
 #include	"cservice.h"
 #include	"cservice_config.h"
-
-const char NOTECommand_cc_rcsId[] = "$Id: NOTECommand.cc,v 1.8 2007/08/28 16:10:11 dan_karrels Exp $" ;
 
 namespace gnuworld
 {

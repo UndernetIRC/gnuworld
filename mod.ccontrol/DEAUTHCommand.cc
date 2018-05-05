@@ -22,14 +22,11 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: DEAUTHCommand.cc,v 1.14 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

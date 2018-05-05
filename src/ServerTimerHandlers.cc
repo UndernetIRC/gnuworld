@@ -19,17 +19,12 @@
  *
  * $Id: ServerTimerHandlers.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $
  */
-
 #include	<string>
-
 #include	<ctime>
-
 #include	"ServerTimerHandlers.h"
 #include	"server.h"
 #include	"ELog.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: ServerTimerHandlers.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $" ) ;
 
 namespace gnuworld
 {

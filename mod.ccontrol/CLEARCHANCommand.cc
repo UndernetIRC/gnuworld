@@ -22,7 +22,7 @@
 
 #include	<string>
 #include	<cstdlib>
-#include        <iomanip>
+#include	<iomanip>
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -30,8 +30,6 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: CLEARCHANCommand.cc,v 1.26 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -90,9 +88,9 @@ if(Chan)
 
 //Check if the user specified the modes, if not assume he ment all of the modes
 if(st.size() == 2)
-	doModes = "obklim";
+	doModes = "obklimrD";
 else if(!strcasecmp(string_upper(st[ 2 ]),"ALL"))
-	doModes = "obklimnspt";
+	doModes = "obklimnsptrDCc";
 else if(!strcasecmp(string_upper(st [ 2]),"-d"))
 	Desynch = true;
 else	

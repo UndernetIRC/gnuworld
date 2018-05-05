@@ -33,8 +33,6 @@
 #include	"gThread.h"
 #include	"ELog.h"
 
-const char rcsId[] = "$Id: gThread.cc,v 1.4 2003/06/17 15:13:53 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 

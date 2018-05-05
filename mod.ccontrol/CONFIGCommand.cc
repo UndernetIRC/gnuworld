@@ -27,8 +27,6 @@
 #include	"gnuworld_config.h"
 #include	"ccontrol_generic.h"	/* for Duration() and Ago() */
 
-RCSTAG( "$Id: CONFIGCommand.cc,v 1.14 2008/01/03 04:26:22 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
 

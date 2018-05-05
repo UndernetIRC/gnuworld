@@ -29,7 +29,6 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -38,8 +37,6 @@
 #include	"Network.h"
 #include	"responses.h"
 #include	"cservice_config.h"
-
-const char PURGECommand_cc_rcsId[] = "$Id: PURGECommand.cc,v 1.22 2008/04/16 20:34:40 danielaustin Exp $" ;
 
 namespace gnuworld
 {
@@ -243,62 +240,6 @@ theChan->setRegisteredTS(0);
 theChan->setChannelMode("+tn");
 theChan->commit();
 
-/*
- * Permanently delete all associated Level records for this channel.
- */
-
-stringstream theQuery ;
-
-theQuery	<< "DELETE FROM levels WHERE channel_id = "
-			<< theChan->getID()
-			<< ends;
-
-#ifdef LOG_SQL
-elog	<< "sqlQuery> "
-		<< theQuery.str().c_str()
-		<< endl;
-#endif
-
-if( !bot->SQLDb->Exec(theQuery ) )
-//if( status != PGRES_COMMAND_OK )
-	{
-	elog	<< "PURGE> SQL Error: "
-		<< bot->SQLDb->ErrorMessage()
-		<< endl ;
-	return false ;
-	}
-
-/*
- * Bin 'em all.
- */
-
-cservice::sqlLevelHashType::const_iterator ptr = bot->sqlLevelCache.begin();
-cservice::sqlLevelHashType::key_type thePair;
-
-while(ptr != bot->sqlLevelCache.end())
-{
-	sqlLevel* tmpLevel = ptr->second;
-	unsigned int channel_id = ptr->first.second;
-
-	if (channel_id == theChan->getID())
-	{
-		thePair = ptr->first;
-
-#ifdef LOG_DEBUG
-		elog << "Purging Level Record for: " << thePair.second << " (UID: " << thePair.first << ")" << endl;
-#endif
-
-		++ptr;
-		bot->sqlLevelCache.erase(thePair);
-
-		delete(tmpLevel);
-	} else
-	{
-		++ptr;
-	}
-
-}
-
 bot->logAdminMessage("%s (%s) has purged %s (%s)",
 	theClient->getNickName().c_str(),
 	theUser->getUserName().c_str(),
@@ -316,9 +257,6 @@ bot->writeChannelLog(theChan,
 	"has purged " + theChan->getName() + " (" + reason + "), " +
 	"Manager was " + manager + " (" + managerEmail + ")" );
 
-/* Remove from cache.. part channel. */
-bot->sqlChannelCache.erase(theChan->getName());
-bot->sqlChannelIDCache.erase(theChan->getID());
 /* no longer interested in this channel */
 bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
 /* remove mode 'R' (no longer registered) */
@@ -328,6 +266,7 @@ if (tmpChan)
 bot->Part(theChan->getName());
 bot->joinCount--;
 
+bot->sqlChannelCache.erase(theChan->getName());
 delete(theChan);
 
 return true ;

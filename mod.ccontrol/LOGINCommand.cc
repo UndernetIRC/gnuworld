@@ -23,20 +23,16 @@
 #include	<string>
 #include	<sstream>
 #include	<iostream>
-
 #include	<cstdlib>
-
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"md5hash.h" 
-#include        "ccUser.h"
+#include	"ccUser.h"
 #include	"events.h"
 #include	"ip.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: LOGINCommand.cc,v 1.32 2009/07/25 18:12:34 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

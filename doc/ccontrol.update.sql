@@ -134,7 +134,7 @@ alter TABLE opers add Ssooo BOOLEAN NOT NULL DEFAULT 't';
 alter TABLE opers add Account VARCHAR(128);
 alter TABLE opers add AccountTS INT4 NOT NULL DEFAULT '0';
 
--- 2016/08/27 Tables for ipv6 connection management
+-- 2016/08/27 Tables for connection limits management
 CREATE TABLE ipLISPs (
         id SERIAL,
         name VARCHAR(200) UNIQUE NOT NULL,
@@ -158,3 +158,5 @@ CREATE TABLE ipLNetblocks (
         );
 
 
+-- 2017-02-09 Adding row for connection limits system
+alter TABLE ipLISPs add maxidentlimit int4 NOT NULL DEFAULT '0';

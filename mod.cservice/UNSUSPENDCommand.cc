@@ -25,18 +25,14 @@
  *
  * $Id: UNSUSPENDCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $
  */
-
 #include	<iostream>
 #include	<string>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"Network.h"
 #include	"levels.h"
 #include	"responses.h"
-
-const char UNSUSPENDCommand_cc_rcsId[] = "$Id: UNSUSPENDCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $" ;
 
 namespace gnuworld
 {

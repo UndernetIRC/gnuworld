@@ -21,10 +21,8 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
@@ -32,8 +30,6 @@
 #include	"misc.h"
 #include	"Constants.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: MODUSERCommand.cc,v 1.28 2009/08/28 18:14:44 hidden1 Exp $" ) ;
 
 namespace gnuworld
 {

@@ -31,7 +31,6 @@
 #include	<string>
 #include	<utility>
 #include	<iostream>
-
 #include	"StringTokenizer.h"
 #include	"ELog.h"
 #include	"cservice.h"
@@ -39,8 +38,6 @@
 #include	"dbHandle.h"
 #include	"responses.h"
 #include	"Network.h"
-
-const char REMUSERCommand_cc_rcsId[] = "$Id: REMUSERCommand.cc,v 1.19 2010/04/10 18:56:06 danielaustin Exp $" ;
 
 namespace gnuworld
 {

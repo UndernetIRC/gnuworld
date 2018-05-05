@@ -19,16 +19,11 @@
  *
  * $Id: ChannelUser.cc,v 1.10 2009/07/26 18:30:37 mrbean_ Exp $
  */
-
 #include	<string>
 #include	<vector>
-
 #include	<cassert>
-
 #include	"iClient.h"
 #include	"ChannelUser.h"
-
-RCSTAG("$Id: ChannelUser.cc,v 1.10 2009/07/26 18:30:37 mrbean_ Exp $" ) ;
 
 namespace gnuworld
 {

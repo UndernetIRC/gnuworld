@@ -44,8 +44,6 @@
 #include	"dbHandle.h"
 #include	"cservice_config.h"
 
-const char CHANINFOCommand_cc_rcsId[] = "$Id: CHANINFOCommand.cc,v 1.62 2009/06/09 15:40:29 mrbean_ Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;
@@ -163,6 +161,14 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		if (theUser->getFlag(sqlUser::F_NOADMIN))
 			flagsSet += "DISABLEAUTH ";
 	}
+	else if (tmpUser == theUser)
+	{
+		if (theUser->getFlag(sqlUser::F_NOPURGE))
+			flagsSet += "NOPURGE ";
+		if (theUser->getFlag(sqlUser::F_ALUMNI))
+			flagsSet += "ALUMNI ";
+	}
+
 	if (adminAccess || (tmpUser == theUser))
 	{
 		if (theUser->getFlag(sqlUser::F_TOTP_REQ_IPR))
@@ -616,36 +622,67 @@ if( !theChan )
 			}
 		}
 		SuppDataList.clear();
-		// check for any objections
-		int objCount = 0;
-		theQuery.str("");
-		theQuery << "SELECT count(*) FROM objections WHERE channel_id="
-				<< chanID
-				<< ends;
-		if (!bot->SQLDb->Exec(theQuery, true))
+                // check for any objections
+                int objCount = 0;
+                theQuery.str("");
+                theQuery << "SELECT count(*) FROM objections WHERE channel_id="
+                                << chanID
+				<< " AND admin_only='N'"
+                                << ends;
+                if (!bot->SQLDb->Exec(theQuery, true))
+                {
+                        bot->logDebugMessage("Error on CHANINFO.objections user objections query");
+                        #ifdef LOG_SQL
+                        //elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+                        elog << "CHANINFO.objections user objections query> SQL Error: "
+                             << bot->SQLDb->ErrorMessage()
+                             << endl ;
+                        #endif
+                }
+                if (bot->SQLDb->Tuples() > 0)
+                        objCount = atoi(bot->SQLDb->GetValue(0,0));
+
+           	// check for any admin comments
+		int comCount = 0;
+		if (adminAccess > 0)
 		{
-			bot->logDebugMessage("Error on CHANINFO.objections query");
-			#ifdef LOG_SQL
-			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-			elog << "CHANINFO.objections query> SQL Error: "
-			     << bot->SQLDb->ErrorMessage()
-			     << endl ;
-			#endif
+	                theQuery.str("");
+        	        theQuery << "SELECT count(*) FROM objections WHERE channel_id="
+                	                << chanID
+					<< " AND admin_only='Y'"
+                        	        << ends;
+                	if (!bot->SQLDb->Exec(theQuery, true))
+                	{
+                        	bot->logDebugMessage("Error on CHANINFO.objections admin comment query");
+                        	#ifdef LOG_SQL
+                        	//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
+                        	elog << "CHANINFO.objections admin comment query> SQL Error: "
+                             	<< bot->SQLDb->ErrorMessage()
+                             	<< endl ;
+                        	#endif
+                	}
+                	if (bot->SQLDb->Tuples() > 0)
+                        	comCount = atoi(bot->SQLDb->GetValue(0,0));
 		}
-		if (bot->SQLDb->Tuples() > 0)
-			objCount = atoi(bot->SQLDb->GetValue(0,0));
-		
-		// output additional information if user is admin, supporter, or applicant)
-		if (showsupplist)
-		{
-			bot->Notice(theClient,"Application posted on: %s",ctime(&posted));
-			if ((status == 9) && (adminAccess > 0))
-				bot->Notice(theClient,"Decision: %s",decision.c_str());
-			bot->Notice(theClient,supplist.c_str());
-			if (objCount > 0)
-				bot->Notice(theClient,"Objections: %i",objCount);
-			return true;
-		}
+                
+                // output additional information if user is admin, supporter, or applicant)
+                if (showsupplist)
+                {
+                        bot->Notice(theClient,"Application posted on: %s",ctime(&posted));
+                        if ((status == 9) && (adminAccess > 0))
+                                bot->Notice(theClient,"Decision: %s",decision.c_str());
+                        bot->Notice(theClient,supplist.c_str());
+			if (adminAccess > 0)
+			{
+				if (objCount > 0 || comCount > 0)
+				{
+					bot->Notice(theClient,"Objections: %i -- Admin Comments: %i", objCount, comCount);
+				}
+			}
+                        else if (objCount > 0)
+                                bot->Notice(theClient,"Objections: %i",objCount);
+                        return true;
+                }
 	return true;
 	}
 	else
@@ -654,8 +691,23 @@ if( !theChan )
 				language::chan_not_reg,
 				string("The channel %s is not registered")).c_str(),
 			st[1].c_str());
-		return true;
 	}
+	if (!theChan && adminAccess)
+	{
+		theChan = bot->getChannelRecord(st[1], true);
+		if (theChan)
+		{
+			string purgeReason = bot->getLastChannelEvent(theChan, sqlChannel::EV_PURGE, bot->currentTime());
+			if (!purgeReason.empty())
+			{
+				bot->Notice(theClient, "\002   *** Last purge history result ***\002");
+				bot->Notice(theClient, purgeReason.c_str());
+			}
+			delete theChan;
+			theChan = NULL;
+		}
+	}
+	return true;
 }
 
 /*

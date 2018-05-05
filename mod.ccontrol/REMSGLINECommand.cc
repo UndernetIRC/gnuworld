@@ -21,20 +21,15 @@
  */
 
 #include	<string>
-#include        <iomanip>
-
+#include	<iomanip>
 #include	<cstdlib>
-
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
 #include	"StringTokenizer.h"
 #include	"gnuworld_config.h"
 
-RCSTAG( "$Id: REMSGLINECommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $" ) ;
-
 namespace gnuworld
 {
-
 using std::string ;
 
 namespace uworld

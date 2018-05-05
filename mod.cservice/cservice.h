@@ -165,11 +165,11 @@ public:
 	virtual void OnWhois( iClient* sourceClient,
 			iClient* targetClient );
 
-	virtual bool Kick( Channel*, iClient*, const std::string& ) ;
+	virtual bool Kick( Channel*, iClient*, const std::string&, bool modeAsServer = false ) ;
 
-	virtual bool Kick( Channel*, const std::vector<iClient*>&, const std::string& ) ;
+	virtual bool Kick( Channel*, const std::vector<iClient*>&, const std::string&, bool modeAsServer = false ) ;
 
-	virtual bool Kick( Channel*, const string&,	const std::string& ) ;
+	virtual bool Kick( Channel*, const string&,	const std::string&, bool modeAsServer = false ) ;
 
 	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
@@ -185,7 +185,7 @@ public:
 
 	/* get last channel event for specific timestamp */
 	const string getLastChannelEvent(sqlChannel* theChannel,
-		unsigned short eventType, unsigned int& eventTime);
+		unsigned short eventType, time_t eventTime);
 
 	typedef commandMapType::const_iterator constCommandIterator ;
 	constCommandIterator command_begin() const
@@ -265,8 +265,8 @@ public:
 	unsigned short isForced(sqlChannel*, sqlUser*);
 
 	/* Fetch a channel record for a channel. */
-	sqlChannel* getChannelRecord( const string& );
-	sqlChannel* getChannelRecord( int );
+	sqlChannel* getChannelRecord(const string&, bool historysearch = false);
+	sqlChannel* getChannelRecord(int, bool historysearch = false);
 
 	/* Fetch a access level record for a user/channel combo. */
 	sqlLevel* getLevelRecord(sqlUser*, sqlChannel*);
@@ -378,6 +378,9 @@ public:
 	/* Interval at which we check for new webrelay messages. */
 	int webrelayPeriod;
 
+	/* Message for iauthd-c when login-on-connect params are wrong */
+	string locMessage;
+
 	/* Duration in seconds at which an idle user/chan/level/ban
 	 * record should be purged from the cache. */
 	int idleUserPeriod;
@@ -392,6 +395,9 @@ public:
 	 * be notified that it is so. */
 	int pendingNotifPeriod;
 
+	/* After how much seconds should expire any newly created never logged in user */
+	int neverLoggedInUsersExpireTime;
+
 	/* Duration in days, after the system purge unlogged users */
 	int UsersExpireDBDays;
 
@@ -405,8 +411,9 @@ public:
 	unsigned int NoRegDaysOnNOSupport;
 	unsigned int RejectAppOnUserFraud;
 	//int AcceptOnTrafficPass = 1;
-	unsigned int ReviewOnObject;
-	unsigned int ReviewOnCompleted;
+	unsigned int RequireReview;
+	unsigned int DecideOnObject;
+	unsigned int DecideOnCompleted;
 	unsigned int ReviewsExpireTime;
 	unsigned int PendingsExpireTime;
 	unsigned int MaxDays;
@@ -438,7 +445,8 @@ public:
 	void checkObjections();
 	void checkAccepts();
 	void checkReviews();
-	void checkPendingCleanups();
+	void cleanUpReviews();
+	void cleanUpPendings();
 	void loadIncompleteChanRegs();
 
 	/* End of The Judge */
@@ -569,7 +577,7 @@ public:
 	/* Checking for need to raise the floodpro level. Returns the repetition number. */
 	unsigned int checkFloodproLevel(sqlChannel*, const string&);
 
-	/* Cleanup the channel flood ip's/clients */
+	/* Cleanup the channel flood masks/clients */
 	void checkChannelsFlood();
 
 	time_t currentTime() const ;
@@ -654,9 +662,6 @@ public:
 
 	void cacheExpireUsers();
 
-	//TODO: Enable this when sure!
-	void wipeNeverLoggedUsers();
-
 	/*
 	 *  Expire Ban records, only if the channel
 	 *  record is 'idle'.
@@ -669,6 +674,12 @@ public:
 	 */
 
 	void cacheExpireLevels();
+
+	/*
+	 * Process any pending reop requests by the bot.
+	 */
+	void performReops();
+
 
 	bool deleteUserFromTable(unsigned int, const string&);
 	bool wipeUser(unsigned int, bool);

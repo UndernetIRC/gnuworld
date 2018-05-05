@@ -19,12 +19,9 @@
  *
  * $Id: WHOISCommand.cc,v 1.25 2005/08/24 13:36:32 kewlio Exp $
  */
-
 #include	<string>
 #include	<iostream>
-
 #include	<cstdlib>
-
 #include	"Network.h"
 #include	"ccontrol.h"
 #include	"CControlCommands.h"
@@ -32,8 +29,6 @@
 #include	"ip.h"
 #include	"ccontrol_generic.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: WHOISCommand.cc,v 1.25 2005/08/24 13:36:32 kewlio Exp $" ) ;
 
 namespace gnuworld
 {

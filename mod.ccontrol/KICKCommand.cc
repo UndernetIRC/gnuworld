@@ -21,7 +21,7 @@
  */
 
 #include	<string>
-#include        <iomanip>
+#include	<iomanip>
 
 #include	<cstdlib>
 
@@ -32,8 +32,6 @@
 #include	"Constants.h"
 #include	"ccBadChannel.h"
 #include	"gnuworld_config.h"
-
-RCSTAG( "$Id: KICKCommand.cc,v 1.15 2006/09/26 17:35:58 kewlio Exp $" ) ;
 
 namespace gnuworld
 {
@@ -119,12 +117,9 @@ if( bot->isOperChan( chanName ) )
 	bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
 	return true ;
 	}
+
 //Its not an oper channel 
-bot->Join( chanName, string(), 0, true ) ;
-
-bot->Kick( theChan, Target, st.assemble( 3 ) ) ;
-
-bot->Part( chanName ) ;
+bot->Kick( theChan, Target, st.assemble(3), true) ;
 
 return true ;
 }

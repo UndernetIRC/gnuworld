@@ -62,16 +62,16 @@ public:
 	inline const std::string&	getLastSeenAs() const
 		{ return nickUserHost ; }
 
-	inline const time_t	getTimeFirstOpped() const
+	inline time_t	getTimeFirstOpped() const
 		{ return ts_firstopped ; }
 
-	inline const time_t	getTimeLastOpped() const
+	inline time_t	getTimeLastOpped() const
 		{ return ts_lastopped ; }
 
 	inline const short&	getDay(int _dayval) const
 		{ return day[_dayval] ; }
 		
-	inline const bool isOldestOp() const
+	inline bool isOldestOp() const
         { return OldestOp; }
 
 	/*

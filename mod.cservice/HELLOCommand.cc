@@ -10,8 +10,6 @@
 #include	"cservice.h"
 #include	"dbHandle.h"
 
-const char HELLOCommand_cc_rcsId[] = "$Id: HELLOCommand.cc,v 1.1 2005/04/03 22:11:42 dan_karrels Exp $" ;
-
 namespace gnuworld
 {
 using std::string ;
