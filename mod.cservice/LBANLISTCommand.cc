@@ -141,7 +141,7 @@ for( std::map< int,sqlBan* >::const_iterator ptr = theChan->banList.begin() ; pt
 				bot->getResponse(theUser,
 					language::lban_exp,
 					string("EXP: %s")).c_str(),
-				bot->prettyDuration(ban_expires_f).c_str());
+				prettyDuration(ban_expires_f).c_str());
 			}
 		}
 	} // for()

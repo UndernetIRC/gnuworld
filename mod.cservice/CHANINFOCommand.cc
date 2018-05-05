@@ -308,7 +308,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->getResponse(tmpUser,
 			language::last_seen,
 			string("Last Seen: %s")).c_str(),
-		bot->prettyDuration(theUser->getLastSeen()).c_str());
+		prettyDuration(theUser->getLastSeen()).c_str());
 
 	if(adminAccess)
 	{
@@ -331,7 +331,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++) {
 		        string userComments = bot->SQLDb->GetValue(i, 0);
 		        unsigned int theTime = atoi(bot->SQLDb->GetValue(i, 1));
-			bot->Notice(theClient,"\002Admin Comment\002: %s ago (%s)", bot->prettyDuration(theTime).c_str(),
+			bot->Notice(theClient,"\002Admin Comment\002: %s ago (%s)", prettyDuration(theTime).c_str(),
 				userComments.c_str());
 		}
         }
@@ -364,7 +364,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 			}
 		}
 
-		bot->Notice(theClient, "Account suspended %s ago, Reason: %s", bot->prettyDuration(theTime).c_str(),
+		bot->Notice(theClient, "Account suspended %s ago, Reason: %s", prettyDuration(theTime).c_str(),
 			reason.c_str());
 		} else
 		{
@@ -390,7 +390,7 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 					}
 				}
 				bot->Notice(theClient, "Account was unsuspended %s ago %s",
-					bot->prettyDuration(theTime).c_str(),
+					prettyDuration(theTime).c_str(),
 					reason.c_str());
 			}
 		}
@@ -744,7 +744,7 @@ if( bot->SQLDb->Exec(theQuery, true ) )
 				language::last_seen_info,
 				string("%s - last seen: %s ago")).c_str(),
 			bot->SQLDb->GetValue(i, 1).c_str(),
-			bot->prettyDuration(atoi(bot->SQLDb->GetValue(i, 3))).c_str());
+			prettyDuration(atoi(bot->SQLDb->GetValue(i, 3))).c_str());
 		} // for()
 	}
 
@@ -805,7 +805,7 @@ if ((adminAccess > 0) && (theChan->getFlag(sqlChannel::F_SUSPEND)))
 	if (suspendreason != "")
 	{
 		bot->Notice(theClient, "Channel suspended %s ago by %s, Reason: %s",
-			bot->prettyDuration(suspendts).c_str(),
+			prettyDuration(suspendts).c_str(),
 			suspender.c_str(),
 			suspendreason.c_str());
 	}

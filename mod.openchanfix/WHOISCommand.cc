@@ -154,7 +154,7 @@ if (theUser != theUser2) {
 	      bot->getResponse(theUser,
 			language::whois_lastused,
 			std::string("Last used the service: %s ago")).c_str(),
-			bot->prettyDuration(theUser2->getLastSeen()).c_str());
+			prettyDuration(theUser2->getLastSeen()).c_str());
   else
     bot->SendTo(theClient,
 	      bot->getResponse(theUser,
@@ -168,7 +168,7 @@ if (st.size() > 2 && string_upper(st[2]) == "-MODIF")
 			language::whois_modif,
 			std::string("Last modified: %s (%s ago)")).c_str(),
 			theUser2->getLastUpdatedBy().c_str(),
-			bot->prettyDuration(theUser2->getLastUpdated()).c_str());
+			prettyDuration(theUser2->getLastUpdated()).c_str());
 
 bot->logLastComMessage(theClient, Message);
 

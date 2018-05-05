@@ -190,7 +190,7 @@ for (unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 	current.command 	= bot->SQLDb->GetValue(i, 2);
 	current.ip 			= bot->SQLDb->GetValue(i, 3);
 	current.hostmask	= bot->SQLDb->GetValue(i, 4);
-	current.timestamp 	= bot->prettyDuration(atoi(bot->SQLDb->GetValue(i, 5))) + " ago.";
+	current.timestamp 	= prettyDuration(atoi(bot->SQLDb->GetValue(i, 5))) + " ago.";
 	if (desc)
 		scanResults.push_front(std::make_pair(username, current));
 	else

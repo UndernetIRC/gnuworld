@@ -42,7 +42,6 @@
 #include	"ip.h"
 #include	"Network.h"
 #include	"StringTokenizer.h"
-#include	"misc.h"
 #include	"ELog.h"
 #include	"dbHandle.h"
 #include	"constants.h"
@@ -4853,32 +4852,6 @@ if(ptr != sqlUserCache.end())
 return flagString;
 }
 
-const string cservice::prettyDuration( int duration ) const
-{
-	if (duration == 0)
-		return "Never";
-
-// Pretty format a 'duration' in seconds to
-// x day(s), xx:xx:xx.
-
-char tmpBuf[ 64 ] = {0};
-
-int	res = currentTime() - duration,
-	secs = res % 60,
-	mins = (res / 60) % 60,
-	hours = (res / 3600) % 24,
-	days = (res / 86400) ;
-
-sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
-	days,
-	(days == 1 ? "" : "s"),
-	hours,
-	mins,
-	secs );
-
-return string( tmpBuf ) ;
-}
-
 void cservice::OnChannelModeV( Channel* theChan, ChannelUser* theChanUser,
 	const xServer::voiceVectorType& theTargets)
 {
@@ -7446,6 +7419,7 @@ if( SQLDb->Exec(theQuery, true ) )
 			//	(SQLDb->GetValue(i,6).c_str() == "Y") ? true : false;
 			newPending->checkStart = atoi(SQLDb->GetValue(i,7).c_str());
 			pendingChannelList.insert( pendingChannelListType::value_type(chanName, newPending) );
+			doXQOplist(chanName);
 
 			/*
 			 *  Lets register our interest in listening on JOIN events for this channel.
@@ -8270,6 +8244,7 @@ void cservice::loadConfigVariables()
 	SupportDays = atoi((cserviceConfig->Require( "support_days" )->second).c_str());
 	ReviewerId = atoi((cserviceConfig->Require( "reviewer_id" )->second).c_str());
 	LogToAdminConsole = atoi((cserviceConfig->Require( "log_to_admin_console" )->second).c_str());
+	ChanfixServerName = cserviceConfig->Require( "chanfix_servername" )->second ;
 	// * End The Judge Variables * //
 	pendingChanPeriod = atoi((cserviceConfig->Require( "pending_duration" )->second).c_str());
 	pendingNotifPeriod = atoi((cserviceConfig->Require( "pending_notif_duration" )->second).c_str());
@@ -8640,10 +8615,29 @@ elog << "cservice::doXQLogin: FAILED login for " << username << endl;
 return true;
 }
 
+bool cservice::doXQOplist(const string& chanName)
+{
+	elog << "cservice::doXQOplist> Executing XQ for " << chanName << endl;
+	logDebugMessage("cservice::doXQOplist> Executing XQ for %s", chanName.c_str());
+	//iServer* theServer = this->MyUplink->Uplink();
+	iServer* chanfixServer = Network->findServerName(ChanfixServerName);
+	if (!chanfixServer)
+	{
+		elog << "cservice::doXQOplist> chanfixServer(" << ChanfixServerName << ") NOT Found!" << endl;
+		return false;
+	}
+	else
+		elog << "<DEBUG> chanfixServer(" << ChanfixServerName << ") found" << endl;
+	string Message = "OPLIST " + chanName;
+	// AB XQ Az iauth:15_d :OPLIST #empfoo
+	//elog << "cservice::doXQOplist: Routing: " << Routing << " Message: " << Message << "\n";
+	return Write("%s XQ %s %s :%s", getCharYY().c_str(), chanfixServer->getCharYY().c_str(), "AnyCServiceRouting", Message.c_str());
+}
+
 bool cservice::doXROplist(iServer* theServer, const string& Routing, const string& Message)
 {
-	// AB XQ Az iauth:15_d :OPLIST #empfoo
-	elog << "cservice::doXQLogin: Routing: " << Routing << " Message: " << Message << "\n";
+	// AB XR Az iauth:15_d :OPLIST #empfoo
+	elog << "cservice::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
 	StringTokenizer st(Message);
 
 	if (st.size() < 6)
@@ -8652,21 +8646,25 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		return false;
 	}
 	string scoreChan = st[1];
-	string rank = st[2];
+	string opCount = st[2];
 	string score = st[3];
 	string account = st[4];
-	string firstOpped = st[5];
-	string lastOpped = st[6];
-	string lastNick = st[7];	// ... but may not be online anymore
+	//st[5] == "--";
+	string firstOpped = st[6]; //tsToDateTime(atoi(st[5]), false);
+	//st[7] == "/";
+	string lastOpped = st[8]; //tsToDateTime(atoi(st[6], true);
+	//st[9] == "/";
+	//string lastNick = st[10];	// ... but may not be online anymore
 
 	elog << "cservice::doXROplist: OPLIST " 
-		<< scoreChan << " " 
-		<< rank << " " 
-		<< score << " " 
-		<< account << " "
-		<< firstOpped << " " 
-		<< lastOpped << " "
-		<< lastNick << endl;
+		<< "scorechan = " << scoreChan << " "
+		<< "opCount(rank) = " << opCount << " "
+		<< "score = " << score << " "
+		<< "account = " << account << " "
+		<< "firstOpped = " << firstOpped << " "
+		<< "lastOpped = " << lastOpped << " "
+		//<< "lastNick = " << lastNick
+		<< endl;
 
 	/*	Now we do the actual work to insert scores to SQL DB
 		Rules:
@@ -8697,12 +8695,20 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		}
 		else {
 			// Pending channel found -- have we inserted this user & chan combo before?
-			sqlChannel* tmpChan = getChannelRecord(scoreChan);
+			sqlPendingChannel* tmpChan = NULL;
+			pendingChannelListType::iterator ptr = pendingChannelList.find(scoreChan);
+			if (ptr != pendingChannelList.end())
+				tmpChan = ptr->second;
+			if (!tmpChan)
+			{
+				elog << "cservice::doXROplist> could not find sqlPendingChannel " << scoreChan << endl;
+				return false;
+			}
 			sqlUser* tmpUser = getUserRecord(account);
 			unsigned int userID = tmpUser->getID();
-			unsigned int chanID = tmpChan->getID();
+			unsigned int chanID = tmpChan->channel_id;
 			stringstream queryString;
-			queryString << "SELECT channel_id FROM pending_chanfix_scores WHERE user_id='"
+			queryString << "SELECT channel_id,first FROM pending_chanfix_scores WHERE user_id='"
 				<< userID
 				<< "' AND channel_id=(SELECT id FROM channels WHERE lower(name)='"
 				<< string_lower(scoreChan)
@@ -8722,12 +8728,12 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 				{
 					// no rows returned -- need to INSERT
 					updateQuery << "INSERT INTO pending_chanfix_scores "
-						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped) VALUES('"
+						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped, first) VALUES ('"
 						<< chanID
 						<< "', '"
 						<< userID
 						<< "', '"
-						<< rank
+						<< opCount
 						<< "', '"
 						<< score
 						<< "', '"
@@ -8736,33 +8742,64 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 						<< firstOpped
 						<< "', '"
 						<< lastOpped
+						<< "', '"
+						<< "Y"
 						<< "')"
 						<< ends;
 				}
 				else {
 					// rows returned -- need to UPDATE
-					int chanID = atoi(SQLDb->GetValue(0, 0).c_str());
-					stringstream updateQuery;
-					updateQuery << "UPDATE pending_chanfix_scores SET "
-						<< "rank='"
-						<< rank
-						<< "', "
-						<< " score='"
-						<< score
-						<< "', "
-						<< " first_opped='"
-						<< firstOpped
-						<< "',"
-						<< " last_opped='"
-						<< lastOpped
-						<< "',"
-						<< " last_updated=,now()::abstime::int4"
-						<< " WHERE user_id='"
-						<< userID
-						<< "' AND channel_id='"
-						<< chanID
-						<< "'"
-						<< ends;
+					int rescount = (int)SQLDb->Tuples();
+					rescount--;
+					int chanID = atoi(SQLDb->GetValue(rescount, 0).c_str());
+					char first = (char)SQLDb->GetValue(rescount, 1)[0];
+					elog << " *** <DEBUG> first == " << first << endl;
+					if (first == 'N')
+					{
+						updateQuery << "UPDATE pending_chanfix_scores SET "
+							<< "rank='"
+							<< opCount
+							<< "', "
+							<< " score='"
+							<< score
+							<< "', "
+							<< " first_opped='"
+							<< firstOpped
+							<< "',"
+							<< " last_opped='"
+							<< lastOpped
+							<< "',"
+							<< " last_updated=now()::abstime::int4, "
+							<< "first='N'"
+							<< " WHERE user_id='"
+							<< userID
+							<< "' AND channel_id='"
+							<< chanID
+							<< "' AND first='N'"
+							<< ends;
+					}
+					else
+					{
+						updateQuery << "INSERT INTO pending_chanfix_scores "
+							<< "(channel_id,user_id,rank,score,account,first_opped,last_opped, first) VALUES ('"
+							<< chanID
+							<< "', '"
+							<< userID
+							<< "', '"
+							<< opCount
+							<< "', '"
+							<< score
+							<< "', '"
+							<< account
+							<< "', '"
+							<< firstOpped
+							<< "', '"
+							<< lastOpped
+							<< "', '"
+							<< "N"
+							<< "')"
+							<< ends;
+					}
 				}
 
 #ifdef LOG_SQL
@@ -8772,7 +8809,14 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 #endif
 
 				// send to SQL
-				SQLDb->Exec(updateQuery);
+				if (!SQLDb->Exec(updateQuery, true))
+				//if( PGRES_TUPLES_OK != status )
+				{
+					elog	<< "cservice::doXROplist::sqlQuery> SQL Error: "
+						<< SQLDb->ErrorMessage()
+						<< endl ;
+					return false ;
+				}
 			} // successful query
 		} // end score exist lookup query
 	} // end pending chan lookup query

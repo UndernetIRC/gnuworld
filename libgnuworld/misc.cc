@@ -505,6 +505,33 @@ sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
 return string( tmpBuf ) ;
 }
 
+const string tsToDateTime(time_t timestamp, bool time)
+{
+	char datetimestring[ 20 ] = {0};
+	struct tm *stm;
+
+	stm = localtime(&timestamp);
+	memset(datetimestring, 0, sizeof(datetimestring));
+
+	if (time)
+		strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d %H:%M:%S", stm);
+	else
+		strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d", stm);
+
+	return string(datetimestring);
+}
+
+int getCurrentGMTHour()
+{
+	time_t rawtime;
+	tm * ptm;
+
+	time ( &rawtime );
+	ptm = gmtime ( &rawtime );
+
+	return ptm->tm_hour;
+}
+
 const string TokenStringsParams(const char* format,...)
 {
 	char buf[ 1024 ] = { 0 } ;

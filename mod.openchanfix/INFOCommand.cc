@@ -108,7 +108,7 @@ if (netChan && bot->isBeingFixed(netChan)) {
 		bot->getResponse(theUser,
 				language::info_fix_started,
 				std::string("Current fix has been running for %s")).c_str(),
-				bot->prettyDuration(theChan->getFixStart()).c_str());
+				prettyDuration(theChan->getFixStart()).c_str());
   else
     bot->SendTo(theClient,
 		bot->getResponse(theUser,
@@ -123,9 +123,9 @@ else
 	if (lastfix == 0)
 		dateTimeOfLastFix = "Never";
 	else
-		dateTimeOfLastFix = bot->tsToDateTime(lastfix, true);
+		dateTimeOfLastFix = tsToDateTime(lastfix, true);
 		
-	bot->SendTo(theClient, "Last fix: %s (%s ago)", dateTimeOfLastFix.c_str(), bot->prettyDuration(lastfix).c_str());
+	bot->SendTo(theClient, "Last fix: %s (%s ago)", dateTimeOfLastFix.c_str(), prettyDuration(lastfix).c_str());
 	
 }
 
@@ -191,7 +191,7 @@ if (noteCount > 0) {
                                 language::info_notes,
                                 std::string("[%d:%s] %s \002%s\002%s%s")).c_str(),
                                             note_id, from.c_str(),
-                                            bot->tsToDateTime(when, true).c_str(),
+                                            tsToDateTime(when, true).c_str(),
                                             bot->getEventName(event).c_str(),
                                             (!theMessage.empty()) ? " " : "", theMessage.c_str());
   }

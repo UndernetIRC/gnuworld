@@ -171,8 +171,8 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
      opPtr != myOps.end() && (all || opCount < OPCOUNT); opPtr++) {
   curOp = *opPtr;
   opCount++;
-  firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
-  lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
+  firstop = tsToDateTime(curOp->getTimeFirstOpped(), false);
+  lastop = tsToDateTime(curOp->getTimeLastOpped(), true);
   inChan = bot->accountIsOnChan(st[1], curOp->getAccount());
   if (inChan)
     nickName = bot->getChanNickName(st[1], curOp->getAccount());

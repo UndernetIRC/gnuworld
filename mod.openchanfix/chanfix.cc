@@ -1091,11 +1091,11 @@ switch(whichEvent)
 		string Command = string_upper(st[0]);
 		if (Command == "OPLIST")
 		{
-			doXQOplist(theServer, Routing, Message);
+			doXROplist(theServer, Routing, Message);
 		}
 		else if (Command == "SCORE")
 		{
-			doXQScore(theServer, Routing, Message);
+			doXRScore(theServer, Routing, Message);
 		}
 		break;
 	}
@@ -2860,57 +2860,6 @@ if (ptr != manFixQ.end()) {
 return false;
 }
 
-const std::string chanfix::prettyDuration( int duration )
-{
-
-// Pretty format a 'duration' in seconds to
-// x day(s), xx:xx:xx.
-
-char tmpBuf[ 64 ] = {0};
-
-int	res = currentTime() - duration,
-	secs = res % 60,
-	mins = (res / 60) % 60,
-	hours = (res / 3600) % 24,
-	days = (res / 86400) ;
-
-sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
-	days,
-	(days == 1 ? "" : "s"),
-	hours,
-	mins,
-	secs );
-
-return std::string( tmpBuf ) ;
-}
-
-const std::string chanfix::tsToDateTime(time_t timestamp, bool time)
-{
-char datetimestring[ 20 ] = {0};
-struct tm *stm;
-
-stm = localtime(&timestamp);
-memset(datetimestring, 0, sizeof(datetimestring));
-
-if (time)
-  strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d %H:%M:%S", stm);
-else
-  strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d", stm);
-
-return std::string(datetimestring);
-}
-
-int chanfix::getCurrentGMTHour()
-{
-time_t rawtime;
-tm * ptm;
-
-time ( &rawtime );
-ptm = gmtime ( &rawtime );
-
-return ptm->tm_hour;
-}
-
 sqlcfUser* chanfix::isAuthed(const std::string Name)
 {
 //Name = escapeSQLChars(Name);
@@ -3677,10 +3626,10 @@ int chanfix::getNewScore( sqlChanOp* chOp, time_t oldestTS )
     return newScore;
 }
 
-bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string& Message)
+bool chanfix::doXROplist(iServer* theServer, const string& Routing, const string& Message)
 {
-	// AB XQ Az BlAAB :OPLIST <chan>
-	elog << "chanfix::doXQOplist: Routing: " << Routing << " Message: " << Message << "\n";
+	// AB XR Az BlAAB :OPLIST <chan>
+	elog << "chanfix::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
 	StringTokenizer st(Message);
 	bool all = true;
 	bool days = false;
@@ -3797,8 +3746,8 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 		opPtr != myOps.end() && (all || opCount < OPCOUNT); opPtr++) {
 		curOp = *opPtr;
 		opCount++;
-		firstop = tsToDateTime(curOp->getTimeFirstOpped(), false);
-		lastop = tsToDateTime(curOp->getTimeLastOpped(), true);
+		firstop = itoa((int)curOp->getTimeFirstOpped());
+		lastop = itoa((int)curOp->getTimeLastOpped());
 		inChan = accountIsOnChan(st[1], curOp->getAccount());
 		if (inChan)
 			nickName = getChanNickName(st[1], curOp->getAccount());
@@ -3838,7 +3787,7 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 		}
 
 		// XREPLY 
-		xResponse = TokenStringsParams("OPLIST %s %3d. %4d  %s -- %s / %s%s%s%s%s%s",
+		xResponse = TokenStringsParams("OPLIST %s %3d %4d  %s -- %s / %s%s%s%s%s%s",
 			st[1].c_str(),
 			opCount,
 			(curOp->getPoints() + curOp->getBonus()),
@@ -3877,6 +3826,12 @@ bool chanfix::doXQOplist(iServer* theServer, const string& Routing, const string
 	}
 
 	// End of OPLIST
+	return true;
+}
+
+bool doXRScore(iServer* theServer, const string& Routing, const string& Message)
+{
+	// TODO
 	return true;
 }
 

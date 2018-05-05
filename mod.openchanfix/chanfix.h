@@ -32,6 +32,7 @@
 #include	"EConfig.h"
 #include	"ELog.h"
 #include	"Timer.h"
+#include	"misc.h"
 
 #include	"chanfixCommands.h"
 #include	"chanfix_config.h"
@@ -299,15 +300,9 @@ public:
 
 	const std::string getEventName(const int);
 
-	const std::string prettyDuration( int );
-
-	const std::string tsToDateTime(time_t, bool);
-
 	const std::string getHostList( sqlcfUser* );
 	
 	const std::string getChanNickName(const std::string&, const std::string&);
-
-	int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 
 	char *convertToAscTime(time_t);
 
@@ -315,9 +310,9 @@ public:
 	bool serverNotice( Channel*, const char*, ... );
 	bool serverNotice( Channel*, const std::string& );
 
-	/* XQUERY support */
-	bool doXQOplist(iServer*, const string&, const string&);
-	bool doXQScore(iServer*, const string&, const string&);
+	/* XREPLY support */
+	bool doXROplist(iServer*, const string&, const string&);
+	bool doXRScore(iServer*, const string&, const string&);
 	bool doXResponse(iServer*, const string&, const string&);
 
 	/*

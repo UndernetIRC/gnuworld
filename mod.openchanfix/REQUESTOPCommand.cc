@@ -234,7 +234,7 @@ if (mintime < bot->getMinRequestOpTime()) {
               bot->getResponse(theUser,
                               language::requestop_must_wait,
                               std::string("You must wait %s seconds before %s can be fixed again with this command, or contact a help channel.")).c_str(),
-                                          bot->prettyDuration(mint).c_str(), netChan->getName().c_str());
+                                          prettyDuration(mint).c_str(), netChan->getName().c_str());
   return;
 }
 

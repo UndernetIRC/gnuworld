@@ -220,11 +220,7 @@ public:
 	 * Return the last error seen by the module system.
 	 */
 	inline const std::string& getLastError() const
-	{
-		std::stringstream ss;
-		ss << ::lt_dlerror() << std::endl;
-		return ss.str();
-	}
+		{ return ::lt_dlerror(); }
 
 	/**
 	 * Return by value the object being loaded from the module.

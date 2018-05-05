@@ -191,6 +191,10 @@ string createClass(const string&, bool wildcard = false);
 /* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
 const string prettyDuration( int ) ;
 
+const string tsToDateTime(time_t, bool);
+
+int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
+
 /* General assemble parameters into one result string */
 const string TokenStringsParams(const char*, ...);
 

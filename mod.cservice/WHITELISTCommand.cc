@@ -202,7 +202,7 @@ if( !bot->SQLDb->Exec( whitelistQuery, true ) )
         }
 	bot->Notice(theClient, "IP %s added to the whitelist.", strIP.c_str());
 	bot->Notice(theClient, "(expires in: %s) by %s -- %s",
-		bot->prettyDuration(bot->currentTime() - whiteTime).c_str(),
+		prettyDuration(bot->currentTime() - whiteTime).c_str(),
 		theUser->getUserName().c_str(), whiteReason.c_str());
 	return true;
 	}
@@ -253,7 +253,7 @@ if (option == "VIEW")
 	const time_t timeAddedOn = (time_t)dbAddedOn;
 	bot->Notice(theClient, "%s: Added on %s", dbIP.c_str(), ctime(&timeAddedOn));
 	bot->Notice(theClient, "(expires in: %s) by %s -- %s", 
-		bot->prettyDuration(bot->currentTime() - (dbExpires - bot->currentTime())).c_str(), 
+		prettyDuration(bot->currentTime() - (dbExpires - bot->currentTime())).c_str(),
 		dbAddedBy.c_str(), dbReason.c_str());
         return true;
         }

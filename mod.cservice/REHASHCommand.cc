@@ -61,7 +61,7 @@ if (option == "MOTD")
                 int lastupdate = bot->rehashMOTD();
                 if (lastupdate > 0) {
                         bot->Notice(theClient, "Done. Rehashed the MOTD, last updated %s ago.",
-                                bot->prettyDuration(lastupdate).c_str(), lastupdate);
+                                prettyDuration(lastupdate).c_str(), lastupdate);
 			return true;
                 } else {
                         bot->Notice(theClient, "Couldn't update the MOTD.");
