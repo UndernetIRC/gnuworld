@@ -4051,8 +4051,17 @@ bool cservice::AcceptChannel(unsigned int chanId, const string& reason)
 
 bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const string& chanName)
 {
+	bool byTheJudge = false;
 	sqlUser* theUser = isAuthed(theClient, true);
-	if (!theUser) return false;
+	if (!theUser)
+	{
+		byTheJudge = true;
+		theUser = new (std::nothrow) sqlUser(SQLDb);
+		if (theClient == getInstance())
+			theUser->setUserName("The Judge");
+		else
+			theUser->setUserName("Not Logged In");
+	}
 
 	unsigned int channel_ts = 0;
 	Channel* tmpChan = Network->findChannel(chanName);
@@ -4209,6 +4218,11 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		Topic(tmpChan, welcomeNewChanTopic);
 #endif
 
+	if (byTheJudge)
+	{
+		delete theUser;
+		theUser = NULL;
+	}
 	return true;
 }
 
