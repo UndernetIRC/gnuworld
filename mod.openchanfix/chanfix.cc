@@ -3645,7 +3645,7 @@ bool chanfix::doXROplist(iServer* theServer, const string& Routing, const string
 	chanfix::chanOpsType myOps = getMyOps(st[1]);
 	if (myOps.empty()) {
 		// Send back the 'NO' response (no scores)
-		xResponse = TokenStringsParams("NO");
+		xResponse = TokenStringsParams("OPLIST %s NO", st[1].c_str());
 		doXResponse(theServer, Routing, xResponse);
 		if (theChan) {
 			// TODO -- XREPLY with number of notes against channel?

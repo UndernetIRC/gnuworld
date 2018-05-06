@@ -3078,6 +3078,7 @@ void cservice::ExpireUsers()
 void cservice::processDBUpdates()
 {
 	logDebugMessage("[DB-UPDATE]: Looking for changes:");
+	UpdatePendingOpLists();
 	checkTrafficPass();
 	updateChannels();
 	updateUsers();
@@ -7127,6 +7128,39 @@ void cservice::setSupporterNoticedStatus(int suppId, const string& chanName, boo
 		}
 }
 
+void cservice::UpdatePendingOpLists()
+{
+	stringstream theQuery;
+	theQuery	<<  "SELECT channels.name"
+				<< " FROM pending,channels"
+				<< " WHERE channels.id = pending.channel_id"
+				<< " AND (pending.status = 0 OR pending.status = 1 OR pending.status = 2 OR pending.status = 8)"
+				<< ends;
+
+#ifdef LOG_SQL
+		elog	<< "cmaster::UpdatePendingOpLists> "
+			<< theQuery.str().c_str()
+			<< endl;
+#endif
+
+	if( SQLDb->Exec(theQuery, true ) )
+//	if( PGRES_TUPLES_OK == status )
+	{
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+			string channelName = SQLDb->GetValue(i,0).c_str();
+			doXQOplist(channelName);
+		}
+	}
+	else
+	{
+		elog    << "cmaster::UpdatePendingOpLists::sqlError> "
+				<< SQLDb->ErrorMessage()
+				<< endl;
+	}
+	return;
+}
+
 /*
  * FirstNoticing is used to prevent noticing '2x times' the supporters:
  * - 1a. When the supporter logs in to X
@@ -7433,7 +7467,6 @@ if( SQLDb->Exec(theQuery, true ) )
 			//	(SQLDb->GetValue(i,6).c_str() == "Y") ? true : false;
 			newPending->checkStart = atoi(SQLDb->GetValue(i,7).c_str());
 			pendingChannelList.insert( pendingChannelListType::value_type(chanName, newPending) );
-			doXQOplist(chanName);
 
 			/*
 			 *  Lets register our interest in listening on JOIN events for this channel.
@@ -8654,6 +8687,12 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 	elog << "cservice::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
 	StringTokenizer st(Message);
 
+	if (st[1] == "NO")
+	{
+		elog << "cservice::doXROplist> NO oplist reported for channel " << st[0] << endl;
+		return true;
+	}
+
 	if (st.size() < 6)
 	{
 		elog << "cservice::doXROplist> OPLIST insufficient response parameters" << endl;
@@ -8687,7 +8726,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 			otherwise we UPDATE
 	*/
 	stringstream queryString;
-	queryString << "SELECT name,status FROM channels,pending WHERE lower(name)='"
+	queryString << "SELECT name,id FROM channels,pending WHERE lower(name)='"
 		<< string_lower(scoreChan)
 		<< "'"
 		<< " AND channels.id = pending.channel_id"
@@ -8709,18 +8748,14 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		}
 		else {
 			// Pending channel found -- have we inserted this user & chan combo before?
-			sqlPendingChannel* tmpChan = NULL;
-			pendingChannelListType::iterator ptr = pendingChannelList.find(scoreChan);
-			if (ptr != pendingChannelList.end())
-				tmpChan = ptr->second;
-			if (!tmpChan)
+			sqlUser* tmpUser = getUserRecord(account);
+			if (!tmpUser)
 			{
-				elog << "cservice::doXROplist> could not find sqlPendingChannel " << scoreChan << endl;
+				elog << "cservice::doXROplist> tmpUser with account = " << account << " could not be found (expired or purged)" << endl;
 				return false;
 			}
-			sqlUser* tmpUser = getUserRecord(account);
 			unsigned int userID = tmpUser->getID();
-			unsigned int chanID = tmpChan->channel_id;
+			unsigned int chanID = atoi(SQLDb->GetValue(0, 1).c_str());
 			stringstream queryString;
 			queryString << "SELECT channel_id,first FROM pending_chanfix_scores WHERE user_id='"
 				<< userID

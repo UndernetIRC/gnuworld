@@ -624,6 +624,9 @@ public:
 	 * doesn't work with the int chanId	*/
 	void setSupporterNoticedStatus(int suppId, const string& chanName, bool noticed);
 
+	/* Update the OpList score data for all the pending channels in status 0,1,2, and 8 */
+	void UpdatePendingOpLists();
+
 	/* checkIncomings is used to select the supporters of a new pending (status=0) channels
 	 * where the supporters had not lodged their support yet */
 	void checkIncomings(bool IsFirstNoticing = false);
