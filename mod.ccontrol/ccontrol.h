@@ -600,22 +600,6 @@ public:
 	ccUser *GetOper( unsigned int );
 
 	/**
-	 * This method will attempt to load an oper info from the database
-	 * based on the user account
-	 */
-	ccUser *GetOperByAC( const string& );
-
-	/**
-	 * This method will add an account to accountsMap
-	 */
-	bool accountsMapAdd (ccUser*, const string&);
-
-	/**
-	 * This method will remove an account from accountsMap
-	 */
-	bool accountsMapDel (const string&);
-
-	/**
 	 * This method add a gline to the database
 	 */
 	bool addGline( ccGline* );
