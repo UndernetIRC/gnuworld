@@ -614,20 +614,11 @@ bool xClient::NoticeChannelOps( const Channel* theChan, const char* Message, ...
 		vsnprintf(buffer, 1024, Message, list);
 		va_end(list);
 
-		for (Channel::const_userIterator chanUsers = theChan->userList_begin();
-			chanUsers != theChan->userList_end(); ++chanUsers)
-		{
-			ChannelUser* tmpUser = chanUsers->second;
-			if (tmpUser->isModeO())
-			{
-				if (!MyUplink->Write("%s O %s :@%s: %s\r\n",
-						getCharYYXXX().c_str(),
-						tmpUser->getClient()->getCharYYXXX().c_str(),
-						theChan->getName().c_str(),
-						buffer))
-					return false;
-			}
-		}
+		if (!MyUplink->Write("%s WC %s :%s\r\n",
+				getCharYYXXX().c_str(),
+				theChan->getName().c_str(),
+				buffer))
+			return false;
 	}
 	return true ;
 }
@@ -649,20 +640,11 @@ bool xClient::NoticeChannelOps( const string& chanName, const char* Message, ...
 		vsnprintf(buffer, 1024, Message, list);
 		va_end(list);
 
-		for (Channel::const_userIterator chanUsers = theChan->userList_begin();
-			chanUsers != theChan->userList_end(); ++chanUsers)
-		{
-			ChannelUser* tmpUser = chanUsers->second;
-			if (tmpUser->isModeO())
-			{
-				if (!MyUplink->Write("%s O %s :@%s: %s\r\n",
-						getCharYYXXX().c_str(),
-						tmpUser->getClient()->getCharYYXXX().c_str(),
-						theChan->getName().c_str(),
-						buffer))
-					return false;
-			}
-		}
+		if (!MyUplink->Write("%s WC %s :%s\r\n",
+				getCharYYXXX().c_str(),
+				theChan->getName().c_str(),
+				buffer))
+			return false;
 	}
 	return true ;
 }
