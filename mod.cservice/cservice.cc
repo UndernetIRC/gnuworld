@@ -3009,9 +3009,9 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	if (expired)
 	{
 		if (last_seen > 0)
-			logAdminMessage("User %s (%s) has expired",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
+			logPrivAdminMessage("User %s (%s) has expired",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
 		else
-			logAdminMessage("User %s (%s) has expired (Never logged in)",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
+			logPrivAdminMessage("User %s (%s) has expired (Never logged in)",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
 	}
 	else logDebugMessage("Deleted(wipeUser) %s (%i) from the database.", tmpUser->getUserName().c_str(),userId);
 
@@ -3087,16 +3087,23 @@ void cservice::processDBUpdates()
 	logDebugMessage("[DB-UPDATE]: Complete.");
 }
 
+struct newChanData
+{
+	string chanName;
+	unsigned int mngr_userId;
+};
+
 void cservice::updateChannels()
 {
 stringstream theQuery ;
 
 theQuery	<< "SELECT "
 			<< sql::channel_fields
-			<< ",now()::abstime::int4 as db_unixtime FROM "
-			<< "channels WHERE last_updated >= "
+			<< ",pending.manager_id,now()::abstime::int4 as db_unixtime FROM "
+			<< "channels,pending WHERE channels.last_updated >= "
 			<< lastChannelRefresh
 			<< " AND registered_ts <> 0"
+			<< " AND id = channel_id"
 			<< ends;
 
 #ifdef LOG_SQL
@@ -3125,10 +3132,10 @@ dbTimeOffset = atoi(SQLDb->GetValue(0,"db_unixtime").c_str()) - ::time(NULL);
 unsigned int updates = 0;
 unsigned int newchans = 0;
 
-vector<sqlChannel*> commitList;
+vector<newChanData*> newChanList;
 
 for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
-	{
+{
 	sqlChannelHashType::iterator ptr =
 		sqlChannelCache.find(SQLDb->GetValue(i, 1));
 
@@ -3142,63 +3149,26 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
 		/*
 		 * Not in the cache.. must be a new channel.
-		 * Create new channel record, insert in cache.
 		 */
 
-		sqlChannel* newChan = new (std::nothrow) sqlChannel(SQLDb);
-		assert( newChan != 0 ) ;
+		newChanData* newChan = new (std::nothrow) newChanData;
+		newChan->chanName = SQLDb->GetValue(i, 1);
+		newChan->mngr_userId = (unsigned int)atoi(SQLDb->GetValue(i, 21).c_str());
+		newChanList.push_back(newChan);
 
-		newChan->setAllMembers(i);
-		sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
-		sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
-		MyUplink->RegisterChannelEvent(newChan->getName(),this);
-		logDebugMessage("[DB-UPDATE]: Found new channel: %s", newChan->getName().c_str());
+		logDebugMessage("[DB-UPDATE]: Found new channel: %s", newChan->chanName.c_str());
 		newchans++;
-		/*
-		 * Do the stuff for this new channel
-		 */
-		Channel* theChan;
-		theChan = Network->findChannel(newChan->getName());
-
-		if (theChan && theChan->getCreationTime() < newChan->getChannelTS())
-			newChan->setChannelTS(theChan->getCreationTime());
-		else
-			newChan->setChannelTS(currentTime());
-
-		newChan->setFlag(sqlChannel::F_AUTOJOIN);
-		newChan->setFlag(sqlChannel::F_NOTAKE);
-		newChan->setNoTake(1);
-
-		Join(newChan->getName(), string("+tnR"), newChan->getChannelTS(), true);
-		newChan->setInChan(true);
-		joinCount++;
-		//Very probably this is already done by the webpage
-		//writeChannelLog(newChan, getInstance(), sqlChannel::EV_JOIN, "Channel Registered");
-		newChan->setRegisteredTS(currentTime());
-		newChan->setChannelMode("+tnR");
-		newChan->setLastUsed(currentTime());
-		commitList.push_back(newChan);
-
-		//Send a welcome notice to the channel
-		if (!welcomeNewChanMessage.empty())
-			xClient::Notice(newChan->getName(), TokenStringsParams(welcomeNewChanMessage.c_str(), newChan->getName().c_str()).c_str());
-
-		//Set a welcome topic of the new channel, only if the actual topic is empty
-#ifdef TOPIC_TRACK
-		if (!welcomeNewChanTopic.empty())
-		if (theChan && theChan->getTopic().empty())
-			xClient::Topic(theChan, welcomeNewChanTopic);
-#endif
-		//Is it worth this?
-		//logAdminMessage("Channel %s is now registered.", newChan->getName().c_str());
-		}
 	}
-
-if (!commitList.empty())
+}
+if (!newChanList.empty())
 {
-	for (vector<sqlChannel*>::iterator itr = commitList.begin(); itr != commitList.end(); itr++)
-		(*itr)->commit();
-	commitList.clear();
+	for (vector<newChanData*>::iterator itr = newChanList.begin(); itr != newChanList.end(); itr++)
+	{
+		sqlUser* mngrUser = getUserRecord((*itr)->mngr_userId);
+		if (!sqlRegisterChannel(getInstance(), mngrUser, (*itr)->chanName.c_str()))
+			logDebugMessage("(cservice::updateChannels) FAILED to sqlRegisterChannel");
+	}
+	newChanList.clear();
 }
 
 logDebugMessage("[DB-UPDATE]: Refreshed %i channel records, loaded %i new channel(s).",
@@ -4063,7 +4033,13 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		else
 			theUser->setUserName("Not Logged In");
 	}
-
+	if (!mngrUsr)
+	{
+		string errormsg = TokenStringsParams("FAILED to sqlRegister %s to non-existing manager user by %s",chanName.c_str(), theUser->getUserName().c_str());
+		logDebugMessage(errormsg.c_str());
+		logPrivAdminMessage(errormsg.c_str());
+		return false;
+	}
 	unsigned int channel_ts = 0;
 	Channel* tmpChan = Network->findChannel(chanName);
 	channel_ts = tmpChan ? tmpChan->getCreationTime() : ::time(NULL);
@@ -4159,16 +4135,23 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 
 	logAdminMessage("%s (%s) has registered %s to %s", theClient->getNickName().c_str(),
 		theUser->getUserName().c_str(), chanName.c_str(), mngrUsr->getUserName().c_str());
-	Notice(theClient,
-		getResponse(theUser,
-			language::regged_chan,
-			string("Registered channel %s")).c_str(),
-			newChan->getName().c_str());
+
+	NoteAllAuthedClients(mngrUsr, "Your channel application of %s is Accepted", chanName.c_str());
+
+	if (theClient != getInstance())
+	{
+		Notice(theClient,
+			getResponse(theUser,
+				language::regged_chan,
+				string("Registered channel %s")).c_str(),
+				newChan->getName().c_str());
+	}
 
 	/*
-	 *  Finally, commit a channellog entry.
+	 *  Finally, commit a channellog entry, but just if theClient is not this client (X) because in that case it is already done by the webpage
 	 */
-	writeChannelLog(newChan, theClient, sqlChannel::EV_REGISTER, "to " + mngrUsr->getUserName());
+	if (theClient != getInstance())
+		writeChannelLog(newChan, theClient, sqlChannel::EV_REGISTER, "to " + mngrUsr->getUserName());
 
 	/*
 	 * Create the new manager.
@@ -4180,7 +4163,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	newManager->setAdded(currentTime());
 	if (theClient == getInstance())
 	{
-		newManager->setAddedBy("(" + getNickName() + ") " + getInstance()->getNickUserHost());
+		newManager->setAddedBy(getInstance()->getNickUserHost());
 		newManager->setLastModifBy("*** The Judge ***");
 	}
 	else
@@ -4191,11 +4174,11 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	newManager->setLastModif(currentTime());
 
 	if (!newManager->insertRecord())
-		{
-			Notice(theClient, "Couldn't automatically add the level 500 Manager, check it doesn't already exist.");
-			delete(newManager);
-			return (false);
-		}
+	{
+		Notice(theClient, "Couldn't automatically add the level 500 Manager, check it doesn't already exist.");
+		delete(newManager);
+		return (false);
+	}
 
 	/*
 	 * Insert this new 500 into the level cache.
@@ -4688,13 +4671,8 @@ void cservice::checkAccepts()
 		else if ((reviewed == true || !RequireReview) && !DecideOnCompleted)
 		{
 			AcceptChannel(acceptList[i].first.first,"ACCEPTED");
-			if (sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
-			{
-				logAdminMessage("%s (The Judge) has registered %s to %s", getInstance()->getNickName().c_str(),
-						acceptList[i].first.second.c_str(), mgrUsr->getUserName().c_str());
-				NoteAllAuthedClients(mgrUsr,"Your channel application of %s is Accepted", acceptList[i].first.second.c_str());
-			} else
-				logDebugMessage("(The Judge) FAILED to sqlRegisterChannel");
+			if (!sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
+				logDebugMessage("(cservice::checkAccepts) FAILED to sqlRegisterChannel");
 		}
 	}
 	acceptList.clear();
@@ -4745,13 +4723,8 @@ void cservice::checkReviews()
                 if ((reviewed == true || !RequireReview) && !DecideOnCompleted)
 		{
 			AcceptChannel(acceptList[i].first.first,"ACCEPTED");
-			if (sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
-			{
-				logAdminMessage("%s (The Judge) has registered %s to %s", getInstance()->getNickName().c_str(),
-						acceptList[i].first.second.c_str(), mgrUsr->getUserName().c_str());
-				NoteAllAuthedClients(mgrUsr,"Your channel application of %s is Accepted", acceptList[i].first.second.c_str());
-			} else
-				logDebugMessage("(The Judge) FAILED to sqlRegisterChannel");
+			if (!sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
+				logDebugMessage("(cservice::checkReviews) FAILED to sqlRegisterChannel");
 		}
 	}
 	acceptList.clear();
