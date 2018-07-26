@@ -2182,7 +2182,7 @@ if ( IP.empty() )
 	}
 
 bool OnChannel = isOnChannel( theChan ) ;
-if( !OnChannel && modeAsServer)
+if( !OnChannel && !modeAsServer)
 	{
 	// Join, giving ourselves ops
 	Join( theChan, string(), 0, true ) ;
