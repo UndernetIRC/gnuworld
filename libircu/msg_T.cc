@@ -64,21 +64,25 @@ if( 0 == theChan )
 iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
 std::string newTopic;
 
-#ifdef TOPIC_TRACK
 if (Param.size() == 5)
 {
 	/* this is a .12 hub! */
 	/* params = numeric, channel, channel creation ts, topic ts, topic */
+	newTopic = Param[ 4 ];
+#ifdef TOPIC_TRACK
 	theChan->setTopic(Param[4]);
 	theChan->setTopicTS(atoi(Param[3]));
-	newTopic = Param[ 4 ];
+#endif // TOPIC_TRACK
 } else {
 	/* this is a .11 hub! (3 arguments) */
 	/* params = numeric, channel, topic */
+	newTopic = Param[ 2 ];
+#ifdef TOPIC_TRACK
 	theChan->setTopic(Param[2]);
 	theChan->setTopicTS(::time(NULL));
-	newTopic = Param[ 2 ];
+#endif // TOPIC_TRACK
 }
+#ifdef TOPIC_TRACK
 if (srcClient == NULL)
 {
 	theChan->setTopicWhoSet("unknown");
