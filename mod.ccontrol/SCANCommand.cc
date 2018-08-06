@@ -193,6 +193,8 @@ if(showUsers)
     				{  
     				ClientInfo += " ";
     				curChannel = (*ptr)->findUser(const_cast< iClient* >(curClient));
+				if (((*ptr)->getMode(Channel::MODE_S)) || ((*ptr)->getMode(Channel::MODE_P)))
+					ClientInfo += "!";
 				if(curChannel->isModeO())
 					{
 					ClientInfo += "@";
