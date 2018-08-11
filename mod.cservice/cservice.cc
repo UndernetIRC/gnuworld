@@ -4104,7 +4104,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 				<< ends;
 
 	#ifdef LOG_SQL
-	elog	<< "sqlQuery> "
+	elog	<< "cservice::sqlRegisterChannel sqlQuery> "
 			<< theQuery.str().c_str()
 			<< endl;
 	#endif
@@ -4112,7 +4112,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	if( !SQLDb->Exec(theQuery ) )
 	//if( status != PGRES_COMMAND_OK )
 		{
-		elog	<< "REGISTER> SQL Error: "
+		elog	<< "cservice::sqlRegisterChannel> SQL Error: "
 			<< SQLDb->ErrorMessage()
 			<< endl ;
 		return false ;
@@ -4134,7 +4134,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 			lvlPair = lvlptr->first;
 
 	#ifdef LOG_DEBUG
-			elog << "REGISTERCommand> Purging Level Record for: " << lvlPair.second << " (UID: " << lvlPair.first << ")" << endl;
+			elog << "cservice::sqlRegisterChannel> Purging Level Record for: " << lvlPair.second << " (UID: " << lvlPair.first << ")" << endl;
 	#endif
 
 			++lvlptr;
@@ -4155,6 +4155,26 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		ptr->second = NULL;
 		delete(pendingChan);
 		pendingChannelList.erase(ptr);
+	}
+
+	theQuery.str("");
+	theQuery	<< "DELETE FROM pending_chanfix_scores WHERE channel_id = "
+				<< newChan->getID()
+				<< ends;
+
+	#ifdef LOG_SQL
+	elog	<< "cservice::sqlRegisterChannel sqlQuery> "
+			<< theQuery.str().c_str()
+			<< endl;
+	#endif
+
+	if( !SQLDb->Exec(theQuery ) )
+	//if( status != PGRES_COMMAND_OK )
+	{
+		elog	<< "cservice::sqlRegisterChannel> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
+		return false ;
 	}
 
 	logAdminMessage("%s (%s) has registered %s to %s", theClient->getNickName().c_str(),
