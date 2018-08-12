@@ -8706,10 +8706,11 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 	// AB XR Az iauth:15_d :OPLIST #empfoo
 	elog << "cservice::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
 	StringTokenizer st(Message);
+	logDebugMessage("cservice::doXROplist> Received OpList data for %s", st[1].c_str());
 
-	if (st[1] == "NO")
+	if (st[2] == "NO")
 	{
-		elog << "cservice::doXROplist> NO oplist reported for channel " << st[0] << endl;
+		elog << "cservice::doXROplist> NO oplist reported for channel " << st[1] << endl;
 		return true;
 	}
 

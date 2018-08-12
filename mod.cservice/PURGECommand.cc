@@ -225,6 +225,8 @@ if (reop)
 	}
 }
 
+bot->doXQOplist(theChan->getName());
+
 /*
  * Reset everything back to nice default values.
  */

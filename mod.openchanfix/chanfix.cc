@@ -3636,11 +3636,11 @@ bool chanfix::doXROplist(iServer* theServer, const string& Routing, const string
 	string xResponse = string();
 
 	if (st.size() < 2) {
-		elog << "chanfix::doXQOplist> OPLIST insufficient parameters" << endl;
+		elog << "chanfix::doXROplist> OPLIST insufficient parameters" << endl;
 		return false;
 	}
 	sqlChannel* theChan = getChannelRecord(st[1]);
-	elog << "chanfix::doXQOplist: OPLIST " << st[1] << endl;
+	elog << "chanfix::doXROplist: OPLIST " << st[1] << endl;
 
 	chanfix::chanOpsType myOps = getMyOps(st[1]);
 	if (myOps.empty()) {
@@ -3680,7 +3680,7 @@ bool chanfix::doXROplist(iServer* theServer, const string& Routing, const string
 	*/
 	if (oCnt == 0) {
 		// Send back the 'NO' response (no scores)
-		xResponse = TokenStringsParams("NO");
+		xResponse = TokenStringsParams("OPLIST %s NO", st[1].c_str());
 		doXResponse(theServer, Routing, xResponse);
 		if (theChan) {
 			// TODO -- XREPLY with number of notes against channel?
