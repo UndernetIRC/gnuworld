@@ -137,6 +137,8 @@ for( iClient::const_channelIterator ptr = Target->channels_begin() ;
         tChannel = theChannel->getName();
         if(theChannelUser->getMode(gnuworld::ChannelUser::MODE_V)) tChannel = "+" + tChannel;
         if(theChannelUser->getMode(gnuworld::ChannelUser::MODE_O)) tChannel = "@" + tChannel;
+	if ((theChannel->getMode(Channel::MODE_S)) || (theChannel->getMode(Channel::MODE_P)))
+		tChannel = "!" + tChannel;
 
 	hasCC = false;
 	for(curPlace = 0; curPlace < tChannel.size();++curPlace)
@@ -190,6 +192,7 @@ for( vector< string >::size_type i = 0 ; i < channels.size() ; i++ )
 
 bot->Notice( theClient, "On channels: %s", chanNames.c_str() ) ;
 bot->Notice( theClient, "* - Channel contains control codes" );
+bot->Notice( theClient, "! - Channel is +s or +p" );
 
 return true ;
 }

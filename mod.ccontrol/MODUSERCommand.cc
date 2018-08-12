@@ -575,7 +575,6 @@ while(pos < st.size())
 			}
 		pos+=2;
 		}
-
 	else if(!strcasecmp(st[pos],"-e")) //Trying to change email
 		{
 		if((pos + 1) >= st.size())

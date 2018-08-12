@@ -92,12 +92,14 @@ if (Network->findServer(Param[ 1 ]) != theServer->getMe())
         return false ;
         }
 
+/*
 elog 	<< "msg_XQ> Received, from: "
 	<< Param[ 0 ] << " To: "
 	<< Param[ 1 ] << " Token: "
 	<< Param[ 2 ] << " Message: "
 	<< Param[ 3 ]
 	<< endl;
+*/
 
 string Routing( Param[2] );
 string Message( Param[3] );

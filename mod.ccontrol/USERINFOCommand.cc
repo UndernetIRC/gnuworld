@@ -210,7 +210,7 @@ for(ptr = bot->usersmap_begin();ptr != bot->usersmap_end();++ptr)
 		bot->Notice(theClient,"Single Sign On: \002%s\002  (only if opered: \002%s\002)   AutoOp: \002%s\002",SSO,SSOOO,AutoOp);
 		std::string Account = tempUser->getAccount();
 		if (strcasecmp(Account,"") != 0)
-			bot->Notice(theClient,"account associated: %s", Account.c_str());
+			bot->Notice(theClient,"Account associated: %s", Account.c_str());
 		if ((st.size() > 2) && (!strcasecmp(st[2],"-cl")))
 		{
 			bot->Notice(theClient, "Password last changed: %s ago", (tempUser->getPassChangeTS() == 0) ? "N/A" : Ago(tempUser->getPassChangeTS()));

@@ -62,20 +62,27 @@ if( 0 == theChan )
 
 // srcClient may be NULL if a server is setting the topic
 iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
+std::string newTopic;
 
-#ifdef TOPIC_TRACK
 if (Param.size() == 5)
 {
 	/* this is a .12 hub! */
 	/* params = numeric, channel, channel creation ts, topic ts, topic */
+	newTopic = Param[ 4 ];
+#ifdef TOPIC_TRACK
 	theChan->setTopic(Param[4]);
 	theChan->setTopicTS(atoi(Param[3]));
+#endif // TOPIC_TRACK
 } else {
 	/* this is a .11 hub! (3 arguments) */
 	/* params = numeric, channel, topic */
+	newTopic = Param[ 2 ];
+#ifdef TOPIC_TRACK
 	theChan->setTopic(Param[2]);
 	theChan->setTopicTS(::time(NULL));
+#endif // TOPIC_TRACK
 }
+#ifdef TOPIC_TRACK
 if (srcClient == NULL)
 {
 	theChan->setTopicWhoSet("unknown");
@@ -86,7 +93,6 @@ if (srcClient == NULL)
 }
 #endif // TOPIC_TRACK
 
-std::string newTopic(Param[ 2 ] ) ;
 
 // No need to pass the new topic, it has already been stored
 // in the theChan
