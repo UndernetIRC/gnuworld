@@ -46,7 +46,7 @@ bot->SendTo(theClient,
             bot->getResponse(theUser,
                             language::status_uptime,
                             std::string("Uptime: \002%s\002")).c_str(),
-                                        bot->prettyDuration(bot->getUplink()->getStartTime()).c_str());
+                                        prettyDuration(bot->getUplink()->getStartTime()).c_str());
 bot->SendTo(theClient,
             bot->getResponse(theUser,
                             language::status_auto_fixing,

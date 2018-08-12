@@ -61,8 +61,8 @@ for (chanfix::sqlChanOpsType::iterator ptr = bot->sqlChanOps.begin();
     }
 
     curOp = chanOp->second;
-    firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
-    lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
+    firstop = tsToDateTime(curOp->getTimeFirstOpped(), false);
+    lastop = tsToDateTime(curOp->getTimeLastOpped(), true);
     bot->SendTo(theClient, "%s %d -- %s / %s", ptr->first.c_str(),
 		(curOp->getPoints() + curOp->getBonus()), firstop.c_str(), lastop.c_str());
   }

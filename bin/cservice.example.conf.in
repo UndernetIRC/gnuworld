@@ -340,3 +340,6 @@ reviewer_id = 1
 # if set to 0 will log to debug channel, otherwise to admin channel
 
 log_to_admin_console = 1;
+
+# chanfix servername to send and receive Oplist/Score requests/answers
+chanfix_servername = gnuworld6.undernet.org

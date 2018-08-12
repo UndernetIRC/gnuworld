@@ -30,6 +30,7 @@
 
 #include	<ctime>
 
+#include	"misc.h"
 #include	"client.h"
 #include	"iClient.h"
 #include	"iServer.h"
@@ -274,9 +275,6 @@ public:
 	/* Fetch the user status flags. L = in cache, P = got password, U = Is authed. */
 	string userStatusFlags( const string& );
 
-	/* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
-	const string prettyDuration( int ) const ;
-
 	/* Returns the current "Flood Points" this iClient has. */
  	unsigned short getFloodPoints(iClient*);
 
@@ -305,6 +303,12 @@ public:
 	bool doCommonAuth(iClient* , string username = string() );
 
 	bool doXResponse(iServer* , const string&, const string&, bool kill = false);
+
+	/* Sends OPLIST data XQUERY about a channel to mod.openchanfix */
+	bool doXQOplist(const string&);
+
+	/* Handles OPLIST data XREPLY from mod.openchanfix */
+	bool doXROplist(iServer*, const string&, const string&);
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.
@@ -422,6 +426,7 @@ public:
 	unsigned int SupportDays;
 	unsigned int ReviewerId;
 	unsigned int LogToAdminConsole;
+	string ChanfixServerName;
 
 	string validResponseString;
 	void AddToValidResponseString(const string&);
@@ -618,6 +623,9 @@ public:
 	/* This is a bug-workaround function, for some reason on cservice::doCommonAuth
 	 * doesn't work with the int chanId	*/
 	void setSupporterNoticedStatus(int suppId, const string& chanName, bool noticed);
+
+	/* Update the OpList score data for all the pending channels in status 0,1,2, and 8 */
+	void UpdatePendingOpLists();
 
 	/* checkIncomings is used to select the supporters of a new pending (status=0) channels
 	 * where the supporters had not lodged their support yet */

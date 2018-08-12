@@ -512,6 +512,7 @@ MyUplink->RegisterEvent( EVT_NETJOIN, this );
 MyUplink->RegisterEvent( EVT_NETBREAK, this );
 MyUplink->RegisterEvent( EVT_NICK, this );
 MyUplink->RegisterEvent( EVT_SERVERMODE, this );
+MyUplink->RegisterEvent( EVT_XQUERY, this);
 
 /**
  * Register for all channel events
@@ -983,7 +984,7 @@ void chanfix::OnEvent( const eventType& whichEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
 switch(whichEvent)
-	{
+{
 	case EVT_ACCOUNT:
 		{
 		iClient* tmpUser = static_cast< iClient* >( data1 ) ;
@@ -1073,7 +1074,32 @@ switch(whichEvent)
 		}
 		break;
 		}
+	case EVT_XQUERY:
+	{
+		iServer* theServer = static_cast< iServer* >(data1);
+		const char* Routing = reinterpret_cast< char* >(data2);
+		const char* Message = reinterpret_cast< char* >(data3);
+		elog << "chanfix.cc: EVT_XQUERY:" << theServer->getName() << " " << Routing << " " << Message << endl;
+		// As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
+		// If it ain't us, ignore the message, the message is probably meant for another client here.
+		StringTokenizer st(Message);
+		if (st.size() < 2)
+		{
+			// No command or no nick supplied
+			break;
+		}
+		string Command = string_upper(st[0]);
+		if (Command == "OPLIST")
+		{
+			doXROplist(theServer, Routing, Message);
+		}
+		else if (Command == "SCORE")
+		{
+			doXRScore(theServer, Routing, Message);
+		}
+		break;
 	}
+}
 
 xClient::OnEvent( whichEvent, data1, data2, data3, data4 ) ;
 }
@@ -2834,57 +2860,6 @@ if (ptr != manFixQ.end()) {
 return false;
 }
 
-const std::string chanfix::prettyDuration( int duration )
-{
-
-// Pretty format a 'duration' in seconds to
-// x day(s), xx:xx:xx.
-
-char tmpBuf[ 64 ] = {0};
-
-int	res = currentTime() - duration,
-	secs = res % 60,
-	mins = (res / 60) % 60,
-	hours = (res / 3600) % 24,
-	days = (res / 86400) ;
-
-sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
-	days,
-	(days == 1 ? "" : "s"),
-	hours,
-	mins,
-	secs );
-
-return std::string( tmpBuf ) ;
-}
-
-const std::string chanfix::tsToDateTime(time_t timestamp, bool time)
-{
-char datetimestring[ 20 ] = {0};
-struct tm *stm;
-
-stm = localtime(&timestamp);
-memset(datetimestring, 0, sizeof(datetimestring));
-
-if (time)
-  strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d %H:%M:%S", stm);
-else
-  strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d", stm);
-
-return std::string(datetimestring);
-}
-
-int chanfix::getCurrentGMTHour()
-{
-time_t rawtime;
-tm * ptm;
-
-time ( &rawtime );
-ptm = gmtime ( &rawtime );
-
-return ptm->tm_hour;
-}
-
 sqlcfUser* chanfix::isAuthed(const std::string Name)
 {
 //Name = escapeSQLChars(Name);
@@ -3649,6 +3624,221 @@ int chanfix::getNewScore( sqlChanOp* chOp, time_t oldestTS )
 	<< std::endl;
     
     return newScore;
+}
+
+bool chanfix::doXROplist(iServer* theServer, const string& Routing, const string& Message)
+{
+	// AB XR Az BlAAB :OPLIST <chan>
+	elog << "chanfix::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
+	StringTokenizer st(Message);
+	bool all = true;
+	bool days = false;
+	string xResponse = string();
+
+	if (st.size() < 2) {
+		elog << "chanfix::doXROplist> OPLIST insufficient parameters" << endl;
+		return false;
+	}
+	sqlChannel* theChan = getChannelRecord(st[1]);
+	elog << "chanfix::doXROplist: OPLIST " << st[1] << endl;
+
+	chanfix::chanOpsType myOps = getMyOps(st[1]);
+	if (myOps.empty()) {
+		// Send back the 'NO' response (no scores)
+		xResponse = TokenStringsParams("OPLIST %s NO", st[1].c_str());
+		doXResponse(theServer, Routing, xResponse);
+		if (theChan) {
+			// TODO -- XREPLY with number of notes against channel?
+
+			/* Perhaps use a mask so we can return these in a single message */
+			if (isTempBlocked(theChan->getChannel()))
+			{
+				// XREPLY with 'TEMPBLOCKED' indicator
+				xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
+				doXResponse(theServer, Routing, xResponse);
+			}
+			else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+			{
+				// XREPLY with 'BLOCKED' indicator
+				xResponse = TokenStringsParams("BLOCKED %s", st[1].c_str());
+				doXResponse(theServer, Routing, xResponse);
+			}
+			else if (theChan->getFlag(sqlChannel::F_ALERT))
+			{
+				// XREPLY with 'ALERTED' indicator
+				xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
+				doXResponse(theServer, Routing, xResponse);
+			}
+		}
+		return true;
+	}
+	unsigned int oCnt = myOps.size();
+
+	/**
+	* Technically, if there are all 0 scores, it will get to this point.
+	* We don't want a notice saying 0 accounts.
+	*/
+	if (oCnt == 0) {
+		// Send back the 'NO' response (no scores)
+		xResponse = TokenStringsParams("OPLIST %s NO", st[1].c_str());
+		doXResponse(theServer, Routing, xResponse);
+		if (theChan) {
+			// TODO -- XREPLY with number of notes against channel?
+
+			/* Perhaps use a mask so we can return these in a single message */
+			if (isTempBlocked(theChan->getChannel()))
+			{
+				// XREPLY with 'TEMPBLOCKED' indicator
+				xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
+				doXResponse(theServer, Routing, xResponse);
+			}
+			else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+			{
+				// XREPLY with 'BLOCKED' indicator
+				xResponse = TokenStringsParams("BLOCKED %s", st[1].c_str());
+				doXResponse(theServer, Routing, xResponse);
+			}
+			else if (theChan->getFlag(sqlChannel::F_ALERT))
+			{
+				// XREPLY with 'ALERTED' indicator
+				xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
+				doXResponse(theServer, Routing, xResponse);
+			}
+		}
+		return true;
+	}
+	if (oCnt > OPCOUNT && !all)
+	{
+		// 'OPCOUNT' unique op accounts in channel
+		xResponse = TokenStringsParams("OPCOUNT %d", OPCOUNT);
+		doXResponse(theServer, Routing, xResponse);
+	} else {
+		// 'oCnt' unique op accounts in channel
+		xResponse = TokenStringsParams("OPCOUNT %d", oCnt);
+		doXResponse(theServer, Routing, xResponse);
+	}
+	/*
+		Rank Score Account -- Time first opped / Time last opped / Nick
+	*/
+
+	// Calculate the data itself
+	sqlChanOp* curOp = 0;
+	unsigned int opCount = 0;
+	unsigned int percent = 0;
+	int cScore;
+	bool inChan = false;
+	std::string firstop;
+	std::string lastop;
+	std::string nickName;
+	std::stringstream dayString;
+	time_t oldestTS = currentTime();
+
+	// Find oldest first op timestamp -- what for?
+	for (chanfix::chanOpsType::iterator chOp = myOps.begin();
+		chOp != myOps.end(); chOp++) {
+		curOp = *chOp;
+		if (curOp->getTimeFirstOpped() < oldestTS)
+			oldestTS = curOp->getTimeFirstOpped();
+	}
+
+	// Iterate over all channel scores to produce output
+	for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
+		opPtr != myOps.end() && (all || opCount < OPCOUNT); opPtr++) {
+		curOp = *opPtr;
+		opCount++;
+		firstop = itoa((int)curOp->getTimeFirstOpped());
+		lastop = itoa((int)curOp->getTimeLastOpped());
+		inChan = accountIsOnChan(st[1], curOp->getAccount());
+		if (inChan)
+			nickName = getChanNickName(st[1], curOp->getAccount());
+
+		// TODO -- we probably don't care about '-days' data for XREPLY
+		if (days) {
+			dayString.str("");
+
+			for (int i = 1; i <= DAYSAMPLES; i++) {
+				cScore = curOp->getDay((currentDay + i) % DAYSAMPLES);
+				percent = static_cast<unsigned int>(((static_cast<float>(cScore) / static_cast<float>(86400 / POINTS_UPDATE_TIME)) * 100) + 0.5);
+
+				if (!cScore)
+					dayString << "."; // no score (.)
+				else if (percent <= 10)
+					dayString << "0"; // 0%-10% (0)
+				else if ((percent >= 11) && (percent <= 20))
+					dayString << "1"; // 11%-20% (1)
+				else if ((percent >= 21) && (percent <= 30))
+					dayString << "2"; // 21%-30% (2)
+				else if ((percent >= 31) && (percent <= 40))
+					dayString << "3"; // 31%-40% (3)
+				else if ((percent >= 41) && (percent <= 50))
+					dayString << "4"; // 41%-50% (4)
+				else if ((percent >= 51) && (percent <= 60))
+					dayString << "5"; // 51%-60% (5)
+				else if ((percent >= 61) && (percent <= 70))
+					dayString << "6"; // 61%-70% (6)
+				else if ((percent >= 71) && (percent <= 80))
+					dayString << "7"; // 71%-80% (7)
+				else if ((percent >= 81) && (percent <= 90))
+					dayString << "8"; // 81%-90% (8)
+				else if ((percent >= 91))
+					dayString << "9"; // 91%-100% (9)
+			}
+			dayString << std::ends;
+		}
+
+		// XREPLY 
+		xResponse = TokenStringsParams("OPLIST %s %3d %4d  %s -- %s / %s%s%s%s%s%s",
+			st[1].c_str(),
+			opCount,
+			(curOp->getPoints() + curOp->getBonus()),
+			curOp->getAccount().c_str(), firstop.c_str(),
+			lastop.c_str(), inChan ? " / " : "",
+			inChan ? nickName.c_str() : "",
+			(days) ? " [" : "",
+			(days) ? dayString.str().c_str() : "",
+			(days) ? "]" : "");
+		doXResponse(theServer, Routing, xResponse);
+
+	} // end of channel score iterator
+
+	if (theChan) {
+		// TODO -- XREPLY with number of notes against channel?
+
+		/* Perhaps use a mask so we can return these in a single message */
+		if (isTempBlocked(theChan->getChannel()))
+		{
+			// XREPLY with 'TEMPBLOCKED' indicator
+			xResponse = TokenStringsParams("TEMPBLOCKED %s", st[1].c_str());
+			doXResponse(theServer, Routing, xResponse);
+		}
+		else if (theChan->getFlag(sqlChannel::F_BLOCKED))
+		{
+			// XREPLY with 'BLOCKED' indicator
+			xResponse = TokenStringsParams("BLOCKED %s", st[1].c_str());
+			doXResponse(theServer, Routing, xResponse);
+		}
+		else if (theChan->getFlag(sqlChannel::F_ALERT))
+		{
+			// XREPLY with 'ALERTED' indicator
+			xResponse = TokenStringsParams("ALERTED %s", st[1].c_str());
+			doXResponse(theServer, Routing, xResponse);
+		}
+	}
+
+	// End of OPLIST
+	return true;
+}
+
+bool doXRScore(iServer* theServer, const string& Routing, const string& Message)
+{
+	// TODO
+	return true;
+}
+
+bool chanfix::doXResponse(iServer* theServer, const string& Routing, const string& Message)
+{
+	elog << "chanfix::doXResponse: " << getCharYY().c_str() << " XR " << theServer->getCharYY().c_str() << " " << Routing.c_str() << " :" << Message.c_str() << endl;
+	return Write("%s XR %s %s :%s", getCharYY().c_str(), theServer->getCharYY().c_str(), Routing.c_str(), Message.c_str());
 }
 
 } // namespace cf

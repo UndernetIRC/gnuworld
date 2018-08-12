@@ -351,7 +351,7 @@ bot->Notice(theClient,
 		language::susp_set,
 		string("SUSPENSION for %s will expire in %s")).c_str(),
 	Target->getUserName().c_str(),
-	bot->prettyDuration(bot->currentTime() - finalDuration ).c_str());
+	prettyDuration(bot->currentTime() - finalDuration ).c_str());
 	if (Target != theUser)
 	{
 		bot->NoteAllAuthedClients(Target, bot->getResponse(Target,language::acc_susp).c_str(), theChan->getName().c_str());

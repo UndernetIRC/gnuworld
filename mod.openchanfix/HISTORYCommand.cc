@@ -101,7 +101,7 @@ bot->SendTo(theClient,
                                         theChan->getChannel().c_str());
 
 for (unsigned int i = 0; i < noteCount; i++)
-  bot->SendTo(theClient, "%s", bot->tsToDateTime(atoi(cacheCon->GetValue(i,0)), true).c_str());
+  bot->SendTo(theClient, "%s", tsToDateTime(atoi(cacheCon->GetValue(i,0)), true).c_str());
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

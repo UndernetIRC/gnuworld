@@ -412,7 +412,7 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 				bot->getResponse(theUser,
 					language::last_mod).c_str(),
 				bot->SQLDb->GetValue(i, 7).c_str(),
-				bot->prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
+				prettyDuration(atoi(bot->SQLDb->GetValue(i,6))).c_str()
 			);
 			}
 		}

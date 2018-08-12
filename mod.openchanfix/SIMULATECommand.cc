@@ -147,7 +147,7 @@ bot->SendTo(theClient,
                             language::manual_simulate_starting,
                             std::string("Simulate for %s (%s) starting at next fixing round (Current C time %s).")).c_str(),
                                         netChan->getName().c_str(), ((autof == true) ? "AUTO" : "MANUAL"), 
-                                        bot->tsToDateTime(bot->currentTime(), true).c_str());
+                                        tsToDateTime(bot->currentTime(), true).c_str());
 
 bot->SendTo(theClient,
             bot->getResponse(theUser,

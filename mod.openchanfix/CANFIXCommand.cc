@@ -24,6 +24,7 @@
  * $Id: CANFIXCommand.cc,v 1.2 2010/03/04 04:24:11 hidden1 Exp $
  */
 #include "gnuworld_config.h"
+#include "misc.h"
 #include "Network.h"
 #include "chanfix.h"
 #include "responses.h"
@@ -127,8 +128,8 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
      opPtr != myOps.end(); opPtr++) {
   curOp = *opPtr;
   opCount++;
-  firstop = bot->tsToDateTime(curOp->getTimeFirstOpped(), false);
-  lastop = bot->tsToDateTime(curOp->getTimeLastOpped(), true);
+  firstop = tsToDateTime(curOp->getTimeFirstOpped(), false);
+  lastop = tsToDateTime(curOp->getTimeLastOpped(), true);
 
   pScore = curOp->getPoints() + curOp->getBonus();
   percent = static_cast<int>((static_cast<float>(pScore) / static_cast<float>(maxScore)) * 100);

@@ -42,7 +42,6 @@
 #include	"ip.h"
 #include	"Network.h"
 #include	"StringTokenizer.h"
-#include	"misc.h"
 #include	"ELog.h"
 #include	"dbHandle.h"
 #include	"constants.h"
@@ -3079,6 +3078,7 @@ void cservice::ExpireUsers()
 void cservice::processDBUpdates()
 {
 	logDebugMessage("[DB-UPDATE]: Looking for changes:");
+	UpdatePendingOpLists();
 	checkTrafficPass();
 	updateChannels();
 	updateUsers();
@@ -4040,6 +4040,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		logPrivAdminMessage(errormsg.c_str());
 		return false;
 	}
+
 	unsigned int channel_ts = 0;
 	Channel* tmpChan = Network->findChannel(chanName);
 	channel_ts = tmpChan ? tmpChan->getCreationTime() : ::time(NULL);
@@ -4080,7 +4081,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 				<< ends;
 
 	#ifdef LOG_SQL
-	elog	<< "sqlQuery> "
+	elog	<< "cservice::sqlRegisterChannel sqlQuery> "
 			<< theQuery.str().c_str()
 			<< endl;
 	#endif
@@ -4088,7 +4089,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	if( !SQLDb->Exec(theQuery ) )
 	//if( status != PGRES_COMMAND_OK )
 		{
-		elog	<< "REGISTER> SQL Error: "
+		elog	<< "cservice::sqlRegisterChannel> SQL Error: "
 			<< SQLDb->ErrorMessage()
 			<< endl ;
 		return false ;
@@ -4110,7 +4111,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 			lvlPair = lvlptr->first;
 
 	#ifdef LOG_DEBUG
-			elog << "REGISTERCommand> Purging Level Record for: " << lvlPair.second << " (UID: " << lvlPair.first << ")" << endl;
+			elog << "cservice::sqlRegisterChannel> Purging Level Record for: " << lvlPair.second << " (UID: " << lvlPair.first << ")" << endl;
 	#endif
 
 			++lvlptr;
@@ -4131,6 +4132,26 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		ptr->second = NULL;
 		delete(pendingChan);
 		pendingChannelList.erase(ptr);
+	}
+
+	theQuery.str("");
+	theQuery	<< "DELETE FROM pending_chanfix_scores WHERE channel_id = "
+				<< newChan->getID()
+				<< ends;
+
+	#ifdef LOG_SQL
+	elog	<< "cservice::sqlRegisterChannel sqlQuery> "
+			<< theQuery.str().c_str()
+			<< endl;
+	#endif
+
+	if( !SQLDb->Exec(theQuery ) )
+	//if( status != PGRES_COMMAND_OK )
+	{
+		elog	<< "cservice::sqlRegisterChannel> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
+		return false ;
 	}
 
 	logAdminMessage("%s (%s) has registered %s to %s", theClient->getNickName().c_str(),
@@ -4840,32 +4861,6 @@ if(ptr != sqlUserCache.end())
 return flagString;
 }
 
-const string cservice::prettyDuration( int duration ) const
-{
-	if (duration == 0)
-		return "Never";
-
-// Pretty format a 'duration' in seconds to
-// x day(s), xx:xx:xx.
-
-char tmpBuf[ 64 ] = {0};
-
-int	res = currentTime() - duration,
-	secs = res % 60,
-	mins = (res / 60) % 60,
-	hours = (res / 3600) % 24,
-	days = (res / 86400) ;
-
-sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
-	days,
-	(days == 1 ? "" : "s"),
-	hours,
-	mins,
-	secs );
-
-return string( tmpBuf ) ;
-}
-
 void cservice::OnChannelModeV( Channel* theChan, ChannelUser* theChanUser,
 	const xServer::voiceVectorType& theTargets)
 {
@@ -5116,7 +5111,7 @@ switch( theEvent )
 		iServer* theServer = static_cast< iServer* >( data1 );
 		const char* Routing = reinterpret_cast< char* >( data2 );
 		const char* Message = reinterpret_cast< char* >( data3 );
-		elog << "CSERVICE.CC: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		elog << "CSERVICE.CC XQUERY: " << theServer->getName() << " " << Routing << " " << Message << endl;
 		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
 		//If it ain't us, ignore the message, the message is probably meant for another client here.
 		StringTokenizer st( Message ) ;
@@ -5130,6 +5125,28 @@ switch( theEvent )
 			{
 			doXQLogin(theServer, Routing, Message);
 			}
+		break;
+		}
+	case EVT_XREPLY:
+		{
+		iServer* theServer = static_cast< iServer* >(data1);
+		const char* Routing = reinterpret_cast< char* >(data2);
+		const char* Message = reinterpret_cast< char* >(data3);
+		elog << "CSERVICE.CC XREPLY: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
+		//If it ain't us, ignore the message, the message is probably meant for another client here.
+		StringTokenizer st(Message);
+		if (st.size() < 2)
+		{
+			// No command or data supplied
+			break;
+		}
+		string Command = string_upper(st[0]);
+		if (Command == "OPLIST")
+		{
+			// Process the channel OPLIST data from mod.openchanfix
+			doXROplist(theServer, Routing, Message);
+		}
 		break;
 		}
 	case EVT_ACCOUNT:
@@ -7105,6 +7122,39 @@ void cservice::setSupporterNoticedStatus(int suppId, const string& chanName, boo
 		}
 }
 
+void cservice::UpdatePendingOpLists()
+{
+	stringstream theQuery;
+	theQuery	<<  "SELECT channels.name"
+				<< " FROM pending,channels"
+				<< " WHERE channels.id = pending.channel_id"
+				<< " AND pending.status IN (0, 1, 2)"
+				<< ends;
+
+#ifdef LOG_SQL
+		elog	<< "cmaster::UpdatePendingOpLists> "
+			<< theQuery.str().c_str()
+			<< endl;
+#endif
+
+	if( SQLDb->Exec(theQuery, true ) )
+//	if( PGRES_TUPLES_OK == status )
+	{
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
+		{
+			string channelName = SQLDb->GetValue(i,0).c_str();
+			doXQOplist(channelName);
+		}
+	}
+	else
+	{
+		elog    << "cmaster::UpdatePendingOpLists::sqlError> "
+				<< SQLDb->ErrorMessage()
+				<< endl;
+	}
+	return;
+}
+
 /*
  * FirstNoticing is used to prevent noticing '2x times' the supporters:
  * - 1a. When the supporter logs in to X
@@ -8235,6 +8285,7 @@ void cservice::loadConfigVariables()
 	SupportDays = atoi((cserviceConfig->Require( "support_days" )->second).c_str());
 	ReviewerId = atoi((cserviceConfig->Require( "reviewer_id" )->second).c_str());
 	LogToAdminConsole = atoi((cserviceConfig->Require( "log_to_admin_console" )->second).c_str());
+	ChanfixServerName = cserviceConfig->Require( "chanfix_servername" )->second ;
 	// * End The Judge Variables * //
 	pendingChanPeriod = atoi((cserviceConfig->Require( "pending_duration" )->second).c_str());
 	pendingNotifPeriod = atoi((cserviceConfig->Require( "pending_notif_duration" )->second).c_str());
@@ -8603,6 +8654,217 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 elog << "cservice::doXQLogin: FAILED login for " << username << endl;
 
 return true;
+}
+
+bool cservice::doXQOplist(const string& chanName)
+{
+	elog << "cservice::doXQOplist> Executing XQ for " << chanName << endl;
+	logDebugMessage("cservice::doXQOplist> Executing XQ for %s", chanName.c_str());
+	//iServer* theServer = this->MyUplink->Uplink();
+	iServer* chanfixServer = Network->findServerName(ChanfixServerName);
+	if (!chanfixServer)
+	{
+		elog << "cservice::doXQOplist> chanfixServer(" << ChanfixServerName << ") NOT Found!" << endl;
+		return false;
+	}
+	else
+		elog << "<DEBUG> chanfixServer(" << ChanfixServerName << ") found" << endl;
+	string Message = "OPLIST " + chanName;
+	// AB XQ Az iauth:15_d :OPLIST #empfoo
+	//elog << "cservice::doXQOplist: Routing: " << Routing << " Message: " << Message << "\n";
+	return Write("%s XQ %s %s :%s", getCharYY().c_str(), chanfixServer->getCharYY().c_str(), "AnyCServiceRouting", Message.c_str());
+}
+
+bool cservice::doXROplist(iServer* theServer, const string& Routing, const string& Message)
+{
+	// AB XR Az iauth:15_d :OPLIST #empfoo
+	elog << "cservice::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
+	StringTokenizer st(Message);
+	logDebugMessage("cservice::doXROplist> Received OpList data for %s", st[1].c_str());
+
+	if (st[2] == "NO")
+	{
+		elog << "cservice::doXROplist> NO oplist reported for channel " << st[1] << endl;
+		return true;
+	}
+
+	if (st.size() < 6)
+	{
+		elog << "cservice::doXROplist> OPLIST insufficient response parameters" << endl;
+		return false;
+	}
+	string scoreChan = st[1];
+	string opCount = st[2];
+	string score = st[3];
+	string account = st[4];
+	//st[5] == "--";
+	string firstOpped = st[6]; //tsToDateTime(atoi(st[5]), false);
+	//st[7] == "/";
+	string lastOpped = st[8]; //tsToDateTime(atoi(st[6], true);
+	//st[9] == "/";
+	//string lastNick = st[10];	// ... but may not be online anymore
+
+	elog << "cservice::doXROplist: OPLIST " 
+		<< "scorechan = " << scoreChan << " "
+		<< "opCount(rank) = " << opCount << " "
+		<< "score = " << score << " "
+		<< "account = " << account << " "
+		<< "firstOpped = " << firstOpped << " "
+		<< "lastOpped = " << lastOpped << " "
+		//<< "lastNick = " << lastNick
+		<< endl;
+
+	/*	Now we do the actual work to insert scores to SQL DB
+		Rules:
+			1). Only do work for channels with a pending application? (we only send XQUERY for these)
+			2). Only INSERT if (channel_id,user_id) pair does not exist,
+			otherwise we UPDATE
+	*/
+	stringstream queryString;
+	queryString << "SELECT name,id FROM channels,pending WHERE lower(name)='"
+		<< string_lower(scoreChan)
+		<< "'"
+		<< " AND channels.id = pending.channel_id"
+		<< ends;
+#ifdef LOG_SQL
+	elog << "cservice::doXROplist::sqlQuery> "
+		<< queryString.str().c_str()
+		<< endl;
+#endif
+
+	if (SQLDb->Exec(queryString, true))
+		//if (PGRES_TUPLES_OK == status)
+	{
+		if (SQLDb->Tuples() < 1)
+		{
+			// No rows returned - no pending record
+			elog << "cservice::doXROplist> no pending channel found: " << scoreChan << endl;
+			return false;
+		}
+		else {
+			// Pending channel found -- have we inserted this user & chan combo before?
+			sqlUser* tmpUser = getUserRecord(account);
+			if (!tmpUser)
+			{
+				elog << "cservice::doXROplist> tmpUser with account = " << account << " could not be found (expired or purged)" << endl;
+				return false;
+			}
+			unsigned int userID = tmpUser->getID();
+			unsigned int chanID = atoi(SQLDb->GetValue(0, 1).c_str());
+			stringstream queryString;
+			queryString << "SELECT channel_id,first FROM pending_chanfix_scores WHERE user_id='"
+				<< userID
+				<< "' AND channel_id=(SELECT id FROM channels WHERE lower(name)='"
+				<< string_lower(scoreChan)
+				<< "')"
+				<< ends;
+#ifdef LOG_SQL
+			elog << "cservice::doXROplist::sqlQuery> "
+				<< queryString.str().c_str()
+				<< endl;
+#endif
+
+			if (SQLDb->Exec(queryString, true))
+				//if (PGRES_TUPLES_OK == status)
+			{
+				stringstream updateQuery;
+				if (SQLDb->Tuples() < 1)
+				{
+					// no rows returned -- need to INSERT
+					updateQuery << "INSERT INTO pending_chanfix_scores "
+						<< "(channel_id,user_id,rank,score,account,first_opped,last_opped, first) VALUES ('"
+						<< chanID
+						<< "', '"
+						<< userID
+						<< "', '"
+						<< opCount
+						<< "', '"
+						<< score
+						<< "', '"
+						<< account
+						<< "', '"
+						<< firstOpped
+						<< "', '"
+						<< lastOpped
+						<< "', '"
+						<< "Y"
+						<< "')"
+						<< ends;
+				}
+				else {
+					// rows returned -- need to UPDATE
+					int rescount = (int)SQLDb->Tuples();
+					rescount--;
+					int chanID = atoi(SQLDb->GetValue(rescount, 0).c_str());
+					char first = (char)SQLDb->GetValue(rescount, 1)[0];
+					elog << " *** <DEBUG> first == " << first << endl;
+					if (first == 'N')
+					{
+						updateQuery << "UPDATE pending_chanfix_scores SET "
+							<< "rank='"
+							<< opCount
+							<< "', "
+							<< " score='"
+							<< score
+							<< "', "
+							<< " first_opped='"
+							<< firstOpped
+							<< "',"
+							<< " last_opped='"
+							<< lastOpped
+							<< "',"
+							<< " last_updated=now()::abstime::int4, "
+							<< "first='N'"
+							<< " WHERE user_id='"
+							<< userID
+							<< "' AND channel_id='"
+							<< chanID
+							<< "' AND first='N'"
+							<< ends;
+					}
+					else
+					{
+						updateQuery << "INSERT INTO pending_chanfix_scores "
+							<< "(channel_id,user_id,rank,score,account,first_opped,last_opped, first) VALUES ('"
+							<< chanID
+							<< "', '"
+							<< userID
+							<< "', '"
+							<< opCount
+							<< "', '"
+							<< score
+							<< "', '"
+							<< account
+							<< "', '"
+							<< firstOpped
+							<< "', '"
+							<< lastOpped
+							<< "', '"
+							<< "N"
+							<< "')"
+							<< ends;
+					}
+				}
+
+#ifdef LOG_SQL
+				elog << "cservice::doXROplist::sqlQuery> "
+					<< updateQuery.str().c_str()
+					<< endl;
+#endif
+
+				// send to SQL
+				if (!SQLDb->Exec(updateQuery, true))
+				//if( PGRES_TUPLES_OK != status )
+				{
+					elog	<< "cservice::doXROplist::sqlQuery> SQL Error: "
+						<< SQLDb->ErrorMessage()
+						<< endl ;
+					return false ;
+				}
+			} // successful query
+		} // end score exist lookup query
+	} // end pending chan lookup query
+	return true;
 }
 
 struct autoOpData {

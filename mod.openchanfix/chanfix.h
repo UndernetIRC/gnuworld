@@ -32,6 +32,7 @@
 #include	"EConfig.h"
 #include	"ELog.h"
 #include	"Timer.h"
+#include	"misc.h"
 
 #include	"chanfixCommands.h"
 #include	"chanfix_config.h"
@@ -299,21 +300,20 @@ public:
 
 	const std::string getEventName(const int);
 
-	const std::string prettyDuration( int );
-
-	const std::string tsToDateTime(time_t, bool);
-
 	const std::string getHostList( sqlcfUser* );
 	
 	const std::string getChanNickName(const std::string&, const std::string&);
-
-	int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 
 	char *convertToAscTime(time_t);
 
 	/* Server notices */
 	bool serverNotice( Channel*, const char*, ... );
 	bool serverNotice( Channel*, const std::string& );
+
+	/* XREPLY support */
+	bool doXROplist(iServer*, const string&, const string&);
+	bool doXRScore(iServer*, const string&, const string&);
+	bool doXResponse(iServer*, const string&, const string&);
 
 	/*
 	 * Send private messages or notices to authenticated users

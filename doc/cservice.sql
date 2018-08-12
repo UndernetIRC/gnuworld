@@ -3,6 +3,9 @@
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2017-01-24:Empus
+--             Added table 'pending_chanfix_scores' to integrate 
+--				channel applications with mod.openchanfix
 -- 2014-08-11: Seven
 --             Added table 'user_sec_history' to track user login history
 -- 2013-12-07: Seven
@@ -413,6 +416,22 @@ CREATE TABLE pending_traffic (
 );
 
 CREATE INDEX pending_traffic_channel_id_idx ON pending_traffic(channel_id);
+
+
+CREATE TABLE pending_chanfix_scores (
+	channel_id INT4 CONSTRAINT pending_chanfix_scores_channel_ref REFERENCES channels (id),
+	user_id TEXT NOT NULL DEFAULT '0',
+	rank INT4 NOT NULL DEFAULT '0',
+	score INT4 NOT NULL DEFAULT '0',
+	account VARCHAR(20) NOT NULL,
+	first_opped VARCHAR(10),
+	last_opped VARCHAR(20),
+	last_updated INT4 NOT NULL DEFAULT now()::abstime::int4,
+	first CHAR NOT NULL DEFAULT 'Y'
+);
+
+CREATE INDEX pending_chanfix_scores_channel_id_idx ON pending_chanfix_scores(channel_id);
+
 
 CREATE TABLE domain (
 	id SERIAL,
