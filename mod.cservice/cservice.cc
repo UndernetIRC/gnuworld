@@ -7154,7 +7154,7 @@ void cservice::UpdatePendingOpLists()
 	theQuery	<<  "SELECT channels.name"
 				<< " FROM pending,channels"
 				<< " WHERE channels.id = pending.channel_id"
-				<< " AND (pending.status = 0 OR pending.status = 1 OR pending.status = 2 OR pending.status = 8)"
+				<< " AND pending.status IN (0, 1, 2)"
 				<< ends;
 
 #ifdef LOG_SQL
