@@ -420,10 +420,10 @@ CREATE INDEX pending_traffic_channel_id_idx ON pending_traffic(channel_id);
 
 CREATE TABLE pending_chanfix_scores (
 	channel_id INT4 CONSTRAINT pending_chanfix_scores_channel_ref REFERENCES channels (id),
-	user_id TEXT NOT NULL DEFAULT '0',
+	user_id INT4 NOT NULL DEFAULT '0',
 	rank INT4 NOT NULL DEFAULT '0',
 	score INT4 NOT NULL DEFAULT '0',
-	account VARCHAR(20) NOT NULL,
+	account VARCHAR(128) NOT NULL,
 	first_opped VARCHAR(10),
 	last_opped VARCHAR(20),
 	last_updated INT4 NOT NULL DEFAULT now()::abstime::int4,

@@ -8694,9 +8694,11 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 		return false;
 	}
 	string scoreChan = st[1];
+	Channel* theChan = Network->findChannel(scoreChan);
 	string opCount = st[2];
 	string score = st[3];
 	string account = st[4];
+	string nickuserhost = account;
 	//st[5] == "--";
 	string firstOpped = st[6]; //tsToDateTime(atoi(st[5]), false);
 	//st[7] == "/";
@@ -8749,9 +8751,23 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 				elog << "cservice::doXROplist> tmpUser with account = " << account << " could not be found (expired or purged)" << endl;
 				return false;
 			}
+			if (tmpUser->networkClientList.size() > 0)
+			{
+				iClient* tmpClient = tmpUser->networkClientList.front();
+				nickuserhost = tmpClient->getNickUserHost();
+				if (theChan)
+				{
+					ChannelUser* tmpChanUser = theChan->findUser(tmpClient);
+					if (tmpChanUser)
+					{
+						if (tmpChanUser->getMode(ChannelUser::MODE_O))
+							nickuserhost = "@" + nickuserhost;
+					}
+				}
+			}
 			unsigned int userID = tmpUser->getID();
 			unsigned int chanID = atoi(SQLDb->GetValue(0, 1).c_str());
-			stringstream queryString;
+			queryString.str("");
 			queryString << "SELECT channel_id,first FROM pending_chanfix_scores WHERE user_id='"
 				<< userID
 				<< "' AND channel_id=(SELECT id FROM channels WHERE lower(name)='"
@@ -8807,6 +8823,9 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 							<< " score='"
 							<< score
 							<< "', "
+							<< " account='"
+							<< nickuserhost
+							<< "', "
 							<< " first_opped='"
 							<< firstOpped
 							<< "',"
@@ -8834,7 +8853,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 							<< "', '"
 							<< score
 							<< "', '"
-							<< account
+							<< nickuserhost
 							<< "', '"
 							<< firstOpped
 							<< "', '"
@@ -8847,7 +8866,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 				}
 
 #ifdef LOG_SQL
-				elog << "cservice::doXROplist::sqlQuery> "
+				elog << "cservice::doXROplist::updateQuery> "
 					<< updateQuery.str().c_str()
 					<< endl;
 #endif
@@ -8856,12 +8875,19 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 				if (!SQLDb->Exec(updateQuery, true))
 				//if( PGRES_TUPLES_OK != status )
 				{
-					elog	<< "cservice::doXROplist::sqlQuery> SQL Error: "
+					elog	<< "cservice::doXROplist::updateQuery> SQL Error: "
 						<< SQLDb->ErrorMessage()
 						<< endl ;
 					return false ;
 				}
 			} // successful query
+			else
+			{
+				elog	<< "cservice::doXROplist::sqlQuery2> SQL Error: "
+					<< SQLDb->ErrorMessage()
+					<< endl ;
+				return false ;
+			}
 		} // end score exist lookup query
 	} // end pending chan lookup query
 	return true;
