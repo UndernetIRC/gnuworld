@@ -376,6 +376,8 @@ unsigned char fixToCIDR64(string& strIP)
 		return 0;
 
 	bool IsIPv4 = irc_in_addr_is_ipv4(&ip);
+	if ((strIP.find(':') == string::npos) && (strIP.find('.') != string::npos))
+		IsIPv4 = true;
 	string::size_type pos = strIP.find('/');
 	strIP = strIP.substr(0, pos);
 
