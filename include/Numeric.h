@@ -763,11 +763,27 @@ inline std::string print_irc_in_addr(const irc_in_addr& IP)
 }
 /////// Test functions end ////////
 
-inline irc_in_addr irc_IPCIDRMinIP(const std::string& IP, unsigned CClonesCIDR = 120)
+//inline irc_in_addr irc_IPCIDRMinIP(const std::string& IP, unsigned CClonesCIDR = 120)
+//{
+//	unsigned char maskbits;
+//	irc_in_addr ircip;
+//	ipmask_parse(IP.c_str(), &ircip, &maskbits);
+//	unsigned int quot = (128 - CClonesCIDR)/16;
+//	unsigned int rem = (128 - CClonesCIDR) % 16;
+//	unsigned int i;
+//	for (i = 0; i < quot; i++)
+//		ircip.in6_16[7-i] = 0;
+//	if (CClonesCIDR == 0)  /* We have i=8 here. Not something we want, do we?  */
+//		i--;
+//	unsigned short ip16 = ntohs(ircip.in6_16[7-i]);
+//	ip16 >>= rem;
+//	ip16 <<= rem;
+//	ircip.in6_16[7-i] = htons(ip16);
+//	return ircip;
+//}
+
+inline irc_in_addr irc_in6_CIDRMinIP(irc_in_addr ircip, unsigned CClonesCIDR = 120)
 {
-	unsigned char maskbits;
-	irc_in_addr ircip;
-	ipmask_parse(IP.c_str(), &ircip, &maskbits);
 	unsigned int quot = (128 - CClonesCIDR)/16;
 	unsigned int rem = (128 - CClonesCIDR) % 16;
 	unsigned int i;
@@ -782,10 +798,20 @@ inline irc_in_addr irc_IPCIDRMinIP(const std::string& IP, unsigned CClonesCIDR =
 	return ircip;
 }
 
+inline std::string IPCIDRMinIP(irc_in_addr ircip, unsigned CClonesCIDR = 120)
+{
+	irc_in_addr ip6 = irc_in6_CIDRMinIP(ircip, CClonesCIDR);
+	return (std::string)ircd_ntoa(&ip6);
+}
+
 inline std::string IPCIDRMinIP(const std::string& IP, unsigned CClonesCIDR = 120)
 {
-	irc_in_addr ip6 = irc_IPCIDRMinIP(IP, CClonesCIDR);
-	return (std::string)ircd_ntoa(&ip6);
+	irc_in_addr ircip;
+	unsigned char ipmask_len;
+	if (!ipmask_parse(IP.c_str(), &ircip, &ipmask_len))
+		return std::string();
+
+	return IPCIDRMinIP(ircip,CClonesCIDR);
 }
 
 } // namespace gnuworld
