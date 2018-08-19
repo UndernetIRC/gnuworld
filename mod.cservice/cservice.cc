@@ -3340,7 +3340,6 @@ lastLevelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime").c_str());
 vector<sqlUser*> cservice::getChannelManager(int channelId)
 {
 	vector<sqlUser*> resultVec;
-	pair<int, int> pairItr;
 	for (sqlLevelHashType::iterator itr = sqlLevelCache.begin(); itr != sqlLevelCache.end(); ++itr)
 	{
 		if (itr->first.second != channelId)
@@ -8698,7 +8697,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 	string opCount = st[2];
 	string score = st[3];
 	string account = st[4];
-	string nickuserhost = account;
+	string nickuserhost;
 	//st[5] == "--";
 	string firstOpped = st[6]; //tsToDateTime(atoi(st[5]), false);
 	//st[7] == "/";
@@ -8813,26 +8812,29 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 					rescount--;
 					int chanID = atoi(SQLDb->GetValue(rescount, 0).c_str());
 					char first = (char)SQLDb->GetValue(rescount, 1)[0];
-					elog << " *** <DEBUG> first == " << first << endl;
+					//elog << " *** <DEBUG> first == " << first << endl;
 					if (first == 'N')
 					{
 						updateQuery << "UPDATE pending_chanfix_scores SET "
 							<< "rank='"
 							<< opCount
 							<< "', "
-							<< " score='"
+							<< "score='"
 							<< score
 							<< "', "
-							<< " account='"
+							<< "nuh='"
 							<< nickuserhost
 							<< "', "
-							<< " first_opped='"
+							<< "account='"
+							<< account
+							<< "', "
+							<< "first_opped='"
 							<< firstOpped
 							<< "',"
-							<< " last_opped='"
+							<< "last_opped='"
 							<< lastOpped
-							<< "',"
-							<< " last_updated=now()::abstime::int4, "
+							<< "', "
+							<< "last_updated=now()::abstime::int4, "
 							<< "first='N'"
 							<< " WHERE user_id='"
 							<< userID
@@ -8844,7 +8846,7 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 					else
 					{
 						updateQuery << "INSERT INTO pending_chanfix_scores "
-							<< "(channel_id,user_id,rank,score,account,first_opped,last_opped, first) VALUES ('"
+							<< "(channel_id,user_id,rank,score,nuh,account,first_opped,last_opped, first) VALUES ('"
 							<< chanID
 							<< "', '"
 							<< userID
@@ -8854,6 +8856,8 @@ bool cservice::doXROplist(iServer* theServer, const string& Routing, const strin
 							<< score
 							<< "', '"
 							<< nickuserhost
+							<< "', '"
+							<< account
 							<< "', '"
 							<< firstOpped
 							<< "', '"

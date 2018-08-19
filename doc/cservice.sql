@@ -423,6 +423,7 @@ CREATE TABLE pending_chanfix_scores (
 	user_id INT4 NOT NULL DEFAULT '0',
 	rank INT4 NOT NULL DEFAULT '0',
 	score INT4 NOT NULL DEFAULT '0',
+	nuh TEXT,
 	account VARCHAR(128) NOT NULL,
 	first_opped VARCHAR(10),
 	last_opped VARCHAR(20),
