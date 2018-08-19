@@ -390,7 +390,7 @@ unsigned char fixToCIDR64(string& strIP)
 
 	if (((ipmask_len >= 16) && (!IsIPv4)) || ((ipmask_len >= 96) && (IsIPv4)))
 	{
-		strIP = IPCIDRMinIP(strIP.c_str(), unsigned(ipmask_len));
+		strIP = IPCIDRMinIP(ip, ipmask_len);
 		if (IsIPv4)
 		{ //adjust to 32 bit, if we have a IPv4/32 we don't want to show /32
 			if (ipmask_len < 128)
