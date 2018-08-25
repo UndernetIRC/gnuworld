@@ -47,10 +47,19 @@ bool HELPCommand::Exec( iClient* theClient, const string& Message )
 	}
 
 	sqlUser* theUser = bot->isAuthed(theClient, false);
-	string msg = bot->getHelpMessage(theUser, string_upper(st.assemble(1)));
+	string topic = string_upper(st.assemble(1));
+	string msg = bot->getHelpMessage(theUser, topic);
 
 	if (msg.empty())
 	msg = bot->getHelpMessage(theUser, "INDEX");
+
+	if (!msg.empty())
+	{
+		bot->Notice(theClient, msg);
+		return true;
+	}
+	else
+		msg = bot->getHelpMessage(NULL, topic);
 
 	if (!msg.empty())
 		bot->Notice(theClient, msg);
