@@ -338,6 +338,7 @@ queryString	<< queryHeader
 			<< escapeSQLChars(channel_mode) << "', "
 			<< "now()::abstime::int4),"
 			<< no_take
+			<< ")"
 			<< ends;
 
 #ifdef LOG_SQL
