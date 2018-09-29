@@ -143,7 +143,7 @@ if (sortby == "timestamp")
 stringstream scanhostQuery;
 scanhostQuery << "SELECT user_id, user_name, command, ip, hostmask, timestamp FROM user_sec_history WHERE "
 		<< "(hostmask ILIKE '" << escapeSQLChars(searchSQL(host)) << "'"
-		<< ") OR (ip ILIKE '" << escapeSQLChars(searchSQL(host)) << "') ORDER BY " << sortby << limto
+		<< ") OR (ip ILIKE '" << escapeSQLChars(searchSQL(host)) << "') ORDER BY " << sortby << (desc == true ? " DESC" : "") << limto
 		<< ends;
 
 #ifdef LOG_SQL
@@ -191,10 +191,7 @@ for (unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
 	current.ip 			= bot->SQLDb->GetValue(i, 3);
 	current.hostmask	= bot->SQLDb->GetValue(i, 4);
 	current.timestamp 	= prettyDuration(atoi(bot->SQLDb->GetValue(i, 5))) + " ago.";
-	if (desc)
-		scanResults.push_front(std::make_pair(username, current));
-	else
-		scanResults.push_back(std::make_pair(username, current));
+	scanResults.push_back(std::make_pair(username, current));
 }
 
 /* use this for each user record (below) */
