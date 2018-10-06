@@ -336,7 +336,7 @@ queryString	<< queryHeader
 			<< registered_ts << ", "
 			<< channel_ts << ", '"
 			<< escapeSQLChars(channel_mode) << "', "
-			<< "now()::abstime::int4),"
+			<< "now()::abstime::int4,"
 			<< no_take
 			<< ")"
 			<< ends;
