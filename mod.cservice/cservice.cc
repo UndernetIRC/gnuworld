@@ -3008,9 +3008,9 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	if (expired)
 	{
 		if (last_seen > 0)
-			logPrivAdminMessage("User %s (%s) has expired",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
+			logDebugMessage("User %s (%s) has expired",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
 		else
-			logPrivAdminMessage("User %s (%s) has expired (Never logged in)",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
+			logDebugMessage("User %s (%s) has expired (Never logged in)",tmpUser->getUserName().c_str(), tmpUser->getEmail().c_str());
 	}
 	else logDebugMessage("Deleted(wipeUser) %s (%i) from the database.", tmpUser->getUserName().c_str(),userId);
 
