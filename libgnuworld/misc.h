@@ -171,6 +171,8 @@ string fixAddress( const string& );
 //Check if we have !at least! a *@hostip format
 bool isUserHost( const string& );
 
+bool isAllWildcard(const string&, bool checkfordots = false);
+
 /* Truncate a > /64 IPv6 address to a /64 cidr address
  * or creates a between /32 - /64 valid cidr address
  */

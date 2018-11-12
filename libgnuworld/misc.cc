@@ -368,6 +368,28 @@ bool isUserHost(const string& address)
 	return true;
 }
 
+bool isAllWildcard(const string& address, bool checkfordots)
+{
+	bool allwildcard = true;
+	for (string::size_type pos = 0; pos < address.size(); pos++)
+	{
+		if ((address[pos] == '*') || (address[pos] == '?'))
+		{
+			continue;
+		}
+		else if ((checkfordots) && (address[pos] == '.'))
+		{
+			continue;
+		}
+		else
+		{
+			allwildcard = false;
+			break;
+		}
+	}
+	return allwildcard;
+}
+
 unsigned char fixToCIDR64(string& strIP)
 {
 	irc_in_addr ip;

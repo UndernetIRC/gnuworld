@@ -4222,6 +4222,9 @@ int ccontrol::checkGline4(string &Host,unsigned int Len,unsigned int &Affected)
 	if (ipmask_len < 120)   //(120 = 128 - 8)
 		retMe |= gline::HUH_NO_HOST;  //Its too wide
 
+	if (isAllWildcard(Hostname, true))
+		retMe |=  gline::HUH_NO_HOST;
+
 	if (ipmask_len < 128)
 		IsWildcard = true;
 
@@ -4239,30 +4242,21 @@ int ccontrol::checkGline4(string &Host,unsigned int Len,unsigned int &Affected)
 	if (Affected > gline::MFGLINE_USERS)
 		retMe |= gline::FU_NEEDED_USERS; //This gline must be set with -fu flag
 
-	if(Len >  gline::MFGLINE_TIME)
+	if (Len > gline::MFGLINE_TIME)
 		retMe |=  gline::FU_NEEDED_TIME;
-	if(Len >  gline::MGLINE_TIME)
+	if (Len > gline::MGLINE_TIME)
 		retMe |=  gline::FORCE_NEEDED_TIME;
+
 	if (IsWildcard) //we have a 'wildcard' gline
 	{  //Need to check the Ident now
-		bool hasId = false;
-		for(string::size_type pos = 0; pos < Ident.size();++pos)
-		{
-			if((Ident[pos] == '*') || (Ident[pos] == '?'))
-			{
-				continue;
-			}
-			else
-			{ //Its not */? so we have a legal ident
-				hasId = true;
-				break;
-			}
-		}
-		if((hasId & (Len >  gline::MGLINE_WILD_TIME))
-			|| (!hasId & (Len >  gline::MGLINE_WILD_NOID_TIME)))
+		bool hasId = !isAllWildcard(Ident);
+		if ((hasId & (Len > gline::MGLINE_WILD_TIME))
+			|| (!hasId & (Len > gline::MGLINE_WILD_NOID_TIME)))
 		{
 			retMe |=  gline::FORCE_NEEDED_WILDTIME;
 		}
+		if (hasId)
+			retMe |=  gline::HUH_NO_HOST;
 	}
 
 	if (getExceptions("*@" + Hostname) > 0)
