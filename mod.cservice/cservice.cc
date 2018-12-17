@@ -450,12 +450,8 @@ void cservice::BurstChannels()
 		theChan->setInChan(true);
 		joinCount++;
 
-			if (getConfigVar("BAN_CHECK_ON_BURST")->asInt() == 1)
-			{
-				/* check current inhabitants of the channel against our banlist */
-				tmpChan = Network->findChannel(theChan->getName());
-				doTheRightThing(tmpChan);
-			}
+		doTheRightThing(tmpChan);
+
 		} else {
 			/* although AUTOJOIN isn't set, set the channel to +R if
 			 * it exists on the Network.
@@ -3121,6 +3117,34 @@ if( !SQLDb->Exec(theQuery, true ) )
 	return;
 	}
 
+// Query updates for channels which has no corresponding data in pending table (it has been cleaned up)
+if (SQLDb->Tuples() <= 0)
+{
+	theQuery.str("");
+	theQuery	<< "SELECT "
+				<< sql::channel_fields
+				<< ",now()::abstime::int4 as db_unixtime FROM "
+				<< "channels WHERE channels.last_updated >= "
+				<< lastChannelRefresh
+				<< " AND registered_ts <> 0"
+				<< ends;
+
+	#ifdef LOG_SQL
+	elog	<< "*** [CMaster::processDBUpdates]:sqlQuery: "
+			<< theQuery.str().c_str()
+			<< endl;
+	#endif
+
+	if( !SQLDb->Exec(theQuery, true ) )
+	//if (status != PGRES_TUPLES_OK)
+		{
+		elog	<< "*** [CMaster::updateChannels]: SQL error: "
+				<< SQLDb->ErrorMessage()
+				<< endl;
+		return;
+		}
+}
+
 if (SQLDb->Tuples() <= 0)
 	{
 	/* Nothing to see here.. */
@@ -3142,7 +3166,9 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	if(ptr != sqlChannelCache.end())
 		{
 		/* Found something! Update it. */
-		(ptr->second)->setAllMembers(i);
+		sqlChannel* updateChannel = ptr->second;
+		updateChannel->setAllMembers(i);
+		doAutoTopic(updateChannel);
 		updates++;
 		}
 	else
@@ -3340,7 +3366,6 @@ lastLevelRefresh = atoi(SQLDb->GetValue(0,"db_unixtime").c_str());
 vector<sqlUser*> cservice::getChannelManager(int channelId)
 {
 	vector<sqlUser*> resultVec;
-	pair<int, int> pairItr;
 	for (sqlLevelHashType::iterator itr = sqlLevelCache.begin(); itr != sqlLevelCache.end(); ++itr)
 	{
 		if (itr->first.second != channelId)
@@ -5633,7 +5658,13 @@ void cservice::doTheRightThing(Channel* tmpChan)
 		}
 	}
 
-	doAllBansOnChan(tmpChan);
+	doAutoTopic(reggedChan);
+
+	if (getConfigVar("BAN_CHECK_ON_BURST")->asInt() == 1)
+	{
+		/* check current inhabitants of the channel against our banlist */
+		doAllBansOnChan(tmpChan);
+	}
 
 	if (reggedChan->getFlag(sqlChannel::F_NOOP) || reggedChan->getFlag(sqlChannel::F_SUSPEND))
 	{
@@ -6257,6 +6288,10 @@ void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
  */
 void cservice::doAutoTopic(sqlChannel* theChan)
 {
+	if (!theChan->getFlag(sqlChannel::F_AUTOTOPIC))
+	{
+		return;
+	}
 
 string extra ;
 if( !theChan->getURL().empty() )
