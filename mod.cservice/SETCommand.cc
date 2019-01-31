@@ -1180,19 +1180,25 @@ else
 				option.c_str(), theChan->getName().c_str(), sqlChannel::getFloodLevelName(theChan->getFloodproLevel()).c_str());
 		if (theChan->getFloodproLevel() > prevFN)
 		{
-			bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
+			if (tmpChan)
+			{
+				bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
 				option.c_str(),
 				theChan->getName().c_str(),
 				value.c_str(),
 				theUser->getUserName().c_str());
+			}
 		}
 		else if (theChan->getFloodproLevel() < prevFN)
 		{
-			bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
-				option.c_str(),
-				theChan->getName().c_str(),
-				value.c_str(),
-				theUser->getUserName().c_str());
+			if (tmpChan)
+			{
+				bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
+					option.c_str(),
+					theChan->getName().c_str(),
+					value.c_str(),
+					theUser->getUserName().c_str());
+			}
 		}
 	    return true;
 	}
@@ -1235,19 +1241,25 @@ else
 			option.c_str(),	theChan->getName().c_str(),	value.c_str());
 		if (theChan->getFloodproLevel() > prevFN)
 		{
-			bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
-				option.c_str(),
-				theChan->getName().c_str(),
-				value.c_str(),
-				theUser->getUserName().c_str());
+			if (tmpChan)
+			{
+				bot->NoticeChannelOps(tmpChan, "Increased %s punishment level on %s to %s by %s",
+					option.c_str(),
+					theChan->getName().c_str(),
+					value.c_str(),
+					theUser->getUserName().c_str());
+			}
 		}
 		else if (theChan->getFloodproLevel() < prevFN)
 		{
-			bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
-				option.c_str(),
-				theChan->getName().c_str(),
-				value.c_str(),
-				theUser->getUserName().c_str());
+			if (tmpChan)
+			{
+				bot->NoticeChannelOps(tmpChan, "Decreased %s punishment level on %s to %s by %s",
+					option.c_str(),
+					theChan->getName().c_str(),
+					value.c_str(),
+					theUser->getUserName().c_str());
+			}
 		}
 
 	    return true;
