@@ -155,8 +155,7 @@ duplicateMapType duplicateMap;
 if( st.size() < 3 )
 	{
 	// No nicks provided, assume we voice ourself. :)
-	voiceList.push_back(theClient);
-	source = Message;
+    source = Message + " " + theClient->getNickName();
 	delim = ' ';
 	}
 else

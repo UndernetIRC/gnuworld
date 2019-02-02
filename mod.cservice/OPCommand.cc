@@ -169,8 +169,7 @@ vector< iClient* > opList; // List of clients to op.
 
 if( st.size() < 3 ) /* No nicks provided, assume we op ourself. :) */
 	{
-	opList.push_back(theClient);
-	source = Message;
+	source = Message + " " + theClient->getNickName();
 	delim = ' ';
 	}
 else

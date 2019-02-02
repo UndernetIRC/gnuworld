@@ -107,11 +107,6 @@ bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 	}
 
 
-	if( st.size() < 3 ) /* No nicks provided, assume we devoice ourself. :) */
-	{
-		devoiceList.push_back(theClient);
-	}
-
 	/*
 	 *  Loop over the remaining 'nick' parameters, opping them all.
 	 */
@@ -124,10 +119,9 @@ bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 	string source;
 	char delim;
 
-	if( st.size() < 3 ) // No nicks provided, assume we op ourself. :)
+	if( st.size() < 3 ) /* No nicks provided, assume we devoice ourself. :) */
 	{
-		devoiceList.push_back(theClient);
-		source = Message;
+        source = Message + " " + theClient->getNickName();
 		delim = ' ';
 	} else
 	{

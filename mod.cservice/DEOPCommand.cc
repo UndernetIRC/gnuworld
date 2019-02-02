@@ -143,8 +143,7 @@ vector< iClient* > deopList ;
 // No nicks provided, assume we op the requesting client
 if( st.size() < 3 )
 	{
-	deopList.push_back(theClient);
-	source = Message;
+    source = Message + " " + theClient->getNickName();
 	delim = ' ';
 	}
 else
