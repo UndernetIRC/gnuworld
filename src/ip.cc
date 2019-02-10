@@ -111,7 +111,7 @@ unsigned int xIP::getIP32() const
 {
 	// 30 24 18 12 6
 	if (!irc_in_addr_is_ipv4(&this->IP)) return 0;
-	string StrIP32 = GetNumericIP();
+	string StrIP32 = GetBase64IP();
 	unsigned int IP32 = (convert2n[ static_cast< size_t >( StrIP32[ 0 ] ) ] << 30) +
 		  (convert2n[ static_cast< size_t >( StrIP32[ 1 ] ) ] << 24) +
 		  (convert2n[ static_cast< size_t >( StrIP32[ 2 ] ) ] << 18) +
