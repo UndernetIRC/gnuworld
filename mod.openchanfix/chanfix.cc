@@ -1710,7 +1710,8 @@ for( std::string::const_iterator ptr = theString.begin() ;
 	{
 	if( *ptr == '\'' )
 		{
-		retMe += "\\\047" ;
+		//retMe += "\\\\\047" ;
+		retMe += "''" ;
 		}
 	else if ( *ptr == '\\' )
 		{
