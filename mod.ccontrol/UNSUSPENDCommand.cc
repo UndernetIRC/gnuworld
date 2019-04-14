@@ -77,12 +77,13 @@ else if(AdFlag < OpFlag)
 		"than you.");
 	return false;
 	}
-if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
+/*if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
 	bot->Notice(theClient,"You can only unsuspend a user that is associated with "
 		"the same server as you");
 	return false;
 	}
+*/
 if(tmpUser->getSuspendLevel() > AdFlag)
 	{
 	bot->Notice(theClient,"The suspend level is set to a higher level than yours");

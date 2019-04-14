@@ -74,12 +74,12 @@ else if(AdFlag < OpFlag)
 		"your own");
 	return false;
 	}
-if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
+/*if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
 	{
 	bot->Notice(theClient,"You can only suspend a user associated with the same server as you");
 	return false;
 	}
-
+*/
 if(bot->isSuspended(tmpUser))
 	{
 	bot->Notice(theClient,"%s is already suspended",st[1].c_str());
