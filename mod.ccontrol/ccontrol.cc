@@ -204,7 +204,7 @@ StdCloneChecksDisabled = atoi(conf.Require("StdCloneChecksDisabled")->second.c_s
 
 AnnounceNick = conf.Require("AnnounceNick")->second;
 
-iauthTimeout = atoi(conf.Require("iauthTimeout")->second;
+iauthTimeout = atoi(conf.Require("iauthTimeout")->second.c_str());
 
 
 // Set up the oper channels
