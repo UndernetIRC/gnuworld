@@ -204,6 +204,8 @@ StdCloneChecksDisabled = atoi(conf.Require("StdCloneChecksDisabled")->second.c_s
 
 AnnounceNick = conf.Require("AnnounceNick")->second;
 
+iauthTimeout = atoi(conf.Require("iauthTimeout")->second;
+
 
 // Set up the oper channels
 EConfig::const_iterator ptr = conf.Find( "operchan" ) ;
@@ -2498,13 +2500,13 @@ CClonesCIDR << " (will GLINE): *@";
 			ipLRecentIauthListType::iterator iItr;
 			for (iItr = ipLRecentIauthList.begin(); iItr != ipLRecentIauthList.end(); ) {
 				iClient *tClient = iItr->first;
-				int age = ::time(0) - iItr->second;
-				if (age > 10) {
+				time_t age = ::time(0) - iItr->second;
+				if (age > iauthTimeout) {
 					if (!strcasecmp(xIP(tClient->getIP()).GetNumericIP(), xIP(NewUser->getIP()).GetNumericIP())) {
 						StringTokenizer st(tClient->getDescription());
 						//assert(st.size() > 1);
 						if (!strncmp(st[0].c_str(), NewUser->getCharYY().c_str(), 2)) {
-								isClientDropped = true;
+							isClientDropped = true;
 						}
 					}
 					ipLDropClient(tClient);

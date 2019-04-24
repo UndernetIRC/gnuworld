@@ -241,7 +241,7 @@ protected:
 
 	ipLnumericMapType		ipLnumericMap;
 
-	typedef pair<iClient*, int>	ipLRecentIauthPairType;
+	typedef pair<iClient*, time_t>	ipLRecentIauthPairType;
 
 	typedef list<ipLRecentIauthPairType>	ipLRecentIauthListType;
 
@@ -1262,6 +1262,8 @@ protected:
 	bool			StdCloneChecksDisabled;
 
 	time_t			dbConnectionTimer;
+
+	time_t			iauthTimeout;
 
 	string			AnnounceNick;
 

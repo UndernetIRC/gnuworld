@@ -87,3 +87,6 @@ AnnounceNick = A
 # Useful if you intend to use the LIMITS command
 StdCloneChecksDisabled = 1
 
+# Timeout for considering that a connect attempt via iauth was unsuccessful
+# (used for clones)
+iauthTimeout = 30
