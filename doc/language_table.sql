@@ -3006,7 +3006,7 @@ COPY "translations" FROM stdin;
 22	10	%s: You are not aboard that deathstar	31337	0
 22	11	%s is already a dark sider in %s	31337	0
 22	12	%s is already a storm trooper in %s	31337	0
-22	13	The power of the dark side you know not, therefore you're annihilated  by %s (%s) on %	31337	0
+22	13	The power of the dark side you know not, therefore you're annihilated  by %s (%s) on %s	31337	0
 22	14	I find your lack of faith disturbing, you're demoted from storm trooper by %s (%s) on %s	31337	0
 22	15	%s is not dark sided in %s	31337	0
 22	16	%s is not a storm trooper in %s	31337	0
