@@ -575,6 +575,7 @@ ccIpLisp::ccIpLisp(dbHandle* _SQLDb)
 	email = "N/A";
 	clonecidr = 64;
 	forcecount = 0;
+	glunidented = 0;
 }
 
 
@@ -604,7 +605,7 @@ ccIpLnb::~ccIpLnb()
 int ccIpLisp::loadData(const string& Name)
 {
 int i = 0;
-static const char Main[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,isgroup,maxidentlimit FROM ipLISPs WHERE name = '";
+static const char Main[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,glunidented,isgroup,maxidentlimit FROM ipLISPs WHERE name = '";
 
 if((!dbConnected) || !(SQLDb))
 	{
@@ -641,8 +642,9 @@ setActive(atoi(SQLDb->GetValue(i,7).c_str()));
 setEmail(SQLDb->GetValue(i,8));
 setCloneCidr(atoi(SQLDb->GetValue(i,9).c_str()));
 setForcecount(atoi(SQLDb->GetValue(i,10).c_str()));
-setGroup(atoi(SQLDb->GetValue(i,11).c_str()));
-setIdentLimit(atoi(SQLDb->GetValue(i,12).c_str()));
+setGlunidented(atoi(SQLDb->GetValue(i,11).c_str()));
+setGroup(atoi(SQLDb->GetValue(i,12).c_str()));
+setIdentLimit(atoi(SQLDb->GetValue(i,13).c_str()));
 
 theQuery.str("");
 
@@ -677,6 +679,8 @@ theQuery	<< Main
 		<< clonecidr
 		<< ", forcecount = "
 		<< forcecount
+		<< ", glunidented = "
+		<< glunidented
 		<< ", isgroup = "
 		<< group
 		<< ", lastmodby = '"
@@ -710,7 +714,7 @@ else
 
 bool ccIpLisp::Insert()
 {
-static const char *quer = "INSERT INTO ipLISPs(name,maxlimit,maxidentlimit,addedby,addedon,lastmodby,lastmodon,email,clonecidr,forcecount,isgroup) VALUES ('";
+static const char *quer = "INSERT INTO ipLISPs(name,maxlimit,maxidentlimit,addedby,addedon,lastmodby,lastmodon,email,clonecidr,forcecount,glunidented,isgroup) VALUES ('";
 
 if(!dbConnected)
 	{
@@ -729,6 +733,7 @@ query		<< quer
 		<< ",'" << ccontrol::removeSqlChars(email)
 		<< "'," << clonecidr
 		<< "," << forcecount
+		<< "," << glunidented
 		<< "," << group
 		<< ")" << ends;
 

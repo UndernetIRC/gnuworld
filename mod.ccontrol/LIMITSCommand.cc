@@ -201,6 +201,46 @@ else if(!strcasecmp(st[1].c_str(),"group"))
 	else
 		bot->Notice(theClient,"group for %s is now %sabled", IpLisp->getName().c_str(), res ? "en" : "dis");
 	}
+else if(!strcasecmp(st[1].c_str(),"glunidented"))
+	{
+	if(st.size() < 4) 
+		{
+		bot->Notice(theClient,"SYNTAX: GLUNIDENTED <isp> <yes|no>");
+		return true;
+		}
+	if(st[2].size() > 32)
+		{
+		bot->Notice(theClient,"Isp can't exceed 32 characters");
+		return true;
+		}
+	IpLisp = bot->getIpLisp(st[2]);
+	
+	if (IpLisp == 0)
+		{
+		bot->Notice(theClient,"Isp not found.");
+		return true;
+		}
+	int res;
+	if (!strcasecmp(st[3].c_str(), "yes"))
+		res = 1;
+	else if (!strcasecmp(st[3].c_str(), "no"))
+		res = 0;
+	else 
+		{
+		bot->Notice(theClient,"must be yes or no");
+		return true;
+		}
+	IpLisp->setGlunidented(res);
+	IpLisp->setModOn(::time(0));
+	IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+	bot->reloadIpLisp(theClient, IpLisp);
+	if (!IpLisp->updateData()) 
+		{
+		bot->Notice(theClient, "SQL insertion failed.");
+		}
+	else
+		bot->Notice(theClient,"glunidented for %s is now %sabled", IpLisp->getName().c_str(), res ? "en" : "dis");
+	}
 else if(!strcasecmp(st[1].c_str(),"forcecount"))
 	{
 	if(st.size() < 4) 

@@ -1,5 +1,8 @@
 -- "$Id: ccontrol.sql,v 1.34 2009/07/25 18:12:33 hidden1 Exp $"
 
+-- 2019-06-29: Hidden
+-- Modified ipLISPs table for unidented glines
+
 -- 2016-04-17 : Hidden
 -- Added Single Sign On + /oper anywhere support
 
@@ -179,6 +182,7 @@ CREATE TABLE ipLISPs (
         maxlimit int4 NOT NULL DEFAULT 0,
         maxidentlimit int4 NOT NULL DEFAULT 0,
 	forcecount int4 NOT NULL DEFAULT 0,
+	glunidented int4 NOT NULL DEFAULT 0,
         active int4 NOT NULL DEFAULT 1,
         isgroup int4 NOT NULL DEFAULT 0,
         addedby VARCHAR(200) NOT NULL,

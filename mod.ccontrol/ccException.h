@@ -269,6 +269,9 @@ public:
 	inline bool		isActive() const
 		{ return (active == 1 ? true : false); }
 
+	inline bool		isGlunidented() const
+		{ return (glunidented == 1 ? true : false); }
+
 	inline bool		isForcecount() const
 		{ return (forcecount == 1 ? true : false); }
 
@@ -344,6 +347,9 @@ public:
 	inline void 	setActive( const int _active) 
 		{ active = _active; }
 
+	inline void 	setGlunidented( const int _glunidented) 
+		{ glunidented = _glunidented; }
+
 	inline void 	setForcecount( const int _forcecount) 
 		{ forcecount = _forcecount; }
 
@@ -376,6 +382,7 @@ protected:
 	
 	int		id;
 	int		forcecount;
+	int		glunidented;
 	int		v6;
 	int		group;
 	string 		Name;
