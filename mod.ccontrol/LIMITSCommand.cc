@@ -506,7 +506,7 @@ else if(!strcasecmp(st[1].c_str(),"delnetblock"))
 		{
 		if(bot->delIpLnb(theClient,st[2],st[3], false))
 			{
-			bot->Notice(theClient,"Successfully deleted netblock '%s'",st[2].c_str());
+			bot->Notice(theClient,"Successfully deleted netblock '%s'",st[3].c_str());
 			}
 		}
 
