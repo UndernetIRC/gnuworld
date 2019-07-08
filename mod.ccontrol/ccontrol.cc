@@ -2621,6 +2621,9 @@ CClonesCIDR << " (will GLINE): *@";
 						}
 						// ~*@ip gline
 						else if (rs.type == 'd') {
+							sprintf(Log,"Glining ~*@%s for unidented connections [ref: %s's %s]",
+								tIP.c_str(), 
+								nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
 							sprintf(GlineMask,"~*@%s", tIP.c_str());
 							//elog << "setting GlineMask to " << GlineMask << ", tIP = " << tIP << endl;
 						}
