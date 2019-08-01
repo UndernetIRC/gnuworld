@@ -6871,7 +6871,7 @@ theLog	<< "INSERT INTO channellog (ts, channelID, event, message, "
  	<< "'["
 	<< nickName
 	<< "]: "
-	<< theClient->getNickUserHost()
+	<< escapeSQLChars(theClient->getNickUserHost())
 	<< " (" << userExtra << ") "
 	<< escapeSQLChars(theMessage)
 	<< "', "
