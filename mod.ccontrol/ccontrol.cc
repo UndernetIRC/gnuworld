@@ -8455,13 +8455,18 @@ bool ipLRetVal = isIpLClientAllowed(newClient, retList, true);
 
 string response;
 if (ipLRetVal) {
-	ipLRecentIauthList.push_back(ipLRecentIauthListType::value_type(newClient, ::time(0))); 
+	/* Disabling ipLRecentIauthList as of 2019-08-12
+	 * There's a lot of other unused code some other place which now
+	 * becomes useless. Still, not commenting that code as of today. -Hidden
+	 */
+	//ipLRecentIauthList.push_back(ipLRecentIauthListType::value_type(newClient, ::time(0))); 
 	response = " :OK";
 }
 else {
 	response = " :NO Connection limit exceeded";
-	ipLDropClient(newClient);
+	//ipLDropClient(newClient);
 }
+ipLDropClient(newClient);
 std::stringstream ss;
 ss << getUplink()->getCharYY() << " XR " << theServer->getCharYY()
 	<< " " << Routing << response;
