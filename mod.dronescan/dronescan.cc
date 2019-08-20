@@ -930,22 +930,23 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			}
 		if (isoktogline == true)
 			{ 
-			if ((glined.size() < 3) && (clientcount < 8))
-				{
-					if (glined.size() != 0) {
-					log(WARN,"Aborting glines for channel %s because only %d flooding clients from %d addresses were found",
-						itr->first.c_str(),clientcount,glined.size());
-					}
-				}  
+			/* Deactivating the gline abortion if too few clients flooding found */
+			//if ((glined.size() < 3) && (clientcount < 8))
+			//	{
+			//		if (glined.size() != 0) {
+			//		log(WARN,"Aborting glines for channel %s because only %d flooding clients from %d addresses were found",
+			//			itr->first.c_str(),clientcount,glined.size());
+			//		}
+			//	}
 #ifdef ENABLE_LOG4CPLUS
-				else {
+			//	else {
 				log(JF_GLINED,"Join flood over in %s. Total joins: %u. Total parts: %u. Total size: %d. Total addresses glined %d.",
 				itr->first.c_str(),
 				jChannel->getNumOfJoins(),
 				jChannel->getNumOfParts(),
 				(theChan == 0 ? 0 : theChan->size()),
 				glined.size());
-				}
+			//	}
 #endif
 			}
 		std::list<std::pair<glineData*,std::list<string> > >::iterator glinesIt = glined.begin();
