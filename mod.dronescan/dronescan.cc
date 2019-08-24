@@ -953,24 +953,9 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		for(; glinesIt != glined.end();++glinesIt)
 			{
 			glineData* curGline = glinesIt->first;
-			if ((glined.size() >= 3) || (clientcount >= 8))
-				{
-				/*
-				string IP = xIP(theClient->getIP()).GetNumericIP();
-				clientsIPFloodMapType::iterator tmpItr = clientsIPFloodMap.find(IP);
-				if (tmpItr != clientsIPFloodMap.end()) {
-					jcFloodClients* aptr = tmpItr->second;
-					clientsIPFloodMap.erase(tmpItr);
-					delete aptr;
-				}
-				IPJQueueType::iterator tmpItr2 = IPJQueue.begin();
-				for (; tmpItr2 != IPJQueue.end(); tmpItr2++) {
-					if (*tmpItr2 == IP) {
-						IPJQueue.erase(tmpItr2);
-						break;
-					}
-				}
-				*/
+			/* Deactivating the gline abortion if too few clients flooding found */
+			//if ((glined.size() >= 3) || (clientcount >= 8))
+			//	{
 				std::list<string>::iterator clientsIt = glinesIt->second.begin();
 #ifdef ENABLE_LOG4CPLUS
 				for(; clientsIt != glinesIt->second.end(); ++ clientsIt)
@@ -990,13 +975,14 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 				if (found_gline_in_queue == false) {
 					glineQueue.push_back(curGline);
 				}
-				} 
+				//} 
 			else {
 				delete curGline;
 				}
 			}
 
-		if ((glined.size() >= 3) || (clientcount >= 8))
+		/* Deactivating the gline abortion if too few clients flooding found */
+		//if ((glined.size() >= 3) || (clientcount >= 8))
 			log(WARN, "Glining %d floodbots from %d different ips", clientcount, glined.size());
 		}
 	
