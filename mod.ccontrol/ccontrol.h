@@ -25,14 +25,20 @@
 //Undef this if you want to log to the database
 #define LOGTOHD
 
-// If a server is >LAG_TOO_BIG ms lagged, report it to opers who have GetLag=ON set
-#define LAG_TOO_BIG 45
+// If a server is >MAX_LAG_TIME ms lagged, report it to opers who have GetLag=ON set
+#define MAX_LAG_TIME 45
 // Minimum Interval in seconds between lag reports for those with GetLag=ON
 #define LAG_REPORT_INTERVAL 300
-// Maximum time diff tolerated for a server's clock
+// Maximum time diff tolerated for a server's clock (for reporting in MsgChanLog)
 #define MAX_TIME_DIFF 120
 // Minimum Interval in seconds between Time diff reports
 #define TIMEDIFF_REPORT_INTERVAL 43200
+// Maximum time diff tolerated for a server's clock (for issuing a SETTIME)
+#define MAX_TIME_DIFF_FOR_SETTIME 4
+// Minimum Interval in seconds between SETTIMES for bad clocks
+#define TIMEDIFF_SETTIME_INTERVAL 1800
+// If a server is >MAX_LAG_TIME_FOR_SETTIME ms lagged, do NOT send SETTIME
+#define MAX_LAG_TIME_FOR_SETTIME 3000
 
 
 
@@ -279,7 +285,7 @@ protected:
 	
 	typedef badChannelsMapType::iterator badChannelsIterator;
 
-	typedef map<iServer*,int>	timediffServersMapType;
+	typedef map<string,int>	timediffServersMapType;
 	
 	timediffServersMapType timediffServersMap;
 

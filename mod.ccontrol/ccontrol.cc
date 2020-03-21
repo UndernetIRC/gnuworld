@@ -1277,7 +1277,7 @@ if(st.size() < 2)
 		time_t lagTime;
 		lagTime = (now.tv_sec - atoi(st[6])) * 1000 + (now.tv_usec - atoi(st[7])) / 1000;
 		elog << "ccontrol(rpingCheck)> DEBUG: RPONG from "
-			<< tmpServer->getNetServer().getName()
+			<< tmpServer->getNetServer()->getName()
 			<< " lag=" << lagTime
 			<< " lastLagRecv (before now)="
 			<< tmpServer->getLastLagRecv()
@@ -1285,7 +1285,7 @@ if(st.size() < 2)
 			<< endl;
 		tmpServer->setLagTime(lagTime);
 		tmpServer->setLastLagRecv(::time(0));
-		//if ((lagTime > LAG_TOO_BIG) && ((::time(0) - tmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)) {
+		//if ((lagTime > MAX_LAG_TIME) && ((::time(0) - tmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)) {
 		//	tmpServer->setLastLagReport(::time(0));
 		//	MsgChanLag("[lag] %s is %ds lagged", Server->getName().c_str(), (int) (lagTime / 1000));
 		//}
@@ -1323,12 +1323,17 @@ if(st.size() < 2)
 			}
 		int lagTime = tmpServer->getLagTime();
 		int timeDiff = abs(::time(0) - (atoi(st[3]) - atoi(st[4])));
-		if ((timeDiff >= MAX_TIME_DIFF) && (lagTime < 5000) && ((::time(0) - timediffServersMap[Server]) > TIMEDIFF_REPORT_INTERVAL))
+		if ((timeDiff >= MAX_TIME_DIFF) && (lagTime < 5000) && ((::time(0) - timediffServersMap[Server->getName()]) > TIMEDIFF_REPORT_INTERVAL))
 			{
 			MsgChanLog("Time diff for %s: %ds", tmpServer->getName().c_str(), timeDiff);
-			timediffServersMap[Server] = ::time(0);
+			timediffServersMap[Server->getName()] = ::time(0);
 			}
 		//MsgChanLog("Message: %s", Message.c_str());
+		if ((lagTime < MAX_LAG_TIME_FOR_SETTIME) && (timeDiff > MAX_TIME_DIFF_FOR_SETTIME) && ((::time(0) - timediffServersMap[Server->getName() + "$td"]) > TIMEDIFF_SETTIME_INTERVAL))
+			{
+			Write("%s SE %d %s", getCharYYXXX().c_str(), ::time(0), tmpServer->getNetServer()->getCharYY().c_str());
+			timediffServersMap[Server->getName() + "$td"] = ::time(0);
+			}
 		}
 
 if(!strcasecmp(st[1],"351"))
@@ -1852,6 +1857,7 @@ else if(timer_id == glineQueueCheck)
 	processGlineQueue();
 	glineQueueCheck = MyUplink->RegisterTimer(::time(0) + glineBurstInterval,this,NULL);	
 	}
+
 else if (timer_id == timeCheck)
 	{
 	ccServer* TmpServer;
@@ -1909,7 +1915,7 @@ else if (timer_id == rpingCheck)
 				{
 				if ((::time(0) - TmpServer->getLastLagSent()) >= 2)
 					TmpServer->setLagTime((::time(0) - TmpServer->getLastLagSent()) * 1000);
-				if ((::time(0) - TmpServer->getLastLagSent()) >= LAG_TOO_BIG)
+				if ((::time(0) - TmpServer->getLastLagSent()) >= MAX_LAG_TIME)
 					{
 					if ((::time(0) - TmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)
 						{
@@ -1942,7 +1948,7 @@ else if (timer_id == rpingCheck)
 			Write("%s RI %s %s %d %s :%d %s", getCharYY().c_str(), TmpServer->getNetServer()->getCharYY().c_str(), getCharYYXXX().c_str(), ::time(0), s.str().c_str(), ::time(0), s.str().c_str());
 			TmpServer->setLastLagSent(::time(0));
 			elog << "ccontrol(rpingCheck)> DEBUG: Sending RPING to "
-				<< TmpServer->getNetServer().getName()
+				<< TmpServer->getNetServer()->getName()
 				<< " " << ::time(0)
 				<< endl;
 
