@@ -5260,13 +5260,19 @@ switch( theEvent )
 		 */
 		if (tmpUser->isModeR())
 		{
-			/* Lookup this user account, if its not there.. trouble */
-			sqlUser* theUser = getUserRecord(tmpUser->getAccount());
-			if (theUser)
+			iServer* tmpServer = Network->findServer(tmpUser->getIntYY());
+			if ((this->getUplink()->isBursting()) || (tmpServer->isBursting()))
 			{
-				newData->currentUser = theUser;
-				theUser->addAuthedClient(tmpUser);
+				/* Lookup this user account, if its not there.. trouble */
+				sqlUser* theUser = getUserRecord(tmpUser->getAccount());
+				if (theUser)
+				{
+					newData->currentUser = theUser;
+					theUser->addAuthedClient(tmpUser);
+				}
 			}
+			else
+				doCommonAuth(tmpUser);
 		}
 		break;
 		} // case EVT_NICK
