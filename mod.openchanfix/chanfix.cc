@@ -3602,12 +3602,12 @@ int chanfix::getNewScore( sqlChanOp* chOp, time_t oldestTS )
     int daysSinceFirstOpOnChan = (currentTime() - oldestTS) / 86400;
     int daysSinceFirstOp = (currentTime() - chOp->getTimeFirstOpped()) / 86400;
     
-    int x = 0;
+    double x;
     
     if (daysSinceFirstOpOnChan < 30)
-       x = 100;
+       x = 100.0;
     else
-       x = 3000 / daysSinceFirstOpOnChan;
+       x = 3000.0 / daysSinceFirstOpOnChan;
     
     /* GET NEW SCORE */
     int newScore = (x * daysSinceFirstOp);
