@@ -1325,7 +1325,8 @@ if(st.size() < 2)
 		int timeDiff = abs(::time(0) - (atoi(st[3]) - atoi(st[4])));
 		if ((timeDiff >= MAX_TIME_DIFF) && (lagTime < 5000) && ((::time(0) - timediffServersMap[Server->getName()]) > TIMEDIFF_REPORT_INTERVAL))
 			{
-			MsgChanLog("Time diff for %s: %ds", tmpServer->getName().c_str(), timeDiff);
+			//MsgChanLog("Time diff for %s: %ds", tmpServer->getName().c_str(), timeDiff);
+			Wallops("Time diff for %s: %ds", tmpServer->getName().c_str(), timeDiff);
 			timediffServersMap[Server->getName()] = ::time(0);
 			}
 		//MsgChanLog("Message: %s", Message.c_str());
