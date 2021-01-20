@@ -655,7 +655,7 @@ RegisterCommand( new SHELLSCommand( this, "SHELLS",
 	operLevel::OPERLEVEL,
 	true ) ) ;
 RegisterCommand( new LIMITSCommand( this, "LIMITS",
-	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chilimit / chname / chemail / forcecount / glunidented / active / group / chccidr / clearall / userinfo)",
+	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chilimit / chname / chemail / forcecount / glunidented / active / group / chccidr / clearall / userinfo / info)",
 	true,
 	commandLevel::flg_LIMITS,
 	false,
@@ -7437,29 +7437,48 @@ return 0;
 
 bool ccontrol::listIpLExceptions( iClient *theClient )
 {
+listIpLExceptions(theClient, "", false);
+}
 
-Notice(theClient,"-= ISP list - listing a total of %d ISPs =-",
-	ipLispVector.size());
+bool ccontrol::listIpLExceptions( iClient *theClient, const string& ispName, bool listEmail )
+{
+
+if (ispName == "")
+	Notice(theClient,"-= ISP list - listing a total of %d ISPs =-",
+		ipLispVector.size());
 
 for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++) {
 	ccIpLisp* isp = *ptr;
 	int i = 0;
 	bool multiple_lines = false;
 
+	if (ispName != "") {
+		isp = getIpLisp(ispName);
+		if (!isp) {
+			Notice(theClient, "No ISP found with name: %s", ispName.c_str());
+			return true;
+		}
+		else
+			Notice(theClient,"-= ISP info for: %s =-", isp->getName().c_str());
+	}
+
 	stringstream s;
 	string str1("");
+	string email("");
 	if (!isp->isActive())
 		str1 = " [NO G]";
 	if (isp->isForcecount())
 		str1 += " [fcount]";
 	if (isp->isGlunidented())
 		str1 += " [glunidented]";
+	if ((listEmail) || (ispName != ""))
+		email = isp->getEmail();
 	if (isp->isGroup()) {
 		str1 += " [group]";
-		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "   Limit: " << isp->getLimit() << " total    Netblocks: ";
+		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "  " << email << "    Limit: " << isp->getLimit() << " total    Netblocks: ";
 	}
 	else
-		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "   Limit: " << isp->getLimit() << " per /" << isp->getCloneCidr() << "    Netblocks: ";
+		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "  " << email << "    Limit: " << isp->getLimit() << " per /" << isp->getCloneCidr() << "    Netblocks: ";
 
 
 	for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++) {
@@ -7480,9 +7499,14 @@ for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++
 	if ((i != 0) || (multiple_lines == false)) {
 		Notice(theClient, "%s", s.str().c_str());
 	}
+	if (ispName != "")
+		break;
 }
 
-Notice(theClient,"-= End of isp list =-");
+if (ispName == "")
+	Notice(theClient,"-= End of isp list =-");
+else
+	Notice(theClient,"-= End of isp info =-");
 
 return true;
 }

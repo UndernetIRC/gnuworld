@@ -56,7 +56,20 @@ if(st.size() < 2)
 bot->MsgChanLog("LIMITS %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[1].c_str(),"list"))
 	{
-	bot->listIpLExceptions(theClient);
+	bool listEmail = false;
+	if ((st.size() > 2) && (!strcasecmp(st[2].c_str(), "-e"))) {
+		listEmail = true;
+	}
+	bot->listIpLExceptions(theClient, "", listEmail);
+	return true;
+	}
+if(!strcasecmp(st[1].c_str(),"info"))
+	{
+	if (st.size() < 3) {
+		bot->Notice(theClient,"SYNTAX: info <isp>");
+		return true;
+	}
+	bot->listIpLExceptions(theClient, st[2], true);
 	return true;
 	}
 else if(!strcasecmp(st[1].c_str(),"addisp"))
@@ -90,7 +103,7 @@ else if(!strcasecmp(st[1].c_str(),"addisp"))
 
 	else
 		{
-		string email = (st.size() >= 5 ? st[4] : "none@available");
+		string email = (st.size() > 5 ? st[5] : "none@available");
 		if(bot->insertIpLisp(theClient,st[2],atoi(st[3].c_str()),atoi(st[4].c_str()),email, 1, 0))
 			{
 			bot->Notice(theClient,"Successfully added isp '%s' for %d connections per /%d"
@@ -160,6 +173,36 @@ else if(!strcasecmp(st[1].c_str(),"active"))
 		}
 	else
 		bot->Notice(theClient,"G-lines on %s %sactivated", IpLisp->getName().c_str(), res ? "" : "de");
+	}
+else if(!strcasecmp(st[1].c_str(),"chemail"))
+	{
+	if(st.size() < 4)
+		{
+		bot->Notice(theClient,"SYNTAX: CHEMAIL <isp> <new email>");
+		return true;
+		}
+	if(st[2].size() > 32)
+		{
+		bot->Notice(theClient,"Isp can't exceed 32 characters");
+		return true;
+		}
+	IpLisp = bot->getIpLisp(st[2]);
+
+	if (IpLisp == 0)
+		{
+		bot->Notice(theClient,"Isp not found.");
+		return true;
+		}
+	IpLisp->setEmail(st[3]);
+	IpLisp->setModOn(::time(0));
+	IpLisp->setModBy(ccontrol::removeSqlChars(theClient->getRealNickUserHost()));
+	bot->reloadIpLisp(theClient, IpLisp);
+	if (!IpLisp->updateData())
+		{
+		bot->Notice(theClient, "SQL insertion failed.");
+		}
+	else
+		bot->Notice(theClient,"Email for %s set to: %s", IpLisp->getName().c_str(), st[3].c_str());
 	}
 else if(!strcasecmp(st[1].c_str(),"group"))
 	{
