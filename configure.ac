@@ -184,55 +184,38 @@ dnl an alternate install location, use that instead.
 
 dnl Prepare to capture the user's input for the location of a pgsql
 dnl installation.
-pgsql_home=""
-pgsql_includedir="."
-pgsql_libdir="."
-AC_ARG_WITH(pgsql-home,
-	AC_HELP_STRING([--with-pgsql-home=PGSQLHOMEDIR],
-			[Specify home directory for PGSQL, default is \
-/usr/local/lib/pgsql]),
-	[pgsql_home=$withval]
+AC_ARG_WITH(pgconfig,
+	AC_HELP_STRING([--with-pgconfig=FILE],
+			[Specify an alternate pg_config location.]),
+	[pg_config_binary=$withval], [pg_config_binary=""]
 )
 
-dnl If the user specified an install location, store the CXXFLAGS and
-dnl LIBS for restoring later. Add the user's install location to
-dnl the CXXFLAGS (for include directory) and LIBS (for library directory).
-dnl This is a pretty clear indication that I have no idea
-dnl what I am doing.
-tmpcxxflags="$CXXFLAGS"
-tmpcppflags="$CPPFLAGS"
-tmplibs="$LIBS"
-if [ test "$pgsql_home" != "" ]; then
-	dnl User provided a home directory
-	dnl Set these next two variables for the AC_CHECK_LIB and
-	dnl AC_CHECK_HEADER used below.
-	CXXFLAGS="$CXXFLAGS -I$pgsql_home/include"
-	CPPFLAGS="$CPPFLAGS -I$pgsql_home/include"
-	LIBS="$LIBS -L$pgsql_home/lib"
 
-	pgsql_includedir="$pgsql_home/include"
-	pgsql_libdir="$pgsql_home/lib"
+if test "x$pg_config_binary" = "x"; then
+	dnl pg_config was not specified; search for it it in PATH.
+	AC_PATH_PROG([pg_config_binary], [pg_config])
 
-	dnl Since the user specified the directory, record the
-	dnl include directory for libpq-fe.h using a bit of a cheat.
-	tmpcxxflags="$tmpcxxflags -I$pgsql_includedir"
-	tmpcppflags="$tmpcppflags -I$pgsql_includedir"
+	if test "x$pg_config_binary" = "x"; then
+		AC_MSG_ERROR([Could not find pg_config. Ensure that PostgreSQL is installed, or specify pg_config location using --with-pgconfig.])
+	fi
+elif test -f $pg_config_binary; then
+	AC_MSG_RESULT([Using pg_config: $pg_config_binary])
+else
+	AC_MSG_ERROR([pg_config file $pg_config_binary does not exist])
 fi
+
+pgsql_includedir=$($pg_config_binary --includedir)
+pgsql_libdir=$($pg_config_binary --libdir)
+
+CXXFLAGS="$CXXFLAGS -I$pgsql_includedir"
+CPPFLAGS="$CPPFLAGS -I$pgsql_includedir"
+LIBS="$LIBS -L$pgsql_libdir"
 
 dnl Check for the pgsql library and header file.
 dnl Need to generalize when mysql support is added.
 AC_CHECK_LIB(pq, PQconnectdb)
 AC_CHECK_HEADER([libpq-fe.h])
 AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
-
-dnl Everything seemed to work, pgsql located.
-dnl Restore the original CXXFLAGS and LIBS. The db library will
-dnl link against pgsql_lib (which is empty if using system default),
-dnl and will include pgsql_include (again, which is empty if using
-dnl system default installation).
-CXXFLAGS="$tmpcxxflags"
-CPPFLAGS="$tmpcppflags"
-LIBS="$tmplibs"
 
 dnl Enable log4cplus if required
 AC_ARG_WITH(log4cplus,

@@ -669,6 +669,7 @@ COND_MODCCONTROL_FALSE
 COND_MODCCONTROL_TRUE
 HAVE_CXX11
 BOOST_THREAD_LIB
+pg_config_binary
 COND_TESTDIR_FALSE
 COND_TESTDIR_TRUE
 COND_PCRE_FALSE
@@ -820,7 +821,7 @@ with_test
 with_pedantic
 with_optimization
 with_prof
-with_pgsql_home
+with_pgconfig
 with_log4cplus
 with_log4cplus_lib
 with_log4cplus_include
@@ -1495,9 +1496,7 @@ Optional Packages:
   --with-pedantic         Add -pedantic to compile options
   --with-optimization     Optimize the executables
   --with-prof             Generate profiling information
-  --with-pgsql-home=PGSQLHOMEDIR
-                          Specify home directory for PGSQL, default is
-                          /usr/local/lib/pgsql
+  --with-pgconfig=FILE    Specify an alternate pg_config location.
   --with-log4cplus        Check log4cplus, if not enabled some modules may not
                           have logging support
   --with-log4cplus-lib=LOG4CPLUSLIBDIR
@@ -16211,31 +16210,75 @@ fi
 
 
 
-pgsql_home=""
-pgsql_includedir="."
-pgsql_libdir="."
 
-# Check whether --with-pgsql-home was given.
-if test "${with_pgsql_home+set}" = set; then :
-  withval=$with_pgsql_home; pgsql_home=$withval
+# Check whether --with-pgconfig was given.
+if test "${with_pgconfig+set}" = set; then :
+  withval=$with_pgconfig; pg_config_binary=$withval
+else
+  pg_config_binary=""
 
 fi
 
 
-tmpcxxflags="$CXXFLAGS"
-tmpcppflags="$CPPFLAGS"
-tmplibs="$LIBS"
-if  test "$pgsql_home" != "" ; then
-				CXXFLAGS="$CXXFLAGS -I$pgsql_home/include"
-	CPPFLAGS="$CPPFLAGS -I$pgsql_home/include"
-	LIBS="$LIBS -L$pgsql_home/lib"
 
-	pgsql_includedir="$pgsql_home/include"
-	pgsql_libdir="$pgsql_home/lib"
+if test "x$pg_config_binary" = "x"; then
+		# Extract the first word of "pg_config", so it can be a program name with args.
+set dummy pg_config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_pg_config_binary+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $pg_config_binary in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_pg_config_binary="$pg_config_binary" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_pg_config_binary="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
 
-			tmpcxxflags="$tmpcxxflags -I$pgsql_includedir"
-	tmpcppflags="$tmpcppflags -I$pgsql_includedir"
+  ;;
+esac
 fi
+pg_config_binary=$ac_cv_path_pg_config_binary
+if test -n "$pg_config_binary"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pg_config_binary" >&5
+$as_echo "$pg_config_binary" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+	if test "x$pg_config_binary" = "x"; then
+		as_fn_error $? "Could not find pg_config. Ensure that PostgreSQL is installed, or specify pg_config location using --with-pgconfig." "$LINENO" 5
+	fi
+elif test -f $pg_config_binary; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Using pg_config: $pg_config_binary" >&5
+$as_echo "Using pg_config: $pg_config_binary" >&6; }
+else
+	as_fn_error $? "pg_config file $pg_config_binary does not exist" "$LINENO" 5
+fi
+
+pgsql_includedir=$($pg_config_binary --includedir)
+pgsql_libdir=$($pg_config_binary --libdir)
+
+CXXFLAGS="$CXXFLAGS -I$pgsql_includedir"
+CPPFLAGS="$CPPFLAGS -I$pgsql_includedir"
+LIBS="$LIBS -L$pgsql_libdir"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PQconnectdb in -lpq" >&5
 $as_echo_n "checking for PQconnectdb in -lpq... " >&6; }
@@ -16291,10 +16334,6 @@ fi
 
 $as_echo "#define HAVE_PGSQL /**/" >>confdefs.h
 
-
-CXXFLAGS="$tmpcxxflags"
-CPPFLAGS="$tmpcppflags"
-LIBS="$tmplibs"
 
 
 # Check whether --with-log4cplus was given.
