@@ -147,7 +147,7 @@ class nickserv : public xClient, public logging::logTarget {
      *******************************/
 
     /** Holds a reference to our Stats collector */
-    Stats::Stats* theStats;
+    gnuworld::Stats* theStats;
 
     /** Holds a reference to our Logger instance */
     logging::Logger* theLogger;
