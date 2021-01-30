@@ -304,11 +304,12 @@ if( ptr == customDataMap->end() )
 
 // Yes, we found this xClient's data element.  Remove it from
 // the customDataMap
+void* data = ptr->second ;
 customDataMap->erase( ptr ) ;
 
 // The customDataMap may now be empty, but let it remain allocated.
 // Return the data element
-return ptr->second ;
+return data ;
 }
 
 bool iClient::addChannel( Channel* theChan )

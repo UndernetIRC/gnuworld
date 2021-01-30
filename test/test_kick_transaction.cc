@@ -189,11 +189,15 @@ for( ; (kItr != kickMap.end()) && (kItr->first == st[ 0 ]) ; ++kItr )
 void pruneKickMap( size_t age )
 {
 for( kickMapType::iterator kItr = kickMap.begin() ;
-	kItr != kickMap.end() ; ++kItr )
+	kItr != kickMap.end() ; )
 	{
 	if( kItr->second.lineNumber <= age )
 		{
-		kickMap.erase( kItr ) ;
+		kItr = kickMap.erase( kItr ) ;
+		}
+	else
+		{
+		++kItr ;
 		}
 	}
 }
