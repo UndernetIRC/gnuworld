@@ -57,7 +57,8 @@ if(Param[2][0] == '+')
 	SName = SName.substr(1);
 	std::string CTime = Param[4];
 	unsigned int intYY = 0;
-	char *temp = new char[2];
+	char temp[3];
+	temp[2] = '\0';
 	if (!Network->allocateServerNumeric(intYY))
 		{
 		elog << "msg_JU> Error while allocating server numeric!"
