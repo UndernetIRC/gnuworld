@@ -152,7 +152,8 @@ CREATE TABLE pending_emailchanges (
 	user_id INT4 NOT NULL,
 	old_email VARCHAR(255) NOT NULL,
 	new_email VARCHAR(255) NOT NULL,
-	expiration INT4 NOT NULL
+	expiration INT4 NOT NULL,
+	phase INT4 NOT NULL
 );
 
 CREATE INDEX pending_emailchanges_cookie_idx ON pending_emailchanges(cookie);
