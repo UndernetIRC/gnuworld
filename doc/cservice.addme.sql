@@ -22,7 +22,7 @@ INSERT into channels (name,flags,channel_ts,registered_ts,last_updated)
 VALUES ('#coder-com',1,now()::abstime::int4,31337,now()::abstime::int4);
 
 INSERT into users (user_name,password,language_id,last_updated) 
-VALUES ('Admin','07d976a29bdb3ff42e19c102852151b28097bbad',1,now()::abstime::int4);
+VALUES ('Admin','xEDi1V791f7bddc526de7e3b0602d0b2993ce21d',1,now()::abstime::int4);
 
 --INSERT into users_lastseen (user_id,last_seen,last_updated) 
 --VALUES (1,now()::abstime::int4,now()::abstime::int4);
