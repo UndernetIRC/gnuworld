@@ -4,7 +4,7 @@
 --
 -- This script will reigster the admin channel * 
 -- And will create an admin by the name of Admin  
--- with pass : temPass And access level 1000
+-- with pass : temPass2020@ And access level 1000
 -- Note this script assumes that you didnt add any users/channels to the db
 --
 --
