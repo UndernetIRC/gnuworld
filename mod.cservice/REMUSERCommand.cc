@@ -148,6 +148,15 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
                 return false;
 	}
 
+	if ((targetLevel == 500) && (targetUser == theUser))
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::cant_rem_owner_self,
+				string("You can't remove yourself from a channel you own")));
+		return false;
+	}
+
 	if ((level <= targetLevel) && (targetUser != theUser))
 	{
 		bot->Notice(theClient,
@@ -157,15 +166,6 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 		return false;
 	}
 
-
-	if ((targetLevel == 500) && (targetUser == theUser))
-	{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::cant_rem_owner_self,
-				string("You can't remove yourself from a channel you own")));
-		return false;
-	}
 
 
 	/*
