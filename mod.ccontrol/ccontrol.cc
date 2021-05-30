@@ -3771,6 +3771,7 @@ vsprintf( buffer, Msg, list ) ;
 va_end( list ) ;
 
 xClient::Notice((Network->findChannel(limitsChan))->getName(),"%s",buffer);
+return true;
 }
 
 bool ccontrol::MsgChanLog(const char *Msg, ... ) 
