@@ -8550,8 +8550,9 @@ else {
 		std::stringstream ss;
 		ipLretStruct r = *Itr;
 		ccIpLnb* nb = r.nb;
-		ss << "R(" << r.type << "): " << IP << " - " << r.mask << " (" << r.count << "/" << r.limit << ")" << " - ref: " << nb->getIpLisp()->getName() << "'s " << nb->getCidr();
-		MsgChanLimits("%s", ss.str().c_str());
+		MsgChanLimits("R(%c): %s - %s (%d/%d) - ref: %s's %s", r.type, IP.c_str(), r.mask.c_str(), r.count, r.limit, nb->getIpLisp()->getName().c_str(), nb->getCidr().c_str());
+		//ss << "R(" << r.type << "): " << IP << " - " << r.mask << " (" << r.count << "/" << r.limit << ")" << " - ref: " << nb->getIpLisp()->getName() << "'s " << nb->getCidr();
+		//MsgChanLimits("%s", ss.str().c_str());
 	}
 	//ipLDropClient(newClient);
 }
