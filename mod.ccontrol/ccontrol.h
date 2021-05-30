@@ -641,6 +641,8 @@ public:
 
 	bool MsgChanLag( const char * , ... ) ;
 
+	bool MsgChanLimits( const char * , ... ) ;
+
 	/**
 	 * This method logs the commands to the database 
 	 * for lastcom report
@@ -1162,6 +1164,13 @@ protected:
 	 * This is also an oper chan.
 	 */
 	string			msgChan ;
+
+	/**
+	 * The name of the channel to which to send network events
+	 * for limits debugging purposes (rejected clients)
+	 * This is also an oper chan.
+	 */
+	string			limitsChan ;
 
 	/**
 	 * The modes to enforce in an oper channel.

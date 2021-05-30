@@ -216,6 +216,16 @@ while( ptr != conf.end() && ptr->first == "operchan" )
 	}
 
 // Read out the client's message channel
+limitsChan = conf.Find( "limitschan" )->second ;
+
+// Make sure that the limitsChan is in the list of operchans
+if( operChans.end() == find( operChans.begin(), operChans.end(), limitsChan ) )
+	{
+	// Not found, add it to the list of operChans
+	operChans.push_back( limitsChan ) ;
+	}
+
+// Read out the client's message channel
 msgChan = conf.Find( "msgchan" )->second ;
 
 // Make sure that the msgChan is in the list of operchans
@@ -986,7 +996,7 @@ return true ;
 
 void ccontrol::BurstChannels()
 {
-// msgChan is an operChan as well, no need to burst it separately
+// msgChan and limitsChan are operChan as well, no need to burst them separately
 for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
 	{
 	// Burst our channels
@@ -3744,6 +3754,23 @@ struct tm* Now = gmtime(tNow);
 char *ATime = asctime(Now);
 ATime[strlen(ATime)-1] = '\0';
 return ATime;
+}
+
+bool ccontrol::MsgChanLimits(const char *Msg, ... ) 
+{
+if(!Network->findChannel(limitsChan))
+	{
+	return false;
+	}
+
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start( list, Msg ) ;
+vsprintf( buffer, Msg, list ) ;
+va_end( list ) ;
+
+xClient::Notice((Network->findChannel(limitsChan))->getName(),"%s",buffer);
 }
 
 bool ccontrol::MsgChanLog(const char *Msg, ... ) 
@@ -8518,6 +8545,14 @@ if (ipLRetVal) {
 }
 else {
 	response = " :NO Connection limit exceeded";
+
+	for (ipLretStructListType::const_iterator Itr = retList.begin(); Itr != retList.end(); Itr++) {
+		std::stringstream ss;
+		ipLretStruct r = *Itr;
+		ccIpLnb* nb = r.nb;
+		ss << "R(" << r.type << "): " << IP << " - " << r.mask << " (" << r.count << "/" << r.limit << ")" << " - ref: " << nb->getIpLisp()->getName() << "'s " << nb->getCidr();
+		MsgChanLimits("%s", ss.str().c_str());
+	}
 	//ipLDropClient(newClient);
 }
 ipLDropClient(newClient);

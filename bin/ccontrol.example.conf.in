@@ -29,6 +29,10 @@ operchan = #valhalla
 # msgchan is also an operchan
 msgchan = #gnuworld.message
 
+# limitsChan is also an operchan, but used for debugging rejected connections.
+# It should be commented most of the time
+#limitsChan = #gnuworld.limitsdebug
+
 # Default gline length (in seconds)
 glength = 3600
 
