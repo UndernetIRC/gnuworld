@@ -219,7 +219,7 @@ public:
 	/**
 	 * Return the last error seen by the module system.
 	 */
-	inline const std::string& getLastError() const
+	inline const char* getLastError() const
 		{ return ::lt_dlerror(); }
 
 	/**
