@@ -48,6 +48,7 @@ bot->incStat("COMMANDS.NEWPASS");
 
 #ifndef USE_NEWPASS
 bot->Notice(theClient, "To change your account password, please use the web interface.");
+(void)Message; (void)validChars;
 return true;
 #else
 
