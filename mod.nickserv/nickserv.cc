@@ -282,6 +282,7 @@ iClient* theClient = static_cast< iClient* >( Data1 );
 
 switch( event ) {
   case EVT_KILL: theClient = static_cast< iClient* >( Data2 );
+    /* fall through */
   case EVT_QUIT: {
     netData* theData = static_cast< netData* >( theClient->removeCustomData(this) );
     delete theData;
@@ -550,7 +551,7 @@ for(QueueType::iterator queuePos = warnQueue.begin(); queuePos != warnQueue.end(
     continue;
   } else {
     Notice(theClient, "You are using a registered nickname. Please login or you will be disconnected.");
-    theData->warned++;
+    theData->warned = true;
     theStats->incStat("NS.WARN");
     theLogger->log(logging::events::E_INFO, "Warned: (" +
       theClient->getCharYYXXX() + ") " + theClient->getNickName());
