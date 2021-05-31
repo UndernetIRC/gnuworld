@@ -792,7 +792,7 @@ PostEvent(EVT_NETBREAK,
 	static_cast<void*>(&nreason));
 
          
-iServer* theServer = Network->removeServerName( serverName ) ;
+iServer* theServer = Network->removeServer( tmpServer->getIntYY(), true ) ;
 if( NULL == theServer )
 	{
 	// The server doesn't exist.
