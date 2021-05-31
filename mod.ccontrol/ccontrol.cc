@@ -6050,7 +6050,7 @@ if(LogInfo->getLogins() > 5)
 	}
 }
 
-void ccontrol::addFloodData(iClient* theClient, unsigned int floodPoints) {
+void ccontrol::addFloodData(iClient* theClient, unsigned int /*floodPoints*/) {
 	if (!theClient->getCustomData(this)) {
 		elog << "Couldnt find custom data for "
 			<< theClient->getNickName() << endl;
@@ -7465,7 +7465,7 @@ return 0;
 
 bool ccontrol::listIpLExceptions( iClient *theClient )
 {
-listIpLExceptions(theClient, "", false);
+return listIpLExceptions(theClient, "", false);
 }
 
 bool ccontrol::listIpLExceptions( iClient *theClient, const string& ispName, bool listEmail )
