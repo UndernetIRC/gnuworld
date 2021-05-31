@@ -390,6 +390,7 @@ void dronescan::OnEvent( const eventType& theEvent,
 		case EVT_CHNICK:
 			{
 			handleNickChange( static_cast< iClient* >( Data1 ) );
+			break;
 			}
 
 		case EVT_KILL : /* Intentional drop through */
@@ -956,8 +957,8 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 			/* Deactivating the gline abortion if too few clients flooding found */
 			//if ((glined.size() >= 3) || (clientcount >= 8))
 			//	{
-				std::list<string>::iterator clientsIt = glinesIt->second.begin();
 #ifdef ENABLE_LOG4CPLUS
+				std::list<string>::iterator clientsIt = glinesIt->second.begin();
 				for(; clientsIt != glinesIt->second.end(); ++ clientsIt)
 					{
 					log(JF_GLINED,(*clientsIt).c_str());
