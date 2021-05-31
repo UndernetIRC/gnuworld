@@ -8013,7 +8013,7 @@ return true;
 void cservice::doCoderStats(iClient* theClient)
 {
 	// *** Count all database users ***
-	int userDBTotal;
+	int userDBTotal = 0;
 	stringstream theQuery;
 	theQuery	<< "SELECT COUNT(*) FROM users"
 				<< ends;
@@ -8713,7 +8713,7 @@ bool cservice::doXQOplist(const string& chanName)
 	return Write("%s XQ %s %s :%s", getCharYY().c_str(), chanfixServer->getCharYY().c_str(), "AnyCServiceRouting", Message.c_str());
 }
 
-bool cservice::doXROplist(iServer* theServer, const string& Routing, const string& Message)
+bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const string& Message)
 {
 	// AB XR Az iauth:15_d :OPLIST #empfoo
 	elog << "cservice::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
