@@ -10,8 +10,3 @@ test_gThread
 test_econfig
 test_burst
 test_bot
-Makefile
-.libs
-.deps
-
-.arch-ids

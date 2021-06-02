@@ -1,0 +1,14 @@
+/autom4te.cache/
+/compile
+/config.log
+/config.status
+/include/defs.h
+/libtool
+/src/gnuworld
+.deps/
+.libs/
+*.la
+*.lo
+*.o
+Makefile
+stamp-h1

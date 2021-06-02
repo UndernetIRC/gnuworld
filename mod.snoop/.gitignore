@@ -1,7 +1,0 @@
-libsnoop_la-snoop.lo
-libsnoop.la
-Makefile
-.libs
-.deps
-
-.arch-ids

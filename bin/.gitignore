@@ -1,5 +1,3 @@
-*.la
-*.so
 *.0
 *.log
 *.Log
@@ -40,5 +38,3 @@ Burst_Acknowledge
 Account_Login
 server_command_map
 logging.properties
-
-.arch-ids
