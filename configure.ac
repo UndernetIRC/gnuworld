@@ -421,21 +421,6 @@ mod.openchanfix/Makefile \
 mod.scanner/Makefile \
 mod.stats/Makefile \
 mod.snoop/Makefile \
-bin/server_command_map \
-bin/ccontrol.example.conf \
-bin/chanfix.example.conf \
-bin/clientExample.example.conf \
-bin/cloner.example.conf \
-bin/cservice.example.conf \
-bin/gnutest.example.conf \
-bin/GNUWorld.example.conf \
-bin/nickserv.example.conf \
-bin/openchanfix.example.conf \
-bin/scanner.example.conf \
-bin/stats.example.conf \
-bin/snoop.example.conf \
-bin/dronescan.example.conf \
-bin/logging.properties \
 tools/checkgnuworld.sh])
 
 AC_OUTPUT

@@ -72,19 +72,19 @@ SUBDIRS = libgnuworld libltdl src db \
 	$(TESTDIR) \
 	libircu
 
-EXTRA_DIST = bin/ccontrol.example.conf.in \
-	bin/chanfix.example.conf.in \
-	bin/clientExample.example.conf.in \
-	bin/cloner.example.conf.in \
-	bin/cservice.example.conf.in \
-	bin/dronescan.example.conf.in \
-	bin/gnutest.example.conf.in \
-	bin/GNUWorld.example.conf.in \
-	bin/nickserv.example.conf.in \
-	bin/openchanfix.example.conf.in \
-	bin/scanner.example.conf.in \
-	bin/stats.example.conf.in \
-	bin/server_command_map.in \
+EXTRA_DIST = bin/ccontrol.example.conf \
+	bin/chanfix.example.conf \
+	bin/clientExample.example.conf \
+	bin/cloner.example.conf \
+	bin/cservice.example.conf \
+	bin/dronescan.example.conf \
+	bin/gnutest.example.conf \
+	bin/GNUWorld.example.conf \
+	bin/nickserv.example.conf \
+	bin/openchanfix.example.conf \
+	bin/scanner.example.conf \
+	bin/stats.example.conf \
+	bin/server_command_map \
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \

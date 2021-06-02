@@ -105,14 +105,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
-CONFIG_CLEAN_FILES = bin/server_command_map bin/ccontrol.example.conf \
-	bin/chanfix.example.conf bin/clientExample.example.conf \
-	bin/cloner.example.conf bin/cservice.example.conf \
-	bin/gnutest.example.conf bin/GNUWorld.example.conf \
-	bin/nickserv.example.conf bin/openchanfix.example.conf \
-	bin/scanner.example.conf bin/stats.example.conf \
-	bin/snoop.example.conf bin/dronescan.example.conf \
-	bin/logging.properties tools/checkgnuworld.sh
+CONFIG_CLEAN_FILES = tools/checkgnuworld.sh
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -174,21 +167,6 @@ DIST_SUBDIRS = libgnuworld libltdl src db @NEW_MODS@ mod.ccontrol \
 	mod.dronescan mod.gnutest mod.nickserv mod.openchanfix \
 	mod.scanner mod.stats mod.snoop test libircu
 am__DIST_COMMON = $(srcdir)/Makefile.in \
-	$(top_srcdir)/bin/GNUWorld.example.conf.in \
-	$(top_srcdir)/bin/ccontrol.example.conf.in \
-	$(top_srcdir)/bin/chanfix.example.conf.in \
-	$(top_srcdir)/bin/clientExample.example.conf.in \
-	$(top_srcdir)/bin/cloner.example.conf.in \
-	$(top_srcdir)/bin/cservice.example.conf.in \
-	$(top_srcdir)/bin/dronescan.example.conf.in \
-	$(top_srcdir)/bin/gnutest.example.conf.in \
-	$(top_srcdir)/bin/logging.properties.in \
-	$(top_srcdir)/bin/nickserv.example.conf.in \
-	$(top_srcdir)/bin/openchanfix.example.conf.in \
-	$(top_srcdir)/bin/scanner.example.conf.in \
-	$(top_srcdir)/bin/server_command_map.in \
-	$(top_srcdir)/bin/snoop.example.conf.in \
-	$(top_srcdir)/bin/stats.example.conf.in \
 	$(top_srcdir)/include/defs.h.in \
 	$(top_srcdir)/tools/checkgnuworld.sh.in AUTHORS COPYING \
 	ChangeLog INSTALL NEWS README TODO ar-lib compile config.guess \
@@ -418,19 +396,19 @@ SUBDIRS = libgnuworld libltdl src db \
 	$(TESTDIR) \
 	libircu
 
-EXTRA_DIST = bin/ccontrol.example.conf.in \
-	bin/chanfix.example.conf.in \
-	bin/clientExample.example.conf.in \
-	bin/cloner.example.conf.in \
-	bin/cservice.example.conf.in \
-	bin/dronescan.example.conf.in \
-	bin/gnutest.example.conf.in \
-	bin/GNUWorld.example.conf.in \
-	bin/nickserv.example.conf.in \
-	bin/openchanfix.example.conf.in \
-	bin/scanner.example.conf.in \
-	bin/stats.example.conf.in \
-	bin/server_command_map.in \
+EXTRA_DIST = bin/ccontrol.example.conf \
+	bin/chanfix.example.conf \
+	bin/clientExample.example.conf \
+	bin/cloner.example.conf \
+	bin/cservice.example.conf \
+	bin/dronescan.example.conf \
+	bin/gnutest.example.conf \
+	bin/GNUWorld.example.conf \
+	bin/nickserv.example.conf \
+	bin/openchanfix.example.conf \
+	bin/scanner.example.conf \
+	bin/stats.example.conf \
+	bin/server_command_map \
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \
@@ -587,36 +565,6 @@ $(top_srcdir)/include/defs.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f include/defs.h include/stamp-h1
-bin/server_command_map: $(top_builddir)/config.status $(top_srcdir)/bin/server_command_map.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/ccontrol.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/ccontrol.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/chanfix.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/chanfix.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/clientExample.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/clientExample.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/cloner.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/cloner.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/cservice.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/cservice.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/gnutest.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/gnutest.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/GNUWorld.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/GNUWorld.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/nickserv.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/nickserv.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/openchanfix.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/openchanfix.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/scanner.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/scanner.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/stats.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/stats.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/snoop.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/snoop.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/dronescan.example.conf: $(top_builddir)/config.status $(top_srcdir)/bin/dronescan.example.conf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-bin/logging.properties: $(top_builddir)/config.status $(top_srcdir)/bin/logging.properties.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 tools/checkgnuworld.sh: $(top_builddir)/config.status $(top_srcdir)/tools/checkgnuworld.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 

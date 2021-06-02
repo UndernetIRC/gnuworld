@@ -20057,7 +20057,7 @@ LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
 
 
 
-ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile libircu/Makefile src/Makefile test/Makefile mod.ccontrol/Makefile mod.chanfix/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.dronescan/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.openchanfix/Makefile mod.scanner/Makefile mod.stats/Makefile mod.snoop/Makefile bin/server_command_map bin/ccontrol.example.conf bin/chanfix.example.conf bin/clientExample.example.conf bin/cloner.example.conf bin/cservice.example.conf bin/gnutest.example.conf bin/GNUWorld.example.conf bin/nickserv.example.conf bin/openchanfix.example.conf bin/scanner.example.conf bin/stats.example.conf bin/snoop.example.conf bin/dronescan.example.conf bin/logging.properties tools/checkgnuworld.sh"
+ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile libircu/Makefile src/Makefile test/Makefile mod.ccontrol/Makefile mod.chanfix/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.dronescan/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.openchanfix/Makefile mod.scanner/Makefile mod.stats/Makefile mod.snoop/Makefile tools/checkgnuworld.sh"
 
 
 cat >confcache <<\_ACEOF
@@ -21280,21 +21280,6 @@ do
     "mod.scanner/Makefile") CONFIG_FILES="$CONFIG_FILES mod.scanner/Makefile" ;;
     "mod.stats/Makefile") CONFIG_FILES="$CONFIG_FILES mod.stats/Makefile" ;;
     "mod.snoop/Makefile") CONFIG_FILES="$CONFIG_FILES mod.snoop/Makefile" ;;
-    "bin/server_command_map") CONFIG_FILES="$CONFIG_FILES bin/server_command_map" ;;
-    "bin/ccontrol.example.conf") CONFIG_FILES="$CONFIG_FILES bin/ccontrol.example.conf" ;;
-    "bin/chanfix.example.conf") CONFIG_FILES="$CONFIG_FILES bin/chanfix.example.conf" ;;
-    "bin/clientExample.example.conf") CONFIG_FILES="$CONFIG_FILES bin/clientExample.example.conf" ;;
-    "bin/cloner.example.conf") CONFIG_FILES="$CONFIG_FILES bin/cloner.example.conf" ;;
-    "bin/cservice.example.conf") CONFIG_FILES="$CONFIG_FILES bin/cservice.example.conf" ;;
-    "bin/gnutest.example.conf") CONFIG_FILES="$CONFIG_FILES bin/gnutest.example.conf" ;;
-    "bin/GNUWorld.example.conf") CONFIG_FILES="$CONFIG_FILES bin/GNUWorld.example.conf" ;;
-    "bin/nickserv.example.conf") CONFIG_FILES="$CONFIG_FILES bin/nickserv.example.conf" ;;
-    "bin/openchanfix.example.conf") CONFIG_FILES="$CONFIG_FILES bin/openchanfix.example.conf" ;;
-    "bin/scanner.example.conf") CONFIG_FILES="$CONFIG_FILES bin/scanner.example.conf" ;;
-    "bin/stats.example.conf") CONFIG_FILES="$CONFIG_FILES bin/stats.example.conf" ;;
-    "bin/snoop.example.conf") CONFIG_FILES="$CONFIG_FILES bin/snoop.example.conf" ;;
-    "bin/dronescan.example.conf") CONFIG_FILES="$CONFIG_FILES bin/dronescan.example.conf" ;;
-    "bin/logging.properties") CONFIG_FILES="$CONFIG_FILES bin/logging.properties" ;;
     "tools/checkgnuworld.sh") CONFIG_FILES="$CONFIG_FILES tools/checkgnuworld.sh" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
