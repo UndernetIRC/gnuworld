@@ -17629,7 +17629,7 @@ if test "$check_threadLib" = yes; then
 $as_echo_n "checking whether gcc accepts the -pthread option... " >&6; }
 	pthreadtest=`$CXX -pthread 2>&1 | grep -c unrecognized`
 
-	if  test "x$pthreadtest" = "x0" ; then
+	if test "x$pthreadtest" = "x0" ; then
 		gcc_support_pthread=yes
 
 		threadLib=-pthread
@@ -17640,7 +17640,7 @@ $as_echo_n "checking whether gcc accepts the -pthread option... " >&6; }
 $as_echo "$gcc_support_pthread" >&6; }
 fi
 
-if  test x"$gcc_support_pthread" = xno ; then
+if test x"$gcc_support_pthread" = xno ; then
 	pthread_found=no
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread_create in -lpthread" >&5
 $as_echo_n "checking for pthread_create in -lpthread... " >&6; }
@@ -17682,7 +17682,7 @@ if test "x$ac_cv_lib_pthread_pthread_create" = xyes; then :
   pthread_found=yes
 fi
 
-	if  test x"$pthread_found" = xyes ; then
+	if test x"$pthread_found" = xyes ; then
 
 		threadLib=-lpthread
 	else
@@ -18423,7 +18423,7 @@ fi
 if test "x$check_log4cplus" != "x" ; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for liblog4cplus.so" >&5
 $as_echo_n "checking for liblog4cplus.so... " >&6; }
-	if test -f "$LOG4CPLUS_LIB/liblog4cplus.so"; then
+	if test -f "$LOG4CPLUS_LIB/liblog4cplus.so" ; then
 		/bin/true
 	else
 	        as_fn_error \
@@ -18434,7 +18434,7 @@ $as_echo "yes" >&6; }
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for log4cplus/logger.h" >&5
 $as_echo_n "checking for log4cplus/logger.h... " >&6; }
-	if test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h"; then
+	if test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h" ; then
 		/bin/true
 	else
 	        as_fn_error \
@@ -18456,7 +18456,7 @@ if test "${with_liboath+set}" = set; then :
 
 fi
 
-if test "$check_liboath" == "yes"; then
+if test "$check_liboath" == "yes" ; then
         check_liboath=/usr/local
 fi
 OATH_LIB="${check_liboath}/lib"
@@ -19884,9 +19884,9 @@ searchForMods=yes
 # Check whether --enable-modules was given.
 if test "${enable_modules+set}" = set; then :
   enableval=$enable_modules;
-if test $enableval = "yes"; then
+if test $enableval = "yes" ; then
 	searchForMods=yes
-elif test $enableval = "no"; then
+elif test $enableval = "no" ; then
 	searchForMods=no
 else
 	tmp="mod.$enableval"
@@ -22851,11 +22851,11 @@ echo ""
 echo "Check the following files for modification before building:"
 echo "  include/gnuworld_config.h"
 
-if test $build_modcservice = true; then
+if test $build_modcservice = true ; then
 	echo "  mod.cservice/cservice_config.h"
 fi
 
-if test $build_modopenchanfix = true; then
+if test $build_modopenchanfix = true ; then
 	echo "  mod.openchanfix/chanfix_config.h"
 fi
 

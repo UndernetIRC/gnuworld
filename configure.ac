@@ -49,7 +49,7 @@ if test "$check_threadLib" = yes; then
 	AC_MSG_CHECKING([whether gcc accepts the -pthread option])
 	pthreadtest=`$CXX -pthread 2>&1 | grep -c unrecognized`
 
-	if [ test "x$pthreadtest" = "x0" ]; then
+	if test "x$pthreadtest" = "x0" ; then
 		gcc_support_pthread=yes
 		AC_SUBST(threadLib)
 		threadLib=-pthread
@@ -59,10 +59,10 @@ if test "$check_threadLib" = yes; then
 	AC_MSG_RESULT([$gcc_support_pthread])
 fi
 
-if [ test x"$gcc_support_pthread" = xno ]; then   
+if test x"$gcc_support_pthread" = xno ; then
 	pthread_found=no
 	AC_CHECK_LIB(pthread, pthread_create, pthread_found=yes)
-	if [ test x"$pthread_found" = xyes ]; then
+	if test x"$pthread_found" = xyes ; then
 		AC_SUBST(threadLib)
 		threadLib=-lpthread
 	else
@@ -213,9 +213,9 @@ AC_ARG_WITH(log4cplus-include,
 	[LOG4CPLUS_INCLUDE=$withval]
 )
 
-if [test "x$check_log4cplus" != "x" ]; then
+if test "x$check_log4cplus" != "x" ; then
 	AC_MSG_CHECKING(for liblog4cplus.so)
-	if [test -f "$LOG4CPLUS_LIB/liblog4cplus.so"]; then
+	if test -f "$LOG4CPLUS_LIB/liblog4cplus.so" ; then
 		/bin/true
 	else
 	        AC_MSG_ERROR( Unable to find liblog4cplus.so, \
@@ -224,7 +224,7 @@ if [test "x$check_log4cplus" != "x" ]; then
 	AC_MSG_RESULT(yes)
 	
 	AC_MSG_CHECKING(for log4cplus/logger.h)
-	if [test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h"]; then
+	if test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h" ; then
 		/bin/true
 	else
 	        AC_MSG_ERROR( Unable to find log4cplus/logger.h, \
@@ -241,7 +241,7 @@ AC_ARG_WITH(liboath,
         AS_HELP_STRING([--with-liboath],[Check liboath, if not enabled TOTP functionality will not be available]),
         [check_liboath=$withval]
 )
-if [test "$check_liboath" == "yes"]; then
+if test "$check_liboath" == "yes" ; then
         check_liboath=/usr/local
 fi
 OATH_LIB="${check_liboath}/lib"
@@ -256,7 +256,7 @@ AC_ARG_WITH(liboath-include,
         [OATH_INCLUDE=$withval]
 )
 
-if [test "x$check_liboath" != "x" ]; then
+if test "x$check_liboath" != "x" ; then
         LDFLAGS="${LDFLAGS} -L${OATH_LIB}"
         CXXFLAGS="${CXXFLAGS} -I${OATH_INCLUDE} -L${OATH_LIB}"
         dnl AC_CHECK_FILE("$OATH_LIB/liboath.so",, [AC_MSG_ERROR([Unable to find liboath.so, \
@@ -310,9 +310,9 @@ current directory are enabled by default.  Specify "no" (without quotes) \
 to build server only]),
 [
 dnl echo "enableval: $enableval"
-if [test $enableval = "yes"]; then
+if test $enableval = "yes" ; then
 	searchForMods=yes
-elif [test $enableval = "no"]; then
+elif test $enableval = "no" ; then
 	searchForMods=no
 else
 	tmp="mod.$enableval"
@@ -407,11 +407,11 @@ echo ""
 echo "Check the following files for modification before building:"
 echo "  include/gnuworld_config.h"
 
-if [test $build_modcservice = true]; then
+if test $build_modcservice = true ; then
 	echo "  mod.cservice/cservice_config.h"
 fi
 
-if [test $build_modopenchanfix = true]; then
+if test $build_modopenchanfix = true ; then
 	echo "  mod.openchanfix/chanfix_config.h"
 fi
 
