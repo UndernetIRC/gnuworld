@@ -10,6 +10,7 @@ AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([include/defs.h])
 AM_INIT_AUTOMAKE([subdir-objects])
+AM_SILENT_RULES([yes])
 
 AM_PROG_AR
 AC_PROG_CXX
