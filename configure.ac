@@ -321,63 +321,35 @@ dnl 	echo "tmp: $tmp"
 dnl	echo "tmp: $tmp"
 	MOD_DIRS="$MOD_DIRS $tmp"
 	searchForMods=no
+fi],[searchForMods=yes]) dnl AC_ARG_ENABLE
 
-dnl	Prepare for conditionals
-	for moduleName in $MOD_DIRS; do
-	  case "$moduleName" in
-	    mod.ccontrol)	build_modccontrol=true;;
-	    mod.chanfix)	build_modchanfix=true;;
-	    mod.clientExample)	build_modclientExample=true;;
-	    mod.cloner)		build_modcloner=true;;
-	    mod.cservice)	build_modcservice=true;;
-	    mod.dronescan)	build_moddronescan=true;;
-	    mod.gnutest)	build_modgnutest=true;;
-	    mod.nickserv)	build_modnickserv=true;;
-	    mod.openchanfix)	build_modopenchanfix=true;;
-	    mod.scanner)	build_modscanner=true;;
-	    mod.stats)		build_modstats=true;;
-	    mod.snoop)		build_modsnoop=true;;
-	    *)			NEW_MODS="$NEW_MODS $moduleName";;
-	  esac
-	done
-fi
-],
-[
-dnl echo "running later"
-searchForMods=yes
-]) dnl AC_ARG_ENABLE
-
-dnl echo "searchForMods: $searchForMods"
-if [test $searchForMods = yes]; then
-	mod_list=`\ls $srcdir | \grep "mod."`
-dnl	echo "mod_list: $mod_list"
-
-	for file in $mod_list; do
-		if [ ! test -d $srcdir/$file ]; then
-			echo "$srcdir/$file is not a directory!"
+if test x$searchForMods = xyes ; then
+	for dir in ${srcdir}/mod.* ; do
+		if ! test -d $dir ; then
 			continue
 		fi
-
-		if [ test -f $srcdir/$file/Makefile.in ]; then
-		  echo Adding module `echo $file | \cut -f2 -d"."`
-		  case "$file" in
-		    mod.ccontrol)	build_modccontrol=true;;
-		    mod.chanfix)	build_modchanfix=true;;
-		    mod.clientExample)	build_modclientExample=true;;
-		    mod.cloner)		build_modcloner=true;;
-		    mod.cservice)	build_modcservice=true;;
-		    mod.dronescan)	build_moddronescan=true;;
-		    mod.gnutest)	build_modgnutest=true;;
-		    mod.nickserv)	build_modnickserv=true;;
-		    mod.openchanfix)	build_modopenchanfix=true;;
-		    mod.scanner)	build_modscanner=true;;
-		    mod.stats)		build_modstats=true;;
-		    mod.snoop)		build_modsnoop=true;;
-		    *)			NEW_MODS="$NEW_MODS $file";;
-		  esac
-		fi
-	 done
+		MOD_DIRS="$MOD_DIRS `basename $dir`"
+	done
 fi
+
+dnl Prepare for conditionals
+for moduleName in $MOD_DIRS; do
+  case "$moduleName" in
+    mod.ccontrol)	build_modccontrol=true;;
+    mod.chanfix)	build_modchanfix=true;;
+    mod.clientExample)	build_modclientExample=true;;
+    mod.cloner)		build_modcloner=true;;
+    mod.cservice)	build_modcservice=true;;
+    mod.dronescan)	build_moddronescan=true;;
+    mod.gnutest)	build_modgnutest=true;;
+    mod.nickserv)	build_modnickserv=true;;
+    mod.openchanfix)	build_modopenchanfix=true;;
+    mod.scanner)	build_modscanner=true;;
+    mod.stats)		build_modstats=true;;
+    mod.snoop)		build_modsnoop=true;;
+    *)			NEW_MODS="$NEW_MODS $moduleName";;
+  esac
+done
 
 AM_CONDITIONAL(COND_MODCCONTROL,[test $build_modccontrol = true])
 AM_CONDITIONAL(COND_MODCHANFIX,[test $build_modchanfix = true])
