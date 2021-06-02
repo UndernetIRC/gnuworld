@@ -5,37 +5,26 @@ echo Configuring GNUWorld...
 echo
 
 AC_REVISION($Revision: 1.42 $)
-AC_INIT([gnuworld], [3.0])
+AC_INIT([gnuworld],[3.0])
+AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/main.cc])
+AC_CONFIG_HEADERS([include/defs.h])
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER(include/defs.h)
 
+AM_PROG_AR
 AC_PROG_CXX
 AC_LANG([C++])
 
 AC_PROG_MAKE_SET(gmake)
 
-AC_DISABLE_STATIC
-AC_ENABLE_SHARED
-
 AC_PROG_INSTALL
-dnl Enable building of the convenience library
-dnl and set LIBLTDL accordingly
-AC_LIBLTDL_CONVENIENCE
-
-dnl Substitute INCLTDL and LIBLTDL in the Makefiles
-dnl For some reason, INCLTDL and LIBLTDL aren't set
-dnl properly on OpenBSD
-LIBLTDL="\$(top_builddir)/libltdl/libltdlc.la"
+dnl Configure libtool and its convenience library
+LT_CONFIG_LTDL_DIR([libltdl])
+LT_INIT([dlopen disable-static shared])
+LTDL_INIT
 
 AM_MAINTAINER_MODE
-AC_ISC_POSIX
-
-dnl Check for dlopen support
-AC_LIBTOOL_DLOPEN
-
-dnl Configure libtool
-AC_PROG_LIBTOOL
+AC_SEARCH_LIBS([strerror],[cposix])
 
 CXXFLAGS="-W -Wall -pipe -I\$(top_srcdir)/libltdl"
 CXXFLAGS="$CXXFLAGS -I\$(top_srcdir)/db"
@@ -43,14 +32,10 @@ CFLAGS="$CFLAGS"
 
 AC_PREFIX_DEFAULT(`pwd`)
 
-dnl Configure libltdl
-AC_CONFIG_SUBDIRS(libltdl)
-
 AC_MSG_CHECKING([whether to detect pthread libraries])
 
 AC_ARG_ENABLE([threads],
-    AC_HELP_STRING([--disable-threads],
-    [disable the linking of the pthread library (default = no)]),
+    AS_HELP_STRING([--disable-threads],[disable the linking of the pthread library (default = no)]),
     [check_threadLib=$enable_threads],
     [check_threadLib=yes])
 
@@ -122,7 +107,6 @@ AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
 
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_TYPE_SIGNAL
 AC_TYPE_MODE_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
@@ -144,8 +128,7 @@ else
 fi
 
 AC_ARG_WITH(debug,
-	AC_HELP_STRING([--without-debug],
-		       [Disable debugging in the executables]),
+	AS_HELP_STRING([--without-debug],[Disable debugging in the executables]),
 	[dummy=true],
 	[CXXFLAGS="$CXXFLAGS -g"]
 )
@@ -153,28 +136,24 @@ AC_ARG_WITH(debug,
 dnl By default, do NOT build test directory
 build_testdir=false
 AC_ARG_WITH(test,
-	AC_HELP_STRING([--with-test],
-			[Enable building of test programs]),
+	AS_HELP_STRING([--with-test],[Enable building of test programs]),
 	[build_testdir=true]
 )
 AM_CONDITIONAL(COND_TESTDIR,[test $build_testdir = true])
 
 AC_ARG_WITH(pedantic,
-	AC_HELP_STRING([--with-pedantic],
-			[Add -pedantic to compile options]),
+	AS_HELP_STRING([--with-pedantic],[Add -pedantic to compile options]),
 	[CXXFLAGS="$CXXFLAGS -pedantic"]
 )
 
 AC_ARG_WITH(optimization,
-	AC_HELP_STRING([--with-optimization],
-			[Optimize the executables]),
+	AS_HELP_STRING([--with-optimization],[Optimize the executables]),
 	[CXXFLAGS="$CXXFLAGS -O2"],
 	[CXXFLAGS="$CXXFLAGS -O0"]
 )
 
 AC_ARG_WITH(prof,
-	AC_HELP_STRING([--with-prof],
-			[Generate profiling information]),
+	AS_HELP_STRING([--with-prof],[Generate profiling information]),
 	[CXXFLAGS="$CXXFLAGS -pg"]
 )
 
@@ -185,8 +164,7 @@ dnl an alternate install location, use that instead.
 dnl Prepare to capture the user's input for the location of a pgsql
 dnl installation.
 AC_ARG_WITH(pgconfig,
-	AC_HELP_STRING([--with-pgconfig=FILE],
-			[Specify an alternate pg_config location.]),
+	AS_HELP_STRING([--with-pgconfig=FILE],[Specify an alternate pg_config location.]),
 	[pg_config_binary=$withval], [pg_config_binary=""]
 )
 
@@ -219,22 +197,19 @@ AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
 
 dnl Enable log4cplus if required
 AC_ARG_WITH(log4cplus,
-	AC_HELP_STRING([--with-log4cplus],
-			[Check log4cplus, if not enabled some modules may not have logging support]),
+	AS_HELP_STRING([--with-log4cplus],[Check log4cplus, if not enabled some modules may not have logging support]),
 	[check_log4cplus=$withval]
 )
 
 LOG4CPLUS_LIB="${check_log4cplus}/lib"
 AC_ARG_WITH(log4cplus-lib,
-	AC_HELP_STRING([--with-log4cplus-lib=LOG4CPLUSLIBDIR],
-			[Specify location to find liblog4cplus.so]),
+	AS_HELP_STRING([--with-log4cplus-lib=LOG4CPLUSLIBDIR],[Specify location to find liblog4cplus.so]),
 	[LOG4CPLUS_LIB=$withval]
 )
 
 LOG4CPLUS_INCLUDE="${check_log4cplus}/include"
 AC_ARG_WITH(log4cplus-include,
-	AC_HELP_STRING([--with-log4cplus-include=LOG4CPLUSINCLUDEDIR],
-			[Specify location to find logger.h]),
+	AS_HELP_STRING([--with-log4cplus-include=LOG4CPLUSINCLUDEDIR],[Specify location to find logger.h]),
 	[LOG4CPLUS_INCLUDE=$withval]
 )
 
@@ -263,8 +238,7 @@ fi
 
 dnl Enable liboath if required
 AC_ARG_WITH(liboath,
-        AC_HELP_STRING([--with-liboath],
-                        [Check liboath, if not enabled TOTP functionality will not be available]),
+        AS_HELP_STRING([--with-liboath],[Check liboath, if not enabled TOTP functionality will not be available]),
         [check_liboath=$withval]
 )
 if [test "$check_liboath" == "yes"]; then
@@ -272,15 +246,13 @@ if [test "$check_liboath" == "yes"]; then
 fi
 OATH_LIB="${check_liboath}/lib"
 AC_ARG_WITH(liboath-lib,
-        AC_HELP_STRING([--with-liboath-lib=LIBOATHLIBDIR],
-                        [Specify location to find liboath.so]),
+        AS_HELP_STRING([--with-liboath-lib=LIBOATHLIBDIR],[Specify location to find liboath.so]),
         [OATH_LIB=$withval]
 )
 
 OATH_INCLUDE="${check_liboath}/include"
 AC_ARG_WITH(liboath-include,
-        AC_HELP_STRING([--with-liboath-include=OATHINCLUDEDIR],
-                        [Specify location to find oath.h]),
+        AS_HELP_STRING([--with-liboath-include=OATHINCLUDEDIR],[Specify location to find oath.h]),
         [OATH_INCLUDE=$withval]
 )
 
@@ -298,22 +270,17 @@ dnl Allow selection of additional includes and libraries paths
 dnl just in case!
 
 AC_ARG_WITH(extra-includes,
-	AC_HELP_STRING([--with-extra-includes=INCLUDESDIR],
-		[Specify location to find additional include files]),
+	AS_HELP_STRING([--with-extra-includes=INCLUDESDIR],[Specify location to find additional include files]),
 	[CXXFLAGS="$CXXFLAGS -I$withval"]
 )
 AC_ARG_WITH(extra-libraries,
-	AC_HELP_STRING([--with-extra-libraries=LIBRARYDIR],
-		[Specify location to find additional libraries]),
+	AS_HELP_STRING([--with-extra-libraries=LIBRARYDIR],[Specify location to find additional libraries]),
 	[LDFLAGS="$LDFLAGS -L$withval"]
 )
 
-dnl This calls a macro in ax_boost_thread.m4
-m4_include([ac_cxx_namespaces.m4])
-m4_include([ax_boost_thread.m4])
-CXXFLAGS="$CXXFLAGS $threadLib"
+dnl AX_BOOST_THREAD requires AX_BOOST_BASE
+AX_BOOST_BASE
 AX_BOOST_THREAD
-m4_include([ax_cxx_compile_stdcxx_11.m4])
 AX_CXX_COMPILE_STDCXX_11
 
 echo
@@ -338,8 +305,7 @@ MOD_DIRS=""
 searchForMods=yes
 
 AC_ARG_ENABLE(modules,
-	AC_HELP_STRING([--enable-modules=mods],
-		[Enable one or more modules; all modules found in the \
+	AS_HELP_STRING([--enable-modules=mods],[Enable one or more modules; all modules found in the \
 current directory are enabled by default.  Specify "no" (without quotes) \
 to build server only]),
 [
@@ -425,10 +391,6 @@ AM_CONDITIONAL(COND_MODOPENCHANFIX,[test $build_modopenchanfix = true])
 AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
 AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
 AM_CONDITIONAL(COND_MODSNOOP,[test $build_modsnoop = true])
-
-for file in $NEW_MODS; do
-	AC_CONFIG_SUBDIRS($file)
-done
 
 LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
 AC_SUBST(LIBGNUWORLD)

@@ -1,4 +1,3 @@
-/autom4te.cache/
 /compile
 /config.log
 /config.status
@@ -7,6 +6,7 @@
 /src/gnuworld
 .deps/
 .libs/
+autom4te.cache/
 *.la
 *.lo
 *.o
