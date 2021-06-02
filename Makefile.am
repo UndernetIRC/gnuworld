@@ -3,74 +3,9 @@
 
 @SET_MAKE@
 
-if COND_MODCCONTROL
-  MODCCONTROL = mod.ccontrol
-endif
-
-if COND_MODCHANFIX
-  MODCHANFIX = mod.chanfix
-endif
-
-if COND_MODCLIENTEXAMPLE
-  MODCLIENTEXAMPLE = mod.clientExample
-endif
-
-if COND_MODCLONER
-  MODCLONER = mod.cloner
-endif
-
-if COND_MODCSERVICE
-  MODCSERVICE = mod.cservice
-endif
-
-if COND_MODDRONESCAN
-  MODDRONESCAN = mod.dronescan
-endif
-
-if COND_MODGNUTEST
-  MODGNUTEST = mod.gnutest
-endif
-
-if COND_MODNICKSERV
-  MODNICKSERV = mod.nickserv
-endif
-
-if COND_MODOPENCHANFIX
-  MODOPENCHANFIX = mod.openchanfix
-endif
-
-if COND_MODSCANNER
-  MODSCANNER = mod.scanner
-endif
-
-if COND_MODSTATS
-  MODSTATS = mod.stats
-endif
-
-if COND_MODSNOOP
-  MODSNOOP = mod.snoop
-endif
-
-if COND_TESTDIR
-  TESTDIR = test
-endif
-
-SUBDIRS = libgnuworld libltdl src db \
-	$(NEW_MODS) \
-	$(MODCCONTROL) \
-	$(MODCHANFIX) \
-	$(MODCLIENTEXAMPLE) \
-	$(MODCLONER) \
-	$(MODCSERVICE) \
-	$(MODDRONESCAN) \
-	$(MODGNUTEST) \
-	$(MODNICKSERV) \
-	$(MODOPENCHANFIX) \
-	$(MODSCANNER) \
-	$(MODSTATS) \
-	$(MODSNOOP) \
-	$(TESTDIR) \
-	libircu
+SUBDIRS = libltdl $(NEW_MODS)
+lib_LTLIBRARIES =
+noinst_LTLIBRARIES =
 
 EXTRA_DIST = bin/ccontrol.example.conf \
 	bin/chanfix.example.conf \
@@ -190,3 +125,59 @@ EXTRA_DIST = bin/ccontrol.example.conf \
 	libltdl/config.h \
 	tools/checkgnuworld.sh
 
+include db/Makefile.am
+include libgnuworld/Makefile.am
+include libircu/Makefile.am
+include src/Makefile.am
+
+if COND_MODCCONTROL
+include $(srcdir)/mod.ccontrol/Makefile.am
+endif
+
+if COND_MODCHANFIX
+include $(srcdir)/mod.chanfix/Makefile.am
+endif
+
+if COND_MODCLIENTEXAMPLE
+include $(srcdir)/mod.clientExample/Makefile.am
+endif
+
+if COND_MODCLONER
+include $(srcdir)/mod.cloner/Makefile.am
+endif
+
+if COND_MODCSERVICE
+include $(srcdir)/mod.cservice/Makefile.am
+endif
+
+if COND_MODDRONESCAN
+include $(srcdir)/mod.dronescan/Makefile.am
+endif
+
+if COND_MODGNUTEST
+include $(srcdir)/mod.gnutest/Makefile.am
+endif
+
+if COND_MODNICKSERV
+include $(srcdir)/mod.nickserv/Makefile.am
+endif
+
+if COND_MODOPENCHANFIX
+include $(srcdir)/mod.openchanfix/Makefile.am
+endif
+
+if COND_MODSCANNER
+include $(srcdir)/mod.scanner/Makefile.am
+endif
+
+if COND_MODSTATS
+include $(srcdir)/mod.stats/Makefile.am
+endif
+
+if COND_MODSNOOP
+include $(srcdir)/mod.snoop/Makefile.am
+endif
+
+if COND_TESTDIR
+include $(srcdir)/test/Makefile.am
+endif

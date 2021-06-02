@@ -9,7 +9,7 @@ AC_INIT([gnuworld],[3.0])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([include/defs.h])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 
 AM_PROG_AR
 AC_PROG_CXX
@@ -364,9 +364,6 @@ AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
 AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
 AM_CONDITIONAL(COND_MODSNOOP,[test $build_modsnoop = true])
 
-LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
-AC_SUBST(LIBGNUWORLD)
-
 AC_SUBST(NEW_MODS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(INCLTDL)
@@ -376,23 +373,6 @@ AC_SUBST(pgsql_includedir)
 AC_SUBST(pgsql_libdir)
 
 AC_CONFIG_FILES([Makefile \
-db/Makefile \
-libgnuworld/Makefile \
-libircu/Makefile \
-src/Makefile \
-test/Makefile \
-mod.ccontrol/Makefile \
-mod.chanfix/Makefile \
-mod.clientExample/Makefile \
-mod.cloner/Makefile \
-mod.cservice/Makefile \
-mod.dronescan/Makefile \
-mod.gnutest/Makefile \
-mod.nickserv/Makefile \
-mod.openchanfix/Makefile \
-mod.scanner/Makefile \
-mod.stats/Makefile \
-mod.snoop/Makefile \
 tools/checkgnuworld.sh])
 
 AC_OUTPUT

@@ -646,7 +646,6 @@ pgsql_libdir
 pgsql_includedir
 LIBTOOL_DEPS
 NEW_MODS
-LIBGNUWORLD
 COND_MODSNOOP_FALSE
 COND_MODSNOOP_TRUE
 COND_MODSTATS_FALSE
@@ -20022,7 +20021,6 @@ else
 fi
 
 
-LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
 
 
 
@@ -20031,9 +20029,7 @@ LIBGNUWORLD="\$(top_builddir)/libgnuworld/libgnuworld.la"
 
 
 
-
-
-ac_config_files="$ac_config_files Makefile db/Makefile libgnuworld/Makefile libircu/Makefile src/Makefile test/Makefile mod.ccontrol/Makefile mod.chanfix/Makefile mod.clientExample/Makefile mod.cloner/Makefile mod.cservice/Makefile mod.dronescan/Makefile mod.gnutest/Makefile mod.nickserv/Makefile mod.openchanfix/Makefile mod.scanner/Makefile mod.stats/Makefile mod.snoop/Makefile tools/checkgnuworld.sh"
+ac_config_files="$ac_config_files Makefile tools/checkgnuworld.sh"
 
 
 cat >confcache <<\_ACEOF
@@ -21239,23 +21235,6 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "db/Makefile") CONFIG_FILES="$CONFIG_FILES db/Makefile" ;;
-    "libgnuworld/Makefile") CONFIG_FILES="$CONFIG_FILES libgnuworld/Makefile" ;;
-    "libircu/Makefile") CONFIG_FILES="$CONFIG_FILES libircu/Makefile" ;;
-    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-    "test/Makefile") CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
-    "mod.ccontrol/Makefile") CONFIG_FILES="$CONFIG_FILES mod.ccontrol/Makefile" ;;
-    "mod.chanfix/Makefile") CONFIG_FILES="$CONFIG_FILES mod.chanfix/Makefile" ;;
-    "mod.clientExample/Makefile") CONFIG_FILES="$CONFIG_FILES mod.clientExample/Makefile" ;;
-    "mod.cloner/Makefile") CONFIG_FILES="$CONFIG_FILES mod.cloner/Makefile" ;;
-    "mod.cservice/Makefile") CONFIG_FILES="$CONFIG_FILES mod.cservice/Makefile" ;;
-    "mod.dronescan/Makefile") CONFIG_FILES="$CONFIG_FILES mod.dronescan/Makefile" ;;
-    "mod.gnutest/Makefile") CONFIG_FILES="$CONFIG_FILES mod.gnutest/Makefile" ;;
-    "mod.nickserv/Makefile") CONFIG_FILES="$CONFIG_FILES mod.nickserv/Makefile" ;;
-    "mod.openchanfix/Makefile") CONFIG_FILES="$CONFIG_FILES mod.openchanfix/Makefile" ;;
-    "mod.scanner/Makefile") CONFIG_FILES="$CONFIG_FILES mod.scanner/Makefile" ;;
-    "mod.stats/Makefile") CONFIG_FILES="$CONFIG_FILES mod.stats/Makefile" ;;
-    "mod.snoop/Makefile") CONFIG_FILES="$CONFIG_FILES mod.snoop/Makefile" ;;
     "tools/checkgnuworld.sh") CONFIG_FILES="$CONFIG_FILES tools/checkgnuworld.sh" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
