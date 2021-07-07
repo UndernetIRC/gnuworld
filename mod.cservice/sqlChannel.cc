@@ -327,19 +327,19 @@ return true;
 
 bool sqlChannel::insertRecord()
 {
-static const char* queryHeader = "INSERT INTO channels (name, flags, registered_ts, channel_ts, channel_mode, last_updated, no_take) VALUES (";
+	
+static const char* queryHeader = "INSERT INTO channels (name, flags, registered_ts, channel_ts, channel_mode, no_take, last_updated) VALUES (";
 
 stringstream queryString;
-queryString	<< queryHeader
+queryString	 << queryHeader
 			<< "'" << escapeSQLChars(name) << "', "
 			<< flags << ", "
 			<< registered_ts << ", "
 			<< channel_ts << ", '"
 			<< escapeSQLChars(channel_mode) << "', "
-			<< "now()::abstime::int4,"
-			<< no_take
-			<< ")"
-			<< ends;
+			<< no_take << ", "
+			<< "now()::abstime::int4)"
+			<< ends;	
 
 #ifdef LOG_SQL
 	elog	<< "sqlChannel::insertRecord> "
