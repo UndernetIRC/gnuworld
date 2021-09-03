@@ -2693,7 +2693,7 @@ CClonesCIDR << " (will GLINE): *@";
 									user.c_str());
 							}
 							else if (isUnidentedBan) {
-								sprintf(GlineReason,"AUTO Please install identd to connect to this server");
+								sprintf(GlineReason,"AUTO Please make sure identd is installed and properly configured on your router and/or firewall to allow connections from the internet on port 113 before you reconnect");
 							}
 							else {
 								sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive connections",
