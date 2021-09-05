@@ -219,7 +219,7 @@ while( ptr != conf.end() && ptr->first == "operchan" )
 limitsChan = conf.Find( "limitschan" )->second ;
 
 // Make sure that the limitsChan is in the list of operchans
-if( operChans.end() == find( operChans.begin(), operChans.end(), limitsChan ) )
+if ((limitsChan != "''") && (operChans.end() == find( operChans.begin(), operChans.end(), limitsChan)))
 	{
 	// Not found, add it to the list of operChans
 	operChans.push_back( limitsChan ) ;
