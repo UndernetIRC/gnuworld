@@ -132,9 +132,11 @@ int match(const char *mask, const char *string)
       case '\\':
         if (*m == '?' || *m == '*')
           ch = *m++;
+        /* fall through */
       default:
         if (ToLower(*s) != ToLower(ch))
           return 1;
+        /* fall through */
       case '?':
         if (!*s++)
           return 1;
@@ -151,12 +153,14 @@ got_star:
       case '?':
         if (!*s++)
           return 1;
+        /* fall through */
       case '*':
         bm = m;
         continue;               /* while */
       case '\\':
         if (*m == '?' || *m == '*')
           ch = *m++;
+        /* fall through */
       default:
         goto break_while;       /* C is structured ? */
     };
@@ -179,6 +183,7 @@ break_while:
       case '\\':
         if (*m == '?' || *m == '*')
           ch = *m++;
+        /* fall through */
       default:
         if (ToLower(*s) != ToLower(ch))
         {
@@ -186,6 +191,7 @@ break_while:
           s = bs;
           goto got_star;
         };
+        /* fall through */
       case '?':
         if (!*s++)
           return 1;
@@ -264,7 +270,7 @@ int smatch(const char *mask, const char *name)
       m_tmp = m;
       for (n_tmp = n; *n && ToLower(*n) != ToLower(*m); n++) ;
     }
-    /* and fall through */
+    /* fall through */
   default:
   normal_character:
     if (!*n)
@@ -293,9 +299,11 @@ int casematch(const char *mask, const char *string)
       case '\\':
         if (*m == '?' || *m == '*')
           ch = *m++;
+        /* fall through */
       default:
         if ((*s) != (ch))
           return 1;
+        /* fall through */
       case '?':
         if (!*s++)
           return 1;
@@ -312,12 +320,14 @@ got_star:
       case '?':
         if (!*s++)
           return 1;
+        /* fall through */
       case '*':
         bm = m;
         continue;               /* while */
       case '\\':
         if (*m == '?' || *m == '*')
           ch = *m++;
+        /* fall through */
       default:
         goto break_while;       /* C is structured ? */
     };
@@ -340,6 +350,7 @@ break_while:
       case '\\':
         if (*m == '?' || *m == '*')
           ch = *m++;
+        /* fall through */
       default:
         if ((*s) != (ch))
         {
@@ -347,6 +358,7 @@ break_while:
           s = bs;
           goto got_star;
         };
+        /* fall through */
       case '?':
         if (!*s++)
           return 1;
@@ -694,6 +706,7 @@ int matchcomp(char *cmask, int *minlen, int *charset, const char *mask)
         case '\\':
           if ((*m == '?') || (*m == '*'))
             ch = *m++;
+          /* fall through */
         default:
           if (star)
           {
@@ -884,6 +897,7 @@ int matchdecomp(char *mask, const char *cmask)
         case '*':
         case '?':
           *rtb++ = '\\';
+          /* fall through */
         default:
           *rtb++ = *rcm;
       };

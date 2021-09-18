@@ -45,8 +45,8 @@ public:
 		const unsigned short int dbPort,
 		const std::string& dbName,
 		const std::string& userName,
-		const std::string& password ) throw( std::exception ) ;
-	pgsqlDB( const std::string& connectInfo ) throw( std::exception ) ;
+		const std::string& password );
+	pgsqlDB( const std::string& connectInfo );
 	virtual ~pgsqlDB() ;
 
 	virtual bool		Exec( const std::string&, bool = false ) ;

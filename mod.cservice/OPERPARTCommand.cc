@@ -113,6 +113,8 @@ bot->joinCount--;
 
 bot->Part(theChan->getName(), "At the request of an IRC Operator");
 
+#else // USE_OPERPARTJOIN
+(void)theClient; (void)Message;
 #endif // USE_OPERPARTJOIN
 
 return true;

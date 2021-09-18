@@ -792,7 +792,7 @@ PostEvent(EVT_NETBREAK,
 	static_cast<void*>(&nreason));
 
          
-iServer* theServer = Network->removeServerName( serverName ) ;
+iServer* theServer = Network->removeServer( tmpServer->getIntYY(), true ) ;
 if( NULL == theServer )
 	{
 	// The server doesn't exist.
@@ -2209,8 +2209,8 @@ chanModes[ 'R' ] = Channel::MODE_REG ;
 chanModes[ 's' ] = Channel::MODE_S ;
 chanModes[ 't' ] = Channel::MODE_T ;
 chanModes[ 'D' ] = Channel::MODE_D ;
-chanModes[ 'C' ] = Channel::MODE_C ;
-chanModes[ 'CTCP' ] = Channel::MODE_CTCP ;
+chanModes[ 'c' ] = Channel::MODE_C ;
+chanModes[ 'C' ] = Channel::MODE_CTCP ;
 
 // This vector is used for argument-less types that can be passed
 // to OnChannelMode()

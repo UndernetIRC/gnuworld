@@ -216,6 +216,16 @@ while( ptr != conf.end() && ptr->first == "operchan" )
 	}
 
 // Read out the client's message channel
+limitsChan = conf.Find( "limitschan" )->second ;
+
+// Make sure that the limitsChan is in the list of operchans
+if ((limitsChan != "''") && (operChans.end() == find( operChans.begin(), operChans.end(), limitsChan)))
+	{
+	// Not found, add it to the list of operChans
+	operChans.push_back( limitsChan ) ;
+	}
+
+// Read out the client's message channel
 msgChan = conf.Find( "msgchan" )->second ;
 
 // Make sure that the msgChan is in the list of operchans
@@ -986,7 +996,7 @@ return true ;
 
 void ccontrol::BurstChannels()
 {
-// msgChan is an operChan as well, no need to burst it separately
+// msgChan and limitsChan are operChan as well, no need to burst them separately
 for( vector< string >::size_type i = 0 ; i < operChans.size() ; i++ )
 	{
 	// Burst our channels
@@ -2683,7 +2693,7 @@ CClonesCIDR << " (will GLINE): *@";
 									user.c_str());
 							}
 							else if (isUnidentedBan) {
-								sprintf(GlineReason,"AUTO Please install identd to connect to this server");
+								sprintf(GlineReason,"AUTO Please make sure identd is installed and properly configured on your router and/or firewall to allow connections from the internet on port 113 before you reconnect");
 							}
 							else {
 								sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive connections",
@@ -3744,6 +3754,24 @@ struct tm* Now = gmtime(tNow);
 char *ATime = asctime(Now);
 ATime[strlen(ATime)-1] = '\0';
 return ATime;
+}
+
+bool ccontrol::MsgChanLimits(const char *Msg, ... ) 
+{
+if(!Network->findChannel(limitsChan))
+	{
+	return false;
+	}
+
+char buffer[ 1024 ] = { 0 } ;
+va_list list;
+
+va_start( list, Msg ) ;
+vsprintf( buffer, Msg, list ) ;
+va_end( list ) ;
+
+xClient::Notice((Network->findChannel(limitsChan))->getName(),"%s",buffer);
+return true;
 }
 
 bool ccontrol::MsgChanLog(const char *Msg, ... ) 
@@ -6022,7 +6050,7 @@ if(LogInfo->getLogins() > 5)
 	}
 }
 
-void ccontrol::addFloodData(iClient* theClient, unsigned int floodPoints) {
+void ccontrol::addFloodData(iClient* theClient, unsigned int /*floodPoints*/) {
 	if (!theClient->getCustomData(this)) {
 		elog << "Couldnt find custom data for "
 			<< theClient->getNickName() << endl;
@@ -7437,7 +7465,7 @@ return 0;
 
 bool ccontrol::listIpLExceptions( iClient *theClient )
 {
-listIpLExceptions(theClient, "", false);
+return listIpLExceptions(theClient, "", false);
 }
 
 bool ccontrol::listIpLExceptions( iClient *theClient, const string& ispName, bool listEmail )
@@ -8518,6 +8546,15 @@ if (ipLRetVal) {
 }
 else {
 	response = " :NO Connection limit exceeded";
+
+	for (ipLretStructListType::const_iterator Itr = retList.begin(); Itr != retList.end(); Itr++) {
+		std::stringstream ss;
+		ipLretStruct r = *Itr;
+		ccIpLnb* nb = r.nb;
+		MsgChanLimits("R(%c): %s - %s (%d/%d) - ref: %s's %s", r.type, IP.c_str(), r.mask.c_str(), r.count, r.limit, nb->getIpLisp()->getName().c_str(), nb->getCidr().c_str());
+		//ss << "R(" << r.type << "): " << IP << " - " << r.mask << " (" << r.count << "/" << r.limit << ")" << " - ref: " << nb->getIpLisp()->getName() << "'s " << nb->getCidr();
+		//MsgChanLimits("%s", ss.str().c_str());
+	}
 	//ipLDropClient(newClient);
 }
 ipLDropClient(newClient);

@@ -1,8 +1,0 @@
-.deps
-.libs
-*.la
-*.lo
-*.so
-*.0
-Makefile
-.arch-ids

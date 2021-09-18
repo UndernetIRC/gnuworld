@@ -27,7 +27,7 @@ public:
 		const unsigned short int dbPort,
 		const std::string& dbName,
 		const std::string& userName,
-		const std::string& password ) throw( std::exception )
+		const std::string& password )
 #ifdef HAVE_PGSQL
 	: pgsqlDB( dbHost,
 		dbPort,
@@ -36,7 +36,7 @@ public:
 		password )
 #endif
 	{}
-	dbHandle( const std::string& connectInfo ) throw( std::exception )
+	dbHandle( const std::string& connectInfo )
 #ifdef HAVE_PGSQL
 	: pgsqlDB( connectInfo )
 #endif

@@ -212,6 +212,8 @@ bot->helloIPList.insert(
 		bot->currentTime() + bot->helloBlockPeriod) );
 
 delete (newUser);
+#else // ALLOW_HELLO
+(void)theClient; (void)Message;
 #endif // ALLOW_HELLO
 
 return true ;

@@ -1,45 +1,46 @@
 ## Process this file with automake to produce Makefile.in
 ## $Id: Makefile.am,v 1.11 2010/08/31 21:16:45 denspike Exp $
 
-lib_LTLIBRARIES = libircu.la
-libircu_la_SOURCES = msg_AC.cc \
-	msg_AD.cc \
-	msg_B.cc \
-	msg_C.cc \
-	msg_CM.cc \
-	msg_D.cc \
-	msg_DS.cc \
-	msg_EA.cc \
-	msg_EB.cc \
-	msg_G.cc \
-	msg_GL.cc \
-	msg_I.cc \
-	msg_J.cc \
-	msg_JU.cc \
-	msg_K.cc \
-	msg_L.cc \
-	msg_M351.cc \
-	msg_M391.cc \
-	msg_M.cc \
-	msg_N.cc \
-	msg_NOOP.cc \
-	msg_O.cc \
-	msg_PA.cc \
-	msg_P.cc \
-	msg_Q.cc \
-	msg_R.cc \
-	msg_RI.cc \
-	msg_RO.cc \
-	msg_S.cc \
-	msg_Server.cc \
-	msg_SQ.cc \
-	msg_T.cc \
-	msg_V.cc \
-	msg_WA.cc \
-	msg_W.cc \
-	msg_XQ.cc \
-	msg_XR.cc \
-	msg_Y.cc
+lib_LTLIBRARIES += libircu.la
+libircu_la_SOURCES = \
+	libircu/msg_AC.cc \
+	libircu/msg_AD.cc \
+	libircu/msg_B.cc \
+	libircu/msg_C.cc \
+	libircu/msg_CM.cc \
+	libircu/msg_D.cc \
+	libircu/msg_DS.cc \
+	libircu/msg_EA.cc \
+	libircu/msg_EB.cc \
+	libircu/msg_G.cc \
+	libircu/msg_GL.cc \
+	libircu/msg_I.cc \
+	libircu/msg_J.cc \
+	libircu/msg_JU.cc \
+	libircu/msg_K.cc \
+	libircu/msg_L.cc \
+	libircu/msg_M351.cc \
+	libircu/msg_M391.cc \
+	libircu/msg_M.cc \
+	libircu/msg_N.cc \
+	libircu/msg_NOOP.cc \
+	libircu/msg_O.cc \
+	libircu/msg_PA.cc \
+	libircu/msg_P.cc \
+	libircu/msg_Q.cc \
+	libircu/msg_R.cc \
+	libircu/msg_RI.cc \
+	libircu/msg_RO.cc \
+	libircu/msg_S.cc \
+	libircu/msg_Server.cc \
+	libircu/msg_SQ.cc \
+	libircu/msg_T.cc \
+	libircu/msg_V.cc \
+	libircu/msg_WA.cc \
+	libircu/msg_W.cc \
+	libircu/msg_XQ.cc \
+	libircu/msg_XR.cc \
+	libircu/msg_Y.cc
 
 libircu_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 libircu_la_LDFLAGS = -module -export-dynamic

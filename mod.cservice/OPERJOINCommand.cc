@@ -125,6 +125,8 @@ if (tmpChan)
 		}
 	}
 
+#else // USER_OPERPARTJOIN
+(void)theClient; (void)Message;
 #endif // USE_OPERPARTJOIN
 
 return true;

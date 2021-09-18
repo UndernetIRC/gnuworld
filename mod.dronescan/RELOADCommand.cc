@@ -43,7 +43,7 @@ namespace gnuworld
 
 namespace ds {
 
-void RELOADCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
+void RELOADCommand::Exec( const iClient *theClient, const string& /*Message*/, const sqlUser* /*theUser*/ )
 {
 //elog	<< "RELOAD> theClient: "
 //	<< *theClient

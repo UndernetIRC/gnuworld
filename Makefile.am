@@ -3,88 +3,23 @@
 
 @SET_MAKE@
 
-if COND_MODCCONTROL
-  MODCCONTROL = mod.ccontrol
-endif
+SUBDIRS = libltdl $(NEW_MODS)
+lib_LTLIBRARIES =
+noinst_LTLIBRARIES =
 
-if COND_MODCHANFIX
-  MODCHANFIX = mod.chanfix
-endif
-
-if COND_MODCLIENTEXAMPLE
-  MODCLIENTEXAMPLE = mod.clientExample
-endif
-
-if COND_MODCLONER
-  MODCLONER = mod.cloner
-endif
-
-if COND_MODCSERVICE
-  MODCSERVICE = mod.cservice
-endif
-
-if COND_MODDRONESCAN
-  MODDRONESCAN = mod.dronescan
-endif
-
-if COND_MODGNUTEST
-  MODGNUTEST = mod.gnutest
-endif
-
-if COND_MODNICKSERV
-  MODNICKSERV = mod.nickserv
-endif
-
-if COND_MODOPENCHANFIX
-  MODOPENCHANFIX = mod.openchanfix
-endif
-
-if COND_MODSCANNER
-  MODSCANNER = mod.scanner
-endif
-
-if COND_MODSTATS
-  MODSTATS = mod.stats
-endif
-
-if COND_MODSNOOP
-  MODSNOOP = mod.snoop
-endif
-
-if COND_TESTDIR
-  TESTDIR = test
-endif
-
-SUBDIRS = libgnuworld libltdl src db \
-	$(NEW_MODS) \
-	$(MODCCONTROL) \
-	$(MODCHANFIX) \
-	$(MODCLIENTEXAMPLE) \
-	$(MODCLONER) \
-	$(MODCSERVICE) \
-	$(MODDRONESCAN) \
-	$(MODGNUTEST) \
-	$(MODNICKSERV) \
-	$(MODOPENCHANFIX) \
-	$(MODSCANNER) \
-	$(MODSTATS) \
-	$(MODSNOOP) \
-	$(TESTDIR) \
-	libircu
-
-EXTRA_DIST = bin/ccontrol.example.conf.in \
-	bin/chanfix.example.conf.in \
-	bin/clientExample.example.conf.in \
-	bin/cloner.example.conf.in \
-	bin/cservice.example.conf.in \
-	bin/dronescan.example.conf.in \
-	bin/gnutest.example.conf.in \
-	bin/GNUWorld.example.conf.in \
-	bin/nickserv.example.conf.in \
-	bin/openchanfix.example.conf.in \
-	bin/scanner.example.conf.in \
-	bin/stats.example.conf.in \
-	bin/server_command_map.in \
+EXTRA_DIST = bin/ccontrol.example.conf \
+	bin/chanfix.example.conf \
+	bin/clientExample.example.conf \
+	bin/cloner.example.conf \
+	bin/cservice.example.conf \
+	bin/dronescan.example.conf \
+	bin/gnutest.example.conf \
+	bin/GNUWorld.example.conf \
+	bin/nickserv.example.conf \
+	bin/openchanfix.example.conf \
+	bin/scanner.example.conf \
+	bin/stats.example.conf \
+	bin/server_command_map \
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \
@@ -190,3 +125,59 @@ EXTRA_DIST = bin/ccontrol.example.conf.in \
 	libltdl/config.h \
 	tools/checkgnuworld.sh
 
+include db/Makefile.am
+include libgnuworld/Makefile.am
+include libircu/Makefile.am
+include src/Makefile.am
+
+if COND_MODCCONTROL
+include $(srcdir)/mod.ccontrol/Makefile.am
+endif
+
+if COND_MODCHANFIX
+include $(srcdir)/mod.chanfix/Makefile.am
+endif
+
+if COND_MODCLIENTEXAMPLE
+include $(srcdir)/mod.clientExample/Makefile.am
+endif
+
+if COND_MODCLONER
+include $(srcdir)/mod.cloner/Makefile.am
+endif
+
+if COND_MODCSERVICE
+include $(srcdir)/mod.cservice/Makefile.am
+endif
+
+if COND_MODDRONESCAN
+include $(srcdir)/mod.dronescan/Makefile.am
+endif
+
+if COND_MODGNUTEST
+include $(srcdir)/mod.gnutest/Makefile.am
+endif
+
+if COND_MODNICKSERV
+include $(srcdir)/mod.nickserv/Makefile.am
+endif
+
+if COND_MODOPENCHANFIX
+include $(srcdir)/mod.openchanfix/Makefile.am
+endif
+
+if COND_MODSCANNER
+include $(srcdir)/mod.scanner/Makefile.am
+endif
+
+if COND_MODSTATS
+include $(srcdir)/mod.stats/Makefile.am
+endif
+
+if COND_MODSNOOP
+include $(srcdir)/mod.snoop/Makefile.am
+endif
+
+if COND_TESTDIR
+include $(srcdir)/test/Makefile.am
+endif

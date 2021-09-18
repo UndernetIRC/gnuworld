@@ -243,7 +243,7 @@ return base64toint( charYYXXX, 5 ) ;
 }
 
 /** Evaluate to non-zero if \a ADDR is a valid address (not all 0s and not all 1s). */
-#define irc_in_addr_valid(ADDR) (((ADDR)->in6_16[0] && ~(ADDR)->in6_16[0]) \
+#define irc_in_addr_valid(ADDR) (((ADDR)->in6_16[0] && ((ADDR)->in6_16[0]) != 65535) \
                                  || (ADDR)->in6_16[1] != (ADDR)->in6_16[0] \
                                  || (ADDR)->in6_16[2] != (ADDR)->in6_16[0] \
                                  || (ADDR)->in6_16[3] != (ADDR)->in6_16[0] \

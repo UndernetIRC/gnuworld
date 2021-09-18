@@ -139,16 +139,6 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 	 *  Unless they are trying to remove themself.. in which case its ok ;)
 	 */
 
-	if ((level <= targetLevel) && (targetUser != theUser))
-	{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::cant_rem_higher,
-				string("Cannot remove a user with equal or higher access than your own")));
-		return false;
-	}
-
-
 	if ((theChan->getName() == "*") && (targetUser == theUser))
 	{
 		bot->Notice(theClient,
@@ -166,6 +156,16 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 				string("You can't remove yourself from a channel you own")));
 		return false;
 	}
+
+	if ((level <= targetLevel) && (targetUser != theUser))
+	{
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::cant_rem_higher,
+				string("Cannot remove a user with equal or higher access than your own")));
+		return false;
+	}
+
 
 
 	/*
