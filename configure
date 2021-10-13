@@ -18461,22 +18461,16 @@ fi
 if test "x$check_log4cplus" != "x" ; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for liblog4cplus.so" >&5
 $as_echo_n "checking for liblog4cplus.so... " >&6; }
-	if test -f "$LOG4CPLUS_LIB/liblog4cplus.so" ; then
-		/bin/true
-	else
-	        as_fn_error \
-			 please use the --with-log4cplus-lib argument to point to the right path "Unable to find liblog4cplus.so" "$LINENO" 5
+	if ! test -f "$LOG4CPLUS_LIB/liblog4cplus.so" ; then
+	        as_fn_error $? "Unable to find liblog4cplus.so, please use the --with-log4cplus-lib argument to point to the right path" "$LINENO" 5
 	fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for log4cplus/logger.h" >&5
 $as_echo_n "checking for log4cplus/logger.h... " >&6; }
-	if test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h" ; then
-		/bin/true
-	else
-	        as_fn_error \
-			 please use the --with-log4cplus-include argument to point to the right path "Unable to find log4cplus/logger.h" "$LINENO" 5
+	if ! test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h" ; then
+	        as_fn_error $? "Unable to find log4cplus/logger.h, please use the --with-log4cplus-include argument to point to the right path" "$LINENO" 5
 	fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
