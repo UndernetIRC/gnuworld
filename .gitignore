@@ -2,7 +2,8 @@
 /config.status
 /include/defs.h
 /libtool
-/src/gnuworld
+/gnuworld
+.dirstamp
 .deps/
 .libs/
 autom4te.cache/
