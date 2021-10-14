@@ -215,23 +215,19 @@ AC_ARG_WITH(log4cplus-include,
 )
 
 if test "x$check_log4cplus" != "x" ; then
-	AC_MSG_CHECKING(for liblog4cplus.so)
-	if test -f "$LOG4CPLUS_LIB/liblog4cplus.so" ; then
-		/bin/true
-	else
-	        AC_MSG_ERROR( Unable to find liblog4cplus.so, \
-			 please use the --with-log4cplus-lib argument to point to the right path)
+	AC_MSG_CHECKING([for liblog4cplus.so])
+	if ! test -f "$LOG4CPLUS_LIB/liblog4cplus.so" ; then
+	        AC_MSG_ERROR( [Unable to find liblog4cplus.so, ]dnl
+[please use the --with-log4cplus-lib argument to point to the right path])
 	fi
-	AC_MSG_RESULT(yes)
+	AC_MSG_RESULT([yes])
 	
-	AC_MSG_CHECKING(for log4cplus/logger.h)
-	if test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h" ; then
-		/bin/true
-	else
-	        AC_MSG_ERROR( Unable to find log4cplus/logger.h, \
-			 please use the --with-log4cplus-include argument to point to the right path)
+	AC_MSG_CHECKING([for log4cplus/logger.h])
+	if ! test -f "$LOG4CPLUS_INCLUDE/log4cplus/logger.h" ; then
+	        AC_MSG_ERROR( [Unable to find log4cplus/logger.h, ]dnl
+[please use the --with-log4cplus-include argument to point to the right path])
 	fi
-	AC_MSG_RESULT(yes)
+	AC_MSG_RESULT([yes])
 	AC_DEFINE([ENABLE_LOG4CPLUS], [], [Enable LOG4CPLUS])
 	LDFLAGS="${LDFLAGS} -L${LOG4CPLUS_LIB} -llog4cplus"
 	CXXFLAGS="${CXXFLAGS} -I${LOG4CPLUS_INCLUDE}"
