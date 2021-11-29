@@ -235,6 +235,14 @@ if( operChans.end() == find( operChans.begin(), operChans.end(), msgChan ) )
 	operChans.push_back( msgChan ) ;
 	}
 
+// Get URL messages for some G-lines
+url_excessive_conn = conf.Require( "url_excessive_conn" )->second ;
+if (url_excessive_conn == "''")
+	url_excessive_conn = "";
+url_install_identd = conf.Require( "url_install_identd" )->second ;
+if (url_install_identd == "''")
+	url_install_identd = "";
+
 // Be sure to use all capital letters for the command name
 
 RegisterCommand( new HELPCommand( this, "HELP", "[topic]"
@@ -2305,7 +2313,7 @@ if(dbConnected)
 								AffectedUsers = shellCurConn;
 								/* set the gline reason */
 								//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
-								sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)", AffectedUsers, (*ptr)->shellco->getName().c_str());
+								sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)%s", AffectedUsers, (*ptr)->shellco->getName().c_str(), url_excessive_conn.c_str());
 								gDuration = CClonesGTime;
 
 								iClient* theClient = Network->findClient(this->getCharYYXXX());
@@ -2395,7 +2403,7 @@ if(dbConnected)
 					sprintf(GlineMask,"%s@%s/%d", NewUser->getUserName().c_str(), client_ip.c_str(), CClonesCIDR);
 					AffectedUsers = CurIdentConnections;
 					/* set the gline reason */
-					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR ident connections",AffectedUsers);
+					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR ident connections%s", AffectedUsers, url_excessive_conn.c_str());
 					DoGline = true;
 					gDuration = maxGlineLen;
 				}
@@ -2468,7 +2476,7 @@ CClonesCIDR << " (will GLINE): *@";
 								sprintf(GlineMask,"*@%s", (*nptr).c_str());
 								AffectedUsers = theCount;
 								/* set the gline reason */
-								sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
+								sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections%s", AffectedUsers, url_excessive_conn.c_str());
 								gDuration = CClonesGTime;
 
 								iClient* theClient = Network->findClient(this->getCharYYXXX());
@@ -2523,7 +2531,7 @@ CClonesCIDR << " (will GLINE): *@";
 					sprintf(GlineMask,"*@%s/%d", client_ip.c_str(), CClonesCIDR);
 					AffectedUsers = CurCIDRConnections;
 					/* set the gline reason */
-					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
+					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections%s", AffectedUsers, url_excessive_conn.c_str());
 					DoGline = true;
 					gDuration = CClonesGTime;
 				}
@@ -2688,16 +2696,17 @@ CClonesCIDR << " (will GLINE): *@";
 							AffectedUsers = ipLconncount;
 							/* set the gline reason */
 							if (isUserban) {
-								sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive IDENT connections (%s@)",
+								sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive IDENT connections (%s@)%s",
 									AffectedUsers, group ? string("[" + nb->ipLisp->getName() + "] ").c_str() : "",
-									user.c_str());
+									user.c_str(),
+									url_excessive_conn.c_str());
 							}
 							else if (isUnidentedBan) {
-								sprintf(GlineReason,"AUTO Please make sure identd is installed and properly configured on your router and/or firewall to allow connections from the internet on port 113 before you reconnect");
+								sprintf(GlineReason,"AUTO Please make sure identd is installed and properly configured on your router and/or firewall to allow connections from the internet on port 113 before you reconnect%s", url_install_identd.c_str());
 							}
 							else {
-								sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive connections",
-									AffectedUsers, group ? string("[" + nb->ipLisp->getName() + "] ").c_str() : "");
+								sprintf(GlineReason,"AUTO [%d] %sAutomatically banned for excessive connections%s",
+									AffectedUsers, group ? string("[" + nb->ipLisp->getName() + "] ").c_str() : "", url_excessive_conn.c_str());
 							}
 							gDuration = CClonesGTime;
 							iClient* theClient = Network->findClient(this->getCharYYXXX());
@@ -2759,7 +2768,7 @@ CClonesCIDR << " (will GLINE): *@";
 					sprintf(GlineMask,"*@%s/%d", client_ip.c_str(), CClonesCIDR);
 					AffectedUsers = CurCIDRConnections;
 					/* set the gline reason */
-					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections",AffectedUsers);
+					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections%s", AffectedUsers, url_excessive_conn.c_str());
 					DoGline = true;
 					gDuration = CClonesGTime;
 				}
@@ -2778,7 +2787,7 @@ CClonesCIDR << " (will GLINE): *@";
 				sprintf(GlineMask,"*@%s",client_ip.c_str());
 				AffectedUsers = CurConnections;
 				/* set the gline reason */
-				sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
+				sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections%s", AffectedUsers, url_excessive_conn.c_str());
 				DoGline = true;
 				gDuration = maxGlineLen;
 			}

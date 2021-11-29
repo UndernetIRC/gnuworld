@@ -1198,6 +1198,12 @@ protected:
 	 */
 	commandMapType		commandMap ;
 	
+	/**
+	 * URLs to append at the end of G-line messages
+	 */
+	string			url_excessive_conn ;
+	string			url_install_identd ;
+
 #ifdef LOGTOHD
 	ccLogList		LogList;
 	
