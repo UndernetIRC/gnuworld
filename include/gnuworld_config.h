@@ -68,6 +68,6 @@
  * Set this to make GNUWorld fork into the background when run.
  * default is OFF to maintain original operation
  */
-#define DAEMON
+#undef DAEMON
 
 #endif /* __GNUWORLD_CONFIG_H */
