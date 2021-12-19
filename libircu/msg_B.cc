@@ -316,10 +316,9 @@ void msg_B::parseBurstUsers( Channel* theChan, const string& theUsers )
 {
 // This is a protected method, so the method arguments are
 // guaranteed to be valid
-
+string chanName = theChan->getName();  // Added for fixing crash when Channel gets destroyed in the result of PostChannelEvent() below
 //elog	<< "msg_B::parseBurstUsers> Channel: " << theChan->getName()
 //	<< ", users: " << theUsers << endl ;
-
 // Parse out users and their modes
 StringTokenizer st( theUsers, ',' ) ;
 
@@ -408,6 +407,15 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 	theServer->PostChannelEvent( EVT_JOIN, theChan,
 		static_cast< void* >( theClient ),
 		static_cast< void* >( chanUser ) ) ;
+
+	// Check if the Channel and User both exist after PostChannelEvent()
+	// Has to be done to prevent a crash for cases where PostChannelEvent() results in kicking the burst user right in the middle of this function.
+	// If the user was alone in the channel, the channel is destroyed and referenced later, causing a segmentation fault.
+	Channel* tmpChan = Network->findChannel( chanName );
+	if (tmpChan == 0)
+		continue;
+	if (tmpChan->findUser(theClient) == 0)
+		continue;
 
 	// Is there a ':' in this client's info?
 	if( string::npos == pos )
