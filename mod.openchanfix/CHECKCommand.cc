@@ -43,7 +43,7 @@ if (!netChan) {
   bot->SendTo(theClient,
               bot->getResponse(theUser,
                               language::no_such_channel,
-                              std::string("No such channel %s.")).c_str());
+                              std::string("No such channel %s.")).c_str(), st[1].c_str());
   return;
 }
 
