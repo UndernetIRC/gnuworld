@@ -7765,6 +7765,9 @@ ipLretStructType ipLretStruct;
 int widestCidr = 129;
 int smallestCidr = 0;
 int isv6 = 1;
+ipLnbVectorType tmpVector;
+std::list<int> nonForcecountCidrList;
+
 
 if (!irc_in_addr_valid(&theClient->getIP())) //avoid 0:: (0.0.0.0) ip addresses
 	return true;
@@ -7789,131 +7792,143 @@ for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++
 		if ((nptr->first < 129) && (nb->getCidr2() < smallestCidr)) { /* cidr/129 means we have forcecount set */
 			break;
 		}
-		clonecidr = nb->getCloneCidr();
+		tmpVector.push_back(*nptr);
+		if (nptr->first < 129)
+			nonForcecountCidrList.push_back(nb->getCloneCidr());
+	}
+}
+for (ipLnbIterator nptr = tmpVector.begin(); nptr != tmpVector.end(); nptr++) {
+	nb = nptr->second;
+	clonecidr = nb->getCloneCidr();
 
-		int tclonecidr = clonecidr;
-		if (nb->getCidr().find(':') == string::npos)
-			tclonecidr += 96;
-		string m;
+	/* New code to handle forcecount differently */
+	if ((nptr->first == 129) && (std::find(nonForcecountCidrList.begin(), nonForcecountCidrList.end(), nb->getCloneCidr()) != nonForcecountCidrList.end())) {
+		// This forcecount cloneCidr is already handled by another non-forcecount isp. Skip.
+		continue;
+	}
+
+	int tclonecidr = clonecidr;
+	if (nb->getCidr().find(':') == string::npos)
+		tclonecidr += 96;
+	string m;
+	if (nb->ipLisp->isGroup())
+		m = nb->getCidr();
+	else
+		m = IPCIDRMinIP(ip, tclonecidr) + "/" + std::to_string(clonecidr);
+	//elog << "LIMITS DEBUG: " << nb->ipLisp->getName() << ":  mask = " << m << endl;
+	ipLclonesMapIterator itr = nb->ipLclonesMap.find(m);
+	if (itr != nb->ipLclonesMap.end()) {
+		int t;
 		if (nb->ipLisp->isGroup())
-			m = nb->getCidr();
+			t = (nb->getLimit() - nb->ipLisp->getCount());
 		else
-			m = IPCIDRMinIP(ip, tclonecidr) + "/" + std::to_string(clonecidr);
-		//elog << "LIMITS DEBUG: " << nb->ipLisp->getName() << ":  mask = " << m << endl;
-		ipLclonesMapIterator itr = nb->ipLclonesMap.find(m);
-		if (itr != nb->ipLclonesMap.end()) {
-			int t;
-			if (nb->ipLisp->isGroup())
-				t = (nb->getLimit() - nb->ipLisp->getCount());
-			else
-				t = (nb->getLimit() - itr->second);
+			t = (nb->getLimit() - itr->second);
+		if ((t < numLeft) && (nb->isActive())) {
+			if (nb->getCidr2() < widestCidr) {
+				widestCidr = nb->getCidr2();
+			}
+			numLeft = t;
+		}
+
+		if (incCount) {
+			itr->second++;
+			nb->incCount(1);
+			nb->ipLisp->incCount(1);
+		}
+		if (t <= 0) {
+			ipLretStruct.nb = nb;
+			ipLretStruct.type = 'i';
+			ipLretStruct.mask = "*@" + m;
+			ipLretStruct.limit = nb->getLimit();
+			if (nb->ipLisp->isGroup()) {
+				ipLretStruct.count = nb->ipLisp->getCount();
+			}
+			else {
+				ipLretStruct.count = itr->second;
+			}
+			retList.push_back(ipLretStruct);
+		}
+	}
+	else if (incCount) {
+		//elog << "D> " << nb->ipLisp->getName() << ": nb->getLimit()=" << nb->getLimit()
+		//	<< ", nb->ipLisp->getCount()=" << nb->ipLisp->getCount() << endl;
+		int t;
+		if (nb->ipLisp->isGroup()) {
+			t = (nb->getLimit() - nb->ipLisp->getCount());
 			if ((t < numLeft) && (nb->isActive())) {
 				if (nb->getCidr2() < widestCidr) {
 					widestCidr = nb->getCidr2();
 				}
 				numLeft = t;
 			}
+		}
+		else
+			t = nb->getLimit();
+		if (t <= 0) {
+			ipLretStruct.nb = nb;
+			ipLretStruct.type = 'i';
+			ipLretStruct.mask = "*@" + m;
+			ipLretStruct.limit = nb->getLimit();
+			ipLretStruct.count = nb->ipLisp->isGroup() ? (nb->ipLisp->getCount() + 1) : 1;
+			retList.push_back(ipLretStruct);
+		}
+		nb->incCount(1);
+		nb->ipLisp->incCount(1);
+		nb->ipLclonesMap.insert(ipLclonesMapType::value_type(m, 1));
+		//elog << "LIMITS DEBUG: ipLclonesMap insert for " << nb->getCidr() << " (/" << nb->getCloneCidr() << "): "
+		//	<< m << endl;
+	}
+	if (incCount) {
+		ipLnbList.push_back(nb);
+		if (nb->ipLisp->isGlunidented() && theClient->getUserName().substr(0,1) == "~") {
+			ipLretStruct.nb = nb;
+			ipLretStruct.type = 'd';
+			ipLretStruct.mask = "~*@" + m;
+			ipLretStruct.limit = 0;
+			ipLretStruct.count = 0;
+			retList.push_back(ipLretStruct);
+		}
+	}
+	if ((nb->getCidr2() > smallestCidr) && (nb->isActive()))
+		smallestCidr = nb->getCidr2();
 
-			if (incCount) {
-				itr->second++;
-				nb->incCount(1);
-				nb->ipLisp->incCount(1);
-			}
-			if (t <= 0) {
-				ipLretStruct.nb = nb;
-				ipLretStruct.type = 'i';
-				ipLretStruct.mask = "*@" + m;
-				ipLretStruct.limit = nb->getLimit();
-				if (nb->ipLisp->isGroup()) {
-					ipLretStruct.count = nb->ipLisp->getCount();
-				}
-				else {
-					ipLretStruct.count = itr->second;
-				}
-				retList.push_back(ipLretStruct);
-			}
-		}
-		else if (incCount) {
-			//elog << "D> " << nb->ipLisp->getName() << ": nb->getLimit()=" << nb->getLimit() 
-			//	<< ", nb->ipLisp->getCount()=" << nb->ipLisp->getCount() << endl;
-			int t;
-			if (nb->ipLisp->isGroup()) {
-				t = (nb->getLimit() - nb->ipLisp->getCount());
-				if ((t < numLeft) && (nb->isActive())) {
-					if (nb->getCidr2() < widestCidr) {
-						widestCidr = nb->getCidr2();
-					}
-					numLeft = t;
-				}
-			}
-			else
-				t = nb->getLimit();
-			if (t <= 0) {
-				ipLretStruct.nb = nb;
-				ipLretStruct.type = 'i';
-				ipLretStruct.mask = "*@" + m;
-				ipLretStruct.limit = nb->getLimit();
-				ipLretStruct.count = nb->ipLisp->isGroup() ? (nb->ipLisp->getCount() + 1) : 1;
-				retList.push_back(ipLretStruct);
-			}
-			nb->incCount(1);
-			nb->ipLisp->incCount(1);
-			nb->ipLclonesMap.insert(ipLclonesMapType::value_type(m, 1));
-			//elog << "LIMITS DEBUG: ipLclonesMap insert for " << nb->getCidr() << " (/" << nb->getCloneCidr() << "): "
-			//	<< m << endl; 
-		}
+	string userip = theClient->getUserName() + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
+	ipLclonesMapIterator iitr = nb->ipLisp->ipLidentclonesMap.find(userip);
+	if (theClient->getIntYY() == getUplink()->getIntYY()) {
+		/* It's a virtually not-yet-connected client from iauth, don't count user ident clones */
+	}
+	else if (iitr != nb->ipLisp->ipLidentclonesMap.end()) {
+		int t;
+		t = nb->getIdentLimit() - iitr->second;
+
 		if (incCount) {
-			ipLnbList.push_back(nb);
-			if (nb->ipLisp->isGlunidented() && theClient->getUserName().substr(0,1) == "~") {
-				ipLretStruct.nb = nb;
-				ipLretStruct.type = 'd';
-				ipLretStruct.mask = "~*@" + m;
-				ipLretStruct.limit = 0;
-				ipLretStruct.count = 0;
-				retList.push_back(ipLretStruct);
-			}
+			iitr->second++;
 		}
-		if ((nb->getCidr2() > smallestCidr) && (nb->isActive()))
-			smallestCidr = nb->getCidr2();
-
-		string userip = theClient->getUserName() + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
-		ipLclonesMapIterator iitr = nb->ipLisp->ipLidentclonesMap.find(userip);
-		if (theClient->getIntYY() == getUplink()->getIntYY()) {
-			/* It's a virtually not-yet-connected client from iauth, don't count user ident clones */
+		if ((t <= 0) && (nb->getIdentLimit() > 0)) {
+			ipLretStruct.nb = nb;
+			ipLretStruct.type = 'u';
+			ipLretStruct.mask = userip;
+			ipLretStruct.count = iitr->second;
+			ipLretStruct.limit = nb->getIdentLimit();
+			retList.push_back(ipLretStruct);
 		}
-		else if (iitr != nb->ipLisp->ipLidentclonesMap.end()) {
-			int t;
-			t = nb->getIdentLimit() - iitr->second;
-
-			if (incCount) {
-				iitr->second++;
-			}
-			if ((t <= 0) && (nb->getIdentLimit() > 0)) {
-				ipLretStruct.nb = nb;
-				ipLretStruct.type = 'u';
-				ipLretStruct.mask = userip;
-				ipLretStruct.count = iitr->second;
-				ipLretStruct.limit = nb->getIdentLimit();
-				retList.push_back(ipLretStruct);
-			}
+	}
+	else if (incCount) {
+		//elog << "D> " << nb->ipLisp->getName() << ": nb->getLimit()=" << nb->getLimit()
+		//	<< ", nb->ipLisp->getCount()=" << nb->ipLisp->getCount() << endl;
+		int t;
+		t = nb->getIdentLimit();
+		if ((t <= 0) && (nb->getIdentLimit() > 0)) {
+			ipLretStruct.nb = nb;
+			ipLretStruct.type = 'u';
+			ipLretStruct.mask = userip;
+			ipLretStruct.count = 1;
+			ipLretStruct.limit = nb->getIdentLimit();
+			retList.push_back(ipLretStruct);
 		}
-		else if (incCount) {
-			//elog << "D> " << nb->ipLisp->getName() << ": nb->getLimit()=" << nb->getLimit() 
-			//	<< ", nb->ipLisp->getCount()=" << nb->ipLisp->getCount() << endl;
-			int t;
-			t = nb->getIdentLimit();
-			if ((t <= 0) && (nb->getIdentLimit() > 0)) {
-				ipLretStruct.nb = nb;
-				ipLretStruct.type = 'u';
-				ipLretStruct.mask = userip;
-				ipLretStruct.count = 1;
-				ipLretStruct.limit = nb->getIdentLimit();
-				retList.push_back(ipLretStruct);
-			}
-			nb->ipLisp->ipLidentclonesMap.insert(ipLclonesMapType::value_type(userip, 1));
-			//elog << "LIMITS DEBUG: ipLclonesMap insert for " << nb->getCidr() << " (/" << nb->getCloneCidr() << "): "
-			//	<< m << endl; 
-		}
+		nb->ipLisp->ipLidentclonesMap.insert(ipLclonesMapType::value_type(userip, 1));
+		//elog << "LIMITS DEBUG: ipLclonesMap insert for " << nb->getCidr() << " (/" << nb->getCloneCidr() << "): "
+		//	<< m << endl;
 	}
 }
 if (incCount) 
