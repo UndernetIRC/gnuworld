@@ -7795,6 +7795,8 @@ for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++
 		tmpVector.push_back(*nptr);
 		if (nptr->first < 129)
 			nonForcecountCidrList.push_back(nb->getCloneCidr());
+		if ((nb->getCidr2() > smallestCidr) && (nb->isActive()))
+			smallestCidr = nb->getCidr2();
 	}
 }
 for (ipLnbIterator nptr = tmpVector.begin(); nptr != tmpVector.end(); nptr++) {
@@ -7889,8 +7891,6 @@ for (ipLnbIterator nptr = tmpVector.begin(); nptr != tmpVector.end(); nptr++) {
 			retList.push_back(ipLretStruct);
 		}
 	}
-	if ((nb->getCidr2() > smallestCidr) && (nb->isActive()))
-		smallestCidr = nb->getCidr2();
 
 	string userip = theClient->getUserName() + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
 	ipLclonesMapIterator iitr = nb->ipLisp->ipLidentclonesMap.find(userip);
