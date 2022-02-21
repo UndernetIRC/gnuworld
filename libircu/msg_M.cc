@@ -140,6 +140,7 @@ if( serverSource != 0 )
 }
 
 /* XXX OPMODE FAILS HERE */
+/* Hidden: But doesn't anymore */
 // Find the ChannelUser of the source client
 // It is possible that the ChannelUser will be NULL, in the
 // case that a server is setting the mode(s)
@@ -154,7 +155,9 @@ if( clientSource != 0 )
 //			<< ") Unable to find channel user: "
 //			<< clientSource->getCharYYXXX()
 //			<< endl ;
+		/* 2022-02-21: Hidden: Commenting line below to allow OPMODE to be used
 		return false ;
+		*/
 		}
 	}
 
