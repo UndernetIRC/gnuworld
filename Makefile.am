@@ -7,6 +7,8 @@ SUBDIRS = libltdl $(NEW_MODS)
 lib_LTLIBRARIES =
 noinst_LTLIBRARIES =
 
+pkgdata_DATA = bin/server_command_map
+
 EXTRA_DIST = bin/ccontrol.example.conf \
 	bin/chanfix.example.conf \
 	bin/clientExample.example.conf \
@@ -19,7 +21,6 @@ EXTRA_DIST = bin/ccontrol.example.conf \
 	bin/openchanfix.example.conf \
 	bin/scanner.example.conf \
 	bin/stats.example.conf \
-	bin/server_command_map \
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \
