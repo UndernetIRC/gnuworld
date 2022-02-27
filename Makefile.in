@@ -35,6 +35,7 @@
 # "$Id: Makefile.am,v 1.1 2003/12/04 00:44:24 dan_karrels Exp $"
 
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -259,7 +260,8 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/defs.h
 CONFIG_CLEAN_FILES = tools/checkgnuworld.sh
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)"
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" \
+	"$(DESTDIR)$(pkgdatadir)"
 @COND_PCRE_TRUE@@COND_TESTDIR_TRUE@am__EXEEXT_1 = test_regex$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -1348,6 +1350,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+DATA = $(pkgdata_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -1597,16 +1600,17 @@ lib_LTLIBRARIES = libgnuworldDB.la libircu.la libgnuworldcore.la \
 	$(am__append_13) $(am__append_15) $(am__append_17) \
 	$(am__append_19) $(am__append_21) $(am__append_23)
 noinst_LTLIBRARIES = libgnuworld.la
+pkgdata_DATA = bin/server_command_map
 EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	bin/clientExample.example.conf bin/cloner.example.conf \
 	bin/cservice.example.conf bin/dronescan.example.conf \
 	bin/gnutest.example.conf bin/GNUWorld.example.conf \
 	bin/nickserv.example.conf bin/openchanfix.example.conf \
 	bin/scanner.example.conf bin/stats.example.conf \
-	bin/server_command_map contrib/00INDEX.TXT contrib/chktrans.py \
-	contrib/encrypt.sh doc/README.pgsql doc/README \
-	doc/README.appjudge doc/README.ccontrol doc/README.cservice \
-	doc/README.dronescan doc/README.sharedmemory doc/autokill.sql \
+	contrib/00INDEX.TXT contrib/chktrans.py contrib/encrypt.sh \
+	doc/README.pgsql doc/README doc/README.appjudge \
+	doc/README.ccontrol doc/README.cservice doc/README.dronescan \
+	doc/README.sharedmemory doc/autokill.sql \
 	doc/ccontrol.addme.sql doc/ccontrol.commands.sql \
 	doc/ccontrol.help.sql doc/ccontrol.sql doc/ccontrol.update.sql \
 	doc/checkvarargs.py doc/chktrans.py doc/cparse.py \
@@ -6078,6 +6082,27 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
+install-pkgdataDATA: $(pkgdata_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(pkgdata_DATA)'; test -n "$(pkgdatadir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgdatadir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pkgdatadir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgdatadir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgdatadir)" || exit $$?; \
+	done
+
+uninstall-pkgdataDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkgdata_DATA)'; test -n "$(pkgdatadir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(pkgdatadir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -6384,12 +6409,12 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS) $(LTLIBRARIES)
+all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(DATA)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgdatadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -6803,7 +6828,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-pkgdataDATA
 
 install-dvi: install-dvi-recursive
 
@@ -7173,7 +7198,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
+uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
+	uninstall-pkgdataDATA
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
@@ -7191,12 +7217,13 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-libLTLIBRARIES install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-libLTLIBRARIES
+	install-pdf-am install-pkgdataDATA install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
+	uninstall-pkgdataDATA
 
 .PRECIOUS: Makefile
 
