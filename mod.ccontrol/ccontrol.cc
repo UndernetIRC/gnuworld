@@ -8569,7 +8569,7 @@ if (ipLRetVal) {
 	response = " :OK";
 }
 else {
-	response = " :NO Connection limit exceeded";
+	response = " :NO Connection limit exceeded" + url_excessive_conn;
 
 	for (ipLretStructListType::const_iterator Itr = retList.begin(); Itr != retList.end(); Itr++) {
 		std::stringstream ss;
