@@ -41,7 +41,7 @@ proc log_channel {hDB channel_id state areason acode} {
 	}
 	set sup_list [string trim $sup_list ", "]
 	set log_msg "\[The Judge\]: Application ${state}. ${areason} Applicant: ${mgr_what}. Supporters: ${sup_list}."
-	pg_exec $hDB "INSERT INTO channellog (ts,channelid,event,message,last_updated) VALUES(now()::abstime::int4,$channel_id,$acode,'\[The Judge\]: Application ${state}. ${areason} Applicant: ${mgr_what}. Supporters: ${sup_list}.',now()::abstime::int4)"
+	pg_exec $hDB "INSERT INTO channellog (ts,channelid,event,message,last_updated) VALUES(date_part('epoch', CURRENT_TIMESTAMP)::int,$channel_id,$acode,'\[The Judge\]: Application ${state}. ${areason} Applicant: ${mgr_what}. Supporters: ${sup_list}.',date_part('epoch', CURRENT_TIMESTAMP)::int)"
 }
 
 proc get_channel {hDB channel_id} {
@@ -52,7 +52,7 @@ proc reject_app {hDB channel_id reason} {
 	global AS_REJECTED REVIEWER_ID
 	puts [format "%s: Rejecting application for channel %s: %s" [clock_stamp] [get_channel $hDB $channel_id] $reason]
 	log_channel $hDB $channel_id "REJECTED" $reason 13
-	pg_exec $hDB "UPDATE pending SET status=$AS_REJECTED, last_updated=now()::abstime::int4, reviewed_by_id=$REVIEWER_ID, decision_ts=now()::abstime::int4, decision='Rejected: $reason' WHERE channel_id=$channel_id"
+	pg_exec $hDB "UPDATE pending SET status=$AS_REJECTED, last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int, reviewed_by_id=$REVIEWER_ID, decision_ts=date_part('epoch', CURRENT_TIMESTAMP)::int, decision='Rejected: $reason' WHERE channel_id=$channel_id"
 	# Need the associated userid
 	pg_select $hDB "SELECT channel_id,manager_id FROM pending WHERE channel_id=$channel_id" res_ch {
 		set notify_user [lindex [array get res_ch "manager_id"] 1]
@@ -67,7 +67,7 @@ proc check_comments {hDB channel_id} {
 		set objcount [lindex [array get res_obj "objcount"] 1]
 		if {$objcount} {
 			puts [format "%s: Moving channel %s to status %d (there are %d objections/comments)" [clock_stamp] [get_channel $hDB $channel_id] $AS_PENDREVIEW $objcount]
-			pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$channel_id"
+			pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$channel_id"
 			set check_res 1
 		}
 	}
@@ -76,7 +76,7 @@ proc check_comments {hDB channel_id} {
 		set comments [string trim [lindex [array get res_cmt "comments"] 1]]
 		if {[string match "REVIEW:*" $comments]} {
 			puts [format "%s: Moving channel %s to status %d (it was labeled for review)" [clock_stamp] [get_channel $hDB $channel_id] $AS_PENDREVIEW]
-			pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW, last_updated=now()::abstime::int4 WHERE channel_id=$channel_id"
+			pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW, last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$channel_id"
 			set check_res 1
 		}
 	}
@@ -104,7 +104,7 @@ proc check_fraudulous {hDB chan_id mgr_id} {
 	if {$isfraud > 0} {
 		# move it to 'Ready for review' if anyone is fraudulous
 		puts [format "%s: Moving channel %s to status %d (%d fraudulent applicant/supporters found)" [clock_stamp] [get_channel $hDB $chan_id] $AS_PENDREVIEW $isfraud]
-		pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+		pg_exec $hDB "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$chan_id"
 	}	
 	return $isfraud
 }
@@ -145,7 +145,7 @@ puts [format "%s: The court is now in session." [clock_stamp]]
 
 # Step 0.5: Reject applications that are still in status 0 after x days.
 set sup_timeout [expr $DAY * $SUPPORT_DAYS]
-pg_select $hSQL "SELECT channel_id,status,check_start_ts FROM pending WHERE (status = $AS_PENDING_SUPPORT) AND (now()::abstime::int4 > (created_ts + $sup_timeout))" sup_expired {
+pg_select $hSQL "SELECT channel_id,status,check_start_ts FROM pending WHERE (status = $AS_PENDING_SUPPORT) AND (date_part('epoch', CURRENT_TIMESTAMP)::int > (created_ts + $sup_timeout))" sup_expired {
 	set chan_id [lindex [array get sup_expired "channel_id"] 1]
         reject_app $hSQL $chan_id "One or more of the supporters did not confirm their support."
 }
@@ -153,7 +153,7 @@ pg_select $hSQL "SELECT channel_id,status,check_start_ts FROM pending WHERE (sta
 
 # Step 1: reject applications that failed to pass the activity test within the required timeframe
 set app_timeout [expr $DAY * $MAX_DAYS]
-pg_select $hSQL "SELECT channel_id,status,check_start_ts,unique_join_count FROM pending WHERE (status = $AS_TRAFFIC_CHECK) AND (now()::abstime::int4 > (check_start_ts + $app_timeout))" t_expired {
+pg_select $hSQL "SELECT channel_id,status,check_start_ts,unique_join_count FROM pending WHERE (status = $AS_TRAFFIC_CHECK) AND (date_part('epoch', CURRENT_TIMESTAMP)::int > (check_start_ts + $app_timeout))" t_expired {
 	set chan_id [lindex [array get t_expired "channel_id"] 1]
 	set joins [lindex [array get t_expired "unique_join_count"] 1]
 
@@ -170,7 +170,7 @@ pg_select $hSQL "SELECT channel_id,status,check_start_ts,unique_join_count FROM 
 			# get supporter count
 			pg_select $hSQL "SELECT COUNT(*) AS supcount FROM supporters WHERE channel_id=$chan_id" res_supc { set sup_joins [lindex [array get sup_res "supcount"] 1] }
 			puts [format "%s: Moving channel %s to status %d (application labeled for human inspection)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_NOTIFICATION]
-			pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=now()::abstime::int4,comments='REVIEW: Only $sup_joins supporters have been seen.', last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+			pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=date_part('epoch', CURRENT_TIMESTAMP)::int,comments='REVIEW: Only $sup_joins supporters have been seen.', last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$chan_id"
 		} else {
 			# No - Reject
 			reject_app $hSQL $chan_id "Not enough activity in the channel."
@@ -188,14 +188,14 @@ pg_select $hSQL "SELECT channel_id,status FROM pending WHERE (status=$AS_TRAFFIC
 
 	if {$sup_joins >= $MIN_SUPPORTERS} {
 		puts [format "%s: Moving channel %s to status %d (traffic check passed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_NOTIFICATION]
-		pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=now()::abstime::int4,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+		pg_exec $hSQL "UPDATE pending SET status=$AS_NOTIFICATION,check_start_ts=date_part('epoch', CURRENT_TIMESTAMP)::int,last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$chan_id"
 	}
 }
 
 # Step 3: check for end of notify period
 set notify_delay [expr $DAY * $NOTIFY_DAYS]
 
-pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE (status = $AS_NOTIFICATION) AND ((check_start_ts + $notify_delay) < now()::abstime::int4)" t_notified {
+pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE (status = $AS_NOTIFICATION) AND ((check_start_ts + $notify_delay) < date_part('epoch', CURRENT_TIMESTAMP)::int)" t_notified {
 	set chan_id [lindex [array get t_notified "channel_id"] 1]
 	set mgr_id [lindex [array get t_notified "manager_id"] 1]
 	set reviewed [lindex [array get t_notified "reviewed"] 1]
@@ -208,24 +208,24 @@ pg_select $hSQL "SELECT channel_id,status,manager_id,reviewed FROM pending WHERE
 					# Register the channel
 			        	log_channel $hSQL $chan_id "ACCEPTED" "All checks passed." 7
 					puts [format "%s: Moving channel %s to status %d (notify period ended)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_COMPLETED]
-					pg_exec $hSQL "UPDATE pending SET status=$AS_COMPLETED,reviewed_by_id=$REVIEWER_ID,decision_ts=now()::abstime::int4,decision='Accepted by The Judge', last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+					pg_exec $hSQL "UPDATE pending SET status=$AS_COMPLETED,reviewed_by_id=$REVIEWER_ID,decision_ts=date_part('epoch', CURRENT_TIMESTAMP)::int,decision='Accepted by The Judge', last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$chan_id"
 					puts [format "%s: Registering channel %s (all checks passed)" [clock_stamp] [get_channel $hSQL $chan_id]]
-					pg_exec $hSQL "UPDATE channels SET registered_ts=now()::abstime::int4, last_updated = now()::abstime::int4 WHERE id=$chan_id"
-					pg_exec $hSQL "INSERT INTO levels (channel_id,user_id,access,added,added_by,last_modif,last_modif_by,last_updated) VALUES($chan_id,$mgr_id,500,now()::abstime::int4,'The Judge',now()::abstime::int4,'The Judge',now()::abstime::int4)"
+					pg_exec $hSQL "UPDATE channels SET registered_ts=date_part('epoch', CURRENT_TIMESTAMP)::int, last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int WHERE id=$chan_id"
+					pg_exec $hSQL "INSERT INTO levels (channel_id,user_id,access,added,added_by,last_modif,last_modif_by,last_updated) VALUES($chan_id,$mgr_id,500,date_part('epoch', CURRENT_TIMESTAMP)::int,'The Judge',date_part('epoch', CURRENT_TIMESTAMP)::int,'The Judge',date_part('epoch', CURRENT_TIMESTAMP)::int)"
 				}
 			}
 		} else {
 			# No, label it for review if no one is suspended on it
 			if {![check_suspended $hSQL $chan_id $mgr_id]} {
 				puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
-        	                pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+        	                pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$chan_id"
 			}
 		}
 	} else {
 		# Objections found, label it for review if no one is suspended on it ;)
 		if {![check_suspended $hSQL $chan_id $mgr_id]} {
 			puts [format "%s: Moving channel %s to status %d (it was never reviewed)" [clock_stamp] [get_channel $hSQL $chan_id] $AS_PENDREVIEW]
-        	        pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=now()::abstime::int4 WHERE channel_id=$chan_id"
+        	        pg_exec $hSQL "UPDATE pending SET status=$AS_PENDREVIEW,last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=$chan_id"
 		}
 	}
 }

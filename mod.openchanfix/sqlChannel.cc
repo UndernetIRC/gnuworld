@@ -196,7 +196,7 @@ while (num_notes >= MAXNOTECOUNT) {
 std::stringstream theLog;
 theLog	<< "INSERT INTO notes (ts, channelID, user_name, event, message) "
 	<< "VALUES ("
-	<< "now()::abstime::int4"
+	<< "date_part('epoch', CURRENT_TIMESTAMP)::int"
 	<< ", "
 	<< id
 	<< ", '"

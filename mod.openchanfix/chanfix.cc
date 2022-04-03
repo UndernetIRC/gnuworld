@@ -903,7 +903,7 @@ bool chanfix::logLastComMessage(iClient* theClient, const std::string& Message)
   std::string log;
   dbHandle* cacheCon = getLocalDBHandle();
 
-  static const char *Main = "INSERT into comlog (ts,user_name,command) VALUES (now()::abstime::int4,'";
+  static const char *Main = "INSERT into comlog (ts,user_name,command) VALUES (date_part('epoch', CURRENT_TIMESTAMP)::int,'";
 
   std::stringstream insertString;
   insertString	<< Main

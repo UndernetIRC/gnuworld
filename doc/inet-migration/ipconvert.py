@@ -88,7 +88,7 @@ else:
 	print ""
 	query = "ALTER TABLE ip_restrict"
 	query += " ADD COLUMN value inet,"
-	query += " ADD COLUMN last_updated int4 NOT NULL DEFAULT now()::abstime::int4,"
+	query += " ADD COLUMN last_updated int4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,"
 	query += " ADD COLUMN last_used int4,"
 	query += " ADD COLUMN expiry int4 NOT NULL DEFAULT 0,"
 	query += " ADD COLUMN description VARCHAR(255);"
@@ -96,7 +96,7 @@ else:
 	print ""
 	# -- allow null entries so we can do new and easier row inserts
 	print "ALTER TABLE ip_restrict ALTER COLUMN added DROP NOT NULL;"
-	print "ALTER TABLE ip_restrict ALTER COLUMN added SET DEFAULT now()::abstime::int4;"
+	print "ALTER TABLE ip_restrict ALTER COLUMN added SET DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int;"
 	print "ALTER TABLE ip_restrict ALTER COLUMN allowmask DROP NOT NULL;"
 	print "ALTER TABLE ip_restrict ALTER COLUMN allowrange1 DROP NOT NULL;"
 	print "ALTER TABLE ip_restrict ALTER COLUMN allowrange2 DROP NOT NULL;"
@@ -294,7 +294,7 @@ else:
 						for net in cidr_list:
 							IPRANGE_EXP += 1
 							desc = '[auto] converted from %s - %s on %s' % (long1, long2, d)
-							print "INSERT INTO ip_restrict (user_id,value,added,added_by,type,last_updated,description) VALUES (%s, '%s', now()::abstime::int4, %s, 1, now()::abstime::int4, %s);" % (user_id, net, added_by, desc)
+							print "INSERT INTO ip_restrict (user_id,value,added,added_by,type,last_updated,description) VALUES (%s, '%s', date_part('epoch', CURRENT_TIMESTAMP)::int, %s, 1, date_part('epoch', CURRENT_TIMESTAMP)::int, %s);" % (user_id, net, added_by, desc)
 						
 					elif length == 1:
 						IPRANGE += 1

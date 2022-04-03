@@ -165,7 +165,7 @@ queryString	<< queryHeader
 		<< "added_by = '" << escapeSQLChars(added_by) << "', "
 		<< "last_modif = " << last_modif << ", "
 		<< "last_modif_by = '" << escapeSQLChars(last_modif_by) << "', "
-		<< "last_updated = now()::abstime::int4 "
+		<< "last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int "
 		<< " WHERE channel_id = " << channel_id
 		<< " AND user_id = " << user_id
 		<< ends;
@@ -204,7 +204,7 @@ queryString	<< queryHeader
 			<< escapeSQLChars(added_by) << "', "
 			<< last_modif << ", '"
 			<< escapeSQLChars(last_modif_by) << "', "
-			<< "now()::abstime::int4)"
+			<< "date_part('epoch', CURRENT_TIMESTAMP)::int)"
 			<< ends;
 
 #ifdef LOG_SQL

@@ -91,7 +91,7 @@ queryString	<< queryHeader
 		<< "expires = " << expires << ", "
 		<< "banmask = '" << escapeSQLChars(banmask) << "', "
 		<< "reason = '" << escapeSQLChars(reason) << "', "
-		<< "last_updated = now()::abstime::int4 "
+		<< "last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int "
 		<< " WHERE id = " << id
 		<< ends;
 
@@ -132,7 +132,7 @@ queryString	<< queryHeader
 		<< level << ", "
 		<< expires << ", '"
 		<< escapeSQLChars(reason) << "', "
-		<< "now()::abstime::int4); SELECT currval('bans_id_seq')"
+		<< "date_part('epoch', CURRENT_TIMESTAMP)::int); SELECT currval('bans_id_seq')"
 		<< ends;
 
 #ifdef LOG_SQL

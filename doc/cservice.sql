@@ -426,7 +426,7 @@ CREATE TABLE pending_chanfix_scores (
 	account VARCHAR(20) NOT NULL,
 	first_opped VARCHAR(10),
 	last_opped VARCHAR(20),
-	last_updated INT4 NOT NULL DEFAULT now()::abstime::int4,
+	last_updated INT4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,
 	first CHAR NOT NULL DEFAULT 'Y'
 );
 
@@ -589,7 +589,7 @@ CREATE TRIGGER t_update_levels AFTER UPDATE ON levels FOR EACH ROW EXECUTE PROCE
 CREATE FUNCTION new_user() RETURNS OPAQUE AS '
 -- creates the users associated last_seen record
 BEGIN
-	INSERT INTO users_lastseen (user_id, last_seen, last_updated) VALUES(NEW.id, now()::abstime::int4,  now()::abstime::int4);
+	INSERT INTO users_lastseen (user_id, last_seen, last_updated) VALUES(NEW.id, date_part('epoch', CURRENT_TIMESTAMP)::int,  date_part('epoch', CURRENT_TIMESTAMP)::int);
 	RETURN NEW;
 END;
 ' LANGUAGE 'plpgsql';
@@ -604,7 +604,7 @@ CREATE TRIGGER t_new_user AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE n
 CREATE FUNCTION delete_user() RETURNS OPAQUE AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(1, OLD.id, 0, 0, now()::abstime::int4);
+	VALUES(1, OLD.id, 0, 0, date_part('epoch', CURRENT_TIMESTAMP)::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -617,7 +617,7 @@ CREATE TRIGGER t_delete_user AFTER DELETE ON users FOR EACH ROW EXECUTE PROCEDUR
 CREATE FUNCTION delete_channel() RETURNS OPAQUE AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(2, OLD.id, 0, 0, now()::abstime::int4);
+	VALUES(2, OLD.id, 0, 0, date_part('epoch', CURRENT_TIMESTAMP)::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -630,7 +630,7 @@ CREATE TRIGGER t_delete_channel AFTER DELETE ON channels FOR EACH ROW EXECUTE PR
 CREATE FUNCTION delete_level() RETURNS OPAQUE AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(3, OLD.channel_id, OLD.user_id, 0, now()::abstime::int4);
+	VALUES(3, OLD.channel_id, OLD.user_id, 0, date_part('epoch', CURRENT_TIMESTAMP)::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -643,7 +643,7 @@ CREATE TRIGGER t_delete_level AFTER DELETE ON levels FOR EACH ROW EXECUTE PROCED
 CREATE FUNCTION delete_ban() RETURNS OPAQUE AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(4, OLD.id, 0, 0, now()::abstime::int4);
+	VALUES(4, OLD.id, 0, 0, date_part('epoch', CURRENT_TIMESTAMP)::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -685,7 +685,7 @@ CREATE TABLE ip_restrict (
 	added_by	int4 NOT NULL,
 	type		int4 NOT NULL DEFAULT 0,
 	value		inet NOT NULL,
-	last_updated	int4 NOT NULL DEFAULT now()::abstime::int4,
+	last_updated	int4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,
 	last_used	int4 NOT NULL DEFAULT 0,
 	expiry		int4 NOT NULL,
 	description	VARCHAR(255)
@@ -706,7 +706,7 @@ CREATE TABLE glines (
         AddedBy VARCHAR(128) NOT NULL,
         AddedOn INT4 NOT NULL,
         ExpiresAt INT4 NOT NULL,
-        LastUpdated INT4 NOT NULL DEFAULT now()::abstime::int4,
+        LastUpdated INT4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,
         Reason VARCHAR(255)
 );
 

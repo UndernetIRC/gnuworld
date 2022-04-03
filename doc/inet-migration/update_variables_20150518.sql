@@ -12,4 +12,4 @@ BAN	1	/msg X ban <#channel> <nick|*!*user@*.host> [duration] [level] [reason]\nA
 -- Add ban reason maximum length
 
 INSERT INTO variables (var_name,contents,last_updated,hint)
-VALUES ('MAX_BAN_REASON_LENGTH', '300', now()::abstime::int4, 'Maximum length for ban reason.');
+VALUES ('MAX_BAN_REASON_LENGTH', '300', date_part('epoch', CURRENT_TIMESTAMP)::int, 'Maximum length for ban reason.');

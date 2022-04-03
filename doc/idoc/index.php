@@ -1996,7 +1996,7 @@ First you have to edit the <i>cservice.addme.sql</i> script, you will find it in
 the <i>doc/</i> directory of the 'gnuworld' cvs repository.
 What you have to do is edit the username who will be added:
 e.g.:
-	<i>INSERT into users (user_name,password,language_id,last_updated) VALUES ('Admin','07d976a29bdb3ff42e19c102852151b28097bbad',1,now()::abstime::int4);</i>
+	<i>INSERT into users (user_name,password,language_id,last_updated) VALUES ('Admin','07d976a29bdb3ff42e19c102852151b28097bbad',1,date_part('epoch', CURRENT_TIMESTAMP)::int);</i>
 Change the "Admin" to your preferred username.
 After that you run it with this command:
 	<i>psql cservice < cservice.addme.sql</i>

@@ -295,10 +295,10 @@ You can get info about other values in the conf file itself.<br>
  <br>
 <br>
  INSERT into users (user_name,password,language_id,last_updated)<br>
- VALUES ('the_user_name','07d976a29bdb3ff42e10c102852151b28097bbad',1,now()::abstime::int4);<br>
+ VALUES ('the_user_name','07d976a29bdb3ff42e10c102852151b28097bbad',1,date_part('epoch', CURRENT_TIMESTAMP)::int);<br>
 <br>
  INSERT into levels (channel_id,user_id,access,last_updated)<br>
- VALUES (1,the_user_id,1000,now()::abstime::int4);<br>
+ VALUES (1,the_user_id,1000,date_part('epoch', CURRENT_TIMESTAMP)::int);<br>
 <br>
  * the_user_name should be the username will be added with level 1000<br>
 <br>

@@ -198,7 +198,7 @@ theQuery	<< Main
 		<< SAccess
 		<< ", last_updated_by = '"
 		<< ccontrol::removeSqlChars(last_updated_by)
-		<< "',last_updated = now()::abstime::int4,flags = "
+		<< "',last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,flags = "
 		<< Flags
 		<<  ",suspend_expires = "
 		<< SuspendExpires

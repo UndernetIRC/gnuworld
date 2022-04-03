@@ -82,7 +82,7 @@ CREATE TABLE glines (
 	AddedBy VARCHAR(128) NOT NULL,
 	AddedOn INT4 NOT NULL,
 	ExpiresAt INT4 NOT NULL,
-	LastUpdated INT4 NOT NULL DEFAULT now()::abstime::int4,
+	LastUpdated INT4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,
 	Reason VARCHAR(255)
 	);
 				
@@ -118,7 +118,7 @@ CREATE TABLE exceptions (
 	Host VARCHAR(128) NOT NULL,
 	Connections INT4 NOT NULL,
 	AddedBy VARCHAR(128) NOT NULL,
-	AddedOn INT4 NOT NULL DEFAULT now()::abstime::int4,
+	AddedOn INT4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,
 	Reason VARCHAR(450) 
 	);	
 	
