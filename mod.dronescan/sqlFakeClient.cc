@@ -74,8 +74,8 @@ fakeInsert	<< "INSERT INTO fakeclients VALUES ("
 		<< "'" << hostname << "', "
 		<< "'" << realname << "', "
 		<< createdBy_i << ", "
-		<< "now()::abstime::int4, "
-		<< "now()::abstime::int4, 0"
+		<< "date_part('epoch', CURRENT_TIMESTAMP)::int, "
+		<< "date_part('epoch', CURRENT_TIMESTAMP)::int, 0"
 		<< ")"
 		;
 

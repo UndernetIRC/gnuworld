@@ -295,7 +295,7 @@ queryString	<< queryHeader
 		<< "channel_ts = " << channel_ts << ", "
 		<< "channel_mode = '" << escapeSQLChars(channel_mode) << "', "
 		<< "userflags = " << userflags << ", "
-		<< "last_updated = now()::abstime::int4, "
+		<< "last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int, "
 		<< "limit_offset = " << limit_offset << ", "
 		<< "limit_period = " << limit_period << ", "
 		<< "limit_grace = " << limit_grace << ", "
@@ -336,7 +336,7 @@ queryString	<< queryHeader
 			<< registered_ts << ", "
 			<< channel_ts << ", '"
 			<< escapeSQLChars(channel_mode) << "', "
-			<< "now()::abstime::int4,"
+			<< "date_part('epoch', CURRENT_TIMESTAMP)::int,"
 			<< no_take
 			<< ")"
 			<< ends;

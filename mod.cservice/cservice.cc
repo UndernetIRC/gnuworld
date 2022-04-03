@@ -150,10 +150,10 @@ channels_flood_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 #ifdef LOG_SQL
 	elog	<< "cservice::OnAttach::sqlQuery> DELETE FROM "
 		<< "webnotices WHERE created_ts < "
-		<< "now()::abstime::int4 - 600)"
+		<< "date_part('epoch', CURRENT_TIMESTAMP)::int - 600)"
 		<< endl;
 #endif
-if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (now()::abstime::int4 - 600)"))
+if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (date_part('epoch', CURRENT_TIMESTAMP)::int - 600)"))
 {
 	/* only register the timer if the query is ok.
 	 * if the query fails, we most likely don't have
@@ -168,7 +168,7 @@ if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (now()::abstime::int4
 		<< endl;
 }
 
-if (SQLDb->Exec("SELECT now()::abstime::int4;",true))
+if (SQLDb->Exec("SELECT date_part('epoch', CURRENT_TIMESTAMP)::int;",true))
 	{
 	// Set our "Last Refresh" timers to the current database system time.
 	time_t serverTime = atoi(SQLDb->GetValue(0,0).c_str());
@@ -1838,7 +1838,7 @@ bool cservice::passedIPR(iClient* theClient)
 bool cservice::updateIPRlast_used(sqlUser* theUser, const string& ipr_ipvalue)
 {
 	stringstream theQuery;
-	theQuery	<< "UPDATE ip_restrict SET last_used = now()::abstime::int4"
+	theQuery	<< "UPDATE ip_restrict SET last_used = date_part('epoch', CURRENT_TIMESTAMP)::int"
 				<< " WHERE user_id = "
 				<< theUser->getID()
 				<< " AND value = '" << ipr_ipvalue << "'"
@@ -2818,7 +2818,7 @@ void cservice::cacheExpireUsers()
 					updateQuery	<< "INSERT INTO users_lastseen (user_id,"
 							<< "last_seen,last_updated) VALUES("
 							<< tmpUser->getID()
-							<< ",now()::abstime::int4,now()::abstime::int4)"
+							<< ",date_part('epoch', CURRENT_TIMESTAMP)::int,date_part('epoch', CURRENT_TIMESTAMP)::int)"
 							<< ends;
 
 #ifdef LOG_SQL
@@ -3098,7 +3098,7 @@ stringstream theQuery ;
 
 theQuery	<< "SELECT "
 			<< sql::channel_fields
-			<< ",pending.manager_id,now()::abstime::int4 as db_unixtime FROM "
+			<< ",pending.manager_id,date_part('epoch', CURRENT_TIMESTAMP)::int as db_unixtime FROM "
 			<< "channels,pending WHERE channels.last_updated >= "
 			<< lastChannelRefresh
 			<< " AND registered_ts <> 0"
@@ -3126,7 +3126,7 @@ if (SQLDb->Tuples() <= 0)
 	theQuery.str("");
 	theQuery	<< "SELECT "
 				<< sql::channel_fields
-				<< ",now()::abstime::int4 as db_unixtime FROM "
+				<< ",date_part('epoch', CURRENT_TIMESTAMP)::int as db_unixtime FROM "
 				<< "channels WHERE channels.last_updated >= "
 				<< lastChannelRefresh
 				<< " AND registered_ts <> 0"
@@ -3284,7 +3284,7 @@ stringstream theQuery ;
 
 theQuery	<< "SELECT "
 			<< sql::level_fields
-			<< ",now()::abstime::int4 as db_unixtime FROM ";
+			<< ",date_part('epoch', CURRENT_TIMESTAMP)::int as db_unixtime FROM ";
 		if (channelId > 0)
 		{
 			theQuery << "levels WHERE channel_id = " << channelId
@@ -3395,7 +3395,7 @@ void cservice::updateUsers()
 
 	theQuery	<< "SELECT "
 				<< sql::user_fields
-				<< ",now()::abstime::int4 as db_unixtime FROM "
+				<< ",date_part('epoch', CURRENT_TIMESTAMP)::int as db_unixtime FROM "
 				<< "users WHERE last_updated >= "
 				<< lastUserRefresh
 				<< ends;
@@ -3515,7 +3515,7 @@ if (timer_id == webrelay_timerID)
 	string webrelayQuery;
 
 	webrelayQuery = "SELECT created_ts,contents FROM webnotices WHERE ";
-	webrelayQuery += "created_ts <= now()::abstime::int4 ";
+	webrelayQuery += "created_ts <= date_part('epoch', CURRENT_TIMESTAMP)::int ";
 	webrelayQuery += "ORDER BY created_ts";
 #ifdef LOG_SQL
 	elog	<< "cservice::OnTimer::sqlQuery> "
@@ -3978,8 +3978,8 @@ bool cservice::RejectChannel(unsigned int chanId, const string& reason)
 {
 	stringstream theQuery;
 	theQuery	<< "UPDATE pending SET status = '9',"
-				<< " last_updated = now()::abstime::int4,"
-				<< " decision_ts = now()::abstime::int4,"
+				<< " last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,"
+				<< " decision_ts = date_part('epoch', CURRENT_TIMESTAMP)::int,"
 				<< " decision = 'by The Judge: "
 				<< reason
 				<< "', reviewed = 'Y', reviewed_by_id = "
@@ -4004,8 +4004,8 @@ bool cservice::ReviewChannel(unsigned int chanId)
 {
 	stringstream theQuery;
 	theQuery	<< "UPDATE pending SET status = '8',"
-				<< "last_updated = now()::abstime::int4,"
-				<< "check_start_ts = now()::abstime::int4 "
+				<< "last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,"
+				<< "check_start_ts = date_part('epoch', CURRENT_TIMESTAMP)::int "
 				<< "WHERE channel_id = " << chanId
 				<< ends;
 
@@ -4026,8 +4026,8 @@ bool cservice::AcceptChannel(unsigned int chanId, const string& reason)
 {
 	stringstream theQuery;
 	theQuery	<< "UPDATE pending SET status = '3',"
-				<< " last_updated = now()::abstime::int4,"
-				<< " decision_ts = now()::abstime::int4,"
+				<< " last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,"
+				<< " decision_ts = date_part('epoch', CURRENT_TIMESTAMP)::int,"
 				<< " decision = 'by The Judge: "
 				<< reason
 				<< "', reviewed = 'Y', reviewed_by_id = "
@@ -4460,7 +4460,7 @@ void cservice::checkNewIncomings()
 	theQuery	<< "SELECT channels.name,channels.id,users.user_name FROM channels,pending,users WHERE channels.id = pending.channel_id "
 				<< "AND pending.status = 0 AND (pending.created_ts + "
 				<< pendingTime
-				<< ") < now()::abstime::int4 "
+				<< ") < date_part('epoch', CURRENT_TIMESTAMP)::int "
 				<< " AND users.id = manager_id"
 				<< ends;
 	if (!SQLDb->Exec(theQuery, true))
@@ -4569,8 +4569,8 @@ void cservice::checkTrafficPass()
 		{
 			stringstream theQuery;
 			theQuery 	<< "UPDATE pending SET status = '2',"
-						<< "check_start_ts = now()::abstime::int4,"
-						<< "last_updated = now()::abstime::int4 "
+						<< "check_start_ts = date_part('epoch', CURRENT_TIMESTAMP)::int,"
+						<< "last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int "
 						<< "WHERE channel_id = " << pendingChan->channel_id
 						<< ends;
 			#ifdef LOG_SQL
@@ -4622,7 +4622,7 @@ void cservice::checkObjections()
 				<< "WHERE channels.id = pending.channel_id "
 				<< "AND pending.status = 2 AND (pending.check_start_ts + "
 				<< notifTime
-				<< ") < now()::abstime::int4 "
+				<< ") < date_part('epoch', CURRENT_TIMESTAMP)::int "
 				<< " AND users.id = manager_id"
 				<< " AND objections.channel_id = pending.channel_id"
 				//<< " LIMIT 1"
@@ -4676,7 +4676,7 @@ void cservice::checkAccepts()
 				<< "WHERE channels.id = pending.channel_id "
 				<< "AND pending.status = 2 AND (pending.check_start_ts + "
 				<< notifTime
-				<< ") < now()::abstime::int4 "
+				<< ") < date_part('epoch', CURRENT_TIMESTAMP)::int "
 				<< " AND users.id = manager_id"
 				<< ends;
 
@@ -4792,7 +4792,7 @@ void cservice::cleanUpReviews()
 	   			<< "WHERE channels.id = pending.channel_id "
 	   			<< "AND pending.status = 8 AND (pending.check_start_ts + "
 	   			<< reviewTime
-	   			<< ") < now()::abstime::int4 "
+	   			<< ") < date_part('epoch', CURRENT_TIMESTAMP)::int "
 	   			<< " AND users.id = manager_id"
 	   			<< ends;
 
@@ -4841,7 +4841,7 @@ void cservice::cleanUpPendings()
 					<< "WHERE (pending.status = 3 OR pending.status = 9 OR pending.status = 4) "
 					<< "AND (pending.last_updated + "
 					<< expireTime
-					<< ") < now()::abstime::int4 "
+					<< ") < date_part('epoch', CURRENT_TIMESTAMP)::int "
 					<< ends;
 		if (!SQLDb->Exec(theQuery, true))
 		{
@@ -7897,7 +7897,7 @@ void cservice::NoteAllAuthedClients(sqlUser* theUser, const char* Message, ... )
 		queryString	<< queryHeader
 				<< theUser->getID() << ", '"
 				<< escapeSQLChars(noteMessage) << "', "
-				<< "now()::abstime::int4);"
+				<< "date_part('epoch', CURRENT_TIMESTAMP)::int);"
 				<< ends;
 
 		#ifdef LOG_SQL
@@ -8851,7 +8851,7 @@ bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const s
 							<< " last_opped='"
 							<< lastOpped
 							<< "',"
-							<< " last_updated=now()::abstime::int4, "
+							<< " last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int, "
 							<< "first='N'"
 							<< " WHERE user_id='"
 							<< userID
@@ -8970,7 +8970,7 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 			updateQuery	<< "INSERT INTO users_lastseen (user_id,"
 					<< "last_seen,last_updated) VALUES("
 					<< theUser->getID()
-					<< ",now()::abstime::int4,now()::abstime::int4)"
+					<< ",date_part('epoch', CURRENT_TIMESTAMP)::int,date_part('epoch', CURRENT_TIMESTAMP)::int)"
 					<< ends;
 
 	#ifdef LOG_SQL
@@ -9732,7 +9732,7 @@ bool cservice::expireWhitelist()
 {
 stringstream whitelistQuery;
 whitelistQuery	<< "DELETE FROM whitelist WHERE "
-		<< "expiresat <= now()::abstime::int4 AND "
+		<< "expiresat <= date_part('epoch', CURRENT_TIMESTAMP)::int AND "
 		<< "expiresat != 0" << ends;
 
 #ifdef LOG_SQL
@@ -9784,7 +9784,7 @@ bool cservice::InsertUserHistory(iClient* theClient, const string& command)
 			<< escapeSQLChars(string_upper(command)) << "', '"
 			<< escapeSQLChars(xIP(theClient->getIP()).GetNumericIP()) << "', '"
 			<< escapeSQLChars(theClient->getRealNickUserHost()) << "', "
-			<< "now()::abstime::int4)"
+			<< "date_part('epoch', CURRENT_TIMESTAMP)::int)"
 			<< ends;
 #ifdef LOG_SQL
 	elog	<< "cservice::InsertUserHistory> "

@@ -6,7 +6,7 @@
 
 -- WARNING: run this only ONCE!
 
-UPDATE variables SET last_updated=now()::abstime::int4,hint='Maximum ban duration (in seconds)',contents=(contents::int4*3600) WHERE var_name='MAX_BAN_DURATION';
+UPDATE variables SET last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int,hint='Maximum ban duration (in seconds)',contents=(contents::int4*3600) WHERE var_name='MAX_BAN_DURATION';
 
 DELETE FROM help WHERE topic='BAN' AND language_id=1;
 

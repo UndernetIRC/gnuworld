@@ -164,7 +164,7 @@ stringstream updateQuery;
 updateQuery	<< "UPDATE supporters SET support = '"
 			<< supportChar
 			<< "'"
-			<< ", last_updated = now()::abstime::int4"
+			<< ", last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int"
 			<< " WHERE channel_id = "
 			<< channel_id
 			<< " AND user_id = "
@@ -248,8 +248,8 @@ if (supportChar == 'Y')
 	{
 		stringstream updatePendingQuery;
 		updatePendingQuery	<< "UPDATE pending SET status = '1',"
-							<< " last_updated = now()::abstime::int4,"
-							<< " check_start_ts = now()::abstime::int4"
+							<< " last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,"
+							<< " check_start_ts = date_part('epoch', CURRENT_TIMESTAMP)::int"
 							<< " WHERE channel_id = "
 							<< channel_id
 							<< " AND status = '0'"
@@ -282,8 +282,8 @@ if (supportChar == 'N')
 
 	stringstream updatePendingQuery;
 	updatePendingQuery	<< "UPDATE pending SET status = '9',"
-						<< " last_updated = now()::abstime::int4,"
-						<< " decision_ts = now()::abstime::int4,"
+						<< " last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,"
+						<< " decision_ts = date_part('epoch', CURRENT_TIMESTAMP)::int,"
 						<< " decision = '--AUTOMATIC (REGPROC)-- NON-SUPPORT'"
 						<< " WHERE channel_id = "
 						<< channel_id
@@ -340,10 +340,10 @@ if (supportChar == 'N')
 		noregQuery	<< cmdHeader
 					<< "('', '','"
 					<< escapeSQLChars(channelName) << "',"
-                    // << "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
-					<< "1, (now()::abstime::int4 + ("
+                    // << "1, (date_part('epoch', CURRENT_TIMESTAMP)::int + (86400*3)), date_part('epoch', CURRENT_TIMESTAMP)::int, '* REGPROC', '-NON SUPPORT-'"
+					<< "1, (date_part('epoch', CURRENT_TIMESTAMP)::int + ("
 					<< noregTime
-					<< ")), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
+					<< ")), date_part('epoch', CURRENT_TIMESTAMP)::int, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
 #ifdef LOG_SQL
@@ -364,7 +364,7 @@ if (supportChar == 'N')
 					<< escapeSQLChars(managerName) << "', '"
 					<< escapeSQLChars(managerEmail) << "', "
 					<< "'', "
-					<< "1, (now()::abstime::int4 + (86400*3)), now()::abstime::int4, '* REGPROC', '-NON SUPPORT-'"
+					<< "1, (date_part('epoch', CURRENT_TIMESTAMP)::int + (86400*3)), date_part('epoch', CURRENT_TIMESTAMP)::int, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
 #ifdef LOG_SQL
@@ -381,11 +381,11 @@ if (supportChar == 'N')
 
 		stringstream clogQuery;
 		clogQuery	<< "INSERT INTO channellog (ts, channelid, event, message, last_updated) VALUES ("
-					<< "now()::abstime::int4, "
+					<< "date_part('epoch', CURRENT_TIMESTAMP)::int, "
 					<< channel_id << ", "
 					<< "1, 'Non-support by "
 					<< escapeSQLChars(theUser->getUserName()) << "', "
-					<< "now()::abstime::int4)"
+					<< "date_part('epoch', CURRENT_TIMESTAMP)::int)"
 					<< ends;
 
 #ifdef LOG_SQL

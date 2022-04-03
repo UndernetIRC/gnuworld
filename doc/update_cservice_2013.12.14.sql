@@ -8,7 +8,7 @@ CREATE TABLE ip_restrict (
 	added_by	int4 NOT NULL,
 	type		int4 NOT NULL DEFAULT 0,
 	value		inet NOT NULL,
-	last_updated	int4 NOT NULL DEFAULT now()::abstime::int4,
+	last_updated	int4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,
 	last_used	int4 NOT NULL DEFAULT 0,
 	expiry		int4 NOT NULL,
 	description	VARCHAR(255)

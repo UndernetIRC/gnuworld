@@ -10,7 +10,7 @@ DBHOST="127.0.0.1"
 
 # default information to put in the db for those .., DO NOT USE a BLANK 'LASTMODIF', use "0".
 LASTMODIFBY=`basename $0`
-LASTMODIF="now()::abstime::int4"
+LASTMODIF="date_part('epoch', CURRENT_TIMESTAMP)::int"
 
 
 
@@ -270,7 +270,7 @@ if [ "$REP1" == "C" ]; then
 	echo "-->             SALT    : [$GENSALT]"
 
 	echo "--> Adding user '$FORCEUSERNAME'..."
-	DAQRY="INSERT INTO users (user_name,password,email,url,question_id,verificationdata,language_id,public_key,last_updated_by,last_updated,signup_cookie,signup_ip,tz_setting) VALUES ('$FORCEUSERNAME','$ENCPASS','$UEMAIL','',$UQID,'$UVA',1,'','$LASTMODIFBY',now()::abstime::int4,'Added from the console','127.0.0.1','')"
+	DAQRY="INSERT INTO users (user_name,password,email,url,question_id,verificationdata,language_id,public_key,last_updated_by,last_updated,signup_cookie,signup_ip,tz_setting) VALUES ('$FORCEUSERNAME','$ENCPASS','$UEMAIL','',$UQID,'$UVA',1,'','$LASTMODIFBY',date_part('epoch', CURRENT_TIMESTAMP)::int,'Added from the console','127.0.0.1','')"
 	echo "--> DB: `echo -n \"$DAQRY\" | $PSQLCMD -h $DBHOST $DBNAME`"
 	FROMC="1"
 	REP1="M"
@@ -312,9 +312,9 @@ if [ "$REP1" == "M" ]; then
 			echo "--> NOTICE: We will be running what should be at this moment just like if you ran 'cservice.addme.sql'"
 			echo "--> NOTICE: You will NOT need to run 'cservice.addme.sql' anymore, so don't run it ;P"
 
-			ADDADMCHAN="INSERT into channels (name,flags,channel_ts,registered_ts,last_updated) VALUES ('*',1,now()::abstime::int4,31337,now()::abstime::int4)"
-			ADDCODERCHAN="INSERT into channels (name,flags,channel_ts,registered_ts,last_updated) VALUES ('#coder-com',1,now()::abstime::int4,31337,now()::abstime::int4)"
-			ADDCODERACCESS="INSERT into levels (channel_id,user_id,access,added_by,added,last_modif_by,last_modif,last_updated) VALUES (2,1,500,'$LASTMODIFBY',$LASTMODIF,'$LASTMODIFBY',$LASTMODIF,now()::abstime::int4)"
+			ADDADMCHAN="INSERT into channels (name,flags,channel_ts,registered_ts,last_updated) VALUES ('*',1,date_part('epoch', CURRENT_TIMESTAMP)::int,31337,date_part('epoch', CURRENT_TIMESTAMP)::int)"
+			ADDCODERCHAN="INSERT into channels (name,flags,channel_ts,registered_ts,last_updated) VALUES ('#coder-com',1,date_part('epoch', CURRENT_TIMESTAMP)::int,31337,date_part('epoch', CURRENT_TIMESTAMP)::int)"
+			ADDCODERACCESS="INSERT into levels (channel_id,user_id,access,added_by,added,last_modif_by,last_modif,last_updated) VALUES (2,1,500,'$LASTMODIFBY',$LASTMODIF,'$LASTMODIFBY',$LASTMODIF,date_part('epoch', CURRENT_TIMESTAMP)::int)"
 
 			echo "--> Inserting ADMIN (*) channel..."
 			echo "--> DB: `echo -n \"$ADDADMCHAN\" | $PSQLCMD -h $DBHOST $DBNAME`"
@@ -337,16 +337,16 @@ if [ "$REP1" == "M" ]; then
 
 	if [ "$ADMINLVL" == "1000" ]; then
 		echo "--> Modifying ADMIN access from $ADMINLVL to 999..."
-		DAQRY="UPDATE levels SET access=999,last_modif_by='$LASTMODIFBY',last_modif=$LASTMODIF,last_updated=now()::abstime::int4 WHERE channel_id=1 AND user_id=$USRID AND access=$ADMINLVL"
+		DAQRY="UPDATE levels SET access=999,last_modif_by='$LASTMODIFBY',last_modif=$LASTMODIF,last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=1 AND user_id=$USRID AND access=$ADMINLVL"
 		echo "--> DB: `echo -n \"$DAQRY\" | $PSQLCMD -h $DBHOST $DBNAME`"
 	else
 		if [ "$ADMINLVL" == "(0" ]; then
 			echo "--> Adding ADMIN access at level 1000..."
-			DAQRY="INSERT INTO levels (channel_id,user_id,access,added_by,added,last_modif_by,last_modif,last_updated) VALUES (1,$USRID,1000,'$LASTMODIFBY',$LASTMODIF,'$LASTMODIFBY',$LASTMODIF,now()::abstime::int4)"
+			DAQRY="INSERT INTO levels (channel_id,user_id,access,added_by,added,last_modif_by,last_modif,last_updated) VALUES (1,$USRID,1000,'$LASTMODIFBY',$LASTMODIF,'$LASTMODIFBY',$LASTMODIF,date_part('epoch', CURRENT_TIMESTAMP)::int)"
 			echo "--> DB: `echo -n \"$DAQRY\" | $PSQLCMD -h $DBHOST $DBNAME`"
 		else
 			echo "--> Modifying ADMIN access from $ADMINLVL to 1000..."
-			DAQRY="UPDATE levels SET access=1000,last_modif_by='$LASTMODIFBY',last_modif=$LASTMODIF,last_updated=now()::abstime::int4 WHERE channel_id=1 AND user_id=$USRID AND access=$ADMINLVL"
+			DAQRY="UPDATE levels SET access=1000,last_modif_by='$LASTMODIFBY',last_modif=$LASTMODIF,last_updated=date_part('epoch', CURRENT_TIMESTAMP)::int WHERE channel_id=1 AND user_id=$USRID AND access=$ADMINLVL"
 			echo "--> DB: `echo -n \"$DAQRY\" | $PSQLCMD -h $DBHOST $DBNAME`"
 		fi
 	fi

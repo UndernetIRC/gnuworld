@@ -105,7 +105,7 @@
 -- 27/08/02 Add REOP command to opers
 --  update opers set saccess = (saccess | 4194304);
 -- 16/12/02 Added lastupdated to glines
---  alter table glines add LastUpdated INT4 NOT NULL DEFAULT now()::abstime::int4;
+--  alter table glines add LastUpdated INT4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int;
 
 -- 28/04/02 Add reason to the exceptions table
 --   alter table exceptions add Reason VARCHAR(450);

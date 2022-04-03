@@ -125,7 +125,7 @@ if (string_lower(st[1]) == "send")
 				<< targetUser->getID() << ", "
 				<< theUser->getID() << ", '"
 				<< escapeSQLChars(message) << "', "
-				<< "now()::abstime::int4);"
+				<< "date_part('epoch', CURRENT_TIMESTAMP)::int);"
 				<< ends;
 
 	#ifdef LOG_SQL
