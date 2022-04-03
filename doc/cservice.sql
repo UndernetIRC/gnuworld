@@ -548,28 +548,28 @@ CREATE TABLE notices (
 --CREATE RULE cm3 AS ON UPDATE TO users DO NOTIFY users_u;
 --CREATE RULE cm4 AS ON UPDATE TO levels DO NOTIFY levels_u;
 
-CREATE FUNCTION update_users() RETURNS OPAQUE AS '
+CREATE FUNCTION update_users() RETURNS TRIGGER AS '
 BEGIN
 	NOTIFY users_u;
 	RETURN NEW;
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE FUNCTION update_channels() RETURNS OPAQUE AS '
+CREATE FUNCTION update_channels() RETURNS TRIGGER AS '
 BEGIN
 	NOTIFY channels_u;
 	RETURN NEW;
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE FUNCTION update_levels() RETURNS OPAQUE AS '
+CREATE FUNCTION update_levels() RETURNS TRIGGER AS '
 BEGIN
 	NOTIFY levels_u;
 	RETURN NEW;
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE FUNCTION update_bans() RETURNS OPAQUE AS '
+CREATE FUNCTION update_bans() RETURNS TRIGGER AS '
 BEGIN
 	NOTIFY bans_u;
 	RETURN NEW;
@@ -586,7 +586,7 @@ CREATE TRIGGER t_update_levels AFTER UPDATE ON levels FOR EACH ROW EXECUTE PROCE
 -- to your database:
 -- /usr/local/pgsql/bin/createlang plpgsql dbname -L /usr/local/pgsql/lib/
 
-CREATE FUNCTION new_user() RETURNS OPAQUE AS '
+CREATE FUNCTION new_user() RETURNS TRIGGER AS '
 -- creates the users associated last_seen record
 BEGIN
 	INSERT INTO users_lastseen (user_id, last_seen, last_updated) VALUES(NEW.id, date_part("epoch", CURRENT_TIMESTAMP)::int,  date_part("epoch", CURRENT_TIMESTAMP)::int);
@@ -601,7 +601,7 @@ CREATE TRIGGER t_new_user AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE n
 -- Functions to automatically generate "Deletion Stubs" for removed records, so CMaster
 -- can pick up on these and clear its cache.
 
-CREATE FUNCTION delete_user() RETURNS OPAQUE AS '
+CREATE FUNCTION delete_user() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
 	VALUES(1, OLD.id, 0, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
@@ -614,7 +614,7 @@ CREATE TRIGGER t_delete_user AFTER DELETE ON users FOR EACH ROW EXECUTE PROCEDUR
 -- Channel table Deletion Stubs
 --
 
-CREATE FUNCTION delete_channel() RETURNS OPAQUE AS '
+CREATE FUNCTION delete_channel() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
 	VALUES(2, OLD.id, 0, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
@@ -627,7 +627,7 @@ CREATE TRIGGER t_delete_channel AFTER DELETE ON channels FOR EACH ROW EXECUTE PR
 -- Level table Deletion Stubs
 --
 
-CREATE FUNCTION delete_level() RETURNS OPAQUE AS '
+CREATE FUNCTION delete_level() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
 	VALUES(3, OLD.channel_id, OLD.user_id, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
@@ -640,7 +640,7 @@ CREATE TRIGGER t_delete_level AFTER DELETE ON levels FOR EACH ROW EXECUTE PROCED
 -- Ban table Deletion Stubs
 --
 
-CREATE FUNCTION delete_ban() RETURNS OPAQUE AS '
+CREATE FUNCTION delete_ban() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
 	VALUES(4, OLD.id, 0, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
