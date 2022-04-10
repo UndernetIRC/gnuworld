@@ -164,3 +164,8 @@
 
 -- 2019-06-29 Adding glunidented option for isps
 alter TABLE ipLISPs add glunidented INT4 NOT NULL DEFAULT '0';
+
+-- 2022-04-10 ccontrol> Refactoring for postgresql 13 (the below works with previous versions too)
+alter table glines alter column lastupdated set default date_part('epoch', CURRENT_TIMESTAMP)::int;
+alter table exceptions alter column addedon set default date_part('epoch', CURRENT_TIMESTAMP)::int;
+
