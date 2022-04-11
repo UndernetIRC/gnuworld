@@ -589,7 +589,7 @@ CREATE TRIGGER t_update_levels AFTER UPDATE ON levels FOR EACH ROW EXECUTE PROCE
 CREATE FUNCTION new_user() RETURNS TRIGGER AS '
 -- creates the users associated last_seen record
 BEGIN
-	INSERT INTO users_lastseen (user_id, last_seen, last_updated) VALUES(NEW.id, date_part("epoch", CURRENT_TIMESTAMP)::int,  date_part("epoch", CURRENT_TIMESTAMP)::int);
+	INSERT INTO users_lastseen (user_id, last_seen, last_updated) VALUES(NEW.id, extract(epoch FROM now())::int, extract(epoch FROM now())::int);
 	RETURN NEW;
 END;
 ' LANGUAGE 'plpgsql';
