@@ -604,7 +604,7 @@ CREATE TRIGGER t_new_user AFTER INSERT ON users FOR EACH ROW EXECUTE PROCEDURE n
 CREATE FUNCTION delete_user() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(1, OLD.id, 0, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
+	VALUES(1, OLD.id, 0, 0, extract(epoch FROM now())::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -617,7 +617,7 @@ CREATE TRIGGER t_delete_user AFTER DELETE ON users FOR EACH ROW EXECUTE PROCEDUR
 CREATE FUNCTION delete_channel() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(2, OLD.id, 0, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
+	VALUES(2, OLD.id, 0, 0, extract(epoch FROM now())::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -630,7 +630,7 @@ CREATE TRIGGER t_delete_channel AFTER DELETE ON channels FOR EACH ROW EXECUTE PR
 CREATE FUNCTION delete_level() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(3, OLD.channel_id, OLD.user_id, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
+	VALUES(3, OLD.channel_id, OLD.user_id, 0, extract(epoch FROM now())::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
@@ -643,7 +643,7 @@ CREATE TRIGGER t_delete_level AFTER DELETE ON levels FOR EACH ROW EXECUTE PROCED
 CREATE FUNCTION delete_ban() RETURNS TRIGGER AS '
 BEGIN
 	INSERT INTO deletion_transactions (tableID, key1, key2, key3, last_updated)
-	VALUES(4, OLD.id, 0, 0, date_part("epoch", CURRENT_TIMESTAMP)::int);
+	VALUES(4, OLD.id, 0, 0, extract(epoch FROM now())::int);
 	RETURN OLD;
 END;
 ' LANGUAGE 'plpgsql';
