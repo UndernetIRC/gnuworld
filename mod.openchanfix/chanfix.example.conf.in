@@ -84,7 +84,9 @@ allowTopOpFix = false
 # Should the top op fixes be able to alert the top 10 ops who are not in
 # the channel at the time of the fix automatically? If no/false then the
 # database help entry for REQUESTOP will need to be updated.
-allowTopOpAlert = true
+# 2022-05-15: Setting no longer active. Even if this setting is set to false,
+#   top ops will be notified by default.
+#allowTopOpAlert = true
 
 # How much percentage within the top score should the top ops score be
 # before they are allowed to perform fixes. Dont include a %.

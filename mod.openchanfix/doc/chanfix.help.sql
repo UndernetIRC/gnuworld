@@ -14,7 +14,7 @@ BLOCK	1	Blocks a channel from being fixed, both automatically and manually.\nThe
 CANFIX	1	Lists the ops that can fix the specified channel without requiring oper assistance.
 CHECK	1	Shows the number of ops and total clients in the specified channel.
 CSCORE	1	Shows the same as SCORE, but in a compact output. See /msg C HELP SCORE.
-CHANFIX	1	Performs a manual fix on the specified channel. Append OVERRIDE, YES, or an exclamation mark (!) to force a manual fix. Append CONTACT if you wish that the top 10 ops for the channel be noticed about the fix before the fix happens.
+CHANFIX	1	Performs a manual fix on the specified channel. Append OVERRIDE, YES, or an exclamation mark (!) to force a manual fix.
 DELFLAG	1	Removes the specified flag from a user. See /msg C HELP ADDFLAG.
 DELHOST	1	Deletes the specified hostmask from a user's list of hostmasks.
 DELNOTE	1	Deletes a note matching the specified id from the specified channel. You can only delete the notes you have added.
@@ -31,7 +31,7 @@ OPLIST	1	Shows the top 10 op accounts and their scores for the specified channel
 OPNICKS	1	Shows the nicknames currently opped on the specified channel.
 REHASH	1	Reloads the translations, configuration, or help values based on the specified target.
 RELOAD	1	Completely reloads chanfix.\nNOTE: This will subject chanfix to a reconnection which will also include a large netburst that takes time to process, so use with caution.
-REQUESTOP	1	Performs a fix on the specified channel. Append CONTACT if you wish that the top 10 ops for the channel be noticed about the fix before the fix happens.
+REQUESTOP	1	Performs a fix on the specified channel.
 SCORE	1	Without extra arguments, shows the top scores of <channel>.\nOtherwise, it shows the score of either an <account> or a currently online client <=nick> for <channel>.
 SET	1	Sets various configuration options to the specified values.\nBoolean settings: ENABLE_AUTOFIX, ENABLE_CHANFIX, ENABLE_CHANNEL_BLOCKING.\nInteger settings: NUM_SERVERS.
 SIMULATE	1	Performs a simulated fix on the specified channel. Append AUTO or MANUAL to choose what type of fix to simulate upon the channel. 

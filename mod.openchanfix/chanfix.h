@@ -454,7 +454,6 @@ public:
 	bool		stopAutoFixOnOp;
 	bool		stopChanFixOnOp;
 	bool		allowTopOpFix;
-	bool		allowTopOpAlert;
 	int		topOpPercent;
 	int		minFixScore;
 	int		minCanFixScore;
@@ -541,7 +540,6 @@ public:
 	bool isChanServLinked() { return chanServLinked; }
 	bool isUpdateRunning() { return updateInProgress; }
 	bool isAllowingTopFix() { return allowTopOpFix; }
-	bool isAllowingTopOpAlert() { return allowTopOpAlert; }
 	unsigned int getTopOpPercent() { return topOpPercent; }
 	unsigned int getMinFixScore() { return minFixScore; }
 	unsigned int getMinCanFixScore() { return minCanFixScore; }

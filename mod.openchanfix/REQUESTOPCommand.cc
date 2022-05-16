@@ -47,7 +47,7 @@ StringTokenizer st(Message);
 
 bool isRequesterScoreHighEnough = false;
 int pScore, requesterScore = 0;
-bool alert = false;
+bool alert = true;
 bool inChan = false;
 sqlChanOp* curOp = 0;
 

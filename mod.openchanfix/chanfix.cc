@@ -151,7 +151,7 @@ RegisterCommand(new CANFIXCommand(this, "CANFIX",
 	0
 	));
 RegisterCommand(new CHANFIXCommand(this, "CHANFIX",
-	"<#channel> [override] [contact]",
+	"<#channel> [override]",
 	2,
 	0 /* Set to 0 to allow all opers to access it, otherwise this should be sqlcfUser::F_CHANFIX */
 	));
@@ -250,7 +250,7 @@ RegisterCommand(new RELOADCommand(this, "RELOAD",
 	sqlcfUser::F_OWNER
 	));
 RegisterCommand(new REQUESTOPCommand(this, "REQUESTOP",
-	isAllowingTopOpAlert() ? "<#channel> [contact]" : "<#channel>",
+	"<#channel>",
 	2,
 	0
 	));
@@ -398,7 +398,6 @@ joinChannels = atob(chanfixConfig->Require("joinChannels")->second) ;
 stopAutoFixOnOp = atob(chanfixConfig->Require("stopAutoFixOnOp")->second) ;
 stopChanFixOnOp = atob(chanfixConfig->Require("stopChanFixOnOp")->second) ;
 allowTopOpFix = atob(chanfixConfig->Require("allowTopOpFix")->second) ;
-allowTopOpAlert = atob(chanfixConfig->Require("allowTopOpAlert")->second) ;
 topOpPercent = atoi((chanfixConfig->Require("topOpPercent")->second).c_str()) ;
 minFixScore = atoi((chanfixConfig->Require("minFixScore")->second).c_str()) ;
 minCanFixScore = atoi((chanfixConfig->Require("minCanFixScore")->second).c_str()) ;

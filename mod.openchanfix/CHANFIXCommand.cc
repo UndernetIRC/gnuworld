@@ -39,7 +39,7 @@ void CHANFIXCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::str
 StringTokenizer st(Message);
 
 bool override = false;
-bool alert = false;
+bool alert = true;
 
 if (st.size() > 2) {
   unsigned int pos = 2;
@@ -55,9 +55,6 @@ if (st.size() > 2) {
 
     if (!strcasecmp(st[pos],"!"))
       override = true;
-
-    if (!strcasecmp(st[pos],"CONTACT"))
-      alert = true;
 
     pos++;
   }
