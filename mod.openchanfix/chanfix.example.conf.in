@@ -79,7 +79,7 @@ stopAutoFixOnOp = true
 stopChanFixOnOp = true
 
 # Should the top ops be allowed to perform fixes on their own channels?
-allowTopOpFix = false
+allowTopOpFix = true
 
 # Should the top op fixes be able to alert the top 10 ops who are not in
 # the channel at the time of the fix automatically? If no/false then the
