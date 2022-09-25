@@ -225,12 +225,12 @@ return 0 ;
 xServer::xServer( int argc, char** argv )
  : eventList( EVT_NOOP ),
    elogFileName( "debug.log" ),
+   socketFileName( "socket.log" ),
    configFileName( CONFFILE )
 {
 logSocket = true ;
 verbose = false ;
-bool doDebug = true ;
-string socketFileName( "socket.log" ) ;
+doDebug = true ;
 
 std::cout << "Before configuration" << endl; 
 #ifdef ENABLE_LOG4CPLUS
@@ -289,43 +289,7 @@ while( (c = getopt( argc, argv, "cd:Df:l:Lhs:")) != -1 )
 		} // close switch
 	} // close while
 
-if( doDebug )
-	{
-	elog.openFile( elogFileName ) ;
-	if( !elog.isOpen() )
-		{
-		clog	<< "*** Unable to open elog file: "
-			<< elogFileName
-			<< endl ;
-		::exit( 0 ) ;
-		}
-	clog	<< "*** Running in debug mode..."
-		<< endl ;
-	}
-
-if( verbose )
-	{
-	elog.setStream( &clog ) ;
-	elog	<< "*** Running in verbose mode..."
-		<< endl ;
-	}
-
-if( logSocket )
-	{
-	socketFile.open( socketFileName.c_str(), std::ios::out ) ;
-	if( !socketFile.is_open() )
-		{
-		clog	<< "*** Unable to open socket log file: "
-			<< socketFileName
-			<< endl ;
-		::exit( -1 ) ;
-		}
-	clog	<< "*** Logging raw data to "
-		<< socketFileName
-		<< "..."
-		<< endl ;
-	}
-
+startLogging() ;
 // Sets up the server internals
 initializeSystem() ;
 }

@@ -764,6 +764,12 @@ public:
 		{ return verbose ; }
 
 	/**
+	 * Return true if debug is enabled
+	 */
+	virtual bool isDebug() const
+		{ return doDebug ; }
+
+	/**
 	 * Return true if the server is to auto reconnect on
 	 * connection termination, false otherwise.
 	 */
@@ -892,6 +898,16 @@ public:
 	 * Output server statistics to the console (clog).
 	 */
 	virtual void dumpStats() ;
+
+	/**
+	 * Start logging.
+	 */
+	virtual void startLogging() ;
+
+	/**
+	 * Rotate logs.
+	 */
+	virtual void rotateLogs() ;
 
 	/**
 	 * Execute any waiting client timers.
@@ -1445,6 +1461,11 @@ protected:
 	std::string	elogFileName ;
 
 	/**
+	 * The name of the file to write socket info
+	 */
+	std::string	socketFileName ;
+
+	/**
 	 * The name of the server config file.
 	 */
 	std::string	configFileName ;
@@ -1480,6 +1501,11 @@ protected:
 	 * True if all elog data should be output to clog.
 	 */
 	bool		verbose ;
+
+	/**
+	 * True if debug is enabled.
+	 */
+	bool		doDebug ;
 
 	/**
 	 * True if autoreconnect is enabled, false otherwise.

@@ -355,6 +355,7 @@ switch( whichSig )
 		retMe = true ;
 		break ;
 	case SIGHUP:
+		rotateLogs() ;
 		retMe = true ;
 		break ;
 	case SIGUSR2:

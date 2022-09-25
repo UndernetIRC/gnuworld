@@ -1994,6 +1994,60 @@ clog	<< "Read " << burstBytes
 	<< endl ;
 }
 
+void xServer::startLogging()
+{
+if( doDebug )
+	{
+	elog.openFile( elogFileName ) ;
+	if( !elog.isOpen() )
+		{
+		clog	<< "*** Unable to open elog file: "
+			<< elogFileName
+			<< endl ;
+		::exit( 0 ) ;
+		}
+	clog	<< "*** Running in debug mode..."
+		<< endl ;
+	}
+
+if( verbose )
+	{
+	elog.setStream( &clog ) ;
+	elog	<< "*** Running in verbose mode..."
+		<< endl ;
+	}
+
+if( logSocket )
+	{
+	socketFile.open( socketFileName.c_str(), std::ios::out ) ;
+	if( !socketFile.is_open() )
+		{
+		clog	<< "*** Unable to open socket log file: "
+			<< socketFileName
+			<< endl ;
+		::exit( -1 ) ;
+		}
+	clog	<< "*** Logging raw data to "
+		<< socketFileName
+		<< "..."
+		<< endl ;
+	}
+}
+
+void xServer::rotateLogs()
+{
+if (elog.isOpen())
+	{
+	elog << endl << "Received SIGHUP. Rotating log files..." << endl;
+	elog.closeFile();
+	}
+if( logSocket && socketFile.is_open() )
+	{
+	socketFile.close() ;
+	}
+startLogging();
+}
+
 void xServer::run()
 {
 mainLoop() ;
