@@ -902,7 +902,7 @@ public:
 	/**
 	 * Start logging.
 	 */
-	virtual void startLogging() ;
+	virtual void startLogging(bool logrotate = false) ;
 
 	/**
 	 * Rotate logs.

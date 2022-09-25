@@ -62,12 +62,17 @@ if( logFile )
 
 bool ELog::openFile( const string& fileName )
 {
+bool isAlreadyOpen = false;
 if( isOpen() )
 	{
+	isAlreadyOpen = true;
 	closeFile() ;
 	}
 logFile = true ;
-outFile.open( fileName.c_str(), std::ios::out | std::ios::trunc ) ;
+if (isAlreadyOpen)
+	outFile.open( fileName.c_str(), std::ios::out | std::ios::app ) ;
+else
+	outFile.open( fileName.c_str(), std::ios::out | std::ios::trunc ) ;
 
 if( !isOpen() )
 	{

@@ -289,7 +289,7 @@ while( (c = getopt( argc, argv, "cd:Df:l:Lhs:")) != -1 )
 		} // close switch
 	} // close while
 
-startLogging() ;
+startLogging(false) ;
 // Sets up the server internals
 initializeSystem() ;
 }

@@ -1994,7 +1994,7 @@ clog	<< "Read " << burstBytes
 	<< endl ;
 }
 
-void xServer::startLogging()
+void xServer::startLogging(bool logrotate)
 {
 if( doDebug )
 	{
@@ -2019,7 +2019,10 @@ if( verbose )
 
 if( logSocket )
 	{
-	socketFile.open( socketFileName.c_str(), std::ios::out ) ;
+	if (logrotate)
+		socketFile.open( socketFileName.c_str(), std::ios::out | std::ios::app) ;
+	else
+		socketFile.open( socketFileName.c_str(), std::ios::out ) ;
 	if( !socketFile.is_open() )
 		{
 		clog	<< "*** Unable to open socket log file: "
@@ -2039,13 +2042,13 @@ void xServer::rotateLogs()
 if (elog.isOpen())
 	{
 	elog << endl << "Received SIGHUP. Rotating log files..." << endl;
-	elog.closeFile();
+	//elog.closeFile();  /* Do not close the file, elog.openFile() will handle that.
 	}
 if( logSocket && socketFile.is_open() )
 	{
 	socketFile.close() ;
 	}
-startLogging();
+startLogging(true);
 }
 
 void xServer::run()
