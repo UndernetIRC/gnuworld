@@ -75,11 +75,9 @@ cout	<< "ConnectionHandler::OnDisconnect> "
 	<< endl ;
 }
 
-void ConnectionHandler::OnTimeout( Connection* cPtr )
+/* This method is now overridden by xServer's onTimeout() method */
+void ConnectionHandler::OnTimeout( Connection * )
 {
-cout	<< "ConnectionHandler::OnTimeout> "
-	<< *cPtr
-	<< endl ;
 }
 
 } // namespace gnuworld

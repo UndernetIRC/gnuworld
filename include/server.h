@@ -755,7 +755,7 @@ public:
 	 * its uplink, false otherwise.
 	 */
 	virtual bool isConnected() const
-		{ return (serverConnection != 0) ; }
+		{ return (serverConnection != 0 && serverConnection->isConnected()) ; }
 
 	/**
 	 * Return true if verbosity is enabled.
@@ -1045,6 +1045,15 @@ public:
 	 */
 	virtual void	ControlCommand( iClient* srcClient,
 				const std::string& message ) ;
+
+	/**
+	 * This method overrides ConnectionHandler's OnTimeout method.
+	 * This method is called if a connection timeout occurs.
+	 * The given Connection is no longer valid when this method
+	 * is called.
+	 */
+	virtual void	OnTimeout( Connection* ) override;
+
 
 protected:
 

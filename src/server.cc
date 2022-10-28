@@ -3428,6 +3428,21 @@ if( msgTokens[ 0 ] == "loadclient" )
 	}
 }
 
+void xServer::OnTimeout( Connection* cPtr )
+{
+std::stringstream s;
+s	<< "xServer::OnTimeout> "
+	<< *cPtr
+	<< endl ;
+cout << s.str();
+if (cPtr == serverConnection)
+	{
+	/* If the connection timeout happens on the hub connection, stop the main loop in main.cc */
+	lastLoop = true;
+	elog << s.str();  /* Line not added to the debug log file - possibly because the program exits quickly because of lastLoop. Didn't verify */
+	}
+}
+
 bool xServer::hasControlAccess( const std::string& userName ) const
 {
 return (allowControlSet.find( userName ) != allowControlSet.end()) ;

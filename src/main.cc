@@ -307,7 +307,7 @@ while( keepRunning )
 	// Check if a reconnection is necessary
 	// Do not reconnect if the server is in the process of
 	// shutting down.
-	if( !isConnected() && !isLastLoop() )
+	if( !serverConnection && !isLastLoop() )
 		{
 		// Connect to the server/file
 		clog	<< "*** Connecting " ;
@@ -379,7 +379,7 @@ while( keepRunning )
 	long seconds = -1 ;
 	time_t now = ::time( 0 ) ;
 
-        if( !timerQueue.empty() )
+	if( !timerQueue.empty() )
                 {
 //		elog	<< "mainLoop> Found a timer"
 //			<< endl ;
@@ -399,6 +399,14 @@ while( keepRunning )
 			seconds = 0 ;
 			}
                 } // if( !timerQueue.empty() )
+
+	// If not fully connected to uplink, make sure timeout is checked every second
+	if (!serverConnection->isConnected())
+		seconds = 1;
+
+	// Give this loop a chance to run at least once every 2 minutes
+	if (seconds > 120)
+		seconds = 120;
 
 	// Process all available data
 	ConnectionManager::Poll( seconds ) ;
