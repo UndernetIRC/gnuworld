@@ -2876,13 +2876,10 @@ size_t count = 0 ;
 
 // First, remove all clients
 for( xNetwork::localClientIterator clientItr = Network->localClient_begin() ;
-	clientItr != Network->localClient_end() ; ++clientItr )
+	clientItr != Network->localClient_end() ; )
 	{
 	++count ;
-	DetachClient( clientItr->second, "Server shutdown" ) ;
-	/* as DetachClient() can alter the local client map, we MUST make this check! */
-	if (Network->localClient_begin() == Network->localClient_end())
-		break;
+	DetachClient( clientItr++->second, "Server shutdown" ) ;
 	}
 
 elog	<< "xServer::doShutdown> Removed "
@@ -2896,14 +2893,12 @@ elog	<< "xServer::doShutdown> Removed "
 count = 0 ;
 // Clear the channels
 for( xNetwork::clientIterator cItr = Network->clients_begin() ;
-	cItr != Network->clients_end() ; ++cItr )
+	cItr != Network->clients_end() ; )
 	{
-	++count ;
 	iClient* theClient = cItr->second ;
+	++count ;
+	++cItr ;
 	delete Network->removeClient( theClient ) ;
-	/* as removeClient() can alter clients map, we MUST make this check! */
-	if (Network->clients_begin() == Network->clients_end())
-		break;
 	}
 elog	<< "xServer::doShutdown> Removed "
 	<< count
@@ -2915,19 +2910,17 @@ elog	<< "xServer::doShutdown> Removed "
 
 count = 0 ;
 for( xNetwork::channelIterator cItr = Network->channels_begin() ;
-	cItr != Network->channels_end() ; ++cItr )
+	cItr != Network->channels_end() ; )
 	{
-	++count ;
 	Channel* theChan = cItr->second ;
+	++count ;
+	++cItr ;
 
 	elog	<< "xServer::doShutdown> Found channel: "
 		<< *theChan
 		<< endl ;
 
 	delete Network->removeChannel( theChan ) ;
-	/* as removeChannel() can alter channels map, we MUST make this check! */
-	if (Network->channels_begin() == Network->channels_end())
-		break;
 	}
 elog	<< "xServer::doShutdown> Removed "
 	<< count
@@ -2955,15 +2948,12 @@ elog	<< "xServer::doShutdown> Removed "
 
 count = 0 ;
 // Remove glines
-for( glineIterator gItr = glines_begin() ; gItr != glines_end() ; 
-	++gItr )
+for( glineIterator gItr = glines_begin() ; gItr != glines_end() ; )
 	{
+	Gline *tmpGline = gItr->second ;
 	++count ;
-	delete gItr->second ;
-	eraseGline( gItr ) ;
-	/* as eraseGline() can alter glines map, we MUST make this check! */
-	if (glines_begin() == glines_end())
-		break;
+	eraseGline( gItr++ ) ;
+	delete tmpGline ;
 	}
 elog	<< "xServer::doShutdown> Removed "
 	<< count

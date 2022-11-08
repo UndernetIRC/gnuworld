@@ -322,7 +322,7 @@ void msg_J::userPartAllChannels( iClient* theClient )
 {
 // Artifact, user is parting all channels
 for( iClient::channelIterator ptr = theClient->channels_begin(),
-	endPtr = theClient->channels_end() ; ptr != endPtr ; ++ptr )
+	endPtr = theClient->channels_end() ; ptr != endPtr ; )
 	{
 
 	// Remove this ChannelUser from the Channel's internal
@@ -357,8 +357,10 @@ for( iClient::channelIterator ptr = theClient->channels_begin(),
 
 		// Yup, remove the channel from the network channel
 		// table
-		delete Network->removeChannel( (*ptr)->getName() ) ;
+		delete Network->removeChannel( (*ptr++)->getName() ) ;
 		}
+	else
+		ptr++ ;
 	}
 
 // Just to be sure

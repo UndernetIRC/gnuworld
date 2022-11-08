@@ -871,12 +871,12 @@ for( eraseMapIterator eraseItr = eraseMap.begin(),
 		// Close the Connection's socket (file) descriptor
 		closeSocket( connectionPtr->getSockFD() ) ;
 
-		// Deallocate the memory associated with the Connection
-		delete connectionPtr ;
-
 		// Remove the Connection from the connectionMap
 		// for this handler
 		handlerItr->second.erase( eraseItr->second ) ;
+
+		// Deallocate the memory associated with the Connection
+		delete connectionPtr ;
 
 		} // for( ; eraseItr->first == handlerItr->first ; )
 

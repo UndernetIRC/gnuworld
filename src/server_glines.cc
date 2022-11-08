@@ -232,8 +232,7 @@ for( const_glineIterator ptr = glines_begin() ;
 
 void xServer::removeMatchingGlines( const string& wildHost )
 {
-for( glineIterator ptr = glines_begin() ; ptr != glines_end() ;
-	++ptr )
+for( glineIterator ptr = glines_begin() ; ptr != glines_end() ; )
 	{
 	// TODO: Does this work with two wildHost's?
 	if( !match( wildHost, ptr->second->getUserHost() ) )
@@ -241,8 +240,9 @@ for( glineIterator ptr = glines_begin() ; ptr != glines_end() ;
 		PostEvent( EVT_REMGLINE,
 			static_cast< void* >( ptr->second ) ) ;
 
-		delete ptr->second ;
-		glineList.erase( ptr ) ;
+		Gline* tmpGline = ptr->second ;
+		glineList.erase( ptr++ ) ;
+		delete  tmpGline ;
 		}
 	}
 }
