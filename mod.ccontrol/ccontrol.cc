@@ -1294,13 +1294,6 @@ if(st.size() < 2)
 
 		time_t lagTime;
 		lagTime = (now.tv_sec - atoi(st[6])) * 1000 + (now.tv_usec - atoi(st[7])) / 1000;
-		elog << "ccontrol(rpingCheck)> DEBUG: RPONG from "
-			<< tmpServer->getNetServer()->getName()
-			<< " lag=" << lagTime
-			<< " lastLagRecv (before now)="
-			<< tmpServer->getLastLagRecv()
-			<< " now=" << ::time(0)
-			<< endl;
 		tmpServer->setLagTime(lagTime);
 		tmpServer->setLastLagRecv(::time(0));
 		//if ((lagTime > MAX_LAG_TIME) && ((::time(0) - tmpServer->getLastLagReport()) > LAG_REPORT_INTERVAL)) {
@@ -1966,11 +1959,6 @@ else if (timer_id == rpingCheck)
 				continue;
 			Write("%s RI %s %s %d %s :%d %s", getCharYY().c_str(), TmpServer->getNetServer()->getCharYY().c_str(), getCharYYXXX().c_str(), ::time(0), s.str().c_str(), ::time(0), s.str().c_str());
 			TmpServer->setLastLagSent(::time(0));
-			elog << "ccontrol(rpingCheck)> DEBUG: Sending RPING to "
-				<< TmpServer->getNetServer()->getName()
-				<< " " << ::time(0)
-				<< endl;
-
 			}
 		//BG RI C] BGAAA 1246224483 960943 :1246224474
 		}
