@@ -201,7 +201,6 @@ if(bot->AddOper(theUser) == true)
 	{
 	bot->Notice(theClient, "Oper successfully added.");
 	theUser->loadData(theUser->getUserName());
-	bot->AddHost(theUser,"*!*@*");
 	}
 else
 	bot->Notice(theClient, "Error while adding the new oper.");
