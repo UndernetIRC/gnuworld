@@ -1,5 +1,8 @@
 -- "$Id: ccontrol.sql,v 1.34 2009/07/25 18:12:33 hidden1 Exp $"
 
+-- 2022-12-27: Hidden
+-- Removed the two shell tables (ShellCompanies and ShellNetblocks)
+
 -- 2019-06-29: Hidden
 -- Modified ipLISPs table for unidented glines
 
@@ -155,24 +158,6 @@ CREATE TABLE BadChannels (
 	Reason VARCHAR(512) NOT NULL,
 	AddedBy VARCHAR(200) NOT NULL
 	);
-
-CREATE TABLE ShellCompanies (
-        id SERIAL,
-        name VARCHAR(200) UNIQUE NOT NULL,
-        active int4 NOT NULL DEFAULT 1,
-        addedby VARCHAR(200) NOT NULL,
-        addedon int4 NOT NULL,
-        lastmodby VARCHAR(200) NOT NULL,
-        lastmodon int4 NOT NULL,
-        maxlimit int4 NOT NULL
-        );
-
-CREATE TABLE ShellNetblocks (
-        companyid int4 NOT NULL,
-        cidr VARCHAR(20) NOT NULL,
-        addedby VARCHAR(200) NOT NULL,
-        addedon int4 NOT NULL
-        );
 
 CREATE TABLE ipLISPs (
         id SERIAL,
