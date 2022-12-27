@@ -2176,7 +2176,6 @@ int AffectedUsers = 0;
 string client_ip;
 char Log[200], GlineMask[250], GlineReason[250];
 std::stringstream s;
-stringListType *OthersList;
 
 int CClonesCIDR;
 bool is_ipv4 = false;
