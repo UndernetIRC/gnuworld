@@ -2287,11 +2287,11 @@ if(dbConnected)
 		}
 		bool ipLRetVal = isIpLClientAllowed(NewUser, retList, true);
 		for (ipLretStructListType::iterator lItr = retList.begin(); lItr != retList.end(); lItr++) {
-			bool isUnidentedBan = false;
 			string netblock, nbstring;
 			ipLretStruct rs = *lItr;
 			nb = rs.nb;
 			int ipLconncount = rs.count;
+			bool isUnidentedBan = rs.type == 'd' ? true : false;
 			bool isUserban = rs.type == 'u' ? true : false;
 			string user = "*";
 			if (isUserban) {
@@ -2299,16 +2299,15 @@ if(dbConnected)
 				assert(st.size() > 0);
 				user = st[0];
 			}
+			if (isUnidentedBan) {
+				user = "~*";
+				ipLRetVal = false;
+			}
 			ipLRetVal = ipLconncount > rs.limit ? false : true;
 			int tcidr = is_ipv4 ? nb->getCloneCidr() + 96 : nb->getCloneCidr();
 			bool group = false;
 			nbstring = rs.mask;
 			//elog << "ccontrol::handleNewClient> DEBUG: nb->ipLisp->isGlunidented()=" << nb->ipLisp->isGlunidented() << ", NewUser->getUserName().substr(0,1)=" << NewUser->getUserName().substr(0,1) << endl;
-			if ((nb->ipLisp->isGlunidented()) && (NewUser->getUserName().substr(0,1) == "~")) {
-				isUnidentedBan = true;
-				user = "~*";
-				ipLRetVal = false;
-			}
 			if (nb->ipLisp->isGroup()) {
 				group = true;
 				netblock = nb->getCidr();
