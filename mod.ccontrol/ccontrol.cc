@@ -2249,124 +2249,12 @@ if(dbConnected)
 		client_ip = IPCIDRMinIP(tIP, CClonesCIDR + 96);
 	else
 		client_ip = IPCIDRMinIP(tIP, CClonesCIDR);
-			/* Shell stuff here */
-	if (irc_in_addr_is_ipv4(&NewUser->getIP())) {
-		int CurCIDRConnections = clientsIp24Map[client_ip];
-		for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++) {
-			if (isCidrMatch((*ptr)->getCidr(),tIP)) {
-				if (shellnbMap.find(*ptr) == shellnbMap.end()) {
-					shellnbMap.insert(shellnbMapType::value_type(*ptr, 1));
-				}
-				else {
-					shellnbMap[*ptr]++;
-				}
-
-				if (shellcoMap.find((*ptr)->shellco) == shellcoMap.end()) {
-					shellcoMap.insert(shellcoMapType::value_type((*ptr)->shellco, 1));
-				}
-				else {
-					shellcoMap[(*ptr)->shellco]++;
-				}
-				if ((*ptr)->shellco->isActive()) {
-					isShellException = true;
-					int shellCurConn = (*ptr)->getCidr2() > 24 ? shellcoMap[(*ptr)->shellco] : CurCIDRConnections;
-					if (shellCurConn > (*ptr)->shellco->getLimit()) {
-						for (shellnbIterator nptr = shellnbList.begin(); nptr != shellnbList.end(); nptr++) {
-							if ((*nptr)->shellco == (*ptr)->shellco) {
-								string netblockToBan;
-								int numUsers;
-								if ((*ptr)->getCidr2() <= 24) {  // If /24 or larger, do not gline other netblocks from the same shell
-									nptr = ptr;
-									netblockToBan = string(client_ip) + "/24";
-									numUsers = CurCIDRConnections;
-								}
-								else {
-									netblockToBan = (*nptr)->getCidr();
-									numUsers = shellnbMap[*nptr];
-								}
-								shellglinecounter++;
-								if ((shellglinecounter == 1) || (s.str().size() > 250)) {
-									if (s.str().size() > 250)
-										MsgChanLog("%s", s.str().c_str());
-									s.str("");
-									s << "Excessive connections (" << shellCurConn << ") from SHELL " << (*ptr)->shellco->getName().c_str() << " (will GLINE): *@";
-								}
-								else
-									s << ", *@";
-								s << netblockToBan << " (" << numUsers << ")";
-								sprintf(Log,"Glining SHELL *@%s (%s) for excessive connections (%d)",
-									netblockToBan.c_str(), (*nptr)->shellco->getName().c_str(), numUsers);
-								sprintf(GlineMask,"*@%s", netblockToBan.c_str());
-								//AffectedUsers = shellnbMap[(*nptr)];
-								AffectedUsers = shellCurConn;
-								/* set the gline reason */
-								//sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive connections",AffectedUsers);
-								sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections (%s)%s", AffectedUsers, (*ptr)->shellco->getName().c_str(), url_excessive_conn.c_str());
-								gDuration = CClonesGTime;
-
-								iClient* theClient = Network->findClient(this->getCharYYXXX());
-#ifndef LOGTOHD
-								DailyLog(theClient,"%s",Log);
-#else
-								ccLog* newLog = new (nothrow) ccLog();
-								newLog->Time = ::time(0);
-								newLog->Desc = Log;
-								newLog->Host = theClient->getRealNickUserHost().c_str();
-								newLog->User = "Me";			
-								newLog->CommandName = "AUTOGLINE";
-								DailyLog(newLog);
-#endif
-								glSet = true;
-								ccGline *tmpGline;
-								tmpGline = new ccGline(SQLDb);
-								tmpGline->setHost(GlineMask);
-								tmpGline->setExpires(::time(0) + gDuration);
-								tmpGline->setReason(GlineReason);
-								tmpGline->setAddedOn(::time(0));
-								tmpGline->setAddedBy(nickName);
-								tmpGline->setLastUpdated(::time(0));
-								tmpGline->Insert();
-								tmpGline->loadData(tmpGline->getHost());
-								addGline(tmpGline);
-								if(!getUplink()->isBursting())
-									addGlineToUplink(tmpGline);
-								
-								if ((*ptr)->getCidr2() <= 24) // If /24 or larger, do not gline other netblocks from the same shell
-									break;
-							}
-						}
-						MsgChanLog("%s", s.str().c_str());
-					}
-				}
-			}
-		}
-	}
-	/* End of shell stuff */
-
-	//DEBUG
-	//if (!checkClones)
-	//	elog << "ccontrol::handleNewClient> checkClones is DISABLED!" << endl;
 
 	if ((checkClones) && (irc_in_addr_valid(&NewUser->getIP()))) //avoid 0:: (0.0.0.0) ip addresses
 		{
-	//DEBUG Start
-			/*if (is_ipv4)
-			{
-				elog << "ccontrol::handleNewClient> CClonesCIDR24 = " << CClonesCIDR24 << endl;
-				elog << "ccontrol::handleNewClient> client_ip = IPCIDRMinIP(" << tIP << ", " << CClonesCIDR + 96 << ") = " << client_ip << endl;
-			}
-			else
-			{
-				elog << "ccontrol::handleNewClient> CClonesCIDR48 = " << CClonesCIDR24 << endl;
-				elog << "ccontrol::handleNewClient> client_ip = IPCIDRMinIP(" << tIP << ", " << CClonesCIDR << ") = " << client_ip << endl;
-			}*/
-	//DEBUG End
-
 			sprintf(Log, "%s/%d-%s", client_ip.c_str(), CClonesCIDR, NewUser->getUserName().c_str());
 			int CurIdentConnections = ++clientsIp24IdentMap[Log];
-	/*DEBUG*///elog << "ccontrol::handleNewClient> CurIdentConnections = ++clientsIp24IdentMap[" << Log << "] = " << CurIdentConnections << endl;
 			int CurCIDRConnections = ++clientsIp24Map[client_ip];
-	/*DEBUG*///elog << "ccontrol::handleNewClient> CurCIDRConnections = ++clientsIp24Map[" << client_ip << "] = " << CurCIDRConnections << endl;
 			sprintf(Log,"*@%s/%d", client_ip.c_str(), CClonesCIDR);
 
 			/* check idents to see if we have too many */
@@ -2376,7 +2264,6 @@ if(dbConnected)
 				/* too many - send a warning to the chanlog if within warning range */
 				if ((clientsIp24IdentMapLastWarn[Log] + CClonesTime) <= time(NULL))
 				{
-			/*DEBUG*///elog << "ccontrol::handleNewClient> clientsIp24IdentMapLastWarn[" << Log << "] Excessive CIDR Ident clones" << endl;
 					MsgChanLog("Excessive CIDR Ident clones (%d) for %s@%s/%d (will%s GLINE)\n",
 						CurIdentConnections, NewUser->getUserName().c_str(), client_ip.c_str(),
 						CClonesCIDR, IClonesGline ? "" : " _NOT_");
@@ -2397,138 +2284,6 @@ if(dbConnected)
 				}
 			}
 
-			//START OF SHELL RELATED - this is completely skipped
-			if (!SKIPTHIS)
-			if (irc_in_addr_is_ipv4(&NewUser->getIP()))
-			if ((!isShellException) && (CurCIDRConnections > maxCClones) &&
-				(CurCIDRConnections > getExceptions(NewUser->getUserName()+"@" + tIP)) &&
-				(CurCIDRConnections > getExceptions(NewUser->getUserName()+"@"+NewUser->getRealInsecureHost())))
-			{
-				// Shell stuff again here
-				if (CClonesCIDR == 24)
-				{
-					int NewLimit = maxCClones;
-					int m = 256;
-					OthersList = 0;
-					int theCount = CurCIDRConnections;
-					string strclient_ip = string(client_ip);
-					for (shellnbIterator ptr = shellnbList.begin(); ptr != shellnbList.end(); ptr++)
-					{
-			//elog << "ShellDebug: " << (*ptr)->getCidr() << ":  get24Mask(): " << (*ptr)->get24Mask() << " client_ip: " << string(client_ip) << endl;
-
-						if ((*ptr)->get24Mask() == strclient_ip) /* There is a shell exception somewhere on that /24, but not for that IP */
-						{
-							stringstream ss;
-							if (!isShellException) {
-								ss << strclient_ip << "/" << CClonesCIDR;
-								OthersList = getOtherCidrs(ss.str());
-							}
-
-							isShellException = true;
-							int j=1;
-							int l=0;
-							l = (*ptr)->getCidr2();
-							if (l <= 24) {
-								elog << "ShellDebug: This shouldn't happen. l = " << l << endl;
-							}
-							for (int k=32; k>l; k--)
-							{
-								j = j * 2;
-							}
-							m -= j;
-							theCount -= shellnbMap[*ptr];
-						}
-					}
-					NewLimit = m / 256 * maxCClones;
-					if ((OthersList != 0) && (OthersList->size() > 0))
-					{
-						if (CurCIDRConnections > NewLimit)
-						{
-							shellglinecounter = 0;
-							for (stringListType::iterator nptr = OthersList->begin(); nptr != OthersList->end(); nptr++) {
-								shellglinecounter++;
-								if ((shellglinecounter == 1) || (s.str().size() > 250)) {
-									if (s.str().size() > 250)
-										MsgChanLog("%s", s.str().c_str());
-									s.str("");
-									s << "Excessive connections (" << theCount << ") from subnet *@" << strclient_ip << "/" <<
-CClonesCIDR << " (will GLINE): *@";
-
-								}
-								else
-									s << ", *@";
-								s << (*nptr);
-
-								sprintf(Log,"Glining non-exempted SHELL *@%s for excessive connections (%d)",
-									(*nptr).c_str(), theCount);
-								sprintf(GlineMask,"*@%s", (*nptr).c_str());
-								AffectedUsers = theCount;
-								/* set the gline reason */
-								sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections%s", AffectedUsers, url_excessive_conn.c_str());
-								gDuration = CClonesGTime;
-
-								iClient* theClient = Network->findClient(this->getCharYYXXX());
-#ifndef LOGTOHD
-								DailyLog(theClient,"%s",Log);
-#else
-								ccLog* newLog = new (std::nothrow) ccLog();
-								newLog->Time = ::time(0);
-								newLog->Desc = Log;
-								newLog->Host = theClient->getRealNickUserHost().c_str();
-								newLog->User = "Me";
-								newLog->CommandName = "AUTOGLINE";
-								DailyLog(newLog);
-#endif
-								glSet = true;
-								ccGline *tmpGline;
-								tmpGline = new ccGline(SQLDb);
-								tmpGline->setHost(GlineMask);
-								tmpGline->setExpires(::time(0) + gDuration);
-								tmpGline->setReason(GlineReason);
-								tmpGline->setAddedOn(::time(0));
-								tmpGline->setAddedBy(nickName);
-								tmpGline->setLastUpdated(::time(0));
-								tmpGline->Insert();
-								tmpGline->loadData(tmpGline->getHost());
-								addGline(tmpGline);
-								if(!getUplink()->isBursting())
-									addGlineToUplink(tmpGline);
-							}
-								MsgChanLog("%s", s.str().c_str());
-						}
-					}
-				} // end of if (CClonesCIDR == 24)
-				if (!StdCloneChecksDisabled)
-				if ((clientsIp24MapLastWarn[client_ip] + CClonesTime) <= time(NULL))
-				{
-					if (shellglinecounter == 0)
-					{
-						MsgChanLog("Excessive connections (%d) from subnet *@%s/%d (will%s GLINE)\n",
-							CurCIDRConnections, client_ip.c_str(), CClonesCIDR, CClonesGline ? "" : " _NOT_");
-						clientsIp24MapLastWarn[client_ip] = time(NULL);
-					}
-				}
-
-
-				/* check for auto-gline feature */
-				if (!StdCloneChecksDisabled)
-				if ((CClonesGline) && (shellglinecounter == 0))
-				{
-					sprintf(Log,"Glining *@%s/%d for excessive connections (%d)",
-						client_ip.c_str(), CClonesCIDR, CurCIDRConnections);
-					sprintf(GlineMask,"*@%s/%d", client_ip.c_str(), CClonesCIDR);
-					AffectedUsers = CurCIDRConnections;
-					/* set the gline reason */
-					sprintf(GlineReason,"AUTO [%d] Automatically banned for excessive CIDR connections%s", AffectedUsers, url_excessive_conn.c_str());
-					DoGline = true;
-					gDuration = CClonesGTime;
-				}
-			} // END OF SHELL RELATED PART !!!
-			// ***************** END OF SHELL RELATED PART !!! *******************
-
-			/* Comment ipv6-only restriction
-			if (!irc_in_addr_is_ipv4(&NewUser->getIP())) {
-			*/
 			bool isClientDropped = false;
 			ccIpLnb* nb;
 			ipLretStructListType retList;
@@ -2729,9 +2484,6 @@ CClonesCIDR << " (will GLINE): *@";
 					}
 				}
 			}
-			/* End of "Comment ipv6-only restriction"
-			}
-			*/
 			//START Replacement for shell related part
 			if (!StdCloneChecksDisabled)
 			if ((SKIPTHIS) || (!irc_in_addr_is_ipv4(&NewUser->getIP())))
