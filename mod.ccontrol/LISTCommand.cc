@@ -83,10 +83,6 @@ else if(!strcasecmp(st[1].c_str(),"exceptions"))
 	{
 	bot->listExceptions(theClient);
 	}
-else if(!strcasecmp(st[1].c_str(),"shells"))
-	{
-	bot->listShellExceptions(theClient);
-	}
 else if(!strcasecmp(st[1].c_str(),"limits"))
 	{
 	bot->listIpLExceptions(theClient);

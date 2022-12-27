@@ -183,7 +183,7 @@ LEARNNET		3	Syntax: /msg $BOT$ learnnet
 LIST		1	****** LIST COMMAND ******
 LIST		2	This command lists various internal lists
 LIST		3	Syntax: /msg $BOT$ list <type>
-LIST		4	<type> - glines, servers, badchannels, exceptions, channels, shells
+LIST		4	<type> - glines, servers, badchannels, exceptions, channels, limits
 LIST		5	 (see /msg $BOT$ help list channels for more info on channels)
 LIST	CHANNELS	1	****** LIST CHANNELS COMMAND ******
 LIST	CHANNELS	2	This command lists channels based on various criteria
@@ -327,12 +327,6 @@ SGLINE		3	Syntax: /msg $BOT$ sgline <user@host> [duration] <reason>
 SGLINE		4	<user@host> - the user@host to gline from the network
 SGLINE		5	[duration] - duration of the gline, supports s,m,h,d for secs,mins,hours,days
 SGLINE		6	<reason> - reason for the gline
-SHELLS		1	****** SHELLS COMMAND ******
-SHELLS		2	Add/remove/modify shells limits/exceptions
-SHELLS		3	Syntax: /msg $BOT$ SHELLS <addcompany|addnetblock|delcompany|delnetblock|list|chlimit|chname|clearall> <Shell company|Netblock> <max connections>
-SHELLS		4	<Shell company>: The name of the shell company
-SHELLS		5	<Netblock>: CIDR netblock
-SHELLS		6	<max connections>: The number of connections allowed before gline
 SHUTDOWN		1	****** SHUTDOWN COMMAND ******
 SHUTDOWN		2	Shutdown the service and exit
 SHUTDOWN		3	Syntax: /msg $BOT$ shutdown <reason>

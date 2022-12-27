@@ -71,7 +71,6 @@ libccontrol_la_SOURCES = \
 	mod.ccontrol/UNSUSPENDCommand.cc \
 	mod.ccontrol/USERINFOCommand.cc \
 	mod.ccontrol/WHOISCommand.cc \
-	mod.ccontrol/SHELLSCommand.cc \
 	mod.ccontrol/ANNOUNCECommand.cc \
 	mod.ccontrol/LIMITSCommand.cc
 

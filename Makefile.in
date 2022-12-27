@@ -339,8 +339,7 @@ am__libccontrol_la_SOURCES_DIST = mod.ccontrol/ccontrol.cc \
 	mod.ccontrol/UNMODERATECommand.cc \
 	mod.ccontrol/UNSUSPENDCommand.cc \
 	mod.ccontrol/USERINFOCommand.cc mod.ccontrol/WHOISCommand.cc \
-	mod.ccontrol/SHELLSCommand.cc mod.ccontrol/ANNOUNCECommand.cc \
-	mod.ccontrol/LIMITSCommand.cc
+	mod.ccontrol/ANNOUNCECommand.cc mod.ccontrol/LIMITSCommand.cc
 am__dirstamp = $(am__leading_dot)dirstamp
 @COND_MODCCONTROL_TRUE@am_libccontrol_la_OBJECTS = mod.ccontrol/libccontrol_la-ccontrol.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-CControlCommands.lo \
@@ -410,7 +409,6 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-UNSUSPENDCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-USERINFOCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-WHOISCommand.lo \
-@COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-SHELLSCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-ANNOUNCECommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-LIMITSCommand.lo
 libccontrol_la_OBJECTS = $(am_libccontrol_la_OBJECTS)
@@ -1065,7 +1063,6 @@ am__depfiles_remade = db/$(DEPDIR)/gnuworldDB.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-SCANGLINECommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-SCHANGLINECommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-SGLINECommand.Plo \
-	mod.ccontrol/$(DEPDIR)/libccontrol_la-SHELLSCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo \
@@ -1828,7 +1825,6 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/UNSUSPENDCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/USERINFOCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/WHOISCommand.cc \
-@COND_MODCCONTROL_TRUE@	mod.ccontrol/SHELLSCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/ANNOUNCECommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/LIMITSCommand.cc
 
@@ -2471,9 +2467,6 @@ mod.ccontrol/libccontrol_la-USERINFOCommand.lo:  \
 	mod.ccontrol/$(am__dirstamp) \
 	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
 mod.ccontrol/libccontrol_la-WHOISCommand.lo:  \
-	mod.ccontrol/$(am__dirstamp) \
-	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
-mod.ccontrol/libccontrol_la-SHELLSCommand.lo:  \
 	mod.ccontrol/$(am__dirstamp) \
 	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
 mod.ccontrol/libccontrol_la-ANNOUNCECommand.lo:  \
@@ -3477,7 +3470,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SCANGLINECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SCHANGLINECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SGLINECommand.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SHELLSCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo@am__quote@ # am--include-marker
@@ -4202,13 +4194,6 @@ mod.ccontrol/libccontrol_la-WHOISCommand.lo: mod.ccontrol/WHOISCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.ccontrol/WHOISCommand.cc' object='mod.ccontrol/libccontrol_la-WHOISCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.ccontrol/libccontrol_la-WHOISCommand.lo `test -f 'mod.ccontrol/WHOISCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/WHOISCommand.cc
-
-mod.ccontrol/libccontrol_la-SHELLSCommand.lo: mod.ccontrol/SHELLSCommand.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT mod.ccontrol/libccontrol_la-SHELLSCommand.lo -MD -MP -MF mod.ccontrol/$(DEPDIR)/libccontrol_la-SHELLSCommand.Tpo -c -o mod.ccontrol/libccontrol_la-SHELLSCommand.lo `test -f 'mod.ccontrol/SHELLSCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/SHELLSCommand.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.ccontrol/$(DEPDIR)/libccontrol_la-SHELLSCommand.Tpo mod.ccontrol/$(DEPDIR)/libccontrol_la-SHELLSCommand.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.ccontrol/SHELLSCommand.cc' object='mod.ccontrol/libccontrol_la-SHELLSCommand.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.ccontrol/libccontrol_la-SHELLSCommand.lo `test -f 'mod.ccontrol/SHELLSCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/SHELLSCommand.cc
 
 mod.ccontrol/libccontrol_la-ANNOUNCECommand.lo: mod.ccontrol/ANNOUNCECommand.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT mod.ccontrol/libccontrol_la-ANNOUNCECommand.lo -MD -MP -MF mod.ccontrol/$(DEPDIR)/libccontrol_la-ANNOUNCECommand.Tpo -c -o mod.ccontrol/libccontrol_la-ANNOUNCECommand.lo `test -f 'mod.ccontrol/ANNOUNCECommand.cc' || echo '$(srcdir)/'`mod.ccontrol/ANNOUNCECommand.cc
@@ -6593,7 +6578,6 @@ distclean: distclean-recursive
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SCANGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SCHANGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SGLINECommand.Plo
-	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SHELLSCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo
@@ -6963,7 +6947,6 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SCANGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SCHANGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SGLINECommand.Plo
-	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SHELLSCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo

@@ -203,24 +203,8 @@ protected:
 	
 	exceptionListType		exceptionList;
 	
-	typedef list< ccShellco* >    shellcoListType;
-	
-	shellcoListType		shellcoList;
-
-	typedef list< ccShellnb* >    shellnbListType;
-	
-	shellnbListType		shellnbList;
-	
 	typedef std::list< string >    stringListType;
 	
-	typedef map<ccShellco*, int>	shellcoMapType;
-
-	shellcoMapType		shellcoMap;
-
-	typedef map<ccShellnb*, int>	shellnbMapType;
-
-	shellnbMapType		shellnbMap;
-
 	typedef vector< ccIpLisp* >    ipLispVectorType;
 	
 	ipLispVectorType		ipLispVector;
@@ -739,34 +723,13 @@ public:
 
 	bool delException( iClient * , const string & );
 
-	ccShellco* getShellco( const string & );
-
-	ccShellco* getShellcobyID( const int & );
-
-	ccShellnb* getShellnb( const string & );
-
 	bool isValidCidr( const string & );
 
 	bool getValidCidr( const string &, string &  );
 	
 	bool isCidrMatch( const string & , const string & );
 	
-	//stringListType* getOtherCidrs( const string & );
-	std::list< string >* getOtherCidrs( const string & );
-	bool test( iClient *, const string &  );
-	bool listShellExceptions( iClient * );
-
-	bool insertShellco( iClient * , const string& , int );
-
-	bool insertShellnb( iClient * , const string & , int );
-
-	bool delShellnb( iClient * , const string & );
-
-	bool delShellco( iClient * , const string & );
-
-	bool clearShells( iClient * );
-	
-        ccIpLisp* getIpLisp( const string & );
+	ccIpLisp* getIpLisp( const string & );
 
 	ccIpLisp* getIpLispbyID( const int & );
 
@@ -1032,8 +995,6 @@ public:
 		{ return ignoreList.end() ; }
 	
 	typedef exceptionListType::iterator exceptionIterator;
-	typedef shellcoListType::iterator shellcoIterator;
-	typedef shellnbListType::iterator shellnbIterator;
 	typedef ipLispVectorType::iterator ipLispIterator;
 	typedef ipLnbVectorType::iterator ipLnbIterator;
 	typedef ipLnumericMapType::iterator ipLnumericIterator;

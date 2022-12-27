@@ -107,7 +107,6 @@ const unsigned long int flg_REMSGLINE = 0x1000000;
 const unsigned long int flg_UNJUPE     = 0x2000000;
 const unsigned long int flg_SCHANGLINE = 0x4000000;
 const unsigned long int flg_FORCECHANGLINE = 0x8000000;
-const unsigned long int flg_SHELLS = 0x10000000;
 const unsigned long int flg_ANNOUNCE = 0x20000000;
 const unsigned long int flg_LIMITS = 0x40000000;
 
