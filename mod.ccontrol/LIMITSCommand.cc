@@ -504,7 +504,7 @@ else if(!strcasecmp(st[1].c_str(),"clearall"))
 		return true;
 	}
 
-	if(bot->clearShells(theClient))
+	if(bot->clearIsps(theClient))
 		{
 		bot->Notice(theClient,"Successfully deleted all isps");
 		}
