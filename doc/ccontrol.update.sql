@@ -169,3 +169,6 @@ alter TABLE ipLISPs add glunidented INT4 NOT NULL DEFAULT '0';
 alter table glines alter column lastupdated set default date_part('epoch', CURRENT_TIMESTAMP)::int;
 alter table exceptions alter column addedon set default date_part('epoch', CURRENT_TIMESTAMP)::int;
 
+-- 2023-01-15 ccontrol> Changing default value for opers.sso and opers.ssooo
+alter table opers alter column sso set default 't';
+alter table opers alter column ssooo set default 't';

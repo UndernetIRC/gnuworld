@@ -2164,8 +2164,16 @@ MsgChanLog("(%s) - %s - AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
  * TODO: Reimplement authentification after netsplit properly some day?
  */
 /* record their connection timestamp + numeric */
-theUser->setLastAuthTS(theClient->getConnectTime());
-theUser->setLastAuthNumeric(theClient->getCharYYXXX());
+/* Do not bother with clients who are logged in and have SSO enabled,
+ * as they get automatically authed after netsplit anyway. That way,
+ * we leave room for one client who could benefit from the
+ * "authentication after netsplit" feature.
+ */
+if (!theClient->isModeR() || !theUser->getSso())
+	{
+	theUser->setLastAuthTS(theClient->getConnectTime());
+	theUser->setLastAuthNumeric(theClient->getCharYYXXX());
+	}
 if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser)))
 	{
 	std::string Numeric = getUplink()->getCharYY();
@@ -2560,50 +2568,53 @@ if(dbConnected)
 			}
 		}
 	}
-/* check if they are already logged into us */
-usersIterator tIterator = usersMap.begin();
-// TODO: Fix auto auth after netsplit. It will only work if it's the latest client that authed that splits.
-while (tIterator != usersMap.end())
+if (!IsAuth(NewUser))
 	{
-	ccUser* tUser = tIterator->second;
-	if ((tUser->getLastAuthTS() == NewUser->getConnectTime()) &&
-			(tUser->getLastAuthNumeric() == NewUser->getCharYYXXX()))
+	/* check if they are already logged into us */
+	usersIterator tIterator = usersMap.begin();
+	// TODO: Fix auto auth after netsplit. It will only work if it's the latest client that authed that splits.
+	while (tIterator != usersMap.end())
 		{
-		tUser->setNumeric(NewUser->getCharYYXXX());
-		// Try creating an authentication entry for the user
-		if (AuthUser(tUser, NewUser))
-			if (!(isSuspended(tUser)))
-					Notice(NewUser, "Automatic authentication after netsplit successful!", tUser->getUserName().c_str());
-			else
-					Notice(NewUser, "Automatic authentication after netsplit successful, however you are suspended", tUser->getUserName().c_str());
-		else
-				Notice(NewUser, "Error in authentication", tUser->getUserName().c_str());
-		MsgChanLog("(%s) - %s: AUTO-AUTHENTICATED (after netsplit)\n", tUser->getUserName().c_str(),
-				NewUser->getRealNickUserHost().c_str());
-		vector<iClient*>::const_iterator Itr;
-		vector<iClient*> Clients = tUser->getClients();
-		int count = 0;
-		for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+		ccUser* tUser = tIterator->second;
+		if ((tUser->getLastAuthTS() == NewUser->getConnectTime()) &&
+				(tUser->getLastAuthNumeric() == NewUser->getCharYYXXX()))
 			{
-			iClient* tClient = *Itr;
-			if (tClient != NewUser) //there is already a user authenticated under that nick
+			tUser->setNumeric(NewUser->getCharYYXXX());
+			// Try creating an authentication entry for the user
+			if (AuthUser(tUser, NewUser))
+				if (!(isSuspended(tUser)))
+						Notice(NewUser, "Automatic authentication after netsplit successful!", tUser->getUserName().c_str());
+				else
+						Notice(NewUser, "Automatic authentication after netsplit successful, however you are suspended", tUser->getUserName().c_str());
+			else
+					Notice(NewUser, "Error in authentication", tUser->getUserName().c_str());
+			MsgChanLog("(%s) - %s: AUTO-AUTHENTICATED (after netsplit)\n", tUser->getUserName().c_str(),
+					NewUser->getRealNickUserHost().c_str());
+			vector<iClient*>::const_iterator Itr;
+			vector<iClient*> Clients = tUser->getClients();
+			int count = 0;
+			for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
 				{
-				count++;
-				if (count == 1) {
-					Notice(NewUser, "The following clients are already authenticated as %s:", tUser->getUserName().c_str());
+				iClient* tClient = *Itr;
+				if (tClient != NewUser) //there is already a user authenticated under that nick
+					{
+					count++;
+					if (count == 1) {
+						Notice(NewUser, "The following clients are already authenticated as %s:", tUser->getUserName().c_str());
+					}
+					iClient *tClient = *Itr;
+					Notice(tClient, "New authentification as you (%s) by %s", tUser->getUserName().c_str(), NewUser->getRealNickUserHost().c_str());
+					StringTokenizer st(tClient->getServer()->getName(), '.');
+					Notice(NewUser, "    %s (%s.*)", tClient->getRealNickUserHost().c_str(), st[0].c_str());
+					}
 				}
-				iClient *tClient = *Itr;
-				Notice(tClient, "New authentification as you (%s) by %s", tUser->getUserName().c_str(), NewUser->getRealNickUserHost().c_str());
-				StringTokenizer st(tClient->getServer()->getName(), '.');
-				Notice(NewUser, "    %s (%s.*)", tClient->getRealNickUserHost().c_str(), st[0].c_str());
-				}
+			/* had enough checking, break out of the loop */
+			break;
 			}
-		/* had enough checking, break out of the loop */
-		break;
+		++tIterator;
 		}
-	++tIterator;
+	/* if we get here, there's no matching user */
 	}
-/* if we get here, there's no matching user */
 }
 
 
