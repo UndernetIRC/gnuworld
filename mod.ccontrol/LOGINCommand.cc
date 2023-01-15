@@ -61,7 +61,7 @@ ccUser* theUser = bot->IsAuth(theClient);
 if (theUser) 
 	{
 	if ((theUser->getAutoOp()) && (!theClient->isOper()))
-		bot->deAuthUser(theUser);
+		bot->deAuthUser(theUser, theClient);
 	else 
 		{
 		//Dont let him authenticate under a new name (for now)

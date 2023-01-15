@@ -45,7 +45,7 @@ if (!tmpUser)
 	bot->Notice(theClient,"You are not currently authenticated");
 	return false;
 	}
-if(bot->deAuthUser(tmpUser))
+if(bot->deAuthUser(tmpUser, theClient))
 	{
 	bot->Notice(theClient,"DeAuthentication successfull");
 	bot->MsgChanLog("(%s) - %s : Deauthenticated\n",tmpUser->getUserName().c_str()

@@ -177,8 +177,8 @@ public:
 	inline const bool&		getNotice() const
 		    { return Notice;  }
 
-	inline const iClient*		getClient() const
-		    { return Client;  }
+	inline const vector<iClient*>	getClients() const
+		    { return Clients;  }
 
 	/*
 	 * Methods to set data attributes
@@ -272,9 +272,6 @@ public:
 	inline void			setNotice( const bool _notice )
 		    { Notice = _notice; }
 
-	inline void			setClient(iClient* _Client)
-		    { Client = _Client; }
-		    
 	inline void			setSqldb(dbHandle* _SQLDb)
 		    { SQLDb = _SQLDb; }
 	/*
@@ -313,7 +310,11 @@ public:
 	void updateAccessFromFlags();
 
 	void updateAccess(unsigned int Type);
-	
+
+	void addClient(iClient* Client);
+
+	void remClient(iClient* Client);
+
 	static unsigned int numAllocated;
 	
 protected:
@@ -346,7 +347,7 @@ protected:
 	bool AutoOp;
 	bool NeedOp;
 	bool Notice;
-	iClient* Client;
+	vector<iClient*> Clients;
 	dbHandle* SQLDb;
 	time_t LastAuthTS;
 	time_t PassChangeTS;

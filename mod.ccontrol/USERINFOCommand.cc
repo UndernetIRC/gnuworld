@@ -183,11 +183,17 @@ for(ptr = bot->usersmap_begin();ptr != bot->usersmap_end();++ptr)
 			sprintf(NeedOp,"NO");
 			}
 		Id=tempUser->getID();
-		if(tempUser->getClient())
+		if(tempUser->getClients().size() > 0)
 			{
-			bot->Notice(theClient,"User Name: %s   Currently logged in from: %s",
-				Name.c_str(),
-				tempUser->getClient()->getRealNickUserHost().c_str());
+			vector<iClient*> Clients = tempUser->getClients();
+			vector<iClient*>::iterator Itr;
+			bot->Notice(theClient,"User Name: %s   Currently logged in from:", Name.c_str());
+			for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+				{
+				iClient* tClient = *Itr;
+				StringTokenizer st2(tClient->getServer()->getName(), '.');
+				bot->Notice(theClient, "    %s (%s.*)", tClient->getRealNickUserHost().c_str(), st2[0].c_str());
+				}
 			}
 		else
 			bot->Notice(theClient,"User Name: %s   Not logged in",Name.c_str());

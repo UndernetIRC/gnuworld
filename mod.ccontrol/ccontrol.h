@@ -491,9 +491,14 @@ public:
 	bool AuthUser( ccUser* ,iClient* );
 	
 	/**
-	 * This method will deauthenticate a client with the bot
+	 * This method will deauthenticate all clients with the bot for a user
 	 */
 	bool deAuthUser( ccUser* );
+
+	/**
+	 * This method will deauthenticate a specific client with the bot for a user
+	 */
+	bool deAuthUser( ccUser*, iClient* );
 
 	/**
 	 * This method will return the access flag needed for a command

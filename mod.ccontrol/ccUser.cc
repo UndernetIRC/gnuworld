@@ -67,7 +67,6 @@ ccUser::ccUser(dbHandle* _SQLDb)
    AutoOp(0),
    NeedOp(0),
    Notice(0),
-   Client(NULL),
    SQLDb( _SQLDb ),
    PassChangeTS(0)
 {
@@ -294,6 +293,31 @@ void ccUser::setCoder()
 {
 IsCoder = true;
 IsOper = IsAdmin = IsSmt = IsUhs = false;
+}
+
+void ccUser::addClient(iClient* Client)
+{
+vector<iClient*>::iterator Itr;
+for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+	{
+	if (*Itr == Client)
+		return;
+	}
+Clients.push_back(Client);
+}
+
+void ccUser::remClient(iClient* Client)
+{
+vector<iClient*>::iterator Itr;
+for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+	{
+	iClient* tClient = *Itr;
+	if (tClient == Client)
+		{
+		Clients.erase(Itr);
+		return;
+		}
+	}
 }
 
 unsigned int ccUser::getType()

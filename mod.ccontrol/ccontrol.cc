@@ -1105,7 +1105,7 @@ ccUser* theUser = IsAuth(theClient);
 
 if ((theUser) && (theUser->getAutoOp()) && (!theClient->isOper()))
 	{
-	deAuthUser(theUser);
+	deAuthUser(theUser, theClient);
 	theUser = IsAuth(theClient);
 	}
 
@@ -1401,7 +1401,7 @@ if((!theUser) && !(theClient->isOper()))
 	{ //We need to add the flood points for this user
 	if(!theClient->getCustomData(this))
 		{
-		elog << "ccontrol::OnCTCP> Couldnt find custom data for " 
+		elog << "ccontrol::OnCTCP> Couldnt find custom data for "
 		     << *theClient << endl;
 		return ;
 		}
@@ -1542,7 +1542,7 @@ switch( theEvent )
 			if(TempAuth)
 		    		{
 				UserData->setDbUser(NULL);
-				TempAuth->setClient(NULL);
+				TempAuth->remClient(tmpUser);
 				}
 
 			ccFloodData *tempLogin = UserData->getFlood();
@@ -2126,15 +2126,6 @@ void ccontrol::OkAuthUser(iClient* theClient, ccUser* theUser)
 //Ok the password match , prepare the ccUser data (or we're here because of Single Sign On)
 string Name = theUser->getUserName();
 iServer* targetServer = Network->findServer( theClient->getIntYY() ) ;
-if((theUser->getClient()) && (theUser->getClient() != theClient)) //there is already a user authenticated under that nick
-	{
-	const iClient *tClient = theUser->getClient();
-	Notice(tClient,"You have just been deauthenticated");
-	MsgChanLog("Login conflict for user %s from %s and %s (%s)\n",
-			Name.c_str(),theClient->getNickName().c_str(),
-			tClient->getNickName().c_str(), targetServer->getName().c_str());
-	deAuthUser(theUser);
-	}
 theUser->setUserName(Name);
 theUser->setNumeric(theClient->getCharYYXXX());
 //Try creating an authentication entry for the user
@@ -2147,19 +2138,41 @@ if(AuthUser(theUser,theClient))
 			theUser->getUserName().c_str()); 
 else if(theClient->isOper())
         Notice(theClient, "Error in authentication as %s",theUser->getUserName().c_str()); 
+vector<iClient*>::const_iterator Itr;
+vector<iClient*> Clients = theUser->getClients();
+int count = 0;
+for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+	{
+	iClient* tClient = *Itr;
+	if (tClient != theClient) //there is already a user authenticated under that nick
+		{
+		count++;
+		if (count == 1) {
+			Notice(theClient, "The following clients are already authenticated as %s:", theUser->getUserName().c_str());
+		}
+		iClient *tClient = *Itr;
+		Notice(tClient, "New authentification as you (%s) by %s", theUser->getUserName().c_str(), theClient->getRealNickUserHost().c_str());
+		StringTokenizer st(tClient->getServer()->getName(), '.');
+		Notice(theClient, "    %s (%s.*)", tClient->getRealNickUserHost().c_str(), st[0].c_str());
+		}
+	}
 MsgChanLog("(%s) - %s - AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
 	theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
+/* Authentification after netsplit will not work properly with multi-login support.
+ * However, with single sign enabled, if the oper is authed to X, he will get
+ * automatically signed in after netsplit.
+ * TODO: Reimplement authentification after netsplit properly some day?
+ */
 /* record their connection timestamp + numeric */
-theUser->setLastAuthTS(::time(0));
+theUser->setLastAuthTS(theClient->getConnectTime());
 theUser->setLastAuthNumeric(theClient->getCharYYXXX());
-if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser))) {
+if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser)))
+	{
 	std::string Numeric = getUplink()->getCharYY();
 	Write("%s OM %s :+o", Numeric.c_str(), theClient->getCharYYXXX().c_str());
-	//theClient->setModeO();
-	//getUplink()->PostEvent(EVT_OPER, static_cast< void* >(theClient));
 	MsgChanLog("(%s) - %s - REMOTE OPER (+o)\n", theUser->getUserName().c_str(),
 		theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
-}
+	}
 }
 
 
@@ -2549,23 +2562,13 @@ if(dbConnected)
 	}
 /* check if they are already logged into us */
 usersIterator tIterator = usersMap.begin();
+// TODO: Fix auto auth after netsplit. It will only work if it's the latest client that authed that splits.
 while (tIterator != usersMap.end())
 	{
 	ccUser* tUser = tIterator->second;
 	if ((tUser->getLastAuthTS() == NewUser->getConnectTime()) &&
 			(tUser->getLastAuthNumeric() == NewUser->getCharYYXXX()))
 		{
-		/* it seems they are! authenticate them */
-		/* check if someone else is already authed as them */
-		if (tUser->getClient())
-			{
-			const iClient *tClient = tUser->getClient();
-			Notice(tClient, "You have just been deauthenticated");
-			MsgChanLog("Login conflict for user %s from %s and %s\n",
-					tUser->getUserName().c_str(), NewUser->getNickName().c_str(),
-					tClient->getNickName().c_str());
-			deAuthUser(tUser);
-			}
 		tUser->setNumeric(NewUser->getCharYYXXX());
 		// Try creating an authentication entry for the user
 		if (AuthUser(tUser, NewUser))
@@ -2577,6 +2580,24 @@ while (tIterator != usersMap.end())
 				Notice(NewUser, "Error in authentication", tUser->getUserName().c_str());
 		MsgChanLog("(%s) - %s: AUTO-AUTHENTICATED (after netsplit)\n", tUser->getUserName().c_str(),
 				NewUser->getRealNickUserHost().c_str());
+		vector<iClient*>::const_iterator Itr;
+		vector<iClient*> Clients = tUser->getClients();
+		int count = 0;
+		for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+			{
+			iClient* tClient = *Itr;
+			if (tClient != NewUser) //there is already a user authenticated under that nick
+				{
+				count++;
+				if (count == 1) {
+					Notice(NewUser, "The following clients are already authenticated as %s:", tUser->getUserName().c_str());
+				}
+				iClient *tClient = *Itr;
+				Notice(tClient, "New authentification as you (%s) by %s", tUser->getUserName().c_str(), NewUser->getRealNickUserHost().c_str());
+				StringTokenizer st(tClient->getServer()->getName(), '.');
+				Notice(NewUser, "    %s (%s.*)", tClient->getRealNickUserHost().c_str(), st[0].c_str());
+				}
+			}
 		/* had enough checking, break out of the loop */
 		break;
 		}
@@ -2807,40 +2828,77 @@ if( commHandler != command_end() )
 return -1 ;
 }	
 
-bool ccontrol::AuthUser( ccUser* TempUser,iClient* tUser)
+bool ccontrol::AuthUser( ccUser* TempUser, iClient* theClient)
 {
-if(!tUser->getCustomData(this))
+if (!theClient->getCustomData(this))
 	{
-	elog << "Couldnt find custom data for " 
-	     << tUser->getNickName() << endl;
+	elog << "Couldnt find custom data for "
+	     << theClient->getNickName() << endl;
 	return false;
 	}
 
-ccUserData* UserData= static_cast<ccUserData*>(tUser->getCustomData(this));
+ccUserData* UserData = static_cast<ccUserData*>(theClient->getCustomData(this));
 UserData->setDbUser(TempUser);
-TempUser->setClient(tUser);
+TempUser->addClient(theClient);
 
 return true;
 }    
 
+// Returns true if theClient is sucessfully deauthenticated
+bool ccontrol::deAuthUser( ccUser* tUser, iClient* theClient)
+{
+vector<iClient*> Clients = tUser->getClients();
+vector<iClient*>::iterator Itr;
+for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+	{
+	iClient* tClient = *Itr;
+	if (tClient == theClient)
+		{
+		if(!tClient->getCustomData(this))
+			{
+			elog << "Couldnt find custom data for "
+				<< tClient->getNickName() << endl;
+				return false;
+			}
+
+		(static_cast<ccUserData*>(tClient->getCustomData(this)))->setDbUser(NULL);
+		tUser->remClient(theClient);
+		return true;
+		}
+	}
+return false;
+}
+
+// Returns true if at least one client is deauthenticated
 bool ccontrol::deAuthUser( ccUser* tUser)
 {
-
-const iClient* tClient = tUser->getClient();
-if(tClient)
+bool retVal = false;
+vector<iClient*> Clients;
+vector<iClient*> ClientsToRem;
+vector<iClient*>::iterator Itr;
+for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
 	{
-	if(!tClient->getCustomData(this))
+	iClient* tClient = *Itr;
+	if(tClient)
 		{
-		elog << "Couldnt find custom data for " 
-		     << tClient->getNickName() << endl;
-		return false;
-		}
+		if(!tClient->getCustomData(this))
+			{
+			elog << "Couldnt find custom data for "
+				<< tClient->getNickName() << endl;
+				continue;
+			}
 
-	(static_cast<ccUserData*>(tClient->getCustomData(this)))->setDbUser(NULL);
-	tUser->setClient(NULL);
+		retVal = true;
+		(static_cast<ccUserData*>(tClient->getCustomData(this)))->setDbUser(NULL);
+		ClientsToRem.push_back(tClient);
+		continue;
+		}
 	}
-		
-return true;
+for (Itr = ClientsToRem.begin(); Itr != ClientsToRem.end(); )
+	{
+	tUser->remClient(*Itr);
+	}
+return retVal;
 }
 
 bool ccontrol::UserGotMask( ccUser* user, const string& Host )
@@ -3482,12 +3540,18 @@ xClient::Notice((Network->findChannel(msgChan))->getName(),"%s",buffer);
 usersIterator uIterator;
 ccUser* tempUser;
 for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
-        {
-        tempUser = uIterator->second;
-	if((tempUser) && (tempUser->getLogs() ) && (tempUser->getClient()))
-                { 
-                Notice(tempUser->getClient(),"%s",buffer);
-                }
+	{
+	tempUser = uIterator->second;
+	vector<iClient*> Clients = tempUser->getClients();
+	if((tempUser) && (tempUser->getLogs() ) && (Clients.size() > 0))
+		{
+		vector<iClient*>::iterator Itr;
+		for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+			{
+			iClient* theClient = *Itr;
+			Notice(theClient,"%s",buffer);
+			}
+		}
 	}
 return true;
 }
@@ -3510,12 +3574,18 @@ xClient::Notice((Network->findChannel(msgChan))->getName(),"%s",buffer);
 usersIterator uIterator;
 ccUser* tempUser;
 for( uIterator = usersMap.begin();uIterator != usersMap.end();++uIterator)
-        {
-        tempUser = uIterator->second;
-	if((tempUser) && (tempUser->getLag() ) && (tempUser->getClient()))
-                { 
-                Notice(tempUser->getClient(),"%s",buffer);
-                }
+	{
+	tempUser = uIterator->second;
+	vector<iClient*> Clients = tempUser->getClients();
+	if((tempUser) && (tempUser->getLogs() ) && (Clients.size() > 0))
+		{
+		vector<iClient*>::iterator Itr;
+		for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+			{
+			iClient* theClient = *Itr;
+			Notice(theClient,"%s",buffer);
+			}
+		}
 	}
 return true;
 }

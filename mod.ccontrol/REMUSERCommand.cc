@@ -80,16 +80,22 @@ if(bot->DeleteOper(string_lower(st[1])))
 	bot->Notice(theClient,"Successfully deleted oper: %s",st[1].c_str());
 	
 	//Check if the user is authenticate 
-	if(theUser->getClient())
+	if(theUser->getClients().size() > 0)
 		{
-		//Get hte user iClient entry from the network , and notify him that he was deleted
-		const iClient *TClient = theUser->getClient(); 
-		if(TClient)
-			bot->Notice(TClient,"You have been removed from my access list, "
-				"and have been deauthenticated.");
-		//Remove the user authenticate entry
-		bot->deAuthUser(theUser);
-		}	
+		vector<iClient*>::iterator Itr;
+		vector<iClient*> Clients = theUser->getClients();
+		bot->Notice(theClient, "Deauthenticated the following online clients:");
+		for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
+			{
+			iClient* tClient = *Itr;
+			bot->Notice(theClient, "    %s", tClient->getRealNickUserHost().c_str());
+			if(tClient)
+				bot->Notice(tClient,"You have been removed from my access list, "
+					"and have been deauthenticated.");
+
+			}
+		}
+	bot->deAuthUser(theUser);
 	delete theUser;
 	return true;	
 	}
