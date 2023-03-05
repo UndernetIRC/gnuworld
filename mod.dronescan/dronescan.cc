@@ -820,14 +820,26 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		bool isoktogline2 = false;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
-				isoktogline = ((::time(0) - lastBurstTime) >= (jcGracePeriodBurstOrSplit / 2) && (::time(0) - lastSplitTime) >= (jcGracePeriodBurstOrSplit / 2) && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))) ? true : false;
+				isoktogline = (
+					(::time(0) - lastBurstTime) >= (jcGracePeriodBurstOrSplit / 2)
+					&& (::time(0) - lastSplitTime) >= (jcGracePeriodBurstOrSplit / 2)
+					&& jcGlineEnable
+					&& jChannel->getNumOfJoins() > jcMinJFSizeToGline
+					&& (
+						jChannel->getNumOfParts() > jcMinJFSizeToGline
+						|| (
+							joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly
+							&& jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline
+						)
+					)
+				) ? true : false;
 				if (isoktogline)
 					isoktogline2 = true;
 #ifdef ENABLE_LOG4CPLUS
 				int numOfUsernames = 0;
 #endif
 				if((joinPartIt->second.numOfJoins >= jcMinJoinToGline &&
-			    joinPartIt->second.numOfParts >= jcMinJoinToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))
+				joinPartIt->second.numOfParts >= jcMinJoinToGline) || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))
 				{
 				if(!joinPartIt->second.seenOper && !joinPartIt->second.seenLoggedInUser)
 					{
@@ -851,7 +863,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 								{
 								clients.push_back(theClient->getNickName() + "!" + theClient->getUserName() +"@"
 									+ xIP(theClient->getIP()).GetNumericIP(true) + " " + theClient->getDescription());
-									
+
 								}
 							}
 						}
@@ -871,7 +883,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 								}
 					} else  {
 					excluded << joinPartIt->first.c_str()
-						 << "[";
+							<< "[";
 					if(joinPartIt->second.seenOper)
 						{
 						excluded << "O";
@@ -884,7 +896,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 					if(excluded.str().size() > 400)
 						{
 						outputNames(itr->first,excluded,true,isoktogline);
-						}	  
+						}
 
 #ifdef ENABLE_LOG4CPLUS
 					std::list<std::pair<std::string,std::string > >::const_iterator userNamesIt = joinPartIt->second.userNames.begin();
@@ -913,11 +925,10 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 									theClient->getUserName().c_str(),
 									userNamesIt->second.c_str(),
 									theClient->getDescription().c_str());
-						
 							}
 						}
 #endif
-					}	 
+					}
 				}
 			}
 
