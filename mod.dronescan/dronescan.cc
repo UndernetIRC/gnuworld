@@ -1263,7 +1263,7 @@ else
 	assert(channel != NULL);
 	jcChanMap[channelName] = channel;
 	}
-unsigned int joinCount = channel->advanceChannelJoin();
+unsigned int joinCount = channel->advanceChannelJoin(theClient);
 
 if(joinCount == jcCutoff)
 	{
@@ -1275,68 +1275,90 @@ if(joinCount == jcCutoff)
 	}
 if(channel->getJoinFlooded())
 	{
-	channel->addJoin(theClient);
-	if (joinCount >= jcCutoff) {
-		string IP = xIP(theClient->getIP()).GetNumericIP();
-		jcFloodClients* jcFC;
-		if ((::time(0) - lastBurstTime) >= jcGracePeriodBurstOrSplit && jcGlineEnable) {
-			clientsIPFloodMapType::const_iterator Itr = clientsIPFloodMap.find(IP);
-			if (Itr != clientsIPFloodMap.end()) {
-				jcFC = Itr->second;
-				if ((unsigned int) (::time(0) - jcFC->ctime) > jcJoinsPerIPTime) {
-					jcFC->ctime = ::time(0);
-					jcFC->count = 0;
-					jcFC->chans.clear();
-					jcFC->nicks.clear();
-					jcFC->log.clear();
-				}
-			}
-			else {
-				jcFC = new (std::nothrow) jcFloodClients;
-				assert(jcFC != NULL);
-				jcFC->count = 0;
-				jcFC->ctime = ::time(0);
-				clientsIPFloodMap[IP] = jcFC;
-			}
-			jcFC->count++;
-			std::list< string >::iterator sItr;
-			bool isMatchFound = false;
-			for (sItr = jcFC->chans.begin(); sItr != jcFC->chans.end(); sItr++) {
-				if (*sItr == channelName) {
-					isMatchFound = true;
-					break;
-				}
-			}
-			if (!isMatchFound)
-				jcFC->chans.push_back(channelName);
-			isMatchFound = false;
-			for (sItr = jcFC->nicks.begin(); sItr != jcFC->nicks.end(); sItr++) {
-				if (*sItr == theClient->getNickName()) {
-					isMatchFound = true;
-					break;
-				}
-			}
-			if (!isMatchFound)
-				jcFC->nicks.push_back(theClient->getNickName());
-
-			std::stringstream s;
-			s << theClient->getNickName()
-				<< "!" << theClient->getUserName()
-				<< "@" << xIP(theClient->getIP()).GetNumericIP()
-				<< " " << theClient->getDescription()
-				<< " " << channelName <<  " " << ::time(0);
-			jcFC->log.push_back(s.str());
-
-
-			if ((unsigned int) jcFC->count >= jcMinJoinsPerIPToGline) {
-				IPJQueue.push_back(IP);
+	if (joinCount == jcCutoff)
+		{
+		for (jfChannel::jClientsVectorIterator jItr = channel->jClientsBegin(); jItr != channel->jClientsEnd(); jItr++)
+			{
+			iClient *tmpClient = Network->findClient(*jItr);
+			if (tmpClient == 0)
+				continue;
+			addJoin(channel, tmpClient, joinCount);
 			}
 		}
-	}
-
+	else
+		addJoin(channel, theClient, joinCount);
 	}
 }
 
+time_t dronescan::getRoundedUnixTime(time_t ts, unsigned int power)
+{
+ts >> power;
+ts << power;
+return ts;
+}
+
+void dronescan::addJoin(jfChannel* channel, iClient *theClient, unsigned int joinCount)
+{
+std::string channelName = channel->getName();
+channel->addJoin(theClient);
+if (joinCount >= jcCutoff) {
+	string IP = xIP(theClient->getIP()).GetNumericIP();
+	jcFloodClients* jcFC;
+	if ((::time(0) - lastBurstTime) >= jcGracePeriodBurstOrSplit && jcGlineEnable) {
+		clientsIPFloodMapType::const_iterator Itr = clientsIPFloodMap.find(IP);
+		if (Itr != clientsIPFloodMap.end()) {
+			jcFC = Itr->second;
+			if ((unsigned int) (::time(0) - jcFC->ctime) > jcJoinsPerIPTime) {
+				jcFC->ctime = ::time(0);
+				jcFC->count = 0;
+				jcFC->chans.clear();
+				jcFC->nicks.clear();
+				jcFC->log.clear();
+			}
+		}
+		else {
+			jcFC = new (std::nothrow) jcFloodClients;
+			assert(jcFC != NULL);
+			jcFC->count = 0;
+			jcFC->ctime = ::time(0);
+			clientsIPFloodMap[IP] = jcFC;
+		}
+		jcFC->count++;
+		std::list< string >::iterator sItr;
+		bool isMatchFound = false;
+		for (sItr = jcFC->chans.begin(); sItr != jcFC->chans.end(); sItr++) {
+			if (*sItr == channelName) {
+				isMatchFound = true;
+				break;
+			}
+		}
+		if (!isMatchFound)
+			jcFC->chans.push_back(channelName);
+		isMatchFound = false;
+		for (sItr = jcFC->nicks.begin(); sItr != jcFC->nicks.end(); sItr++) {
+			if (*sItr == theClient->getNickName()) {
+				isMatchFound = true;
+				break;
+			}
+		}
+		if (!isMatchFound)
+			jcFC->nicks.push_back(theClient->getNickName());
+
+		std::stringstream s;
+		s << theClient->getNickName()
+			<< "!" << theClient->getUserName()
+			<< "@" << xIP(theClient->getIP()).GetNumericIP()
+			<< " " << theClient->getDescription()
+			<< " " << channelName <<  " " << ::time(0);
+		jcFC->log.push_back(s.str());
+
+
+		if ((unsigned int) jcFC->count >= jcMinJoinsPerIPToGline) {
+			IPJQueue.push_back(IP);
+		}
+	}
+}
+}
 
 void dronescan::handleChannelPart(Channel* theChan,iClient* theClient)
 {

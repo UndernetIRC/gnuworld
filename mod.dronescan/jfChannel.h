@@ -35,6 +35,8 @@ public:
 	
 	typedef std::map<std::string,jfClientData> joinPartMapType;
 	typedef joinPartMapType::const_iterator joinPartMapIterator;
+	typedef std::vector<std::string> jClientsVectorType;
+	typedef jClientsVectorType::const_iterator jClientsVectorIterator;
 		
 	/**
 	 * Constructor to set up initial state.
@@ -71,13 +73,22 @@ public:
 	
 	inline const joinPartMapIterator joinPartEnd() const
 		{ return joinPartMap.end(); }
-		
+
+	inline const jClientsVectorIterator jClientsBegin() const
+		{ return jClients.begin(); }
+
+	inline const jClientsVectorIterator jClientsEnd() const
+		{ return jClients.end(); }
+
 	/*********************
 	 ** M U T A T O R S **
 	 *********************/
 	
-	inline unsigned int advanceChannelJoin() 
-		{ return ++numOfJoins; }
+	inline unsigned int advanceChannelJoin(iClient* tmpClient)
+		{
+		jClients.push_back(std::string(tmpClient->getCharYYXXX()));
+		return ++numOfJoins;
+		}
 	
 	inline void resetJoinCount()
 		{ numOfJoins = 0; }
@@ -112,6 +123,7 @@ protected:
 	bool		partFlooded;
 	joinPartMapType joinPartMap;
 	time_t lastJoinFlood;
+	jClientsVectorType jClients;
 
 }; // class jfChannel
 

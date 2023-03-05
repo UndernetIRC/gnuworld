@@ -155,7 +155,13 @@ public:
 
 	/** handles a channel part */
 	void handleChannelPart( Channel*, iClient* );
-	
+
+	/** get rounded unix time */
+	time_t getRoundedUnixTime(time_t, unsigned int);
+
+	/** addJoin() method */
+	void addJoin(jfChannel*, iClient*, unsigned int);
+
 	/** This function handles new clients as they connect. */
 	void handleNewClient( iClient* ) ;
 
