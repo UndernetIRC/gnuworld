@@ -230,6 +230,7 @@ public:
 	clientsIPMapType clientsIPMap;
 	clientsIPFloodMapType clientsIPFloodMap;
 	int lastBurstTime;
+	int lastSplitTime;
 
 	/** Typedef of currently seen drone channels */
 	typedef std::map< std::string , activeChannel* > droneChannelsType;
@@ -256,6 +257,7 @@ public:
 	/** Join counter config options */
 	unsigned int jcInterval;
 	unsigned int jcCutoff;
+	unsigned int jcGracePeriodBurstOrSplit;
 	unsigned int jcMinJoinToGline;
 	unsigned int jcMinJoinToGlineJOnly;
 	unsigned int jcMinJoinsPerIPToGline;

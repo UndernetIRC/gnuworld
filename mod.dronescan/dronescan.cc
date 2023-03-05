@@ -130,6 +130,7 @@ ncInterval = atoi(dronescanConfig->Require("ncInterval")->second.c_str());
 ncCutoff = atoi(dronescanConfig->Require("ncCutoff")->second.c_str());
 rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
 jcMinJoinToGline = atoi(dronescanConfig->Require("jcMinJoinToGline")->second.c_str());
+jcGracePeriodBurstOrSplit = atoi(dronescanConfig->Require("jcGracePeriodBurstOrSplit")->second.c_str());
 jcMinJoinToGlineJOnly = atoi(dronescanConfig->Require("jcMinJoinToGlineJOnly")->second.c_str());
 jcMinJoinsPerIPToGline = atoi(dronescanConfig->Require("jcMinJoinsPerIPToGline")->second.c_str());
 jcJoinsPerIPTime = atoi(dronescanConfig->Require("jcJoinsPerIPTime")->second.c_str());
@@ -379,6 +380,7 @@ void dronescan::OnEvent( const eventType& theEvent,
 			}
 		case EVT_NETBREAK :
 			{
+			lastSplitTime = ::time(0);
 			updateState();
 			break;
 			}
@@ -818,7 +820,7 @@ for(jcChanMapType::const_iterator itr = jcChanMap.begin() ;
 		bool isoktogline2 = false;
 		for(;joinPartIt != joinPartEnd; ++joinPartIt )
 			{
-				isoktogline = ((::time(0) - lastBurstTime) > 25 && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))) ? true : false;
+				isoktogline = ((::time(0) - lastBurstTime) >= (jcGracePeriodBurstOrSplit / 2) && (::time(0) - lastSplitTime) >= (jcGracePeriodBurstOrSplit / 2) && jcGlineEnable && jChannel->getNumOfJoins() > jcMinJFSizeToGline && (jChannel->getNumOfParts() > jcMinJFSizeToGline || (joinPartIt->second.numOfJoins >= jcMinJoinToGlineJOnly && jChannel->getNumOfJoins() >= jcMinJFJOnlySizeToGline))) ? true : false;
 				if (isoktogline)
 					isoktogline2 = true;
 #ifdef ENABLE_LOG4CPLUS
@@ -1246,7 +1248,7 @@ if( droneChanItr != droneChannels.end() )
 	}
 
 /* Do join count processing if applicable */
-if ((::time(0) - lastBurstTime) < 60)
+if ((::time(0) - lastBurstTime) < jcGracePeriodBurstOrSplit)
 	return;  /* Don't report join/floods right after a burst */
 const string& channelName = theChannel->getName();
 jcChanMapIterator jcChanIt = jcChanMap.find(channelName);
@@ -1277,7 +1279,7 @@ if(channel->getJoinFlooded())
 	if (joinCount >= jcCutoff) {
 		string IP = xIP(theClient->getIP()).GetNumericIP();
 		jcFloodClients* jcFC;
-		if ((::time(0) - lastBurstTime) >= 60 && jcGlineEnable) {
+		if ((::time(0) - lastBurstTime) >= jcGracePeriodBurstOrSplit && jcGlineEnable) {
 			clientsIPFloodMapType::const_iterator Itr = clientsIPFloodMap.find(IP);
 			if (Itr != clientsIPFloodMap.end()) {
 				jcFC = Itr->second;
