@@ -628,7 +628,7 @@ public:
 	 * then all but the sourceClient will receive the event.
 	 */
 	virtual void	UserLogin( iClient*, const std::string&,
-				xClient* = 0 ) ;
+				const time_t, xClient* = 0 ) ;
 
 	/**
 	 * Post a system event to the rest of the system.  Note

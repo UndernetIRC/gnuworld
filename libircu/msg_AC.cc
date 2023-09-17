@@ -38,13 +38,14 @@ CREATE_HANDLER(msg_AC)
 
 /**
  * ACCOUNT message handler.
- * SOURCE AC TARGET ACCOUNT
+ * SOURCE AC TARGET ACCOUNT CREATION_TS
  * Eg:
- * AXAAA AC BQrTd Gte
+ * AXAAA AC BQrTd Hidden 1694970265
+ * Note: CREATION_TS is optional
  */
 bool msg_AC::Execute( const xParameters& Param )
 {
-if( Param.size() != 3 )
+if (( Param.size() != 3 ) && ( Param.size() != 4 ))
 	{
 	elog	<< "msg_AC> Invalid number of parameters"
 		<< std::endl ;
@@ -82,13 +83,18 @@ if( ! account.empty() ) {
 			account_ts = atoi(account_ts_s.c_str());
 		}
 	}
+	if (Param.size() == 4) {
+		std::string account_ts_s = Param[3];
+		if (!account_ts_s.empty()) {
+			account_ts = atoi(account_ts_s);
+		}
+	}
 }
 
 
 // Update user information
 theClient->setAccount( account ) ;
-
-if( account_ts != 0 ) theClient->setAccountTS( account_ts );
+theClient->setAccountTS( account_ts );
 
 // Post event to listening clients
 theServer->PostEvent( EVT_ACCOUNT, static_cast< void* >( theClient ) ) ;
