@@ -9082,7 +9082,7 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 	 * Eg: AX AC APAFD gte
 	 */
 	if (!LoC)
-		this->MyUplink->UserLogin(theClient, theUser->getUserName(), theUser->getSignupTS(), this);
+		this->MyUplink->UserLogin(theClient, theUser->getUserName(), static_cast<time_t>(theUser->getID()), this);
 
 	/*
 	 * If the user account has been suspended, make sure they don't get
