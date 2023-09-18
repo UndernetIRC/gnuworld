@@ -96,8 +96,10 @@ if (!theUser)
 	}
 else
 	{ 
-	if ((!strcasecmp(theClient->getAccount(),theUser->getAccount())) && (theClient->getAccountTS() == theUser->getAccountTS()))
-		isXAuthed = true;
+	if (!strcasecmp(theClient->getAccount(), theUser->getAccount())) {
+		if ((theClient->getAccountTS() == theUser->getAccountTS()) || (theUser->getAccountTS() == 0))
+			isXAuthed = true;
+	}
 
 	//Check if the user need to be operd to login
 	if((!theClient->isOper()) && (theUser->getNeedOp())) {
@@ -152,6 +154,11 @@ else
 		bot->addLogin(theClient);
 		return false;
 		}
+	if ((theUser->getAccountTS() != theClient->getAccountTS()) && (theUser->getAccountTS() != 0)) {
+		// euworld has never received an account_ts for this account before. Update the db.
+		theUser->setAccountTS(theClient->getAccountTS());
+		theUser->Update();
+	}
 	//Ok the password match , prepare the ccUser data
 	bot->OkAuthUser(theClient, theUser);
 	} 

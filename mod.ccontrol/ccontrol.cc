@@ -2101,10 +2101,12 @@ ccUser *theUser = GetOperByAC(theClient->getAccount());
 if (!theUser)
 	return;
 if (theUser->getAccountTS() != theClient->getAccountTS()) {
-	elog << "ccontrol::handleAC()> getAccount mismatch for " << theClient->getAccount()
-		<< ". theClient->getAccountTS() = " << theClient->getAccountTS() << " && theUser->getAccountTS() = "
-		<< theUser->getAccountTS() << endl;
-	return;
+	if (theUser->getAccountTS() != 0) {
+		elog << "ccontrol::handleAC()> getAccount mismatch for " << theClient->getAccount()
+			<< ". theClient->getAccountTS() = " << theClient->getAccountTS() << " && theUser->getAccountTS() = "
+			<< theUser->getAccountTS() << endl;
+		return;
+	}
 }
 if (!theUser->getSso())
 	return;
@@ -2117,6 +2119,11 @@ if (!theClient->isOper()) {
 }
 if (IsAuth(theClient))
 	return;
+if ((theUser->getAccountTS() != theClient->getAccountTS()) && (theUser->getAccountTS() != 0)) {
+	// euworld has never received an account_ts for this account before. Update the db.
+	theUser->setAccountTS(theClient->getAccountTS());
+	theUser->Update();
+}
 OkAuthUser(theClient, theUser);
 return;
 }
@@ -2721,7 +2728,7 @@ theQuery	<< Main
 		<< "," << (Oper->getSsooo() ? "'t'" : "'n'")
 		<< "," << (Oper->getAutoOp() ? "'t'" : "'n'")
 		<< ",'" << removeSqlChars(Oper->getAccount())
-		<< "'," << "0"
+		<< "'," << Oper->getAccountTS()
 		<< ")"
 		<< ends;
 
