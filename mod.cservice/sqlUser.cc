@@ -199,10 +199,6 @@ flags = atoi(SQLDb->GetValue(row, 5));
 last_updated_by = SQLDb->GetValue(row, 6);
 last_updated = atoi(SQLDb->GetValue(row, 7));
 signup_ts = atoi(SQLDb->GetValue(row, 8));
-if (signup_ts == 0) {
-	// A signup TS of 0 in ircu's ACCOUNT means the user is deactivated
-	signup_ts = 1;
-}
 email = SQLDb->GetValue(row, 9);
 maxlogins = atoi(SQLDb->GetValue(row, 10));
 verifdata = SQLDb->GetValue(row, 11);
