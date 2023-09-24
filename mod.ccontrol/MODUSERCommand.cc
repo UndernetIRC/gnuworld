@@ -556,7 +556,7 @@ while(pos < st.size())
 				return false;
 			}
 			tmpUser->setAccount(bot->removeSqlChars(cAC));
-			tmpUser->setAccountTS(theClient->getAccountTS());
+			tmpUser->setAccountID(theClient->getAccountID());
 			bot->accountsMapAdd(tmpUser, cAC);
 			bot->Notice(theClient,"Successfully set your account to: %s.",cAC.c_str());
 		}
@@ -564,7 +564,7 @@ while(pos < st.size())
 			if (!dbAC.empty())
 				bot->accountsMapDel(dbAC);
 			tmpUser->setAccount("");
-			tmpUser->setAccountTS(0);
+			tmpUser->setAccountID(0);
 			bot->Notice(theClient,"Successfully removed your account.");
 		}
 

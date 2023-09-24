@@ -94,7 +94,7 @@ if( ! account.empty() ) {
 
 // Update user information
 theClient->setAccount( account ) ;
-theClient->setAccountTS( account_ts );
+theClient->setAccountID( account_ts );
 
 // Post event to listening clients
 theServer->PostEvent( EVT_ACCOUNT, static_cast< void* >( theClient ) ) ;

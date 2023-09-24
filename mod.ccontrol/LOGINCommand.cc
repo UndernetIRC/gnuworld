@@ -97,7 +97,7 @@ if (!theUser)
 else
 	{ 
 	if (!strcasecmp(theClient->getAccount(), theUser->getAccount())) {
-		if ((theClient->getAccountTS() == theUser->getAccountTS()) || (theUser->getAccountTS() == 0))
+		if ((theClient->getAccountID() == theUser->getAccountID()) || (theUser->getAccountID() == 0))
 			isXAuthed = true;
 	}
 
@@ -154,9 +154,9 @@ else
 		bot->addLogin(theClient);
 		return false;
 		}
-	if ((theUser->getAccountTS() != theClient->getAccountTS()) && (theUser->getAccountTS() != 0)) {
+	if ((theUser->getAccountID() != theClient->getAccountID()) && (theUser->getAccountID() != 0)) {
 		// euworld has never received an account_ts for this account before. Update the db.
-		theUser->setAccountTS(theClient->getAccountTS());
+		theUser->setAccountID(theClient->getAccountID());
 		theUser->Update();
 	}
 	//Ok the password match , prepare the ccUser data

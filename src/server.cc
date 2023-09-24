@@ -2817,7 +2817,7 @@ return true ;
 }
 
 void xServer::UserLogin( iClient* destClient, const string& account,
-	const time_t account_ts, xClient* sourceClient )
+	const time_t account_id, xClient* sourceClient )
 {
 assert( destClient != 0 ) ;
 
@@ -2830,7 +2830,7 @@ if( account.empty() )
 	}
 
 destClient->setAccount( account ) ;
-destClient->setAccountTS(account_ts);
+destClient->setAccountID(account_id);
 
 stringstream	outStream ;
 outStream	<< getCharYY()
@@ -2839,7 +2839,7 @@ outStream	<< getCharYY()
 		<< " "
 		<< account
 		<< " "
-		<< account_ts;
+		<< account_id;
 Write( outStream ) ;
 
 PostEvent( EVT_ACCOUNT,

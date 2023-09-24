@@ -2100,11 +2100,11 @@ void ccontrol::handleAC( iClient* theClient)
 ccUser *theUser = GetOperByAC(theClient->getAccount());
 if (!theUser)
 	return;
-if (theUser->getAccountTS() != theClient->getAccountTS()) {
-	if (theUser->getAccountTS() != 0) {
+if (theUser->getAccountID() != theClient->getAccountID()) {
+	if (theUser->getAccountID() != 0) {
 		elog << "ccontrol::handleAC()> getAccount mismatch for " << theClient->getAccount()
-			<< ". theClient->getAccountTS() = " << theClient->getAccountTS() << " && theUser->getAccountTS() = "
-			<< theUser->getAccountTS() << endl;
+			<< ". theClient->getAccountID() = " << theClient->getAccountID() << " && theUser->getAccountID() = "
+			<< theUser->getAccountID() << endl;
 		return;
 	}
 }
@@ -2119,9 +2119,9 @@ if (!theClient->isOper()) {
 }
 if (IsAuth(theClient))
 	return;
-if ((theUser->getAccountTS() != theClient->getAccountTS()) && (theUser->getAccountTS() != 0)) {
-	// euworld has never received an account_ts for this account before. Update the db.
-	theUser->setAccountTS(theClient->getAccountTS());
+if ((theUser->getAccountID() != theClient->getAccountID()) && (theUser->getAccountID() != 0)) {
+	// euworld has never received an account ID for this account before. Update the db.
+	theUser->setAccountID(theClient->getAccountID());
 	theUser->Update();
 }
 OkAuthUser(theClient, theUser);
@@ -2728,7 +2728,7 @@ theQuery	<< Main
 		<< "," << (Oper->getSsooo() ? "'t'" : "'n'")
 		<< "," << (Oper->getAutoOp() ? "'t'" : "'n'")
 		<< ",'" << removeSqlChars(Oper->getAccount())
-		<< "'," << Oper->getAccountTS()
+		<< "'," << Oper->getAccountID()
 		<< ")"
 		<< ends;
 
@@ -4679,7 +4679,7 @@ for(unsigned int i =0;i<SQLDb->Tuples();++i)
 	tempUser->setSsooo(!strcasecmp(SQLDb->GetValue(i,24),"t"));
 	tempUser->setAutoOp(!strcasecmp(SQLDb->GetValue(i,25),"t"));
 	tempUser->setAccount(SQLDb->GetValue(i,26));
-	tempUser->setAccountTS(atoi(SQLDb->GetValue(i,27).c_str()));
+	tempUser->setAccountID(atoi(SQLDb->GetValue(i,27).c_str()));
 	usersMap[tempUser->getUserName()]=tempUser;
 	string AC = tempUser->getAccount();
 	if (!AC.empty())

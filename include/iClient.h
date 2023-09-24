@@ -221,11 +221,20 @@ public:
 		{ return account ; }
 	
 	/**
+	 * Retrieve client's account ID.
+	 *
+	 * @return the ID of the account if set, else 0.
+	 */
+	inline const time_t& getAccountTS() const
+		{ return account_ts; }
+
+	/**
 	 * Retrieve client's account timestamp.
 	 *
 	 * @return the timestamp of the account if set, else 0.
+	 * Note: the value in ircu is a timestamp, but gnuworld uses it as the account ID
 	 */
-	inline const time_t& getAccountTS() const
+	inline const time_t& getAccountID() const
 		{ return account_ts; }
 
 	/**
@@ -247,7 +256,7 @@ public:
 		// We know that the user is mode R already
 		if (isModeX()) setHiddenHost();
 		}
-	
+
 	/**
 	 * Set the account timestamp for this iClient.
 	 * Only valid if the iClient isModeR()
@@ -255,7 +264,17 @@ public:
 	inline void setAccountTS( const time_t _account_ts )
 		{
 		if( ! isModeR() ) { return ; }
-		
+		account_ts = _account_ts;
+		}
+
+	/**
+	 * Set the account ID for this iClient.
+	 * Only valid if the iClient isModeR()
+	 * Note: the value in ircu is a timestamp, but gnuworld uses it as the account ID
+	 */
+	inline void setAccountID( const time_t _account_ts )
+		{
+		if( ! isModeR() ) { return ; }
 		account_ts = _account_ts;
 		}
 
