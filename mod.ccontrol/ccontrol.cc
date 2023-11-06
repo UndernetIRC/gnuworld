@@ -2119,10 +2119,12 @@ if (!theClient->isOper()) {
 }
 if (IsAuth(theClient))
 	return;
-if ((theUser->getAccountID() != theClient->getAccountID()) && (theUser->getAccountID() != 0)) {
+if ((theUser->getAccountID() != theClient->getAccountID()) && (theUser->getAccountID() == 0)) {
 	// euworld has never received an account ID for this account before. Update the db.
 	theUser->setAccountID(theClient->getAccountID());
 	theUser->Update();
+	Notice(theClient, "Your X account ID (%d) is now stored in my database along with your X account.", theClient->getAccountID());
+	Notice(theClient, "This ensures that if your username expires and gets re-registered, I will see the difference. You should never see this message again");
 }
 OkAuthUser(theClient, theUser);
 return;
