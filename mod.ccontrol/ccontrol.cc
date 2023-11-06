@@ -2101,7 +2101,7 @@ ccUser *theUser = GetOperByAC(theClient->getAccount());
 if (!theUser)
 	return;
 if (theUser->getAccountID() != theClient->getAccountID()) {
-	if (theUser->getAccountID() != 0) {
+	if ((theUser->getAccountID() != 0) && (theClient->getAccountID() != 0)) {
 		elog << "ccontrol::handleAC()> getAccount mismatch for " << theClient->getAccount()
 			<< ". theClient->getAccountID() = " << theClient->getAccountID() << " && theUser->getAccountID() = "
 			<< theUser->getAccountID() << endl;
