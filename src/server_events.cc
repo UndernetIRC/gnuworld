@@ -240,6 +240,7 @@ void xServer::PostChannelEvent( const channelEventType& theEvent,
 	void* Data3, void* Data4 )
 {
 assert( theChan != 0 ) ;
+string channelName = theChan->getName();
 
 // First deliver this channel event to any listeners for all channel
 // events.
@@ -257,12 +258,22 @@ if( allChanPtr != channelEventMap.end() )
 
 // Find listeners for this specific channel
 channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
+	channelEventMap.find(channelName) ;
 if( chanPtr == channelEventMap.end() )
 	{
 	// No listeners for this channel's events
 	return ;
 	}
+
+/* 2024-01-05 (by Hidden): It is possible that the channel was destroyed (only one user in the channel
+ * was kicked or killed by the service right after the creation of the channel in the above onChannelEvent()).
+ * We have to make sure theChan is still valid.
+ */
+Channel *theChan2 = Network->findChannel(channelName.c_str());
+if (!theChan2) {
+	channelEventMap.erase(chanPtr);
+	return;
+}
 
 // Iterate through the listeners for this channel's events
 // and notify each listener of the event
