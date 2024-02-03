@@ -124,7 +124,7 @@ if (!isRequesterScoreHighEnough)
   bot->SendTo(theClient,
                 bot->getResponse(theUser,
                                 language::score_not_high_enough,
-                                std::string("You score for %s is not high enough to issue a fix.")).c_str(),
+                                std::string("Your score for %s is not high enough to issue a fix.")).c_str(),
                                             netChan->getName().c_str());
   return;
 }

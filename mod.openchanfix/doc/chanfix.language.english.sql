@@ -199,7 +199,7 @@ COPY "translations" FROM stdin;
 1	193	Current fix is on hold (waiting for ops to join)	31337	0
 1	194	Channel Score -- Time first opped / Time last opped	31337	0
 1	195	Account %s doesn't have any scores in the database.	31337	0
-1	196	You score for %s is not high enough to issue a fix.	31337	0
+1	196	Your score for %s is not high enough to issue a fix.	31337	0
 1	197	Accounts who can issue fixes in channel %s:	31337	0
 1	198	Account -- Time first opped / Time last opped	31337	0
 1	199	You do not have a high enough score for %s to check canfix list.	31337	0
