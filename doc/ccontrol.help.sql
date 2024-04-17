@@ -128,7 +128,7 @@ INVITE		3	Syntax: /msg $BOT$ invite <#channel>
 INVITE		4	<#channel> - the channel to invite you to
 LIMITS		1	****** LIMITS COMMAND ******
 LIMITS		2	Manage IPv4/v6 clone limits
-LIMITS		3	LIMITS commands: addisp, addnetblock, delisp, delnetblock, list, chlimit, chname, chemail, forcecount, active, group, chccidr, clearall, userinfo
+LIMITS		3	LIMITS commands: addisp, addnetblock, delisp, delnetblock, list, chlimit, chname, chemail, forcecount, active, nogline, group, chccidr, clearall, userinfo
 LIMITS		4	Syntax for the two main commands:
 LIMITS		5	1. ADDISP <name> <max connections> <clones cidr> [abuse email]
 LIMITS		6	2. ADDNETBLOCK <isp> <netblock>

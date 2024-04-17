@@ -567,6 +567,7 @@ ccIpLisp::ccIpLisp(dbHandle* _SQLDb)
 	maxlimit = 0;
 	maxIdentlimit = 0;
 	active = 1;
+	nogline = 0;
 	v6 = 2;
 	AddedOn = ::time(0);
 	ModOn = ::time(0);
@@ -605,7 +606,7 @@ ccIpLnb::~ccIpLnb()
 int ccIpLisp::loadData(const string& Name)
 {
 int i = 0;
-static const char Main[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,glunidented,isgroup,maxidentlimit FROM ipLISPs WHERE name = '";
+static const char Main[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,glunidented,isgroup,maxidentlimit,nogline FROM ipLISPs WHERE name = '";
 
 if((!dbConnected) || !(SQLDb))
 	{
@@ -645,6 +646,7 @@ setForcecount(atoi(SQLDb->GetValue(i,10).c_str()));
 setGlunidented(atoi(SQLDb->GetValue(i,11).c_str()));
 setGroup(atoi(SQLDb->GetValue(i,12).c_str()));
 setIdentLimit(atoi(SQLDb->GetValue(i,13).c_str()));
+setNoGline(atoi(SQLDb->GetValue(i,14).c_str()));
 
 theQuery.str("");
 
@@ -673,6 +675,8 @@ theQuery	<< Main
 		<< AddedOn
 		<< ", active = "
 		<< active
+		<< ", nogline = "
+		<< nogline
 		<< ", lastmodon = "
 		<< ModOn
 		<< ", clonecidr = "

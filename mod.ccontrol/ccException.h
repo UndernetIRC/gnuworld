@@ -269,6 +269,9 @@ public:
 	inline bool		isActive() const
 		{ return (active == 1 ? true : false); }
 
+	inline bool		isNoGline() const
+		{ return (nogline == 1 ? true : false); }
+
 	inline bool		isGlunidented() const
 		{ return (glunidented == 1 ? true : false); }
 
@@ -347,6 +350,9 @@ public:
 	inline void 	setActive( const int _active) 
 		{ active = _active; }
 
+	inline void 	setNoGline( const int _nogline)
+		{ nogline = _nogline; }
+
 	inline void 	setGlunidented( const int _glunidented) 
 		{ glunidented = _glunidented; }
 
@@ -392,6 +398,7 @@ protected:
 	int 		maxIdentlimit;
 	int		count;
 	int		active;
+	int		nogline;
 	string 		AddedBy;
 	time_t		AddedOn;
 	string 		ModBy;
@@ -412,6 +419,9 @@ public:
 
 	inline bool		isActive() const
 		{ return ipLisp->isActive(); }
+
+	inline bool		isNoGline() const
+		{ return ipLisp->isNoGline(); }
 
 	inline bool		isForcecount() const
 		{ return ipLisp->isForcecount(); }

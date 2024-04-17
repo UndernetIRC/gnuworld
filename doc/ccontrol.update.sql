@@ -172,3 +172,6 @@ alter table exceptions alter column addedon set default date_part('epoch', CURRE
 -- 2023-01-15 ccontrol> Changing default value for opers.sso and opers.ssooo
 alter table opers alter column sso set default 't';
 alter table opers alter column ssooo set default 't';
+
+-- 2024-04-16 ccontrol> Limits: adding nogline column
+alter table ipLISPs add nogline INT4 NOT NULL DEFAULT 0;

@@ -169,6 +169,7 @@ CREATE TABLE ipLISPs (
 	forcecount int4 NOT NULL DEFAULT 0,
 	glunidented int4 NOT NULL DEFAULT 0,
         active int4 NOT NULL DEFAULT 1,
+        nogline int4 NOT NULL DEFAULT 0,
         isgroup int4 NOT NULL DEFAULT 0,
         addedby VARCHAR(200) NOT NULL,
         addedon int4 NOT NULL,

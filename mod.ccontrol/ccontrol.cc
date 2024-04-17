@@ -664,7 +664,7 @@ RegisterCommand( new EXCEPTIONCommand( this, "EXCEPTIONS",
 	operLevel::OPERLEVEL,
 	true ) ) ;
 RegisterCommand( new LIMITSCommand( this, "LIMITS",
-	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chilimit / chname / chemail / forcecount / glunidented / active / group / chccidr / clearall / userinfo / info)",
+	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chilimit / chname / chemail / forcecount / glunidented / active / nogline / group / chccidr / clearall / userinfo / info)",
 	true,
 	commandLevel::flg_LIMITS,
 	false,
@@ -2352,13 +2352,13 @@ if(dbConnected)
 					if (group) {
 						MsgChanLog("Excessive CIDR ident clones (%d/%d) for user %s@ in GROUP %s [ref: %s] (will%s GLINE)\n",
 							ipLconncount, rs.limit, user.c_str(), nb->ipLisp->getName().c_str(),
-							nb->getCidr().c_str(), nb->isActive()  ? "" : " _NOT_");
+							nb->getCidr().c_str(), nb->isActive() && !nb->isNoGline() ? "" : " _NOT_");
 
 					}
 					else {	
 						MsgChanLog("Excessive CIDR ident clones (%d/%d) for %s [ref: %s] (will%s GLINE)\n",
 							ipLconncount, rs.limit, rs.mask.c_str(),
-							nb->getCidr().c_str(), nb->isActive()  ? "" : " _NOT_");
+							nb->getCidr().c_str(), nb->isActive() && !nb->isNoGline() ? "" : " _NOT_");
 
 					}
 					clientsIp24MapLastWarn[nbstring] = time(NULL);
@@ -2367,12 +2367,12 @@ if(dbConnected)
 					if (group) {
 						MsgChanLog("Excessive connections (%d/%d) from GROUP %s [ref: %s] (will%s GLINE)\n",
 							ipLconncount, rs.limit, nb->ipLisp->getName().c_str(),
-							nb->getCidr().c_str(), !ipLRetVal && nb->isActive()  ? "" : " _NOT_");
+							nb->getCidr().c_str(), !ipLRetVal && nb->isActive() && !nb->isNoGline() ? "" : " _NOT_");
 					}
 					else {
 						MsgChanLog("Excessive connections (%d/%d) from subnet *@%s [ref: %s's %s] (will%s GLINE)\n",
 							ipLconncount, rs.limit, netblock.c_str(), nb->ipLisp->getName().c_str(),
-							nb->getCidr().c_str(), !ipLRetVal && nb->isActive()  ? "" : " _NOT_");
+							nb->getCidr().c_str(), !ipLRetVal && nb->isActive() && !nb->isNoGline() ? "" : " _NOT_");
 					}
 					clientsIp24MapLastWarn[nbstring] = time(NULL);
 				}
@@ -2380,7 +2380,7 @@ if(dbConnected)
 
 			string netblocks;
 			/* check for auto-gline feature */
-			if (!ipLRetVal && nb->isActive()) {
+			if (!ipLRetVal && nb->isActive() && !nb->isNoGline()) {
 				ccIpLnb *original_nb = nb;
 				for (ipLnbVectorType::iterator nItr = ipLnbVector.begin(); nItr != ipLnbVector.end(); nItr++) {
 					if (group) {
@@ -6835,7 +6835,9 @@ for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++
 	string str1("");
 	string email("");
 	if (!isp->isActive())
-		str1 = " [NO G]";
+		str1 = " [INACTIVE]";
+	if (isp->isNoGline())
+		str1 += " [NO G]";
 	if (isp->isForcecount())
 		str1 += " [fcount]";
 	if (isp->isGlunidented())
@@ -7602,7 +7604,7 @@ return status;
 bool ccontrol::loadExceptions()
 {
 static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions";
-static const char Query2[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,glunidented,isgroup,maxidentlimit FROM ipLISPs ORDER BY id";
+static const char Query2[] = "SELECT name,id,AddedBy,AddedOn,lastmodby,lastmodon,maxlimit,active,email,clonecidr,forcecount,glunidented,isgroup,maxidentlimit,nogline FROM ipLISPs ORDER BY id";
 static const char Query3[] = "SELECT cidr,ispid,AddedBy,AddedOn FROM ipLNetblocks";
 
 if(!dbConnected)
@@ -7691,6 +7693,7 @@ for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
 	tempIpLisp->setGlunidented(atoi(SQLDb->GetValue(i,11).c_str()));
 	tempIpLisp->setGroup(atoi(SQLDb->GetValue(i,12).c_str()));
 	tempIpLisp->setIdentLimit(atoi(SQLDb->GetValue(i,13).c_str()));
+	tempIpLisp->setNoGline(atoi(SQLDb->GetValue(i,14).c_str()));
 	
 	ipLispVector.push_back(tempIpLisp);
 	}
