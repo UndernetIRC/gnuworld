@@ -195,6 +195,7 @@ theUser->setLag(false);
 theUser->setSso(true);
 theUser->setSsooo(true);
 theUser->setAutoOp(false);
+theUser->setAccountID(::time(0));
 
 
 if(bot->AddOper(theUser) == true)
