@@ -128,7 +128,7 @@ RegisterCommand(new ADDHOSTCommand(this, "ADDHOST",
 RegisterCommand(new ADDNOTECommand(this, "ADDNOTE",
 	"<#channel> <reason>",
 	3,
-	sqlcfUser::F_COMMENT
+	0 /* Set to 0 to allow all opers to access it, otherwise this should be sqlcfUser::F_COMMENT */
 	));
 RegisterCommand(new ADDUSERCommand(this, "ADDUSER",
 	"<username> [host]",
@@ -138,7 +138,7 @@ RegisterCommand(new ADDUSERCommand(this, "ADDUSER",
 RegisterCommand(new ALERTCommand(this, "ALERT",
 	"<#channel> <reason>",
 	3,
-	sqlcfUser::F_COMMENT
+	0 /* Set to 0 to allow all opers to access it, otherwise this should be sqlcfUser::F_COMMENT */
 	));
 RegisterCommand(new BLOCKCommand(this, "BLOCK",
 	"<#channel> <reason>",
@@ -180,7 +180,7 @@ RegisterCommand(new DELHOSTCommand(this, "DELHOST",
 RegisterCommand(new DELNOTECommand(this, "DELNOTE",
 	"<#channel> <note_id>",
 	3,
-	sqlcfUser::F_COMMENT
+	0 /* Set to 0 to allow all opers to access it, otherwise this should be sqlcfUser::F_COMMENT */
 	));
 RegisterCommand(new DELUSERCommand(this, "DELUSER",
 	"<username>",
@@ -306,7 +306,7 @@ RegisterCommand(new SUSPENDCommand(this, "SUSPEND",
 RegisterCommand(new UNALERTCommand(this, "UNALERT",
 	"<#channel>",
 	2,
-	sqlcfUser::F_COMMENT
+	0 /* Set to 0 to allow all opers to access it, otherwise this should be sqlcfUser::F_COMMENT */
 	));
 RegisterCommand(new UNBLOCKCommand(this, "UNBLOCK",
 	"<#channel>",
