@@ -693,6 +693,20 @@ if (st.size() < commHandler->second->getNumParams()) {
   return;
 }
 
+/* Hidden: As of 2024-05-04, require opers to be authenticated to use oper level commands.
+   This is mainly for logging purposes, otherwise chanfix and oper notes are empty, as only account is stored in the note, not the nick!user@host.
+*/
+if (theClient->getAccount().length() == 0) {
+  if (Command != "CANFIX" && Command != "HELP" && Command != "REQUESTOP") {
+    SendTo(theClient,
+        getResponse(theUser,
+                    language::need_to_auth,
+                    std::string("You need to authenticate to use this command.")).c_str());
+    return;
+  }
+}
+
+
 /* If you change this code, remember to change it in HELPCommand.cc */
 sqlcfUser::flagType requiredFlags = commHandler->second->getRequiredFlags();
 if (requiredFlags) {
