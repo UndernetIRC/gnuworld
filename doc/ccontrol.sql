@@ -160,29 +160,29 @@ CREATE TABLE BadChannels (
 	);
 
 CREATE TABLE ipLISPs (
-        id SERIAL,
-        name VARCHAR(200) UNIQUE NOT NULL,
-        email VARCHAR(200) NOT NULL,
-        clonecidr int4 NOT NULL DEFAULT 0,
-        maxlimit int4 NOT NULL DEFAULT 0,
-        maxidentlimit int4 NOT NULL DEFAULT 0,
+	id SERIAL,
+	name VARCHAR(200) UNIQUE NOT NULL,
+	email VARCHAR(200) NOT NULL,
+	clonecidr int4 NOT NULL DEFAULT 0,
+	maxlimit int4 NOT NULL DEFAULT 0,
+	maxidentlimit int4 NOT NULL DEFAULT 0,
 	forcecount int4 NOT NULL DEFAULT 0,
 	glunidented int4 NOT NULL DEFAULT 0,
-        active int4 NOT NULL DEFAULT 1,
-        nogline int4 NOT NULL DEFAULT 0,
-        isgroup int4 NOT NULL DEFAULT 0,
-        addedby VARCHAR(200) NOT NULL,
-        addedon int4 NOT NULL,
-        lastmodby VARCHAR(200) NOT NULL,
-        lastmodon int4 NOT NULL
-        );
+	active int4 NOT NULL DEFAULT 1,
+	nogline int4 NOT NULL DEFAULT 0,
+	isgroup int4 NOT NULL DEFAULT 0,
+	addedby VARCHAR(200) NOT NULL,
+	addedon int4 NOT NULL,
+	lastmodby VARCHAR(200) NOT NULL,
+	lastmodon int4 NOT NULL
+	);
 
 CREATE TABLE ipLNetblocks (
-        ispid int4 NOT NULL,
-        cidr VARCHAR(50) NOT NULL,
-        addedby VARCHAR(200) NOT NULL,
-        addedon int4 NOT NULL
-        );
+	ispid int4 NOT NULL,
+	cidr VARCHAR(50) NOT NULL,
+	addedby VARCHAR(200) NOT NULL,
+	addedon int4 NOT NULL
+	);
 
 INSERT INTO public.iplisps (id, name, email, clonecidr, maxlimit, forcecount, active, isgroup, addedby, addedon, lastmodby, lastmodon, maxidentlimit, glunidented, nogline) VALUES (1, 'default32', 'email@not.available', 32, 5, 1, 1, 0, 'euworld!euworld@undernet.org', 0, 'euworld!euworld@undernet.org', 0, 5, 0, 0);
 INSERT INTO public.iplisps (id, name, email, clonecidr, maxlimit, forcecount, active, isgroup, addedby, addedon, lastmodby, lastmodon, maxidentlimit, glunidented, nogline) VALUES (2, 'default24', 'email@not.available', 24, 50, 0, 1, 0, 'euworld!euworld@undernet.org', 0, 'euworld!euworld@undernet.org', 0, 5, 0, 0);
