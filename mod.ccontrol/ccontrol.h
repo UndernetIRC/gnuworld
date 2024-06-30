@@ -65,7 +65,7 @@
 #include        "ccGline.h"
 #include        "ccServer.h"
 #include 	"ccFloodData.h"
-#include 	"ccException.h"
+#include	"ccException.h"
 #include        "server.h"
 #include	"CommandsDec.h"
 #include 	"ccBadChannel.h"
@@ -198,10 +198,6 @@ protected:
 	typedef list< ccFloodData* >	ignoreListType;
 	
 	ignoreListType			ignoreList;
-	
-	typedef list< ccException* >    exceptionListType;
-	
-	exceptionListType		exceptionList;
 	
 	typedef std::list< string >    stringListType;
 	
@@ -714,20 +710,10 @@ public:
 	
 	void wallopsAsServer(const char * , ... );
 
-	int getExceptions( const string & );
-	
-	bool isException( const string & );
-
 	int isGlinedException( const string & );
 
 	void addGlinedException( const string & );
 	
-	bool listExceptions( iClient * );
-	
-	bool insertException( iClient * , const string & , int , const string &);
-
-	bool delException( iClient * , const string & );
-
 	bool isValidCidr( const string & );
 
 	bool getValidCidr( const string &, string &  );
@@ -999,17 +985,10 @@ public:
 	ignoreIterator ignore_end()
 		{ return ignoreList.end() ; }
 	
-	typedef exceptionListType::iterator exceptionIterator;
 	typedef ipLispVectorType::iterator ipLispIterator;
 	typedef ipLnbVectorType::iterator ipLnbIterator;
 	typedef ipLnumericMapType::iterator ipLnumericIterator;
 	typedef ipLclonesMapType::iterator ipLclonesMapIterator;
-	
-	exceptionIterator exception_begin() 
-		{ return exceptionList.begin(); }
-
-	exceptionIterator exception_end()
-		{ return exceptionList.end(); }
 	
 	clientsIpMapType		clientsIpMap;
 
@@ -1021,42 +1000,6 @@ public:
 	clientsIpIterator clientsIp_end()
 		{ return clientsIpMap.end(); }
 
-	clientsIpMapType		clientsIp24Map;
-
-	clientsIpMapType		clientsIp24MapLastWarn;
-
-	clientsIpIterator clientsIp24_begin()
-		{ return clientsIp24Map.begin(); }
-
-	clientsIpIterator clientsIp24_end()
-		{ return clientsIp24Map.end(); }
-
-	clientsIpMapType		clientsIp24IdentMap;
-
-	clientsIpMapType		clientsIp24IdentMapLastWarn;
-
-	clientsIpIterator clientsIp24IdentMap_begin()
-		{ return clientsIp24IdentMap.begin(); }
-
-	clientsIpIterator clientsIp24IdentMap_end()
-		{ return clientsIp24IdentMap.end(); }
-	
-	clientsIpMapType		virtualClientsMap;
-
-	clientsIpIterator virtualClientsMap_begin()
-		{ return virtualClientsMap.begin(); }
-					
-	clientsIpIterator virtualClientsMap_end()
-		{ return virtualClientsMap.end(); }
-
-	clientsIpMapType		virtualClientsMapLastWarn;
-
-	clientsIpIterator virtualClientsMapLastWarn_begin()
-		{ return virtualClientsMapLastWarn.begin(); }
-
-	clientsIpIterator virtualClientsMapLastWarn_end()
-		{ return virtualClientsMapLastWarn.end(); }
-	
 	typedef  usersMapType::const_iterator	usersconstiterator;
 	
 	typedef  accountsMapType::const_iterator	accountsconstiterator;
@@ -1219,23 +1162,9 @@ protected:
 
 	int 			ExpiredInterval;
 
-	int			maxClones;
-	 
-	int			maxVClones;
-
-	int			maxCClones;
-
-	int			CClonesCIDR24;
-
-	int			CClonesCIDR48;
-
 	int			CClonesTime;
 
-	bool			CClonesGline;
-
 	int			CClonesGTime;
-
-	bool			IClonesGline;
 
 	int			maxIClones;
 
@@ -1246,8 +1175,6 @@ protected:
 	bool			checkClones;
 
 	bool			showCGIpsInLogs;
-
-	bool			StdCloneChecksDisabled;
 
 	time_t			dbConnectionTimer;
 

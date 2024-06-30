@@ -308,7 +308,6 @@ am__libccontrol_la_SOURCES_DIST = mod.ccontrol/ccontrol.cc \
 	mod.ccontrol/CLEARCHANCommand.cc \
 	mod.ccontrol/COMMANDSCommand.cc mod.ccontrol/CONFIGCommand.cc \
 	mod.ccontrol/DEAUTHCommand.cc mod.ccontrol/DEOPCommand.cc \
-	mod.ccontrol/EXCEPTIONCommand.cc \
 	mod.ccontrol/FORCECHANGLINECommand.cc \
 	mod.ccontrol/FORCEGLINECommand.cc mod.ccontrol/GCHANCommand.cc \
 	mod.ccontrol/GLINECommand.cc mod.ccontrol/HELPCommand.cc \
@@ -362,7 +361,6 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-CONFIGCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-DEAUTHCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-DEOPCommand.lo \
-@COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-EXCEPTIONCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-FORCECHANGLINECommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-FORCEGLINECommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-GCHANCommand.lo \
@@ -1026,7 +1024,6 @@ am__depfiles_remade = db/$(DEPDIR)/gnuworldDB.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-CONFIGCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-DEAUTHCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-DEOPCommand.Plo \
-	mod.ccontrol/$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCEGLINECommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-GCHANCommand.Plo \
@@ -1780,7 +1777,6 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/CONFIGCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/DEAUTHCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/DEOPCommand.cc \
-@COND_MODCCONTROL_TRUE@	mod.ccontrol/EXCEPTIONCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/FORCECHANGLINECommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/FORCEGLINECommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/GCHANCommand.cc \
@@ -2329,9 +2325,6 @@ mod.ccontrol/libccontrol_la-DEAUTHCommand.lo:  \
 	mod.ccontrol/$(am__dirstamp) \
 	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
 mod.ccontrol/libccontrol_la-DEOPCommand.lo:  \
-	mod.ccontrol/$(am__dirstamp) \
-	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
-mod.ccontrol/libccontrol_la-EXCEPTIONCommand.lo:  \
 	mod.ccontrol/$(am__dirstamp) \
 	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
 mod.ccontrol/libccontrol_la-FORCECHANGLINECommand.lo:  \
@@ -3437,7 +3430,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-CONFIGCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-DEAUTHCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-DEOPCommand.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCEGLINECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-GCHANCommand.Plo@am__quote@ # am--include-marker
@@ -3872,13 +3864,6 @@ mod.ccontrol/libccontrol_la-DEOPCommand.lo: mod.ccontrol/DEOPCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.ccontrol/DEOPCommand.cc' object='mod.ccontrol/libccontrol_la-DEOPCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.ccontrol/libccontrol_la-DEOPCommand.lo `test -f 'mod.ccontrol/DEOPCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/DEOPCommand.cc
-
-mod.ccontrol/libccontrol_la-EXCEPTIONCommand.lo: mod.ccontrol/EXCEPTIONCommand.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT mod.ccontrol/libccontrol_la-EXCEPTIONCommand.lo -MD -MP -MF mod.ccontrol/$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Tpo -c -o mod.ccontrol/libccontrol_la-EXCEPTIONCommand.lo `test -f 'mod.ccontrol/EXCEPTIONCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/EXCEPTIONCommand.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.ccontrol/$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Tpo mod.ccontrol/$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.ccontrol/EXCEPTIONCommand.cc' object='mod.ccontrol/libccontrol_la-EXCEPTIONCommand.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.ccontrol/libccontrol_la-EXCEPTIONCommand.lo `test -f 'mod.ccontrol/EXCEPTIONCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/EXCEPTIONCommand.cc
 
 mod.ccontrol/libccontrol_la-FORCECHANGLINECommand.lo: mod.ccontrol/FORCECHANGLINECommand.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT mod.ccontrol/libccontrol_la-FORCECHANGLINECommand.lo -MD -MP -MF mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Tpo -c -o mod.ccontrol/libccontrol_la-FORCECHANGLINECommand.lo `test -f 'mod.ccontrol/FORCECHANGLINECommand.cc' || echo '$(srcdir)/'`mod.ccontrol/FORCECHANGLINECommand.cc
@@ -6552,7 +6537,6 @@ distclean: distclean-recursive
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-CONFIGCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-DEAUTHCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-DEOPCommand.Plo
-	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCEGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-GCHANCommand.Plo
@@ -6922,7 +6906,6 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-CONFIGCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-DEAUTHCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-DEOPCommand.Plo
-	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-EXCEPTIONCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCECHANGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-FORCEGLINECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-GCHANCommand.Plo

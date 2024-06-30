@@ -24,7 +24,6 @@ libccontrol_la_SOURCES = \
 	mod.ccontrol/CONFIGCommand.cc \
 	mod.ccontrol/DEAUTHCommand.cc \
 	mod.ccontrol/DEOPCommand.cc \
-	mod.ccontrol/EXCEPTIONCommand.cc \
 	mod.ccontrol/FORCECHANGLINECommand.cc \
 	mod.ccontrol/FORCEGLINECommand.cc \
 	mod.ccontrol/GCHANCommand.cc \
