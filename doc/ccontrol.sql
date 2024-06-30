@@ -184,3 +184,13 @@ CREATE TABLE ipLNetblocks (
         addedon int4 NOT NULL
         );
 
+INSERT INTO public.iplisps (id, name, email, clonecidr, maxlimit, forcecount, active, isgroup, addedby, addedon, lastmodby, lastmodon, maxidentlimit, glunidented, nogline) VALUES (1, 'default32', 'email@not.available', 32, 5, 1, 1, 0, 'euworld!euworld@undernet.org', 0, 'euworld!euworld@undernet.org', 0, 5, 0, 0);
+INSERT INTO public.iplisps (id, name, email, clonecidr, maxlimit, forcecount, active, isgroup, addedby, addedon, lastmodby, lastmodon, maxidentlimit, glunidented, nogline) VALUES (2, 'default24', 'email@not.available', 24, 50, 0, 1, 0, 'euworld!euworld@undernet.org', 0, 'euworld!euworld@undernet.org', 0, 5, 0, 0);
+INSERT INTO public.iplisps (id, name, email, clonecidr, maxlimit, forcecount, active, isgroup, addedby, addedon, lastmodby, lastmodon, maxidentlimit, glunidented, nogline) VALUES (3, 'default48', 'email@not.available', 48, 25, 0, 1, 0, 'euworld!euworld@undernet.org', 0, 'euworld!euworld@undernet.org', 0, 5, 0, 0);
+INSERT INTO public.iplisps (id, name, email, clonecidr, maxlimit, forcecount, active, isgroup, addedby, addedon, lastmodby, lastmodon, maxidentlimit, glunidented, nogline) VALUES (4, 'default64', 'email@not.available', 64, 4, 0, 1, 0, 'euworld!euworld@undernet.org', 0, 'euworld!euworld@undernet.org', 0, 5, 0, 0);
+
+INSERT INTO public.iplnetblocks (ispid, cidr, addedby, addedon) VALUES (1, '0.0.0.0/0', 'euworld!euworld@undernet.org', 0);
+INSERT INTO public.iplnetblocks (ispid, cidr, addedby, addedon) VALUES (2, '0.0.0.0/0', 'euworld!euworld@undernet.org', 0);
+INSERT INTO public.iplnetblocks (ispid, cidr, addedby, addedon) VALUES (3, '0::/0', 'euworld!euworld@undernet.org', 0);
+INSERT INTO public.iplnetblocks (ispid, cidr, addedby, addedon) VALUES (4, '0::/0', 'euworld!euworld@undernet.org', 0);
+
