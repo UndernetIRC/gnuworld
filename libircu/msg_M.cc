@@ -223,7 +223,14 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			modeVector.push_back(
 				make_pair(polarity, Channel::MODE_CTCP));
 			break;
-
+		case 'P':
+			modeVector.push_back(
+				make_pair(polarity, Channel::MODE_PART));
+			break;
+		case 'M':
+			modeVector.push_back(
+				make_pair(polarity, Channel::MODE_MNOREG));
+			break;
 		// Channel mode l only has an argument if
 		// it is being added, but not removed
 		case 'l':

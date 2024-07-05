@@ -78,7 +78,7 @@ if( !isConnected() )
 	cout	<< "pgsqlDB> Failed to connect to db: "
 		<< ErrorMessage()
 		<< endl ;
-	throw std::exception() ;
+//	throw std::exception() ;
 	}
 }
 

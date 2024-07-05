@@ -33,6 +33,8 @@ Remember: If you have an existing 'old' gnuworld installation, follow doc/inet-m
 + Added NOVOICE channel setting (same behaviour as NOOP but prevents users being voiced)
 + Channel user suspensions can now have an optional reason applied
 + Added AUTOMODE protection on users who do not have sufficient access for the automatic mode (OP or VOICE)
++ Added MODE command to set channel modes via X
++ Added support for mulitiple kicks delimited by ','
 + Added optional channel flood protection (tracked by IP address) for lvl 500+ to set:
 
     /msg X set <channel> FLOODPRO <ON|OFF>

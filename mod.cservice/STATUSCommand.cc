@@ -115,7 +115,6 @@ Channel* tmpChan = Network->findChannel(theChan->getName());
 
 if (tmpChan)
 	{
-	// If the person has access >200, or is a 1+ admin (or and Oper).
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
 			language::status_chan_info,
@@ -123,7 +122,8 @@ if (tmpChan)
 		tmpChan->getName().c_str(),
 		tmpChan->size(),
 		bot->countChanOps(tmpChan) ) ;
-	if ((level >= 200) || (admLevel >= 1) || theClient->isOper())
+	// If the person has access >200, or is a 1+ admin (or and Oper).
+	if ((level >= level::status2) || (admLevel >= 1) || theClient->isOper())
 		{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,

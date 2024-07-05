@@ -42,21 +42,23 @@ using std::string ;
 using std::endl ;
 using std::stringstream ;
 
-const Channel::modeType Channel::MODE_T = 0x01 ;
-const Channel::modeType Channel::MODE_N = 0x02 ;
-const Channel::modeType Channel::MODE_S = 0x04 ;
-const Channel::modeType Channel::MODE_P = 0x08 ;
-const Channel::modeType Channel::MODE_K = 0x10 ;
-const Channel::modeType Channel::MODE_L = 0x20 ;
-const Channel::modeType Channel::MODE_M = 0x40 ;
-const Channel::modeType Channel::MODE_I = 0x80 ;
-const Channel::modeType Channel::MODE_R = 0x100 ;
-const Channel::modeType Channel::MODE_D = 0x200 ;
-const Channel::modeType Channel::MODE_A = 0x400 ;
-const Channel::modeType Channel::MODE_U = 0x800 ;
-const Channel::modeType Channel::MODE_REG = 0x1000 ;
-const Channel::modeType Channel::MODE_C = 0x2000;
-const Channel::modeType Channel::MODE_CTCP = 0x4000;
+const Channel::modeType Channel::MODE_T	      = 0x00001 ;
+const Channel::modeType Channel::MODE_N       = 0x00002 ;
+const Channel::modeType Channel::MODE_S       = 0x00004 ;
+const Channel::modeType Channel::MODE_P       = 0x00008 ;
+const Channel::modeType Channel::MODE_K       = 0x00010 ;
+const Channel::modeType Channel::MODE_L       = 0x00020 ;
+const Channel::modeType Channel::MODE_M       = 0x00040 ;
+const Channel::modeType Channel::MODE_I       = 0x00080 ;
+const Channel::modeType Channel::MODE_R       = 0x00100 ;
+const Channel::modeType Channel::MODE_D       = 0x00200 ;
+const Channel::modeType Channel::MODE_A       = 0x00400 ;
+const Channel::modeType Channel::MODE_U       = 0x00800 ;
+const Channel::modeType Channel::MODE_REG     = 0x01000 ;
+const Channel::modeType Channel::MODE_C       = 0x02000 ;
+const Channel::modeType Channel::MODE_CTCP    = 0x04000 ;
+const Channel::modeType Channel::MODE_PART    = 0x08000 ;
+const Channel::modeType Channel::MODE_MNOREG  = 0x10000 ;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -485,7 +487,8 @@ if( modes & MODE_REG )	modeString += 'R' ;
 if( modes & MODE_D )	modeString += 'D' ;
 if (modes & MODE_C)		modeString += 'c';
 if (modes & MODE_CTCP)	modeString += 'C';
-
+if (modes & MODE_PART)	modeString += 'P';
+if (modes & MODE_MNOREG)	modeString += 'M';
 
 if( modes & MODE_K )
 	{

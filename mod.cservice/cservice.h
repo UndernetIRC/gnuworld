@@ -101,7 +101,7 @@ public:
 	string confSqlPort;
 	string confSqlUser;
 	string confCCChan;
-	short connectRetries;
+	unsigned int connectRetries;
 	unsigned int connectCheckFreq;
 	unsigned int connectRetry;
 	unsigned int limitCheckPeriod;
