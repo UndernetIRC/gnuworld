@@ -71,7 +71,7 @@ public:
 	 * The type used to store this channel's current channel
 	 * modes.
 	 */
-	typedef unsigned short int modeType ;
+	typedef unsigned int modeType ;
 
 	/// Bit representing channel mode +t
 	static const modeType	MODE_T ;
@@ -107,10 +107,16 @@ public:
 	static const modeType	MODE_D ;
 
 	/// Bit representing channel mode +c
-	static const modeType	MODE_C;
+	static const modeType	MODE_C ;
 
 	/// Bit representing channel mode +C
-	static const modeType	MODE_CTCP;
+	static const modeType	MODE_CTCP ;
+
+	/// Bit representing channel mode +P
+	static const modeType	MODE_PART ;
+
+	/// Bit representing channel mode +M
+	static const modeType	MODE_MNOREG ;
 
 	/// Bit representing channel mode +A
 	static const modeType	MODE_A ;

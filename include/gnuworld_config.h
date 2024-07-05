@@ -55,7 +55,7 @@
  * MAX_CHAN_MODES
  * The maximum number of channel modes per command.
  */
-#define MAX_CHAN_MODES 10
+#define MAX_CHAN_MODES 6
 
 /**
  * TOPIC_TRACK

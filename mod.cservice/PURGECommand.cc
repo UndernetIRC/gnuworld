@@ -269,6 +269,7 @@ bot->Part(theChan->getName());
 bot->joinCount--;
 
 bot->sqlChannelCache.erase(theChan->getName());
+bot->sqlChannelIDCache.erase(theChan->getID());
 delete(theChan);
 
 return true ;

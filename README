@@ -3,10 +3,6 @@ Welcome to GNUWorld
 ------------------
 
 ****
-The best and most comprehensive information for installing gnuworld, 
-postgresql, and the cservice and ccontrol (uworld) modules can be found at 
-https://gnuworld.sourceforge.io/gnuworld-setup.
-
 The setup procedures listed here are generic, and do not provide any 
 information for building databases for these two modules.
 ****
@@ -15,12 +11,8 @@ GNUWorld is an IRC services server.  This server hosts several
 virtual client modules that perform IRC network and channel 
 functions.
 
-GNUWorld's homepage is located at http://gnuworld.sourceforge.io,
-www.gnuworld.org, or gnuworld.undernet.org.  From these pages 
-you may obtain the latest information about GNUWorld.
-
 To use GNUWorld, you need a few of the basics:
-	- An uplink IRC server.  Make sure the U lines are
+	- An uplink IRC server.  Make sure the UWorld block is
 	  set properly for the bots you wish for GNUWorld to 
 	  host.
 	- A machine to run GNUWorld.  Keep in mind that
@@ -43,19 +35,6 @@ git clone https://github.com/UndernetIRC/gnuworld.git
 (Execute the above command on a single line in your shell.)
 This will create a directory under your current directory named 
 "gnuworld" in which all of GNUWorld's files will be placed.
-
-Installing GNUWorld
--------------------
-
-If you used the CVS method above, you may proceed directly to the
-Building GNUWorld section below.  Otherwise you downloaded a
-tar gzipped copy of GNUWorld.
-
-Unpack the archive as follows:
-
-gzip -cd gnuworld.xxx.tar.gz | tar xf -
-
-where xxx is the version of GNUWorld you have obtained.
 
 Building GNUWorld
 ----------------

@@ -23,6 +23,7 @@
 #include	"ELog.h"
 #include	"cservice.h"
 #include	"Network.h"
+#include	"levels.h"
 
 
 namespace gnuworld
@@ -40,7 +41,7 @@ if (!theUser)
 	return false;
 	}
 
-if (bot->getAdminAccessLevel(theUser) < 800) return false;
+if (bot->getAdminAccessLevel(theUser) < level::stats) return false;
 
 if( st.size() >= 2 )
 {

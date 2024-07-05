@@ -1739,6 +1739,20 @@ list<const Channel*> xNetwork::getChannelsWithModes(const string& modes) const
 							foundMatch = false;
 						}
 						break;
+				case 'P':	/* mode to prevent part messages */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_PART))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_PART)))
+						{
+							foundMatch = false;
+						}
+						break;
+				case 'M':	/* mode to prevent part messages */
+						if ((!modeflag && cptr->second->getMode(Channel::MODE_MNOREG))
+							|| (modeflag && !cptr->second->getMode(Channel::MODE_MNOREG)))
+						{
+							foundMatch = false;
+						}
+						break;
 				case 'A':	/* Apass for oplevels */
 						if ((!modeflag && cptr->second->getMode(Channel::MODE_A))
 							|| (modeflag && !cptr->second->getMode(Channel::MODE_A)))

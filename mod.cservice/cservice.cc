@@ -255,12 +255,12 @@ RegisterCommand(new TOPICCommand(this, "TOPIC", "<#channel> <topic>", 4));
 RegisterCommand(new CHANINFOCommand(this, "CHANINFO", "<#channel>", 3));
 RegisterCommand(new CHANINFOCommand(this, "INFO", "<username>", 3));
 RegisterCommand(new BANLISTCommand(this, "BANLIST", "<#channel>", 3));
-RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nick> <reason>", 4));
+RegisterCommand(new KICKCommand(this, "KICK", "<#channel> <nicks | *!*@*.host> [reason]", 4));
 RegisterCommand(new STATUSCommand(this, "STATUS", "<#channel>", 4));
 RegisterCommand(new SUSPENDCommand(this, "SUSPEND", "<#channel> <username> <duration> [level] [reason]", 5));
 RegisterCommand(new UNSUSPENDCommand(this, "UNSUSPEND", "<#channel> <username>", 5));
-RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nick | *!*user@*.host> [duration] [level] [reason]", 5));
-RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <*!*user@*.host>", 5));
+RegisterCommand(new BANCommand(this, "BAN", "<#channel> <nicks | *!*user@*.host> [duration] [level] [reason]", 5));
+RegisterCommand(new UNBANCommand(this, "UNBAN", "<#channel> <nicks | *!*user@*.host>", 5));
 RegisterCommand(new LBANLISTCommand(this, "LBANLIST", "<#channel> <banmask>", 5));
 RegisterCommand(new NEWPASSCommand(this, "NEWPASS", "<new passphrase>", 8));
 RegisterCommand(new JOINCommand(this, "JOIN", "<#channel>", 8));
@@ -269,6 +269,7 @@ RegisterCommand(new OPERJOINCommand(this, "OPERJOIN", "<#channel>", 8));
 RegisterCommand(new OPERPARTCommand(this, "OPERPART", "<#channel>", 8));
 RegisterCommand(new CLEARMODECommand(this, "CLEARMODE", "<#channel>", 4));
 RegisterCommand(new SUSPENDMECommand(this, "SUSPENDME", "<password>", 15));
+RegisterCommand(new MODECommand(this, "MODE", "<#channel> <modes> [arguments]", 4));
 
 RegisterCommand(new WHITELISTCommand(this, "WHITELIST", "<ADD|REM|VIEW> <IP> [duration] [reason]", 10));
 RegisterCommand(new SCANHOSTCommand(this, "SCANHOST", "<mask> [-sort <user|cmd|host|ip|time>] [-max n] [-order <asc|desc>]", 10));
@@ -6036,7 +6037,6 @@ void cservice::OnWhois( iClient* sourceClient,
 	/*
 	 *  Return info about 'targetClient' to 'sourceClient'
 	 */
-// TODO: Only use one stringstream here
 
 stringstream s;
 s	<< getCharYY()
@@ -6045,67 +6045,57 @@ s	<< getCharYY()
 	<< " " << targetClient->getNickName()
 	<< " " << targetClient->getUserName()
 	<< " " << targetClient->getInsecureHost()
-	<< " * :"
+	<< " * :" << targetClient->getDescription()
 	<< ends;
 Write( s );
 
-stringstream s4;
-s4	<< getCharYY()
-	<< " 317 "
-	<< sourceClient->getCharYYXXX()
-	<< " " << targetClient->getNickName()
-	<< " 0 " << targetClient->getConnectTime()
-	<< " :seconds idle, signon time"
-	<< ends;
-Write( s4 );
-
 if (targetClient->isOper())
 	{
-	stringstream s5;
-	s5	<< getCharYY()
+	s.str("");
+	s	<< getCharYY()
 		<< " 313 "
 		<< sourceClient->getCharYYXXX()
 		<< " " << targetClient->getNickName()
 		<< " :is an IRC Operator"
 		<< ends;
-	Write( s5 );
+	Write( s );
 	}
 
 sqlUser* theUser = isAuthed(targetClient, false);
 
 if (theUser)
 	{
-	stringstream s6;
-	s6	<< getCharYY()
-		<< " 316 "
+	s.str("");
+	s	<< getCharYY()
+		<< " 330 "
 		<< sourceClient->getCharYYXXX()
 		<< " " << targetClient->getNickName()
-		<< " :is Logged in as "
-		<< theUser->getUserName()
+		<< " " << theUser->getUserName()
+		<< " :is logged in as"
 		<< ends;
-	Write( s6 );
+	Write( s );
 	}
 
 if (isIgnored(targetClient))
 	{
-	stringstream s7;
-	s7	<< getCharYY()
+	s.str("");
+	s	<< getCharYY()
 		<< " 316 "
 		<< sourceClient->getCharYYXXX()
 		<< " " << targetClient->getNickName()
-		<< " :is currently being ignored. "
+		<< " :is currently being ignored."
 		<< ends;
-	Write( s7 );
+	Write( s );
 	}
 
-stringstream s3;
-s3	<< getCharYY()
+s.str("");
+s	<< getCharYY()
 	<< " 318 "
 	<< sourceClient->getCharYYXXX()
 	<< " " << targetClient->getNickName()
 	<< " :End of /WHOIS list."
 	<< ends;
-Write( s3 );
+Write( s );
 }
 
 bool cservice::Kick(Channel* theChan, iClient* theClient, const string& reason, bool modeAsServer)
@@ -7575,16 +7565,12 @@ void cservice::checkDbConnectionStatus()
 					<< endl ;
 
 			connectRetries++;
-			if (connectRetries >= 6)
-			{
-				logAdminMessage("Unable to contact database after 6 attempts, shutting down.");
-				//MyUplink->flushBuffer();
+			if (connectRetries == connectRetry)
+				logAdminMessage("Unable to contact database after %d attempts, shutting down.", connectRetry);
+			else if (connectRetries > connectRetry)
 				::exit(0);
-			} else
-			{
+			else
 				logAdminMessage("Connection failed, retrying:");
-			}
-
 
 		} else
 		{
@@ -7592,6 +7578,7 @@ void cservice::checkDbConnectionStatus()
 				SQLDb->Exec("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;");
 //				SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;");
 				logAdminMessage("Successfully reconnected to database server. Panic over ;)");
+				connectRetries = 0 ;
 		}
 	}
 
@@ -8675,7 +8662,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			elog << "cservice::doXQLogin: Auth res = AUTH_ML_EXCEEDED" << endl;
 			break;
 		case AUTH_SUCCEEDED:
-			doXResponse(theServer, Routing, theUser->getUserName());
+			doXResponse(theServer, Routing, theUser->getUserName() + ":" + itoa(theUser->getID()));
 			elog    << "cservice::doXQLogin: "
 					<< "Succesful auth for "
 					<< username

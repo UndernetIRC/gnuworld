@@ -65,6 +65,7 @@ namespace gnuworld {
   const int invite = 100;
   const int suspend = 100;
   const int unsuspend = 100;
+  const int mode = 100;
 
   const int masskick = 200;
   const int status2 = 200; // Users can see the channel modes too
@@ -98,6 +99,7 @@ namespace gnuworld {
 
   const int servnotice = 800;
   const int say = 800;
+  const int stats = 800;
 
   // Debug Commands
   const int shutdown = 900;

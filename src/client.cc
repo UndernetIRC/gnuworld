@@ -2564,6 +2564,16 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			modeVector.push_back(make_pair(false,
 				Channel::MODE_CTCP));
 			break;
+		case 'P':  // mode to prevent part messages
+			theChan->removeMode(Channel::MODE_PART);
+			modeVector.push_back(make_pair(false,
+				Channel::MODE_PART));
+			break;
+		case 'M':  // mode to prevent part messages
+			theChan->removeMode(Channel::MODE_MNOREG);
+			modeVector.push_back(make_pair(false,
+				Channel::MODE_MNOREG));
+			break;
 		case 'A':  // Apass for oplevels
 			if (theChan->getMode(Channel::MODE_A))
 				{
