@@ -51,23 +51,63 @@ bot->MsgChanLog("CONFIG %s",st.assemble(1).c_str());
 	
 for(unsigned int  pos =1; pos < st.size() ;)
 	{
-	if(!strcasecmp(st[pos],"-VClones"))
+	if(!strcasecmp(st[pos],"-CClonesTime"))
 		{
 		if(st.size() < pos +2)
 			{
-			bot->Notice(theClient,"-VClones must get the number of virtual clones");
+			bot->Notice(theClient,"-CClonesTime must get the duration between announcements per netblock.");
 			return true;
 			}
-		if(!bot->updateMisc("VClones",atoi(st[pos+1].c_str())))
+		if (!IsTimeSpec(st[pos+1]))
 			{
-			bot->MsgChanLog("Error while updating the max virtual clones in the db!\n");
+			bot->Notice(theClient,"-CClonesTime must have a valid time specified, e.g. 60s or 1m");
+			return true;
 			}
-		else
+		int g = extractTime(st[pos+1], 1);
+		if (g < 0 || g > 300)
 			{
-			bot->Notice(theClient,"%s was successfully updated to %s",
-				    st[pos].c_str(),st[pos+1].c_str());
+			bot->Notice(theClient,"-CClonesTime value must be between 0s and 5m.");
+			return true;
 			}
-		pos+=2;
+  	        if(!bot->updateMisc("CClonesTime",g))
+				{
+				bot->MsgChanLog("Error while updating the Duration time.\n");
+				}
+  	        else
+				{
+				bot->Notice(theClient,"%s was successfully updated to %s",
+				st[pos].c_str(),Duration((long)g));
+				}
+			pos+=2;
+		}
+	else if(!strcasecmp(st[pos],"-CClonesGTime"))
+		{
+		if (st.size() < pos +2)
+			{
+			bot->Notice(theClient,"-CClonesGTime must get the duration of the gline in seconds.");
+			return true;
+			}
+			if (!IsTimeSpec(st[pos+1]))
+				{
+				bot->Notice(theClient,"Invalid CIDR Clones Gline Time specified.");
+				return true;
+				}
+			int g = extractTime(st[pos+1], 1);
+			if (g < 1800 || g > 172800)
+				{
+				bot->Notice(theClient,"-CClonesGTime value must be between 1800 and 172800 seconds (30 mins - 2 days).");
+				return true;
+				}
+			if (!bot->updateMisc("CClonesGTime",g))
+				{
+				bot->MsgChanLog("Error while updating the CIDR Clones Gline Time.\n");
+				}
+			else
+				{
+				bot->Notice(theClient,"%s was successfully updated to %s",
+					st[pos].c_str(),Duration((long)g));
+				}
+			pos += 2;
 		}
 	else if(!strcasecmp(st[pos],"-IClones"))
 		{
@@ -86,148 +126,6 @@ for(unsigned int  pos =1; pos < st.size() ;)
 				st[pos].c_str(),st[pos+1].c_str());
 			}
 		pos+=2;
-		}
-        else if(!strcasecmp(st[pos],"-CClonesCIDR24"))
-                {
-                if(st.size() < pos +2)
-                        {
-                        bot->Notice(theClient,"-CClonesCIDR24 must get the CIDR24 Size");
-                        return true;
-                        }
-                if((atoi(st[pos+1].c_str())<16) || (atoi(st[pos+1].c_str())>31))
-                        {
-                        bot->Notice(theClient,"-CClonesCIDR24 must have a CIDR Size in the range 16-32");
-                        return true;
-                        }
-                if(!bot->updateMisc("CClonesCIDR24",atoi(st[pos+1].c_str())))
-                        {
-                        bot->MsgChanLog("Error while updating the CIDR24 size for clones in the db!\n");
-                        }
-                else
-                        {
-                        bot->Notice(theClient,"%s was successfully updated to %s",
-                                st[pos].c_str(),st[pos+1].c_str());
-                        bot->Notice(theClient,"This change requires you to restart the service IMMEDIATELY or "
-                                "unexpected results will occur!");
-                        }
-                pos+=2;
-                }
-        else if(!strcasecmp(st[pos],"-CClonesCIDR48"))
-                {
-                if(st.size() < pos +2)
-                        {
-                        bot->Notice(theClient,"-CClonesCIDR48 must get the CIDR48 Size");
-                        return true;
-                        }
-                if((atoi(st[pos+1].c_str())<16) || (atoi(st[pos+1].c_str())>63))
-                        {
-                        bot->Notice(theClient,"-CClonesCIDR48 must have a CIDR Size in the range 16-64");
-                        return true;
-                        }
-                if(!bot->updateMisc("CClonesCIDR48",atoi(st[pos+1].c_str())))
-                        {
-                        bot->MsgChanLog("Error while updating the CIDR48 size for clones in the db!\n");
-                        }
-                else
-                        {
-                        bot->Notice(theClient,"%s was successfully updated to %s",
-                                st[pos].c_str(),st[pos+1].c_str());
-                        bot->Notice(theClient,"This change requires you to restart the service IMMEDIATELY or "
-                                "unexpected results will occur!");
-                        }
-                pos+=2;
-                }
-        else if(!strcasecmp(st[pos],"-CClonesTime"))
-  	        {
-  	        if(st.size() < pos +2)
-  	                 {
-  	                 bot->Notice(theClient,"-CClonesTime must get the duration between announcements per netblock.");
-  	                 return true;
-  	                 }
-		if (!IsTimeSpec(st[pos+1]))
-			{
-			bot->Notice(theClient,"-CClonesTime must have a valid time specified, e.g. 60s or 1m");
-			return true;
-			}
-		int g = extractTime(st[pos+1], 1);
-		if (g < 0 || g > 300)
-  	                 {
-  	                 bot->Notice(theClient,"-CClonesTime value must be between 0s and 5m.");
-  	                 return true;
-  	                 }
-  	        if(!bot->updateMisc("CClonesTime",g))
-  	                 {
-  	                 bot->MsgChanLog("Error while updating the Duration time.\n");
-  	                 }
-  	        else
-  	                 {
-  	                 bot->Notice(theClient,"%s was successfully updated to %s",
-  	                 st[pos].c_str(),Duration((long)g));
-  	                 }
-                 pos+=2;
-                 }
-	else if(!strcasecmp(st[pos],"-CClonesGTime"))
-		{
-			if (st.size() < pos +2)
-			{
-				bot->Notice(theClient,"-CClonesGTime must get the duration of the gline in seconds.");
-				return true;
-			}
-			if (!IsTimeSpec(st[pos+1]))
-			{
-				bot->Notice(theClient,"Invalid CIDR Clones Gline Time specified.");
-				return true;
-			}
-			int g = extractTime(st[pos+1], 1);
-			if (g < 1800 || g > 172800)
-			{
-				bot->Notice(theClient,"-CClonesGTime value must be between 1800 and 172800 seconds (30 mins - 2 days).");
-				return true;
-			}
-			if (!bot->updateMisc("CClonesGTime",g))
-			{
-				bot->MsgChanLog("Error while updating the CIDR Clones Gline Time.\n");
-			} else {
-				bot->Notice(theClient,"%s was successfully updated to %s",
-					st[pos].c_str(),Duration((long)g));
-			}
-			pos += 2;
-		}
-        else if(!strcasecmp(st[pos],"-CClones"))
-                {
-                if(st.size() < pos +2)
-                        {
-                        bot->Notice(theClient,"-CClones must be the number of CIDR clones");
-                        return true;
-                        }
-                if(!bot->updateMisc("CClones",atoi(st[pos+1].c_str())))
-                        {
-                        bot->MsgChanLog("Error while updated the max CIDR clones in the db!\n");
-                        }
-                else
-                        {
-                        bot->Notice(theClient,"%s was successfully updated to %s",
-                                st[pos].c_str(),st[pos+1].c_str());
-                        }
-                pos+=2;
-                }
-	else if(!strcasecmp(st[pos],"-Clones"))
-		{
-		if(st.size() < pos +2)
-			{
-			bot->Notice(theClient,"-Clones must get the number of virtual clones");
-			return true;
-			}
-		if(!bot->updateMisc("Clones",atoi(st[pos+1].c_str())))
-			{
-			bot->MsgChanLog("Error while updating the max clones in the db!\n");
-			}
-		else
-			{
-			bot->Notice(theClient,"%s was successfully updated to %s",
-				    st[pos].c_str(),st[pos+1].c_str());
-			}
-		pos+=2;			
 		}
 	else if(!strcasecmp(st[pos],"-GBCount"))
 		{
@@ -324,42 +222,6 @@ for(unsigned int  pos =1; pos < st.size() ;)
 				    st[pos].c_str(),st[pos+1].c_str());
 			}
 		pos+=2;			
-		}
-        else if(!strcasecmp(st[pos],"-CClonesGline"))
-                {
-                if(st.size() < pos +2)
-                        {
-                        bot->Notice(theClient,"-CClonesGline must get a yes/no answer indicating whether or not to auto-gline");
-                        return true;
-                        }
-                if(!bot->updateMisc("CClonesGline",(strcasecmp(st[pos+1],"YES") == 0) ? 1 : 0))
-                        {
-                        bot->MsgChanLog("Error while updating the CIDR auto-gline flag in the db\n");
-                        }
-                else
-                        {
-                        bot->Notice(theClient,"%s was successfully updated to %s",
-                                st[pos].c_str(),st[pos+1].c_str());
-                        }
-                pos+=2;
-		}
-	else if(!strcasecmp(st[pos],"-IClonesGline"))
-		{
-		if(st.size() < pos +2)
-			{
-			bot->Notice(theClient,"-IClonesGline must get a yes/no answer indicating whether or not to auto-gline");
-			return true;
-			}
-		if(!bot->updateMisc("IClonesGline",(strcasecmp(st[pos+1],"YES") == 0) ? 1 : 0))
-			{
-			bot->MsgChanLog("Error while updating the CIDR ident auto-gline flag in the db\n");
-			}
-		else
-			{
-			bot->Notice(theClient,"%s was successfully updated to %s",
-				st[pos].c_str(),st[pos+1].c_str());
-			}
-		pos+=2;
 		}
 	else
 		{
