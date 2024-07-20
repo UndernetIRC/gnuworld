@@ -785,6 +785,11 @@ void xClient::OnInvite( iClient*, Channel* )
 
 bool xClient::Kill( iClient* theClient, const string& reason )
 {
+return Kill( theClient, reason, true ) ;
+}
+
+bool xClient::Kill( iClient* theClient, const string& reason, bool asServer )
+{
 assert( theClient != 0 ) ;
 
 if( theClient->isModeK() || !isConnected() )
@@ -792,10 +797,22 @@ if( theClient->isModeK() || !isConnected() )
 	return false ;
 	}
 
-Write( "%s D %s :%s",
-	MyUplink->getCharYY().c_str(),
-	theClient->getCharYYXXX().c_str(),
-	reason.c_str() ) ;
+if( asServer )
+	{
+	Write( "%s D %s :%s (%s)",
+		MyUplink->getCharYY().c_str(),
+		theClient->getCharYYXXX().c_str(),
+		MyUplink->getName().c_str(),
+		reason.c_str() ) ;
+	}
+else
+	{
+	Write( "%s D %s :%s (%s)",
+		getCharYYXXX().c_str(),
+		theClient->getCharYYXXX().c_str(),
+		getNickName().c_str(),
+		reason.c_str() ) ;
+	}
 
 // Why was all this commented out? -- gk
 // beats me -- dan

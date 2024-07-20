@@ -474,7 +474,7 @@ public:
 	 * This method does NOT work for local clients.
 	 */
 	virtual void		rehashNick( const std::string& yyxxx,
-					const std::string& newNick ) ;
+					const std::string& newNick, const time_t& newTS ) ;
 
 	/**
 	 * This method performs a recursive removal of all servers

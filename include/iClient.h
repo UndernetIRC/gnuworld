@@ -121,7 +121,7 @@ public:
 		const std::string& _account,
 		const time_t _account_ts,
 		const std::string& _description,
-		const time_t& _connectTime ) ;
+		const time_t& _nick_ts ) ;
 
 	/**
 	 * Construct a new iClient given a large list of
@@ -142,7 +142,7 @@ public:
 		const std::string& _setHost,
 		const std::string& _fakeHost,
 		const std::string& _description,
-		const time_t& _connectTime ) ;
+		const time_t& _nick_ts ) ;
 
 	/**
 	 * Destruct the iClient.
@@ -190,6 +190,12 @@ public:
 		{ return (nickName + '!' + userName + '@' + insecureHost) ; }
 
 	/**
+	 * Retrieve a string of the form: user@real-host for this user.
+	 */
+	inline const std::string getRealUserHost() const
+		{ return (userName + '@' + realInsecureHost) ; }
+
+	/**
 	 * Retrieve a string of the form: nick!user@real-host for this user.
 	 */
 	inline const std::string getRealNickUserHost() const
@@ -219,14 +225,6 @@ public:
 	 */
 	inline const std::string& getAccount() const
 		{ return account ; }
-	
-	/**
-	 * Retrieve client's account ID.
-	 *
-	 * @return the ID of the account if set, else 0.
-	 */
-	inline const time_t& getAccountTS() const
-		{ return account_ts; }
 
 	/**
 	 * Retrieve client's account timestamp.
@@ -255,16 +253,6 @@ public:
 
 		// We know that the user is mode R already
 		if (isModeX()) setHiddenHost();
-		}
-
-	/**
-	 * Set the account timestamp for this iClient.
-	 * Only valid if the iClient isModeR()
-	 */
-	inline void setAccountTS( const time_t _account_ts )
-		{
-		if( ! isModeR() ) { return ; }
-		account_ts = _account_ts;
 		}
 
 	/**
@@ -300,10 +288,16 @@ public:
 	const iServer* getServer();
 
 	/**
-	 * Retrieve the iClient's connection time.
+	 * Retrieve the iClient's nickname timestamp.
 	 */
-	inline const time_t& getConnectTime() const
-		{ return connectTime ; }
+	inline const time_t& getNickTS() const
+		{ return nick_ts ; }
+
+	/**
+	 * Set the iClient's nickname timestamp.
+	 */
+	inline void setNickTS( const time_t& newTS )
+		{ nick_ts = newTS ; }
 
 	/**
 	 * Retrieve the iClient's IP. Network byte ordered
@@ -687,9 +681,9 @@ protected:
 	std::string	description ;
 
 	/**
-	 * The time at which this iClient connected to the network.
+	 * The time at which this iClient took its current nickname.
 	 */
-	time_t		connectTime ;
+	time_t		nick_ts ;
 
 	/**
 	 * This client's current user modes.

@@ -2118,7 +2118,7 @@ MsgChanLog("(%s) - %s - AUTHENTICATED (%s)\n",theUser->getUserName().c_str(),
  */
 if (!theClient->isModeR() || !theUser->getSso())
 	{
-	theUser->setLastAuthTS(theClient->getConnectTime());
+	theUser->setLastAuthTS(theClient->getNickTS());
 	theUser->setLastAuthNumeric(theClient->getCharYYXXX());
 	}
 if ((!theClient->isOper()) && (theUser->getAutoOp()) && (!isSuspended(theUser)))
@@ -2352,7 +2352,7 @@ if (!IsAuth(NewUser))
 	while (tIterator != usersMap.end())
 		{
 		ccUser* tUser = tIterator->second;
-		if ((tUser->getLastAuthTS() == NewUser->getConnectTime()) &&
+		if ((tUser->getLastAuthTS() == NewUser->getNickTS()) &&
 				(tUser->getLastAuthNumeric() == NewUser->getCharYYXXX()))
 			{
 			tUser->setNumeric(NewUser->getCharYYXXX());
