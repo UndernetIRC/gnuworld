@@ -1303,8 +1303,8 @@ if(channel->getJoinFlooded())
 
 time_t dronescan::getRoundedUnixTime(time_t ts, unsigned int power)
 {
-ts >> power;
-ts << power;
+ts >>= power;
+ts <<= power;
 return ts;
 }
 
