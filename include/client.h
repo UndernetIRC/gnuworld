@@ -95,6 +95,7 @@ public:
 	 * the given iClient (network generic client).
 	 */
 	virtual bool Kill( iClient*, const std::string& ) ;
+	virtual bool Kill( iClient*, const std::string&, bool ) ;
 
 	/**
 	 * QuoteAsServer will send data to the network as the

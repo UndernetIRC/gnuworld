@@ -104,7 +104,7 @@ if( 3 == params.size() )
 //		<< params
 //		<< endl ;
 
-	Network->rehashNick( params[ 0 ], params[ 1 ] ) ;
+	Network->rehashNick( params[ 0 ], params[ 1 ], atoi( params[ 2 ] ) ) ;
 	return true ;
 	}
 
@@ -216,7 +216,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		sethost,	// asuka sethost
 		fakehost,	// srvx fakehost
 		description,	// real name / infoline
-		atoi( params[ 3 ] ) // connection time
+		atoi( params[ 3 ] ) // nick timestamp
 		) ;
 assert( newClient != 0 ) ;
 

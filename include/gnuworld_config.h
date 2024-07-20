@@ -49,7 +49,7 @@
  * Enabling this by default will not have adverse effects on gnuworld's
  * functionality, except to increase memory usage a bit.
  */
-#define SRVX
+#undef SRVX
 
 /**
  * MAX_CHAN_MODES

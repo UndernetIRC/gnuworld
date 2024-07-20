@@ -620,7 +620,7 @@ return removeChannel( theChan->getName() ) ;
 }
 
 void xNetwork::rehashNick( const string& yyxxx,
-	const string& newNick )
+	const string& newNick, const time_t& newTS )
 {
 //elog	<< "xNetwork::rehashNick> yyxxx: "
 //	<< yyxxx
@@ -648,6 +648,9 @@ string oldNick = theClient->getNickName() ;
 
 // Change the client's nickname
 theClient->setNickName( newNick ) ;
+
+// Update the client's nick timestamp
+theClient->setNickTS( newTS ) ;
 
 // Add the client back to the nickname table
 addNick( theClient ) ;
