@@ -3491,6 +3491,28 @@ s	<< getCharYY()
 return Write( s.str() ) ;
 }
 
+bool xServer::Notice( iClient* theClient, const char* format, ... )
+{
+assert( theClient != 0 ) ;
+
+char buf[ 1024 ] = { 0 } ;
+va_list _list ;
+
+va_start( _list, format ) ;
+vsnprintf( buf, 1024, format, _list ) ;
+va_end( _list ) ;
+
+stringstream s ;
+s	<< getCharYY()
+	<< " O "
+	<< theClient->getCharYYXXX()
+	<< " :"
+	<< buf
+	<< ends ;
+
+return Write( s );
+}
+
 bool xServer::serverNotice( Channel* theChan, const char* format, ... )
 {
 	assert( theChan != 0 ) ;

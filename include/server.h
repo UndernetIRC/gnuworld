@@ -528,6 +528,7 @@ public:
 	 * Sent a notice to a client as the server.
 	 */
 	virtual bool	Notice( iClient*, const std::string& ) ;
+	virtual bool  Notice( iClient*, const char*, ... ) ;
 
 	/**
 	 * Sent a notice to a channel as the server.
