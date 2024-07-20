@@ -202,7 +202,7 @@ public:
 	void log(LOG_TYPE, const char*, ...) ;
 
 	#ifdef ENABLE_LOG4CPLUS
-	void log(char*,const char*, ...);
+	void log(const char*,const char*, ...);
 	#endif
 
 	/** Set the topic of the console channel. */

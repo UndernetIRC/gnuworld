@@ -312,7 +312,6 @@ public:
 
 	/* XREPLY support */
 	bool doXROplist(iServer*, const string&, const string&);
-	bool doXRScore(iServer*, const string&, const string&);
 	bool doXResponse(iServer*, const string&, const string&);
 
 	/*

@@ -1106,10 +1106,6 @@ switch(whichEvent)
 		{
 			doXROplist(theServer, Routing, Message);
 		}
-		else if (Command == "SCORE")
-		{
-			doXRScore(theServer, Routing, Message);
-		}
 		break;
 	}
 }
@@ -2570,10 +2566,8 @@ void chanfix::stopFixingChan(Channel* theChan, bool force)
 if (!theChan) return;
 
 bool inFix = false;
-bool isAutoFix = false; /* false = manual - true = auto */
 
 if ((stopAutoFixOnOp || force) && isBeingAutoFixed(theChan)) {
-  isAutoFix = true;
   inFix = true;
   removeFromAutoQ(theChan);
 }
@@ -3840,12 +3834,6 @@ bool chanfix::doXROplist(iServer* theServer, const string& Routing, const string
 	}
 
 	// End of OPLIST
-	return true;
-}
-
-bool doXRScore(iServer* theServer, const string& Routing, const string& Message)
-{
-	// TODO
 	return true;
 }
 

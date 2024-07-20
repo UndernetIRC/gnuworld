@@ -49,7 +49,7 @@ bool LOGINCommand::Exec( iClient* theClient, const string& Message)
 {
 StringTokenizer st( Message ) ;
 
-bool isXAuthed = false;
+bool isAuthedToX = false;
 
 if( st.size() < 3 )
 	{
@@ -98,7 +98,7 @@ else
 	{ 
 	if (!strcasecmp(theClient->getAccount(), theUser->getAccount())) {
 		if ((theClient->getAccountID() == theUser->getAccountID()) || (theUser->getAccountID() == 0))
-			isXAuthed = true;
+			isAuthedToX = true;
 	}
 
 	//Check if the user need to be operd to login
@@ -154,7 +154,7 @@ else
 		bot->addLogin(theClient);
 		return false;
 		}
-	if (!strcasecmp(theClient->getAccount(), theUser->getAccount())) {
+	if (isAuthedToX) {
 		if ((theUser->getAccountID() != theClient->getAccountID()) && (theUser->getAccountID() == 0)) {
 			// euworld has never received an accountID for this account before. Update the db.
 			theUser->setAccountID(theClient->getAccountID());

@@ -62,7 +62,6 @@ bot->MsgChanLog("JUPE %s\n",st.assemble(1).c_str());
 
 iServer* Server;
 string SName;
-unsigned int contime;
 if(string::npos != st[ 1 ].find_first_of( '*' ))
 	{
 	bot->Notice(theClient,"Sorry, but you must give a full server name when juping!");
@@ -82,7 +81,6 @@ if(Server)
 		    st[1].c_str());
 	}
 SName = st[1];
-contime = ::time(0);
 
 if(!strcasecmp(SName,Network->findServer(bot->getUplink()->getUplinkCharYY())->getName()))
 	{

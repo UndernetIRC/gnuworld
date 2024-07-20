@@ -69,7 +69,6 @@ char AutoOp[4];
 string SuspendedBy;
 string SuspendReason;
 time_t SuspendExpires;
-unsigned int Id;
 unsigned int SuspendLevel;
 string SLevel;
 ccontrol::usersconstiterator ptr;
@@ -182,7 +181,6 @@ for(ptr = bot->usersmap_begin();ptr != bot->usersmap_end();++ptr)
 			{
 			sprintf(NeedOp,"NO");
 			}
-		Id=tempUser->getID();
 		if(tempUser->getClients().size() > 0)
 			{
 			vector<iClient*> Clients = tempUser->getClients();
