@@ -4689,6 +4689,11 @@ if(!gotInterval)
 	glineBurstInterval = 5;
 	updateMisc("GlineBurstInterval",glineBurstInterval);
 	}
+if(!gotIClones)
+	{
+	maxIClones = 20;
+	updateMisc("IClones",maxIClones);
+	}
 if(!gotCClonesTime)
 	{
 	CClonesTime = 60;
