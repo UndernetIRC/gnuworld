@@ -281,7 +281,7 @@ public:
 	inline const std::string& getFakeHost() const
 		{ return fakeHost ; }
 #endif
-	
+
 	/**
 	 * Retrieve the iClient's server
 	 */
@@ -292,6 +292,20 @@ public:
 	 */
 	inline const time_t& getNickTS() const
 		{ return nick_ts ; }
+
+	/**
+	 * Retrieve the first nickname timestamp recorded
+	 * for an iClient.
+	 * For clients having connected prior to gnuworld being linked,
+	 * the timestamp will be the latter of their connection timestamp
+	 * and the timestamp of any nickname changes after connection but
+	 * prior to gnuworld linking.
+	 *
+	 * For clients connecting after gnuworld being linked, this will be
+	 * their connection timestamp.
+	 */
+	inline const time_t& getFirstNickTS() const
+		{ return first_nick_ts ; }
 
 	/**
 	 * Set the iClient's nickname timestamp.
@@ -684,6 +698,12 @@ protected:
 	 * The time at which this iClient took its current nickname.
 	 */
 	time_t		nick_ts ;
+
+	/**
+	 * The first nickname timestamp received for a client either at burst
+	 * or at connect.
+	 */
+	time_t		first_nick_ts ;
 
 	/**
 	 * This client's current user modes.
