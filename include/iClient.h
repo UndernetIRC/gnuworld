@@ -304,13 +304,6 @@ public:
 	 * For clients connecting after gnuworld being linked, this will be
 	 * their connection timestamp.
 	 */
-
- This will be the connection
-	 * timestamp for:
-	 * (i) iClients having connected after gnuworld is linked.
-	 * (ii) iClients having connected prior to gnuworld being linked,
-	 * but who have not changed their nickname since connecting.
-	 */
 	inline const time_t& getFirstNickTS() const
 		{ return first_nick_ts ; }
 
