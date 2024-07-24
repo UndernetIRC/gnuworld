@@ -6299,11 +6299,6 @@ for (ipLnbIterator ptr = ipLnbVector.begin(); ptr != ipLnbVector.end(); ptr++)
 return 0;
 }
 
-bool ccontrol::listIpLExceptions( iClient *theClient )
-{
-return listIpLExceptions(theClient, "");
-}
-
 bool ccontrol::listIpLExceptionsOld( iClient *theClient, const string& ispName, bool listEmail )
 {
 
@@ -6377,15 +6372,15 @@ else
 return true;
 }
 
-bool ccontrol::listIpLExceptions( iClient *theClient, const string& ispName )
+bool ccontrol::listIpLExceptions( iClient *theClient )
 {
 
-Notice(theClient, "%-31s  %-5s  %-5s  %-9s  %-9s  %-10s  %-20s  %-10s", "IP", "Count", "Limit", "ISP count", "ISP Limit", "CIDR Mask", "ISP", "Tags");
+Notice(theClient, "%-31s  %-5s  %-13s  %-9s  %-20s  %-10s", "IP", "Count", "Limit", "ISP count", "ISP", "Tags");
 
 for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++) {
 	ccIpLisp* isp = *ptr;
-	int i = 0;
 	stringstream s;
+	string limit;
 	string str1("");
 	string email("");
 	if (!isp->isActive())
@@ -6396,14 +6391,25 @@ for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++
 		str1 += " [fcount]";
 	if (isp->isGlunidented())
 		str1 += " [glunidented]";
-	if (isp->isGroup())
+	if (isp->isGroup()) {
 		str1 += " [group]";
+		limit = "total";
+	}
+	else
+		limit = "per /" + itoa(isp->getCloneCidr());
 
 	for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++) {
 		if (isp != nptr->second->ipLisp)
 			continue;
 		ccIpLnb *nb = nptr->second;
-		Notice(theClient, "%-31s  %-5d  %-5s  %-9d  %-9s  /%-9d  %-20s %-s", nb->getCidr().c_str(), nb->getCount(), !isp->isGroup() ? itoa(isp->getLimit()).c_str() : "", isp->getCount(), isp->isGroup() ? itoa(nb->getLimit()).c_str() : "", isp->getCloneCidr(), isp->getName().c_str(), str1.c_str());
+		Notice(theClient, "%-31s  %-5d  %4d %-8s  %-9d  %-20s %-s",
+			nb->getCidr().c_str(),
+			nb->getCount(),
+			isp->getLimit(),
+			limit.c_str(),
+			isp->getCount(),
+			isp->getName().c_str(),
+			str1.c_str());
 	}
 	// if (ispName != "")
 	// 	break;

@@ -727,7 +727,6 @@ public:
 	ccIpLnb* getIpLnb( const string &, const string & );
         
 	bool listIpLExceptionsOld( iClient *, const string &, bool );
-	bool listIpLExceptions( iClient *, const string & );
 	bool listIpLExceptions( iClient * );
 
 	//bool isIpLClientAllowed( iClient *, ipLretPairListType &, bool);

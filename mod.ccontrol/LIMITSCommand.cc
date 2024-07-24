@@ -56,7 +56,7 @@ if(st.size() < 2)
 bot->MsgChanLog("LIMITS %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[1].c_str(),"list"))
 	{
-	bot->listIpLExceptions(theClient, "");
+	bot->listIpLExceptions(theClient);
 	return true;
 	}
 if(!strcasecmp(st[1].c_str(),"list-old"))
