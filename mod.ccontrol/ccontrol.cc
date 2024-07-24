@@ -6380,7 +6380,7 @@ return true;
 bool ccontrol::listIpLExceptions( iClient *theClient, const string& ispName )
 {
 
-Notice(theClient, "%-31s %-5s %-5s %-9s %-11s %-10s %-20s %-10s", "IP", "Count", "Limit", "ISP count", "ISP Limit", "CIDR Mask", "ISP", "Tags");
+Notice(theClient, "%-31s  %-5s  %-5s  %-9s  %-9s  %-10s  %-20s  %-10s", "IP", "Count", "Limit", "ISP count", "ISP Limit", "CIDR Mask", "ISP", "Tags");
 
 for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++) {
 	ccIpLisp* isp = *ptr;
@@ -6396,19 +6396,14 @@ for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++
 		str1 += " [fcount]";
 	if (isp->isGlunidented())
 		str1 += " [glunidented]";
-	if (isp->isGroup()) {
+	if (isp->isGroup())
 		str1 += " [group]";
-		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "  " << email << "    Limit: " << isp->getLimit() << " total    Netblocks: ";
-	}
-	else
-		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "  " << email << "    Limit: " << isp->getLimit() << " per /" << isp->getCloneCidr() << "    Netblocks: ";
-
 
 	for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++) {
 		if (isp != nptr->second->ipLisp)
 			continue;
 		ccIpLnb *nb = nptr->second;
-		Notice(theClient, "%-31s %-5d %-5d %-9d %-11d /%-9d %-20s%-s", nb->getCidr().c_str(), nb->getCount(), isp->getLimit(), isp->getCount(), isp->getLimit(), isp->getCloneCidr(), isp->getName().c_str(), str1.c_str());
+		Notice(theClient, "%-31s  %-5d  %-5s  %-9d  %-9s  /%-9d  %-20s %-s", nb->getCidr().c_str(), nb->getCount(), !isp->isGroup() ? itoa(isp->getLimit()).c_str() : "", isp->getCount(), isp->isGroup() ? itoa(nb->getLimit()).c_str() : "", isp->getCloneCidr(), isp->getName().c_str(), str1.c_str());
 	}
 	// if (ispName != "")
 	// 	break;
