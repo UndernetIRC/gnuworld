@@ -56,11 +56,16 @@ if(st.size() < 2)
 bot->MsgChanLog("LIMITS %s\n",st.assemble(1).c_str());
 if(!strcasecmp(st[1].c_str(),"list"))
 	{
+	bot->listIpLExceptions(theClient, "");
+	return true;
+	}
+if(!strcasecmp(st[1].c_str(),"list-old"))
+	{
 	bool listEmail = false;
 	if ((st.size() > 2) && (!strcasecmp(st[2].c_str(), "-e"))) {
 		listEmail = true;
 	}
-	bot->listIpLExceptions(theClient, "", listEmail);
+	bot->listIpLExceptionsOld(theClient, "", listEmail);
 	return true;
 	}
 if(!strcasecmp(st[1].c_str(),"info"))
@@ -69,7 +74,7 @@ if(!strcasecmp(st[1].c_str(),"info"))
 		bot->Notice(theClient,"SYNTAX: info <isp>");
 		return true;
 	}
-	bot->listIpLExceptions(theClient, st[2], true);
+	bot->listIpLExceptionsOld(theClient, st[2], true);
 	return true;
 	}
 else if(!strcasecmp(st[1].c_str(),"addisp"))

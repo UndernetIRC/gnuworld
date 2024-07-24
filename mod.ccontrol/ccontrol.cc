@@ -6301,10 +6301,10 @@ return 0;
 
 bool ccontrol::listIpLExceptions( iClient *theClient )
 {
-return listIpLExceptions(theClient, "", false);
+return listIpLExceptions(theClient, "");
 }
 
-bool ccontrol::listIpLExceptions( iClient *theClient, const string& ispName, bool listEmail )
+bool ccontrol::listIpLExceptionsOld( iClient *theClient, const string& ispName, bool listEmail )
 {
 
 if (ispName == "")
@@ -6373,6 +6373,46 @@ if (ispName == "")
 	Notice(theClient,"-= End of isp list =-");
 else
 	Notice(theClient,"-= End of isp info =-");
+
+return true;
+}
+
+bool ccontrol::listIpLExceptions( iClient *theClient, const string& ispName )
+{
+
+Notice(theClient, "%-31s %-5s %-5s %-9s %-11s %-10s %-20s %-10s", "IP", "Count", "Limit", "ISP count", "ISP Limit", "CIDR Mask", "ISP", "Tags");
+
+for (ipLispIterator ptr = ipLispVector.begin(); ptr != ipLispVector.end(); ptr++) {
+	ccIpLisp* isp = *ptr;
+	int i = 0;
+	stringstream s;
+	string str1("");
+	string email("");
+	if (!isp->isActive())
+		str1 = " [INACTIVE]";
+	if (isp->isNoGline())
+		str1 += " [NO G]";
+	if (isp->isForcecount())
+		str1 += " [fcount]";
+	if (isp->isGlunidented())
+		str1 += " [glunidented]";
+	if (isp->isGroup()) {
+		str1 += " [group]";
+		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "  " << email << "    Limit: " << isp->getLimit() << " total    Netblocks: ";
+	}
+	else
+		s << isp->getName() << " (" << isp->getCount() << ") " << str1 << "  " << email << "    Limit: " << isp->getLimit() << " per /" << isp->getCloneCidr() << "    Netblocks: ";
+
+
+	for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++) {
+		if (isp != nptr->second->ipLisp)
+			continue;
+		ccIpLnb *nb = nptr->second;
+		Notice(theClient, "%-31s %-5d %-5d %-9d %-11d /%-9d %-20s%-s", nb->getCidr().c_str(), nb->getCount(), isp->getLimit(), isp->getCount(), isp->getLimit(), isp->getCloneCidr(), isp->getName().c_str(), str1.c_str());
+	}
+	// if (ispName != "")
+	// 	break;
+}
 
 return true;
 }
