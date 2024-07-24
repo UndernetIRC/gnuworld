@@ -27,6 +27,7 @@
 #include	<map>
 #include	<vector>
 #include	<utility>
+#include	<list>
 
 #include	<ctime>
 
@@ -41,7 +42,7 @@ using std::map ;
 using std::vector ;
 
 //	< Message < time, count > >
-typedef map < string, std::pair < time_t, unsigned int > > floodMessageType;
+typedef std::map < string, std::pair < time_t, unsigned int > > floodMessageType;
 
 class chanFloodType
 {
@@ -465,14 +466,14 @@ public:
 	 * on this channel
 	 */
 
-	typedef map< unsigned int, std::pair < unsigned short, string > > forceMapType ;
+	typedef std::map< unsigned int, std::pair < unsigned short, string > > forceMapType ;
 	forceMapType forceMap;
 
-	typedef map < int,sqlBan*> sqlBanMapType;
+	typedef std::map < int,sqlBan*> sqlBanMapType;
 	sqlBanMapType banList;
 
 	// < repeater_Mask, flooder_struct >
-	typedef map < string, chanFloodType* > chanFloodMapType;
+	typedef std::map < string, chanFloodType* > chanFloodMapType;
 	chanFloodMapType chanFloodMap;
 
 protected:
