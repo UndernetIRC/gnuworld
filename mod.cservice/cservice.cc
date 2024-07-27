@@ -2647,6 +2647,7 @@ stringstream expireQuery;
 expireQuery	<< "SELECT channel_id,id FROM bans "
 		<< "WHERE expires > 0 AND expires <= "
 		<< expiredTime
+		<< " ORDER BY channel_id"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -2683,6 +2684,9 @@ if( !SQLDb->Exec(expireQuery, true ) )
  */
 typedef vector < pair < unsigned int, unsigned int > > expireVectorType;
 expireVectorType expireVector;
+typedef vector < unsigned int > channelsVectorType;
+channelsVectorType	channelsVector;
+typedef vector < string > unbanVectorType ;
 
 for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
@@ -2690,60 +2694,106 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		atoi(SQLDb->GetValue(i, 0).c_str()),
 		atoi(SQLDb->GetValue(i, 1).c_str()) )
 		);
+	channelsVector.push_back(atoi(SQLDb->GetValue(i, 0).c_str()));
 	}
 
-for (expireVectorType::const_iterator resultPtr = expireVector.begin();
-	resultPtr != expireVector.end(); ++resultPtr)
+/* Delete duplicates from channelsVector. */
+sort( channelsVector.begin(), channelsVector.end() ) ;
+auto it = unique( channelsVector.begin(), channelsVector.end() ) ;
+channelsVector.erase( it, channelsVector.end() ) ;
+
+for (channelsVectorType::const_iterator chanPtr = channelsVector.begin();
+	chanPtr != channelsVector.end(); ++chanPtr)
 	{
-	sqlChannel* theChan = getChannelRecord( resultPtr->first );
+	sqlChannel* theChan = getChannelRecord( *chanPtr );
+	Channel* tmpChan = Network->findChannel( theChan->getName() ) ;
+
 	if (!theChan)
 		{
-		// TODO: Debuglog.
+		elog 	<< "cservice::expireBans> Unable to find channel-ID "
+					<< *chanPtr
+					<< endl ;
+
 		continue;
 		}
 
 	#ifdef LOG_DEBUG
-		elog	<< "Checking bans for "
-			<< theChan->getName()
-			<< endl;
+	elog	<< "Checking bans for "
+				<< theChan->getName()
+				<< endl;
 	#endif
 
-	/* Attempt to find the ban according to its id */
-	map< int,sqlBan* >::iterator ptr =  
-		theChan->banList.find(resultPtr->second);
+	/* Vector to store bans for each channel. */
+	unbanVectorType unbanVector ;
 
-	/* Was a ban found ? */
-	if (ptr != theChan->banList.end())
+	for (expireVectorType::const_iterator resultPtr = expireVector.begin();
+		resultPtr != expireVector.end(); ++resultPtr)
 		{
-		sqlBan* theBan = ptr->second;
-		theChan->banList.erase(ptr);
+		/* Skip bans not related to the present channel. */
+		if( resultPtr->first != theChan->getID() ) continue ;
 
-		Channel* tmpChan = Network->findChannel(
-			theChan->getName());
-		if (tmpChan)
+		/* Attempt to find the ban according to its id */
+		map< int,sqlBan* >::iterator ptr =
+			theChan->banList.find(resultPtr->second);
+
+		/* Was a ban found ? */
+		if (ptr != theChan->banList.end())
 			{
-			UnBan(tmpChan, theBan->getBanMask());
+			sqlBan* theBan = ptr->second;
+			theChan->banList.erase(ptr);
+
+			/* Only add to unbanVector (to set -b) if the ban is set on the channel. */
+			if( tmpChan && tmpChan->findBan( theBan->getBanMask() ) )
+				{
+				unbanVector.push_back( theBan->getBanMask() ) ;
+				tmpChan->removeBan( theBan->getBanMask() ) ;
+				}
+
+			#ifdef LOG_DEBUG
+				elog	<< "Cleared Ban "
+					<< theBan->getBanMask()
+					<< " from cache"
+					<< endl;
+			#endif
+
+			delete(theBan); theBan = nullptr ;
 			}
+		else
+			{
+			#ifdef LOG_DEBUG
+			elog << "Unable to find ban "
+					<< " with id "
+					<< resultPtr->second
+					<< endl;
+			#endif
+			}
+		} // for() expireVector
 
-		#ifdef LOG_DEBUG
-			elog	<< "Cleared Ban "
-				<< theBan->getBanMask()
-				<< " from cache"
-				<< endl;
-		#endif
+	/* Mode string. */
+	string modeString { } ;
+	string args { } ;
 
-		delete(theBan);
-		}
-	else
+	for (unbanVectorType::const_iterator banPtr = unbanVector.begin(),
+		end = unbanVector.end(); banPtr != end ; ++banPtr)
 		{
-		#ifdef LOG_DEBUG
-		elog << "Unable to find ban "
-		     << " with id " 
-		     << resultPtr->second
-		     << endl;
-		#endif
-		}     
-	} /* Forall results in set */
+		modeString += 'b' ;
+		args += *banPtr + ' ' ;
+
+		if( ( MAX_CHAN_MODES == modeString.size() ) ||
+			( ( banPtr + 1 ) == end ) )
+			{
+			stringstream s ;
+			s	<< getCharYYXXX() << " M "
+				<< tmpChan->getName() << ' '
+				<< "-" << modeString << ' ' << args ;
+
+			Write( s ) ;
+
+			modeString.erase( modeString.begin(), modeString.end() ) ;
+			args.erase( args.begin(), args.end() ) ;
+			}
+		} // for() unbanVector
+	} // for() channelsVector
 
 stringstream deleteQuery;
 deleteQuery	<< "DELETE FROM bans "
