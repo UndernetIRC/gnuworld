@@ -552,11 +552,6 @@ for(Channel::userIterator chanUsers = theChannel->userList_begin();
 		}
 	}
 
-elog << "Size of clients to kick: "
-	<< clientsToKick.size()
-	<< " takemembercount: "
-	<< takeMembersCount << endl;
-
 bool allmatched = false ;
 if ((takeMembersCount > 1) && (takeMembersCount == (unsigned int)clientsToKick.size()))
 	allmatched = true;
