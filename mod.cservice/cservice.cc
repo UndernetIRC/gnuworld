@@ -2686,7 +2686,6 @@ typedef vector < pair < unsigned int, unsigned int > > expireVectorType;
 expireVectorType expireVector;
 typedef vector < unsigned int > channelsVectorType;
 channelsVectorType	channelsVector;
-typedef vector < string > unbanVectorType ;
 
 for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 	{
@@ -2724,7 +2723,7 @@ for (channelsVectorType::const_iterator chanPtr = channelsVector.begin();
 	#endif
 
 	/* Vector to store bans for each channel. */
-	unbanVectorType unbanVector ;
+	xServer::banVectorType	banVector ;
 
 	for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 		resultPtr != expireVector.end(); ++resultPtr)
@@ -2745,8 +2744,8 @@ for (channelsVectorType::const_iterator chanPtr = channelsVector.begin();
 			/* Only add to unbanVector (to set -b) if the ban is set on the channel. */
 			if( tmpChan && tmpChan->findBan( theBan->getBanMask() ) )
 				{
-				unbanVector.push_back( theBan->getBanMask() ) ;
-				tmpChan->removeBan( theBan->getBanMask() ) ;
+				banVector.push_back( xServer::banVectorType::value_type(
+					false, theBan->getBanMask() ) ) ;
 				}
 
 			#ifdef LOG_DEBUG
@@ -2768,31 +2767,7 @@ for (channelsVectorType::const_iterator chanPtr = channelsVector.begin();
 			#endif
 			}
 		} // for() expireVector
-
-	/* Mode string. */
-	string modeString { } ;
-	string args { } ;
-
-	for (unbanVectorType::const_iterator banPtr = unbanVector.begin(),
-		end = unbanVector.end(); banPtr != end ; ++banPtr)
-		{
-		modeString += 'b' ;
-		args += *banPtr + ' ' ;
-
-		if( ( MAX_CHAN_MODES == modeString.size() ) ||
-			( ( banPtr + 1 ) == end ) )
-			{
-			stringstream s ;
-			s	<< getCharYYXXX() << " M "
-				<< tmpChan->getName() << ' '
-				<< "-" << modeString << ' ' << args ;
-
-			Write( s ) ;
-
-			modeString.erase( modeString.begin(), modeString.end() ) ;
-			args.erase( args.begin(), args.end() ) ;
-			}
-		} // for() unbanVector
+		UnBan( tmpChan, banVector ) ;
 	} // for() channelsVector
 
 stringstream deleteQuery;

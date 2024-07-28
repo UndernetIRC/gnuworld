@@ -321,7 +321,7 @@ if (((int)st2.size() + ban_count) > max_bans)
 	return true;
 	}
 
-vector< string > banList ;
+xServer::banVectorType	banVector ;
 vector< iClient* > clientsToKick ;
 vector< sqlBan* > newBans;
 
@@ -347,19 +347,24 @@ for( ; counter < st2.size() ; counter++ ) {
 			continue ;
 			}
 
-		elog 	<< "cservice::BANCommand> #" << counter << ": "
-					<< aNick->getNickName() << " "  << aNick->getInsecureHost()
-					<< endl ;
-
 		/* Ban and kick this user */
 		banTarget = Channel::createBan(aNick);
+
+#ifdef LOG_DEBUG
+		elog 	<< "cservice::BANCommand> #" << counter << ": "
+			<< aNick->getNickUserHost()
+			<< " banTarget: "
+			<< banTarget
+			<< endl ;
+#endif
 		}
 	else
 		{
+#ifdef LOG_DEBUG
 		elog	<< "cservice::BANCommand> #" << counter << ": "
-					<< banTarget
-					<< endl;
-
+			<< banTarget
+			<< endl ;
+#endif
 		// Validate any eventual cidr range
 		if (!validCIDRLength(st2[counter]))
 			{
@@ -440,9 +445,9 @@ for( ; counter < st2.size() ; counter++ ) {
 		if( !theChannel->removeBan(theBan->getBanMask()) )
 			{
 			elog	<< "cservice::BANCommand> Unable to find "
-					<< "ban: "
-					<< theBan->getBanMask()
-					<< endl ;
+				<< "ban: "
+				<< theBan->getBanMask()
+				<< endl ;
 			continue ;
 			}*/
 
@@ -460,11 +465,11 @@ for( ; counter < st2.size() ; counter++ ) {
 		if( sqlBanIterator == theChan->banList.end() )
 			{
 			elog	<< "cservice::BANCommand> Unable to find "
-					<< "ban in sqlChannel, id "
-					<< theBan->getID()
-					<< ", mask: "
-					<< theBan->getBanMask()
-					<< endl ;
+				<< "ban in sqlChannel, id "
+				<< theBan->getID()
+				<< ", mask: "
+				<< theBan->getBanMask()
+				<< endl ;
 			}
 		else
 			{
@@ -520,7 +525,9 @@ for( ; counter < st2.size() ; counter++ ) {
 		} // for()
 
 	// Only set the ban if there are clients on the channel maching the banTarget.
-	if( foundClient ) banList.push_back( banTarget ) ;
+	if( foundClient )
+		banVector.push_back( xServer::banVectorType::value_type(
+			true, banTarget ) ) ;
 
 	/* Insert this new record into the database. */
 	newBan->insertRecord();
@@ -585,11 +592,11 @@ if (level < 500 &&
 		if( sqlBanIterator == theChan->banList.end() )
 			{
 			elog	<< "cservice::BANCommand> Unable to find "
-					<< "ban in sqlChannel, id "
-					<< theBan->getID()
-					<< ", mask: "
-					<< theBan->getBanMask()
-					<< endl ;
+				<< "ban in sqlChannel, id "
+				<< theBan->getID()
+				<< ", mask: "
+				<< theBan->getBanMask()
+				<< endl ;
 			continue ;
 			}
 
@@ -615,7 +622,7 @@ if( !respNotOnChan.empty() )
 			respNotOnChan.c_str() ) ;
 
 if( !respCIDR.empty() )
-	bot->Notice( theClient, "CIDR range for %s is too wide, maximum allowed is /32", 
+	bot->Notice( theClient, "CIDR range for %s is too wide, maximum allowed is /32",
 		respCIDR.c_str() ) ;
 
 if ( !respExists.empty() )
@@ -642,9 +649,9 @@ if( !respBans.empty() )
 		banLevel ) ;
 
 /* Make sure there are no duplicates */
-sort( banList.begin(), banList.end() ) ;
-auto it2 = unique( banList.begin(), banList.end() ) ;
-banList.erase( it2, banList.end() ) ;
+sort( banVector.begin(), banVector.end() ) ;
+auto it2 = unique( banVector.begin(), banVector.end() ) ;
+banVector.erase( it2, banVector.end() ) ;
 
 /*
  * If this ban level is < 75, we don't kick the user, we simply don't
@@ -663,41 +670,15 @@ else
 	 */
 	if( !clientsToKick.empty() )
 		{
-		// Setting bans.
-		string modeString ;
-		string args ;
-		for( std::vector< string >::const_iterator ptr = banList.begin(),
-		end = banList.end() ; ptr != end ; ++ptr )
-			{
-			/* add ban to channel banlist */
-			theChannel->setBan( *ptr ) ;
+		/* Setting bans. */
+		bot->Ban( theChannel, banVector ) ;
 
-			modeString += 'b' ;
-			args += *ptr + ' ' ;
-
-			if( ( MAX_CHAN_MODES == modeString.size() ) ||
-				( ( ptr + 1 ) == end ) )
-				{
-				stringstream s ;
-				s	<< bot->getCharYYXXX() << " M "
-					<< theChan->getName() << ' '
-					<< "+" << modeString << ' ' << args ;
-
-				bot->Write( s ) ;
-
-			//	elog << "BAN: "<< s.str() << endl ;
-
-				modeString.erase( modeString.begin(), modeString.end() ) ;
-				args.erase( args.begin(), args.end() ) ;
-				} // if()
-			} // for()
-
-			/* kick the users */
-			string finalReason = "(" + theUser->getUserName() + ") " + banReason ;
-			bot->Kick( theChannel, clientsToKick, finalReason ) ;
-			} // if()
-		} // else
-	return true ;
+		/* kick the users */
+		string finalReason = "(" + theUser->getUserName() + ") " + banReason ;
+		bot->Kick( theChannel, clientsToKick, finalReason ) ;
+		} // if()
+	} // else
+return true ;
 }
 
 } // Namespace GNUWorld.

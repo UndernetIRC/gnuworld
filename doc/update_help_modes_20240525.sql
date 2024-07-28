@@ -11,4 +11,6 @@ UPDATE help SET contents = E'/msg X unban <#channel> <nicks | *!*user@*.host>\nR
 
 UPDATE translations SET text = 'The ban %s is already in my banlist!' WHERE language_id=1 AND response_id=22;
 
+UPDATE translations SET text = 'Removed %i channel bans and %i internal bans that matched %s' where language_id=1 AND response_id=143;
+
 INSERT INTO help VALUES ('MODE', '1', E'/msg X mode <#channel> <modes> [arguments]\nMakes X set or remove a channel mode in your channel.\nThe mode must start with either + or - to specify whether a mode shall be set or removed.\nFor channel mode l(imit) or k(ey), the limit or key must be provided.\nUse the OP, DEOP, VOICE and DEVOICE commands to give or remove ops or voice.');

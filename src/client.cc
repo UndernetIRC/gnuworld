@@ -1706,10 +1706,10 @@ if( !OnChannel )
 return true ;
 }
 
-bool xClient::Ban( Channel* theChan,
-	const std::vector< iClient* >& clientVector )
+bool xClient::UnBan( Channel* theChan,
+	const xServer::banVectorType& banVector )
 {
-assert( theChan != NULL ) ;
+assert( theChan != nullptr ) ;
 
 if( !isConnected() )
 	{
@@ -1726,7 +1726,126 @@ else
 	{
 	// Bot is already on the channel
 	ChannelUser* meUser = theChan->findUser( me ) ;
-	if( NULL == meUser )
+	if( nullptr == meUser )
+		{
+		elog	<< "xClient::UnBan> Unable to find myself in "
+			<< "channel: "
+			<< theChan->getName()
+			<< endl ;
+		return false ;
+		}
+
+	// Make sure we have ops
+	if( !meUser->getMode( ChannelUser::MODE_O ) )
+		{
+		// The bot does NOT have ops
+		return false ;
+		}
+
+	// The bot has ops
+	}
+
+string modeString { } ;
+string args { } ;
+
+for( xServer::banVectorType::const_iterator banPtr = banVector.begin(),
+	end = banVector.end(); banPtr != end ; ++banPtr)
+	{
+	modeString += 'b' ;
+	args += banPtr->second + ' ' ;
+
+	if( ( MAX_CHAN_MODES == modeString.size() ) ||
+		( ( banPtr + 1 ) == end ) )
+		{
+		stringstream s ;
+		s	<< getCharYYXXX() << " M "
+			<< theChan->getName() << ' '
+			<< "-" << modeString << ' ' << args ;
+
+		Write( s ) ;
+
+		modeString.erase( modeString.begin(), modeString.end() ) ;
+		args.erase( args.begin(), args.end() ) ;
+		}
+	} // for() banVector
+
+MyUplink->OnChannelModeB( theChan, 0,
+	const_cast< xServer::banVectorType& >( banVector ) ) ;
+
+if( !OnChannel )
+	{
+	Part( theChan ) ;
+	}
+
+return true ;
+}
+
+bool xClient::Ban( Channel* theChan,
+	const std::vector< iClient* >& clientVector )
+{
+assert( theChan != nullptr ) ;
+
+if( !isConnected() )
+	{
+	return false ;
+	}
+
+xServer::banVectorType banVector ;
+
+for( std::vector< iClient* >::const_iterator ptr = clientVector.begin(),
+	end = clientVector.end() ; ptr != end ; ++ptr )
+	{
+	if( nullptr == *ptr )
+		{
+		elog	<< "xClient::Ban(vector)> Found NULL "
+			<< "iClient!"
+			<< endl ;
+		continue ;
+		}
+
+	if( (*ptr)->isModeK() )
+		{
+		continue ;
+		}
+
+	ChannelUser* theUser = theChan->findUser( *ptr ) ;
+	if( nullptr == theUser )
+		{
+		elog	<< "xClient::Ban(vector)> Unable to find "
+			<< "client on channel: "
+			<< theChan->getName()
+			<< endl ;
+		continue ;
+		}
+
+	banVector.push_back( xServer::banVectorType::value_type(
+		true, Channel::createBan( *ptr ) ) ) ;
+	}
+
+return Ban( theChan, banVector ) ;
+}
+
+bool xClient::Ban( Channel* theChan,
+	const xServer::banVectorType& banVector )
+{
+assert( theChan != nullptr ) ;
+
+if( !isConnected() )
+	{
+	return false ;
+	}
+
+bool OnChannel = isOnChannel( theChan ) ;
+if( !OnChannel )
+	{
+	// Join, giving ourselves ops
+	Join( theChan, string(), 0, true ) ;
+	}
+else
+	{
+	// Bot is already on the channel
+	ChannelUser* meUser = theChan->findUser( me ) ;
+	if( nullptr == meUser )
 		{
 		elog	<< "xClient::Ban> Unable to find myself in "
 			<< "channel: "
@@ -1745,40 +1864,8 @@ else
 	// The bot has ops
 	}
 
-xServer::banVectorType banVector ;
-
-for( std::vector< iClient* >::const_iterator ptr = clientVector.begin(),
-	end = clientVector.end() ; ptr != end ; ++ptr )
-	{
-	if( NULL == *ptr )
-		{
-		elog	<< "xClient::Ban(vector)> Found NULL "
-			<< "iClient!"
-			<< endl ;
-		continue ;
-		}
-
-	if( (*ptr)->isModeK() )
-		{
-		continue ;
-		}
-
-	ChannelUser* theUser = theChan->findUser( *ptr ) ;
-	if( NULL == theUser )
-		{
-		elog	<< "xClient::Ban(vector)> Unable to find "
-			<< "client on channel: "
-			<< theChan->getName()
-			<< endl ;
-		continue ;
-		}
-
-	banVector.push_back( xServer::banVectorType::value_type(
-		true, Channel::createBan( *ptr ) ) ) ;
-	}
-
-string modeString = "+" ;
-string args ;
+string modeString { } ;
+string args { } ;
 
 for( xServer::banVectorType::const_iterator ptr = banVector.begin(),
 	end = banVector.end() ; ptr != end ; ++ptr )
@@ -1786,13 +1873,13 @@ for( xServer::banVectorType::const_iterator ptr = banVector.begin(),
 	modeString += 'b' ;
 	args += ptr->second + ' ' ;
 
-	if( ((MAX_CHAN_MODES + 1) == modeString.size()) ||
-		((ptr + 1) == end) )
+	if( ( MAX_CHAN_MODES == modeString.size() ) ||
+		( ( ptr + 1 ) == end ) )
 		{
 		stringstream s ;
 		s	<< getCharYYXXX() << " M "
 			<< theChan->getName() << ' '
-			<< modeString << ' ' << args ;
+			<< "+" << modeString << ' ' << args ;
 
 		Write( s ) ;
 
@@ -1803,7 +1890,8 @@ for( xServer::banVectorType::const_iterator ptr = banVector.begin(),
 
 	} // for()
 
-MyUplink->OnChannelModeB( theChan, 0, banVector ) ;
+MyUplink->OnChannelModeB( theChan, 0,
+	const_cast< xServer::banVectorType& >( banVector ) ) ;
 
 if( !OnChannel )
 	{

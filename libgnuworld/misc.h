@@ -193,6 +193,9 @@ string createClass(const string&, bool wildcard = false);
 /* Formats a timestamp into a "X Days, XX:XX:XX" from 'Now'. */
 const string prettyDuration( int ) ;
 
+/* Comma separates thousands for a number (e.g. 1000 to 1,000) */
+const string prettyNumber( int ) ;
+
 const string tsToDateTime(time_t, bool);
 
 int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
