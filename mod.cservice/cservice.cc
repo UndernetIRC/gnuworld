@@ -7422,8 +7422,8 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 		if (totalUsers > 50)
 		{
 			// Hmm, what a strange large channel
-			logDebugMessage("Weird large new channel appliaction of %s, usercount=%i, clones=%i", theChan->getName().c_str(), totalUsers, clonesCount);
-			logAdminMessage("Weird large new channel appliaction of %s, usercount=%i, clones=%i", theChan->getName().c_str(), totalUsers, clonesCount);
+			logDebugMessage("Weird large new channel application of %s, usercount=%i, clones=%i", theChan->getName().c_str(), totalUsers, clonesCount);
+			logAdminMessage("Weird large new channel application of %s, usercount=%i, clones=%i", theChan->getName().c_str(), totalUsers, clonesCount);
 		}
 	}
 	pendingChan->join_count = totalUsers;
