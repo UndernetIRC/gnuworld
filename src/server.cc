@@ -1111,7 +1111,11 @@ if( !fakeClient->getDescription().empty() )
 	description = fakeClient->getDescription() ;
 	}
 
-Write( "%s N %s %d %d %s %s %s %s %s :%s\n",
+string accountString { } ;
+if( fakeClient->getMode( iClient::MODE_REGISTERED ) )
+	accountString += " " + fakeClient->getAccount() + ":" + itoa( fakeClient->getAccountID() ) ;
+
+Write( "%s N %s %d %d %s %s %s%s %s %s :%s\n",
 	fakeServer->getCharYY().c_str(),
 	fakeClient->getNickName().c_str(),
 	hopCount,
@@ -1119,6 +1123,7 @@ Write( "%s N %s %d %d %s %s %s %s %s :%s\n",
 	fakeClient->getUserName().c_str(),
 	fakeClient->getInsecureHost().c_str(),
 	fakeClient->getStringModes().c_str(),
+	accountString.c_str(),
 	xIP( fakeClient->getIP() ).GetBase64IP().c_str(),
 	fakeClient->getCharYYXXX().c_str(),
 	description.c_str() ) ;
