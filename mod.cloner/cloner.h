@@ -43,43 +43,74 @@ class cloner : public xClient
 {
 
 public:
-	cloner( const std::string& configFileName ) ;
-	virtual ~cloner() ;
+  cloner( const std::string& configFileName ) ;
+  virtual ~cloner() ;
 
-	virtual void OnConnect() ;
-	virtual void OnTimer( const xServer::timerID&, void* ) ;
-	virtual void OnPrivateMessage( iClient*, const std::string&,
-			bool secure = false ) ;
-	virtual void addClone() ;
+  virtual void                OnAttach() ;
+  virtual void                OnConnect() ;
+  virtual void                OnTimer( const xServer::timerID&, void* ) ;
+  virtual void                OnPrivateMessage( iClient*, const std::string&,
+                                bool secure = false ) ;
+  virtual void                OnNetworkKick( Channel*, iClient*,
+                                iClient*, const string&, bool ) ;
+  virtual void                addClone() ;
+  virtual size_t              joinClone( iClient*, Channel* ) ;
+  virtual size_t              joinClone( const size_t, Channel* ) ;
+  virtual size_t              partClone( iClient*, Channel*, const string ) ;
+  virtual size_t              partClone( const size_t, Channel*, const string ) ;
+  virtual size_t              quitClone( const size_t, const string ) ;
+  virtual size_t              quitClone( iClient*, const string ) ;
+  virtual bool                banMatch( const Channel*, const iClient* ) ;
+
+  gnuworld::xServer::timerID	loadCloneTimer ;
+  gnuworld::xServer::timerID	delayJoinTimer ;
 
 protected:
 
-	virtual bool		hasAccess( const std::string& ) const ;
+  virtual bool                hasAccess( const std::string& ) const ;
 
-	virtual std::string	randomNick( int minLength = 5,
-					int maxLength = 9 ) ;
-	virtual std::string	randomUser() ;
-	virtual std::string	randomHost() ;
-	virtual char		randomChar() ;
+  virtual std::string         randomNick( int minLength = 5,
+                                int maxLength = 9 ) ;
+  virtual std::string         randomUser() ;
+  virtual std::string         randomHost() ;
+  virtual std::string         randomAccount() ;
+  virtual char                randomChar() ;
+  virtual iClient*            randomClone() ;
 
-	std::list< std::string >	allowAccess ;
-	std::list< iClient* >		clones ;
-	std::vector< std::string >	userNames ;
-	std::vector< std::string >	hostNames ;
-	iServer*		fakeServer ;
+  std::list< std::string >    allowAccess ;
+  std::vector< std::string >  userNames ;
+  std::vector< std::string >  hostNames ;
+  std::vector< std::pair
+    < std::string, int > >    accountNames ;
 
-	bool			allowOpers ;
+  typedef std::vector
+            < iClient* >      cloneVectorType ;
+  cloneVectorType             clones ;
 
-	size_t			makeCloneCount ;
-	size_t			cloneBurstCount ;
-	size_t			minNickLength ;
-	size_t			maxNickLength ;
+  iServer*                    fakeServer ;
 
-	std::string		cloneDescription ;
-	std::string		cloneMode ;
-	std::string		fakeServerName ;
-	std::string		fakeServerDescription ;
+  /* Options for loading clones. */
+  bool                        cloneIdent ;
+  bool                        cloneModeO ;
+  bool                        cloneModeK ;
+  bool                        cloneModeR ;
+  bool                        cloneModeX ;
 
+  bool                        allowOpers ;
+
+  size_t                      makeCloneCount ;
+  size_t                      cloneBurstCount ;
+  size_t                      minNickLength ;
+  size_t                      maxNickLength ;
+  size_t                      delayCount ;
+  size_t                      joinCloneCount ;
+
+  std::string                 cloneDescription ;
+  std::string                 cloneMode ;
+  std::string                 fakeServerName ;
+  std::string                 fakeServerDescription ;
+
+  Channel*                    delayChan ;
 } ;
 
 } // namespace gnuworld
