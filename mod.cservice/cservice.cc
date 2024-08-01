@@ -7756,8 +7756,8 @@ void cservice::preloadUserCache()
 	theQuery	<< "SELECT " << sql::user_fields
 				<< " FROM users,users_lastseen WHERE "
 				<< " users_lastseen.user_id = users.id AND "
-				<< " users_lastseen.last_seen >= "
-				<< currentTime() - (preloadUserDays * 86400)
+				<< " users_lastseen.last_seen >= (date_part('epoch', CURRENT_TIMESTAMP)::int - "
+				<< (preloadUserDays * 86400) << ")"
 				<< ends;
 
 	elog		<< "*** [CMaster::preloadUserCache]: Loading users accounts logged in within "
