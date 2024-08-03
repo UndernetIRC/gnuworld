@@ -1722,6 +1722,7 @@ void ccontrol::OnChannelEvent( const channelEventType& theEvent,
 {
 switch( theEvent )
 	{
+	case EVT_BURST:
 	case EVT_JOIN:
 		if( !isOperChan( theChan ) )
 			{

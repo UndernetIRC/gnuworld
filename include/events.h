@@ -79,7 +79,8 @@ enum
 	EVT_SERVERMODE, // when server performs modes.
 	EVT_TOPIC, // passed even if TRACK_TOPIC is disabled
 	EVT_KICK, // moved to xClient::OnNetworkKick()
-	EVT_CREATE
+	EVT_CREATE,
+	EVT_BURST
 } ;
 
 /**
@@ -137,6 +138,9 @@ typedef int channelEventType ;
  * EVT_JOIN
  *  1) iClient*
  *  2) ChannelUser*
+ * EVT_BURST
+ *  1) iClient*
+ *  2) ChannelUser*
  */
 
 const std::string eventNames[] = {
@@ -163,7 +167,8 @@ const std::string eventNames[] = {
 	"Channel Mode By Server", /* EVT_SERVERMODE */
 	"Channel Topic Change", /* EVT_TOPIC */
 	"Channel Kick", /* EVT_KICK */
-	"Channel Create" /* EVT_CREATE */
+	"Channel Create", /* EVT_CREATE */
+	"Channel Burst" /* EVT_BURST */
 } ;
 
 } // namespace gnuworld

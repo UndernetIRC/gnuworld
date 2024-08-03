@@ -216,6 +216,7 @@ void nickserv::OnChannelEvent(const channelEventType& theEvent,
 iClient* theClient = 0;
 
 switch (theEvent) {
+  case EVT_BURST:
   case EVT_JOIN: {
     if(theChannel->getName() != consoleChannel) {
       theLogger->log(logging::events::E_WARNING, "Received a JOIN for channel: %s.",

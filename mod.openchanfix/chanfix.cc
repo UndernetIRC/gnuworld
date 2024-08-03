@@ -819,6 +819,7 @@ if (theChan->size() < minClients)  return;
 
 switch( whichEvent )
 	{
+	case EVT_BURST:
 	case EVT_JOIN:
 		{
 		/* If this is the operChan or supportChan, op opers on join */
