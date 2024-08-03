@@ -2669,7 +2669,7 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			modeVector.push_back(make_pair(false,
 				Channel::MODE_CTCP));
 			break;
-		case 'P':  // mode to prevent part messages
+		case 'u':  // mode to prevent part messages
 			theChan->removeMode(Channel::MODE_PART);
 			modeVector.push_back(make_pair(false,
 				Channel::MODE_PART));

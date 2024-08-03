@@ -1742,7 +1742,7 @@ list<const Channel*> xNetwork::getChannelsWithModes(const string& modes) const
 							foundMatch = false;
 						}
 						break;
-				case 'P':	/* mode to prevent part messages */
+				case 'u':	/* mode to prevent part messages */
 						if ((!modeflag && cptr->second->getMode(Channel::MODE_PART))
 							|| (modeflag && !cptr->second->getMode(Channel::MODE_PART)))
 						{

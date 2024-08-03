@@ -1662,7 +1662,9 @@ sqlUser* cservice::getUserRecord(int Id)
 		return NULL;
 	} else if (SQLDb->Tuples() == 0)
 	{
-		logDebugMessage("getUserRecordUserIdQuery = 0 !");
+		logDebugMessage("getUserRecordUserIdQuery = 0 (%d)!", Id);
+		elog	<< "cservice::getUserRecord> nil hits for userID "
+			<< Id << endl ;
 		return NULL;
 	}
 	string id = SQLDb->GetValue(0,0);
@@ -3482,8 +3484,32 @@ void cservice::updateBans()
  * control to the relevant member for the timer
  * triggered.
  */
-void cservice::OnTimer(const xServer::timerID& timer_id, void*)
+void cservice::OnTimer(const xServer::timerID& timer_id, void* parms)
 {
+/**
+ * If the timer is called with a param, we check:
+ * 1: Whether the param is a sqlChannel object; and
+ * 2: Whether the timer_id mathes the sqlChannel's getLimitJoinTimer()
+ */
+
+if (parms != nullptr)
+{
+#ifdef LOG_DEBUG
+	elog	<< "cservice::OnTimer> Called with parms (JOINLIM)"
+		<< endl;
+#endif
+	sqlChannel *sqlChan = static_cast<sqlChannel *>(parms);
+	if (sqlChan != nullptr && sqlChan->getLimitJoinTimer() == timer_id && sqlChan->getLimitJoinActive())
+	{
+		undoJoinLimits(sqlChan);
+#ifdef LOG_DEBUG
+		elog	<< "cservice::OnTimer> Calling undoJoinLimits for "
+			<< sqlChan->getName() << " (ID: " << sqlChan->getID() << ")"
+			<< endl;
+#endif
+	}
+}
+
 if (timer_id == limit_timerID)
 	{
 	updateLimits();
@@ -5734,6 +5760,7 @@ switch( whichEvent )
 		theClient = static_cast< iClient* >( data1 ) ;
 
 		pendingChannelListType::iterator ptr = pendingChannelList.find(theChan->getName());
+		iServer* theServer = Network->findServer( theClient->getIntYY() ) ;
 
 		if (ptr != pendingChannelList.end() && (!isDBRegisteredChannel(theChan->getName())))
 			{
@@ -5742,7 +5769,6 @@ switch( whichEvent )
 			 * If this is the case, its not a manual /join.
 			 */
 
-			iServer* theServer = Network->findServer( theClient->getIntYY() ) ;
 			if (!theServer->isBursting())
 				{
 				/*
@@ -5895,8 +5921,18 @@ switch( whichEvent )
 			doAutoTopic(reggedChan);
 			}
 
+		sqlUser *theUser = isAuthed(theClient, false);
+		/**
+		 * Check if JOINLIM is enabled, and this is a unidented host,
+		 * user is not logged in, and the nick is not from a bursting server.
+		 */
+		if (!theUser &&
+			theClient->getUserName()[0] == '~' &&
+			reggedChan->getFlag(sqlChannel::F_JOINLIM) &&
+			!theServer->isBursting())
+			doJoinLimit(reggedChan, theChan);
+
 		/* Deal with auto-op first - check this users access level. */
-		sqlUser* theUser = isAuthed(theClient, false);
 		if (!theUser)
 			{
 			/* If not authed, bye. */
@@ -6249,6 +6285,216 @@ void cservice::updateLimits()
 
 		++ptr;
 		}
+}
+
+void cservice::undoJoinLimits(sqlChannel *reggedChan)
+{
+	reggedChan->setLimitJoinTime(0);
+	reggedChan->setLimitJoinCount(0);
+
+	Channel *theChan = Network->findChannel(reggedChan->getName());
+	std::stringstream ss(reggedChan->getLimitJoinModeSet());
+	std::string parm;
+	std::vector<std::string> parms;
+
+	while (ss >> parm)
+	{ // Get array of parameters, first one is the modes
+		parms.push_back(parm);
+	}
+
+	unsigned int parmcount = 1;
+	for (char c : parms[0])
+	{
+		if (c == 'k')
+		{ // Key
+			theChan->removeMode(Channel::MODE_K);
+			theChan->setKey("");
+			parmcount++;
+		}
+		else if (c == 'b')
+		{ // Ban
+			theChan->removeBan(parms[parmcount]);
+			parmcount++;
+		}
+		else
+		{ // Normal mode
+			if (c == 'D')
+				theChan->removeMode(Channel::MODE_D);
+			if (c == 'c')
+				theChan->removeMode(Channel::MODE_C);
+			if (c == 'C')
+				theChan->removeMode(Channel::MODE_CTCP);
+			if (c == 'i')
+				theChan->removeMode(Channel::MODE_I);
+			if (c == 'm')
+				theChan->removeMode(Channel::MODE_M);
+			// if (c == 'M') theChan->removeMode(Channel::MODE_MNOREG);
+			// if (c == 'u') theChan->removeMode(Channel::MODE_PART);
+			if (c == 'r')
+				theChan->removeMode(Channel::MODE_R);
+			if (c == 's')
+				theChan->removeMode(Channel::MODE_S);
+		}
+	}
+
+	// Set the mode in channel
+	stringstream s;
+	s << getCharYYXXX()
+		<< " M "
+		<< reggedChan->getName()
+		<< " -"
+		<< reggedChan->getLimitJoinModeSet()
+		<< " "
+		<< theChan->getCreationTime()
+		<< ends;
+	Write(s);
+	incStat("CORE.JOINLIM.ALTER");
+
+	reggedChan->setLimitJoinActive(false);
+}
+
+void cservice::stopTimer(xServer::timerID timerID)
+{
+	MyUplink->UnRegisterTimer(timerID, 0);
+}
+
+void cservice::doJoinLimit(sqlChannel *reggedChan, Channel *theChan)
+{
+	if (reggedChan->getLimitJoinActive())
+	{
+		// When a new client joins, reset the JOINPERIOD to keep it alive
+		timerID tmpTimer = MyUplink->UnRegisterTimer(reggedChan->getLimitJoinTimer(), NULL);
+
+		// Start new timer with remaining time + joinsecs
+		time_t theTime = ::time( nullptr) + reggedChan->getLimitJoinPeriod();
+		tmpTimer = MyUplink->RegisterTimer(theTime, this, reggedChan);
+
+		reggedChan->setLimitJoinTimer(tmpTimer);
+		reggedChan->setLimitJoinTimeExpire(theTime);
+
+		return; // We are already active, just reset the timer
+	}
+
+	if (reggedChan->getLimitJoinTime() == 0 || (reggedChan->getLimitJoinTime() + reggedChan->getLimitJoinSecs()) < currentTime())
+	{ // We have passed the session, start a new one
+		reggedChan->setLimitJoinTime(currentTime());
+		reggedChan->setLimitJoinCount(1);
+		return;
+	}
+
+	reggedChan->addLimitJoinCount(); // Increment number of unidented joins in last period
+	if (reggedChan->getLimitJoinCount() >= (reggedChan->getLimitJoinMax()))
+	{ // Check if we're above threshold
+		// Check if we're opped
+		ChannelUser *tmpBotUser = theChan->findUser(getInstance());
+		if (!tmpBotUser)
+			return;
+		if (!tmpBotUser->getMode(ChannelUser::MODE_O))
+			return;
+
+		// Filter out already set channel modes from the mode to set, to avoid removing them when the mode is lifted
+		std::string chanModes = theChan->getModeString();
+		std::string wantModes = reggedChan->getLimitJoinMode();
+		std::string resultModes = "";
+
+		bool doneparms = false;
+		for (char c : wantModes)
+		{
+			if (c == ' ')
+				doneparms = true; // Done parsing modes, now we got to parameters
+			if (doneparms)
+			{
+				resultModes += c;
+			}
+			else
+			{
+				if (chanModes.find(c) == std::string::npos || c == 'b')
+				{ // If mode is not already set, and ignore bans
+					resultModes += c;
+				}
+			}
+		}
+
+		std::stringstream ss(wantModes);
+		std::string parm;
+		std::vector<std::string> parms;
+
+		while (ss >> parm)
+		{ // Get array of parameters, first one is the modes
+			parms.push_back(parm);
+		}
+
+		unsigned int parmcount = 1;
+		for (char c : parms[0])
+		{
+			if (c == 'k')
+			{ // Key
+				theChan->setMode(Channel::MODE_K);
+				theChan->setKey(parms[parmcount]);
+				parmcount++;
+			}
+			else if (c == 'b')
+			{ // Ban
+				std::string banMask = parms[parmcount];
+				theChan->setBan(banMask);
+				parmcount++;
+			}
+			else
+			{ // Normal mode
+				if (c == 'D')
+					theChan->setMode(Channel::MODE_D);
+				if (c == 'c')
+					theChan->setMode(Channel::MODE_C);
+				if (c == 'C')
+					theChan->setMode(Channel::MODE_CTCP);
+				if (c == 'i')
+					theChan->setMode(Channel::MODE_I);
+				if (c == 'm')
+					theChan->setMode(Channel::MODE_M);
+				// if (c == 'M') theChan->setMode(Channel::MODE_MNOREG);
+				// if (c == 'u') theChan->setMode(Channel::MODE_PART);
+				if (c == 'r')
+					theChan->setMode(Channel::MODE_R);
+				if (c == 's')
+					theChan->setMode(Channel::MODE_S);
+			}
+		}
+
+		// If no modes are set, because they are already set in the channel, abort.
+		if (resultModes.empty())
+			return;
+
+		// Send action opnotice to channel 
+		NoticeChannelOps(theChan->getName(),
+			"Activated JOINLIM protection and set chanmode +%s for %i seconds",
+			resultModes.c_str(), reggedChan->getLimitJoinPeriod());
+
+		// Save mode for unsetting later
+		reggedChan->setLimitJoinModeSet(resultModes);
+		reggedChan->setLimitJoinActive(true);
+
+		// Set the mode in channel
+		stringstream s;
+		s << getCharYYXXX()
+			<< " M "
+			<< theChan->getName()
+			<< " +"
+			<< resultModes
+			<< " "
+			<< theChan->getCreationTime()
+			<< ends;
+		Write(s);
+
+		// Register a timer to lift this
+		time_t theTime = time(NULL) + reggedChan->getLimitJoinPeriod();
+		if (reggedChan->getLimitJoinTimer() > 0)
+			stopTimer(reggedChan->getLimitJoinTimer()); // Unregister old one
+
+		reggedChan->setLimitJoinTimer(MyUplink->RegisterTimer(theTime, this, reggedChan));
+		reggedChan->setLimitJoinTimeExpire(theTime);
+
+		incStat("CORE.JOINLIM.ALTER");
+	}
 }
 
 void cservice::doFloatingLimit(sqlChannel* reggedChan, Channel* theChan)
@@ -8342,6 +8588,12 @@ void cservice::loadConfigVariables()
 	connectCheckFreq = atoi((cserviceConfig->Require( "connection_check_frequency" )->second).c_str());
 	connectRetry = atoi((cserviceConfig->Require( "connection_retry_total" )->second).c_str());
 	limitCheckPeriod = atoi((cserviceConfig->Require( "limit_check" )->second).c_str());
+	limitJoinMaxLowest = atoi((cserviceConfig->Require( "limitjoin_max_lowest" )->second).c_str());
+	limitJoinMaxHighest = atoi((cserviceConfig->Require( "limitjoin_max_highest" )->second).c_str());
+	limitJoinSecsLowest = atoi((cserviceConfig->Require( "limitjoin_secs_lowest" )->second).c_str());
+	limitJoinSecsHighest = atoi((cserviceConfig->Require( "limitjoin_secs_highest" )->second).c_str());
+	limitJoinPeriodHighest = atoi((cserviceConfig->Require( "limitjoin_period_highest" )->second).c_str());
+	limitJoinAllowedModes = (cserviceConfig->Require( "limitjoin_allowedmodes" )->second).c_str();
 	loginDelay = atoi((cserviceConfig->Require( "login_delay" )->second).c_str());
 	noteDuration = atoi((cserviceConfig->Require( "note_duration" )->second).c_str());
 	noteLimit = atoi((cserviceConfig->Require( "note_limit" )->second).c_str());

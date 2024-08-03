@@ -32,6 +32,7 @@
 #include	<ctime>
 
 #include	"dbHandle.h"
+#include	"server.h"
 #include	"sqlBan.h"
 
 namespace gnuworld
@@ -125,7 +126,7 @@ public:
 	static const flagType	F_TEMP;
 	static const flagType	F_CAUTION;
 	static const flagType	F_VACATION;
-	static const flagType   F_LOCKED;
+	static const flagType	F_LOCKED;
 
 	static const flagType	F_ALWAYSOP;
 	static const flagType	F_STRICTOP;
@@ -135,6 +136,7 @@ public:
 	static const flagType	F_AUTOJOIN;
 	static const flagType	F_FLOATLIM;
 	static const flagType	F_MIA;		// MIA review tag
+	static const flagType	F_JOINLIM;
 	static const flagType	F_NOFORCE; // Reserved for use by Planetarion.
 	static const flagType	F_NOVOICE;
 	static const flagType	F_NOTAKE;
@@ -286,6 +288,36 @@ public:
 	inline const unsigned int& getLimitMax() const
 		{ return limit_max ; }
 
+	inline const unsigned int& getLimitJoinMax() const
+		{ return limit_joinmax ; }
+
+	inline const unsigned int& getLimitJoinSecs() const
+		{ return limit_joinsecs ; }
+
+	inline const unsigned int& getLimitJoinPeriod() const
+		{ return limit_joinperiod; }
+
+	std::string getLimitJoinMode()
+		{ return limit_joinmode ; }
+
+	std::string getLimitJoinModeSet()
+		{ return limit_joinmodeset ; }
+
+	inline unsigned int& getLimitJoinCount()
+		{ return limit_joincount ; }
+
+	inline time_t& getLimitJoinTime()
+		{ return limit_joinlast ; }
+
+	inline time_t& getLimitJoinTimeExpire()
+		{ return limit_jointimerexpire ; }
+
+	inline const bool& getLimitJoinActive()
+		{ return limit_joinactive ; }
+
+	inline const xServer::timerID& getLimitJoinTimer()
+		{ return limit_jointimerID ; }
+
 	inline const unsigned int& getMaxBans() const
 		{ return max_bans ; }
 
@@ -297,6 +329,9 @@ public:
 	unsigned int getTotalNoticeCount(const string&);
 
 	unsigned int getTotalCTCPCount(const string&);
+
+	std::string getLimitJoinMode() const
+		{ return limit_joinmode; }
 
 	/**
 	 * Load channel data from the backend using the channel name as
@@ -365,6 +400,11 @@ public:
 			floodlevel = FLOODPRO_NONE;
 	}
 
+	// When an unidented client joins the channel, call this and this increments
+	inline void addLimitJoinCount()
+		{ limit_joincount++; }
+
+	// When did we start a new unidented client session
 	inline void setLastFloodTime( const time_t& _last_flood )
 		{ last_flood = _last_flood; }
 
@@ -418,6 +458,36 @@ public:
 
 	inline void setLimitMax( const unsigned int& _limit_max )
 		{ limit_max = _limit_max; }
+
+	inline void setLimitJoinMax( const unsigned int& _limit_joinmax )
+		{ limit_joinmax = _limit_joinmax; }
+
+	inline void setLimitJoinSecs( const unsigned int& _limit_joinsecs )
+		{ limit_joinsecs = _limit_joinsecs; }
+
+	inline void setLimitJoinMode( const string& _limit_mode )
+		{ limit_joinmode = _limit_mode; }
+
+	inline void setLimitJoinModeSet( const string& _limit_mode )
+		{ limit_joinmodeset = _limit_mode; }
+
+	inline void setLimitJoinPeriod( const unsigned int& _limit_joinperiod )
+		{ limit_joinperiod = _limit_joinperiod; }
+
+	inline void setLimitJoinTime( const time_t& _last_time )
+		{ limit_joinlast = _last_time; }
+
+	inline void setLimitJoinTimeExpire( const time_t& _expire_time )
+		{ limit_jointimerexpire = _expire_time; }
+
+	inline void setLimitJoinCount( const unsigned int& _limit_count )
+		{ limit_joincount = _limit_count; }
+
+	inline void setLimitJoinActive( const bool& _is_active )
+		{ limit_joinactive = _is_active; }
+
+	inline void setLimitJoinTimer( const xServer::timerID& _timer )
+		{ limit_jointimerID = _timer; }
 
 	inline void setMaxBans( const unsigned int& _max_bans )
 		{ max_bans = _max_bans; }
@@ -487,9 +557,9 @@ protected:
 	unsigned short	notice_period;
 	unsigned short	ctcp_period;
 	unsigned short	flood_period;
-    unsigned short	repeat_count;
-    FloodProLevel		floodlevel;
-    FloodProLevel		man_floodlevel; //the variable to keep track which floodpro level was set manually
+  unsigned short	repeat_count;
+  FloodProLevel		floodlevel;
+  FloodProLevel		man_floodlevel; //the variable to keep track which floodpro level was set manually
 	string		url ;
 	string		description ;
 	string		comment ;
@@ -506,9 +576,19 @@ protected:
 	unsigned int limit_offset;
 	time_t limit_period;
 	time_t last_limit_check;
-	time_t 		last_flood;	//last time when an floodpro measure was taken (kick/ban/gline)
+	time_t last_flood;	//last time when an floodpro measure was taken (kick/ban/gline)
+	time_t limit_joinlast = 0; //first time (in current joinlimit session) unidented user was seen joining
+	time_t limit_jointimerexpire; // time for scheduled expire
+	unsigned int limit_joincount = 0; // how many unidented joins have we have in this session
 	unsigned int limit_grace;
 	unsigned int limit_max;
+	unsigned int limit_joinmax; // Number of unidented joins in joinsecs period
+	unsigned int limit_joinsecs; // Number of seconds period to monitor unidented joins
+	std::string  limit_joinmode; // Mode to set when triggerin a joinlimit event
+	std::string  limit_joinmodeset; // Current mode set when last triggered
+	unsigned int limit_joinperiod; // The period before unsetting modes again
+	xServer::timerID limit_jointimerID; // ID of the current running timer
+	bool limit_joinactive = false; // State of the joinlimit active
 	unsigned int max_bans;
 	unsigned int no_take;
 	time_t		now;

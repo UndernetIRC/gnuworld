@@ -254,6 +254,30 @@ if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 	<< ends;
 	flagsSet += floatLim.str().c_str();
 }
+
+if (theChan->getFlag(sqlChannel::F_JOINLIM))
+{
+	stringstream joinLim;
+	joinLim << " JOINLIM (MAX:"
+		<< theChan->getLimitJoinMax()
+		<< ", SECS:"
+		<< theChan->getLimitJoinSecs()
+		<< ", PRD:"
+		<< theChan->getLimitJoinPeriod()
+		<< ", MODE: "
+		<< theChan->getLimitJoinMode().c_str()
+		<< ")"
+		<< ends;
+	flagsSet += joinLim.str().c_str();
+}
+
+if (theChan->getLimitJoinActive())
+	bot->Notice(theClient,
+		bot->getResponse(theUser, language::status_joinlim,
+			string("Active JOINMODE modes (+%s) will expire in %i seconds")).c_str(),
+			theChan->getLimitJoinModeSet().c_str(),
+			theChan->getLimitJoinTimeExpire() - time(nullptr));
+
 /* show userflags (if not 'NONE') */
 if (theChan->getUserFlags() == 1) flagsSet += "USERFLAGS=OP ";
 else if (theChan->getUserFlags() == 2) flagsSet += "USERFLAGS=VOICE ";

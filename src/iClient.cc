@@ -328,13 +328,6 @@ if( std::find( channelList.begin(), channelList.end(), theChan )
 
 // Add the channel to the channelList
 channelList.push_front( theChan ) ;
-//So far this clears all the time topic
-//#ifdef TOPIC_TRACK
-//	/* initialise the topic data if topic_track is enabled */
-//	theChan->setTopicTS(0);
-//	theChan->setTopicWhoSet("");
-//	theChan->setTopic("");
-//#endif
 return true ;
 }
 

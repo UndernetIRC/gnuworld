@@ -1789,7 +1789,7 @@ if( !chanModes.empty() &&
 				else
 					theChan->removeMode(Channel::MODE_CTCP);
 				break;
-			case 'P':
+			case 'u':
 				if (plus)
 					theChan->setMode(Channel::MODE_PART);
 				else
@@ -2293,7 +2293,7 @@ chanModes[ 't' ] = Channel::MODE_T ;
 chanModes[ 'D' ] = Channel::MODE_D ;
 chanModes[ 'c' ] = Channel::MODE_C ;
 chanModes[ 'C' ] = Channel::MODE_CTCP ;
-chanModes[ 'P' ] = Channel::MODE_PART ;
+chanModes[ 'u' ] = Channel::MODE_PART ;
 chanModes[ 'M' ] = Channel::MODE_MNOREG ;
 
 // This vector is used for argument-less types that can be passed
@@ -2368,7 +2368,7 @@ for( ; tokenIndex < st.size() ; )
 			case 't':
 			case 'c':
 			case 'C':
-			case 'P':
+			case 'u':
 			case 'M':
 			case 'D':
 //				elog	<< "xServer::Mode> General mode: "
@@ -3321,7 +3321,7 @@ for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ;
 		case 'C':
 			theChan->setMode( Channel::MODE_CTCP ) ;
 			break;
-		case 'P':
+		case 'u':
 			theChan->setMode( Channel::MODE_PART ) ;
 			break;
 		case 'M':

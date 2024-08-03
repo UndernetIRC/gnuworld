@@ -211,36 +211,48 @@ namespace gnuworld
 		const int no_adduser =				173;
 		const int noadduser_on =			174;
 		const int noadduser_off =			175;
-		const int auth_failed_logins =		176;
-		const int max_failed_logins =		177;
+		const int auth_failed_logins =			176;
+		const int max_failed_logins =			177;
 		const int automode_invite =			178;
 		const int auth_failed_token =			179;
 		const int following_clients_auth = 		180;
 		const int suspend_if_not_you = 			181;
 		const int account_unusable_suspendme = 		182;
-		const int is_cservice_alumni = 		183;
+		const int is_cservice_alumni = 			183;
 		const int novoice_set =				184;
 		const int acc_susp =				185;
 		const int acc_unsusp =				186;
-		const int acc_new =					187;
+		const int acc_new =				187;
 		const int acc_modif =				188;
-		const int acc_rem =					189;
+		const int acc_rem =				189;
 		const int insuff_avoice =			190;
-		const int insuff_aop =			191;
-		const int reason_must =			192;
-		const int susp_reason =			193;
+		const int insuff_aop =				191;
+		const int reason_must =				192;
+		const int susp_reason =				193;
 		const int unsusp_reason =			194;
 
 		// Allow for merge of other features
 
-		const int welcome_max_len = 205;
-		const int welcome_cleared = 206;
-		const int welcome_status = 207;
+		const int welcome_max_len = 			205;
+		const int welcome_cleared = 			206;
+		const int welcome_status = 			207;
 
-		const int chan_noforce = 208;
+		const int chan_noforce = 			208;
+
+		const int set_joinmax_joinrange = 		210;
+		const int set_joinmax_secrange = 		211;
+		const int set_joinmax = 			212;
+		const int set_joinmode = 			213;
+		const int set_joinmode_allowed = 		214;
+		const int set_joinmode_params = 		215;
+		const int ban_invalid = 			216;
+		const int set_joinperiod_range = 		217;
+		const int set_joinperiod = 			218;
+		const int status_joinlim = 			219;
+
 
 		const int greeting = 				9998;
-		const int motd =					9999;
+		const int motd =				9999;
 	}
 }
 

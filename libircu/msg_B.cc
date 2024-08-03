@@ -229,7 +229,7 @@ if( '+' == Param[ whichToken ][ 0 ] )
 				modeVector.push_back( make_pair(
 					true, Channel::MODE_CTCP ) ) ;
 				break ;
-			case 'P':
+			case 'u':
 				modeVector.push_back( make_pair(
 					true, Channel::MODE_PART ) ) ;
 				break ;

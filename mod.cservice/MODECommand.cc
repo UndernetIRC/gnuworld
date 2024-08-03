@@ -300,7 +300,7 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 
 			modeString += st[ 2 ][ charPos ] ;
 			break;
-		/*case 'P': //No part msg
+		/*case 'u': //No part msg
 			if(!plus)
 				tmpChan->removeMode( Channel::MODE_PART ) ;
 			else
