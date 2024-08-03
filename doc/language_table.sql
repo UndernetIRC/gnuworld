@@ -206,173 +206,173 @@ COPY "translations" FROM stdin;
 -- 03/09/01 - nighty <nighty@undernet.org>.
 
 COPY "translations" FROM stdin;
-2	1	Désolé. Vous êtes déjà authentifié sous le nom d'utilisateur %s	31337	0
-2	2	AUTHENTIFICATION RÉUSSIE pour %s	31337	0
-2	3	Désolé. Votre accès est insuffisant pour utiliser cette commande	31337	0
-2	4	Désolé. Le canal %s est vide	31337	0
+2	1	Dï¿½solï¿½. Vous ï¿½tes dï¿½jï¿½ authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	2	AUTHENTIFICATION Rï¿½USSIE pour %s	31337	0
+2	3	Dï¿½solï¿½. Votre accï¿½s est insuffisant pour utiliser cette commande	31337	0
+2	4	Dï¿½solï¿½. Le canal %s est vide	31337	0
 2	5	Je suis incapable de trouver %s	31337	0
 2	6	Je ne vois pas %s sur le canal %s	31337	0
-2	7	Le canal %s ne semble pas être enregistré	31337	0
-2	8	Vous avez été op par %s (%s) sur %s	31337	0
-2	9	Vous avez été voice par %s (%s) sur %s	31337	0
-2	10	%s: Vous n'êtes pas dans ce canal	31337	0
-2	11	%s est déjà op sur %s	31337	0
-2	12	%s est déjà voice sur %s	31337	0
-2	13	Vous avez été deop par %s (%s)	31337	0
-2	14	Vous avez été devoice par %s (%s)	31337	0
+2	7	Le canal %s ne semble pas ï¿½tre enregistrï¿½	31337	0
+2	8	Vous avez ï¿½tï¿½ op par %s (%s) sur %s	31337	0
+2	9	Vous avez ï¿½tï¿½ voice par %s (%s) sur %s	31337	0
+2	10	%s: Vous n'ï¿½tes pas dans ce canal	31337	0
+2	11	%s est dï¿½jï¿½ op sur %s	31337	0
+2	12	%s est dï¿½jï¿½ voice sur %s	31337	0
+2	13	Vous avez ï¿½tï¿½ deop par %s (%s)	31337	0
+2	14	Vous avez ï¿½tï¿½ devoice par %s (%s)	31337	0
 2	15	%s n'est pas op sur %s	31337	0
 2	16	%s n'est pas voice sur %s	31337	0
-2	17	AUTHENTIFICATION REFUSÉE pour %s (Mot de passe Invalide)	31337	0
+2	17	AUTHENTIFICATION REFUSï¿½E pour %s (Mot de passe Invalide)	31337	0
 2	18	Je ne suis pas dans ce canal!!	31337	0
 2	19	Niveau de ban invalide. Niveau valide: entre 1 et %i.	31337	0
-2	20	Durée du ban invalide. La durée maximale est de %d journé.	31337	0
-2	21	La raison d'un ban ne peut dépasser 128 caractères.	31337	0
-2	22	Ce ban est déjà dans ma liste!	31337	0
-2	23	Le ban %s est dejà couvert par %s	31337	0
+2	20	Durï¿½e du ban invalide. La durï¿½e maximale est de %d journï¿½.	31337	0
+2	21	La raison d'un ban ne peut dï¿½passer 128 caractï¿½res.	31337	0
+2	22	Ce ban est dï¿½jï¿½ dans ma liste!	31337	0
+2	23	Le ban %s est dejï¿½ couvert par %s	31337	0
 2	24	Niveau minimum invalide.	31337	0
 2	25	Niveau maximum invalide.	31337	0
 2	26	UTILISATEUR: %s NIVEAU: %s %s	31337	0
 2	27	CANAL: %s -- AUTOMODE: %s	31337	0
-2	28	DERNIÈRE MODIFICATION: %s (depuis %s)	31337	0
+2	28	DERNIï¿½RE MODIFICATION: %s (depuis %s)	31337	0
 2	29	** SUSPENDU ** - Expire dans %s  (Level %i)	31337	0
-2	30	DERNIÈRE FOIS VU: il y a %s.	31337	0
-2	31	Il y a plus de %d requêtes trouvées.	31337	0
-2	32	SVP restreindre votre requête	31337	0
-2	33	Fin de la liste des accès	31337	0
-2	34	Aucune correspondance trouvée!	31337	0
-2	35	Vous ne pouvez pas ajouter un utilisateur à un niveau égal ou supérieur au votre. 	31337	0
-2	36	Niveau d'accès invalide	31337	0
-2	37	%s a déjà été ajouté sur %s au niveau %i.	31337	0
-2	38	Utilisateur %s ajouté sur %s au niveau %i	31337	0
+2	30	DERNIï¿½RE FOIS VU: il y a %s.	31337	0
+2	31	Il y a plus de %d requï¿½tes trouvï¿½es.	31337	0
+2	32	SVP restreindre votre requï¿½te	31337	0
+2	33	Fin de la liste des accï¿½s	31337	0
+2	34	Aucune correspondance trouvï¿½e!	31337	0
+2	35	Vous ne pouvez pas ajouter un utilisateur ï¿½ un niveau ï¿½gal ou supï¿½rieur au votre. 	31337	0
+2	36	Niveau d'accï¿½s invalide	31337	0
+2	37	%s a dï¿½jï¿½ ï¿½tï¿½ ajoutï¿½ sur %s au niveau %i.	31337	0
+2	38	Utilisateur %s ajoutï¿½ sur %s au niveau %i	31337	0
 2	39	Quelque chose semble incorrect: %s	31337	0
 2	40	%s: fin de la liste des bans	31337	0
-2	41	Impossible de voir les détails de l'utilisateur (Invisible).	31337	0
+2	41	Impossible de voir les dï¿½tails de l'utilisateur (Invisible).	31337	0
 2	42	Informations sur: %s (%i)	31337	0
-2	43	Connecté en ce moment via: %s	31337	0
+2	43	Connectï¿½ en ce moment via: %s	31337	0
 2	44	URL: %s	31337	0
 2	45	Langue: %i	31337	0
 2	46	Canaux: %s	31337	0
-2	47	Entrée Flood: %i	31337	0
+2	47	Entrï¿½e Flood: %i	31337	0
 2	48	Sortie Flood (Bytes): %i	31337	0
-2	49	%s a été enregistré par:	31337	0
-2	50	%s - vu pour la dernière fois: il y a %s	31337	0
+2	49	%s a ï¿½tï¿½ enregistrï¿½ par:	31337	0
+2	50	%s - vu pour la derniï¿½re fois: il y a %s	31337	0
 2	51	Desc: %s	31337	0
-2	52	Vous voulez me Flooder? Je ne vais plus vous répondre dorénavant.	31337	0
-2	53	Je crois que je vous ai envoyé beaucoup trop d'informations. Je vais vous ignorer un peu.	31337	0
-2	54	Commande incomplète	31337	0
+2	52	Vous voulez me Flooder? Je ne vais plus vous rï¿½pondre dorï¿½navant.	31337	0
+2	53	Je crois que je vous ai envoyï¿½ beaucoup trop d'informations. Je vais vous ignorer un peu.	31337	0
+2	54	Commande incomplï¿½te	31337	0
 2	55	Pour utiliser %s, Vous devez /msg %s@%s	31337	0
-2	56	Désolé. Vous devez être authentifié pour utiliser cette commande.	31337	0
-2	57	Le canal %s a été suspendu par un administrateur de cservice.	31337	0
-2	58	Votre accès sur %s a été suspendu.	31337	0
+2	56	Dï¿½solï¿½. Vous devez ï¿½tre authentifiï¿½ pour utiliser cette commande.	31337	0
+2	57	Le canal %s a ï¿½tï¿½ suspendu par un administrateur de cservice.	31337	0
+2	58	Votre accï¿½s sur %s a ï¿½tï¿½ suspendu.	31337	0
 2	59	Le mode NOOP est actif sur %s	31337	0
 2	60	Le mode STRICTOP est actif sur %s	31337	0
 2	61	Vous venez de deop plus de %i personnes	31337	0
 2	62	SYNTAXE: %s	31337	0
-2	63	Votre niveau sur %s à été temporairement augmenté au niveau %i	31337	0
-2	64	%s est enregistré.	31337	0
-2	65	%s n'est pas enregistré.	31337	0
-2	66	Je ne crois pas que %s apprécierait ça.	31337	0
+2	63	Votre niveau sur %s ï¿½ ï¿½tï¿½ temporairement augmentï¿½ au niveau %i	31337	0
+2	64	%s est enregistrï¿½.	31337	0
+2	65	%s n'est pas enregistrï¿½.	31337	0
+2	66	Je ne crois pas que %s apprï¿½cierait ï¿½a.	31337	0
 2	67	\002*** Liste des Bans pour le canal %s ***\002	31337	0
 2	68	%s %s Niveau: %i	31337	0
-2	69	AJOUTÉ PAR: %s (%s)	31337	0
+2	69	AJOUTï¿½ PAR: %s (%s)	31337	0
 2	70	DEPUIS: %s	31337	0
 2	71	EXPIRATION: %s	31337	0
 2	72	\002*** FIN ***\002	31337	0
-2	73	Désolé, Je ne sais pas qui est %s.	31337	0
-2	74	Vous avez été déloggué, vous n'êtes plus authentifié.	31337	0
-2	75	%s n'apparaît pas comme ayant accès sur %s.	31337	0
-2	76	Vous ne pouvez pas modifier un utilisateur ayant un niveau supérieur ou égal au votre.	31337	0
-2	77	Vous ne pouvez pas donner un niveau d'accès supérieur ou égal au votre à un utilisateur.	31337	0
-2	78	Modification du niveau de %s sur le canal %s à %i effectuée.	31337	0
+2	73	Dï¿½solï¿½, Je ne sais pas qui est %s.	31337	0
+2	74	Vous avez ï¿½tï¿½ dï¿½logguï¿½, vous n'ï¿½tes plus authentifiï¿½.	31337	0
+2	75	%s n'apparaï¿½t pas comme ayant accï¿½s sur %s.	31337	0
+2	76	Vous ne pouvez pas modifier un utilisateur ayant un niveau supï¿½rieur ou ï¿½gal au votre.	31337	0
+2	77	Vous ne pouvez pas donner un niveau d'accï¿½s supï¿½rieur ou ï¿½gal au votre ï¿½ un utilisateur.	31337	0
+2	78	Modification du niveau de %s sur le canal %s ï¿½ %i effectuï¿½e.	31337	0
 2	79	Activation du MODE Automatique (OP) pour %s sur le canal %s	31337	0
 2	80	Activation du MODE Automatique (VOICE) pour %s sur le canal %s	31337	0
-2	81	Désactivation des MODES Automatiques pour %s sur le canal %s	31337	0
-2	82	Votre mot de passe ne peut être ni votre nom d'utilisateur ni votre nick - La Syntaxe est: NEWPASS <nouveau mot de passe>	31337	0
-2	83	Votre mot de passe a été changé avec succès.	31337	0
+2	81	Dï¿½sactivation des MODES Automatiques pour %s sur le canal %s	31337	0
+2	82	Votre mot de passe ne peut ï¿½tre ni votre nom d'utilisateur ni votre nick - La Syntaxe est: NEWPASS <nouveau mot de passe>	31337	0
+2	83	Votre mot de passe a ï¿½tï¿½ changï¿½ avec succï¿½s.	31337	0
 2	84	Le mode NOOP est actif sur %s	31337	0
-2	85	Le mode STRICTOP est actif sur %s (et %s n'est pas authentifié)	31337	0
-2	86	Le mode STRICTOP est actif sur %s (et l'accès de %s est insuffisant)	31337	0
-2	87	%s a été purgé	31337	0
-2	88	%s est déjà enregistré.	31337	0
+2	85	Le mode STRICTOP est actif sur %s (et %s n'est pas authentifiï¿½)	31337	0
+2	86	Le mode STRICTOP est actif sur %s (et l'accï¿½s de %s est insuffisant)	31337	0
+2	87	%s a ï¿½tï¿½ purgï¿½	31337	0
+2	88	%s est dï¿½jï¿½ enregistrï¿½.	31337	0
 2	89	Nom de canal invalide.	31337	0
-2	90	%s a été enregistré	31337	0
-2	91	%s à été enlevé de ma liste silence/ignore	31337	0
+2	90	%s a ï¿½tï¿½ enregistrï¿½	31337	0
+2	91	%s ï¿½ ï¿½tï¿½ enlevï¿½ de ma liste silence/ignore	31337	0
 2	92	%s introuvable dans ma liste silence/ignore	31337	0
-2	93	Vous ne pouvez pas effacer un utilisateur ayant un niveau égal ou supérieur au votre.	31337	0
-2	94	Vous ne pouvez pas effacer votre accès sur un canal dont vous êtes le propriétaire.	31337	0
-2	95	L'accès de l'utilisateur %s a été effacé sur %s	31337	0
-2	96	Le mode INVISIBLE pour vos informations est maintenant à ON.	31337	0
-2	97	Le mode INVISIBLE pour vos informations est maintenant à OFF.	31337	0
+2	93	Vous ne pouvez pas effacer un utilisateur ayant un niveau ï¿½gal ou supï¿½rieur au votre.	31337	0
+2	94	Vous ne pouvez pas effacer votre accï¿½s sur un canal dont vous ï¿½tes le propriï¿½taire.	31337	0
+2	95	L'accï¿½s de l'utilisateur %s a ï¿½tï¿½ effacï¿½ sur %s	31337	0
+2	96	Le mode INVISIBLE pour vos informations est maintenant ï¿½ ON.	31337	0
+2	97	Le mode INVISIBLE pour vos informations est maintenant ï¿½ OFF.	31337	0
 2	98	%s pour %s est %s	31337	0
-2	99	La valeur de %s doit être ON ou OFF	31337	0
+2	99	La valeur de %s doit ï¿½tre ON ou OFF	31337	0
 2	100	Configuration USERFLAGS invalide! Les valeurs correctes sont NONE, OP, VOICE.	31337	0
 2	101	Le USERFLAGS de %s est %s	31337	0
-2	102	La valeur de MASSDEOPPRO doit être comprise entre 0 et 7	31337	0
-2	103	MASSDEOPPRO de %s a été configuré à %d	31337	0
-2	104	La valeur de FLOODPRO doit être comprise entre 0 et 7	31337	0
-2	105	FLOODPRO de %s a été configuré à %d	31337	0
-2	106	La DESCRIPTION ne doit pas dépasser %i caractères.	31337	0
-2	107	La DESCRIPTION de %s a été éffacée.	31337	0
+2	102	La valeur de MASSDEOPPRO doit ï¿½tre comprise entre 0 et 7	31337	0
+2	103	MASSDEOPPRO de %s a ï¿½tï¿½ configurï¿½ ï¿½ %d	31337	0
+2	104	La valeur de FLOODPRO doit ï¿½tre comprise entre 0 et 7	31337	0
+2	105	FLOODPRO de %s a ï¿½tï¿½ configurï¿½ ï¿½ %d	31337	0
+2	106	La DESCRIPTION ne doit pas dï¿½passer %i caractï¿½res.	31337	0
+2	107	La DESCRIPTION de %s a ï¿½tï¿½ ï¿½ffacï¿½e.	31337	0
 2	108	La DESCRIPTION de %s est: %s	31337	0
-2	109	L'URL ne doit pas dépasser %i caractères.	31337	0
-2	110	L'URL de %s a été effacée.	31337	0
+2	109	L'URL ne doit pas dï¿½passer %i caractï¿½res.	31337	0
+2	110	L'URL de %s a ï¿½tï¿½ effacï¿½e.	31337	0
 2	111	L'URL de %s est: %s	31337	0
-2	112	Les KEYWORDS (Mots-Clés) ne doivent pas dépasser 80 caractères.	31337	0
+2	112	Les KEYWORDS (Mots-Clï¿½s) ne doivent pas dï¿½passer 80 caractï¿½res.	31337	0
 2	113	KEYWORDS de %s sont: %s	31337	0
-2	114	Langue activée: %s.	31337	0
-2	115	ERREUR: Langue selectionnée invalide.	31337	0
-2	116	Le canal %s est introuvable sur le réseau!	31337	0
+2	114	Langue activï¿½e: %s.	31337	0
+2	115	ERREUR: Langue selectionnï¿½e invalide.	31337	0
+2	116	Le canal %s est introuvable sur le rï¿½seau!	31337	0
 2	117	ERREUR: Configuration de canal invalide.	31337	0
 2	118	Liste de silence/ignore:	31337	0
 2	119	La liste de silence/ignore est vide	31337	0
 2	120	-- Fin de la liste de silence/ignore 	31337	0
 2	121	Statut interne du Service de Canaux CMaster:	31337	0
-2	122	[          Statistiques du Canal] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337	0
-2	123	[     Statistiques Utilisateurs] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337	0
-2	124	[   Statistiques Niveaux d'accès] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337	0
-2	125	[          Statistiques des bans] \002Entrées en cache:\002 %i    \002Requêtes Base:\002 %i    \002# de fois Cache touché:\002 %i    \002Efficacité:\002 %.2f%%	31337	0
-2	126	Dernier évènement NOTIFY d'utilisateur: %i	31337	0
-2	127	Dernier évènement NOTIFY de canal: %i	31337	0
-2	128	Dernier évènement NOTIFY de niveau: %i	31337	0
-2	129	Dernier évènement NOTIFY de ban: %i	31337	0
-2	130	Données assignées: %i	31337	0
+2	122	[          Statistiques du Canal] \002Entrï¿½es en cache:\002 %i    \002Requï¿½tes Base:\002 %i    \002# de fois Cache touchï¿½:\002 %i    \002Efficacitï¿½:\002 %.2f%%	31337	0
+2	123	[     Statistiques Utilisateurs] \002Entrï¿½es en cache:\002 %i    \002Requï¿½tes Base:\002 %i    \002# de fois Cache touchï¿½:\002 %i    \002Efficacitï¿½:\002 %.2f%%	31337	0
+2	124	[   Statistiques Niveaux d'accï¿½s] \002Entrï¿½es en cache:\002 %i    \002Requï¿½tes Base:\002 %i    \002# de fois Cache touchï¿½:\002 %i    \002Efficacitï¿½:\002 %.2f%%	31337	0
+2	125	[          Statistiques des bans] \002Entrï¿½es en cache:\002 %i    \002Requï¿½tes Base:\002 %i    \002# de fois Cache touchï¿½:\002 %i    \002Efficacitï¿½:\002 %.2f%%	31337	0
+2	126	Dernier ï¿½vï¿½nement NOTIFY d'utilisateur: %i	31337	0
+2	127	Dernier ï¿½vï¿½nement NOTIFY de canal: %i	31337	0
+2	128	Dernier ï¿½vï¿½nement NOTIFY de niveau: %i	31337	0
+2	129	Dernier ï¿½vï¿½nement NOTIFY de ban: %i	31337	0
+2	130	Donnï¿½es assignï¿½es: %i	31337	0
 2	131	\002En fonction depuis (uptime):\002 %s	31337	0
-2	132	Le canal %s a %d utilisateur(s) (%i opérateur(s))	31337	0
+2	132	Le canal %s a %d utilisateur(s) (%i opï¿½rateur(s))	31337	0
 2	133	Les Modes du canal sont: %s	31337	0
 2	134	Flags actifs: %s	31337	0
-2	135	Vous ne pouvez pas suspendre un utilisateur ayant un niveau égal ou supérieur au votre.	31337	0
-2	136	Unité de temps invalide.	31337	0
-2	137	Durée de suspension invalide.	31337	0
-2	138	La SUSPENSION pour %s a été annulée.	31337	0
-2	139	%s est déjà suspendu sur %s	31337	0
+2	135	Vous ne pouvez pas suspendre un utilisateur ayant un niveau ï¿½gal ou supï¿½rieur au votre.	31337	0
+2	136	Unitï¿½ de temps invalide.	31337	0
+2	137	Durï¿½e de suspension invalide.	31337	0
+2	138	La SUSPENSION pour %s a ï¿½tï¿½ annulï¿½e.	31337	0
+2	139	%s est dï¿½jï¿½ suspendu sur %s	31337	0
 2	140	La SUSPENSION pour %s va expirer dans %s	31337	0
-2	141	ERREUR: Le topic ne peut dépasser 145 caractères.	31337	0
-2	142	Votre accès est insuffisant pour enlever le ban %s de la base de données de %s	31337	0
-2	143	%i ban(s) correpondant à %s ont été supprimés.	31337	0
-2	144	Votre accès temporaire au niveau %i sur le canal %s à été supprimé.	31337	0
-2	145	Vous ne semblez pas avoir forcé l'accès à %s, Serait-il expiré?	31337	0
+2	141	ERREUR: Le topic ne peut dï¿½passer 145 caractï¿½res.	31337	0
+2	142	Votre accï¿½s est insuffisant pour enlever le ban %s de la base de donnï¿½es de %s	31337	0
+2	143	%i ban(s) correpondant ï¿½ %s ont ï¿½tï¿½ supprimï¿½s.	31337	0
+2	144	Votre accï¿½s temporaire au niveau %i sur le canal %s ï¿½ ï¿½tï¿½ supprimï¿½.	31337	0
+2	145	Vous ne semblez pas avoir forcï¿½ l'accï¿½s ï¿½ %s, Serait-il expirï¿½?	31337	0
 2	146	%s n'est pas suspendu sur %s	31337	0
-2	147	%s est un Opérateur IRC	31337	0
-2	148	%s n'est pas authentifié.	31337	0
-2	149	%s est authentifié sous le nom d'utilisateur %s%s	31337	0
-2	150	%s est un représentant Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337	0
-2	151	%s est un Administrateur Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337	0
-2	152	%s est un Développeur Officiel de CService%s et authentifié sous le nom d'utilisateur %s	31337	0
-2	153	Il y a plus de %i entrées correspondantes [%s]	31337	0
-2	154	Veuillez svp restreindre votre requête.	31337	0
-2	155	Aucune entrée ne correspond à votre requête. [%s]	31337	0
-2	156	%s: Les modes du canal on été remis à zéro.	31337	0
+2	147	%s est un Opï¿½rateur IRC	31337	0
+2	148	%s n'est pas authentifiï¿½.	31337	0
+2	149	%s est authentifiï¿½ sous le nom d'utilisateur %s%s	31337	0
+2	150	%s est un reprï¿½sentant Officiel de CService%s et authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	151	%s est un Administrateur Officiel de CService%s et authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	152	%s est un Dï¿½veloppeur Officiel de CService%s et authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	153	Il y a plus de %i entrï¿½es correspondantes [%s]	31337	0
+2	154	Veuillez svp restreindre votre requï¿½te.	31337	0
+2	155	Aucune entrï¿½e ne correspond ï¿½ votre requï¿½te. [%s]	31337	0
+2	156	%s: Les modes du canal on ï¿½tï¿½ remis ï¿½ zï¿½ro.	31337	0
 2	158	Option Invalide.	31337	0
 2	159	%s est un Bot de Services Officiel d'Undernet.	31337	0
-2	160	%s est un Représentant Officiel de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337	0
-2	161	%s est un Participan Officiel de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337	0
-2	162	%s est un Développeur Officie de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337	0
-2	163	%s est un Sénior Officiel de Coder-Com%s et authentifié sous le nom d'utilisateur %s	31337	0
-2	164	 et un Opérateur IRC	31337	0
-2	165	Ban sur %s ajouté à %s au niveau %i	31337	0
+2	160	%s est un Reprï¿½sentant Officiel de Coder-Com%s et authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	161	%s est un Participan Officiel de Coder-Com%s et authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	162	%s est un Dï¿½veloppeur Officie de Coder-Com%s et authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	163	%s est un Sï¿½nior Officiel de Coder-Com%s et authentifiï¿½ sous le nom d'utilisateur %s	31337	0
+2	164	 et un Opï¿½rateur IRC	31337	0
+2	165	Ban sur %s ajoutï¿½ ï¿½ %s au niveau %i	31337	0
 2	166	%s: La liste des bans est vide.	31337	0
-2	167	Je suis déjà dans ce canal!	31337	0
-2	168	Cette commande est réservée aux Opérateurs IRC	31337	0
+2	167	Je suis dï¿½jï¿½ dans ce canal!	31337	0
+2	168	Cette commande est rï¿½servï¿½e aux Opï¿½rateurs IRC	31337	0
 2	169	Je ne suis pas op sur %s	31337	0
 2	170	%s pour %i minutes	31337	0
 2	184	The NOVOICE flag is set on %s	31337	0
@@ -394,11 +394,11 @@ COPY "translations" FROM stdin;
 COPY "translations" FROM stdin;
 3	1	Beklager, Du er allerede autoriseret som %s	31337	0
 3	2	AUTORISATION LYKKEDES som %s	31337	0
-3	3	Beklager, du har utilstrækkelig adgang til at udføre den kommando	31337	0
+3	3	Beklager, du har utilstrï¿½kkelig adgang til at udfï¿½re den kommando	31337	0
 3	4	Beklager, kanalen %s er tom	31337	0
 3	5	Jeg kan ikke se %s nogen steder	31337	0
-3	6	Jeg kan ikke finde %s på kanalen %s	31337	0
-3	7	Kanelen %s ser ikke ud til at være registreret	31337	0
+3	6	Jeg kan ikke finde %s pï¿½ kanalen %s	31337	0
+3	7	Kanelen %s ser ikke ud til at vï¿½re registreret	31337	0
 3	8	Du er op'et af %s (%s) i %s	31337	0
 3	9	Du er voice'et af %s (%s) i %s	31337	0
 3	10	%s: Du er ikke i denne kanal	31337	0
@@ -410,31 +410,31 @@ COPY "translations" FROM stdin;
 3	16	%s er ikke voice'et i %s	31337	0
 3	17	AUTORISATION MISLYKKEDES som %s (Ugyldigt Kodeord)	31337	0
 3	18	Jeg er ikke i den kanal!	31337	0
-3	19	Ugyldigt banlevel område. Gyldigt område er 1-%i.	31337	0
-3	20	Ugyldigt ban varighed. Din ban varighed kan max bestå af %d dage.	31337	0
-3	21	Ban grund kan ikke overtræde 128 karaktere	31337	0
+3	19	Ugyldigt banlevel omrï¿½de. Gyldigt omrï¿½de er 1-%i.	31337	0
+3	20	Ugyldigt ban varighed. Din ban varighed kan max bestï¿½ af %d dage.	31337	0
+3	21	Ban grund kan ikke overtrï¿½de 128 karaktere	31337	0
 3	22	Specifiseret ban er allerede i min banliste!	31337	0
-3	23	Ban'et %s er allerede dækket af %s	31337	0
+3	23	Ban'et %s er allerede dï¿½kket af %s	31337	0
 3	24	Ugyldigt minimums level.	31337	0
 3	25	Ugyldigt maximums level.	31337	0
 3	26	BRUGER: %s ADGANG: %s %s	31337	0
 3	27	KANAL: %s - AUTOMODE: %s	31337	0
-3	28	SIDST ÆNDRET: %s (%s siden)	31337	0
-3	29	** SUSPENDERET ** - Udløber om %s (Level %i)	31337	0
+3	28	SIDST ï¿½NDRET: %s (%s siden)	31337	0
+3	29	** SUSPENDERET ** - Udlï¿½ber om %s (Level %i)	31337	0
 3	30	SIDST SET: %s siden.	31337	0
 3	31	Der er mere end %d matchende indtastninger.	31337	0
-3	32	Forkort venligst din forspørgelse.	31337	0
-3	33	Slut på adgangsliste.	31337	0
+3	32	Forkort venligst din forspï¿½rgelse.	31337	0
+3	33	Slut pï¿½ adgangsliste.	31337	0
 3	34	Ingen match!	31337	0
-3	35	Kan ikke tilføje en bruger med ens eller højere adgang end din egen.	31337	0
+3	35	Kan ikke tilfï¿½je en bruger med ens eller hï¿½jere adgang end din egen.	31337	0
 3	36	Ugyldigt adgangs level.	31337	0
-3	37	%s er allerede tilføjet til %s med adgangs level %i.	31337	0
-3	38	Tilføjet bruget %s til %s med adgangs level %i	31337	0
+3	37	%s er allerede tilfï¿½jet til %s med adgangs level %i.	31337	0
+3	38	Tilfï¿½jet bruget %s til %s med adgangs level %i	31337	0
 3	39	Noget gik galt: %s	31337	0
 3	40	%s: Slut af ban liste	31337	0
 3	41	Kan ikke vise bruger detaljer (Usynlig)	31337	0
 3	42	Information omkring: %s (%i)	31337	0
-3	43	Nuværende logget på via: %s	31337	0
+3	43	Nuvï¿½rende logget pï¿½ via: %s	31337	0
 3	44	URL: %s	31337	0
 3	45	Sprog: %i	31337	0
 3	46	Kanaler: %s	31337	0
@@ -443,59 +443,59 @@ COPY "translations" FROM stdin;
 3	49	%s er registreret af:	31337	0
 3	50	%s - sidst set: %s siden	31337	0
 3	51	Desc: %s	31337	0
-3	52	Floode mig vil du? Jeg vil ikke høre mere på dig	31337	0
+3	52	Floode mig vil du? Jeg vil ikke hï¿½re mere pï¿½ dig	31337	0
 3	53	Jeg tror jeg har sendt dig en lille smule for meget data, jeg vil ignorere dig i et stykke tid.	31337	0
 3	54	Ukomplet kommando	31337	0
 3	55	For at bruge %s, skal du /msg %s@%s	31337	0
-3	56	Sorry, Du skal være logget ind for at bruge denne kommando.	31337	0
+3	56	Sorry, Du skal vï¿½re logget ind for at bruge denne kommando.	31337	0
 3	57	Kanalen %s er blevet suspenderet af en cservice administrator.	31337	0
-3	58	Din adgang på %s er blevet suspenderet.	31337	0
-3	59	NOOP flaget er sat på %s	31337	0
-3	60	STRICTOP flaget flaget er sat på %s	31337	0
+3	58	Din adgang pï¿½ %s er blevet suspenderet.	31337	0
+3	59	NOOP flaget er sat pï¿½ %s	31337	0
+3	60	STRICTOP flaget flaget er sat pï¿½ %s	31337	0
 3	61	Du har lige deop'et flere end %i folk	31337	0
 3	62	SYNTAKS: %s	31337	0
-3	63	Midlertidigt forhøjet din adgang på kanal %s til %i	31337	0
+3	63	Midlertidigt forhï¿½jet din adgang pï¿½ kanal %s til %i	31337	0
 3	64	%s er registreret.	31337	0
 3	65	%s er ikke registreret.	31337	0
-3	66	Jeg tror ikke %s ville værtsætte det.	31337	0
+3	66	Jeg tror ikke %s ville vï¿½rtsï¿½tte det.	31337	0
 3	67	\002*** Ban Liste for kanal %s ***\002	31337	0
 3	68	%s %s Level: %i	31337	0
-3	69	TILFØJET AF: %s (%s)	31337	0
+3	69	TILFï¿½JET AF: %s (%s)	31337	0
 3	70	SIDEN: %s	31337	0
 3	71	UDL: %s	31337	0
 3	72	\002*** SLUT ***\002	31337	0
 3	73	Sorry, Jeg ved ikke hvem %s er.	31337	0
-3	74	Sorry, du er ikke længere autoriseret med mig.	31337	0
+3	74	Sorry, du er ikke lï¿½ngere autoriseret med mig.	31337	0
 3	75	%s Ser ikke ud til at have adgang i %s.	31337	0
-3	76	Kan ikke ændre en bruger med ens eller højere adgang end din egen.	31337	0
-3	77	Kan ikke give en bruger højere eller ens adgang end din egen.	31337	0
-3	78	Ændrede %s's adgangs level på kanal %s til %i	31337	0
-3	79	Satte Automatisk MODE til OP for %s på kanal %s	31337	0
-3	80	Satte Automatisk MODE til VOICE for %s på kanal %s	31337	0
-3	81	Automatisk MODE for %s på kanal %s er nu slået fra	31337	0
-3	82	Dit kodeord kan ikke være dit brugernavn eller nuværende nick - syntaks er: NEWPASS <nyt kodeord>	31337	0
-3	83	Kodeordet er ændret med succes.	31337	0
-3	84	NOOP flaget er sat på %s	31337	0
-3	85	STRICTOP flaget er sat på %s (og %s er ikke autoriseret)	31337	0
-3	86	STRICTOP flaget er sat på %s (og %s har ikke tilstrækkelig adgang)	31337	0
+3	76	Kan ikke ï¿½ndre en bruger med ens eller hï¿½jere adgang end din egen.	31337	0
+3	77	Kan ikke give en bruger hï¿½jere eller ens adgang end din egen.	31337	0
+3	78	ï¿½ndrede %s's adgangs level pï¿½ kanal %s til %i	31337	0
+3	79	Satte Automatisk MODE til OP for %s pï¿½ kanal %s	31337	0
+3	80	Satte Automatisk MODE til VOICE for %s pï¿½ kanal %s	31337	0
+3	81	Automatisk MODE for %s pï¿½ kanal %s er nu slï¿½et fra	31337	0
+3	82	Dit kodeord kan ikke vï¿½re dit brugernavn eller nuvï¿½rende nick - syntaks er: NEWPASS <nyt kodeord>	31337	0
+3	83	Kodeordet er ï¿½ndret med succes.	31337	0
+3	84	NOOP flaget er sat pï¿½ %s	31337	0
+3	85	STRICTOP flaget er sat pï¿½ %s (og %s er ikke autoriseret)	31337	0
+3	86	STRICTOP flaget er sat pï¿½ %s (og %s har ikke tilstrï¿½kkelig adgang)	31337	0
 3	87	Slettet kanal %s	31337	0
 3	88	%s er allerede registeret med mig.	31337	0
 3	89	Ugyldigt kanal navn.	31337	0
 3	90	Registrerede kanal %s	31337	0
 3	91	Har fjernet %s fra min ignorerings liste	31337	0
 3	92	Kunne ikke finde %s i min ignorerings liste	31337	0
-3	93	Kan ikke fjerne en bruger med ens eller højere adgang end din egen	31337	0
+3	93	Kan ikke fjerne en bruger med ens eller hï¿½jere adgang end din egen	31337	0
 3	94	Du kan ikke fjerne dig selv fra en kanal du ejer	31337	0
 3	95	Har fjernet bruger %s fra %s	31337	0
 3	96	Din USYNLIG indstilling er nu sat til ON.	31337	0
 3	97	Din USYNLIG indstilling er nu sat til OFF.	31337	0
 3	98	%s for %s er %s	31337	0
-3	99	Værdig af %s skal være ON eller OFF	31337	0
-3	100	Ugyldig USERFLAGS indstilling. Korrekte værdiger er NONE, OP, VOICE.	31337	0
+3	99	Vï¿½rdig af %s skal vï¿½re ON eller OFF	31337	0
+3	100	Ugyldig USERFLAGS indstilling. Korrekte vï¿½rdiger er NONE, OP, VOICE.	31337	0
 3	101	USERFLAGS for %s er %s	31337	0
-3	102	Værdi af MASSDEOPPRO skal være 0-7	31337	0
+3	102	Vï¿½rdi af MASSDEOPPRO skal vï¿½re 0-7	31337	0
 3	103	MASSDEOPPRO for %s er sat til %d	31337	0
-3	104	Værdi af FLOODPRO skal være 0-7	31337	0
+3	104	Vï¿½rdi af FLOODPRO skal vï¿½re 0-7	31337	0
 3	105	FLOODPRO for %s er sat til %d	31337	0
 3	106	DESKRIPTION kan max have %i karaktere!	31337	0
 3	107	DESKRIPTION for %s er fjernet.	31337	0
@@ -503,63 +503,63 @@ COPY "translations" FROM stdin;
 3	109	URL'en kan max have %i karaktere!	31337	0
 3	110	URL for %s er fjernet.	31337	0
 3	111	URL for %s er: %s	31337	0
-3	112	Strengen af nøgleord kan ikke overtræde 80 karaktere!	31337	0
-3	113	NØGLEORD for %s er: %s	31337	0
+3	112	Strengen af nï¿½gleord kan ikke overtrï¿½de 80 karaktere!	31337	0
+3	113	Nï¿½GLEORD for %s er: %s	31337	0
 3	114	Sprog er sat til %s.	31337	0
 3	115	FEJL: Ugyldigt sprogvalg.	31337	0
-3	116	Kan ikke finde kanal %s på netværket!	31337	0
+3	116	Kan ikke finde kanal %s pï¿½ netvï¿½rket!	31337	0
 3	117	FEJL: Ugyldig kanal indstilling.	31337	0
 3	118	Ignore liste:	31337	0
 3	119	Ignore listen er tom	31337	0
-3	120	-- Slut på Ignore Liste	31337	0
+3	120	-- Slut pï¿½ Ignore Liste	31337	0
 3	121	CMaster Kanal Services intern status:	31337	0
-3	122	[        Kanal Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
-3	123	[       Bruger Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
-3	124	[Adgangs Level Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
-3	125	[          Ban Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespørgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
+3	122	[        Kanal Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespï¿½rgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
+3	123	[       Bruger Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespï¿½rgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
+3	124	[Adgangs Level Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespï¿½rgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
+3	125	[          Ban Statistik] \002Cached Indtastninger:\002 %i    \002DB Forespï¿½rgsler:\002 %i    \002Cache Hits:\002 %i    \002Udnyttelse:\002 %.2f%%	31337	0
 3	126	Sidst modtaget Bruger NOTIFY: %i	31337	0
 3	127	Sidst modtaget Kanal NOTIFY: %i	31337	0
 3	128	Sidst modtaget Level NOTIFY: %i	31337	0
 3	129	Sidst modtaget Ban NOTIFY: %i	31337	0
 3	130	Custom data beholdere allokeret: %i	31337	0
 3	131	\002Uptime:\002 %s	31337	0
-3	132	Kanal %s har %d brugere (%i operatører)	31337	0
+3	132	Kanal %s har %d brugere (%i operatï¿½rer)	31337	0
 3	133	Mode er: %s	31337	0
 3	134	Flag sat: %s	31337	0
-3	135	Kan ikke suspendere en bruger med ens eller højere adgang end din egen.	31337	0
+3	135	Kan ikke suspendere en bruger med ens eller hï¿½jere adgang end din egen.	31337	0
 3	136	Ugyldige tids enheder.	31337	0
 3	137	Ugyldig suspenderings periode.	31337	0
-3	138	SUSPENDERING for %s er slået fra.	31337	0
-3	139	%s er allerede suspenderet på %s	31337	0
-3	140	SUSPENDERING for %s vil udløbe i %s	31337	0
-3	141	FEJL: Topic kan ikke overtræde 145 karaktere	31337	0
-3	142	Du har utilstrækkelig adgang til at fjerne ban'et %s fra %s's database	31337	0
+3	138	SUSPENDERING for %s er slï¿½et fra.	31337	0
+3	139	%s er allerede suspenderet pï¿½ %s	31337	0
+3	140	SUSPENDERING for %s vil udlï¿½be i %s	31337	0
+3	141	FEJL: Topic kan ikke overtrï¿½de 145 karaktere	31337	0
+3	142	Du har utilstrï¿½kkelig adgang til at fjerne ban'et %s fra %s's database	31337	0
 3	143	Fjernet %i bans der matcher %s	31337	0
 3	144	Fjernet din midlertidige adgang af %i fra kanal %s	31337	0
-3	145	Du ser ikke ud til at have en tvunget adgang i %s, måske er den udløbet?	31337	0
-3	146	%s er ikke suspenderet på %s	31337	0
-3	147	%s er en IRC operatør	31337	0
+3	145	Du ser ikke ud til at have en tvunget adgang i %s, mï¿½ske er den udlï¿½bet?	31337	0
+3	146	%s er ikke suspenderet pï¿½ %s	31337	0
+3	147	%s er en IRC operatï¿½r	31337	0
 3	148	%s er IKKE logget ind.	31337	0
 3	149	%s er logget ind som %s%s	31337	0
-3	150	%s er en Officiel CService Repræsentativ%s og logget ind som %s	31337	0
+3	150	%s er en Officiel CService Reprï¿½sentativ%s og logget ind som %s	31337	0
 3	151	%s er en Officiel CService Administrator%s og logget ind som %s	31337	0
 3	152	%s er en Officiel CService Udvikler%s og logget ind som %s	31337	0
 3	153	Der er flere end %i indtastninger der matcher [%s]	31337	0
-3	154	Forkort venligst din søge maske	31337	0
+3	154	Forkort venligst din sï¿½ge maske	31337	0
 3	155	Ingen matchende indtastninger for [%s]	31337	0
 3	156	%s: Kanal modes fjernet.	31337	0
 3	158	Ugyldig indstilling.	31337	0
 3	159	%s er en Officiel Undernet Service bot.	31337	0
-3	160	%s er en Officiel Coder-Com Repræsentativ%s og logget ind som %s	31337	0
+3	160	%s er en Officiel Coder-Com Reprï¿½sentativ%s og logget ind som %s	31337	0
 3	161	%s er en Officiel Coder-Com Medarbejder%s og logget ind som %s	31337	0
 3	162	%s er en Officiel Coder-Com Udvikler%s og logget ind som %s	31337	0
 3	163	%s er en Officiel Coder-Com Senior%s og logget ind som %s	31337	0
-3	164	 og en IRC operatør	31337	0
-3	165	Tilføjede ban %s til %s på level %i	31337	0
+3	164	 og en IRC operatï¿½r	31337	0
+3	165	Tilfï¿½jede ban %s til %s pï¿½ level %i	31337	0
 3	166	%s: ban liste er tom.	31337	0
 3	167	Jeg er allerede i den kanal!	31337	0
-3	168	Denne kommando er reserveeret til IRC Operatører	31337	0
-3	169	Jeg er ikke op'et på %s	31337	0
+3	168	Denne kommando er reserveeret til IRC Operatï¿½rer	31337	0
+3	169	Jeg er ikke op'et pï¿½ %s	31337	0
 3	170	%s for %i minuter	31337	0
 3	184	The NOVOICE flag is set on %s	31337	0
 3	185	Your access on %s has been suspended.	31337	0
@@ -599,7 +599,7 @@ COPY "translations" FROM stdin;
 4	19	Ongeldig banniveau. Geldige breedte is 1-%i.	31337	0
 4	20	Ongeldige banlengte. Je banlengte kan maximum %d uur dagen.	31337	0
 4	21	Banreden kan de 128 karakters niet overschrijden	31337	0
-4	22	Gespecifiëerde ban staat reeds in mijn banlijst!	31337	0
+4	22	Gespecifiï¿½erde ban staat reeds in mijn banlijst!	31337	0
 4	23	De ban %s wordt reeds gedekt door %s	31337	0
 4	24	Ongeldig minimum niveau.	31337	0
 4	25	Ongeldig maximum niveau.	31337	0
@@ -643,7 +643,7 @@ COPY "translations" FROM stdin;
 4	63	Tijdelijk je toegang in %s verhoogd naar %i	31337	0
 4	64	%s is geregistreerd.	31337	0
 4	65	%s is niet geregistreerd.	31337	0
-4	66	Ik denk niet dat %s dat zou appreciëren.	31337	0
+4	66	Ik denk niet dat %s dat zou appreciï¿½ren.	31337	0
 4	67	\002*** Banlijst voor kanaal %s ***\002	31337	0
 4	68	%s %s Niveau: %i	31337	0
 4	69	TOEGEVOEGD DOOR: %s (%s)	31337	0
@@ -699,10 +699,10 @@ COPY "translations" FROM stdin;
 4	119	Negeerlijst is leeg	31337	0
 4	120	-- Einde van negeerlijst	31337	0
 4	121	CMaster kanaal Services interne status:	31337	0
-4	122	[        Kanaal Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
-4	123	[     Gebruiker Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
-4	124	[Toegangsniveau Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
-4	125	[           Ban Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiëntie:\002 %.2f%%	31337	0
+4	122	[        Kanaal Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiï¿½ntie:\002 %.2f%%	31337	0
+4	123	[     Gebruiker Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiï¿½ntie:\002 %.2f%%	31337	0
+4	124	[Toegangsniveau Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiï¿½ntie:\002 %.2f%%	31337	0
+4	125	[           Ban Record Stats] \002Gecachete Records:\002 %i    \002DB Aanvragen:\002 %i    \002Cache Treffers:\002 %i    \002Efficiï¿½ntie:\002 %.2f%%	31337	0
 4	126	Laatst ontvangen User NOTIFY: %i	31337	0
 4	127	Laatst ontvangen Kanaal NOTIFY: %i	31337	0
 4	128	Laatst ontvangen Niveau NOTIFY: %i	31337	0
@@ -727,19 +727,19 @@ COPY "translations" FROM stdin;
 4	147	%s is een IRCoperator	31337	0
 4	148	%s is NIET ingelogd.	31337	0
 4	149	%s is ingelogd als %s%s	31337	0
-4	150	%s is een Officiële CService Vertegenwoordiger%s en is ingelogd als %s	31337	0
-4	151	%s is een Officiële CService Administrator%s en is ingelogd als %s	31337	0
-4	152	%s is een Officiële CService Ontwikkelaar%s en is ingelogd als %s	31337	0
+4	150	%s is een Officiï¿½le CService Vertegenwoordiger%s en is ingelogd als %s	31337	0
+4	151	%s is een Officiï¿½le CService Administrator%s en is ingelogd als %s	31337	0
+4	152	%s is een Officiï¿½le CService Ontwikkelaar%s en is ingelogd als %s	31337	0
 4	153	Er zijn meer dan %i records die overeenstemmen met [%s]	31337	0
 4	154	Gelieve je zoekopdracht te beperken	31337	0
 4	155	Geen overeenkomstige records voor [%s]	31337	0
 4	156	%s: Kanaalmodes zijn gereset.	31337	0
 4	158	Ongeldige optie.	31337	0
-4	159	%s is een Officiële Undernet Service Bot	31337	0
-4	160	%s is een Officiële Coder-Com Vertegenwoordiger%s en is ingelogd als %s	31337	0
-4	161	%s is een Officiële Coder-Com Medewerker%s en is ingelogd als %s	31337	0
-4	162	%s is een Officiële Coder-Com Ontwikkelaar%s en is ingelogd als %s	31337	0
-4	163	%s is een Officiële Coder-Com Veteraan%s en is ingelogd als %s	31337	0
+4	159	%s is een Officiï¿½le Undernet Service Bot	31337	0
+4	160	%s is een Officiï¿½le Coder-Com Vertegenwoordiger%s en is ingelogd als %s	31337	0
+4	161	%s is een Officiï¿½le Coder-Com Medewerker%s en is ingelogd als %s	31337	0
+4	162	%s is een Officiï¿½le Coder-Com Ontwikkelaar%s en is ingelogd als %s	31337	0
+4	163	%s is een Officiï¿½le Coder-Com Veteraan%s en is ingelogd als %s	31337	0
 4	164	 en een IRCoperator	31337	0
 4	165	Ban %s toegevoegd aan %s met niveau %i	31337	0
 4	166	%s: banlijst is leeg.	31337	0
@@ -766,7 +766,7 @@ COPY "translations" FROM stdin;
 COPY "translations" FROM stdin;
 5	1	Verzeihung, aber du bist schon eingeloggt als %s	31337	0
 5	2	AUTHENTIFIKATION ERFOLGREICH als %s	31337	0
-5	3	Verzeihung, aber du hast nicht genug Berechtigung um diesen Befehl auszuführen	31337	0
+5	3	Verzeihung, aber du hast nicht genug Berechtigung um diesen Befehl auszufï¿½hren	31337	0
 5	4	Verzeihung, aber der Channel %s ist leer	31337	0
 5	5	Ich sehe %s nirgendswo	31337	0
 5	6	Ich kann %s nicht im Channel %s finden	31337	0
@@ -782,30 +782,30 @@ COPY "translations" FROM stdin;
 5	16	%s ist nicht Voice in %s	31337	0
 5	17	AUTHENTIFIKATION FEHLGESCHLAGEN als %s (Falsches Passwort)	31337	0
 5	18	Ich bin nicht in diesem Channel!	31337	0
-5	19	Ungültiges Banlevel. Gültig ist 1-%i.	31337	0
-5	20	Ungültige Banzeit. Deine Bandauer kann maximal %d Tage sein.	31337	0
-5	21	Bangrund darf nicht 128 Zeichen überschreiten	31337	0
+5	19	Ungï¿½ltiges Banlevel. Gï¿½ltig ist 1-%i.	31337	0
+5	20	Ungï¿½ltige Banzeit. Deine Bandauer kann maximal %d Tage sein.	31337	0
+5	21	Bangrund darf nicht 128 Zeichen ï¿½berschreiten	31337	0
 5	22	Spezifizierter Ban ist bereits in der Banliste!	31337	0
 5	23	Der Ban %s ist bereits eingedeckt von %s	31337	0
-5	24	Ungültiges Minimallevel.	31337	0
-5	25	Ungültiges Maximallevel.	31337	0
+5	24	Ungï¿½ltiges Minimallevel.	31337	0
+5	25	Ungï¿½ltiges Maximallevel.	31337	0
 5	26	BENUTZER: %s LEVEL: %s %s	31337	0
 5	27	CHANNEL: %s -- AUTOMODE: %s	31337	0
-5	28	ZULETZT VERÄNDERT: %s (vor %s)	31337	0
-5	29	** SUSPENDIERT ** - Verfällt in %s (Level %i)	31337	0
+5	28	ZULETZT VERï¿½NDERT: %s (vor %s)	31337	0
+5	29	** SUSPENDIERT ** - Verfï¿½llt in %s (Level %i)	31337	0
 5	30	ZULETZT GESEHEN: vor %s.	31337	0
-5	31	Es gibt mehr als %d passende Einträge.	31337	0
+5	31	Es gibt mehr als %d passende Eintrï¿½ge.	31337	0
 5	32	Bitte begrenze deine Anfrage.	31337	0
 5	33	Ende der Benutzerliste	31337	0
 5	34	Kein passender Eintrag!	31337	0
-5	35	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes hinzufügen.	31337	0
-5	36	Ungültiges Berechtigungslevel.	31337	0
+5	35	Kann keinen Benutzer mit gleichen oder hï¿½heren Level als dein eigenes hinzufï¿½gen.	31337	0
+5	36	Ungï¿½ltiges Berechtigungslevel.	31337	0
 5	37	%s ist bereits in der Benutzerliste von %s mit Level %i.	31337	0
-5	38	Habe Benutzer %s in %s mit Level %i hinzugefügt	31337	0
+5	38	Habe Benutzer %s in %s mit Level %i hinzugefï¿½gt	31337	0
 5	39	Irgendetwas lief falsch: %s	31337	0
 5	40	%s: Ende der Banliste	31337	0
 5	41	Nicht in der Lage die Benutzerdetails zu zeigen (unsichtbar)	31337	0
-5	42	Informationen über: %s (%i)	31337	0
+5	42	Informationen ï¿½ber: %s (%i)	31337	0
 5	43	Zur Zeit eingeloggt via: %s	31337	0
 5	44	URL: %s	31337	0
 5	45	Sprache: %i	31337	0
@@ -815,9 +815,9 @@ COPY "translations" FROM stdin;
 5	49	%s ist registriert von:	31337	0
 5	50	%s - zuletzt gesehen: vor %s	31337	0
 5	51	Beschreibung: %s	31337	0
-5	52	Du willst mich flooden? Ich werde dir nicht weiter zuhören	31337	0
+5	52	Du willst mich flooden? Ich werde dir nicht weiter zuhï¿½ren	31337	0
 5	53	Ich glaube ich habe dir zu viele Daten geschickt. Ich werde dich eine Weile lang ignorieren.	31337	0
-5	54	Unvollständiger Befehl	31337	0
+5	54	Unvollstï¿½ndiger Befehl	31337	0
 5	55	Um %s zu benutzen, musst du mir via /msg %s@%s schreiben	31337	0
 5	56	Verzeihung, aber du musst eingeloggt sein um diesen Befehl zu benutzen.	31337	0
 5	57	Der Channel %s wurde von einen CService Administrator suspendiert.	31337	0
@@ -826,69 +826,69 @@ COPY "translations" FROM stdin;
 5	60	Die STRICTOP Einstellung ist in %s gesetzt	31337	0
 5	61	Du hast gerade mehr als %i User gedeopt	31337	0
 5	62	SYNTAX: %s	31337	0
-5	63	Habe deine Berechtigung in %s vorübergehend auf %i erhöht	31337	0
+5	63	Habe deine Berechtigung in %s vorï¿½bergehend auf %i erhï¿½ht	31337	0
 5	64	%s ist registriert.	31337	0
 5	65	%s ist nicht registriert.	31337	0
-5	66	Ich denke nicht, daß %s dies schätzen würde.	31337	0
-5	67	\002*** Banliste für den Channel %s ***\002	31337	0
+5	66	Ich denke nicht, daï¿½ %s dies schï¿½tzen wï¿½rde.	31337	0
+5	67	\002*** Banliste fï¿½r den Channel %s ***\002	31337	0
 5	68	%s %s Level: %i	31337	0
-5	69	HINZUGEFÜGT VON: %s (%s)	31337	0
+5	69	HINZUGEFï¿½GT VON: %s (%s)	31337	0
 5	70	SEIT: %s	31337	0
-5	71	VERFÄLLT: %s	31337	0
+5	71	VERFï¿½LLT: %s	31337	0
 5	72	\002*** ENDE ***\002	31337	0
-5	73	Ich weiß nicht wer %s ist.	31337	0
+5	73	Ich weiï¿½ nicht wer %s ist.	31337	0
 5	74	Du bist nicht mehr bei mir authentifiziert.	31337	0
 5	75	%s scheint keine Berechtigung in %s zu haben.	31337	0
-5	76	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes modifizieren.	31337	0
-5	77	Kann keinen Benutzer ein gleiches oder höheres Level als dein eigenes geben.	31337	0
+5	76	Kann keinen Benutzer mit gleichen oder hï¿½heren Level als dein eigenes modifizieren.	31337	0
+5	77	Kann keinen Benutzer ein gleiches oder hï¿½heres Level als dein eigenes geben.	31337	0
 5	78	Habe %s's Berechtigungslevel im Channel %s zu %i modifizert	31337	0
-5	79	Habe AUTOMODE für %s auf OP im Channel %s gesetzt	31337	0
-5	80	Habe AUTOMODE für %s auf VOICE im Channel %s gesetzt	31337	0
-5	81	Habe AUTOMODE für %s auf NONE im Channel %s gesetzt	31337	0
+5	79	Habe AUTOMODE fï¿½r %s auf OP im Channel %s gesetzt	31337	0
+5	80	Habe AUTOMODE fï¿½r %s auf VOICE im Channel %s gesetzt	31337	0
+5	81	Habe AUTOMODE fï¿½r %s auf NONE im Channel %s gesetzt	31337	0
 5	82	Dein Passwort kann nicht dein Username oder aktueller Nickname sein - Syntax ist: NEWPASS <neues Passwort>	31337	0
-5	83	Passwort wurde erfolgreich geändert.	31337	0
+5	83	Passwort wurde erfolgreich geï¿½ndert.	31337	0
 5	84	Die NOOP Einstellung ist in %s gesetzt	31337	0
 5	85	Die STRICTOP Einstellung ist in %s gesetzt (und %s ist nicht authentifiziert)	31337	0
-5	86	Die STRICTOP Einstellung ist in %s gesetzt (und %s hat nicht genügend Berechtigung)	31337	0
+5	86	Die STRICTOP Einstellung ist in %s gesetzt (und %s hat nicht genï¿½gend Berechtigung)	31337	0
 5	87	Habe Channel %s bereinigt	31337	0
 5	88	%s ist bereits mit mir registriert.	31337	0
-5	89	Ungültiger Channelname.	31337	0
+5	89	Ungï¿½ltiger Channelname.	31337	0
 5	90	Habe Channel %s registriert	31337	0
 5	91	Habe %s von meiner Silenceliste entfernt	31337	0
 5	92	Kann %s nicht in meiner Silenceliste finden	31337	0
-5	93	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes entfernen	31337	0
+5	93	Kann keinen Benutzer mit gleichen oder hï¿½heren Level als dein eigenes entfernen	31337	0
 5	94	Du kannst dich nicht selbst von einen Channel entfernen, den du selber besitzt	31337	0
 5	95	Habe Benutzer %s von %s entfernt	31337	0
 5	96	Deine INVISIBLE Einstellung ist jetzt AN.	31337	0
 5	97	Deine INVISIBLE Einstellung ist jetzt AUS.	31337	0
-5	98	%s für %s ist %s	31337	0
-5	99	Wert für %s muß ON oder OFF sein.	31337	0
-5	100	Ungültige USERFLAG Einstellung. Korrekte Werte sind NONE, OP, VOICE.	31337	0
-5	101	USERFLAGS für %s ist %s	31337	0
-5	102	Wert für MASSDEOPPRO muß 0-7 sein	31337	0
-5	103	MASSDEOPPRO für %s ist auf %d gesetzt	31337	0
-5	104	Wert für FLOODPRO muß 0-7 sein	31337	0
-5	105	FLOODPRO für %s ist auf %d gesetzt	31337	0
+5	98	%s fï¿½r %s ist %s	31337	0
+5	99	Wert fï¿½r %s muï¿½ ON oder OFF sein.	31337	0
+5	100	Ungï¿½ltige USERFLAG Einstellung. Korrekte Werte sind NONE, OP, VOICE.	31337	0
+5	101	USERFLAGS fï¿½r %s ist %s	31337	0
+5	102	Wert fï¿½r MASSDEOPPRO muï¿½ 0-7 sein	31337	0
+5	103	MASSDEOPPRO fï¿½r %s ist auf %d gesetzt	31337	0
+5	104	Wert fï¿½r FLOODPRO muï¿½ 0-7 sein	31337	0
+5	105	FLOODPRO fï¿½r %s ist auf %d gesetzt	31337	0
 5	106	DESCRIPTION kann maximal %i Zeichen sein!	31337	0
-5	107	DESCRIPTION für %s wurde gelöscht.	31337	0
-5	108	DESCRIPTION für %s ist: %s	31337	0
+5	107	DESCRIPTION fï¿½r %s wurde gelï¿½scht.	31337	0
+5	108	DESCRIPTION fï¿½r %s ist: %s	31337	0
 5	109	URL kann maximal %i Zeichen sein!	31337	0
-5	110	URL für %s wurde gelöscht.	31337	0
-5	111	URL für %s ist: %s	31337	0
-5	112	Die Zeichenkette der Schlüsselwörter darf nicht 80 Zeichen überschreiten!	31337	0
-5	113	KEYWORDS für %s sind: %s	31337	0
+5	110	URL fï¿½r %s wurde gelï¿½scht.	31337	0
+5	111	URL fï¿½r %s ist: %s	31337	0
+5	112	Die Zeichenkette der Schlï¿½sselwï¿½rter darf nicht 80 Zeichen ï¿½berschreiten!	31337	0
+5	113	KEYWORDS fï¿½r %s sind: %s	31337	0
 5	114	Sprache wurde auf %s gesetzt.	31337	0
-5	115	FEHLER: Ungültige Sprachwahl.	31337	0
+5	115	FEHLER: Ungï¿½ltige Sprachwahl.	31337	0
 5	116	Kann Channel %s nicht auf dem Netzwerk lokalisieren!	31337	0
-5	117	FEHLER: Ungültige Channeleinstellung.	31337	0
+5	117	FEHLER: Ungï¿½ltige Channeleinstellung.	31337	0
 5	118	Ignoreliste:	31337	0
 5	119	Ignoreliste ist leer	31337	0
 5	120	-- Ende der Ignoreliste	31337	0
 5	121	CMaster Channel Services interner Status:	31337	0
-5	122	[           Channel Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
-5	123	[              User Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
-5	124	[Berechtigungslevel Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
-5	125	[               Ban Rekord Statistiken] \002Gecachte Einträge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivität:\002 %.2f%%	31337	0
+5	122	[           Channel Rekord Statistiken] \002Gecachte Eintrï¿½ge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivitï¿½t:\002 %.2f%%	31337	0
+5	123	[              User Rekord Statistiken] \002Gecachte Eintrï¿½ge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivitï¿½t:\002 %.2f%%	31337	0
+5	124	[Berechtigungslevel Rekord Statistiken] \002Gecachte Eintrï¿½ge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivitï¿½t:\002 %.2f%%	31337	0
+5	125	[               Ban Rekord Statistiken] \002Gecachte Eintrï¿½ge:\002 %i    \002DB Anfragen:\002 %i    \002Cachetreffer:\002 %i    \002Effektivitï¿½t:\002 %.2f%%	31337	0
 5	126	Letzte empfangene Benutzerbenachrichtigung: %i	31337	0
 5	127	Letzte empfangene Channelbenachrichtigung: %i	31337	0
 5	128	Letzte empfangene Levelbenachrichtigung: %i	31337	0
@@ -898,17 +898,17 @@ COPY "translations" FROM stdin;
 5	132	Channel %s hat %d User (%i Operatoren)	31337	0
 5	133	Mode ist: %s	31337	0
 5	134	Einstellungen: %s	31337	0
-5	135	Kann keinen Benutzer mit gleichen oder höheren Level als dein eigenes suspendieren	31337	0
-5	136	Ungültige Zeiteinheiten	31337	0
-5	137	Ungültige Suspendierungslänge.	31337	0
-5	138	SUSPENDIERUNG für %s wurde aufgehoben	31337	0
+5	135	Kann keinen Benutzer mit gleichen oder hï¿½heren Level als dein eigenes suspendieren	31337	0
+5	136	Ungï¿½ltige Zeiteinheiten	31337	0
+5	137	Ungï¿½ltige Suspendierungslï¿½nge.	31337	0
+5	138	SUSPENDIERUNG fï¿½r %s wurde aufgehoben	31337	0
 5	139	%s ist bereits suspendiert in %s	31337	0
-5	140	SUSPENDIERUNG für %s wird in %s verfallen	31337	0
-5	141	FEHLER: Topic darf nicht 145 Zeichen überschreiten	31337	0
+5	140	SUSPENDIERUNG fï¿½r %s wird in %s verfallen	31337	0
+5	141	FEHLER: Topic darf nicht 145 Zeichen ï¿½berschreiten	31337	0
 5	142	Du hast nicht genug Berechtigung um den Ban %s von %s's Database zu entfernen	31337	0
 5	143	Habe %i Bans entfernt, die auf %s zutrafen	31337	0
-5	144	Habe deine vorübergehende Berechtigung von %i vom Channel %s entfernt	31337	0
-5	145	Es scheint so als hättest du keine erzwungene Berechtigung in %s, vielleicht ist sie verfallen?	31337	0
+5	144	Habe deine vorï¿½bergehende Berechtigung von %i vom Channel %s entfernt	31337	0
+5	145	Es scheint so als hï¿½ttest du keine erzwungene Berechtigung in %s, vielleicht ist sie verfallen?	31337	0
 5	146	%s ist nicht suspendiert in %s	31337	0
 5	147	%s ist ein IRC Operator	31337	0
 5	148	%s ist NICHT eingeloggt.	31337	0
@@ -916,23 +916,23 @@ COPY "translations" FROM stdin;
 5	150	%s ist ein offizieller CService Vertreter%s und eingeloggt als %s	31337	0
 5	151	%s ist ein offizieller CService Administrator%s und eingeloggt als %s	31337	0
 5	152	%s ist ein offizieller CService Entwickler%s und eingeloggt als %s	31337	0
-5	153	Es gibt mehr als %i passende Einträge [%s]	31337	0
+5	153	Es gibt mehr als %i passende Eintrï¿½ge [%s]	31337	0
 5	154	Bitte begrenze deine Suchmaske	31337	0
-5	155	Keine passenden Einträge für [%s]	31337	0
-5	156	%s: Habe Channelmodes gelöscht.	31337	0
-5	158	Ungültige Option.	31337	0
+5	155	Keine passenden Eintrï¿½ge fï¿½r [%s]	31337	0
+5	156	%s: Habe Channelmodes gelï¿½scht.	31337	0
+5	158	Ungï¿½ltige Option.	31337	0
 5	159	%s ist ein offizieller Undernet Service Bot.	31337	0
 5	160	%s ist ein offizieller Coder-Com Vertreter%s und eingeloggt als %s	31337	0
 5	161	%s ist ein offizieller Coder-Com Mitarbeiter%s und eingeloggt als %s	31337	0
 5	162	%s ist ein offizieller Coder-Com Entwickler%s und eingeloggt als %s	31337	0
-5	163	%s ist ein offizieller Coder-Com Dienstältester%s und eingeloggt als %s	31337	0
+5	163	%s ist ein offizieller Coder-Com Dienstï¿½ltester%s und eingeloggt als %s	31337	0
 5	164	 und ein IRC Operator	31337	0
-5	165	Habe den ban %s zu %s mit Level %i hinzugefügt	31337	0
+5	165	Habe den ban %s zu %s mit Level %i hinzugefï¿½gt	31337	0
 5	166	%s: Banliste ist leer.	31337	0
 5	167	Ich bin bereits in diesen Channel!	31337	0
-5	168	Dieser Befehl ist für IRC Operatoren reserviert	31337	0
+5	168	Dieser Befehl ist fï¿½r IRC Operatoren reserviert	31337	0
 5	169	Ich bin nicht geopt in %s	31337	0
-5	170	%s für %i Minuten	31337	0
+5	170	%s fï¿½r %i Minuten	31337	0
 5	184	The NOVOICE flag is set on %s	31337	0
 5	185	Your access on %s has been suspended.	31337	0
 5	186	Your suspension on %s has been cancelled.	31337	0
@@ -950,123 +950,123 @@ COPY "translations" FROM stdin;
 -- 20/04/02 - Giancarlo Ottaviani - NRiDeR <nrider@virtualpoint.com.br>
 
 COPY "translations" FROM stdin;
-6	1	Desculpe, Você já está autenticado como %s	31337	0
-6	2	SUCESSO NA AUTENTICAÇÃO como %s	31337	0
-6	3	Desculpe, você não tem acesso suficiente para efetuar este comando	31337	0
-6	4	Desculpe, o canal %s está vazio	31337	0
-6	5	Eu não vejo %s em lugar algum	31337	0
-6	6	Eu não posso encontrar %s no canal %s	31337	0
-6	7	O canal %s não parece ser registrado	31337	0
-6	8	Foi dado op a você por %s (%s) no %s	31337	0
-6	9	Foi dado voice a você por %s (%s) no %s	31337	0
-6	10	%s: Você não está neste canal	31337	0
-6	11	%s já está com op no %s	31337	0
-6	12	%s já está com voice no %s	31337	0
-6	13	Foi retirado o op de você por %s (%s)	31337	0
-6	14	Foi retirado o voice de você por %s (%s)	31337	0
-6	15	%s não está com op no %s	31337	0
-6	16	%s não está com voice no %s	31337	0
-6	17	FALHA NA AUTENTICAÇÃO como %s (Senha inválida)	31337	0
-6	18	Eu não estou neste canal!	31337	0
-6	19	Escala inválida de nívelban. Escala válida é 1-%i.	31337	0
-6	20	Duração de ban inválida. Sua duração de ban aplicada pode ser de no máximo %d dias.	31337	0
-6	21	Motivo do ban não exceder 128 characteres	31337	0
-6	22	O ban especificado já está na banlist!	31337	0
-6	23	O ban %s já está coberto por %s	31337	0
-6	24	Nível mínimo inválido.	31337	0
-6	25	Nível máximo inválido.	31337	0
-6	26	USUÁRIO: %s NÍVEL: %s %s	31337	0
-6	27	CANAL: %s -- MODO AUTOMÁTICO: %s	31337	0
-6	28	ÚLTIMA MODIFICAÇÃO: %s (%s atrás)	31337	0
-6	29	** SUSPENSÃO ** - Expira em %s  (nível %i)	31337	0
-6	30	ÚLTIMA VEZ: %s atrás.	31337	0
-6	31	Há mais de %d entradas.	31337	0
+6	1	Desculpe, Vocï¿½ jï¿½ estï¿½ autenticado como %s	31337	0
+6	2	SUCESSO NA AUTENTICAï¿½ï¿½O como %s	31337	0
+6	3	Desculpe, vocï¿½ nï¿½o tem acesso suficiente para efetuar este comando	31337	0
+6	4	Desculpe, o canal %s estï¿½ vazio	31337	0
+6	5	Eu nï¿½o vejo %s em lugar algum	31337	0
+6	6	Eu nï¿½o posso encontrar %s no canal %s	31337	0
+6	7	O canal %s nï¿½o parece ser registrado	31337	0
+6	8	Foi dado op a vocï¿½ por %s (%s) no %s	31337	0
+6	9	Foi dado voice a vocï¿½ por %s (%s) no %s	31337	0
+6	10	%s: Vocï¿½ nï¿½o estï¿½ neste canal	31337	0
+6	11	%s jï¿½ estï¿½ com op no %s	31337	0
+6	12	%s jï¿½ estï¿½ com voice no %s	31337	0
+6	13	Foi retirado o op de vocï¿½ por %s (%s)	31337	0
+6	14	Foi retirado o voice de vocï¿½ por %s (%s)	31337	0
+6	15	%s nï¿½o estï¿½ com op no %s	31337	0
+6	16	%s nï¿½o estï¿½ com voice no %s	31337	0
+6	17	FALHA NA AUTENTICAï¿½ï¿½O como %s (Senha invï¿½lida)	31337	0
+6	18	Eu nï¿½o estou neste canal!	31337	0
+6	19	Escala invï¿½lida de nï¿½velban. Escala vï¿½lida ï¿½ 1-%i.	31337	0
+6	20	Duraï¿½ï¿½o de ban invï¿½lida. Sua duraï¿½ï¿½o de ban aplicada pode ser de no mï¿½ximo %d dias.	31337	0
+6	21	Motivo do ban nï¿½o exceder 128 characteres	31337	0
+6	22	O ban especificado jï¿½ estï¿½ na banlist!	31337	0
+6	23	O ban %s jï¿½ estï¿½ coberto por %s	31337	0
+6	24	Nï¿½vel mï¿½nimo invï¿½lido.	31337	0
+6	25	Nï¿½vel mï¿½ximo invï¿½lido.	31337	0
+6	26	USUï¿½RIO: %s Nï¿½VEL: %s %s	31337	0
+6	27	CANAL: %s -- MODO AUTOMï¿½TICO: %s	31337	0
+6	28	ï¿½LTIMA MODIFICAï¿½ï¿½O: %s (%s atrï¿½s)	31337	0
+6	29	** SUSPENSï¿½O ** - Expira em %s  (nï¿½vel %i)	31337	0
+6	30	ï¿½LTIMA VEZ: %s atrï¿½s.	31337	0
+6	31	Hï¿½ mais de %d entradas.	31337	0
 6	32	Por favor, Restrinja sua pergunta.	31337	0
 6	33	Final da lista de acesso	31337	0
-6	34	Não Consta!	31337	0
-6	35	Não pode adicionar um usuário com acesso igual ou mais elevado do que o seu. 	31337	0
-6	36	Nível de acesso inválido.	31337	0
-6	37	%s já está adicionado no %s com nível de acesso %i.	31337	0
-6	38	Adicionado usuário %s no %s com nível de acesso %i	31337	0
+6	34	Nï¿½o Consta!	31337	0
+6	35	Nï¿½o pode adicionar um usuï¿½rio com acesso igual ou mais elevado do que o seu. 	31337	0
+6	36	Nï¿½vel de acesso invï¿½lido.	31337	0
+6	37	%s jï¿½ estï¿½ adicionado no %s com nï¿½vel de acesso %i.	31337	0
+6	38	Adicionado usuï¿½rio %s no %s com nï¿½vel de acesso %i	31337	0
 6	39	Alguma coisa errada: %s	31337	0
 6	40	%s: Final da lista de ban	31337	0
-6	41	Incapaz de ver os detalhes do usuário (Invisível)	31337	0
-6	42	Informação sobre: %s (%i)	31337	0
+6	41	Incapaz de ver os detalhes do usuï¿½rio (Invisï¿½vel)	31337	0
+6	42	Informaï¿½ï¿½o sobre: %s (%i)	31337	0
 6	43	Atualmente logado sobre: %s	31337	0
 6	44	URL: %s	31337	0
 6	45	Idioma: %i	31337	0
 6	46	Canais: %s	31337	0
 6	47	Pontos de entrada de Flood: %i	31337	0
-6	48	Saída de Flood (Bytes): %i	31337	0
-6	49	%s é registrado por:	31337	0
-6	50	%s - última vez: %s atrás	31337	0
-6	51	Descrição: %s	31337	0
-6	52	Me fazendo flood? Não irei mais escuta-lo!	31337	0
-6	53	Eu acredito ter enviado poucos dados a mais, Estou ignorando você por enquanto.	31337	0
+6	48	Saï¿½da de Flood (Bytes): %i	31337	0
+6	49	%s ï¿½ registrado por:	31337	0
+6	50	%s - ï¿½ltima vez: %s atrï¿½s	31337	0
+6	51	Descriï¿½ï¿½o: %s	31337	0
+6	52	Me fazendo flood? Nï¿½o irei mais escuta-lo!	31337	0
+6	53	Eu acredito ter enviado poucos dados a mais, Estou ignorando vocï¿½ por enquanto.	31337	0
 6	54	Comando incompleto	31337	0
-6	55	Para usar %s, você precisa /msg %s@%s	31337	0
-6	56	Desculpe, Você precisa estar logado para efetuar este comando.	31337	0
+6	55	Para usar %s, vocï¿½ precisa /msg %s@%s	31337	0
+6	56	Desculpe, Vocï¿½ precisa estar logado para efetuar este comando.	31337	0
 6	57	O canal %s foi suspendido por um administrador do CService.	31337	0
 6	58	Seu acesso no %s foi suspendido.	31337	0
-6	59	Função NOOP está ajustada no %s	31337	0
-6	60	Função STRICTOP está ajustada no %s	31337	0
-6	61	Você tirou o op de mais de %i pessoas	31337	0
+6	59	Funï¿½ï¿½o NOOP estï¿½ ajustada no %s	31337	0
+6	60	Funï¿½ï¿½o STRICTOP estï¿½ ajustada no %s	31337	0
+6	61	Vocï¿½ tirou o op de mais de %i pessoas	31337	0
 6	62	SINTAXE: %s	31337	0
 6	63	Aumentou temporariamente seu acesso no canal %s para %i	31337	0
-6	64	%s é registrado.	31337	0
-6	65	%s não é registrado.	31337	0
-6	66	Eu acredito que %s não apreciaria isso.	31337	0
+6	64	%s ï¿½ registrado.	31337	0
+6	65	%s nï¿½o ï¿½ registrado.	31337	0
+6	66	Eu acredito que %s nï¿½o apreciaria isso.	31337	0
 6	67	\002*** Lista de ban para o canal %s ***\002	31337	0
-6	68	%s %s Nível: %i	31337	0
+6	68	%s %s Nï¿½vel: %i	31337	0
 6	69	ADICIONADO POR: %s (%s)	31337	0
 6	70	DESDE: %s	31337	0
 6	71	EXP: %s	31337	0
 6	72	\002*** FIM ***\002	31337	0
-6	73	Desculpe, Eu não sei quem %s é.	31337	0
-6	74	Desculpe, você não é mais autorizado comigo.	31337	0
-6	75	%s não parece ter o acesso no %s.	31337	0
-6	76	Não pode modificar um usuário com acesso igual ou mais elevado que seu próprio acesso.	31337	0
-6	77	Não pode dar um acesso mais elevado ou igual o que tem.	31337	0
+6	73	Desculpe, Eu nï¿½o sei quem %s ï¿½.	31337	0
+6	74	Desculpe, vocï¿½ nï¿½o ï¿½ mais autorizado comigo.	31337	0
+6	75	%s nï¿½o parece ter o acesso no %s.	31337	0
+6	76	Nï¿½o pode modificar um usuï¿½rio com acesso igual ou mais elevado que seu prï¿½prio acesso.	31337	0
+6	77	Nï¿½o pode dar um acesso mais elevado ou igual o que tem.	31337	0
 6	78	Acesso modificado de %s's no canal %s para %i	31337	0
 6	79	Ajustado AUTOMODE em OP para %s no canal %s	31337	0
 6	80	Ajustado AUTOMODE em VOICE para %s no canal %s	31337	0
 6	81	Ajustado AUTOMODE em NONE para %s no canal %s	31337	0
-6	82	Sua senha não poder seu username ou nick - sintaxe é: NEWPASS <nova senha>	31337	0
+6	82	Sua senha nï¿½o poder seu username ou nick - sintaxe ï¿½: NEWPASS <nova senha>	31337	0
 6	83	Senha modificada com sucesso.	31337	0
-6	84	Função NOOP está ligada no %s	31337	0
-6	85	The STRICTOP está ligada no %s (e %s não está autenticado)	31337	0
-6	86	The STRICTOP está ligada no %s (e %s tem nível insuficiente)	31337	0
+6	84	Funï¿½ï¿½o NOOP estï¿½ ligada no %s	31337	0
+6	85	The STRICTOP estï¿½ ligada no %s (e %s nï¿½o estï¿½ autenticado)	31337	0
+6	86	The STRICTOP estï¿½ ligada no %s (e %s tem nï¿½vel insuficiente)	31337	0
 6	87	Canal Perdido %s	31337	0
-6	88	%s já está registrado comigo.	31337	0
-6	89	Nome de canal inválido.	31337	0
+6	88	%s jï¿½ estï¿½ registrado comigo.	31337	0
+6	89	Nome de canal invï¿½lido.	31337	0
 6	90	Canal registrado %s	31337	0
-6	91	Removido %s de minha lista de silêncio	31337	0
-6	92	Não posso encontrar %s em minha lista do silêncio	31337	0
-6	93	Não pode remover um usuário com o acesso igual ou mais elevado que seu próprio	31337	0
-6	94	Você não pode se remover de um canal que registrou	31337	0
-6	95	Usuário %s removido do %s	31337	0
-6	96	Seu ajuste INVISÍVEL está agora LIGADO.	31337	0
-6	97	Seu ajuste INVISÍVEL está agora DESLIGADO.	31337	0
-6	98	%s para %s é %s	31337	0
+6	91	Removido %s de minha lista de silï¿½ncio	31337	0
+6	92	Nï¿½o posso encontrar %s em minha lista do silï¿½ncio	31337	0
+6	93	Nï¿½o pode remover um usuï¿½rio com o acesso igual ou mais elevado que seu prï¿½prio	31337	0
+6	94	Vocï¿½ nï¿½o pode se remover de um canal que registrou	31337	0
+6	95	Usuï¿½rio %s removido do %s	31337	0
+6	96	Seu ajuste INVISï¿½VEL estï¿½ agora LIGADO.	31337	0
+6	97	Seu ajuste INVISï¿½VEL estï¿½ agora DESLIGADO.	31337	0
+6	98	%s para %s ï¿½ %s	31337	0
 6	99	valor de %s precisa ser ON ou OFF	31337	0
-6	100	Ajuste de USERFLAGS inválido. Os valores corretos são NONE, OP, VOICE.	31337	0
-6	101	USERFLAGS para %s é %s	31337	0
+6	100	Ajuste de USERFLAGS invï¿½lido. Os valores corretos sï¿½o NONE, OP, VOICE.	31337	0
+6	101	USERFLAGS para %s ï¿½ %s	31337	0
 6	102	o valor de MASSDEOPPRO tem que ser 0-7	31337	0
-6	103	MASSDEOPPRO para %s é ajustado a %d	31337	0
+6	103	MASSDEOPPRO para %s ï¿½ ajustado a %d	31337	0
 6	104	o valor de FLOODPRO tem que ser de 0-7	31337	0
-6	105	FLOODPRO para %s é ajustado a %d	31337	0
-6	106	A DESCRIÇÃO pode ter no máximo %i caracteres!	31337	0
-6	107	DESCRIÇÃO para %s foi apagada.	31337	0
-6	108	DESCRIÇÃO para %s é: %s	31337	0
-6	109	A URL pode ter no máximo %i caracteres!	31337	0
+6	105	FLOODPRO para %s ï¿½ ajustado a %d	31337	0
+6	106	A DESCRIï¿½ï¿½O pode ter no mï¿½ximo %i caracteres!	31337	0
+6	107	DESCRIï¿½ï¿½O para %s foi apagada.	31337	0
+6	108	DESCRIï¿½ï¿½O para %s ï¿½: %s	31337	0
+6	109	A URL pode ter no mï¿½ximo %i caracteres!	31337	0
 6	110	URL para %s foi apagada.	31337	0
-6	111	URL para %s é: %s	31337	0
-6	112	A linha de keywords não pode exceder 80 caracteres!	31337	0
-6	113	KEYWORDS para %s são: %s	31337	0
+6	111	URL para %s ï¿½: %s	31337	0
+6	112	A linha de keywords nï¿½o pode exceder 80 caracteres!	31337	0
+6	113	KEYWORDS para %s sï¿½o: %s	31337	0
 6	114	O idioma foi ajustado para %s.	31337	0
-6	115	ERRO: Seleção inválida de idioma.	31337	0
-6	116	Não pode localizar o canal %s na rede!	31337	0
-6	117	ERRO: Ajuste inválido de canal.	31337	0
+6	115	ERRO: Seleï¿½ï¿½o invï¿½lida de idioma.	31337	0
+6	116	Nï¿½o pode localizar o canal %s na rede!	31337	0
+6	117	ERRO: Ajuste invï¿½lido de canal.	31337	0
 6	118	Lista de ignorados:	31337	0
 6	119	Lista de ignorados vazia	31337	0
 6	120	-- Fina da lista de ignorados	31337	0
@@ -1081,43 +1081,43 @@ COPY "translations" FROM stdin;
 6	129	Last recieved Ban NOTIFY: %i	31337	0
 6	130	Recipientes feitos sob encomenda dos dados alocados: %i	31337	0
 6	131	\002Uptime:\002 %s	31337	0
-6	132	Canal %s tem %d usuários (%i operadores)	31337	0
-6	133	Modo é: %s	31337	0
-6	134	Flags são: %s	31337	0
-6	135	Não pode suspender um usuário com acesso igual ou mais elevado que o seu próprio.	31337	0
+6	132	Canal %s tem %d usuï¿½rios (%i operadores)	31337	0
+6	133	Modo ï¿½: %s	31337	0
+6	134	Flags sï¿½o: %s	31337	0
+6	135	Nï¿½o pode suspender um usuï¿½rio com acesso igual ou mais elevado que o seu prï¿½prio.	31337	0
 6	136	unidades bogus do tempo	31337	0
-6	137	Duração de suspensão invalida.	31337	0
-6	138	SUSPENSÃO de %s foi cancelada	31337	0
-6	139	%s já está suspendido no %s	31337	0
-6	140	SUSPENSÃO de %s acabará em %s	31337	0
-6	141	ERRO: Tópico não pode exceder 145 caracteres	31337	0
-6	142	Você tem nível insuficiente para remover o ban %s de %s's database	31337	0
+6	137	Duraï¿½ï¿½o de suspensï¿½o invalida.	31337	0
+6	138	SUSPENSï¿½O de %s foi cancelada	31337	0
+6	139	%s jï¿½ estï¿½ suspendido no %s	31337	0
+6	140	SUSPENSï¿½O de %s acabarï¿½ em %s	31337	0
+6	141	ERRO: Tï¿½pico nï¿½o pode exceder 145 caracteres	31337	0
+6	142	Vocï¿½ tem nï¿½vel insuficiente para remover o ban %s de %s's database	31337	0
 6	143	Removido %i bans combinado %s	31337	0
 6	144	Removido temporariamente o acesso de %i no canal %s	31337	0
-6	145	Você não parece ter um acesso forçado em %s, talvez expirou?	31337	0
-6	146	%s não está suspenso no %s	31337	0
-6	147	%s é um IRC operator	31337	0
-6	148	%s NÃO está logado.	31337	0
-6	149	%s está logado como %s%s	31337	0
-6	150	%s é um Representante Oficial CService%s e está logado como %s	31337	0
-6	151	%s é um Administrador Oficial CService%s e está logado como %s	31337	0
-6	152	%s é um Desenvolvedor Oficial CService%s e está logado como %s	31337	0
-6	153	Há mais do que %i entrada combinando [%s]	31337	0
+6	145	Vocï¿½ nï¿½o parece ter um acesso forï¿½ado em %s, talvez expirou?	31337	0
+6	146	%s nï¿½o estï¿½ suspenso no %s	31337	0
+6	147	%s ï¿½ um IRC operator	31337	0
+6	148	%s Nï¿½O estï¿½ logado.	31337	0
+6	149	%s estï¿½ logado como %s%s	31337	0
+6	150	%s ï¿½ um Representante Oficial CService%s e estï¿½ logado como %s	31337	0
+6	151	%s ï¿½ um Administrador Oficial CService%s e estï¿½ logado como %s	31337	0
+6	152	%s ï¿½ um Desenvolvedor Oficial CService%s e estï¿½ logado como %s	31337	0
+6	153	Hï¿½ mais do que %i entrada combinando [%s]	31337	0
 6	154	Por favor, restrinja sua mascara de pesquisa	31337	0
 6	155	Nenhuma entradas combinando para [%s]	31337	0
 6	156	%s: Modos do canal Apagado.	31337	0
-6	158	Opção inválida.	31337	0
-6	159	%s é um Bot de Serviço Oficial da Undernet.	31337	0
-6	160	%s é um Representante Oficial Coder-Com%s e está logado como %s	31337	0
-6	161	%s é um Contribuidor Oficial Coder-Com%s e está logado como %s	31337	0
-6	162	%s é um Programador Oficial Coder-Com%s e está logado como %s	31337	0
-6	163	%s é um Sênior Oficial Coder-Com%s e está logado como %s	31337	0
-6	164	 e é IRC operator	31337	0
-6	165	Adicionado ban %s no %s com nível %i	31337	0
+6	158	Opï¿½ï¿½o invï¿½lida.	31337	0
+6	159	%s ï¿½ um Bot de Serviï¿½o Oficial da Undernet.	31337	0
+6	160	%s ï¿½ um Representante Oficial Coder-Com%s e estï¿½ logado como %s	31337	0
+6	161	%s ï¿½ um Contribuidor Oficial Coder-Com%s e estï¿½ logado como %s	31337	0
+6	162	%s ï¿½ um Programador Oficial Coder-Com%s e estï¿½ logado como %s	31337	0
+6	163	%s ï¿½ um Sï¿½nior Oficial Coder-Com%s e estï¿½ logado como %s	31337	0
+6	164	 e ï¿½ IRC operator	31337	0
+6	165	Adicionado ban %s no %s com nï¿½vel %i	31337	0
 6	166	%s: lista de ban vazia.	31337	0
-6	167	Eu já estou neste canal!	31337	0
-6	168	Este comando é reservado para IRC Operators	31337	0
-6	169	Eu não tenho op no %s	31337	0
+6	167	Eu jï¿½ estou neste canal!	31337	0
+6	168	Este comando ï¿½ reservado para IRC Operators	31337	0
+6	169	Eu nï¿½o tenho op no %s	31337	0
 6	170	%s para %i minutos	31337	0
 6	184	The NOVOICE flag is set on %s	31337	0
 6	185	Your access on %s has been suspended.	31337	0
@@ -1137,43 +1137,43 @@ COPY "translations" FROM stdin;
 -- 04/03/07 - Ombretta Gorini <ombra.g@galactica.it>.
 
 COPY "translations" FROM stdin;
-7	1	Spiacente, sei già autenticato come %s	31337	0
+7	1	Spiacente, sei giï¿½ autenticato come %s	31337	0
 7	2	AUTENTICAZIONE RIUSCITA come %s	31337	0
 7	3	Spiacente, non hai un accesso sufficiente per eseguire quel comando	31337	0
-7	4	Spiacente, il canale %s è vuoto	31337	0
+7	4	Spiacente, il canale %s ï¿½ vuoto	31337	0
 7	5	Non vedo nessun %s	31337	0
 7	6	Non trovo %s nel canale %s	31337	0
 7	7	Il canale %s non risulta essere registrato	31337	0
-7	8	Ti è stato dato l'op da %s (%s) in %s	31337	0
-7	9	Ti è stato dato il voice da %s (%s) in %s	31337	0
+7	8	Ti ï¿½ stato dato l'op da %s (%s) in %s	31337	0
+7	9	Ti ï¿½ stato dato il voice da %s (%s) in %s	31337	0
 7	10	%s: Non sei in quel canale	31337	0
-7	11	%s ha già l'op in %s	31337	0
-7	12	%s ha già il voice in %s	31337	0
-7	13	Ti è stato tolto l'op da %s (%s)	31337	0
-7	14	Ti è stato tolto il voice da %s (%s)	31337	0
+7	11	%s ha giï¿½ l'op in %s	31337	0
+7	12	%s ha giï¿½ il voice in %s	31337	0
+7	13	Ti ï¿½ stato tolto l'op da %s (%s)	31337	0
+7	14	Ti ï¿½ stato tolto il voice da %s (%s)	31337	0
 7	15	%s non ha l'op in %s	31337	0
 7	16	%s non ha il voice in %s	31337	0
 7	17	AUTENTICAZIONE FALLITA come %s (Password non valida)	31337	0
 7	18	Non mi trovo in quel canale!	31337	0
-7	19	Range del livello del ban non valido. Il range valido è compreso tra 1 e %i.	31337	0
-7	20	Durata del ban non valida. La durata massima di un ban può essere di %d giorni.	31337	0
-7	21	Il motivo del ban non può superare i 128 caratteri	31337	0
-7	22	Il ban specificato è già presente nella mia lista dei ban!	31337	0
-7	23	Il ban %s è già coperto da %s	31337	0
+7	19	Range del livello del ban non valido. Il range valido ï¿½ compreso tra 1 e %i.	31337	0
+7	20	Durata del ban non valida. La durata massima di un ban puï¿½ essere di %d giorni.	31337	0
+7	21	Il motivo del ban non puï¿½ superare i 128 caratteri	31337	0
+7	22	Il ban specificato ï¿½ giï¿½ presente nella mia lista dei ban!	31337	0
+7	23	Il ban %s ï¿½ giï¿½ coperto da %s	31337	0
 7	24	Livello minimo non valido.	31337	0
 7	25	Livello massimo non valido.	31337	0
 7	26	UTENTE: %s ACCESSO: %s %s	31337	0
 7	27	CANALE: %s -- AUTOMODE: %s	31337	0
-7	28	ULTIMA MODIFICA: %s (%s fà)	31337	0
+7	28	ULTIMA MODIFICA: %s (%s fï¿½)	31337	0
 7	29	** SOSPESO ** - Scade il %s (Level %i)	31337	0
 7	30	VISTO L'ULTIMA VOLTA: %s.	31337	0
-7	31	Sono presenti più di %d corrispondenze.	31337	0
+7	31	Sono presenti piï¿½ di %d corrispondenze.	31337	0
 7	32	Per favore, restringi il campo di ricerca dell'interrogazione.	31337	0
 7	33	Fine della lista degli accessi	31337	0
 7	34	Nessuna Corrispondenza!	31337	0
 7	35	Non puoi aggiungere un utente con un livello di accesso uguale o superiore al tuo.	31337	0
 7	36	Livello di accesso non valido.	31337	0
-7	37	%s è già stato aggiunto in %s con livello di accesso %i.	31337	0
+7	37	%s ï¿½ giï¿½ stato aggiunto in %s con livello di accesso %i.	31337	0
 7	38	Aggiunto l'utente %s a %s con livello di accesso %i	31337	0
 7	39	Qualcosa non va: %s	31337	0
 7	40	%s: Fine della lista dei ban	31337	0
@@ -1185,23 +1185,23 @@ COPY "translations" FROM stdin;
 7	46	Canali: %s	31337	0
 7	47	Input Flood Points: %i	31337	0
 7	48	Ouput Flood (Bytes): %i	31337	0
-7	49	%s è registrato da:	31337	0
+7	49	%s ï¿½ registrato da:	31337	0
 7	50	%s - visto l'ultima volta: %s 	31337	0
 7	51	Desc: %s	31337	0
-7	52	Vuoi floodarmi? Bene bene, allora mi sa che da adesso non ti ascolto più.	31337	0
+7	52	Vuoi floodarmi? Bene bene, allora mi sa che da adesso non ti ascolto piï¿½.	31337	0
 7	53	Penso che abbia visto abbastanza, adesso ti ignoro per un po'.	31337	0
 7	54	Comando non completo	31337	0
 7	55	Per usare %s, devi scrivere /msg %s@%s	31337	0
 7	56	Spiacente, devi autenticarti per usare questo comando.	31337	0
-7	57	Il canale %s è stato sospeso da un amministratore di CService.	31337	0
-7	58	Il tuo accesso su %s è stato sospeso.	31337	0
-7	59	Il flag NOOP è impostato su %s	31337	0
-7	60	Il flag STRICTOP è impostato su %s	31337	0
-7	61	Hai appena tolto l'op a più di %i persone	31337	0
+7	57	Il canale %s ï¿½ stato sospeso da un amministratore di CService.	31337	0
+7	58	Il tuo accesso su %s ï¿½ stato sospeso.	31337	0
+7	59	Il flag NOOP ï¿½ impostato su %s	31337	0
+7	60	Il flag STRICTOP ï¿½ impostato su %s	31337	0
+7	61	Hai appena tolto l'op a piï¿½ di %i persone	31337	0
 7	62	SINTASSI: %s	31337	0
-7	63	Il tuo accesso è stato temporaneamente incrementato sul canale %s a %i	31337	0
-7	64	%s è registrato.	31337	0
-7	65	%s non è registrato.	31337	0
+7	63	Il tuo accesso ï¿½ stato temporaneamente incrementato sul canale %s a %i	31337	0
+7	64	%s ï¿½ registrato.	31337	0
+7	65	%s non ï¿½ registrato.	31337	0
 7	66	Non penso che %s possa apprezzarlo.	31337	0
 7	67	\002*** Lista dei Ban per il canale %s ***\002	31337	0
 7	68	%s %s Livello: %i	31337	0
@@ -1210,7 +1210,7 @@ COPY "translations" FROM stdin;
 7	71	SCADENZA: %s	31337	0
 7	72	\002*** FINE ***\002	31337	0
 7	73	Spiacente, ma non conosco chi sia %s.	31337	0
-7	74	Spiacente, non sei più autorizzato con me.	31337	0
+7	74	Spiacente, non sei piï¿½ autorizzato con me.	31337	0
 7	75	%s non sembra avere accesso in %s.	31337	0
 7	76	Non posso modificare un utente con un livello di accesso uguale o superiore al tuo.	31337	0
 7	77	Non puoi dare un accesso uguale o superiore al tuo a un altro utente.	31337	0
@@ -1218,44 +1218,44 @@ COPY "translations" FROM stdin;
 7	79	Impostato AUTOMODE a OP per %s sul canale %s	31337	0
 7	80	Impostato AUTOMODE a VOICE per %s sul canale %s	31337	0
 7	81	Impostato AUTOMODE a NONE per %s sul canale %s	31337	0
-7	82	La tua password non può essere il tuo username o il tuo attuale nick - la sintassi è: NEWPASS <nuova password>	31337	0
-7	83	La password è stata cambiata con successo.	31337	0
-7	84	Il flag NOOP è impostato su %s	31337	0
-7	85	Il flag STRICTOP è impostato su %s (e %s non è autenticato)	31337	0
-7	86	Il flag STRICTOP è impostato su %s (e %s non ha accesso sufficiente)	31337	0
+7	82	La tua password non puï¿½ essere il tuo username o il tuo attuale nick - la sintassi ï¿½: NEWPASS <nuova password>	31337	0
+7	83	La password ï¿½ stata cambiata con successo.	31337	0
+7	84	Il flag NOOP ï¿½ impostato su %s	31337	0
+7	85	Il flag STRICTOP ï¿½ impostato su %s (e %s non ï¿½ autenticato)	31337	0
+7	86	Il flag STRICTOP ï¿½ impostato su %s (e %s non ha accesso sufficiente)	31337	0
 7	87	Purgato il canale %s	31337	0
-7	88	%s è già registrato da me.	31337	0
+7	88	%s ï¿½ giï¿½ registrato da me.	31337	0
 7	89	Nome del canale non valido.	31337	0
 7	90	Registrato il canale %s	31337	0
-7	91	%s è stato rimosso dalla lista dei silence	31337	0
+7	91	%s ï¿½ stato rimosso dalla lista dei silence	31337	0
 7	92	Non trovo %s nella mia lista dei silence	31337	0
 7	93	Non puoi rimuovere un utente con accesso uguale o superiore al tuo	31337	0
 7	94	Non puoi rimuovere te stesso da un canale che possiedi	31337	0
 7	95	Rimosso l'utente %s da %s	31337	0
-7	96	L'impostazione INVISIBLE adesso è attiva (ON).	31337	0
-7	97	L'impostazione INVISIBLE adesso non è attiva (OFF).	31337	0
-7	98	%s per %s è %s	31337	0
+7	96	L'impostazione INVISIBLE adesso ï¿½ attiva (ON).	31337	0
+7	97	L'impostazione INVISIBLE adesso non ï¿½ attiva (OFF).	31337	0
+7	98	%s per %s ï¿½ %s	31337	0
 7	99	il valore di %s dev'essere ON oppure OFF	31337	0
 7	100	Impostazione USERFLAGS non valida. I valori corretti sono NONE, OP o VOICE.	31337	0
-7	101	USERFLAGS per %s è %s	31337	0
+7	101	USERFLAGS per %s ï¿½ %s	31337	0
 7	102	il valore di MASSDEOPPRO dev'essere compreso tra 0 e 7 inclusi	31337	0
-7	103	MASSDEOPPRO per %s è impostato a %d	31337	0
+7	103	MASSDEOPPRO per %s ï¿½ impostato a %d	31337	0
 7	104	il valore di FLOODPRO dev'essere compreso tra 0 e 7 inclusi	31337	0
-7	105	FLOODPRO per %s è impostato a %d	31337	0
-7	106	La DESCRIPTION non può superare gli %i caratteri.	31337	0
-7	107	La DESCRIPTION per %s è stata cancellata.	31337	0
-7	108	La DESCRIPTION per %s è: %s	31337	0
-7	109	L'URL non può superare i %i caratteri.	31337	0
-7	110	L'URL per %s è stata cancellata.	31337	0
-7	111	L'URL per %s è: %s	31337	0
-7	112	La stringa contenente le parole chiave non può superare gli 80 caratteri.	31337	0
+7	105	FLOODPRO per %s ï¿½ impostato a %d	31337	0
+7	106	La DESCRIPTION non puï¿½ superare gli %i caratteri.	31337	0
+7	107	La DESCRIPTION per %s ï¿½ stata cancellata.	31337	0
+7	108	La DESCRIPTION per %s ï¿½: %s	31337	0
+7	109	L'URL non puï¿½ superare i %i caratteri.	31337	0
+7	110	L'URL per %s ï¿½ stata cancellata.	31337	0
+7	111	L'URL per %s ï¿½: %s	31337	0
+7	112	La stringa contenente le parole chiave non puï¿½ superare gli 80 caratteri.	31337	0
 7	113	Le KEYWORDS (parole chiave) per %s sono: %s	31337	0
-7	114	La lingua selezionata è %s.	31337	0
+7	114	La lingua selezionata ï¿½ %s.	31337	0
 7	115	ERRORE: Selezione della lingua non valida.	31337	0
 7	116	Non trovo il canale %s nella rete!	31337	0
 7	117	ERRORE: Impostazione del canale non valida.	31337	0
 7	118	Lista degli Ignore:	31337	0
-7	119	La lista degli Ignore è vuota	31337	0
+7	119	La lista degli Ignore ï¿½ vuota	31337	0
 7	120	-- Fine della Lista degli Ignore	31337	0
 7	121	Stato interno CMaster Channel Services:	31337	0
 7	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Richieste:\002 %i    \002Cache Hits:\002 %i    \002Efficienza:\002 %.2f%%	31337	0
@@ -1269,39 +1269,39 @@ COPY "translations" FROM stdin;
 7	130	Contenitori di dati proprietari allocati: %i	31337	0
 7	131	\002Tempo di vita:\002 %s	31337	0
 7	132	Il canale %s ha %d utenti (%i operatori)	31337	0
-7	133	Mode è: %s	31337	0
+7	133	Mode ï¿½: %s	31337	0
 7	134	Flags impostati: %s	31337	0
 7	135	Non posso sospendere un utente con accesso uguale o superiore al tuo.	31337	0
-7	136	unità di tempo sconosciuta	31337	0
+7	136	unitï¿½ di tempo sconosciuta	31337	0
 7	137	Durata della sospensione non valida.	31337	0
-7	138	La SOSPENSIONE per %s è stata annullata	31337	0
-7	139	%s è già stato sospeso in %s	31337	0
-7	140	La SOSPENSIONE per %s scadrà in %s	31337	0
-7	141	ERRORE: Il topic non può superare i 145 caratteri	31337	0
+7	138	La SOSPENSIONE per %s ï¿½ stata annullata	31337	0
+7	139	%s ï¿½ giï¿½ stato sospeso in %s	31337	0
+7	140	La SOSPENSIONE per %s scadrï¿½ in %s	31337	0
+7	141	ERRORE: Il topic non puï¿½ superare i 145 caratteri	31337	0
 7	142	Non hai accesso sufficiente per rimuovere il ban %s dal database di %s.	31337	0
 7	143	Sono stati rimossi %i ban che corrispondono a %s	31337	0
 7	144	Rimosso temporaneamente il tuo accesso di %i dal canale %s	31337	0
-7	145	Non sembra che tu abbia un accesso forzato in %s, forse è scaduto?	31337	0
-7	146	%s non è sospeso in %s	31337	0
-7	147	%s è un operatore IRC	31337	0
-7	148	%s NON è autenticato.	31337	0
-7	149	%s è autenticato come %s%s	31337	0
-7	150	%s è un Rappresentante Ufficiale di CService%s e autenticato come %s	31337	0
-7	151	%s è un Ammistratore Ufficiale di CService%s e autenticato come %s	31337	0
-7	152	%s è uno Sviluppatore Ufficiale di CService%s e autenticato come %s	31337	0
-7	153	Ci sono più di %i corrispondenze di [%s]	31337	0
+7	145	Non sembra che tu abbia un accesso forzato in %s, forse ï¿½ scaduto?	31337	0
+7	146	%s non ï¿½ sospeso in %s	31337	0
+7	147	%s ï¿½ un operatore IRC	31337	0
+7	148	%s NON ï¿½ autenticato.	31337	0
+7	149	%s ï¿½ autenticato come %s%s	31337	0
+7	150	%s ï¿½ un Rappresentante Ufficiale di CService%s e autenticato come %s	31337	0
+7	151	%s ï¿½ un Ammistratore Ufficiale di CService%s e autenticato come %s	31337	0
+7	152	%s ï¿½ uno Sviluppatore Ufficiale di CService%s e autenticato come %s	31337	0
+7	153	Ci sono piï¿½ di %i corrispondenze di [%s]	31337	0
 7	154	Per favore, restringi la tua maschera di ricerca	31337	0
 7	155	Non ci sono corrispondenze per [%s]	31337	0
 7	156	%s: Mode del canale annullati.	31337	0
 7	158	Opzione non valida.	31337	0
-7	159	%s è un Bot di Servizio Ufficiale di Undernet.	31337	0
+7	159	%s ï¿½ un Bot di Servizio Ufficiale di Undernet.	31337	0
 7	160	%s is an Official Coder-Com Representative%s and logged in as %s	31337	0
 7	161	%s is an Official Coder-Com Contributer%s and logged in as %s	31337	0
 7	162	%s is an Official Coder-Com Developer%s and logged in as %s	31337	0
 7	163	%s is an Official Coder-Com Senior%s and logged in as %s	31337	0
 7	165	Aggiunto il ban %s a %s con livello %i	31337	0
 7	166	%s: lista dei ban vuota.	31337	0
-7	167	Sono già in quel canale!	31337	0
+7	167	Sono giï¿½ in quel canale!	31337	0
 7	184	The NOVOICE flag is set on %s	31337	0
 7	185	Your access on %s has been suspended.	31337	0
 7	186	Your suspension on %s has been cancelled.	31337	0
@@ -1507,173 +1507,173 @@ COPY "translations" FROM stdin;
 -- 09/03/2001 - Algol <algol@undernet.org>.
 
 COPY "translations" FROM stdin;
-9	1	Ho sento, ja estàs autentificat/da com a %s	31337	0
-9	2	AUTENTICACIÓ REEIXIDA com a %s	31337	0
-9	3	Ho sento, el teu accés és insuficient per efectuar aquesta comanda.	31337	0
-9	4	Ho sento, el canal %s és buit.	31337	0
+9	1	Ho sento, ja estï¿½s autentificat/da com a %s	31337	0
+9	2	AUTENTICACIï¿½ REEIXIDA com a %s	31337	0
+9	3	Ho sento, el teu accï¿½s ï¿½s insuficient per efectuar aquesta comanda.	31337	0
+9	4	Ho sento, el canal %s ï¿½s buit.	31337	0
 9	5	No veig cap %s enlloc.	31337	0
 9	6	No trobo cap %s al canal %s	31337	0
 9	7	El canal %s no consta com a enregistrat.	31337	0
 9	8	Has rebut op de %s (%s) a %s.	31337	0
 9	9	Has rebut veu de %s (%s) a %s.	31337	0
 9	10	%s: No ets a aquest canal.	31337	0
-9	11	%s ja té op a %s	31337	0
-9	12	%s ja té veu a %s	31337	0
+9	11	%s ja tï¿½ op a %s	31337	0
+9	12	%s ja tï¿½ veu a %s	31337	0
 9	13	L'op t'ha estat llevat per %s (%s).	31337	0
 9	14	La veu t'ha estat llevada per %s (%s).	31337	0
-9	15	%s no té op a %s	31337	0
-9	16	%s no té veu a %s	31337	0
-9	17	AUTENTICACIÓ FALLIDA com a %s (Contrasenya no vàlida).	31337	0
-9	18	No sóc pas a aquest canal!	31337	0
-9	19	Nivell de bandeig no vàlid. Els nivells vàlids són entre 1-%i.	31337	0
-9	20	Durada de bandeig no vàlida . La durada màxima del bandeig és de %d dia.	31337	0
-9	21	La raó del ban no pot excedir de 128 caràcters.	31337	0
-9	22	El bandeig especificat ja és a la meva llista!	31337	0
+9	15	%s no tï¿½ op a %s	31337	0
+9	16	%s no tï¿½ veu a %s	31337	0
+9	17	AUTENTICACIï¿½ FALLIDA com a %s (Contrasenya no vï¿½lida).	31337	0
+9	18	No sï¿½c pas a aquest canal!	31337	0
+9	19	Nivell de bandeig no vï¿½lid. Els nivells vï¿½lids sï¿½n entre 1-%i.	31337	0
+9	20	Durada de bandeig no vï¿½lida . La durada mï¿½xima del bandeig ï¿½s de %d dia.	31337	0
+9	21	La raï¿½ del ban no pot excedir de 128 carï¿½cters.	31337	0
+9	22	El bandeig especificat ja ï¿½s a la meva llista!	31337	0
 9	23	El bandeig %s ja queda cobert per %s	31337	0
-9	24	Nivell mínim no vàlid.	31337	0
-9	25	Nivell màxim no vàlid.	31337	0
-9	26	USUARI/A: %s ACCÉS: %s %s	31337	0
+9	24	Nivell mï¿½nim no vï¿½lid.	31337	0
+9	25	Nivell mï¿½xim no vï¿½lid.	31337	0
+9	26	USUARI/A: %s ACCï¿½S: %s %s	31337	0
 9	27	CANAL: %s -- AUTOMODE: %s	31337	0
-9	28	DARRERA MODIFICACIÓ: %s (fa %s)	31337	0
-9	29	** SUSPÈS/A ** - Expira d'aquí a %s (Level %i)	31337	0
+9	28	DARRERA MODIFICACIï¿½: %s (fa %s)	31337	0
+9	29	** SUSPï¿½S/A ** - Expira d'aquï¿½ a %s (Level %i)	31337	0
 9	30	VIST/A PER DARRERA VEGADA: fa %s.	31337	0
-9	31	Hi ha més de %d entrades coincidents.	31337	0
+9	31	Hi ha mï¿½s de %d entrades coincidents.	31337	0
 9	32	Si et plau, restringeix la teva cerca.	31337	0
 9	33	Fi de la llista d'accessos.	31337	0
-9	34	Cap Coincidència!	31337	0
-9	35	No pots afegir cap usuari/a amb un nivell d'accés igual o superior al teu.	31337	0
-9	36	Nivell d'accés no vàlid.	31337	0
-9	37	%s ja té accés a %s amb nivell %i.	31337	0
-9	38	Afegit l'usuari/a %s a %s amb nivell d'accés %i.	31337	0
-9	39	Quelcom no ha anat bé: %s	31337	0
+9	34	Cap Coincidï¿½ncia!	31337	0
+9	35	No pots afegir cap usuari/a amb un nivell d'accï¿½s igual o superior al teu.	31337	0
+9	36	Nivell d'accï¿½s no vï¿½lid.	31337	0
+9	37	%s ja tï¿½ accï¿½s a %s amb nivell %i.	31337	0
+9	38	Afegit l'usuari/a %s a %s amb nivell d'accï¿½s %i.	31337	0
+9	39	Quelcom no ha anat bï¿½: %s	31337	0
 9	40	%s: Fi de la llista de bandeigs.	31337	0
 9	41	Els detalls de l'usuari/a no es poden veure pas (Invisible).	31337	0
-9	42	Informació sobre: %s (%i)	31337	0
-9	43	Connexió actual autenticada: %s	31337	0
+9	42	Informaciï¿½ sobre: %s (%i)	31337	0
+9	43	Connexiï¿½ actual autenticada: %s	31337	0
 9	44	URL: %s	31337	0
 9	45	Idioma: %i	31337	0
 9	46	Canals: %s	31337	0
 9	47	Punts de Flood d'Entrada: %i	31337	0
 9	48	Flood de Sortida (Bytes): %i	31337	0
-9	49	%s està enregistrat per:	31337	0
+9	49	%s estï¿½ enregistrat per:	31337	0
 9	50	%s - vist/a per darrer cop: fa %s	31337	0
 9	51	Desc: %s	31337	0
-9	52	Em vols floodejar, oi? Doncs no t'escoltaré més.	31337	0
-9	53	Em penso que ja m'has fet enviar-te massa dades, ara t'ignoraré una estona.	31337	0
+9	52	Em vols floodejar, oi? Doncs no t'escoltarï¿½ mï¿½s.	31337	0
+9	53	Em penso que ja m'has fet enviar-te massa dades, ara t'ignorarï¿½ una estona.	31337	0
 9	54	Comanda incompleta.	31337	0
 9	55	Per fer %s, has de fer /msg %s@%s	31337	0
 9	56	Ho sento, t'has d'haver autenticat per utilitzar aquesta comanda.	31337	0
-9	57	El canal %s ha estat suspès per una/a administrador/a de CService.	31337	0
-9	58	El teu accés a %s ha estat suspès.	31337	0
-9	59	L'opció NOOP està activa a %s	31337	0
-9	60	L'opció STRICTOP està activa a %s	31337	0
-9	61	Acabes de llevar l'op a més de %i usuari/es.	31337	0
+9	57	El canal %s ha estat suspï¿½s per una/a administrador/a de CService.	31337	0
+9	58	El teu accï¿½s a %s ha estat suspï¿½s.	31337	0
+9	59	L'opciï¿½ NOOP estï¿½ activa a %s	31337	0
+9	60	L'opciï¿½ STRICTOP estï¿½ activa a %s	31337	0
+9	61	Acabes de llevar l'op a mï¿½s de %i usuari/es.	31337	0
 9	62	SINTAXI: %s	31337	0
-9	63	El teu accés al canal %s ha estat incrementat temporalment fins %i.	31337	0
-9	64	%s està enregistrat.	31337	0
-9	65	%s no està enregistrat.	31337	0
-9	66	No crec que a %s li fes gràcia.	31337	0
+9	63	El teu accï¿½s al canal %s ha estat incrementat temporalment fins %i.	31337	0
+9	64	%s estï¿½ enregistrat.	31337	0
+9	65	%s no estï¿½ enregistrat.	31337	0
+9	66	No crec que a %s li fes grï¿½cia.	31337	0
 9	67	\002*** Llista de Bandeigs al canal %s ***\002	31337	0
 9	68	%s %s Nivell: %i	31337	0
 9	69	AFEGIT PER: %s (%s)	31337	0
 9	70	DES DE: %s	31337	0
 9	71	EXP: %s	31337	0
 9	72	\002*** FI ***\002	31337	0
-9	73	Ho sento, no sé qui és %s.	31337	0
-9	74	Ho sento, ja no estàs autenticat/da.	31337	0
-9	75	%s no figura amb accés a %s	31337	0
-9	76	No pots modificar cap usuari/a amb nivell d'accés igual o superior al teu.	31337	0
-9	77	No pots donar a un/a usuari/a un accés de nivell igual o superior al teu.	31337	0
-9	78	El nivell d'accés de %s al canal %s s'ha canviat a %i.	31337	0
+9	73	Ho sento, no sï¿½ qui ï¿½s %s.	31337	0
+9	74	Ho sento, ja no estï¿½s autenticat/da.	31337	0
+9	75	%s no figura amb accï¿½s a %s	31337	0
+9	76	No pots modificar cap usuari/a amb nivell d'accï¿½s igual o superior al teu.	31337	0
+9	77	No pots donar a un/a usuari/a un accï¿½s de nivell igual o superior al teu.	31337	0
+9	78	El nivell d'accï¿½s de %s al canal %s s'ha canviat a %i.	31337	0
 9	79	AUTOMODE canviat a OP per a %s al canal %s	31337	0
 9	80	AUTOMODE canviat a VOICE pera %s al canal %s	31337	0
 9	81	AUTOMODE canviat a NONE per a %s al canal %s	31337	0
-9	82	La teva contrasenya no pot pas ser el teu nom d'usuari/a ni el teu nick actual - la sintaxi és: NEWPASS <nova contrasenya>	31337	0
+9	82	La teva contrasenya no pot pas ser el teu nom d'usuari/a ni el teu nick actual - la sintaxi ï¿½s: NEWPASS <nova contrasenya>	31337	0
 9	83	Contrasenya canviada correctament.	31337	0
-9	84	L'opció NOOP està activada a %s	31337	0
-9	85	L'opció STRICTOP està activada a %s (i %s no s'ha autenticat).	31337	0
-9	86	L'opció STRICTOP està activada a %s (i %s té un accés insuficient).	31337	0
+9	84	L'opciï¿½ NOOP estï¿½ activada a %s	31337	0
+9	85	L'opciï¿½ STRICTOP estï¿½ activada a %s (i %s no s'ha autenticat).	31337	0
+9	86	L'opciï¿½ STRICTOP estï¿½ activada a %s (i %s tï¿½ un accï¿½s insuficient).	31337	0
 9	87	El canal %s ha estat purgat.	31337	0
-9	88	%s ja està enregistrat.	31337	0
-9	89	Nom de canal no vàlid.	31337	0
+9	88	%s ja estï¿½ enregistrat.	31337	0
+9	89	Nom de canal no vï¿½lid.	31337	0
 9	90	El canal %s ha estat enregistrat.	31337	0
 9	91	%s ha estat esborrat de la meva llista de silencis.	31337	0
 9	92	No he trobat %s a la meva llista de silencis.	31337	0
-9	93	No pots suprimir cap usuari amb un accés igual o superior al teu.	31337	0
-9	94	No pots suprimir el teu propi accés a un canal que et pertany.	31337	0
+9	93	No pots suprimir cap usuari amb un accï¿½s igual o superior al teu.	31337	0
+9	94	No pots suprimir el teu propi accï¿½s a un canal que et pertany.	31337	0
 9	95	S'ha suprimit l'usuari/a %s a %s	31337	0
-9	96	La teva opció INVISIBLE és ara activa (ON).	31337	0
-9	97	La teva opció INVISIBLE és ara inactiva (OFF).	31337	0
-9	98	%s a %s és %s	31337	0
-9	99	el valor de %s ha d'ésser 'ON' o 'OFF'.	31337	0
-9	100	Valor d'USERFLAGS no vàlid. Els valors correctes són NONE, OP, VOICE.	31337	0
-9	101	USERFLAGS per %s és %s.	31337	0
+9	96	La teva opciï¿½ INVISIBLE ï¿½s ara activa (ON).	31337	0
+9	97	La teva opciï¿½ INVISIBLE ï¿½s ara inactiva (OFF).	31337	0
+9	98	%s a %s ï¿½s %s	31337	0
+9	99	el valor de %s ha d'ï¿½sser 'ON' o 'OFF'.	31337	0
+9	100	Valor d'USERFLAGS no vï¿½lid. Els valors correctes sï¿½n NONE, OP, VOICE.	31337	0
+9	101	USERFLAGS per %s ï¿½s %s.	31337	0
 9	102	el valor de MASSDEOPPRO ha d'estar entre 0-7.	31337	0
 9	103	MASSDEOPPRO per %s s'ha fixat a %d.	31337	0
 9	104	el valor de FLOODPRO ha d'estar entre 0-7.	31337	0
 9	105	FLOODPRO per %s s'ha fixat a %d.	31337	0
-9	106	DESCRIPTION pot tenir fins a %i caràcters com a màxim!	31337	0
+9	106	DESCRIPTION pot tenir fins a %i carï¿½cters com a mï¿½xim!	31337	0
 9	107	La DESCRIPTION de %s ha estat esborrada.	31337	0
-9	108	DESCRIPTION de %s és: %s	31337	0
-9	109	URL pot tenir fins a %i caràcters com a màxim!	31337	0
+9	108	DESCRIPTION de %s ï¿½s: %s	31337	0
+9	109	URL pot tenir fins a %i carï¿½cters com a mï¿½xim!	31337	0
 9	110	La URL de %s ha estat esborrada.	31337	0
-9	111	La URL de %s és: %s	31337	0
-9	112	KEYWORDS pot tenir fins a 80 caràcters com a màxim!	31337	0
-9	113	Les KEYWORDS de %s són: %s	31337	0
+9	111	La URL de %s ï¿½s: %s	31337	0
+9	112	KEYWORDS pot tenir fins a 80 carï¿½cters com a mï¿½xim!	31337	0
+9	113	Les KEYWORDS de %s sï¿½n: %s	31337	0
 9	114	L'idioma s'ha fixat a %s.	31337	0
-9	115	ERROR: Selecció d'idioma no vàlida.	31337	0
+9	115	ERROR: Selecciï¿½ d'idioma no vï¿½lida.	31337	0
 9	116	No puc trobar el canal %s a la xarxa!	31337	0
-9	117	ERROR: Configuració de canal no vàlida.	31337	0
+9	117	ERROR: Configuraciï¿½ de canal no vï¿½lida.	31337	0
 9	118	Llista d'ignoraments:	31337	0
-9	119	La llista d'ignoraments és buida.	31337	0
+9	119	La llista d'ignoraments ï¿½s buida.	31337	0
 9	120	-- Fi de la Llista d'Ignoraments.	31337	0
 9	121	Estat intern dels Serveis de Canals CMaster:	31337	0
-9	122	[         Estadístiques de Canals] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337	0
-9	123	[       Estadístiques d'Usuari/es] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337	0
-9	124	[Estadístiques de Nivells d'Accés] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337	0
-9	125	[       Estadístiques de Bandeigs] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiència:\002 %.2f%%	31337	0
-9	126	Darrera recepció de NOTIFY d'Usuari/a: %i	31337	0
-9	127	Darrera recepció de NOTIFY de Canal: %i	31337	0
-9	128	Darrera recepció de NOTIFY de Nivell: %i	31337	0
-9	129	Darrera recepció de NOTIFY de Bandeig: %i	31337	0
-9	130	Contenidors de dades pròpies assignats: %i	31337	0
+9	122	[         Estadï¿½stiques de Canals] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiï¿½ncia:\002 %.2f%%	31337	0
+9	123	[       Estadï¿½stiques d'Usuari/es] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiï¿½ncia:\002 %.2f%%	31337	0
+9	124	[Estadï¿½stiques de Nivells d'Accï¿½s] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiï¿½ncia:\002 %.2f%%	31337	0
+9	125	[       Estadï¿½stiques de Bandeigs] \002Entrades en Cache:\002 %i    \002DB Peticions:\002 %i    \002Encerts de Cache:\002 %i    \002Eficiï¿½ncia:\002 %.2f%%	31337	0
+9	126	Darrera recepciï¿½ de NOTIFY d'Usuari/a: %i	31337	0
+9	127	Darrera recepciï¿½ de NOTIFY de Canal: %i	31337	0
+9	128	Darrera recepciï¿½ de NOTIFY de Nivell: %i	31337	0
+9	129	Darrera recepciï¿½ de NOTIFY de Bandeig: %i	31337	0
+9	130	Contenidors de dades prï¿½pies assignats: %i	31337	0
 9	131	\002En funcionament (Uptime):\002 %s	31337	0
-9	132	El canal %s té %d usuari/es (%i operador/es).	31337	0
+9	132	El canal %s tï¿½ %d usuari/es (%i operador/es).	31337	0
 9	133	Mode(s): %s	31337	0
 9	134	Opcions actives: %s	31337	0
-9	135	No pots suspendre cap usuari/a amb nivell d'accés igual o superior al teu.	31337	0
-9	136	unitats de temps no vàlides.	31337	0
-9	137	Durada de suspensió no vàlida.	31337	0
-9	138	La SUSPENSIÓ de %s ha estat cancel·lada.	31337	0
-9	139	%s ja està suspès/a a %s	31337	0
-9	140	La SUSPENSIÓ de %s espirarà en %s	31337	0
-9	141	ERROR: TOPIC no pot superar els 145 caràcters.	31337	0
-9	142	El teu accés és insuficient per suprimir el bandeig %s de la base de dades de %s	31337	0
+9	135	No pots suspendre cap usuari/a amb nivell d'accï¿½s igual o superior al teu.	31337	0
+9	136	unitats de temps no vï¿½lides.	31337	0
+9	137	Durada de suspensiï¿½ no vï¿½lida.	31337	0
+9	138	La SUSPENSIï¿½ de %s ha estat cancelï¿½lada.	31337	0
+9	139	%s ja estï¿½ suspï¿½s/a a %s	31337	0
+9	140	La SUSPENSIï¿½ de %s espirarï¿½ en %s	31337	0
+9	141	ERROR: TOPIC no pot superar els 145 carï¿½cters.	31337	0
+9	142	El teu accï¿½s ï¿½s insuficient per suprimir el bandeig %s de la base de dades de %s	31337	0
 9	143	Suprimits %i bandeigs coincidents amb %s	31337	0
-9	144	Suprimit el teu accés temporal de nivell %i al canal %s	31337	0
-9	145	No consta que tinguis cap accés forçat a %s, potser ha expirat?	31337	0
-9	146	%s no està suspès/a a %s	31337	0
-9	147	%s és un/a Operador/a d'IRC.	31337	0
-9	148	%s NO està autenticat/da.	31337	0
-9	149	%s està autenticat/da com a %s%s	31337	0
-9	150	%s és un/a Representant Oficial de CService%s i està autenticat/da com a %s	31337	0
-9	151	%s és un/a Administrador/a Oficial de CService%s i està autenticat/da com a %s	31337	0
-9	152	%s és un/a Programador/a Oficial de CService%s i està autenticat/da com a %s	31337	0
-9	153	Hi ha més de %i entrades coincidents amb [%s]	31337	0
-9	154	Restringeix la màscara de cerca, si et plau.	31337	0
+9	144	Suprimit el teu accï¿½s temporal de nivell %i al canal %s	31337	0
+9	145	No consta que tinguis cap accï¿½s forï¿½at a %s, potser ha expirat?	31337	0
+9	146	%s no estï¿½ suspï¿½s/a a %s	31337	0
+9	147	%s ï¿½s un/a Operador/a d'IRC.	31337	0
+9	148	%s NO estï¿½ autenticat/da.	31337	0
+9	149	%s estï¿½ autenticat/da com a %s%s	31337	0
+9	150	%s ï¿½s un/a Representant Oficial de CService%s i estï¿½ autenticat/da com a %s	31337	0
+9	151	%s ï¿½s un/a Administrador/a Oficial de CService%s i estï¿½ autenticat/da com a %s	31337	0
+9	152	%s ï¿½s un/a Programador/a Oficial de CService%s i estï¿½ autenticat/da com a %s	31337	0
+9	153	Hi ha mï¿½s de %i entrades coincidents amb [%s]	31337	0
+9	154	Restringeix la mï¿½scara de cerca, si et plau.	31337	0
 9	155	Cap entrada coincident amb [%s]	31337	0
 9	156	%s: Els modes del canal han estat esborrats.	31337	0
-9	158	Opció no vàlida.	31337	0
-9	159	%s és un Bot de Servei Oficial d'Undernet.	31337	0
-9	160	%s és un/a Representant Oficial de Coder-Com%s i està autenticat/da com a %s	31337	0
-9	161	%s és un/a Contrbuïdor/a Oficial de Coder-Com%s i està autenticat/da com a %s	31337	0
-9	162	%s és un/a Programador/a Oficial de Coder-Com%s i està autenticat/da com a %s	31337	0
-9	163	%s és un/a Senior Oficial de Coder-Com%s i està autenticat/da com a %s	31337	0
+9	158	Opciï¿½ no vï¿½lida.	31337	0
+9	159	%s ï¿½s un Bot de Servei Oficial d'Undernet.	31337	0
+9	160	%s ï¿½s un/a Representant Oficial de Coder-Com%s i estï¿½ autenticat/da com a %s	31337	0
+9	161	%s ï¿½s un/a Contrbuï¿½dor/a Oficial de Coder-Com%s i estï¿½ autenticat/da com a %s	31337	0
+9	162	%s ï¿½s un/a Programador/a Oficial de Coder-Com%s i estï¿½ autenticat/da com a %s	31337	0
+9	163	%s ï¿½s un/a Senior Oficial de Coder-Com%s i estï¿½ autenticat/da com a %s	31337	0
 9	164	 i un/a Operador/a d'IRC.	31337	0
 9	165	S'ha afegit el bandeig %s a %s amb nivell %i	31337	0
-9	166	%s: la llista de bandeigs és buida.	31337	0
-9	167	Ja sóc a aquest canal!	31337	0
-9	168	Aquesta comanda és reservada per a Operador/es d'IRC.	31337	0
+9	166	%s: la llista de bandeigs ï¿½s buida.	31337	0
+9	167	Ja sï¿½c a aquest canal!	31337	0
+9	168	Aquesta comanda ï¿½s reservada per a Operador/es d'IRC.	31337	0
 9	169	No tinc pas op a %s	31337	0
 9	170	%s durant %i minuts.	31337	0
 9	184	The NOVOICE flag is set on %s	31337	0
@@ -1693,80 +1693,80 @@ COPY "translations" FROM stdin;
 -- 09/03/2001 - Algol <algol@undernet.org>.
 
 COPY "translations" FROM stdin;
-10	1	Lo siento, ya estás autentificado/a como %s	31337	0
-10	2	AUTENTIFICACIÓN COMPLETADA como %s	31337	0
+10	1	Lo siento, ya estï¿½s autentificado/a como %s	31337	0
+10	2	AUTENTIFICACIï¿½N COMPLETADA como %s	31337	0
 10	3	Lo siento, tu acceso es insuficiente para ejecutar esta orden.	31337	0
-10	4	Lo siento, el canal %s está vacío.	31337	0
-10	5	No veo a %s en ningún sitio.	31337	0
+10	4	Lo siento, el canal %s estï¿½ vacï¿½o.	31337	0
+10	5	No veo a %s en ningï¿½n sitio.	31337	0
 10	6	No encuentro a %s en el canal %s	31337	0
 10	7	El canal %s no consta como registrado.	31337	0
 10	8	Has recibido op de %s (%s) en %s	31337	0
 10	9	Has recibido voz de %s (%s) en %s	31337	0
-10	10	%s: No estás en ese canal.	31337	0
+10	10	%s: No estï¿½s en ese canal.	31337	0
 10	11	%s ya tiene op en %s	31337	0
 10	12	%s ya tiene voz en %s	31337	0
 10	13	Te ha quitado el op: %s (%s)	31337	0
 10	14	Te ha quitado la voz: %s (%s)	31337	0
 10	15	%s no tiene op en %s	31337	0
 10	16	%s no tiene voz en %s	31337	0
-10	17	AUTENTIFICACIÓN FALLIDA como %s (Contraseña no válida).	31337	0
+10	17	AUTENTIFICACIï¿½N FALLIDA como %s (Contraseï¿½a no vï¿½lida).	31337	0
 10	18	No estoy en ese canal!	31337	0
-10	19	Nivel de ban no válido. El intervalo válido es 1-%i.	31337	0
-10	20	Duración de ban no válida. La duración de ban máxima es de %d día.	31337	0
+10	19	Nivel de ban no vï¿½lido. El intervalo vï¿½lido es 1-%i.	31337	0
+10	20	Duraciï¿½n de ban no vï¿½lida. La duraciï¿½n de ban mï¿½xima es de %d dï¿½a.	31337	0
 10	21	El motivo del ban no puede superar los 128 caracteres.	31337	0
-10	22	El ban especificado ya está en mi lista de bans!	31337	0
-10	23	El ban %s ya está cubierto por %s	31337	0
-10	24	Nivel mínimo no válido.	31337	0
-10	25	Nivel máximo no válido.	31337	0
+10	22	El ban especificado ya estï¿½ en mi lista de bans!	31337	0
+10	23	El ban %s ya estï¿½ cubierto por %s	31337	0
+10	24	Nivel mï¿½nimo no vï¿½lido.	31337	0
+10	25	Nivel mï¿½ximo no vï¿½lido.	31337	0
 10	26	USUARIO/A: %s ACCESO: %s %s	31337	0
 10	27	CANAL: %s -- AUTOMODO: %s	31337	0
-10	28	ÚLTIMA MODIFICACIÓN: %s (hace %s)	31337	0
+10	28	ï¿½LTIMA MODIFICACIï¿½N: %s (hace %s)	31337	0
 10	29	** SUSPENDIDO/A ** - Expira dentro de %s (Level %i)	31337	0
-10	30	VISTO/A POR ÚLTIMA VEZ: hace %s.	31337	0
-10	31	Hay más de %d entradas coincidentes.	31337	0
-10	32	Restringe tu búsqueda, por favor.	31337	0
+10	30	VISTO/A POR ï¿½LTIMA VEZ: hace %s.	31337	0
+10	31	Hay mï¿½s de %d entradas coincidentes.	31337	0
+10	32	Restringe tu bï¿½squeda, por favor.	31337	0
 10	33	Fin de la lista de accesos.	31337	0
 10	34	No hay coincidencias!	31337	0
-10	35	No puedes añadir un usuario/a con un nivel igual o superior al tuyo.	31337	0
-10	36	Nivel de acceso no válido.	31337	0
-10	37	%s ya está añadido a %s con nivel de acceso %i.	31337	0
-10	38	Se ha añadido el/la usuario/a %s a %s con nivel de acceso %i	31337	0
+10	35	No puedes aï¿½adir un usuario/a con un nivel igual o superior al tuyo.	31337	0
+10	36	Nivel de acceso no vï¿½lido.	31337	0
+10	37	%s ya estï¿½ aï¿½adido a %s con nivel de acceso %i.	31337	0
+10	38	Se ha aï¿½adido el/la usuario/a %s a %s con nivel de acceso %i	31337	0
 10	39	Algo ha fallado: %s	31337	0
 10	40	%s: Fin de la lista de bans.	31337	0
 10	41	Imposible ver los detalles del/la usuario/a (Invisible).	31337	0
-10	42	Información sobre: %s (%i)	31337	0
-10	43	Conexión actual autentificada: %s	31337	0
+10	42	Informaciï¿½n sobre: %s (%i)	31337	0
+10	43	Conexiï¿½n actual autentificada: %s	31337	0
 10	44	URL: %s	31337	0
 10	45	Idioma: %i	31337	0
 10	46	Canales: %s	31337	0
 10	47	Puntos de Flood de Entrada: %i	31337	0
 10	48	Flood de Salida (Bytes): %i	31337	0
-10	49	%s está registrado por:	31337	0
-10	50	%s - visto/a por última vez: %s ago	31337	0
+10	49	%s estï¿½ registrado por:	31337	0
+10	50	%s - visto/a por ï¿½ltima vez: %s ago	31337	0
 10	51	Desc: %s	31337	0
-10	52	Pretendes floodearme? Pues no voy a hacerte más caso.	31337	0
-10	53	Creo que ya te he enviado datos de sobra, ahora te ignoraré un rato.	31337	0
+10	52	Pretendes floodearme? Pues no voy a hacerte mï¿½s caso.	31337	0
+10	53	Creo que ya te he enviado datos de sobra, ahora te ignorarï¿½ un rato.	31337	0
 10	54	Orden incompleta	31337	0
 10	55	Para usar %s, debes /msg %s@%s	31337	0
 10	56	Lo siento, has de estar autentificado/a para utilizar esta orden.	31337	0
 10	57	El canal %s ha sido suspendido por un/a administrador/a de CService.	31337	0
 10	58	Tu acceso en %s ha sido suspendido.	31337	0
-10	59	La opción NOOP está activa en %s	31337	0
-10	60	La opción STRICTOP está activa en %s	31337	0
-10	61	Acabas de quitar el op a más de %i usuarios/as.	31337	0
+10	59	La opciï¿½n NOOP estï¿½ activa en %s	31337	0
+10	60	La opciï¿½n STRICTOP estï¿½ activa en %s	31337	0
+10	61	Acabas de quitar el op a mï¿½s de %i usuarios/as.	31337	0
 10	62	SINTAXIS: %s	31337	0
 10	63	Tu acceso en el canal %s se ha incrementado temporalmente a %i.	31337	0
-10	64	%s está registrado.	31337	0
-10	65	%s no está registrado.	31337	0
+10	64	%s estï¿½ registrado.	31337	0
+10	65	%s no estï¿½ registrado.	31337	0
 10	66	Dudo que a %s le parezca bien.	31337	0
 10	67	\002*** Lista de bans para el canal %s ***\002	31337	0
 10	68	%s %s Nivel: %i	31337	0
-10	69	AÑADIDO POR: %s (%s)	31337	0
+10	69	Aï¿½ADIDO POR: %s (%s)	31337	0
 10	70	DESDE: %s	31337	0
 10	71	EXP: %s	31337	0
 10	72	\002*** FIN ***\002	31337	0
-10	73	Lo siento, no sé quién es %s.	31337	0
-10	74	Lo siento, ya no estás autentificado/a.	31337	0
+10	73	Lo siento, no sï¿½ quiï¿½n es %s.	31337	0
+10	74	Lo siento, ya no estï¿½s autentificado/a.	31337	0
 10	75	%s no consta con acceso en %s	31337	0
 10	76	No puedes modificar los usuarios/as con nivel de acceso igual o superior al tuyo.	31337	0
 10	77	No puedes dar a un/a usuario/a un acceso de nivel igual o superior al tuyo.	31337	0
@@ -1774,92 +1774,92 @@ COPY "translations" FROM stdin;
 10	79	AUTOMODE cambiado a OP para %s en el canal %s	31337	0
 10	80	AUTOMODE cambiado a VOICE para %s en el canal %s	31337	0
 10	81	AUTOMODE cambiado a NONE para %s en el canal %s	31337	0
-10	82	Tu contraseña no puede ser tu nombre de usuario/a ni tu nick actual - la sintaxis es: NEWPASS <nueva contraseña>	31337	0
-10	83	Contraseña cambiada con éxito.	31337	0
-10	84	La opción NOOP está acitavada en %s	31337	0
-10	85	La opción STRICTOP está activada en %s (y %s no está autentificado/a).	31337	0
-10	86	La opción STRICTOP está activada en %s (y %s tiene un acceso insuficiente).	31337	0
+10	82	Tu contraseï¿½a no puede ser tu nombre de usuario/a ni tu nick actual - la sintaxis es: NEWPASS <nueva contraseï¿½a>	31337	0
+10	83	Contraseï¿½a cambiada con ï¿½xito.	31337	0
+10	84	La opciï¿½n NOOP estï¿½ acitavada en %s	31337	0
+10	85	La opciï¿½n STRICTOP estï¿½ activada en %s (y %s no estï¿½ autentificado/a).	31337	0
+10	86	La opciï¿½n STRICTOP estï¿½ activada en %s (y %s tiene un acceso insuficiente).	31337	0
 10	87	El canal %s ha sido purgado.	31337	0
-10	88	%s ya está registrado.	31337	0
-10	89	Nombre de canal no válido.	31337	0
+10	88	%s ya estï¿½ registrado.	31337	0
+10	89	Nombre de canal no vï¿½lido.	31337	0
 10	90	El canal %s ha sido registrado.	31337	0
 10	91	%s ha sido eliminado de mi lista de silencios.	31337	0
 10	92	No he encontrado %s en mi lista de silencios.	31337	0
 10	93	No puedes suprimir usuarios/as con nivel de acceso igual o superior al tuyo.	31337	0
 10	94	No puedes suprimir tu propio acceso en un canal que es tuyo.	31337	0
 10	95	Se ha suprimido el/la usuario/a %s de %s	31337	0
-10	96	Tu opción INVISIBLE está ahora activa (ON).	31337	0
-10	97	Your INVISIBLE setting está ahora inactiva (OFF).	31337	0
-10	98	%s en %s está %s	31337	0
-10	99	el valor de %s sólo puede ser 'ON' u 'OFF'.	31337	0
-10	100	Valor de USERFLAGS no válido. Los valores válidos son NONE, OP, VOICE.	31337	0
+10	96	Tu opciï¿½n INVISIBLE estï¿½ ahora activa (ON).	31337	0
+10	97	Your INVISIBLE setting estï¿½ ahora inactiva (OFF).	31337	0
+10	98	%s en %s estï¿½ %s	31337	0
+10	99	el valor de %s sï¿½lo puede ser 'ON' u 'OFF'.	31337	0
+10	100	Valor de USERFLAGS no vï¿½lido. Los valores vï¿½lidos son NONE, OP, VOICE.	31337	0
 10	101	USERFLAGS en %s es %s.	31337	0
 10	102	el valor de MASSDEOPPRO tiene que estar entre 0-7.	31337	0
 10	103	MASSDEOPPRO en %s se ha establecido en %d.	31337	0
 10	104	el valor de FLOODPRO tiene que estar entre 0-7.	31337	0
 10	105	FLOODPRO en %s se ha establecido en %d.	31337	0
-10	106	DESCRIPTION puede contener un máximo de %i caracteres!	31337	0
+10	106	DESCRIPTION puede contener un mï¿½ximo de %i caracteres!	31337	0
 10	107	La DESCRIPTION de %s ha sido borrada.	31337	0
 10	108	La DESCRIPTION de %s es: %s	31337	0
-10	109	URL puede contener un máximo de %i caracteres!	31337	0
+10	109	URL puede contener un mï¿½ximo de %i caracteres!	31337	0
 10	110	la URL de %s ha sido borrada.	31337	0
 10	111	La URL de %s es: %s	31337	0
-10	112	la cadena de KEYWORDS puede contener un máximo de 80 caracteres!	31337	0
+10	112	la cadena de KEYWORDS puede contener un mï¿½ximo de 80 caracteres!	31337	0
 10	113	KEYWORDS de %s son: %s	31337	0
 10	114	Se ha seleccionado el idioma %s.	31337	0
-10	115	ERROR: Selección de idioma no válida.	31337	0
+10	115	ERROR: Selecciï¿½n de idioma no vï¿½lida.	31337	0
 10	116	No puedo encontrar el canal %s en la red!	31337	0
-10	117	ERROR: Configuración de canal incorrecta.	31337	0
+10	117	ERROR: Configuraciï¿½n de canal incorrecta.	31337	0
 10	118	Lista de ignores:	31337	0
-10	119	La lista de ignores está vacía	31337	0
+10	119	La lista de ignores estï¿½ vacï¿½a	31337	0
 10	120	-- Fin de la Lista de Ignores	31337	0
 10	121	Estado interno de los Servicios de Canales CMaster:	31337	0
-10	122	[          Estadísticas de Registros de Canales] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-10	123	[         Estadísticas de Registros de Usuarios] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-10	124	[Estadísticas de Registros de Niveles de Acceso] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-10	125	[             Estadísticas de Registros de Bans] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-10	126	Última recepción de NOTIFY de Usuario/a: %i	31337	0
-10	127	Última recepción de NOTIFY de Canal: %i	31337	0
-10	128	Última recepción de NOTIFY de Nivel: %i	31337	0
-10	129	Última recepción de NOTIFY de Ban: %i	31337	0
+10	122	[          Estadï¿½sticas de Registros de Canales] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+10	123	[         Estadï¿½sticas de Registros de Usuarios] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+10	124	[Estadï¿½sticas de Registros de Niveles de Acceso] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+10	125	[             Estadï¿½sticas de Registros de Bans] \002Entradas en Cache:\002 %i    \002DB Peticiones:\002 %i    \002Aciertos en Cache:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
+10	126	ï¿½ltima recepciï¿½n de NOTIFY de Usuario/a: %i	31337	0
+10	127	ï¿½ltima recepciï¿½n de NOTIFY de Canal: %i	31337	0
+10	128	ï¿½ltima recepciï¿½n de NOTIFY de Nivel: %i	31337	0
+10	129	ï¿½ltima recepciï¿½n de NOTIFY de Ban: %i	31337	0
 10	130	Contenedores de datos propios asignados: %i	31337	0
 10	131	\002Funcionando (Uptime):\002 %s	31337	0
 10	132	El canal %s tiene %d usuarios/as (%i operadores/as)	31337	0
 10	133	Modo(s): %s	31337	0
 10	134	Opciones: %s	31337	0
 10	135	No puedes suspender usuarios/as con un nivel de acceso igual o superior al tuyo.	31337	0
-10	136	unidades de tiempo erróneas.	31337	0
-10	137	Duración de suspensión no válida.	31337	0
-10	138	La SUSPENSIÓN de %s ha sido cancelada	31337	0
-10	139	%s ya está suspendido/a en %s	31337	0
-10	140	La SUSPENSIÓN de %s expirará dentro de %s.	31337	0
-10	141	ERROR: TOPIC no puede contener más de 145 caracteres.	31337	0
+10	136	unidades de tiempo errï¿½neas.	31337	0
+10	137	Duraciï¿½n de suspensiï¿½n no vï¿½lida.	31337	0
+10	138	La SUSPENSIï¿½N de %s ha sido cancelada	31337	0
+10	139	%s ya estï¿½ suspendido/a en %s	31337	0
+10	140	La SUSPENSIï¿½N de %s expirarï¿½ dentro de %s.	31337	0
+10	141	ERROR: TOPIC no puede contener mï¿½s de 145 caracteres.	31337	0
 10	142	Tu acceso es insuficiente para suprimir el ban %s de la base de datos de %s	31337	0
 10	143	Suprimidos %i bans coincidentes con %s	31337	0
 10	144	Se ha suprimido tu acceso temporal de nivel %i en el canal %s	31337	0
-10	145	No consta que tengas un acceso forzado en %s, quizás ha expirado?	31337	0
-10	146	%s no está suspendido/a en %s	31337	0
+10	145	No consta que tengas un acceso forzado en %s, quizï¿½s ha expirado?	31337	0
+10	146	%s no estï¿½ suspendido/a en %s	31337	0
 10	147	%s es un/a Operador/a de IRC	31337	0
-10	148	%s NO está autentificado/a.	31337	0
-10	149	%s está autentificado/a como %s%s	31337	0
-10	150	%s es un/a Representante Oficial de CService%s y está autentificado/a como %s	31337	0
-10	151	%s es un/a Administrador/a Oficial de %s y está autentificado/a como %s	31337	0
-10	152	%s es un/a Programador/a Oficial de CService%s y está autentificado/a como %s	31337	0
-10	153	Hay más de %i entradas coincidentes con [%s]	31337	0
-10	154	Restringe la máscara de búsqueda, por favor.	31337	0
+10	148	%s NO estï¿½ autentificado/a.	31337	0
+10	149	%s estï¿½ autentificado/a como %s%s	31337	0
+10	150	%s es un/a Representante Oficial de CService%s y estï¿½ autentificado/a como %s	31337	0
+10	151	%s es un/a Administrador/a Oficial de %s y estï¿½ autentificado/a como %s	31337	0
+10	152	%s es un/a Programador/a Oficial de CService%s y estï¿½ autentificado/a como %s	31337	0
+10	153	Hay mï¿½s de %i entradas coincidentes con [%s]	31337	0
+10	154	Restringe la mï¿½scara de bï¿½squeda, por favor.	31337	0
 10	155	No hay entradas coincidentes con [%s]	31337	0
 10	156	%s: Los modos del canal han sido borrados.	31337	0
-10	158	Opción inválida.	31337	0
+10	158	Opciï¿½n invï¿½lida.	31337	0
 10	159	%s es un Bot de Servicio Oficial de Undernet.	31337	0
-10	160	%s es un/a Representante Oficial de Coder-Com%s y está autentificado/a como %s	31337	0
-10	161	%s es un/a Contribuidor Oficial de Coder-Com%s y está autentificado/a como %s	31337	0
-10	162	%s es un/a Programador/a Oficial de Coder-Com%s y está autentificado/a como %s	31337	0
-10	163	%s es un/a Senior Oficial de Coder-Com%s y está autentificado/a como %s	31337	0
+10	160	%s es un/a Representante Oficial de Coder-Com%s y estï¿½ autentificado/a como %s	31337	0
+10	161	%s es un/a Contribuidor Oficial de Coder-Com%s y estï¿½ autentificado/a como %s	31337	0
+10	162	%s es un/a Programador/a Oficial de Coder-Com%s y estï¿½ autentificado/a como %s	31337	0
+10	163	%s es un/a Senior Oficial de Coder-Com%s y estï¿½ autentificado/a como %s	31337	0
 10	164	 y un/a Operador/a de IRC.	31337	0
-10	165	Se ha añadido el ban %s a %s con nivel %i.	31337	0
-10	166	%s: la lista de bans está vacía.	31337	0
+10	165	Se ha aï¿½adido el ban %s a %s con nivel %i.	31337	0
+10	166	%s: la lista de bans estï¿½ vacï¿½a.	31337	0
 10	167	Ya estoy en ese canal!	31337	0
-10	168	Esta orden está reservada para Operadores/as de IRC.	31337	0
+10	168	Esta orden estï¿½ reservada para Operadores/as de IRC.	31337	0
 10	169	No tengo op en %s	31337	0
 10	170	%s durante %i minutos.	31337	0
 10	184	The NOVOICE flag is set on %s	31337	0
@@ -2063,179 +2063,179 @@ COPY "translations" FROM stdin;
 \.
 
 -- Turkish language definition.
--- 21/08/01 - Mehmet Akçin <cavalry@ircdestek.org>.
+-- 21/08/01 - Mehmet Akï¿½in <cavalry@ircdestek.org>.
 -- 21/08/01 - Ozan Ferah <claymore@ircdestek.org>.
 
 COPY "translations" FROM stdin;
-12	1	Üzgünüm, %s olarak zaten tanýmlýsýnýz.	31337	0
-12	2	%s olarak TANIMLAMA BAÞARILI	31337	0
-12	3	Üzgünüm, o komutu uygulamak için yeterli eriþiminiz yok	31337	0
-12	4	Üzgünüm, %s kanalý boþ	31337	0
-12	5	%s hiçbir yerde görünmüyor	31337	0
-12	6	%s rumuzunu %s kanalýnda göremiyorum	31337	0
-12	7	%s kanalý kayýtlý olarak gözükmüyor	31337	0
-12	8	%s size operatörlük yetkisi verdi (%s) / %s	31337	0
-12	9	%s size konuþma yetkisi verdi (%s) / %s	31337	0
-12	10	%s: Siz kanalda deðilsiniz	31337	0
-12	11	%s zaten %s kanalýnda operatör durumunda	31337	0
-12	12	%s zaten %s kanalýnda konuþma durumunda	31337	0
-12	13	%s tarafýndan operatörlük yetkiniz alýndý (%s)	31337	0
-12	14	%s tarafýndan konuþma yetkiniz alýndý (%s)	31337	0
-12	15	%s için %s kanalýnda operatörlük yetkisi yok	31337	0
-12	16	%s için %s kanalýnda konuþma yetkisi yok	31337	0
-12	17	%s kanalýnda TANIMLAMA BAÞARISIZ (Geçersiz Þifre)	31337	0
-12	18	Ben o kanalda deðilim!	31337	0
-12	19	Geçersiz yasaklama-seviye dizisi. Geçerli dizi 1-%i olmalý.	31337	0
-12	20	Geçersiz yasaklama süresi. Sizin yasaklama süreniz en fazla %d günler olabilir.	31337	0
-12	21	Yasaklama sebebi 128 karakteri aþmamalýdýr	31337	0
-12	22	Belirtilen yasaklama zaten benim yasaklýlar listemde!	31337	0
-12	23	%s yasaklamasý zaten %s ile kapsanmýþ durumda	31337	0
-12	24	Geçersiz en az seviye.	31337	0
-12	25	Geçersiz en fazla seviye.	31337	0
-12	26	KULLANICI: %s ERÝÞÝM: %s %s	31337	0
+12	1	ï¿½zgï¿½nï¿½m, %s olarak zaten tanï¿½mlï¿½sï¿½nï¿½z.	31337	0
+12	2	%s olarak TANIMLAMA BAï¿½ARILI	31337	0
+12	3	ï¿½zgï¿½nï¿½m, o komutu uygulamak iï¿½in yeterli eriï¿½iminiz yok	31337	0
+12	4	ï¿½zgï¿½nï¿½m, %s kanalï¿½ boï¿½	31337	0
+12	5	%s hiï¿½bir yerde gï¿½rï¿½nmï¿½yor	31337	0
+12	6	%s rumuzunu %s kanalï¿½nda gï¿½remiyorum	31337	0
+12	7	%s kanalï¿½ kayï¿½tlï¿½ olarak gï¿½zï¿½kmï¿½yor	31337	0
+12	8	%s size operatï¿½rlï¿½k yetkisi verdi (%s) / %s	31337	0
+12	9	%s size konuï¿½ma yetkisi verdi (%s) / %s	31337	0
+12	10	%s: Siz kanalda deï¿½ilsiniz	31337	0
+12	11	%s zaten %s kanalï¿½nda operatï¿½r durumunda	31337	0
+12	12	%s zaten %s kanalï¿½nda konuï¿½ma durumunda	31337	0
+12	13	%s tarafï¿½ndan operatï¿½rlï¿½k yetkiniz alï¿½ndï¿½ (%s)	31337	0
+12	14	%s tarafï¿½ndan konuï¿½ma yetkiniz alï¿½ndï¿½ (%s)	31337	0
+12	15	%s iï¿½in %s kanalï¿½nda operatï¿½rlï¿½k yetkisi yok	31337	0
+12	16	%s iï¿½in %s kanalï¿½nda konuï¿½ma yetkisi yok	31337	0
+12	17	%s kanalï¿½nda TANIMLAMA BAï¿½ARISIZ (Geï¿½ersiz ï¿½ifre)	31337	0
+12	18	Ben o kanalda deï¿½ilim!	31337	0
+12	19	Geï¿½ersiz yasaklama-seviye dizisi. Geï¿½erli dizi 1-%i olmalï¿½.	31337	0
+12	20	Geï¿½ersiz yasaklama sï¿½resi. Sizin yasaklama sï¿½reniz en fazla %d gï¿½nler olabilir.	31337	0
+12	21	Yasaklama sebebi 128 karakteri aï¿½mamalï¿½dï¿½r	31337	0
+12	22	Belirtilen yasaklama zaten benim yasaklï¿½lar listemde!	31337	0
+12	23	%s yasaklamasï¿½ zaten %s ile kapsanmï¿½ï¿½ durumda	31337	0
+12	24	Geï¿½ersiz en az seviye.	31337	0
+12	25	Geï¿½ersiz en fazla seviye.	31337	0
+12	26	KULLANICI: %s ERï¿½ï¿½ï¿½M: %s %s	31337	0
 12	27	KANAL: %s -- OTOMOD: %s	31337	0
-12	28	SON DEÐÝÞÝM: %s (%s önce)	31337	0
-12	29	** ASKIYA ALINMIÞ ** - %s içinde süresi dolacak (Seviye %i)	31337	0
-12	30	SON GÖRÜÞ: %s önce.	31337	0
-12	31	15'den fazla eþleþen giriþ var.	31337	0
-12	32	Lütfen soruyu sýnýrlandýrýn.	31337	0
-12	33	Eriþim listesi sonu	31337	0
-12	34	Eþleþme Yok!	31337	0
-12	35	Sizikine eþit ya da yüksek seviye ile kullanýcý ekleyemezsiniz.	31337	0
-12	36	Geçersiz eriþim seviyesi.	31337	0
-12	37	%s zaten %s kanalýnda %i eriþim seviyesi ile eklenmiþ.	31337	0
-12	38	%s kullanýcýsý %s kanalýnda %i eriþim seviyesi ile eklendi	31337	0
-12	39	Birþeyde aksama oldu: %s	31337	0
-12	40	%s: Yasaklýlar listesi sonu	31337	0
-12	41	Kullanýcý detaylarý listelenemedi (Görünmez)	31337	0
-12	42	Hakkýnda bilgiler: %s (%i)	31337	0
-12	43	Þu anda giriþ yapmýþ olan: %s	31337	0
+12	28	SON DEï¿½ï¿½ï¿½ï¿½M: %s (%s ï¿½nce)	31337	0
+12	29	** ASKIYA ALINMIï¿½ ** - %s iï¿½inde sï¿½resi dolacak (Seviye %i)	31337	0
+12	30	SON Gï¿½Rï¿½ï¿½: %s ï¿½nce.	31337	0
+12	31	15'den fazla eï¿½leï¿½en giriï¿½ var.	31337	0
+12	32	Lï¿½tfen soruyu sï¿½nï¿½rlandï¿½rï¿½n.	31337	0
+12	33	Eriï¿½im listesi sonu	31337	0
+12	34	Eï¿½leï¿½me Yok!	31337	0
+12	35	Sizikine eï¿½it ya da yï¿½ksek seviye ile kullanï¿½cï¿½ ekleyemezsiniz.	31337	0
+12	36	Geï¿½ersiz eriï¿½im seviyesi.	31337	0
+12	37	%s zaten %s kanalï¿½nda %i eriï¿½im seviyesi ile eklenmiï¿½.	31337	0
+12	38	%s kullanï¿½cï¿½sï¿½ %s kanalï¿½nda %i eriï¿½im seviyesi ile eklendi	31337	0
+12	39	Birï¿½eyde aksama oldu: %s	31337	0
+12	40	%s: Yasaklï¿½lar listesi sonu	31337	0
+12	41	Kullanï¿½cï¿½ detaylarï¿½ listelenemedi (Gï¿½rï¿½nmez)	31337	0
+12	42	Hakkï¿½nda bilgiler: %s (%i)	31337	0
+12	43	ï¿½u anda giriï¿½ yapmï¿½ï¿½ olan: %s	31337	0
 12	44	Site: %s	31337	0
 12	45	Lisan: %i	31337	0
 12	46	Kanallar: %s	31337	0
-12	47	Giren Yüklenme Puaný: %i	31337	0
-12	48	Çýkan Yüklenme (Bit): %i	31337	0
-12	49	%s kanalýný kayýt ettirmiþ olan:	31337	0
-12	50	%s - son görüþ: %s önce	31337	0
-12	51	Taným: %s	31337	0
-12	52	Bana yükleme yapmaya devam edecek misin? Bundan sonra seni dinlemeyeceðim	31337	0
-12	53	Düþünüyorum da sana biraz fazla bilgi yolladým, seni bir süre önemsemeyeceðim.	31337	0
+12	47	Giren Yï¿½klenme Puanï¿½: %i	31337	0
+12	48	ï¿½ï¿½kan Yï¿½klenme (Bit): %i	31337	0
+12	49	%s kanalï¿½nï¿½ kayï¿½t ettirmiï¿½ olan:	31337	0
+12	50	%s - son gï¿½rï¿½ï¿½: %s ï¿½nce	31337	0
+12	51	Tanï¿½m: %s	31337	0
+12	52	Bana yï¿½kleme yapmaya devam edecek misin? Bundan sonra seni dinlemeyeceï¿½im	31337	0
+12	53	Dï¿½ï¿½ï¿½nï¿½yorum da sana biraz fazla bilgi yolladï¿½m, seni bir sï¿½re ï¿½nemsemeyeceï¿½im.	31337	0
 12	54	Noksan komut	31337	0
-12	55	%s komutunu kullanmak için, yapmanýz gereken /msg %s@%s	31337	0
-12	56	Üzgünüm, bu komutu kullanmak için tanýmlanmalýsýnýz.	31337	0
-12	57	%s kanalý bir cservice yöneticisi tarafýndan geçici olarak kapatýlmýþ.	31337	0
-12	58	%s kanalýndaki eriþiminiz askýya alýnmýþ.	31337	0
-12	59	%s kanalýnda NOOP özelliði aktif hale getirilmiþtir	31337	0
-12	60	%s kanalýnda STRICTOP özelliði aktif hale getirilmiþtir	31337	0
-12	61	Biraz önce %i kiþiden fazlasýndan operatörlük yetkisi aldýnýz	31337	0
-12	62	SÖZDÝZÝMÝ: %s	31337	0
-12	63	%s kanalýnda eriþiminiz geçici olarak %i olarak yükseltildi	31337	0
-12	64	%s kayýtlý.	31337	0
-12	65	%s kayýtsýz.	31337	0
-12	66	%s kanalýnýn bunu takdir edeceðini sanmýyorum.	31337	0
-12	67	\002*** %s için Yasaklýlar Listesi ***\002	31337	0
+12	55	%s komutunu kullanmak iï¿½in, yapmanï¿½z gereken /msg %s@%s	31337	0
+12	56	ï¿½zgï¿½nï¿½m, bu komutu kullanmak iï¿½in tanï¿½mlanmalï¿½sï¿½nï¿½z.	31337	0
+12	57	%s kanalï¿½ bir cservice yï¿½neticisi tarafï¿½ndan geï¿½ici olarak kapatï¿½lmï¿½ï¿½.	31337	0
+12	58	%s kanalï¿½ndaki eriï¿½iminiz askï¿½ya alï¿½nmï¿½ï¿½.	31337	0
+12	59	%s kanalï¿½nda NOOP ï¿½zelliï¿½i aktif hale getirilmiï¿½tir	31337	0
+12	60	%s kanalï¿½nda STRICTOP ï¿½zelliï¿½i aktif hale getirilmiï¿½tir	31337	0
+12	61	Biraz ï¿½nce %i kiï¿½iden fazlasï¿½ndan operatï¿½rlï¿½k yetkisi aldï¿½nï¿½z	31337	0
+12	62	Sï¿½ZDï¿½Zï¿½Mï¿½: %s	31337	0
+12	63	%s kanalï¿½nda eriï¿½iminiz geï¿½ici olarak %i olarak yï¿½kseltildi	31337	0
+12	64	%s kayï¿½tlï¿½.	31337	0
+12	65	%s kayï¿½tsï¿½z.	31337	0
+12	66	%s kanalï¿½nï¿½n bunu takdir edeceï¿½ini sanmï¿½yorum.	31337	0
+12	67	\002*** %s iï¿½in Yasaklï¿½lar Listesi ***\002	31337	0
 12	68	%s %s Seviye: %i	31337	0
 12	69	EKLEYEN: %s (%s)	31337	0
-12	70	BAÞLANGIÇ: %s	31337	0
-12	71	SONA ERÝÞ: %s	31337	0
+12	70	BAï¿½LANGIï¿½: %s	31337	0
+12	71	SONA ERï¿½ï¿½: %s	31337	0
 12	72	\002*** SON ***\002	31337	0
 12	73	%s kimdir bilmiyorum.	31337	0
-12	74	Artýk bende tanýmlý deðilsiniz.	31337	0
-12	75	%s %s kanalýnda eriþimli gözükmüyor.	31337	0
-12	76	Sizinkine eþit ya da fazla eriþimli kullanýcýda deðiþiklik yapamazsýnýz.	31337	0
-12	77	Sizinkine eþit ya da fazla eriþim veremezsiniz.	31337	0
-12	78	%s için eriþim seviyesi %s kanalýnda %i olarak deðiþtirildi	31337	0
-12	79	%s kullanýcý adý için %s kanalýnda otomatik operatörlük verildi	31337	0
-12	80	%s kullanýcý adý için %s kanalýnda otomatik konuþma verildi	31337	0
-12	81	%s kullanýcý adý için %s kanalýnda otomatik seçeneði kaldýrýldý	31337	0
-12	82	Þifre ibareniz kullanýcý adýnýz ya da þuanki rumuzunuz olamaz - sözdizimi: NEWPASS <yeni ibare>	31337	0
-12	83	Þifre deðiþimi baþarýlý.	31337	0
-12	84	%s kanalýnda NOOP özelliði aktif hale getirilmiþtir	31337	0
-12	85	%s kanalýnda STRICTOP özelliði aktif hale getirilmiþtir (ve %s tanýmlanmamýþ)	31337	0
-12	86	%s kanalýnda STRICTOP özelliði aktif hale getirilmiþtir (ve %s yetersiz eriþimli)	31337	0
-12	87	%s kanalý kapatýldý	31337	0
-12	88	%s zaten bende kayýtlý.	31337	0
-12	89	Geçersiz kanal ismi.	31337	0
-12	90	Kayýtlý kanal %s	31337	0
-12	91	%s sessizlik listemden çýkarýldý	31337	0
-12	92	%s sessizlik listemde bulunamadý	31337	0
-12	93	Sizinkine eþit ya da fazla eriþimli kullanýcýyý silemezsiniz	31337	0
-12	94	Kendinizi, sahibi olduðunuz kanaldan silemezsiniz	31337	0
-12	95	%s kullanýcýsý %s kanalýnda silindi	31337	0
-12	96	GÖRÜNMEZLÝK ayarýnýz açýldý.	31337	0
-12	97	GÖRÜNMEZLÝK ayarýnýz kapatýldý.	31337	0
-12	98	%s %s için %s	31337	0
-12	99	%s için deðer ON ya da OFF olmalý	31337	0
-12	100	Geçersiz USERFLAGS ayarý. Doðru deðerler NONE, OP, VOICE.	31337	0
-12	101	%s için USERFLAGS ayarý %s	31337	0
-12	102	MASSDEOPPRO için deðer 0-7 olmalý	31337	0
-12	103	MASSDEOPPRO %s kanalý için %d yapýldý	31337	0
-12	104	FLOODPRO için deðer 0-7 olmalý	31337	0
-12	105	FLOODPRO %s kanalý için %d yapýldý	31337	0
+12	74	Artï¿½k bende tanï¿½mlï¿½ deï¿½ilsiniz.	31337	0
+12	75	%s %s kanalï¿½nda eriï¿½imli gï¿½zï¿½kmï¿½yor.	31337	0
+12	76	Sizinkine eï¿½it ya da fazla eriï¿½imli kullanï¿½cï¿½da deï¿½iï¿½iklik yapamazsï¿½nï¿½z.	31337	0
+12	77	Sizinkine eï¿½it ya da fazla eriï¿½im veremezsiniz.	31337	0
+12	78	%s iï¿½in eriï¿½im seviyesi %s kanalï¿½nda %i olarak deï¿½iï¿½tirildi	31337	0
+12	79	%s kullanï¿½cï¿½ adï¿½ iï¿½in %s kanalï¿½nda otomatik operatï¿½rlï¿½k verildi	31337	0
+12	80	%s kullanï¿½cï¿½ adï¿½ iï¿½in %s kanalï¿½nda otomatik konuï¿½ma verildi	31337	0
+12	81	%s kullanï¿½cï¿½ adï¿½ iï¿½in %s kanalï¿½nda otomatik seï¿½eneï¿½i kaldï¿½rï¿½ldï¿½	31337	0
+12	82	ï¿½ifre ibareniz kullanï¿½cï¿½ adï¿½nï¿½z ya da ï¿½uanki rumuzunuz olamaz - sï¿½zdizimi: NEWPASS <yeni ibare>	31337	0
+12	83	ï¿½ifre deï¿½iï¿½imi baï¿½arï¿½lï¿½.	31337	0
+12	84	%s kanalï¿½nda NOOP ï¿½zelliï¿½i aktif hale getirilmiï¿½tir	31337	0
+12	85	%s kanalï¿½nda STRICTOP ï¿½zelliï¿½i aktif hale getirilmiï¿½tir (ve %s tanï¿½mlanmamï¿½ï¿½)	31337	0
+12	86	%s kanalï¿½nda STRICTOP ï¿½zelliï¿½i aktif hale getirilmiï¿½tir (ve %s yetersiz eriï¿½imli)	31337	0
+12	87	%s kanalï¿½ kapatï¿½ldï¿½	31337	0
+12	88	%s zaten bende kayï¿½tlï¿½.	31337	0
+12	89	Geï¿½ersiz kanal ismi.	31337	0
+12	90	Kayï¿½tlï¿½ kanal %s	31337	0
+12	91	%s sessizlik listemden ï¿½ï¿½karï¿½ldï¿½	31337	0
+12	92	%s sessizlik listemde bulunamadï¿½	31337	0
+12	93	Sizinkine eï¿½it ya da fazla eriï¿½imli kullanï¿½cï¿½yï¿½ silemezsiniz	31337	0
+12	94	Kendinizi, sahibi olduï¿½unuz kanaldan silemezsiniz	31337	0
+12	95	%s kullanï¿½cï¿½sï¿½ %s kanalï¿½nda silindi	31337	0
+12	96	Gï¿½Rï¿½NMEZLï¿½K ayarï¿½nï¿½z aï¿½ï¿½ldï¿½.	31337	0
+12	97	Gï¿½Rï¿½NMEZLï¿½K ayarï¿½nï¿½z kapatï¿½ldï¿½.	31337	0
+12	98	%s %s iï¿½in %s	31337	0
+12	99	%s iï¿½in deï¿½er ON ya da OFF olmalï¿½	31337	0
+12	100	Geï¿½ersiz USERFLAGS ayarï¿½. Doï¿½ru deï¿½erler NONE, OP, VOICE.	31337	0
+12	101	%s iï¿½in USERFLAGS ayarï¿½ %s	31337	0
+12	102	MASSDEOPPRO iï¿½in deï¿½er 0-7 olmalï¿½	31337	0
+12	103	MASSDEOPPRO %s kanalï¿½ iï¿½in %d yapï¿½ldï¿½	31337	0
+12	104	FLOODPRO iï¿½in deï¿½er 0-7 olmalï¿½	31337	0
+12	105	FLOODPRO %s kanalï¿½ iï¿½in %d yapï¿½ldï¿½	31337	0
 12	106	KANAL TANIMI en fazla %i karakter olabilir	31337	0
-12	107	%s için KANAL TANIMI silindi.	31337	0
-12	108	%s için KANAL TANIMI: %s	31337	0
-12	109	Site adý en fazla %i karakter olabilir!	31337	0
-12	110	%s için site adý silindi.	31337	0
-12	111	%s için site adý: %s	31337	0
-12	112	Anahtar kelimeler için dizgi 80 karakteri aþamaz!	31337	0
-12	113	%s için ANAHTAR KELÝMELER: %s	31337	0
+12	107	%s iï¿½in KANAL TANIMI silindi.	31337	0
+12	108	%s iï¿½in KANAL TANIMI: %s	31337	0
+12	109	Site adï¿½ en fazla %i karakter olabilir!	31337	0
+12	110	%s iï¿½in site adï¿½ silindi.	31337	0
+12	111	%s iï¿½in site adï¿½: %s	31337	0
+12	112	Anahtar kelimeler iï¿½in dizgi 80 karakteri aï¿½amaz!	31337	0
+12	113	%s iï¿½in ANAHTAR KELï¿½MELER: %s	31337	0
 12	114	Lisan %s olarak belirlendi.	31337	0
-12	115	HATA: Geçersiz lisan seçimi.	31337	0
-12	116	Aðda %s kanalýnýn yeri saptanamýyor!	31337	0
-12	117	HATA: Geçersiz kanal ayarý.	31337	0
-12	118	Önemsenmeyenler listesi:	31337	0
-12	119	Önemsenmeyenler listesi boþ	31337	0
-12	120	-- Önemsenmeyenler listesi sonu	31337	0
-12	121	CMaster Kanal Servisleri dahili statüsü:	31337	0
-12	122	[     Kanal Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
-12	123	[        Kullanýcý Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
-12	124	[Eriþim Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
-12	125	[         Yasaklama Kayýt Ýstatistikleri] \002Kaydedilmiþ giriþler:\002 %i    \002VT Ýstekleri:\002 %i    \002Kayýt hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
-12	126	Alýnan son Kullanýcý BÝLDÝRÝMÝ: %i	31337	0
-12	127	Alýnan son Kanal BÝLDÝRÝMÝ: %i	31337	0
-12	128	Alýnan son Seviye BÝLDÝRÝMÝ: %i	31337	0
-12	129	Alýnan son Yasaklama BÝLDÝRÝMÝ: %i	31337	0
-12	130	Belirli bilgi kaplarý tahsis edildi: %i	31337	0
-12	131	\002Açýk kaldýðý süre:\002 %s	31337	0
-12	132	%s kanalýnda %d tane kullanýcý var (%i operatör)	31337	0
+12	115	HATA: Geï¿½ersiz lisan seï¿½imi.	31337	0
+12	116	Aï¿½da %s kanalï¿½nï¿½n yeri saptanamï¿½yor!	31337	0
+12	117	HATA: Geï¿½ersiz kanal ayarï¿½.	31337	0
+12	118	ï¿½nemsenmeyenler listesi:	31337	0
+12	119	ï¿½nemsenmeyenler listesi boï¿½	31337	0
+12	120	-- ï¿½nemsenmeyenler listesi sonu	31337	0
+12	121	CMaster Kanal Servisleri dahili statï¿½sï¿½:	31337	0
+12	122	[     Kanal Kayï¿½t ï¿½statistikleri] \002Kaydedilmiï¿½ giriï¿½ler:\002 %i    \002VT ï¿½stekleri:\002 %i    \002Kayï¿½t hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
+12	123	[        Kullanï¿½cï¿½ Kayï¿½t ï¿½statistikleri] \002Kaydedilmiï¿½ giriï¿½ler:\002 %i    \002VT ï¿½stekleri:\002 %i    \002Kayï¿½t hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
+12	124	[Eriï¿½im Kayï¿½t ï¿½statistikleri] \002Kaydedilmiï¿½ giriï¿½ler:\002 %i    \002VT ï¿½stekleri:\002 %i    \002Kayï¿½t hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
+12	125	[         Yasaklama Kayï¿½t ï¿½statistikleri] \002Kaydedilmiï¿½ giriï¿½ler:\002 %i    \002VT ï¿½stekleri:\002 %i    \002Kayï¿½t hitleri:\002 %i    \002Verim:\002 %.2f%%	31337	0
+12	126	Alï¿½nan son Kullanï¿½cï¿½ Bï¿½LDï¿½Rï¿½Mï¿½: %i	31337	0
+12	127	Alï¿½nan son Kanal Bï¿½LDï¿½Rï¿½Mï¿½: %i	31337	0
+12	128	Alï¿½nan son Seviye Bï¿½LDï¿½Rï¿½Mï¿½: %i	31337	0
+12	129	Alï¿½nan son Yasaklama Bï¿½LDï¿½Rï¿½Mï¿½: %i	31337	0
+12	130	Belirli bilgi kaplarï¿½ tahsis edildi: %i	31337	0
+12	131	\002Aï¿½ï¿½k kaldï¿½ï¿½ï¿½ sï¿½re:\002 %s	31337	0
+12	132	%s kanalï¿½nda %d tane kullanï¿½cï¿½ var (%i operatï¿½r)	31337	0
 12	133	Mod: %s	31337	0
 12	134	Bayraklar: %s	31337	0
-12	135	Sizinkine eþit ya da fazla eriþimi olan kiþiyi askýya alamazsýnýz.	31337	0
-12	136	sahte zaman üniteleri	31337	0
-12	137	Geçersiz akýya alma süresi.	31337	0
-12	138	%s için ASKIYA ALMA iptal edildi	31337	0
-12	139	%s zaten %s kanalýnda askýya alýnmýþ durumda	31337	0
-12	140	%s için ASKIYA ALMA %s süre sonra dolacak	31337	0
-12	141	HATA: Baþlýk 145 karakteri aþamaz	31337	0
-12	142	%s yasaklamasýný %s kanalýnýn veri tabanýndan kaldýrmak için yetersiz eriþiminiz var	31337	0
-12	143	%i tane %s ile eþleþen yasaklama silindi	31337	0
-12	144	%i olan geçici eriþiminiz %s kanalýndan silindi	31337	0
-12	145	%s kanalýnda güçlendirilmiþ eriþimin yok gibi görünüyor, belki süresi dolmuþtur?	31337	0
-12	146	%s %s kanalýnda askýya alýnmamýþ	31337	0
-12	147	%s bir IRC operatörü	31337	0
-12	148	%s tanýmlanmamýþ durumda.	31337	0
-12	149	%s %s%s olarak tanýmlý	31337	0
-12	150	%s Resmi bir CService Temsilcisi%s ve %s olarak tanýmlý	31337	0
-12	151	%s Resmi bir CService Yöneticisi%s ve %s olarak tanýmlý	31337	0
-12	152	%s Resmi bir CService Geliþtiricisi%s ve %s olarak tanýmlý	31337	0
-12	153	%i taneden daha fazla eþleþme var [%s]	31337	0
-12	154	Lütfen arama maskenizi sýnýrlandýrýn	31337	0
-12	155	[%s] için geçerli eþleþme yok	31337	0
-12	156	%s: Kanal modlarý temizlendi.	31337	0
-12	158	Geçersiz seçenek.	31337	0
+12	135	Sizinkine eï¿½it ya da fazla eriï¿½imi olan kiï¿½iyi askï¿½ya alamazsï¿½nï¿½z.	31337	0
+12	136	sahte zaman ï¿½niteleri	31337	0
+12	137	Geï¿½ersiz akï¿½ya alma sï¿½resi.	31337	0
+12	138	%s iï¿½in ASKIYA ALMA iptal edildi	31337	0
+12	139	%s zaten %s kanalï¿½nda askï¿½ya alï¿½nmï¿½ï¿½ durumda	31337	0
+12	140	%s iï¿½in ASKIYA ALMA %s sï¿½re sonra dolacak	31337	0
+12	141	HATA: Baï¿½lï¿½k 145 karakteri aï¿½amaz	31337	0
+12	142	%s yasaklamasï¿½nï¿½ %s kanalï¿½nï¿½n veri tabanï¿½ndan kaldï¿½rmak iï¿½in yetersiz eriï¿½iminiz var	31337	0
+12	143	%i tane %s ile eï¿½leï¿½en yasaklama silindi	31337	0
+12	144	%i olan geï¿½ici eriï¿½iminiz %s kanalï¿½ndan silindi	31337	0
+12	145	%s kanalï¿½nda gï¿½ï¿½lendirilmiï¿½ eriï¿½imin yok gibi gï¿½rï¿½nï¿½yor, belki sï¿½resi dolmuï¿½tur?	31337	0
+12	146	%s %s kanalï¿½nda askï¿½ya alï¿½nmamï¿½ï¿½	31337	0
+12	147	%s bir IRC operatï¿½rï¿½	31337	0
+12	148	%s tanï¿½mlanmamï¿½ï¿½ durumda.	31337	0
+12	149	%s %s%s olarak tanï¿½mlï¿½	31337	0
+12	150	%s Resmi bir CService Temsilcisi%s ve %s olarak tanï¿½mlï¿½	31337	0
+12	151	%s Resmi bir CService Yï¿½neticisi%s ve %s olarak tanï¿½mlï¿½	31337	0
+12	152	%s Resmi bir CService Geliï¿½tiricisi%s ve %s olarak tanï¿½mlï¿½	31337	0
+12	153	%i taneden daha fazla eï¿½leï¿½me var [%s]	31337	0
+12	154	Lï¿½tfen arama maskenizi sï¿½nï¿½rlandï¿½rï¿½n	31337	0
+12	155	[%s] iï¿½in geï¿½erli eï¿½leï¿½me yok	31337	0
+12	156	%s: Kanal modlarï¿½ temizlendi.	31337	0
+12	158	Geï¿½ersiz seï¿½enek.	31337	0
 12	159	%s Resmi bir Undernet Servis Robotu.	31337	0
-12	160	%s Resmi bir Coder-Com Temsilcisi%s ve %s olarak tanýmlý	31337	0
-12	161	%s Resmi bir Coder-Com Katkýda Bulunucusu%s ve %s olarak tanýmlý	31337	0
-12	162	%s Resmi bir Coder-Com Geliþtiricisi%s ve %s olarak tanýmlý	31337	0
-12	163	%s Resmi bir Coder-Com Uzmaný%s ve %s olarak tanýmlý	31337	0
-12	164	 ve bir IRC operatörü	31337	0
-12	165	%s yasaklamasý %s kanalýnda %i seviye ile eklendi	31337	0
-12	166	%s: yasaklýlar listesi boþ.	31337	0
-12	167	Ben zaten o kanaldayým!	31337	0
-12	168	Bu komut IRC operatörlere ait	31337	0
-12	169	%s kanalýnda operatörlük yetkim yok	31337	0
-12	170	%s için %i dakika	31337	0
+12	160	%s Resmi bir Coder-Com Temsilcisi%s ve %s olarak tanï¿½mlï¿½	31337	0
+12	161	%s Resmi bir Coder-Com Katkï¿½da Bulunucusu%s ve %s olarak tanï¿½mlï¿½	31337	0
+12	162	%s Resmi bir Coder-Com Geliï¿½tiricisi%s ve %s olarak tanï¿½mlï¿½	31337	0
+12	163	%s Resmi bir Coder-Com Uzmanï¿½%s ve %s olarak tanï¿½mlï¿½	31337	0
+12	164	 ve bir IRC operatï¿½rï¿½	31337	0
+12	165	%s yasaklamasï¿½ %s kanalï¿½nda %i seviye ile eklendi	31337	0
+12	166	%s: yasaklï¿½lar listesi boï¿½.	31337	0
+12	167	Ben zaten o kanaldayï¿½m!	31337	0
+12	168	Bu komut IRC operatï¿½rlere ait	31337	0
+12	169	%s kanalï¿½nda operatï¿½rlï¿½k yetkim yok	31337	0
+12	170	%s iï¿½in %i dakika	31337	0
 12	184	The NOVOICE flag is set on %s	31337	0
 12	185	Your access on %s has been suspended.	31337	0
 12	186	Your suspension on %s has been cancelled.	31337	0
@@ -2251,31 +2251,31 @@ COPY "translations" FROM stdin;
 
 -- Norwegian Language Definition.
 -- 21/08/01
--- Bjørn Osdal (Nick: Snatcher) <mrosdal@online.no>
+-- Bjï¿½rn Osdal (Nick: Snatcher) <mrosdal@online.no>
 -- Ronny Kvislavangen (Nick: KingGenie) <genie@undernet.org>
 -- Past Contributions: Mr_|r0n, CISC.
 
 COPY "translations" FROM stdin;
 13	1	Beklager, men du er allerede logget inn som %s.	31337	0
 13	2	INNLOGGING GODKJENT som %s.	31337	0
-13	3	Beklager, men du har ikke nok aksess for å få utført den kommandoen.	31337	0
+13	3	Beklager, men du har ikke nok aksess for ï¿½ fï¿½ utfï¿½rt den kommandoen.	31337	0
 13	4	Beklager, men kanalen %s er tom.	31337	0
 13	5	Jeg kan ikke finne %s noen steder	31337	0
-13	6	Jeg kan ikke finne %s på %s 	31337	0
-13	7	Kanalen %s ser ikke ut til å være registrert.	31337	0
-13	8	Du har fått operatør status av %s (%s) i %s	31337	0
-13	9	Du har fått voice status av %s (%s) i %s	31337	0
+13	6	Jeg kan ikke finne %s pï¿½ %s 	31337	0
+13	7	Kanalen %s ser ikke ut til ï¿½ vï¿½re registrert.	31337	0
+13	8	Du har fï¿½tt operatï¿½r status av %s (%s) i %s	31337	0
+13	9	Du har fï¿½tt voice status av %s (%s) i %s	31337	0
 13	10	%s: Du er ikke i den kanalen	31337	0
-13	11	%s er allerede operatør i %s	31337	0
+13	11	%s er allerede operatï¿½r i %s	31337	0
 13	12	%s har allerede voice i %s	31337	0
-13	13	%s (%s) tok ifra deg operatør status	31337	0
+13	13	%s (%s) tok ifra deg operatï¿½r status	31337	0
 13	14	%s (%s) tok ifra deg voice status	31337	0
-13	15	%s er ikke operatør i %s	31337	0
+13	15	%s er ikke operatï¿½r i %s	31337	0
 13	16	%s har ikke voice i %s	31337	0
 13	17	INNLOGGING FEILET som %s (Feil passord)	31337	0
 13	18	Jeg er ikke i den kanalen!	31337	0
-13	19	Ugyldig banlevel. Må være 1-%i.	31337	0
-13	20	Ugyldig ban varighet. Den kan maksimum være %d dager.	31337	0
+13	19	Ugyldig banlevel. Mï¿½ vï¿½re 1-%i.	31337	0
+13	20	Ugyldig ban varighet. Den kan maksimum vï¿½re %d dager.	31337	0
 13	21	Ban grunn kan ikke overstige 128 tegn	31337	0
 13	22	Den spesifiserte bannen er allerede i min banliste!	31337	0
 13	23	Bannen %s er allerede dekket av %s	31337	0
@@ -2284,41 +2284,41 @@ COPY "translations" FROM stdin;
 13	26	BRUKER: %s AKSESS: %s %s	31337	0
 13	27	KANAL: %s -- AUTOMODE: %s	31337	0
 13	28	SIST MODIFISERT: %s (%s siden)	31337	0
-13	29	** SUSPENDERT ** - Utløper om %s (Level %i)	31337	0
+13	29	** SUSPENDERT ** - Utlï¿½per om %s (Level %i)	31337	0
 13	30	Sist sett for: %s timer siden	31337	0
 13	31	Det er mere enn %d treff som passer dine kriterier.	31337	0
-13	32	Vennligst begrens ditt søk.	31337	0
-13	33	Slutt på aksesslisten	31337	0
+13	32	Vennligst begrens ditt sï¿½k.	31337	0
+13	33	Slutt pï¿½ aksesslisten	31337	0
 13	34	Ingen treff!	31337	0
-13	35	Kan ikke legge til bruker med lik eller høyere aksess enn din egen.	31337	0
+13	35	Kan ikke legge til bruker med lik eller hï¿½yere aksess enn din egen.	31337	0
 13	36	Ikke gyldig aksess level.	31337	0
 13	37	%s er allerede lagt til i %s med aksess level %i.	31337	0
 13	38	Lagt til bruker %s i %s med aksess level %i	31337	0
 13	39	Noe gikk galt: %s	31337	0
-13	40	%s: Slutt på banlisten	31337	0
-13	41	Ikke mulig å se brukers detaljer (Usynlig)	31337	0
+13	40	%s: Slutt pï¿½ banlisten	31337	0
+13	41	Ikke mulig ï¿½ se brukers detaljer (Usynlig)	31337	0
 13	42	Informasjon om: %s (%i)	31337	0
-13	43	Er akuratt nå logget på via: %s	31337	0
+13	43	Er akuratt nï¿½ logget pï¿½ via: %s	31337	0
 13	44	URL: %s	31337	0
-13	45	Språk: %i	31337	0
+13	45	Sprï¿½k: %i	31337	0
 13	46	Kanaler: %s	31337	0
 13	47	Input Flood Points: %i	31337	0
 13	48	Ouput Flood (Bytes): %i	31337	0
 13	49	%s er registrert av:	31337	0
 13	50	%s - sist sett: %s siden	31337	0
 13	51	Beskrivelse: %s	31337	0
-13	52	Bare flood meg du. Jeg kommer ikke til å høre på deg igjen	31337	0
-13	53	Jeg tror jeg sendte deg litt for mye data. Jeg kommer til å ignorere deg for en liten stund.	31337	0
+13	52	Bare flood meg du. Jeg kommer ikke til ï¿½ hï¿½re pï¿½ deg igjen	31337	0
+13	53	Jeg tror jeg sendte deg litt for mye data. Jeg kommer til ï¿½ ignorere deg for en liten stund.	31337	0
 13	54	Ufullstendig kommando	31337	0
-13	55	For å bruke %s, må du bruke /msg %s@%s	31337	0
-13	56	Beklager, men du må være logget inn for å bruke denne kommandoen.	31337	0
+13	55	For ï¿½ bruke %s, mï¿½ du bruke /msg %s@%s	31337	0
+13	56	Beklager, men du mï¿½ vï¿½re logget inn for ï¿½ bruke denne kommandoen.	31337	0
 13	57	Kanalen %s har blitt suspendert av en Cservice Administrator.	31337	0
-13	58	Din aksess på %s er suspendert.	31337	0
-13	59	NOOP flagget er satt på %s	31337	0
-13	60	STRICTOP flagget er satt på %s	31337	0
+13	58	Din aksess pï¿½ %s er suspendert.	31337	0
+13	59	NOOP flagget er satt pï¿½ %s	31337	0
+13	60	STRICTOP flagget er satt pï¿½ %s	31337	0
 13	61	Du deopet flere enn %i personer	31337	0
 13	62	SYNTAKS: %s	31337	0
-13	63	Midlertidig øket din aksess på kanal %s til %i	31337	0
+13	63	Midlertidig ï¿½ket din aksess pï¿½ kanal %s til %i	31337	0
 13	64	%s er registrert.	31337	0
 13	65	%s er ikke registrert.	31337	0
 13	66	Jeg tror ikke at %s vil like det der.	31337	0
@@ -2326,56 +2326,56 @@ COPY "translations" FROM stdin;
 13	68	%s %s Level: %i	31337	0
 13	69	LAGT TIL AV: %s (%s)	31337	0
 13	70	SIDEN: %s	31337	0
-13	71	UTGÅR: %s	31337	0
+13	71	UTGï¿½R: %s	31337	0
 13	72	\002*** SLUTT ***\002	31337	0
 13	73	Jeg vet ikke hvem %s er.	31337	0
 13	74	Du er ikke logget inn hos meg lenger.	31337	0
-13	75	%s ser ikke ut til å ha aksess i %s.	31337	0
-13	76	Kan ikke modifisere en bruker med aksess som er lik eller høyere enn din egen.	31337	0
-13	77	Kan ikke gi en bruker aksess som er lik eller høyere enn din egen.	31337	0
-13	78	Modifisert %s sin aksess på kanal %s til %i	31337	0
-13	79	Satt AUTOMODE til OP for %s på kanal %s	31337	0
-13	80	Satt AUTOMODE til VOICE for %s på kanal %s	31337	0
-13	81	Satt AUTOMODE til IKKENOE for %s påp kanal %s	31337	0
-13	82	Ditt passord kan ikke være ditt brukernavn eller ditt nåværende nick - syntaks er: NEWPASS <nytt passord>	31337	0
+13	75	%s ser ikke ut til ï¿½ ha aksess i %s.	31337	0
+13	76	Kan ikke modifisere en bruker med aksess som er lik eller hï¿½yere enn din egen.	31337	0
+13	77	Kan ikke gi en bruker aksess som er lik eller hï¿½yere enn din egen.	31337	0
+13	78	Modifisert %s sin aksess pï¿½ kanal %s til %i	31337	0
+13	79	Satt AUTOMODE til OP for %s pï¿½ kanal %s	31337	0
+13	80	Satt AUTOMODE til VOICE for %s pï¿½ kanal %s	31337	0
+13	81	Satt AUTOMODE til IKKENOE for %s pï¿½p kanal %s	31337	0
+13	82	Ditt passord kan ikke vï¿½re ditt brukernavn eller ditt nï¿½vï¿½rende nick - syntaks er: NEWPASS <nytt passord>	31337	0
 13	83	Passordet er byttet.	31337	0
-13	84	NOOP flagget er satt på %s	31337	0
-13	85	STRICTOP flagget er satt på %s (og %s er ikke logget inn)	31337	0
-13	86	STRICTOP flagget er satt på %s (og %s har ikke nok aksess)	31337	0
+13	84	NOOP flagget er satt pï¿½ %s	31337	0
+13	85	STRICTOP flagget er satt pï¿½ %s (og %s er ikke logget inn)	31337	0
+13	86	STRICTOP flagget er satt pï¿½ %s (og %s har ikke nok aksess)	31337	0
 13	87	Slettet kanal %s	31337	0
 13	88	%s er allerede registrert hos meg.	31337	0
 13	89	Ugyldig kanalnavn.	31337	0
 13	90	Registrert kanal %s	31337	0
 13	91	Slettet %s fra min ignoreliste	31337	0
 13	92	Kunne ikke slette %s fra min ignoreliste	31337	0
-13	93	Kan ikke slette en bruker med lik eller høyere aksess enn din egen	31337	0
+13	93	Kan ikke slette en bruker med lik eller hï¿½yere aksess enn din egen	31337	0
 13	94	Du kan ikke fjerne deg selv ifra en kanal du eier.	31337	0
 13	95	Slettet bruker %s fra %s	31337	0
-13	96	INVISIBLE(usynlig) er nå ON(på).	31337	0
-13	97	INVISIBLE(usynlig) er nå OFF(av).	31337	0
+13	96	INVISIBLE(usynlig) er nï¿½ ON(pï¿½).	31337	0
+13	97	INVISIBLE(usynlig) er nï¿½ OFF(av).	31337	0
 13	98	%s for %s er %s	31337	0
-13	99	%s MÅ være ON eller OFF	31337	0
+13	99	%s Mï¿½ vï¿½re ON eller OFF	31337	0
 13	100	Ugyldig USERFLAGS instilling. Korrekte verdier er: NONE, OP, VOICE.	31337	0
 13	101	USERFLAGS for %s er %s	31337	0
-13	102	Verdien for MASSDEOPPRO må være 0-7	31337	0
+13	102	Verdien for MASSDEOPPRO mï¿½ vï¿½re 0-7	31337	0
 13	103	MASSDEOPPRO for %s er satt til %d	31337	0
-13	104	Verdien til FLOODPRO må være 0-7	31337	0
+13	104	Verdien til FLOODPRO mï¿½ vï¿½re 0-7	31337	0
 13	105	FLOODPRO for %s er satt til %d	31337	0
-13	106	BESKRIVELSE kan maksimalt være %i tegn!	31337	0
+13	106	BESKRIVELSE kan maksimalt vï¿½re %i tegn!	31337	0
 13	107	BESKRIVELSE for %s er slettet.	31337	0
 13	108	BESKRIVELSE for %s er: %s	31337	0
-13	109	URL kan maksimum være %i tegn!	31337	0
+13	109	URL kan maksimum vï¿½re %i tegn!	31337	0
 13	110	URL for %s er slettet.	31337	0
 13	111	URL for %s er: %s	31337	0
 13	112	KEYWORDS kan ikke overstige 80 tegn!	31337	0
 13	113	KEYWORDS for %s er: %s	31337	0
-13	114	Språk er satt til %s.	31337	0
-13	115	ERROR: Ugyldig språk valg.	31337	0
-13	116	Kan ikke finne kanal %s på nettverket!	31337	0
+13	114	Sprï¿½k er satt til %s.	31337	0
+13	115	ERROR: Ugyldig sprï¿½k valg.	31337	0
+13	116	Kan ikke finne kanal %s pï¿½ nettverket!	31337	0
 13	117	ERROR: Ugyldig kanal innstilling.	31337	0
 13	118	Ignoreliste:	31337	0
 13	119	Ignorelista er tom	31337	0
-13	120	-- Slutt på ignorelista	31337	0
+13	120	-- Slutt pï¿½ ignorelista	31337	0
 13	121	CMaster Channel Services intern status:	31337	0
 13	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 13	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
@@ -2387,29 +2387,29 @@ COPY "translations" FROM stdin;
 13	129	Sist mottatt ban NOTIFY: %i	31337	0
 13	130	Custom data containers allocated: %i	31337	0
 13	131	\002Oppetid:\002 %s	31337	0
-13	132	Kanalen %s har %d brukere (%i operatører)	31337	0
+13	132	Kanalen %s har %d brukere (%i operatï¿½rer)	31337	0
 13	133	Mode er: %s	31337	0
 13	134	Flagg satt: %s	31337	0
-13	135	Kan ikke suspendere en bruker med lik eller høyere aksess enn din egen.	31337	0
+13	135	Kan ikke suspendere en bruker med lik eller hï¿½yere aksess enn din egen.	31337	0
 13	136	bogus tids enheter	31337	0
 13	137	Ugyldig suspend varighet.	31337	0
 13	138	SUSPENSION for %s er slettet	31337	0
-13	139	%s er allerede suspendert på %s	31337	0
-13	140	SUSPENSION for %s går ut om %s	31337	0
+13	139	%s er allerede suspendert pï¿½ %s	31337	0
+13	140	SUSPENSION for %s gï¿½r ut om %s	31337	0
 13	141	ERROR: Topic kan ikke overskride 145 tegn	31337	0
-13	142	Du har ikke tilstrekkelig aksess for å slette bannen %s ifra %s's database	31337	0
+13	142	Du har ikke tilstrekkelig aksess for ï¿½ slette bannen %s ifra %s's database	31337	0
 13	143	Slettet %i bans som stemmer med %s	31337	0
-13	144	Midlertidig slettet din aksess på %i ifra kanal %s	31337	0
-13	145	Det ser ikke ut som at du har en tvunget aksess i %s, kanskje den har utløpt?	31337	0
-13	146	%s er ikke suspendert på %s	31337	0
-13	147	%s er en IRC operatør	31337	0
+13	144	Midlertidig slettet din aksess pï¿½ %i ifra kanal %s	31337	0
+13	145	Det ser ikke ut som at du har en tvunget aksess i %s, kanskje den har utlï¿½pt?	31337	0
+13	146	%s er ikke suspendert pï¿½ %s	31337	0
+13	147	%s er en IRC operatï¿½r	31337	0
 13	148	%s er IKKE logget inn.	31337	0
 13	149	%s er logget inn som %s%s	31337	0
 13	150	%s er en offisiell CService Representant%s og er logget inn som  %s	31337	0
 13	151	%s er en offisiell CService Administrator%s og er logget inn som %s	31337	0
 13	152	%s er en offisiell CService Utvikler%s og er logget inn som %s	31337	0
 13	153	Det er flere enn %i muligheter som passer [%s]	31337	0
-13	154	Vennligst begrens dine søkekriterie	31337	0
+13	154	Vennligst begrens dine sï¿½kekriterie	31337	0
 13	155	Ingen postering funner for [%s]	31337	0
 13	156	%s: Slettet kanal modes.	31337	0
 13	158	Ugyldig valg.	31337	0
@@ -2418,12 +2418,12 @@ COPY "translations" FROM stdin;
 13	161	%s er en offisiell Coder-Com Bidragsyter%s og er logget inn som %s	31337	0
 13	162	%s er en offisiell Coder-Com Utvikler%s og er logget inn som %s	31337	0
 13	163	%s er en offisiell Coder-Com Senior%s og er logget inn som %s	31337	0
-13	164	 og en IRC operatør	31337	0
+13	164	 og en IRC operatï¿½r	31337	0
 13	165	Lagt til ban %s til %s med level %i	31337	0
 13	166	%s: banlisten er tom.	31337	0
-13	167	Jeg er allerede på den kanalen!	31337	0
-13	168	Denne kommandoen er reservert for IRC operatører	31337	0
-13	169	Jeg er ikke operatør på %s	31337	0
+13	167	Jeg er allerede pï¿½ den kanalen!	31337	0
+13	168	Denne kommandoen er reservert for IRC operatï¿½rer	31337	0
+13	169	Jeg er ikke operatï¿½r pï¿½ %s	31337	0
 13	170	%s for %i minutter	31337	0
 13	184	The NOVOICE flag is set on %s	31337	0
 13	185	Your access on %s has been suspended.	31337	0
@@ -2581,7 +2581,7 @@ COPY "translations" FROM stdin;
 14	144	Izalatou tadakhoulouke al moua9ate fi al mousstawa %i fi 9anate %s	31337	0
 14	145	La tadhare 9ade da3amata tadakhoulake ila %s, hale satantahi?	31337	0
 14	146	%s lame youwa9afe 3ala %s	31337	0
-14	147	%s huwa Opérateur IRC	31337	0
+14	147	%s huwa Opï¿½rateur IRC	31337	0
 14	148	%s ghayre mou3arafe.	31337	0
 14	149	%s mou3arafe 3abra userid %s%s	31337	0
 14	150	%s moumatile rassmi li CService%s wa mou3arafe 3abra userid %s	31337	0
@@ -2622,175 +2622,175 @@ COPY "translations" FROM stdin;
 -- 22/04/02 - Shaun Okeefe <simba@wildstar.net>.
 
 COPY "translations" FROM stdin;
-15	1	%sîöèòøéí, äðê îæåää ëáø áîòøëú áëéðåé  	31337	0
-15	2	%säàéîåú òáø áäöìçä ë  	31337	0
-15	3	âéùúê àéððä îñôé÷ä òì îðú ìäùúîù áô÷åãä æå	31337	0
-15	4	øé÷ %sîöèòøéí, òøåõ  	31337	0
-15	5	ìà ðîöà áàéæåø %säîùúîù  	31337	0
-15	6	%s àéððå ðåëç áòøåõ %s äîùúîù	31337	0
-15	7	ìà øùåí %s òøåõ 	31337	0
-15	8	%s á (%s) %s ÷éáìú àåô î	31337	0
-15	9	%s á (%s) %s ÷éáìú ÷åì î	31337	0
-15	10	%s àéðê  áòøåõ	31337	0
-15	11	%s ëáø àåô á %s	31337	0
-15	12	%s ëáø ÷åì á %s	31337	0
-15	13	äåøéã ìê àú äàåô %s (%s) on %s	31337	0
-15	14	äåøéã ìê àú ä÷åì %s (%s) on %s	31337	0
-15	15	%s àéðå  àåô á: %s	31337	0
-15	16	%s àéðå  ÷åì á: %s	31337	0
-15	17	àéðå àåùø %säîùúîù   	31337	0
-15	18	àðé ìà ðîöà áòøåõ !	31337	0
-15	19	1 øîú äáàï ìà çå÷éú,äèååç äåà áéï -%i	31337	0
-15	20	îùê æîï äáàï ìà çå÷é, äæîï äîéøáé äåà %d ùòåú.	31337	0
-15	21	.ñéáú äáàï ìà éëåìä ìäéåú îòáø ì 128 úååéí	31337	0
-15	22	.áàï æä ëáø ðîöà áøùéîä	31337	0
-15	23	%s îëåñä ò"é äáàï %s äáàï	31337	0
-15	24	äøîä äîéðéîìéú îæòøéú.	31337	0
-15	25	äøîä äî÷ñéîìéú îéøáéú.	31337	0
-15	26	%s %s :âéùä %sùí îùúîù: 	31337	0
-15	27	%s :îöá àåèåîèé %sòøåõ: 	31337	0
-15	28	%s :ìôðé %s :ùåðä ìàçøåðä 	31337	0
-15	29	%s òã  %i äâéùä îåùòú áøîä ùì	31337	0
-15	30	%sðøàä ìàçøåðä ìôðé:	31337	0
-15	31	éù éåúø î %d òøëéí îúàéîéí.	31337	0
-15	32	äâáì àú á÷ùúê.	31337	0
-15	33	.ñåó øùéîú äâéùåú	31337	0
-15	34	àéï äúàîåú !	31337	0
-15	35	ìà ðéúï ìäåñéó îùúîù áòì âéùä ùååä àå âáåää îæå ùìê.	31337	0
-15	36	øîú äâéùä ìà çå÷éú.	31337	0
-15	37	%s äåñó ì %s òí âéùä áøîä ùì %i 	31337	0
-15	38	%s òí øîú âéùä ùì  %s  äåñó ëáø ì %i	31337	0
-15	39	îùäå ùâåé %s	31337	0
-15	40	%s: ñåó øùéîú äáàðéí	31337	0
-15	41	.ìà ðéúï ìøàåú àú ôøèé äîùúîù (áìúé ðøàä)	31337	0
-15	42	%s îéãò òì äîùúîù  (%i)	31337	0
-15	43	%s :ëøâò îæåää ãøê	31337	0
-15	44	%s :ëúåáú	31337	0
-15	45	%i :ùôä	31337	0
-15	46	%s òøåöéí:	31337	0
+15	1	%sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  	31337	0
+15	2	%sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½  	31337	0
+15	3	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½	31337	0
+15	4	ï¿½ï¿½ï¿½ %sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½  	31337	0
+15	5	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  	31337	0
+15	6	%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	7	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ 	31337	0
+15	8	%s ï¿½ (%s) %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	9	%s ï¿½ (%s) %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	10	%s ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	11	%s ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ %s	31337	0
+15	12	%s ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ %s	31337	0
+15	13	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s (%s) on %s	31337	0
+15	14	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s (%s) on %s	31337	0
+15	15	%s ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ ï¿½: %s	31337	0
+15	16	%s ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ ï¿½: %s	31337	0
+15	17	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   	31337	0
+15	18	ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ !	31337	0
+15	19	1 ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ -%i	31337	0
+15	20	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ %d ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	21	.ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ 128 ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	22	.ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	23	%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½"ï¿½ ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½	31337	0
+15	24	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	25	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	26	%s %s :ï¿½ï¿½ï¿½ï¿½ %sï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½: 	31337	0
+15	27	%s :ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %sï¿½ï¿½ï¿½ï¿½: 	31337	0
+15	28	%s :ï¿½ï¿½ï¿½ï¿½ %s :ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 	31337	0
+15	29	%s ï¿½ï¿½  %i ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½	31337	0
+15	30	%sï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½:	31337	0
+15	31	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ %d ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	32	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	33	.ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	34	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ !	31337	0
+15	35	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.	31337	0
+15	36	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	37	%s ï¿½ï¿½ï¿½ï¿½ ï¿½ %s ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ %i 	31337	0
+15	38	%s ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½  %s  ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ %i	31337	0
+15	39	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s	31337	0
+15	40	%s: ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	41	.ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)	31337	0
+15	42	%s ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  (%i)	31337	0
+15	43	%s :ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½	31337	0
+15	44	%s :ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	45	%i :ï¿½ï¿½ï¿½	31337	0
+15	46	%s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:	31337	0
 15	47	Input Flood Points: %i	31337	0
 15	48	Ouput Flood (Bytes): %i	31337	0
-15	49	%s øùåí ò"é	31337	0
-15	50	%s - ðøàä ìàçøåðä ìôðé %s	31337	0
+15	49	%s ï¿½ï¿½ï¿½ï¿½ ï¿½"ï¿½	31337	0
+15	50	%s - ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s	31337	0
 15	51	Desc: %s	31337	0
-15	52	úöéó àåúé? àðé ìà îúëååï ìä÷ùéá ìê éåúø.	31337	0
-15	53	àðé çåùá ùùìçúé ìê éåúø îéãé ðúåðéí, àðé àúòìí îîê ìæîï îä.	31337	0
-15	54	ô÷åãä ìà îåùìîú.	31337	0
-15	55	 /msg %s@%s òìéê ìáöò %s ëãé ìäùúîù á	31337	0
-15	56	äðê öøéê ìäæãäåú  òì îðú ìäùúîù áô÷åãä æå.	31337	0
-15	57	îåùòä ë"é ääðäìä %s äòøåõ	31337	0
-15	58	%säâéùä ùìê îåùòú á 	31337	0
-15	59	%s äåâãø á NOOP flag  	31337	0
-15	60	%s äåâãø á STRICTOP flag 	31337	0
-15	61	àðùéí %iäåøãú àåô ìéåúø î  	31337	0
-15	62	%s úçáéø:	31337	0
-15	63	%s áòøåõ %i äòìä àú âéùúê áàåôï æîðé ì	31337	0
-15	64	øùåí %s	31337	0
-15	65	àéðå øùåí %s	31337	0
-15	66	éòøéê æàú %s àéððé çåùá ù	31337	0
-15	67	\002*** øùéîú äáàðéí ùì òøåõ %s ***\002	31337	0
-15	68	%s %s  %iøîä 	31337	0
-15	69	%s äåñó ò"é (%s)	31337	0
-15	70	%sîàæ: 	31337	0
-15	71	%s òã:	31337	0
+15	52	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½? ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	53	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½.	31337	0
+15	54	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	55	 /msg %s@%s ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	56	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½.	31337	0
+15	57	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½"ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	58	%sï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ 	31337	0
+15	59	%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ NOOP flag  	31337	0
+15	60	%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ STRICTOP flag 	31337	0
+15	61	ï¿½ï¿½ï¿½ï¿½ï¿½ %iï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½  	31337	0
+15	62	%s ï¿½ï¿½ï¿½ï¿½ï¿½:	31337	0
+15	63	%s ï¿½ï¿½ï¿½ï¿½ï¿½ %i ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	64	ï¿½ï¿½ï¿½ï¿½ %s	31337	0
+15	65	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s	31337	0
+15	66	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	67	\002*** ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s ***\002	31337	0
+15	68	%s %s  %iï¿½ï¿½ï¿½ 	31337	0
+15	69	%s ï¿½ï¿½ï¿½ï¿½ ï¿½"ï¿½ (%s)	31337	0
+15	70	%sï¿½ï¿½ï¿½: 	31337	0
+15	71	%s ï¿½ï¿½:	31337	0
 15	72	\002*** END ***\002	31337	0
-15	73	àéðå îåëø %s äîùúîù 	31337	0
-15	74	.àéðê øùàé ìäùúîù áé éåúø	31337	0
-15	75	%s àéðå îåôéò ëáòì âéùä á %s	31337	0
-15	76	.àéðê éëåì ìùðåú øîú âéùä ìøîä ùååä àå âáåää ìæå ùìê	31337	0
-15	77	ìà ðéúï ìúú âéùä ùååä àå âáåää îæå ùìê.	31337	0
-15	78	%s ìîùúîù %s áòøåõ %i ùåðúä øîú äâéùä ì	31337	0
-15	79	%s á %sáåöò, îöá àåô àåèåîèé ì  	31337	0
-15	80	%s á %s áåöò, îöá ôìåñ àåèåîèé ì 	31337	0
-15	81	%s áòøåõ %säåâãø îöá àåèåîèé ùì àó àçã 	31337	0
-15	82	ìùéðåé NEWPASS <new password>äñéñîä àéððä éëåìä ìäéåú äùí îùúîù ùìê àå äëéðåé äðåëçé, áöò: 	31337	0
-15	83	äñéñîä ùåðúä áäöìçä.	31337	0
-15	84	%s äåâãø á NOOP flag  	31337	0
-15	85	(ìà àåùø %s å)   %s äåâãø á  STRICTOP flag 	31337	0
-15	86	(àéððå áòì âéùä îñôé÷ä %s) äåâãø á %s  STRICTOP flag 	31337	0
-15	87	ðñâø  %s	31337	0
-15	88	ëáø øùåí %s 	31337	0
-15	89	ùí äòøåõ ùâåé.	31337	0
-15	90	øùåí %s	31337	0
-15	91	äåñø îäøùéîä äù÷èä %s	31337	0
-15	92	àéðå ðîöà áøùéîä äù÷èä %s 	31337	0
-15	93	àéðê éëåì ìäñéø îùúîù ùøîú äâéùä ùìå ùååä àå âáåää îùìê.	31337	0
-15	94	àéðê éëåì ìäñéø àú òöîê îäòøåõ ùìê.	31337	0
-15	95	%s îòøåõ %s äåñø äîùúîù	31337	0
-15	96	äîöá äáìúé ðøàä ôòéì.	31337	0
-15	97	äîöá äáìúé ðøàä àéðå ôòéì.	31337	0
-15	98	%s äåà  %s ì %s 	31337	0
-15	99	.öøéê ìäéåú ôòéì àå àéðå ôòéì %sòøê ùì 	31337	0
-15	100	äâãøåú éåæøôìàâ ùâåéåú, äâãøåú ðëåðåú äï  NONE, OP, VOICE.	31337	0
-15	101	%s ì %s éåæøôìàâ äåà	31337	0
-15	102	.òøëéé îàñ-ãéàåô-ôøå öøéëéí ìäéåú áéï 7-0	31337	0
-15	103	%s îåâãøéí ì %d îàñ-ãéàåô-ôøå	31337	0
-15	104	òøëéé ôìåãôøå öøéëéí ìäéåú áéï 7-0	31337	0
-15	105	%s îåâãøéí ì %d òøëéé ôìåãôøå	31337	0
-15	106	äúéàåø àéðå éëåì ìäéåú îòáø ì %i úååéí!	31337	0
-15	107	äúéàåø ðîç÷ %s 	31337	0
-15	108	%s äåà %s äúéàåø ì	31337	0
-15	109	äëúåáú àéðä éëåìä ìäéåú îòáø ì %i úååéí!	31337	0
-15	110	ðîç÷ä %s äëúåáú ì	31337	0
-15	111	%s äëúåáú ì %s	31337	0
-15	112	îçøåæú äàåúéåú àéððä éëåìä ìäéåú îòáø ì 80 úååéí!	31337	0
-15	113	%s äï %s îéìåú äîôúç ì	31337	0
-15	114	%s äâãøú äùôä äðáçøú äéà 	31337	0
-15	115	ùâéàä: áçéøú äùôä àéððä àôùøéú.	31337	0
-15	116	òì äøùú %s ìà ðéúï ìîöåà àú äòøåõ 	31337	0
-15	117	ùâéàä: äâãøåú äòøåõ ùâåéåú.	31337	0
-15	118	øùéîú äúòìîåéåú:	31337	0
-15	119	øùéîú ääúòìîåéåú øé÷ä.	31337	0
-15	120	-- ñåó øùéîú ääúòìîåéåú	31337	0
+15	73	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 	31337	0
+15	74	.ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½	31337	0
+15	75	%s ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ %s	31337	0
+15	76	.ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½	31337	0
+15	77	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.	31337	0
+15	78	%s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ %i ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	79	%s ï¿½ %sï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½  	31337	0
+15	80	%s ï¿½ %s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ 	31337	0
+15	81	%s ï¿½ï¿½ï¿½ï¿½ï¿½ %sï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ 	31337	0
+15	82	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ NEWPASS <new password>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½: 	31337	0
+15	83	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	84	%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ NOOP flag  	31337	0
+15	85	(ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s ï¿½)   %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½  STRICTOP flag 	31337	0
+15	86	(ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %s) ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %s  STRICTOP flag 	31337	0
+15	87	ï¿½ï¿½ï¿½ï¿½  %s	31337	0
+15	88	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s 	31337	0
+15	89	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	90	ï¿½ï¿½ï¿½ï¿½ %s	31337	0
+15	91	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ %s	31337	0
+15	92	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ %s 	31337	0
+15	93	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	94	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.	31337	0
+15	95	%s ï¿½ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	96	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	97	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	98	%s ï¿½ï¿½ï¿½  %s ï¿½ %s 	31337	0
+15	99	.ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %sï¿½ï¿½ï¿½ ï¿½ï¿½ 	31337	0
+15	100	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½  NONE, OP, VOICE.	31337	0
+15	101	%s ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½	31337	0
+15	102	.ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ 7-0	31337	0
+15	103	%s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %d ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½	31337	0
+15	104	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ 7-0	31337	0
+15	105	%s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %d ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	106	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ %i ï¿½ï¿½ï¿½ï¿½ï¿½!	31337	0
+15	107	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s 	31337	0
+15	108	%s ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	109	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ %i ï¿½ï¿½ï¿½ï¿½ï¿½!	31337	0
+15	110	ï¿½ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	111	%s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %s	31337	0
+15	112	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ 80 ï¿½ï¿½ï¿½ï¿½ï¿½!	31337	0
+15	113	%s ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	114	%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ 	31337	0
+15	115	ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	116	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ 	31337	0
+15	117	ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	118	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:	31337	0
+15	119	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	120	-- ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
 15	121	CMaster Channel Services internal status:	31337	0
 15	122	[     Channel Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 15	123	[        User Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 15	124	[Access Level Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
 15	125	[         Ban Record Stats] \002Cached Entries:\002 %i    \002DB Requests:\002 %i    \002Cache Hits:\002 %i    \002Efficiency:\002 %.2f%%	31337	0
-15	126	éãéòä àçøåðä ùäú÷áìä îäîùúîù: %i	31337	0
-15	127	éãéòä àçøåðä ùäú÷áìä îäòøåõ: %i	31337	0
-15	128	éãéòä àçøåðä ùäú÷áìä  òì øîä : %i	31337	0
-15	129	äåãòä  àçøåðä ùäú÷áìä òì áàï : %i	31337	0
+15	126	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: %i	31337	0
+15	127	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: %i	31337	0
+15	128	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ï¿½ : %i	31337	0
+15	129	ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ : %i	31337	0
 15	130	Custom data containers allocated: %i	31337	0
 15	131	\002Uptime:\002 %s	31337	0
-15	132	%s îùúîùéí áòøåõ %d àåôéí å %iéùðí	31337	0
-15	133	%s äîöá äåà 	31337	0
+15	132	%s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ %d ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %iï¿½ï¿½ï¿½ï¿½	31337	0
+15	133	%s ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ 	31337	0
 15	134	Flags set: %s	31337	0
-15	135	àéï àôùøåú ìäùòåú îùúîù áòì âéùä ùååä àå âáåää îæå ùìê.	31337	0
-15	136	äæîï ùâåé.	31337	0
-15	137	îùê æîï ääùòéä àéðå çå÷é.	31337	0
-15	138	îáåèìú %s ääùòéä ùì	31337	0
-15	139	%s ëáø îåùòä á %s	31337	0
-15	140	%s úéâîø úåê %s ääùòéä ùì	31337	0
-15	141	ùâéàä: äèåôé÷ àéðå éëåì ìäëéì éåúø î 145 úååéí.	31337	0
-15	142	ðúåðéí %s î %s âéùúê àéðä îñôé÷ä òì îðú ìäñéø àú äáàï 	31337	0
-15	143	áàðéí îúàéîéí %i %s äåñøå á	31337	0
-15	144	%i áøîä ùì %s äåñøä âéùúê äæîðéú îòøåõ	31337	0
+15	135	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.	31337	0
+15	136	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	137	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	138	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½	31337	0
+15	139	%s ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %s	31337	0
+15	140	%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½	31337	0
+15	141	ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ 145 ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	142	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %s ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 	31337	0
+15	143	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %i %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	144	%i ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
 15	145	You don't appear to have a forced access in %s, perhaps it expired?	31337	0
-15	146	%s àéðå îåùòä á %s	31337	0
-15	147	IRC äåà îôòéì %s  	31337	0
-15	148	àéðå îæåää %s 	31337	0
-15	149	%s%s îæåää ë %s  	31337	0
-15	150	%s øùîé, åîæåää ë CService Representative%s äåà %s	31337	0
-15	151	%s øùîé, åîæåää ë CService Administrator%s äåà %s	31337	0
-15	152	%s øùîé, åîæåää ë CService Developer%s äåà %s	31337	0
-15	153	òøëéí %i éåúø î [%s]éù ì   	31337	0
-15	154	úäéä éåúø ñôöéôé áçéôåù	31337	0
-15	155	[%s] ìà äú÷áìå òøëéí îúàéîéí ì	31337	0
-15	156	îöáé äòøåõ äðîç÷å :%s 	31337	0
-15	158	äàôùøåú àéðä çå÷éú.	31337	0
-15	159	äåà áåè øùîé ùì àðãøðè %s 	31337	0
-15	160	%s øùîé, åîæåää ë Coder-Com Representative%s äåà %s	31337	0
-15	161	%s øùîé, åîæåää ë Coder-Com Contributer%s  äåà %s	31337	0
-15	162	%s øùîé, åîæåää ë Coder-Com Developer%s   äåà %s	31337	0
-15	163	%s øùîé, åîæåää ë Coder-Com Senior%s    äåà %s	31337	0
-15	164	IRC åîôòéì	31337	0
-15	165	%s äáàï %s áòøåõ %i ðåñó áøîä ùì	31337	0
-15	166	øùéîú äáàðéí øé÷ä :%s 	31337	0
-15	167	àðé ëáø ðîöà áòøåõ !	31337	0
-15	168	ø÷ îôòìé äùøú éëåìéí ìäùúîù áô÷åãä æå.	31337	0
-15	169	%s àéï ìé àåô á	31337	0
-15	170	%s ã÷åú ì %i	31337	0
+15	146	%s ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %s	31337	0
+15	147	IRC ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ %s  	31337	0
+15	148	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ %s 	31337	0
+15	149	%s%s ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ %s  	31337	0
+15	150	%s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ CService Representative%s ï¿½ï¿½ï¿½ %s	31337	0
+15	151	%s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ CService Administrator%s ï¿½ï¿½ï¿½ %s	31337	0
+15	152	%s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ CService Developer%s ï¿½ï¿½ï¿½ %s	31337	0
+15	153	ï¿½ï¿½ï¿½ï¿½ï¿½ %i ï¿½ï¿½ï¿½ï¿½ ï¿½ [%s]ï¿½ï¿½ ï¿½   	31337	0
+15	154	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	155	[%s] ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	156	ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ :%s 	31337	0
+15	158	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.	31337	0
+15	159	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %s 	31337	0
+15	160	%s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ Coder-Com Representative%s ï¿½ï¿½ï¿½ %s	31337	0
+15	161	%s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ Coder-Com Contributer%s  ï¿½ï¿½ï¿½ %s	31337	0
+15	162	%s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ Coder-Com Developer%s   ï¿½ï¿½ï¿½ %s	31337	0
+15	163	%s ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ Coder-Com Senior%s    ï¿½ï¿½ï¿½ %s	31337	0
+15	164	IRC ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	31337	0
+15	165	%s ï¿½ï¿½ï¿½ï¿½ %s ï¿½ï¿½ï¿½ï¿½ï¿½ %i ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½	31337	0
+15	166	ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ :%s 	31337	0
+15	167	ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ !	31337	0
+15	168	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½.	31337	0
+15	169	%s ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½	31337	0
+15	170	%s ï¿½ï¿½ï¿½ï¿½ ï¿½ %i	31337	0
 15	184	The NOVOICE flag is set on %s	31337	0
 15	185	Your access on %s has been suspended.	31337	0
 15	186	Your suspension on %s has been cancelled.	31337	0
