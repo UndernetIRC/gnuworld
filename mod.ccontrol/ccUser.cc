@@ -21,22 +21,22 @@
  */
  
 #include	<sstream>
-#include	<string> 
+#include	<string>
 
-#include	<cstring> 
+#include	<cstring>
 
 #include	"dbHandle.h"
 #include	"ELog.h"
 #include	"misc.h"
-#include	"ccUser.h" 
+#include	"ccUser.h"
 #include	"commLevels.h"
 #include	"ccontrol.h"
 #include	"gnuworld_config.h"
 
 namespace gnuworld
 {
-using std::string ; 
-using std::endl ; 
+using std::string ;
+using std::endl ;
 using std::stringstream ;
 using std::ends ;
 
@@ -51,10 +51,10 @@ ccUser::ccUser(dbHandle* _SQLDb)
    IsSuspended(0),
    SuspendExpires(0),
    SuspendLevel(0),
-   SuspendReason(""),      
+   SuspendReason(""),
    Access( 0 ),
    SAccess( 0 ),
-   Flags( 0 ), 
+   Flags( 0 ),
    IsUhs(0),
    IsOper(0),
    IsAdmin(0),
@@ -68,6 +68,7 @@ ccUser::ccUser(dbHandle* _SQLDb)
    NeedOp(0),
    Notice(0),
    SQLDb( _SQLDb ),
+   LastAuthTS(0),
    PassChangeTS(0)
 {
 ++numAllocated;
@@ -84,7 +85,7 @@ if(!dbConnected)
 	{
 	return false;
 	}
-	
+
 static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE lower(user_name) = '";
 
 if(!dbConnected)
@@ -100,7 +101,7 @@ theQuery	<< Main
 
 elog	<< "ccUser::loadData> "
 	<< theQuery.str().c_str()
-	<< endl; 
+	<< endl;
 
 if( SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
 //if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
@@ -119,7 +120,7 @@ if(!dbConnected)
 	{
 	return false;
 	}
-	
+
 static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE user_id = ";
 stringstream theQuery;
 
@@ -135,7 +136,7 @@ theQuery	<< Main
 
 elog	<< "ccontrol::loadData> "
 	<< theQuery.str().c_str()
-	<< endl; 
+	<< endl;
 
 if( SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
 //if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
@@ -172,12 +173,12 @@ SuspendReason = SQLDb->GetValue(0,19);
 Notice = (!strcasecmp(SQLDb->GetValue(0,20),"t") ? 1 : 0 );
 GetLag = (!strcasecmp(SQLDb->GetValue(0,21),"t") ? 1 : 0 );
 PassChangeTS = atoi(SQLDb->GetValue(0,22).c_str());
-Sso = (!strcasecmp(SQLDb->GetValue(0,23),"t") ? 1 : 0 ); 
+Sso = (!strcasecmp(SQLDb->GetValue(0,23),"t") ? 1 : 0 );
 Ssooo = (!strcasecmp(SQLDb->GetValue(0,24),"t") ? 1 : 0 );
 AutoOp = (!strcasecmp(SQLDb->GetValue(0,25),"t") ? 1 : 0 );
 Account = SQLDb->GetValue(0,26);
 AccountTS = atoi(SQLDb->GetValue(0,27).c_str());
-}    
+}
 
 bool ccUser::Update()
 {

@@ -143,18 +143,22 @@ if( (int)st2.size() > max_multiunbans )
 	}
 
 // Let's store masks to unban in a vector.
-std::vector< string > unbanList ;
+xServer::banVectorType	banVector ;
 
 /* Strings for providing colapsed responses. */
 string respUnban ;
 string respNotOnChan ;
 
+/* Counter of deleted internal bans */
+int banCount ;
+
 for( ; counter < st2.size() ; counter++ )
 	{
+#ifdef LOG_DEBUG
 	elog	<< "cservice::UNBANCommand> #" << counter
-				<< ": " << st2[counter]
-				<< endl;
-
+		<< ": " << st2[counter]
+		<< endl;
+#endif
 	/*
 	 *  Are they trying to unban by nick or hostmask?
 	 */
@@ -271,6 +275,7 @@ for( ; counter < st2.size() ; counter++ )
 		theChan->banList.erase( sqlBanIterator );
 		theBan->deleteRecord();
 		delete(theBan);
+		banCount++ ;
 		}
 
 	/*
@@ -296,41 +301,20 @@ for( ; counter < st2.size() ; counter++ )
 
 		if ( comparison )
 			{
-			unbanList.push_back( *cPtr ) ;
-			theChannel->removeBan(*cPtr);
-			cPtr = theChannel->banList_begin();
-			}
-		else
-			{
-			++cPtr;
+			banVector.push_back( xServer::banVectorType::value_type(
+					false, *cPtr ) ) ;
 			}
 
+			++cPtr;
 		} // while()
 	} // for()
 
-string modeString ;
-string args ;
+/* Make sure there are no duplicates */
+sort( banVector.begin(), banVector.end() ) ;
+auto it = unique( banVector.begin(), banVector.end() ) ;
+banVector.erase( it, banVector.end() ) ;
 
-for( std::vector< string >::const_iterator ptr = unbanList.begin(),
-end = unbanList.end() ; ptr != end ; ++ptr )
-	{
-	modeString += 'b' ;
-	args += *ptr + ' ' ;
-
-	if( ( MAX_CHAN_MODES == modeString.size() ) ||
-		( ( ptr + 1 ) == end ) )
-		{
-		stringstream s ;
-		s	<< bot->getCharYYXXX() << " M "
-			<< theChan->getName() << ' '
-			<< "-" << modeString << ' ' << args ;
-
-		bot->Write( s ) ;
-
-		modeString.erase( modeString.begin(), modeString.end() ) ;
-		args.erase( args.begin(), args.end() ) ;
-		} // if()
-	} // for()
+bot->UnBan( theChannel, banVector ) ;
 
 if( !respNotOnChan.empty() )
 	bot->Notice( theClient,
@@ -342,15 +326,15 @@ if( !respNotOnChan.empty() )
 bot->Notice( theClient,
 	bot->getResponse( theUser,
 		language::bans_removed,
-		string( "Removed %i bans that matched %s" ) ).c_str(),
-		unbanList.size(), respUnban.c_str() ) ;
+		string( "Removed %i channel bans and %i internal bans that matched %s" ) ).c_str(),
+		banVector.size(), banCount, respUnban.c_str() ) ;
 
 // Send action opnotice to channel if OPLOG is enabled
 if( theChan->getFlag( sqlChannel::F_OPLOG ) )
 	bot->NoticeChannelOps( theChan->getName(),
-		"%s (%s) removed %i bans that matched %s",
+		"%s (%s) removed %i channel bans and %i internal bans that matched %s",
 		theClient->getNickName().c_str(), theUser->getUserName().c_str(),
-		unbanList.size(), respUnban.c_str() ) ;
+		banVector.size(), banCount, respUnban.c_str() ) ;
 
 return true;
 

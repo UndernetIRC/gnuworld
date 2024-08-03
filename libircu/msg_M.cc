@@ -223,7 +223,7 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			modeVector.push_back(
 				make_pair(polarity, Channel::MODE_CTCP));
 			break;
-		case 'P':
+		case 'u':
 			modeVector.push_back(
 				make_pair(polarity, Channel::MODE_PART));
 			break;

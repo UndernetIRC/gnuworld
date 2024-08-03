@@ -426,7 +426,13 @@ public:
 	unsigned int SupportDays;
 	unsigned int ReviewerId;
 	unsigned int LogToAdminConsole;
-	string ChanfixServerName;
+	unsigned int limitJoinMaxLowest;
+	unsigned int limitJoinMaxHighest;
+	unsigned int limitJoinSecsLowest;
+	unsigned int limitJoinSecsHighest;
+	unsigned int limitJoinPeriodHighest;
+	std::string limitJoinAllowedModes;
+	std::string ChanfixServerName;
 
 	string validResponseString;
 	void AddToValidResponseString(const string&);
@@ -536,6 +542,9 @@ public:
 
 	/* Automatically updates the floating limit for this channel */
 	void doFloatingLimit(sqlChannel*, Channel*);
+
+	/* Check for unidented clients joining */
+	void doJoinLimit(sqlChannel*, Channel*);
 
 	/* This function is used to ban a mask, to who no matching client is currently existing on the channel */
 	bool doSingleBan(sqlChannel* theChan, const string& banMask, unsigned short banLevel, unsigned int banExpire, const string& theReason);
@@ -647,6 +656,8 @@ public:
 	 *  intervals to perform maintainence, etc.
 	 */
 
+	void stopTimer(xServer::timerID);
+
 	/*
 	 * Expire suspends, ignores and bans respectively.
 	 */
@@ -712,7 +723,7 @@ public:
 	void preloadChannelCache();
 	void preloadLevelsCache();
 	void preloadUserCache();
-	
+
 	bool loadGlines();
 
 	void updateChannels();
@@ -723,6 +734,7 @@ public:
 	void updateBans();
 
 	void updateLimits();
+	void undoJoinLimits(sqlChannel* reggedChan);
 
 	bool addGline( csGline* );
 	bool remGline( csGline* );

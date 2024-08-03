@@ -113,6 +113,7 @@ namespace gnuworld {
     const int massdeoppro = 500;
     const int keywords = 450;
     const int floatlim = 450;
+    const int joinlim = 450;
 
     const int desc = 450;
     const int mode = 450;

@@ -532,6 +532,12 @@ public:
 	virtual bool	Ban( Channel*, const std::vector< iClient* >& ) ;
 
 	/**
+	 * Set bans on a channel from a banVector, join/part the channel if necessary.
+	 * The banVector must not include duplicates.
+	 */
+	virtual bool 	Ban( Channel*, const xServer::banVectorType& ) ;
+
+	/**
 	 * Ban kick a client from a channel for the given reason.
 	 */
 	virtual bool	BanKick( Channel*, iClient*, const std::string& ) ;
@@ -540,6 +546,13 @@ public:
 	 * Remove a channel ban.
 	 */
 	virtual bool	UnBan( Channel*, const std::string& ) ;
+
+	/**
+	 * Removes channel bans from a banVector, join/part the channel if necessary.
+	 * The banVector must not include duplicates, and only include exact existing
+	 * bans on the channel.
+	 */
+	virtual bool	UnBan( Channel*, const xServer::banVectorType& ) ;
 
 	/**
 	 * Kick a user from a channel, join/part if necessary.

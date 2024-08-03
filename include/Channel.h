@@ -481,7 +481,7 @@ public:
 	void setTopicWhoSet( const std::string& _TopicWhoSet )
 		{ topic_whoset = _TopicWhoSet; }
 
-	void setTopicTS( const long& _TopicTS )
+	void setTopicTS( const time_t& _TopicTS )
 		{ topic_ts = _TopicTS; }
 	
 #endif	
@@ -620,7 +620,7 @@ protected:
 
 	std::string	topic_whoset;
 
-	long		topic_ts;
+	time_t		topic_ts;
 #endif
 
 } ;

@@ -1848,7 +1848,293 @@ else
 	    return true;
 	}
 
+	// ********* JOIN LIMITATION - prevents unidented and unauthed users from sneaking into the channel in preparation for a flood **********
+	if (option == "JOINLIM")
+	{
+		if (level < level::set::joinlim)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
+			return true;
+		}
 
+		if (value == "ON")
+		{
+			theChan->setFlag(sqlChannel::F_JOINLIM);
+			theChan->setLimitJoinTime(0);
+			theChan->setLimitJoinCount(0);
+		}
+		else if (value == "OFF")
+		{
+			theChan->removeFlag(sqlChannel::F_JOINLIM);
+			if (theChan->getLimitJoinActive())
+			{
+				bot->stopTimer(theChan->getLimitJoinTimer());
+				bot->undoJoinLimits(theChan);
+			}
+		}
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_cmd_syntax_on_off,
+					string("value of %s must be ON or OFF")).c_str(),
+					option.c_str());
+			return true;
+		}
+		theChan->commit();
+
+		// Check for default
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_cmd_status,
+				string("%s for %s is %s")).c_str(),
+				option.c_str(),
+				theChan->getName().c_str(),
+				theChan->getFlag(sqlChannel::F_JOINLIM) ? "ON" : "OFF");
+		return true;
+	}
+
+	if (option == "JOINMAX")
+	{
+		if (level < level::set::joinlim)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
+			return true;
+		}
+
+		std::istringstream ss(value.c_str());
+
+		int limit_joins = -1, limit_secs;
+		char colon;
+
+		// Extract numbers based on colon if present
+		if (ss >> limit_joins >> colon >> limit_secs && colon == ':')
+		{
+			if (limit_joins < (int)bot->limitJoinMaxLowest || limit_joins > (int)bot->limitJoinMaxHighest)
+			{
+				bot->Notice(theClient,
+					bot->getResponse(theUser,
+						language::set_joinmax_joinrange,
+						string("Value of joins has to be %i-%i")).c_str(),
+						(int)bot->limitJoinMaxLowest, (int)bot->limitJoinMaxHighest);
+				return true;
+			}
+
+			if (limit_secs < (int)bot->limitJoinSecsLowest || limit_secs > (int)bot->limitJoinSecsHighest)
+			{
+				bot->Notice(theClient,
+					bot->getResponse(theUser,
+						language::set_joinmax_secrange,
+						string("Value of seconds has to be %i-%i")).c_str(),
+						(int)bot->limitJoinSecsLowest, (int)bot->limitJoinSecsHighest);
+				return true;
+			}
+
+			theChan->setLimitJoinMax(limit_joins);
+			theChan->setLimitJoinSecs(limit_secs);
+			theChan->setLimitJoinTime(0);
+			theChan->setLimitJoinCount(0);
+			theChan->commit();
+
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_joinmax,
+					string("JOINMAX for %s is now %i:%i (JOINS:SECS)")).c_str(),
+					theChan->getName().c_str(), limit_joins, limit_secs);
+
+			return true;
+		}
+		else
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::syntax,
+					string("SYNTAX: %s")).c_str(),
+					string("SET <#channel> JOINMAX <joins:secs>").c_str());
+			return false;
+		}
+		return true;
+	}
+
+	if (option == "JOINMODE")
+	{
+		if (level < level::set::joinlim)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
+			return true;
+		}
+
+		if (st.size() < 4)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::syntax,
+					string("SYNTAX: %s")).c_str(),
+					string("SET <#channel> JOINMODE <modes> [parameters]").c_str());
+			return false;
+		}
+
+		std::string allowedModes = bot->limitJoinAllowedModes;
+		std::string resultModes = "";
+
+		StringTokenizer::size_type numParam = 0;
+		bool invalidMode = false;
+		bool invalidParam = false;
+
+		for (char c : st[3])
+		{
+			if (c == '+')
+				continue;
+
+			if (allowedModes.find(c) != std::string::npos)
+			{
+				if (c == 'k')
+					numParam++; // Ignore this parm
+				if (c == 'b')
+				{
+					numParam++;
+					if (st.size() < numParam + 4)
+					{
+						invalidParam = true;
+						break;
+					}
+					std::string banMask = fixAddress(st[numParam + 3]);
+					if (!validUserMask(banMask))
+					{
+						bot->Notice(theClient,
+							bot->getResponse(theUser,
+								language::ban_invalid,
+								string("The banmask '%s' is not valid")).c_str(),
+								st[numParam + 3].c_str());
+						return true;
+					}
+				}
+				resultModes += c;
+			}
+			else
+			{
+				invalidMode = true;
+				break;
+			}
+		}
+
+		if (invalidMode || resultModes.empty())
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_joinmode_allowed,
+					string("The allowed JOINMODE modes are: %s")).c_str(),
+					bot->limitJoinAllowedModes.c_str());
+			return true;
+		}
+
+		if (invalidParam || numParam != (st.size() - 4))
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_joinmode_params,
+					string("Invalid number of JOINMODE parameters: %i modes and %i parameters provided")).c_str(),
+					numParam, st.size() - 4);
+			return true;
+		}
+
+		std::string modeString = "+";
+		modeString += resultModes;
+		if (numParam > 0)
+		{
+			modeString += " ";
+			for (int i = 0; i < (int)numParam; i++)
+			{
+				modeString += st[i + 4];
+				if (i < (int)(numParam - 1))
+					modeString += " ";
+			}
+		}
+		theChan->setLimitJoinMode(modeString);
+		theChan->commit();
+
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_joinmode,
+				string("JOINMODE for %s is now: %s")).c_str(),
+				theChan->getName().c_str(), modeString.c_str());
+		return true;
+	}
+
+	if (option == "JOINPERIOD")
+	{
+		if (level < level::set::joinlim)
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::insuf_access,
+					string("You do not have enough access!")));
+			return true;
+		}
+
+		unsigned int limit_period = atoi(value.c_str());
+		if ((limit_period < 1) || (limit_period > bot->limitJoinPeriodHighest))
+		{
+			bot->Notice(theClient,
+				bot->getResponse(theUser,
+					language::set_joinperiod_range,
+					string("Value of JOINPERIOD has to be 1-%i")).c_str(),
+					(int) bot->limitJoinPeriodHighest);
+			return true;
+		}
+
+		/* Is JOINPERIOD changes while an active timer is running? */
+		if (theChan->getLimitJoinActive())
+		{
+			time_t lapTime = ::time(nullptr) - theChan->getLimitJoinTime();
+			time_t expTime = ::time(nullptr) - lapTime + limit_period;
+
+			/**
+			 * If the time lapsed under the existing timer is more than
+			 * the new limit_period, kill the timer and undo modes.
+			 */
+			if (lapTime >= limit_period)
+			{
+				bot->stopTimer(theChan->getLimitJoinTimer());
+				bot->undoJoinLimits(theChan);
+				theChan->setLimitJoinTimer(0);
+				theChan->setLimitJoinTimeExpire(0);
+			}
+
+			/**
+			 * if the time lapsed under the existing timer is less than
+			 * the new limit_period, reset timer to new expire time.
+			 */
+			else if (lapTime < limit_period)
+			{
+				bot->stopTimer(theChan->getLimitJoinTimer());
+				xServer::timerID newTimer = this->server->RegisterTimer(expTime, bot, theChan);
+				theChan->setLimitJoinTimer(newTimer);
+				theChan->setLimitJoinTimeExpire(expTime);
+			}
+		}
+
+		theChan->setLimitJoinPeriod(limit_period);
+		theChan->commit();
+
+		bot->Notice(theClient,
+			bot->getResponse(theUser,
+				language::set_joinperiod,
+				string("JOINPERIOD for %s is now: %i seconds")).c_str(),
+				theChan->getName().c_str(), limit_period);
+		return true;
+	}
+
+	// ********** FLOAT LIMITATION - prevents hordes of clones to rapidly join the channel **********
 	if(option == "FLOATLIM")
 	{
 	    if(level < level::set::floatlim)

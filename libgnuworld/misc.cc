@@ -30,6 +30,7 @@
 #include	<cstring>
 
 #include	<sstream>
+#include	<locale>
 
 #include	"misc.h"
 #include	"StringTokenizer.h"
@@ -499,6 +500,14 @@ string createClass(const string& address, bool wildcard)
 			fixaddr = extractNickUser(address) + '@' + fixaddr;
 		return fixaddr;
 	}
+}
+
+const string prettyNumber( int number )
+{
+std::stringstream ss ;
+ss.imbue( std::locale("en_US.UTF-8") ) ;
+ss << number ;
+return ss.str() ;
 }
 
 const string prettyDuration( int duration )

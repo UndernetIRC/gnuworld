@@ -66,6 +66,9 @@ Channel::Channel( const string& _name,
    creationTime( _creationTime ),
    modes( 0 ),
    limit( 0 )
+#ifdef TOPIC_TRACK
+	 ,topic_ts( 0 )
+#endif
 {}
 
 Channel::~Channel()
@@ -476,19 +479,19 @@ const string Channel::getModeString() const
 string modeString( "+" ) ;
 string argString ;
 
-if( modes & MODE_T )	modeString += 't' ;
-if( modes & MODE_N )	modeString += 'n' ;
-if( modes & MODE_S )	modeString += 's' ;
-if( modes & MODE_P )	modeString += 'p' ;
-if( modes & MODE_M )	modeString += 'm' ;
-if( modes & MODE_I )	modeString += 'i' ;
-if( modes & MODE_R )	modeString += 'r' ;
-if( modes & MODE_REG )	modeString += 'R' ;
-if( modes & MODE_D )	modeString += 'D' ;
-if (modes & MODE_C)		modeString += 'c';
-if (modes & MODE_CTCP)	modeString += 'C';
-if (modes & MODE_PART)	modeString += 'P';
-if (modes & MODE_MNOREG)	modeString += 'M';
+if( modes & MODE_T )		modeString += 't' ;
+if( modes & MODE_N )		modeString += 'n' ;
+if( modes & MODE_S )		modeString += 's' ;
+if( modes & MODE_P )		modeString += 'p' ;
+if( modes & MODE_M )		modeString += 'm' ;
+if( modes & MODE_I )		modeString += 'i' ;
+if( modes & MODE_R )		modeString += 'r' ;
+if( modes & MODE_REG )		modeString += 'R' ;
+if( modes & MODE_D )		modeString += 'D' ;
+if( modes & MODE_C )		modeString += 'c';
+if( modes & MODE_CTCP )		modeString += 'C';
+if( modes & MODE_PART )		modeString += 'u';
+if( modes & MODE_MNOREG )	modeString += 'M';
 
 if( modes & MODE_K )
 	{

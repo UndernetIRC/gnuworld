@@ -69,6 +69,7 @@ const sqlChannel::flagType sqlChannel::F_VACATION = 0x00000080 ;
 const sqlChannel::flagType sqlChannel::F_LOCKED   = 0x00000100 ;
 const sqlChannel::flagType sqlChannel::F_FLOATLIM = 0x00000200 ;
 const sqlChannel::flagType sqlChannel::F_MIA      = 0x00000400 ;
+const sqlChannel::flagType sqlChannel::F_JOINLIM  = 0x00000800 ;
 
 const sqlChannel::flagType sqlChannel::F_ALWAYSOP  = 0x00010000 ;
 const sqlChannel::flagType sqlChannel::F_STRICTOP  = 0x00020000 ;
@@ -139,6 +140,11 @@ sqlChannel::sqlChannel(dbHandle* _SQLDb)
    last_flood(0),
    limit_grace(2),
    limit_max(0),
+   limit_joinmax(0),
+   limit_joinsecs(0),
+   limit_joinmode(),
+   limit_joinperiod(0),
+   limit_jointimerID(0),
    max_bans(0),
    no_take(0),
    SQLDb( _SQLDb )
@@ -269,6 +275,10 @@ limit_max = atoi(SQLDb->GetValue(row,17));
 max_bans = atoi(SQLDb->GetValue(row,18));
 no_take = atoi(SQLDb->GetValue(row,19));
 welcome = SQLDb->GetValue(row, 20);
+limit_joinmax = atoi(SQLDb->GetValue(row,21));
+limit_joinsecs = atoi(SQLDb->GetValue(row,22));
+limit_joinperiod = atoi(SQLDb->GetValue(row,23));
+limit_joinmode = SQLDb->GetValue(row,24);
 
 setAllFlood();
 }
@@ -303,7 +313,11 @@ queryString	<< queryHeader
 		<< "max_bans = " << max_bans << ", "
 		<< "description = '" << escapeSQLChars(description) << "', "
 		<< "comment = '" << escapeSQLChars(comment) << "', "
-		<< "no_take = " << no_take << " "
+		<< "no_take = " << no_take << ", "
+		<< "limit_joinmax = " << limit_joinmax << ", "
+		<< "limit_joinsecs = " << limit_joinsecs << ", "
+		<< "limit_joinperiod = " << limit_joinperiod << ", "
+		<< "limit_joinmode = '" << escapeSQLChars(limit_joinmode) << "' "
 		<< queryCondition << id
 		<< ends;
 

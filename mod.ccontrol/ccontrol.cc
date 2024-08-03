@@ -1745,7 +1745,8 @@ xClient::OnChannelEvent( theEvent, theChan,
 
 void ccontrol::OnTimer(const xServer::timerID& timer_id, void*)
 {
-if (timer_id ==  postDailyLog)
+#ifndef LOGTOHD
+if (timer_id == postDailyLog)
 	{ 
 	// Create the lastcom report 
 	CreateReport(::time(0) - 24*3600,::time(0));
@@ -1758,6 +1759,9 @@ if (timer_id ==  postDailyLog)
 	postDailyLog = MyUplink->RegisterTimer(theTime, this, NULL); 
 	}
 else if (timer_id == expiredTimer)
+#else
+if (timer_id == expiredTimer)
+#endif
 	{
 	refreshGlines();
 	refreshIgnores();
