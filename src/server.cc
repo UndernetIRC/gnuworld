@@ -1507,6 +1507,7 @@ bool xServer::JoinChannel( xClient* theClient,
 {
 // Determine the timestamp to use for the join
 time_t postJoinTime = joinTime ;
+channelEventType whichEvent = EVT_JOIN ;
 if( 0 == postJoinTime )
 	{
 	postJoinTime = ::time( 0 ) ;
@@ -1547,6 +1548,7 @@ if( (NULL == theChan) && bursting )
 		}
 
 	Write( s ) ;
+	whichEvent = EVT_BURST ;
 
 	// Instantiate the new channel
 	theChan = new (std::nothrow) Channel( chanName, time( 0 ) ) ;
@@ -1588,6 +1590,7 @@ else if( NULL == theChan )
 		<< ' '
 		<< postJoinTime ;
 	Write( s ) ;
+	whichEvent = EVT_CREATE ;
 	}
 
 	if( !chanModes.empty() )
@@ -1660,6 +1663,7 @@ else if( bursting )
 		}
 
 	Write( s ) ;
+	whichEvent = EVT_BURST ;
 	}
 else
 	{
@@ -1922,7 +1926,7 @@ if( !theChan->addUser( theChanUser ) )
 	return false ;
 	}
 
-PostChannelEvent( EVT_JOIN, theChan,
+PostChannelEvent( whichEvent, theChan,
 	static_cast< void* >( theIClient ),
 	static_cast< void* >( theChanUser ) ) ;
 

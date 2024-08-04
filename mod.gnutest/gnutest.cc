@@ -156,6 +156,7 @@ iClient* theClient = 0 ;
 
 switch( whichEvent )
 	{
+	case EVT_BURST:
 	case EVT_CREATE:
 //		elog	<< "gnutest::OnChannelEvent> EVT_CREATE\n" ;
 	case EVT_JOIN:

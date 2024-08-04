@@ -412,7 +412,7 @@ for( StringTokenizer::const_iterator ptr = st.begin() ; ptr != st.end() ;
 
 	// Notify the services clients that a user has
 	// joined the channel
-	theServer->PostChannelEvent( EVT_JOIN, theChan,
+	theServer->PostChannelEvent( EVT_BURST, theChan,
 		static_cast< void* >( theClient ),
 		static_cast< void* >( chanUser ) ) ;
 

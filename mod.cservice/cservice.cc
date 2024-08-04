@@ -5745,9 +5745,13 @@ void cservice::OnChannelEvent( const channelEventType& whichEvent,
 	void* data1, void* data2, void* data3, void* data4 )
 {
 iClient* theClient = 0 ;
+bool burstJoin = false ;
 
 switch( whichEvent )
 	{
+	case EVT_BURST:
+		burstJoin = true ;
+		// fall through
 	case EVT_CREATE:
 	case EVT_JOIN:
 		{
@@ -5760,7 +5764,6 @@ switch( whichEvent )
 		theClient = static_cast< iClient* >( data1 ) ;
 
 		pendingChannelListType::iterator ptr = pendingChannelList.find(theChan->getName());
-		iServer* theServer = Network->findServer( theClient->getIntYY() ) ;
 
 		if (ptr != pendingChannelList.end() && (!isDBRegisteredChannel(theChan->getName())))
 			{
@@ -5769,7 +5772,7 @@ switch( whichEvent )
 			 * If this is the case, its not a manual /join.
 			 */
 
-			if (!theServer->isBursting())
+			if (!burstJoin)
 				{
 				/*
 				 *  Yes, this channel is pending registration, update join count
@@ -5929,7 +5932,7 @@ switch( whichEvent )
 		if (!theUser &&
 			theClient->getUserName()[0] == '~' &&
 			reggedChan->getFlag(sqlChannel::F_JOINLIM) &&
-			!theServer->isBursting())
+			!burstJoin)
 			doJoinLimit(reggedChan, theChan);
 
 		/* Deal with auto-op first - check this users access level. */
