@@ -270,6 +270,8 @@ public:
 	unsigned int jcJoinsPerIPTime;
 	unsigned int jcMinJFSizeToGline;
 	unsigned int jcMinJFJOnlySizeToGline;
+	unsigned int jcIgnoreJoinFloodLag;
+	unsigned int jcIgnoreJoinFloodLagTS;
 	bool jcGlineEnable;
 	bool jcGlineEnableConf;
 	std::string jcGlineReason;

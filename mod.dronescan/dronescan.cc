@@ -136,6 +136,8 @@ jcMinJoinsPerIPToGline = atoi(dronescanConfig->Require("jcMinJoinsPerIPToGline")
 jcJoinsPerIPTime = atoi(dronescanConfig->Require("jcJoinsPerIPTime")->second.c_str());
 jcMinJFSizeToGline = atoi(dronescanConfig->Require("jcMinJFSizeToGline")->second.c_str());
 jcMinJFJOnlySizeToGline = atoi(dronescanConfig->Require("jcMinJFJOnlySizeToGline")->second.c_str());
+jcIgnoreJoinFloodLag = atoi(dronescanConfig->Require("jcIgnoreJoinFloodLag")->second.c_str());
+jcIgnoreJoinFloodLagTS = atoi(dronescanConfig->Require("jcIgnoreJoinFloodLagTS")->second.c_str());
 jcGlineEnable = atoi(dronescanConfig->Require("jcGlineEnable")->second.c_str()) == 1 ? true : false;
 jcGlineEnableConf = jcGlineEnable;
 jcGlineReason = dronescanConfig->Require("jcGlineReason")->second.c_str();
@@ -1261,6 +1263,10 @@ if( droneChanItr != droneChannels.end() )
 /* Do join count processing if applicable */
 if ((::time(0) - lastBurstTime) < jcGracePeriodBurstOrSplit)
 	return;  /* Don't report join/floods right after a burst */
+const iServer* theClientServer = theClient->getServer();
+if ((theClientServer->getLag() > jcIgnoreJoinFloodLag) && ((::time(0) - theClientServer->getLastLagTS()) < jcIgnoreJoinFloodLagTS))
+	return; /* Don't report join/floods if server is lagged */
+
 const string& channelName = theChannel->getName();
 jcChanMapIterator jcChanIt = jcChanMap.find(channelName);
 jfChannel* channel;
