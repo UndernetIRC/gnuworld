@@ -4,7 +4,7 @@
 
 -- ChangeLog:
 -- 2024-08-05: MrIron
---						 Added columns for the JOINLIM feature written by Telac.
+--             Added columns for the JOINLIM feature written by Telac.
 -- 2017-01-24:Empus
 --             Added table 'pending_chanfix_scores' to integrate 
 --				channel applications with mod.openchanfix
