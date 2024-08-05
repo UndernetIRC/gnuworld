@@ -91,6 +91,22 @@ if( NULL == theClient )
 time_t creationTime =
 	static_cast< time_t >( atoi( Param[ Param.size() - 1 ] ) ) ;
 
+iServer* nickUplink = 0;
+char serverYY[3];
+strncpy(serverYY, Param[0], 2);
+serverYY[2] = '\0';
+nickUplink = Network->findServer(serverYY);
+if (!nickUplink->isBursting())
+	{
+	// Set the server's lag time
+	time_t lag = 0;
+	if (::time(0) > creationTime)
+		lag = ::time(0) - creationTime;
+	else
+		lag = 0;
+	nickUplink->setLag(lag);
+	}
+
 // Tokenize based on ','.  Multiple channels may be put into the
 // same C(REATE) command.
 StringTokenizer st( Param[ 1 ], ',' ) ;

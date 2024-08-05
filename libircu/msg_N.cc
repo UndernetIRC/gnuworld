@@ -109,6 +109,7 @@ else
 
 if (!nickUplink->isBursting())
 	{
+	// Set the server's lag time
 	time_t nick_ts = atoi(params[2]);
 	time_t lag = 0;
 	if (::time(0) > nick_ts)
