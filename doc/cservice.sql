@@ -3,6 +3,8 @@
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2024-08-05: MrIron
+--						 Added columns for the JOINLIM feature written by Telac.
 -- 2017-01-24:Empus
 --             Added table 'pending_chanfix_scores' to integrate 
 --				channel applications with mod.openchanfix
@@ -171,6 +173,10 @@ CREATE TABLE channels (
 
 	welcome VARCHAR(300) DEFAULT '',
 
+	limit_joinmax INT4 DEFAULT '3',
+	limit_joinsecs INT4 DEFAULT '1',
+	limit_joinperiod INT4 DEFAULT '180',
+	limit_joinmode VARCHAR(255) DEFAULT '+rb *!~*@*',
 	PRIMARY KEY (id)
 );
 
