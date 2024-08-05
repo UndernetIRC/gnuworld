@@ -430,10 +430,10 @@ void dronescan::OnChannelEvent( const channelEventType& theEvent,
 	if(currentState == BURST) return ;
 
 	/* If this is not a join and not part, we don't care. */
-	if(theEvent != EVT_JOIN && theEvent != EVT_BURST && theEvent != EVT_PART) return ;
+	if(theEvent != EVT_JOIN && theEvent != EVT_PART) return ;
 
 	iClient* theClient = static_cast< iClient* > (Data1);
-	if(theEvent == EVT_JOIN || theEvent == EVT_BURST)
+	if(theEvent == EVT_JOIN)
 		{
 		handleChannelJoin(theChannel,theClient);
 		}
