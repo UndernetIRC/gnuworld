@@ -52,7 +52,9 @@ iServer::iServer( const unsigned int& _uplink,
 	startTime( _connectTime ),
 	description( _description ),
 	bursting( false ),
-	flags( 0 )
+	flags( 0 ),
+	lag( 0 ),
+	lastLagTS( 0 )
 {}
 
 iServer::~iServer()

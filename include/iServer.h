@@ -186,6 +186,27 @@ public:
 		{ return startTime ; }
 
 	/**
+	 * Return the lag of this server (in seconds).
+	 */
+	inline const time_t& getLag() const
+		{ return lag ; }
+
+	/**
+	 * Set the lag value and update lastLagTS to current TS.
+	 */
+	inline void setLag( const time_t& _lag )
+		{
+		lag = _lag ;
+		lastLagTS = ::time(0) ;
+		}
+
+	/**
+	 * Return the TS of the last lag update
+	 */
+	inline const time_t& getLastLagTS() const
+		{ return lastLagTS ; }
+
+	/**
 	 * Return the description of this server.
 	 */
 	inline const std::string& getDescription() const
@@ -309,6 +330,16 @@ protected:
 	 */
 	flagType	flags ;
 
+	/**
+	 * This server's lag time (in seconds), based on the last nick change
+	 * or new client connection from this server.
+	 */
+	time_t		lag ;
+
+	/**
+	 * Timestamp of last update of the lag value for this server
+	 */
+	time_t		lastLagTS ;
 } ;
 
 } // namespace gnuworld

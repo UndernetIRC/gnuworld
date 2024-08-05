@@ -96,6 +96,28 @@ if( params.size() < 3 )
 	return false ;
 	}
 
+iServer* nickUplink = 0;
+if (3 == params.size())
+	{
+	char serverYY[3];
+	strncpy(serverYY, params[0], 2);
+	serverYY[2] = '\0';
+	nickUplink = Network->findServer(serverYY);
+	}
+else
+	nickUplink = Network->findServer(params[0]);
+
+if (!nickUplink->isBursting())
+	{
+	time_t nick_ts = atoi(params[2]);
+	time_t lag = 0;
+	if (::time(0) > nick_ts)
+		lag = ::time(0) - nick_ts;
+	else
+		lag = 0;
+	nickUplink->setLag(lag);
+	}
+
 // AUAAB N Gte- 949527071
 if( 3 == params.size() )
 	{
@@ -109,7 +131,6 @@ if( 3 == params.size() )
 	}
 
 // Else, it's the network giving us a new client.
-iServer* nickUplink = Network->findServer( params[ 0 ] ) ;
 if( NULL == nickUplink )
 	{
 	elog	<< "msg_N> Unable to find server: "
