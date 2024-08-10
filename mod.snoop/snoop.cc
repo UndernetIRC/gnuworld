@@ -192,7 +192,7 @@ iClient* newClient = new (std::nothrow) iClient(
 	username,
 	"AAAAAA", // host base 64
 	hostname,
-	"realInsecureHost.com", // realInsecureHost
+	hostname, // realInsecureHost
 	"+i", // mode
 	string(), // account
 	0, // account_ts
