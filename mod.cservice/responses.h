@@ -250,6 +250,11 @@ namespace gnuworld
 		const int set_joinperiod = 			218;
 		const int status_joinlim = 			219;
 
+		const int mode_opvoice = 220;
+		const int mode_is = 221;
+		const int mode_banset = 222;
+		const int mode_wrongkey = 223;
+		const int mode_keylength = 224;
 
 		const int greeting = 				9998;
 		const int motd =				9999;
