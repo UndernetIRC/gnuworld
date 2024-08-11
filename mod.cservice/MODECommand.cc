@@ -112,7 +112,10 @@ string modeString = "" ;
 // argString holds the updated arguments, delimited by space (' ')
 string argString = "" ;
 
-// Will be set to true if a person tries to set usermodes (o/v) or bans. 
+// Store the banmasks.
+string banString = "" ;
+
+// Will be set to true if a person tries to give or remove ops or voice.
 bool wrongMode = false ;
 
 // Keep track of the polarity of the mode change.
@@ -144,7 +147,7 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 				}
 
 			if( !validUserMask(st[ argPos ]) ) break ;
-			
+
 			// Add this mode to the current modeString
 			modeString += st[ 2 ][ charPos ] ;
 
@@ -155,7 +158,12 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 			else
 				tmpChan->setBan( st[ argPos ] ) ;
 
-			// Mode to next argument
+			// Add ban to banString, to be used in the response.
+			if( !banString.empty() )
+				banString += ", " ;
+			banString += st[ argPos ] ;
+
+			// Move to next argument
 			argPos++ ;
 
 			break ;
@@ -166,11 +174,24 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 				Usage( theClient ) ;
 				return true ;
 				}
-		
-			if(plus)
+
+			if( plus )
 				{
 				if( tmpChan->getMode( Channel::MODE_K ) ) /* Do not update key if chan is already +k */
+					{
+					argPos++ ;
 					break ;
+					}
+
+				if( st[ argPos ].size() > MAX_KEY_LENGTH )
+					{
+					bot->Notice( theClient,
+						bot->getResponse( theUser,
+							language::mode_keylength,
+							string( "The channel key cannot exceed %i characters." ) ).c_str(),
+							MAX_KEY_LENGTH ) ;
+					return false ;
+					}
 
 				changeModeK = true ;
 				keyPos = argPos ;
@@ -178,13 +199,19 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 			else
 				{
 				if( !tmpChan->getMode( Channel::MODE_K ) ) /* Not +k? */
+					{
+					argPos++ ;
 					break ;
+					}
 
 				// The user needs to provide the correct key in order to -k
 				if( tmpChan->getKey() != st[ argPos ] )
 					{
-						bot->Notice( theClient, "You need to provide the existing key in order to set -k." ) ;
-						return false;
+					bot->Notice( theClient,
+						bot->getResponse( theUser,
+							language::mode_wrongkey,
+							string( "You need to provide the existing key in order to unset the key." ) ).c_str() ) ;
+					return false ;
 					}
 
 				changeModeK = true ;
@@ -196,9 +223,9 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 			// Add this argument to the current argument string
 			argString += st[ argPos ] + ' ' ;
 
-			// Mode to next argument
+			// Move to next argument
 			argPos++ ;
-				
+
 			break ;
 		case 'l': //Limit
 			// Mode -l requires no argument
@@ -209,7 +236,7 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 				tmpChan->removeMode( Channel::MODE_L ) ;
 				break ;
 				}
-				
+
 			// Else, the user has specified +l, need an
 			// argument.
 			if( argPos >= st.size() || !IsNumeric( st[ argPos ] ) )
@@ -224,106 +251,106 @@ for( string::size_type charPos = 0 ; charPos < st[ 2 ].size() ; ++charPos )
 			// Save position of argument
 			limitPos = argPos ;
 
-			// Mode to next argument
+			// Move to next argument
 			argPos++ ;
 
 			break ;
 		case 'i':  //Invite?
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_I ) ;
 			else
 				tmpChan->setMode( Channel::MODE_I ) ;
-			modeString += st[ 2 ][ charPos ] ;
 
-			break;
+			modeString += st[ 2 ][ charPos ] ;
+			break ;
 		case 'p':  //Private?
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_P ) ;
 			else
 				tmpChan->setMode( Channel::MODE_P ) ;
 
-    		modeString += st[ 2 ][ charPos ] ;
-			break;
+			modeString += st[ 2 ][ charPos ] ;
+			break ;
 		case 'r':  //Moderated for non-authed users?
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_R ) ;
 			else
 				tmpChan->setMode( Channel::MODE_R ) ;
 
-    		modeString += st[ 2 ][ charPos ] ;
-			break;
+			modeString += st[ 2 ][ charPos ] ;
+			break ;
 		case 's':  //Secret?
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_S ) ;
 			else
 				tmpChan->setMode( Channel::MODE_S ) ;
-		
+
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		case 'm':  //Moderated?
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_M ) ;
-			else	
+			else
 				tmpChan->setMode( Channel::MODE_M ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		case 'n':  //No External Messages?
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_N ) ;
-			else					
+			else
 				tmpChan->setMode( Channel::MODE_N ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		case 't':  //Topic?
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_T ) ;
 			else
 				tmpChan->setMode( Channel::MODE_T ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		case 'c': //Colours
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_C ) ;
 			else
 				tmpChan->setMode( Channel::MODE_C ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		case 'C': //CTCP
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_CTCP ) ;
 			else
 				tmpChan->setMode( Channel::MODE_CTCP ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		/*case 'u': //No part msg
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_PART ) ;
 			else
 				tmpChan->setMode( Channel::MODE_PART ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		case 'M': //Moderated for non-registered users
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_MNOREG ) ;
 			else
 				tmpChan->setMode( Channel::MODE_MNOREG ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;*/
+			break ;*/
 		case 'D':  //Delayed joins
-			if(!plus)
+			if( !plus )
 				tmpChan->removeMode( Channel::MODE_D ) ;
 			else
 				tmpChan->setMode( Channel::MODE_D ) ;
 
 			modeString += st[ 2 ][ charPos ] ;
-			break;
+			break ;
 		case '+':
 			if( plus )
 				{
@@ -361,32 +388,46 @@ if( modeString.size() > 1 || limitPos > 0 )
 		}
 
 	bot->Mode( tmpChan, modeString, argString, false ) ;
-	bot->Notice( theClient, "Mode for %s is now %s", tmpChan->getName().c_str(), tmpChan->getModeString().c_str() ) ;
+	bot->Notice( theClient,
+		bot->getResponse( theUser,
+			language::mode_is,
+			string( "Mode for %s is now: %s" ) ).c_str(),
+			tmpChan->getName().c_str(), tmpChan->getModeString().c_str() ) ;
+
+	if( !banString.empty() )
+		bot->Notice( theClient,
+			bot->getResponse( theUser,
+				language::mode_banset,
+				string( "Ban-modes set for: %s" ) ).c_str(),
+				banString.c_str() ) ;
 
 	// Update Mode_K
 	if( changeModeK )
 		{
 		if ( keyPos > 0 )
 			{
-			tmpChan->setMode(Channel::MODE_K);
-			tmpChan->setKey(st [ keyPos ]);
+			tmpChan->setMode( Channel::MODE_K ) ;
+			tmpChan->setKey( st [ keyPos ] ) ;
 			}
 		else
 			{
-			tmpChan->removeMode(Channel::MODE_K);
-			tmpChan->setKey("");
+			tmpChan->removeMode( Channel::MODE_K ) ;
+			tmpChan->setKey( "" ) ;
 			}
 		}
 
 	// Send action opnotice to channel if OPLOG is enabled
-	if( theChan->getFlag( sqlChannel::F_OPLOG ))
-		bot->NoticeChannelOps(theChan->getName(),
+	if( theChan->getFlag( sqlChannel::F_OPLOG ) )
+		bot->NoticeChannelOps( theChan->getName(),
 			"%s (%s) set mode: %s %s",
-			theClient->getNickName().c_str(), 
-			theUser->getUserName().c_str(), modeString.c_str(), argString.c_str());
+			theClient->getNickName().c_str(),
+			theUser->getUserName().c_str(), modeString.c_str(), argString.c_str() ) ;
 
 	if( wrongMode )
-		bot->Notice( theClient, "Please use the (DE)OP aor (DE)VOICE commands for +/- o/v." ) ;
+		bot->Notice( theClient,
+			bot->getResponse( theUser,
+				language::mode_opvoice,
+				string( "Please use the OP, DEOP, VOICE and DEVOICE commands to give or remove ops or voice." ) ) ) ;
 	}
 else
 	{

@@ -44,3 +44,9 @@ UPDATE translations SET text = 'Trgnati %i banovi na kanalot i %i vnatresni bano
 UPDATE translations SET text = 'Removed %i channel destructors and %i internal destructors that matched %s' WHERE language_id=22 AND response_id=143;
 
 INSERT INTO help VALUES ('MODE', '1', E'/msg X mode <#channel> <modes> [parameters]\nMakes X set or remove a channel mode in your channel.\nThe mode must start with either + or - to specify whether a mode shall be set or removed.\nFor channel mode l(imit) or k(ey), the limit or key must be provided.\nUse the OP, DEOP, VOICE and DEVOICE commands to give or remove ops or voice.');
+
+INSERT INTO translations (text, response_id, language_id, last_updated) VALUES ('Please use the OP, DEOP, VOICE and DEVOICE commands to give or remove ops or voice.', 220, 1, 31337);
+INSERT INTO translations (text, response_id, language_id, last_updated) VALUES ('Mode for %s is now: %s', 221, 1, 31337);
+INSERT INTO translations (text, response_id, language_id, last_updated) VALUES ('Ban-modes set for: %s', 222, 1, 31337);
+INSERT INTO translations (text, response_id, language_id, last_updated) VALUES ('You need to provide the existing key in order to unset the key.', 223, 1, 31337);
+INSERT INTO translations (text, response_id, language_id, last_updated) VALUES ('The channel key cannot exceed %i characters.', 224, 1, 31337);

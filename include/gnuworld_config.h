@@ -58,6 +58,12 @@
 #define MAX_CHAN_MODES 6
 
 /**
+ * MAX_KEY_LENGTH
+ * The maximum number of characters in a channel key.
+ */
+#define MAX_KEY_LENGTH 23
+
+/**
  * TOPIC_TRACK
  * Set if you want gnuworld to track topics in the network channels
  */
