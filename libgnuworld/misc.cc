@@ -28,7 +28,8 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
-
+#include	<chrono>
+#include	<iomanip>
 #include	<sstream>
 #include	<locale>
 
@@ -512,8 +513,8 @@ return ss.str() ;
 
 const string prettyDuration( int duration )
 {
-	if (duration == 0)
-		return "Never";
+if (duration == 0)
+	return "Never";
 
 // Pretty format a 'duration' in seconds to
 // x day(s), xx:xx:xx.
@@ -535,6 +536,23 @@ sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
 
 return string( tmpBuf ) ;
 }
+
+const string prettyTime( const time_t& theTime )
+{
+std::tm retTime = *std::gmtime( &theTime ) ;
+
+std::ostringstream oss ;
+oss << std::put_time( &retTime, "%F %H:%M:%S" ) ;
+
+return oss.str() ;
+}
+
+/*const long long elapsedMs( const auto startTime )
+{
+const auto endTime( std::chrono::high_resolution_clock::now() ) ;
+const auto duration( std::chrono::duration_cast<std::chrono::milliseconds> ( endTime - startTime ) ) ;
+return duration.count() ;
+}*/
 
 const string tsToDateTime(time_t timestamp, bool time)
 {

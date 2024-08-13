@@ -34,9 +34,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<cstdarg>
+#include	<chrono>
 
 #include	"client.h"
-#include  	"cservice.h"
+#include	"cservice.h"
 #include	"EConfig.h"
 #include	"events.h"
 #include	"ip.h"
@@ -2807,8 +2808,7 @@ void cservice::cacheExpireUsers()
 	logDebugMessage("Beginning User cache cleanup:");
 	sqlUserHashType::iterator ptr = sqlUserCache.begin();
 	sqlUser* tmpUser;
-	clock_t startTime = ::clock();
-	clock_t endTime = 0;
+	const auto startTime = std::chrono::high_resolution_clock::now();
 	int purgeCount = 0;
 	int updateCount = 0;
 	string removeKey;
@@ -2890,9 +2890,8 @@ void cservice::cacheExpireUsers()
 			++ptr;
 		}
 	}
-	endTime = ::clock();
-	logDebugMessage("User cache cleanup complete; Removed %i user records in %i ms.",
-		purgeCount, (endTime - startTime) /  CLOCKS_PER_SEC);
+	logDebugMessage("User cache cleanup complete; Removed %i user records in %lld ms.",
+		purgeCount, elapsedMs(startTime));
 	logDebugMessage("I also updated %i last_seen records for people logged in for >24 hours.",
 		updateCount);
 }

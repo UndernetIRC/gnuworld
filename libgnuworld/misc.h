@@ -27,6 +27,8 @@
 
 #include	<string>
 #include	<iostream>
+#include	<format>
+#include	<chrono>
 
 #include	<cctype>
 #include	<cstring>
@@ -196,12 +198,27 @@ const string prettyDuration( int ) ;
 /* Comma separates thousands for a number (e.g. 1000 to 1,000) */
 const string prettyNumber( int ) ;
 
+/* Formats a timestamp into %F %H:%M:%S */
+const std::string prettyTime( const std::time_t& theTime ) ;
+
+/* Returns the number of milliseconds having lapsed from the startTime,
+ * provided as an argument.
+ */
+template <typename Clock = std::chrono::high_resolution_clock, typename Duration = std::chrono::milliseconds>
+long long elapsedMs( const typename Clock::time_point& startTime )
+{ return std::chrono::duration_cast<Duration>( Clock::now() - startTime ).count() ; }
+
 const string tsToDateTime(time_t, bool);
 
 int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 
-/* General assemble parameters into one result string */
+/* General assemble parameters into one result string (C-style) */
 const string TokenStringsParams(const char*, ...);
+
+/* General assemble parameters into one result string (std::vformat) */
+template<typename Format, typename... Args>
+std::string formatString( const Format& format, Args&&... args )
+{ return std::vformat( format, std::make_format_args( std::forward< Args >( args )... ) ) ; }
 
 } // namespace gnuworld
 
