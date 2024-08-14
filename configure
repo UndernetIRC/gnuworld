@@ -21115,7 +21115,7 @@ then :
 fi
 
 
-    OATH_INCLUDE="/usr/local/include"
+    OATH_INCLUDE="/usr/local/include:/usr/include"
 
 # Check whether --with-liboath-include was given.
 if test ${with_liboath_include+y}
@@ -21171,16 +21171,19 @@ else $as_nop
   as_fn_error 1 "Unable to find liboath.so, please use the --with-liboath-lib argument to point to the right path" "$LINENO" 5
 fi
 
-    as_ac_File=`printf "%s\n" "ac_cv_file_"$OATH_INCLUDE/liboath/oath.h"" | $as_tr_sh`
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for \"$OATH_INCLUDE/liboath/oath.h\"" >&5
-printf %s "checking for \"$OATH_INCLUDE/liboath/oath.h\"... " >&6; }
+
+		for dir in $(echo $OATH_INCLUDE | tr ':' ' ')
+		do
+				as_ac_File=`printf "%s\n" "ac_cv_file_"$dir/liboath/oath.h"" | $as_tr_sh`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for \"$dir/liboath/oath.h\"" >&5
+printf %s "checking for \"$dir/liboath/oath.h\"... " >&6; }
 if eval test \${$as_ac_File+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r ""$OATH_INCLUDE/liboath/oath.h""; then
+if test -r ""$dir/liboath/oath.h""; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -21191,10 +21194,19 @@ eval ac_res=\$$as_ac_File
 printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"
 then :
-
-else $as_nop
-  as_fn_error 1 "Unable to find oath.h, please use the --with-liboath-include argument to point to the right path" "$LINENO" 5
+  OATH_FOUND=yes
 fi
+
+				if test "$OATH_FOUND" = "yes"; then
+						OATH_INCLUDE_DIR="$dir"
+						break
+				fi
+		done
+
+		# If oath.h was not found in any of the specified directories
+		if test "$OATH_FOUND" != "yes"; then
+				as_fn_error $? "Unable to find oath.h, please use the --with-liboath-include argument to point to the right path" "$LINENO" 5
+		fi
 
     fi
 

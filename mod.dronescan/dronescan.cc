@@ -239,7 +239,7 @@ RegisterCommand(new ANALYSECommand(this, "ANALYSE", "<#channel>"));
 RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
 RegisterCommand(new FAKECommand(this, "FAKE", "(activate)"));
 RegisterCommand(new LISTCommand(this, "LIST", "(active|fakeclients|joinflood|users)"));
-RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS <user> <level>"));
+RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS) <user> <level>"));
 RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
 RegisterCommand(new REMEXCEPTIONALCHANNELCommand(this, "REMEXCEPTIONALCHANNEL","<channel name>"));
 RegisterCommand(new REMUSERCommand(this, "REMUSER", "<user>"));
@@ -2055,7 +2055,7 @@ bool dronescan::addExceptionalChannel(const string& chanName)
 {
 std::stringstream insertQ;
 insertQ << "INSERT into exceptionalChannels(name) VALUES('"
-        << chanName << "');" << std::ends;
+        << escapeSQLChars(chanName) << "');" << std::ends;
 
 //ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
 if( !SQLDb->Exec(insertQ) )
@@ -2072,7 +2072,7 @@ bool dronescan::remExceptionalChannel(const string& chanName)
 {
 std::stringstream insertQ;
 insertQ << "DELETE from exceptionalChannels where name='"
-        << chanName << "';" << std::ends;
+        << escapeSQLChars(chanName) << "';" << std::ends;
 
 //ExecStatusType status = SQLDb->Exec(insertQ.str().c_str());
 if( !SQLDb->Exec(insertQ) )

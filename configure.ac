@@ -349,7 +349,7 @@ if test "$check_liboath" = "yes"; then
             [OATH_LIB=$withval]
     )
 
-    OATH_INCLUDE="/usr/local/include"
+    OATH_INCLUDE="/usr/local/include:/usr/include"
     AC_ARG_WITH(liboath-include,
             AS_HELP_STRING([--with-liboath-include=OATHINCLUDEDIR],[Specify location to find oath.h]),
             [OATH_INCLUDE=$withval]
@@ -360,7 +360,21 @@ if test "$check_liboath" = "yes"; then
     dnl AC_CHECK_FILE("$OATH_LIB/liboath.so",, [AC_MSG_ERROR([Unable to find liboath.so, \
     dnl                 please use the --with-liboath-lib argument to point to the right path],1)])
     AC_CHECK_LIB(oath,oath_totp_validate,, [AC_MSG_ERROR([Unable to find liboath.so, please use the --with-liboath-lib argument to point to the right path],1)])
-    AC_CHECK_FILE("$OATH_INCLUDE/liboath/oath.h",, [AC_MSG_ERROR([Unable to find oath.h, please use the --with-liboath-include argument to point to the right path],1)])
+
+		for dir in $(echo $OATH_INCLUDE | tr ':' ' ')
+		do
+				AC_CHECK_FILE("$dir/liboath/oath.h", OATH_FOUND=yes)
+				if test "$OATH_FOUND" = "yes"; then
+						OATH_INCLUDE_DIR="$dir"
+						break
+				fi
+		done
+
+		# If oath.h was not found in any of the specified directories
+		if test "$OATH_FOUND" != "yes"; then
+				AC_MSG_ERROR([Unable to find oath.h, please use the --with-liboath-include argument to point to the right path])
+		fi
+
     dnl AC_DEFINE([ENABLE_LIBOATH], [], [Enable LIBOATH])
 fi
 

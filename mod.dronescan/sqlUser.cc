@@ -52,12 +52,12 @@ if( !SQLDb ) { return true; }
 stringstream queryString;
 queryString	<< "UPDATE users SET "
 		<< "last_seen = " << last_seen << ", "
-		<< "last_updated_by = '" << last_updated_by << "', "
+		<< "last_updated_by = '" << escapeSQLChars(last_updated_by) << "', "
 		<< "last_updated = " << last_updated << ", "
 		<< "flags = " << flags << ", "
 		<< "access = " << access
 		<< " WHERE "
-		<< "user_name = '" << user_name << "'"
+		<< "user_name = '" << escapeSQLChars(user_name) << "'"
 		;
 
 #ifdef LOG_SQL
@@ -84,11 +84,11 @@ insertString	<< "INSERT INTO users "
 		<< "(user_name, created, last_seen, last_updated, last_updated_by, flags, access) "
 		<< "VALUES "
 		<< "("
-		<< "'" << user_name << "', "
+		<< "'" << escapeSQLChars(user_name) << "', "
 		<< created << ", "
 		<< last_seen << ", "
 		<< last_updated << ", "
-		<< "'" << last_updated_by << "', "
+		<< "'" << escapeSQLChars(last_updated_by) << "', "
 		<< flags << ", "
 		<< access
 		<< ")"
@@ -115,7 +115,7 @@ bool sqlUser::remove()
 {
 stringstream deleteString;
 deleteString	<< "DELETE FROM users "
-		<< "WHERE user_name = '" << user_name << "'"
+		<< "WHERE user_name = '" << escapeSQLChars(user_name) << "'"
 		;
 
 if( !SQLDb->Exec(deleteString ) )
