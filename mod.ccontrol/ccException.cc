@@ -114,7 +114,7 @@ if((!dbConnected) || !(SQLDb))
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(Name)
+		<< escapeSQLChars(Name)
 		<< "'"
 		<< ends;
 
@@ -165,7 +165,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(AddedBy)
+		<< escapeSQLChars(AddedBy)
 		<< "', maxlimit = "
 		<< maxlimit
 		<< ", maxidentlimit = "
@@ -187,11 +187,11 @@ theQuery	<< Main
 		<< ", isgroup = "
 		<< group
 		<< ", lastmodby = '"
-		<< ccontrol::removeSqlChars(ModBy)
+		<< escapeSQLChars(ModBy)
 		<< "', email = '"
-		<< ccontrol::removeSqlChars(email)
+		<< escapeSQLChars(email)
 		<< "', name = '"
-		<< ccontrol::removeSqlChars(Name)
+		<< escapeSQLChars(Name)
 		<< "' WHERE id = " 
 		<< id
 		<<  ends;
@@ -226,14 +226,14 @@ if(!dbConnected)
 
 stringstream query;
 query		<< quer
-		<< ccontrol::removeSqlChars(Name) << "',"
+		<< escapeSQLChars(Name) << "',"
 		<< maxlimit
 		<< "," << maxIdentlimit
-		<< ",'" << ccontrol::removeSqlChars(AddedBy)
+		<< ",'" << escapeSQLChars(AddedBy)
 		<< "'," << AddedOn
-		<< ",'" << ccontrol::removeSqlChars(ModBy)
+		<< ",'" << escapeSQLChars(ModBy)
 		<< "'," << ModOn
-		<< ",'" << ccontrol::removeSqlChars(email)
+		<< ",'" << escapeSQLChars(email)
 		<< "'," << clonecidr
 		<< "," << forcecount
 		<< "," << glunidented
@@ -267,9 +267,9 @@ if(!dbConnected)
 
 stringstream query;
 query		<< quer
-		<< ccontrol::removeSqlChars(cidr) << "',"
+		<< escapeSQLChars(cidr) << "',"
 		<< ipLispid
-		<< ",'" << ccontrol::removeSqlChars(AddedBy)
+		<< ",'" << escapeSQLChars(AddedBy)
 		<< "'," << AddedOn
 		<< ")" << ends;
 
@@ -300,7 +300,7 @@ if(!dbConnected)
 
 stringstream query;
 query		<< quer
-		<< ccontrol::removeSqlChars(Name) << "'"
+		<< escapeSQLChars(Name) << "'"
 		<< ends;
 
 elog 		<< "ccIpLisp::delException> "
@@ -329,7 +329,7 @@ if(!dbConnected)
 
 stringstream query;
 query		<< quer
-		<< ccontrol::removeSqlChars(cidr) << "'"
+		<< escapeSQLChars(cidr) << "'"
 		<< " and ispid = "
 		<< ipLispid
 		<< ends;

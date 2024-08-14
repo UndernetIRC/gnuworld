@@ -46,7 +46,7 @@ if( st.size() < 2 )
 
 //Fetch the user record from the database	
 //ccUser *tmpUser = bot->GetUser(st[1]);
-ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
+ccUser* tmpUser = bot->GetOper(escapeSQLChars(st[1]));
 
 if(!tmpUser)
 	{

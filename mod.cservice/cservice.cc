@@ -169,32 +169,6 @@ if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (date_part('epoch', C
 		<< endl;
 }
 
-if (SQLDb->Exec("SELECT date_part('epoch', CURRENT_TIMESTAMP)::int;",true))
-	{
-	// Set our "Last Refresh" timers to the current database system time.
-	time_t serverTime = atoi(SQLDb->GetValue(0,0).c_str());
-	lastChannelRefresh = serverTime;
-	lastUserRefresh = serverTime;
-	lastLevelRefresh = serverTime;
-	lastBanRefresh = serverTime;
-
-	/*
-	 * Calculate the current time offset from the DB server.
-	 * We always want to talk in DB server time.
-	 */
-
-	dbTimeOffset = serverTime - ::time(NULL);
-	elog	<< "*** [CMaster::ImplementServer]:  Current DB server time: "
-		<< currentTime()
-		<< endl;
-	}
-else
-	{
- 	elog	<< "Unable to retrieve time from postgres server!"
-		<< endl;
-	::exit(0);
-	}
-
 /* Register our interest in recieving some Network events from gnuworld. */
 
 MyUplink->RegisterEvent( EVT_KILL, this );
@@ -336,6 +310,32 @@ else
 	{
 	elog	<< "*** [CMaster]: Connection established to SQL server. "
 			<< endl ;
+	}
+
+if (SQLDb->Exec("SELECT date_part('epoch', CURRENT_TIMESTAMP)::int;",true))
+	{
+	// Set our "Last Refresh" timers to the current database system time.
+	time_t serverTime = atoi(SQLDb->GetValue(0,0).c_str());
+	lastChannelRefresh = serverTime;
+	lastUserRefresh = serverTime;
+	lastLevelRefresh = serverTime;
+	lastBanRefresh = serverTime;
+
+	/*
+	 * Calculate the current time offset from the DB server.
+	 * We always want to talk in DB server time.
+	 */
+
+	dbTimeOffset = serverTime - ::time(NULL);
+	elog	<< "*** [CMaster::ImplementServer]:  Current DB server time: "
+		<< currentTime()
+		<< endl;
+	}
+else
+	{
+	elog	<< "Unable to retrieve time from postgres server!"
+		<< endl;
+	::exit(0);
 	}
 
 loadConfigVariables();
@@ -7196,57 +7196,6 @@ const string cservice::getLastChannelEvent(sqlChannel* theChannel,
 		return reason;
 	}
 	return "";
-}
-
-/**
- * Global method to replace ' with \' in strings for safe placement in
- * SQL statements.
- */
-const string escapeSQLChars(const string& theString)
-{
-string retMe ;
-
-for( string::const_iterator ptr = theString.begin() ;
-	ptr != theString.end() ; ++ptr )
-	{
-	if( *ptr == '\'' )
-		{
-		//retMe += "\\\047" ;
-		retMe += "''";
-		}
-	else if ( *ptr == '\\' )
-		{
-		retMe += "\\\134" ;
-		}
-	else
-		{
-		retMe += *ptr ;
-		}
-	}
-return retMe ;
-}
-
-const string searchSQL(const string& theString)
-{
-string retMe ;
-
-for( string::const_iterator ptr = theString.begin() ;
-        ptr != theString.end() ; ++ptr )
-        {
-        if( *ptr == '*' )
-                {
-                retMe += "%" ;
-                }
-        else if ( *ptr == '?' )
-		{
-		retMe += "_" ;
-		}
-        else
-		{
-                retMe += *ptr ;
-                }
-        }
-return retMe ;
 }
 
 time_t cservice::currentTime() const

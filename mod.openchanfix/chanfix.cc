@@ -1711,30 +1711,6 @@ if (hostlist.str() == "") hostlist << "None.";
 return hostlist.str();
 }
 
-const std::string escapeSQLChars(const std::string& theString)
-{
-std::string retMe ;
-
-for( std::string::const_iterator ptr = theString.begin() ;
-	ptr != theString.end() ; ++ptr )
-	{
-	if( *ptr == '\'' )
-		{
-		//retMe += "\\\\\047" ;
-		retMe += "''" ;
-		}
-	else if ( *ptr == '\\' )
-		{
-		retMe += "\\\134" ;
-		}
-	else
-		{
-		retMe += *ptr ;
-		}
-	}
-return retMe ;
-}
-
 bool atob( std::string str )
 {
 str = string_lower(str);

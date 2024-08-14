@@ -50,11 +50,11 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery        << "UPDATE BadChannels SET Reason = '"
-		<< ccontrol::removeSqlChars(Reason)
+		<< escapeSQLChars(Reason)
 		<< "', AddedBy = '"
-		<< ccontrol::removeSqlChars(AddedBy)
+		<< escapeSQLChars(AddedBy)
 		<< "' WHERE lower(Name) = '"
-		<< ccontrol::removeSqlChars(string_lower(Name)) << "'"
+		<< escapeSQLChars(string_lower(Name)) << "'"
                 << ends;
          
 elog    << "ccBadChannel::Update> "
@@ -82,7 +82,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery        << "DELETE FROM BadChannels WHERE lower(Name) = '"
-		<< ccontrol::removeSqlChars(string_lower(Name)) << "'"
+		<< escapeSQLChars(string_lower(Name)) << "'"
                 << ends;
          
 elog    << "ccBadChannel::Delete> "
@@ -110,10 +110,10 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery        << "INSERT INTO BadChannels (Name,Reason,AddedBy) VALUES ('"
-		<< ccontrol::removeSqlChars(Name) << "','"
-		<< ccontrol::removeSqlChars(Reason)
+		<< escapeSQLChars(Name) << "','"
+		<< escapeSQLChars(Reason)
 		<< "','"
-		<< ccontrol::removeSqlChars(AddedBy) 
+		<< escapeSQLChars(AddedBy)
 		<< "')"
                 << ends;
          

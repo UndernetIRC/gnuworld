@@ -2468,14 +2468,14 @@ if(!dbConnected)
 	}
 stringstream theQuery;
 theQuery	<< Main
-		<< removeSqlChars(Oper->getUserName()) <<"','"
-		<< removeSqlChars(Oper->getPassword()) << "',"
+		<< escapeSQLChars(Oper->getUserName()) <<"','"
+		<< escapeSQLChars(Oper->getPassword()) << "',"
 		<< Oper->getAccess() << ","
 		<< Oper->getSAccess() << ",'"
-		<< removeSqlChars(Oper->getLast_Updated_by())
+		<< escapeSQLChars(Oper->getLast_Updated_by())
 		<< "',date_part('epoch', CURRENT_TIMESTAMP)::int,"
 		<< Oper->getFlags() << ",'"
-		<< removeSqlChars(Oper->getServer()) 
+		<< escapeSQLChars(Oper->getServer())
 		<< "' ," 
 		<< (Oper->getIsSuspended() ? "'t'" : "'n'") 
 		<< "," << Oper->getSuspendExpires()
@@ -2495,7 +2495,7 @@ theQuery	<< Main
 		<< "," << (Oper->getSso() ? "'t'" : "'n'")
 		<< "," << (Oper->getSsooo() ? "'t'" : "'n'")
 		<< "," << (Oper->getAutoOp() ? "'t'" : "'n'")
-		<< ",'" << removeSqlChars(Oper->getAccount())
+		<< ",'" << escapeSQLChars(Oper->getAccount())
 		<< "'," << Oper->getAccountID()
 		<< ")"
 		<< ends;
@@ -2577,7 +2577,7 @@ static const char *Main = "DELETE FROM opers WHERE lower(user_name) = '";
 
 stringstream theQuery;
 theQuery	<< Main
-		<< removeSqlChars(Name)
+		<< escapeSQLChars(Name)
 		<< "'"
 		<< ends;
 
@@ -2821,7 +2821,7 @@ static const char *Main = "INSERT INTO hosts (user_id,host) VALUES (";
 stringstream theQuery;
 theQuery	<< Main
 		<< user->getID() <<",'"
-		<< removeSqlChars(host) << "')"
+		<< escapeSQLChars(host) << "')"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -2858,7 +2858,7 @@ stringstream theQuery;
 theQuery	<< Main
 		<< user->getID()
 		<< " And host = '"
-		<< removeSqlChars(host) << "'"
+		<< escapeSQLChars(host) << "'"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -2926,7 +2926,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< string_lower(removeSqlChars(command))
+		<< string_lower(escapeSQLChars(command))
 		<< "' ORDER BY line"
 		<< ends;
 
@@ -2971,9 +2971,9 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< string_lower(removeSqlChars(command))
+		<< string_lower(escapeSQLChars(command))
 		<< "' and lower(subcommand) = '"
-		<< string_lower(removeSqlChars(subcommand))
+		<< string_lower(escapeSQLChars(subcommand))
 		<< "' ORDER BY line"
 		<< ends;
 
@@ -3473,8 +3473,8 @@ else
 	{
 	theQuery << "Unknown";
 	}
-theQuery	<< " (" << removeSqlChars(theClient->getRealNickUserHost()) <<")','"
-		<< removeSqlChars(buffer) << "')"
+theQuery	<< " (" << escapeSQLChars(theClient->getRealNickUserHost()) <<")','"
+		<< escapeSQLChars(buffer) << "')"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -3580,8 +3580,8 @@ strcpy(buffer,log.c_str());
 stringstream theQuery;
 theQuery	<< Main
 		<< "Unknown"
-		<< " (" << removeSqlChars(theClient->getRealNickUserHost()) <<")','"
-		<< removeSqlChars(buffer) << "')"
+		<< " (" << escapeSQLChars(theClient->getRealNickUserHost()) <<")','"
+		<< escapeSQLChars(buffer) << "')"
 		<< ends;
 
 #ifdef LOG_SQL
@@ -5308,12 +5308,12 @@ if(!dbConnected)
 	}
 
 stringstream theQuery;
-theQuery << existsQ << string_lower(removeSqlChars(Comm->getRealName())) << "'";
+theQuery << existsQ << string_lower(escapeSQLChars(Comm->getRealName())) << "'";
 bool update = (SQLDb->Exec(theQuery, true) && (SQLDb->Tuples() > 0));
 theQuery.str("");
 if(update) {
 	theQuery	<< Main
-		<< removeSqlChars(Comm->getName())
+		<< escapeSQLChars(Comm->getName())
 		<< "', isDisabled = "
 		<< (Comm->getIsDisabled() ? "'t'" : "'n'")
 		<< ", NeedOp = "
@@ -5323,14 +5323,14 @@ if(update) {
 		<< ", MinLevel = "
 		<< Comm->getMinLevel() 
 		<< " WHERE lower(RealName) = '"
-		<< string_lower(removeSqlChars(Comm->getRealName()))
+		<< string_lower(escapeSQLChars(Comm->getRealName()))
 		<< "'"
 		<< ends;
 
 } else {
 	theQuery << "INSERT into Commands (RealName,Name,Flags,IsDisabled,NeedOp,NoLog,MinLevel,SAccess) VALUES (";
-	theQuery << "'" << removeSqlChars(Comm->getRealName()) << "',";
-	theQuery << "'" << removeSqlChars(Comm->getName()) << "',";
+	theQuery << "'" << escapeSQLChars(Comm->getRealName()) << "',";
+	theQuery << "'" << escapeSQLChars(Comm->getName()) << "',";
 	theQuery << Comm->getFlags() << ",";
 	theQuery << (Comm->getIsDisabled() ? "'t'" : "'n'") << ",";
 	theQuery << (Comm->getNeedOp() ? "'t'" : "'n'") << ",";
@@ -5390,7 +5390,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< string_lower(removeSqlChars(Comm->getRealName()))
+		<< string_lower(escapeSQLChars(Comm->getRealName()))
 		<< "'" << ends;
 
 if( !SQLDb->Exec( theQuery, true ) )
@@ -5427,33 +5427,6 @@ for(serverIt = serversMap.begin();serverIt != serversMap.end();++serverIt)
 		return serverIt->first;
 	}
 return "";
-
-}
-
-const string ccontrol::removeSqlChars(const string& Msg)
-{
-string NewString;
-
-for(string::const_iterator ptr = Msg.begin(); ptr != Msg.end() ; ++ptr)
-	{
-	if(*ptr == ';')
-		{
-		NewString += ' ';
-		}
-	else if(*ptr == '\'')
-		{
-		NewString += "\\\047";
-		}
-	else if(*ptr == '\\')
-		{
-		NewString += "\\\134";
-		}
-	else
-		{
-		NewString += *ptr;
-		}
-	}
-return NewString;
 
 }
 
@@ -5967,7 +5940,7 @@ for(;ptr != VersionsList.end();)
 	}
 
 string delS = "DELETE FROM misc WHERE VarName = 'Version' AND lower(Value5) = '" 
-		+ string_lower(removeSqlChars(oldVer)) + "'";
+		+ string_lower(escapeSQLChars(oldVer)) + "'";
 return SQLDb->Exec(delS);
 return true;
 }
@@ -6449,14 +6422,14 @@ if ((CloneCidr < 8) || (CloneCidr > 128)) {
 ccIpLisp* tempIpLisp = new (std::nothrow) ccIpLisp(SQLDb);
 assert(tempIpLisp != NULL);
 
-tempIpLisp->setName(removeSqlChars(Name));
+tempIpLisp->setName(escapeSQLChars(Name));
 tempIpLisp->setLimit(Connections);
-tempIpLisp->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempIpLisp->setAddedBy(escapeSQLChars(theClient->getRealNickUserHost()));
 tempIpLisp->setAddedOn(::time(0));
-tempIpLisp->setModBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempIpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
 tempIpLisp->setModOn(::time(0));
 tempIpLisp->setCloneCidr(CloneCidr);
-tempIpLisp->setEmail(removeSqlChars(Email));
+tempIpLisp->setEmail(escapeSQLChars(Email));
 tempIpLisp->setForcecount(Forcecount);
 tempIpLisp->setActive(Active);
 tempIpLisp->setGroup(0);
@@ -6916,10 +6889,10 @@ for (ipLispIterator iptr = ipLispVector.begin(); iptr != ipLispVector.end(); ipt
 ccIpLnb* tempIpLnb = new (std::nothrow) ccIpLnb(SQLDb);
 assert(tempIpLnb != NULL);
 
-tempIpLnb->setCidr(removeSqlChars(Cidr));
-tempIpLnb->setAddedBy(removeSqlChars(theClient->getRealNickUserHost()));
+tempIpLnb->setCidr(escapeSQLChars(Cidr));
+tempIpLnb->setAddedBy(escapeSQLChars(theClient->getRealNickUserHost()));
 tempIpLnb->setAddedOn(::time(0));
-//tempIpLnb->setModBy(removeSqlChars(theClient->getRealNickUserHost()));
+//tempIpLnb->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
 //tempIpLnb->setModOn(::time(0));
 tempIpLnb->setIpLispID(Isp);
 //Update the database, and the internal list

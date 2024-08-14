@@ -75,7 +75,7 @@ if(!dbConnected)
 	}
 stringstream delQuery;
 delQuery	<< Del
-		<< ccontrol::removeSqlChars(string_lower(Host)) << "'"
+		<< escapeSQLChars(string_lower(Host)) << "'"
 		<< ends;
 
 
@@ -93,12 +93,12 @@ static const char *Main = "INSERT INTO Glines (Host,AddedBy,AddedOn,ExpiresAt,La
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(Host) << "','"
-		<< ccontrol::removeSqlChars(AddedBy) << "',"
+		<< escapeSQLChars(Host) << "','"
+		<< escapeSQLChars(AddedBy) << "',"
 		<< AddedOn << ","
 		<< Expires << ","
 		<< LastUpdated << ",'"
-		<< ccontrol::removeSqlChars(Reason) << "')"
+		<< escapeSQLChars(Reason) << "')"
 		<< ends;
 
 elog	<< "Gline::Insert::sqlQuery> "
@@ -137,9 +137,9 @@ stringstream theQuery;
 theQuery	<< Main
 		<< Id
 		<< "', Host = '"
-		<< ccontrol::removeSqlChars(Host)
+		<< escapeSQLChars(Host)
 		<< "', AddedBy = '"
-		<< ccontrol::removeSqlChars(AddedBy)
+		<< escapeSQLChars(AddedBy)
 		<< "', AddedOn = "
 		<< AddedOn
 		<< ",ExpiresAt = "
@@ -147,7 +147,7 @@ theQuery	<< Main
 		<< ",LastUpdated = "
 		<< LastUpdated
 		<<  ",Reason = '"
-		<< ccontrol::removeSqlChars(Reason) << "'"
+		<< escapeSQLChars(Reason) << "'"
 		<< " WHERE Id = " << Id
 		<<  ends;
 
@@ -224,7 +224,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(HostName.c_str())
+		<< escapeSQLChars(HostName.c_str())
 		<< "'" << ends;
 
 elog	<< "ccontrol::loadData> "

@@ -220,6 +220,18 @@ template<typename Format, typename... Args>
 std::string formatString( const Format& format, Args&&... args )
 { return std::vformat( format, std::make_format_args( std::forward< Args >( args )... ) ) ; }
 
+/**
+ * Global method to replace ' with \' in strings for safe placement in
+ * SQL statements.
+ */
+const std::string escapeSQLChars( const std::string& ) ;
+
+/**
+ * Global method to replace wildcards (* and ?) with % and _ in strings for wildcard
+ * searches in SQL statements.
+ */
+const std::string searchSQL( const std::string& ) ;
+
 } // namespace gnuworld
 
 #endif /* __MISC__ */

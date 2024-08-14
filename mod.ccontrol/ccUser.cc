@@ -95,7 +95,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(string_lower(Name))
+		<< escapeSQLChars(string_lower(Name))
 		<< "'"
 		<< ends;
 
@@ -191,13 +191,13 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(Password)
+		<< escapeSQLChars(Password)
 		<< "', Access = "
 		<< Access
 		<< ", SAccess = "
 		<< SAccess
 		<< ", last_updated_by = '"
-		<< ccontrol::removeSqlChars(last_updated_by)
+		<< escapeSQLChars(last_updated_by)
 		<< "',last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,flags = "
 		<< Flags
 		<<  ",suspend_expires = "
@@ -239,13 +239,13 @@ theQuery	<< Main
 		<< ",NeedOp = "
 		<< (NeedOp ? "'t'" : "'n'")
 		<< ", Email = '"
-		<<  ccontrol::removeSqlChars(Email)
+		<<  escapeSQLChars(Email)
 		<< "', Account = '"
-		<<  ccontrol::removeSqlChars(Account)
+		<<  escapeSQLChars(Account)
 		<< "',Notice = "
 		<< (Notice ? "'t'" : "'n'")
 		<< " WHERE lower(user_name) = '" 
-		<< ccontrol::removeSqlChars( string_lower(UserName)) << "'"
+		<< escapeSQLChars( string_lower(UserName)) << "'"
 		<<  ends;
 
 elog	<< "ccontrol::UpdateOper> "

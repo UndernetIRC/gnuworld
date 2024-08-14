@@ -44,7 +44,7 @@ if( st.size() < 4 )
 	return true;
 	}
 //Fetch the oper record from the database	
-ccUser* tmpUser = bot->GetOper(bot->removeSqlChars(st[1]));
+ccUser* tmpUser = bot->GetOper(escapeSQLChars(st[1]));
 
 if(!tmpUser)
 	{
@@ -154,10 +154,10 @@ if(!strcasecmp(st[3],"-l"))
 	}
 //Set the suspention and update the db
 tmpUser->setSuspendExpires(Len + time( 0 ));
-tmpUser->setSuspendedBy(bot->removeSqlChars(theClient->getRealNickUserHost()));	    
+tmpUser->setSuspendedBy(escapeSQLChars(theClient->getRealNickUserHost()));
 tmpUser->setIsSuspended(true);
 tmpUser->setSuspendLevel(Level);
-tmpUser->setSuspendReason(bot->removeSqlChars(st.assemble(ResPos)));	
+tmpUser->setSuspendReason(escapeSQLChars(st.assemble(ResPos)));
 if(tmpUser->Update())
 	{
 	bot->Notice(theClient,"%s has been suspended",st[1].c_str());

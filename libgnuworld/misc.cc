@@ -547,13 +547,6 @@ oss << std::put_time( &retTime, "%F %H:%M:%S" ) ;
 return oss.str() ;
 }
 
-/*const long long elapsedMs( const auto startTime )
-{
-const auto endTime( std::chrono::high_resolution_clock::now() ) ;
-const auto duration( std::chrono::duration_cast<std::chrono::milliseconds> ( endTime - startTime ) ) ;
-return duration.count() ;
-}*/
-
 const string tsToDateTime(time_t timestamp, bool time)
 {
 	char datetimestring[ 20 ] = {0};
@@ -590,6 +583,61 @@ const string TokenStringsParams(const char* format,...)
 	vsnprintf( buf, 1024, format, _list ) ;
 	va_end( _list ) ;
 	return string(buf);
+}
+
+/**
+ * Global method to replace ' with \' in strings for safe placement in
+ * SQL statements.
+ */
+const string escapeSQLChars( const string& theString )
+{
+string retMe ;
+
+for( string::const_iterator ptr = theString.begin() ;
+	ptr != theString.end() ; ++ptr )
+	{
+	if( *ptr == '\'' )
+		{
+		//retMe += "\\\047" ;
+		retMe += "''";
+		}
+	else if ( *ptr == '\\' )
+		{
+		retMe += "\\\134" ;
+		}
+	else
+		{
+		retMe += *ptr ;
+		}
+	}
+return retMe ;
+}
+
+/**
+ * Global method to replace wildcards (* and ?) with % and _ in strings for wildcard
+ * searches in SQL statements.
+ */
+const string searchSQL( const string& theString )
+{
+string retMe ;
+
+for( string::const_iterator ptr = theString.begin() ;
+	ptr != theString.end() ; ++ptr )
+	{
+	if( *ptr == '*' )
+		{
+		retMe += "%" ;
+		}
+	else if ( *ptr == '?' )
+		{
+		retMe += "_" ;
+		}
+	else
+		{
+		retMe += *ptr ;
+		}
+	}
+return retMe ;
 }
 
 } // namespace gnuworld
