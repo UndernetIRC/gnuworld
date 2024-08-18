@@ -537,30 +537,58 @@ sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
 return string( tmpBuf ) ;
 }
 
-const string prettyTime( const time_t& theTime )
+const string prettyTime( const time_t& theTime, bool Time )
 {
 std::tm retTime = *std::gmtime( &theTime ) ;
 
 std::ostringstream oss ;
-oss << std::put_time( &retTime, "%F %H:%M:%S" ) ;
+if( Time )
+	oss << std::put_time( &retTime, "%F %H:%M:%S" ) ;
+else
+	oss << std::put_time( &retTime, "%F" ) ;
 
 return oss.str() ;
 }
 
-const string tsToDateTime(time_t timestamp, bool time)
+const string prettyTime( const time_t& theTime, const std::string& timezone )
 {
-	char datetimestring[ 20 ] = {0};
-	struct tm *stm;
+// Convert the epoch time to a chrono time_point
+std::chrono::system_clock::time_point tp = std::chrono::system_clock::from_time_t( theTime ) ;
 
-	stm = localtime(&timestamp);
-	memset(datetimestring, 0, sizeof(datetimestring));
+// Ensure the time_point is floored to seconds
+auto floored_tp = std::chrono::floor<std::chrono::seconds>( tp ) ;
 
-	if (time)
-		strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d %H:%M:%S", stm);
-	else
-		strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d", stm);
+std::chrono::zoned_time<std::chrono::seconds> zt ;
+try
+	{
+	// Attempt to create a zoned_time with the provided timezone
+	zt = std::chrono::zoned_time{ timezone, floored_tp } ;
+	}
+catch( const std::runtime_error& e )
+	{
+	// If an exception occurs, default to UTC
+	zt = std::chrono::zoned_time{ "UTC", floored_tp } ;
+	}
 
-	return string(datetimestring);
+std::ostringstream oss ;
+oss << std::format( "{:%Y-%m-%d %H:%M:%S}", zt ) ;
+
+return oss.str() ;
+}
+
+bool isValidTimezone( const std::string& timezone )
+{
+try
+	{
+	auto now = std::chrono::system_clock::now() ;
+	std::chrono::zoned_time zt{ timezone, now } ;
+	return true ;
+	}
+catch( const std::runtime_error& )
+	{
+	// If an exception occurs, the timezone is invalid
+	return false ;
+	}
 }
 
 int getCurrentGMTHour()

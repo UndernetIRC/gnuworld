@@ -203,13 +203,13 @@ theQuery	<< Main
 		<<  ",suspend_expires = "
 		<< SuspendExpires
 		<< " ,suspended_by = '"
-		<< SuspendedBy
+		<< escapeSQLChars(SuspendedBy)
 		<< "' ,suspend_level = "
 		<< SuspendLevel
 		<< ", suspend_reason = '"
-		<< SuspendReason
+		<< escapeSQLChars(SuspendReason)
 		<< "' ,server = '"
-		<< Server
+		<< escapeSQLChars(Server)
 		<< "' ,isSuspended = "
 		<< (IsSuspended ? "'t'" : "'n'")
 		<< ",isUhs = "

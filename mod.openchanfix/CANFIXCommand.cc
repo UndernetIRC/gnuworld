@@ -128,8 +128,8 @@ for (chanfix::chanOpsType::iterator opPtr = myOps.begin();
      opPtr != myOps.end(); opPtr++) {
   curOp = *opPtr;
   opCount++;
-  firstop = tsToDateTime(curOp->getTimeFirstOpped(), false);
-  lastop = tsToDateTime(curOp->getTimeLastOpped(), true);
+  firstop = prettyTime(curOp->getTimeFirstOpped(), false);
+  lastop = prettyTime(curOp->getTimeLastOpped());
 
   pScore = curOp->getPoints() + curOp->getBonus();
   percent = static_cast<int>((static_cast<float>(pScore) / static_cast<float>(maxScore)) * 100);

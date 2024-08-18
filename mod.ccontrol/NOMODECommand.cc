@@ -52,7 +52,7 @@ if(st[2].size() > channel::MaxName)
 	return false;
 	}
 
-bot->MsgChanLog("NOMODE %s\n",escapeSQLChars(st.assemble(1)).c_str());
+bot->MsgChanLog("NOMODE %s\n",st.assemble(1).c_str());
 	    
 if(!strcasecmp(st[1],"ADD"))
 	{
@@ -69,8 +69,8 @@ if(!strcasecmp(st[1],"ADD"))
 		return true;
 		}
 	
-	NewChannel = new (std::nothrow) ccBadChannel(escapeSQLChars(st[2]),
-					escapeSQLChars(st.assemble(3)),
+	NewChannel = new (std::nothrow) ccBadChannel(st[2],
+					st.assemble(3),
 					theClient->getRealNickUserHost());
 	assert(NewChannel != NULL);
 	if(!NewChannel->Insert(bot->SQLDb))

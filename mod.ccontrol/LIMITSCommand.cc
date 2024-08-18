@@ -170,7 +170,7 @@ else if(!strcasecmp(st[1].c_str(),"active"))
 		}
 	IpLisp->setActive(res);
 	IpLisp->setModOn(::time(0));
-	IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+	IpLisp->setModBy(theClient->getRealNickUserHost());
 	bot->reloadIpLisp(theClient, IpLisp);
 	if (!IpLisp->updateData())
 		{
@@ -211,7 +211,7 @@ else if(!strcasecmp(st[1].c_str(),"nogline"))
 		}
 	IpLisp->setNoGline(res);
 	IpLisp->setModOn(::time(0));
-	IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+	IpLisp->setModBy(theClient->getRealNickUserHost());
 	bot->reloadIpLisp(theClient, IpLisp);
 	if (!IpLisp->updateData())
 		{
@@ -241,7 +241,7 @@ else if(!strcasecmp(st[1].c_str(),"chemail"))
 		}
 	IpLisp->setEmail(st[3]);
 	IpLisp->setModOn(::time(0));
-	IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+	IpLisp->setModBy(theClient->getRealNickUserHost());
 	bot->reloadIpLisp(theClient, IpLisp);
 	if (!IpLisp->updateData())
 		{
@@ -281,7 +281,7 @@ else if(!strcasecmp(st[1].c_str(),"group"))
 		}
 	IpLisp->setGroup(res);
 	IpLisp->setModOn(::time(0));
-	IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+	IpLisp->setModBy(theClient->getRealNickUserHost());
 	bot->reloadIpLisp(theClient, IpLisp);
 	if (!IpLisp->updateData())
 		{
@@ -321,7 +321,7 @@ else if(!strcasecmp(st[1].c_str(),"glunidented"))
 		}
 	IpLisp->setGlunidented(res);
 	IpLisp->setModOn(::time(0));
-	IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+	IpLisp->setModBy(theClient->getRealNickUserHost());
 	bot->reloadIpLisp(theClient, IpLisp);
 	if (!IpLisp->updateData())
 		{
@@ -361,7 +361,7 @@ else if(!strcasecmp(st[1].c_str(),"forcecount"))
 		}
 	IpLisp->setForcecount(res);
 	IpLisp->setModOn(::time(0));
-	IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+	IpLisp->setModBy(theClient->getRealNickUserHost());
 	bot->reloadIpLisp(theClient, IpLisp);
 	if (!IpLisp->updateData())
 		{
@@ -395,7 +395,7 @@ else if(!strcasecmp(st[1].c_str(),"chccidr"))
 			return true;
 		IpLisp->setCloneCidr(atoi(st[3].c_str()));
 		IpLisp->setModOn(::time(0));
-		IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+		IpLisp->setModBy(theClient->getRealNickUserHost());
 		bot->reloadIpLisp(theClient, IpLisp);
 		if (!IpLisp->updateData())
 			{
@@ -433,7 +433,7 @@ else if(!strcasecmp(st[1].c_str(),"chilimit"))
 		{
 		IpLisp->setIdentLimit(atoi(st[3].c_str()));
 		IpLisp->setModOn(::time(0));
-		IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+		IpLisp->setModBy(theClient->getRealNickUserHost());
 		if (!IpLisp->updateData())
 			{
 			bot->Notice(theClient, "SQL insertion failed.");
@@ -470,7 +470,7 @@ else if(!strcasecmp(st[1].c_str(),"chlimit"))
 		{
 		IpLisp->setLimit(atoi(st[3].c_str()));
 		IpLisp->setModOn(::time(0));
-		IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+		IpLisp->setModBy(theClient->getRealNickUserHost());
 		if (!IpLisp->updateData())
 			{
 			bot->Notice(theClient, "SQL insertion failed.");
@@ -507,9 +507,9 @@ else if(!strcasecmp(st[1].c_str(),"chname"))
 		}
 	else
 		{
-		IpLisp->setName(escapeSQLChars(st[3]));
+		IpLisp->setName(st[3]);
 		IpLisp->setModOn(::time(0));
-		IpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+		IpLisp->setModBy(theClient->getRealNickUserHost());
 		if (!IpLisp->updateData())
 			{
 			bot->Notice(theClient, "SQL insertion failed.");

@@ -199,7 +199,11 @@ const string prettyDuration( int ) ;
 const string prettyNumber( int ) ;
 
 /* Formats a timestamp into %F %H:%M:%S */
-const std::string prettyTime( const std::time_t& theTime ) ;
+const std::string prettyTime( const std::time_t&, bool = true ) ;
+const std::string prettyTime( const std::time_t&, const std::string& ) ;
+
+/* Checks whether a timezone string is valid for use with prettyTime(). */
+bool isValidTimezone( const std::string& ) ;
 
 /* Returns the number of milliseconds having lapsed from the startTime,
  * provided as an argument.
@@ -207,8 +211,6 @@ const std::string prettyTime( const std::time_t& theTime ) ;
 template <typename Clock = std::chrono::high_resolution_clock, typename Duration = std::chrono::milliseconds>
 long long elapsedMs( const typename Clock::time_point& startTime )
 { return std::chrono::duration_cast<Duration>( Clock::now() - startTime ).count() ; }
-
-const string tsToDateTime(time_t, bool);
 
 int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 

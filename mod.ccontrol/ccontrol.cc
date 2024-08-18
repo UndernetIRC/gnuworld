@@ -2479,9 +2479,9 @@ theQuery	<< Main
 		<< "' ," 
 		<< (Oper->getIsSuspended() ? "'t'" : "'n'") 
 		<< "," << Oper->getSuspendExpires()
-		<< ",'" << Oper->getSuspendedBy()
+		<< ",'" << escapeSQLChars(Oper->getSuspendedBy())
 		<< "'," << Oper->getSuspendLevel()
-		<< ",'" << Oper->getSuspendReason()
+		<< ",'" << escapeSQLChars(Oper->getSuspendReason())
 		<< "'," << (Oper->isUhs() ? "'t'" : "'n'")
 		<< "," << (Oper->isOper() ? "'t'" : "'n'")
 		<< "," << (Oper->isAdmin() ? "'t'" : "'n'")
@@ -3467,7 +3467,7 @@ stringstream theQuery;
 theQuery	<< Main;
 if(Oper)
 	{
-	theQuery << Oper->getUserName();
+	theQuery << escapeSQLChars(Oper->getUserName());
 	}
 else
 	{
@@ -6422,14 +6422,14 @@ if ((CloneCidr < 8) || (CloneCidr > 128)) {
 ccIpLisp* tempIpLisp = new (std::nothrow) ccIpLisp(SQLDb);
 assert(tempIpLisp != NULL);
 
-tempIpLisp->setName(escapeSQLChars(Name));
+tempIpLisp->setName(Name);
 tempIpLisp->setLimit(Connections);
-tempIpLisp->setAddedBy(escapeSQLChars(theClient->getRealNickUserHost()));
+tempIpLisp->setAddedBy(theClient->getRealNickUserHost());
 tempIpLisp->setAddedOn(::time(0));
-tempIpLisp->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+tempIpLisp->setModBy(theClient->getRealNickUserHost());
 tempIpLisp->setModOn(::time(0));
 tempIpLisp->setCloneCidr(CloneCidr);
-tempIpLisp->setEmail(escapeSQLChars(Email));
+tempIpLisp->setEmail(Email);
 tempIpLisp->setForcecount(Forcecount);
 tempIpLisp->setActive(Active);
 tempIpLisp->setGroup(0);
@@ -6889,10 +6889,10 @@ for (ipLispIterator iptr = ipLispVector.begin(); iptr != ipLispVector.end(); ipt
 ccIpLnb* tempIpLnb = new (std::nothrow) ccIpLnb(SQLDb);
 assert(tempIpLnb != NULL);
 
-tempIpLnb->setCidr(escapeSQLChars(Cidr));
-tempIpLnb->setAddedBy(escapeSQLChars(theClient->getRealNickUserHost()));
+tempIpLnb->setCidr(Cidr);
+tempIpLnb->setAddedBy(theClient->getRealNickUserHost());
 tempIpLnb->setAddedOn(::time(0));
-//tempIpLnb->setModBy(escapeSQLChars(theClient->getRealNickUserHost()));
+//tempIpLnb->setModBy(theClient->getRealNickUserHost());
 //tempIpLnb->setModOn(::time(0));
 tempIpLnb->setIpLispID(Isp);
 //Update the database, and the internal list

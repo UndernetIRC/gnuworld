@@ -109,7 +109,7 @@ else if(!strcasecmp(st[1],"-allcoders"))
 	
 //ccUser* theUser = bot->GetUser(st[1]);
 else
-	theUser = bot->GetOper(escapeSQLChars(st[1]));
+	theUser = bot->GetOper(st[1]);
 	
 if (!AllOpers && !AllAdmins && !AllSmts && !AllCoders && !theUser)
 	{	
@@ -214,7 +214,7 @@ for (list<ccUser*>::iterator Itr = ccList.begin(); Itr != ccList.end(); Itr++)
 		}	
 	//Remove the command 	
 	theUser->removeCommand(Comm);
-	theUser->setLast_Updated_By(escapeSQLChars(theClient->getRealNickUserHost()));
+	theUser->setLast_Updated_By(theClient->getRealNickUserHost());
 	if(theUser->Update())
 		{
 		bot->Notice(theClient,"Successfully removed the command from %s",theUser->getUserName().c_str());
