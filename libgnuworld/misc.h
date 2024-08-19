@@ -200,9 +200,6 @@ const string prettyNumber( int ) ;
 /* Formats a timestamp into %F %H:%M:%S */
 const std::string prettyTime( const std::time_t&, bool = true ) ;
 
-/* Checks whether a timezone string is valid for use with prettyTime(). */
-bool isValidTimezone( const std::string& ) ;
-
 /* Returns the number of milliseconds having lapsed from the startTime,
  * provided as an argument.
  */

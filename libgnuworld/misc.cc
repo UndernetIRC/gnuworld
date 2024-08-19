@@ -550,21 +550,6 @@ else
 return oss.str() ;
 }
 
-bool isValidTimezone( const std::string& timezone )
-{
-try
-	{
-	auto now = std::chrono::system_clock::now() ;
-	std::chrono::zoned_time zt{ timezone, now } ;
-	return true ;
-	}
-catch( const std::runtime_error& )
-	{
-	// If an exception occurs, the timezone is invalid
-	return false ;
-	}
-}
-
 int getCurrentGMTHour()
 {
 	time_t rawtime;
