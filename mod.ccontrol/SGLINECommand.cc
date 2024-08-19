@@ -168,7 +168,7 @@ if(!tmpUser)
 	}
 	
 unsigned int Users;
-string nickUserHost = bot->removeSqlChars(theClient->getRealNickUserHost()) ;
+string nickUserHost = theClient->getRealNickUserHost() ;
 StringTokenizer ReasonTokenizer ( st.assemble( pos + ResStart ), '|');
 string Reason = ReasonTokenizer[0];
 string sgHost = st[pos];
@@ -257,7 +257,7 @@ if(TmpGline)
 	Up =  true;	
 else TmpGline = new ccGline(bot->SQLDb);
 if(!RealName)
-	TmpGline->setHost(bot->removeSqlChars(sgHost));
+	TmpGline->setHost(sgHost);
 else
 	TmpGline->setHost(RealHost);
 TmpGline->setExpires(::time(0) + gLength);

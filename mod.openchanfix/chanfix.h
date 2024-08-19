@@ -568,7 +568,6 @@ public:
 
 }; // class chanfix
 
-const std::string escapeSQLChars(const std::string&);
 bool atob(std::string);
 
 } // namespace cf

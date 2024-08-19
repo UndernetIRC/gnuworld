@@ -786,8 +786,6 @@ public:
 
 	const string expandDbServer(const string&);
 	
-	static const string removeSqlChars(const string&);
-	
 	void checkDbConnection();
 	
 	void updateSqldb(dbHandle*);

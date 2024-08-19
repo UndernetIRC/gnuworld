@@ -34,9 +34,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<cstdarg>
+#include	<chrono>
 
 #include	"client.h"
-#include  	"cservice.h"
+#include	"cservice.h"
 #include	"EConfig.h"
 #include	"events.h"
 #include	"ip.h"
@@ -167,32 +168,6 @@ if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (date_part('epoch', C
 		<< "table, not checking webnotices."
 		<< endl;
 }
-
-if (SQLDb->Exec("SELECT date_part('epoch', CURRENT_TIMESTAMP)::int;",true))
-	{
-	// Set our "Last Refresh" timers to the current database system time.
-	time_t serverTime = atoi(SQLDb->GetValue(0,0).c_str());
-	lastChannelRefresh = serverTime;
-	lastUserRefresh = serverTime;
-	lastLevelRefresh = serverTime;
-	lastBanRefresh = serverTime;
-
-	/*
-	 * Calculate the current time offset from the DB server.
-	 * We always want to talk in DB server time.
-	 */
-
-	dbTimeOffset = serverTime - ::time(NULL);
-	elog	<< "*** [CMaster::ImplementServer]:  Current DB server time: "
-		<< currentTime()
-		<< endl;
-	}
-else
-	{
- 	elog	<< "Unable to retrieve time from postgres server!"
-		<< endl;
-	::exit(0);
-	}
 
 /* Register our interest in recieving some Network events from gnuworld. */
 
@@ -335,6 +310,32 @@ else
 	{
 	elog	<< "*** [CMaster]: Connection established to SQL server. "
 			<< endl ;
+	}
+
+if (SQLDb->Exec("SELECT date_part('epoch', CURRENT_TIMESTAMP)::int;",true))
+	{
+	// Set our "Last Refresh" timers to the current database system time.
+	time_t serverTime = atoi(SQLDb->GetValue(0,0).c_str());
+	lastChannelRefresh = serverTime;
+	lastUserRefresh = serverTime;
+	lastLevelRefresh = serverTime;
+	lastBanRefresh = serverTime;
+
+	/*
+	 * Calculate the current time offset from the DB server.
+	 * We always want to talk in DB server time.
+	 */
+
+	dbTimeOffset = serverTime - ::time(NULL);
+	elog	<< "*** [CMaster::ImplementServer]:  Current DB server time: "
+		<< currentTime()
+		<< endl;
+	}
+else
+	{
+	elog	<< "Unable to retrieve time from postgres server!"
+		<< endl;
+	::exit(0);
 	}
 
 loadConfigVariables();
@@ -2807,8 +2808,7 @@ void cservice::cacheExpireUsers()
 	logDebugMessage("Beginning User cache cleanup:");
 	sqlUserHashType::iterator ptr = sqlUserCache.begin();
 	sqlUser* tmpUser;
-	clock_t startTime = ::clock();
-	clock_t endTime = 0;
+	const auto startTime = std::chrono::high_resolution_clock::now();
 	int purgeCount = 0;
 	int updateCount = 0;
 	string removeKey;
@@ -2890,9 +2890,8 @@ void cservice::cacheExpireUsers()
 			++ptr;
 		}
 	}
-	endTime = ::clock();
-	logDebugMessage("User cache cleanup complete; Removed %i user records in %i ms.",
-		purgeCount, (endTime - startTime) /  CLOCKS_PER_SEC);
+	logDebugMessage("User cache cleanup complete; Removed %i user records in %lld ms.",
+		purgeCount, elapsedMs(startTime));
 	logDebugMessage("I also updated %i last_seen records for people logged in for >24 hours.",
 		updateCount);
 }
@@ -7197,57 +7196,6 @@ const string cservice::getLastChannelEvent(sqlChannel* theChannel,
 		return reason;
 	}
 	return "";
-}
-
-/**
- * Global method to replace ' with \' in strings for safe placement in
- * SQL statements.
- */
-const string escapeSQLChars(const string& theString)
-{
-string retMe ;
-
-for( string::const_iterator ptr = theString.begin() ;
-	ptr != theString.end() ; ++ptr )
-	{
-	if( *ptr == '\'' )
-		{
-		//retMe += "\\\047" ;
-		retMe += "''";
-		}
-	else if ( *ptr == '\\' )
-		{
-		retMe += "\\\134" ;
-		}
-	else
-		{
-		retMe += *ptr ;
-		}
-	}
-return retMe ;
-}
-
-const string searchSQL(const string& theString)
-{
-string retMe ;
-
-for( string::const_iterator ptr = theString.begin() ;
-        ptr != theString.end() ; ++ptr )
-        {
-        if( *ptr == '*' )
-                {
-                retMe += "%" ;
-                }
-        else if ( *ptr == '?' )
-		{
-		retMe += "_" ;
-		}
-        else
-		{
-                retMe += *ptr ;
-                }
-        }
-return retMe ;
 }
 
 time_t cservice::currentTime() const

@@ -27,6 +27,7 @@
 
 #include	<string>
 #include	<iostream>
+#include	<chrono>
 
 #include	<cctype>
 #include	<cstring>
@@ -196,12 +197,32 @@ const string prettyDuration( int ) ;
 /* Comma separates thousands for a number (e.g. 1000 to 1,000) */
 const string prettyNumber( int ) ;
 
-const string tsToDateTime(time_t, bool);
+/* Formats a timestamp into %F %H:%M:%S */
+const std::string prettyTime( const std::time_t&, bool = true ) ;
+
+/* Returns the number of milliseconds having lapsed from the startTime,
+ * provided as an argument.
+ */
+template <typename Clock = std::chrono::high_resolution_clock, typename Duration = std::chrono::milliseconds>
+long long elapsedMs( const typename Clock::time_point& startTime )
+{ return std::chrono::duration_cast<Duration>( Clock::now() - startTime ).count() ; }
 
 int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 
-/* General assemble parameters into one result string */
+/* General assemble parameters into one result string (C-style) */
 const string TokenStringsParams(const char*, ...);
+
+/**
+ * Global method to replace ' with \' in strings for safe placement in
+ * SQL statements.
+ */
+const std::string escapeSQLChars( const std::string& ) ;
+
+/**
+ * Global method to replace wildcards (* and ?) with % and _ in strings for wildcard
+ * searches in SQL statements.
+ */
+const std::string searchSQL( const std::string& ) ;
 
 } // namespace gnuworld
 

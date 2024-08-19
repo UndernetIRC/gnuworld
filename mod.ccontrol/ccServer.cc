@@ -83,13 +83,13 @@ if(!dbConnected)
 	}
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(Name) <<"','"
-		<< ccontrol::removeSqlChars(Uplink) << "','"
-		<< ccontrol::removeSqlChars(Numeric) << "',"
+		<< escapeSQLChars(Name) <<"','"
+		<< escapeSQLChars(Uplink) << "','"
+		<< escapeSQLChars(Numeric) << "',"
 		<< LastConnected << ","
 		<< LastSplitted 
-		<< ",'" << ccontrol::removeSqlChars(SplitReason)
-		<< "','" << ccontrol::removeSqlChars(Version)
+		<< ",'" << escapeSQLChars(SplitReason)
+		<< "','" << escapeSQLChars(Version)
 		<< "'," << AddedOn
 		<< "," << LastUpdated
 		<< "," 
@@ -127,19 +127,19 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(Name)
+		<< escapeSQLChars(Name)
 		<< "', LastUplink = '"
-		<< ccontrol::removeSqlChars(Uplink)
+		<< escapeSQLChars(Uplink)
 		<< "', LastNumeric = '"
-		<< ccontrol::removeSqlChars(Numeric)
+		<< escapeSQLChars(Numeric)
 		<< "', LastConnected = "
 		<< LastConnected
 		<< ",SplitedOn = "
 		<< LastSplitted
 		<< ", SplitReason = '"
-		<< ccontrol::removeSqlChars(SplitReason) 
+		<< escapeSQLChars(SplitReason)
 		<< "', Version = '"
-		<< ccontrol::removeSqlChars(Version)
+		<< escapeSQLChars(Version)
 		<< "', AddedOn = " 
 		<< AddedOn
 		<< ", LastUpdated = " 
@@ -180,7 +180,7 @@ if(!dbConnected)
 stringstream theQuery;
 theQuery	<< server::Query
 		<< "Where lower(Name) = '"
-		<< ccontrol::removeSqlChars(string_lower(ServerName))
+		<< escapeSQLChars(string_lower(ServerName))
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::LoadData> "
@@ -214,7 +214,7 @@ if(!dbConnected)
 stringstream theQuery;
 theQuery	<< server::Query
 		<< "Where LastNumeric = '"
-		<< ccontrol::removeSqlChars(ServNumeric)
+		<< escapeSQLChars(ServNumeric)
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::LoadNumericData> "
@@ -268,7 +268,7 @@ if(!dbConnected)
 
 stringstream theQuery;
 theQuery	<< Main
-		<< ccontrol::removeSqlChars(string_lower(Name))
+		<< escapeSQLChars(string_lower(Name))
 		<< "'" << ends;
 
 elog	<< "ccontrol::Server::Delete> "

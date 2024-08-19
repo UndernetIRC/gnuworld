@@ -28,7 +28,8 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
-
+#include	<chrono>
+#include	<iomanip>
 #include	<sstream>
 #include	<locale>
 
@@ -512,8 +513,8 @@ return ss.str() ;
 
 const string prettyDuration( int duration )
 {
-	if (duration == 0)
-		return "Never";
+if (duration == 0)
+	return "Never";
 
 // Pretty format a 'duration' in seconds to
 // x day(s), xx:xx:xx.
@@ -536,20 +537,17 @@ sprintf(tmpBuf, "%i day%s, %02d:%02d:%02d",
 return string( tmpBuf ) ;
 }
 
-const string tsToDateTime(time_t timestamp, bool time)
+const string prettyTime( const time_t& theTime, bool Time )
 {
-	char datetimestring[ 20 ] = {0};
-	struct tm *stm;
+std::tm retTime = *std::gmtime( &theTime ) ;
 
-	stm = localtime(&timestamp);
-	memset(datetimestring, 0, sizeof(datetimestring));
+std::ostringstream oss ;
+if( Time )
+	oss << std::put_time( &retTime, "%F %H:%M:%S" ) ;
+else
+	oss << std::put_time( &retTime, "%F" ) ;
 
-	if (time)
-		strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d %H:%M:%S", stm);
-	else
-		strftime(datetimestring, sizeof(datetimestring), "%Y-%m-%d", stm);
-
-	return string(datetimestring);
+return oss.str() ;
 }
 
 int getCurrentGMTHour()
@@ -572,6 +570,61 @@ const string TokenStringsParams(const char* format,...)
 	vsnprintf( buf, 1024, format, _list ) ;
 	va_end( _list ) ;
 	return string(buf);
+}
+
+/**
+ * Global method to replace ' with \' in strings for safe placement in
+ * SQL statements.
+ */
+const string escapeSQLChars( const string& theString )
+{
+string retMe ;
+
+for( string::const_iterator ptr = theString.begin() ;
+	ptr != theString.end() ; ++ptr )
+	{
+	if( *ptr == '\'' )
+		{
+		//retMe += "\\\047" ;
+		retMe += "''";
+		}
+	else if ( *ptr == '\\' )
+		{
+		retMe += "\\\134" ;
+		}
+	else
+		{
+		retMe += *ptr ;
+		}
+	}
+return retMe ;
+}
+
+/**
+ * Global method to replace wildcards (* and ?) with % and _ in strings for wildcard
+ * searches in SQL statements.
+ */
+const string searchSQL( const string& theString )
+{
+string retMe ;
+
+for( string::const_iterator ptr = theString.begin() ;
+	ptr != theString.end() ; ++ptr )
+	{
+	if( *ptr == '*' )
+		{
+		retMe += "%" ;
+		}
+	else if ( *ptr == '?' )
+		{
+		retMe += "_" ;
+		}
+	else
+		{
+		retMe += *ptr ;
+		}
+	}
+return retMe ;
 }
 
 } // namespace gnuworld

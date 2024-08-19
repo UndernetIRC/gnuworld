@@ -832,10 +832,6 @@ bool InsertUserHistory(iClient*, const string&);
 
 } ;
 
-
-const string escapeSQLChars(const string& theString);
-const string searchSQL(const string& theString);
-
 } // namespace gnuworld
 
 #endif // __CSERVICE_H

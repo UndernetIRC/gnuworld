@@ -47,7 +47,7 @@ if( st.size() < 2 )
 	return true;
 	}
 //Fetch the user record from the database
-ccUser* theUser = bot->GetOper(bot->removeSqlChars(st[1]));
+ccUser* theUser = bot->GetOper(st[1]);
 if (!theUser) 
 	{ 
 	bot->Notice(theClient,"Oper %s does not exist in database, " 

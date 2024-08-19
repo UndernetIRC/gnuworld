@@ -58,25 +58,17 @@ void ACCESSCommand::Exec( const iClient *theClient, const string& Message, const
 		}
 	}
 
-	time_t lastseen = targetUser->getLastSeen();
-	char lastseen_r[21];
-	struct tm *lastseen_b = gmtime(&lastseen);
-	strftime(lastseen_r, 20, "%F %H:%M:%S", lastseen_b);
-
 	/* Give the client information about the targetUser */
 	bot->Reply(theClient, "Username : %-10s Access: %4u",
 		targetUser->getUserName().c_str(),
 		targetUser->getAccess()
 		);
 	bot->Reply(theClient, "Last Seen: %s",
-		lastseen_r
+		prettyTime(targetUser->getLastSeen()).c_str()
 		);
 
-	lastseen = targetUser->getLastUpdated();
-	lastseen_b = gmtime(&lastseen);
-	strftime(lastseen_r, 20, "%F %H:%M:%S", lastseen_b);
 	bot->Reply(theClient, "Last Updated: %s (by %s)",
-		lastseen_r,
+		prettyTime(targetUser->getLastUpdated()).c_str(),
 		targetUser->getLastUpdatedBy().c_str()
 		);
 

@@ -1173,7 +1173,7 @@ if (sendConsoleNotices) {
 
 /* Everything sent here is also logged to a file on disk */
 if (adminLog.is_open()) {
-  std::string theLog = std::string( "[" ) + tsToDateTime(currentTime(), true) + "] " + buf ;
+  std::string theLog = std::string( "[" ) + prettyTime(currentTime()) + "] " + buf ;
   adminLog << theLog << std::endl;
 }
 
@@ -1198,7 +1198,7 @@ serverNotice(tmpChan, message);
 
 /* Everything sent here is also logged to a file on disk */
 if (debugLog.is_open()) {
-  std::string theLog = std::string( "[" ) + tsToDateTime(currentTime(), true) + "] " + buf ;
+  std::string theLog = std::string( "[" ) + prettyTime(currentTime()) + "] " + buf ;
   debugLog << theLog << std::endl;
 }
 
@@ -1711,30 +1711,6 @@ if (hostlist.str() == "") hostlist << "None.";
 return hostlist.str();
 }
 
-const std::string escapeSQLChars(const std::string& theString)
-{
-std::string retMe ;
-
-for( std::string::const_iterator ptr = theString.begin() ;
-	ptr != theString.end() ; ++ptr )
-	{
-	if( *ptr == '\'' )
-		{
-		//retMe += "\\\\\047" ;
-		retMe += "''" ;
-		}
-	else if ( *ptr == '\\' )
-		{
-		retMe += "\\\134" ;
-		}
-	else
-		{
-		retMe += *ptr ;
-		}
-	}
-return retMe ;
-}
-
 bool atob( std::string str )
 {
 str = string_lower(str);
@@ -2219,7 +2195,7 @@ if ((!numClientsToOp || maxScore < min_score) &&
                 getResponse(theUser,
                                  language::sim_modes_removed,
                                  std::string("(%s) Channel modes have been removed.")).c_str(),
-                                 tsToDateTime(c_Time, true).c_str());
+                                 prettyTime(c_Time).c_str());
     }
   }
 return false;
@@ -2231,7 +2207,7 @@ if (numClientsToOp) {
             getResponse(theUser,
                              language::sim_opping,
                              std::string("(%s) Opping: %s (%d Clients)")).c_str(),
-                             tsToDateTime(c_Time, true).c_str(), args.c_str(), numClientsToOp);
+                             prettyTime(c_Time).c_str(), args.c_str(), numClientsToOp);
 }
 
 if (numClientsToOp + currentOps >= netChan->size() ||
@@ -2260,7 +2236,7 @@ bool chanfix::simulateFix(sqlChannel* sqlChan, bool autofix, iClient* theClient,
               getResponse(theUser,
                                language::sim_modes_removed,
                                std::string("(%s) Channel modes have been removed.")).c_str(),
-                               tsToDateTime(currentTime(), true).c_str());
+                               prettyTime(currentTime()).c_str());
 
   while (t) {
     if (next_fix == t) {

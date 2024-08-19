@@ -60,7 +60,7 @@ if(st[1].size() > server::MaxName)
 	return false;
 	}
 
-ccServer* tmpServer = bot->getServer(bot->removeSqlChars(st[1]));
+ccServer* tmpServer = bot->getServer(st[1]);
 if(!tmpServer)
 	{
 	bot->Notice(theClient, "Server %s is not in my database!\n",st [ 1 ].c_str());

@@ -57,7 +57,7 @@ if((st[1].substr(0,1) != "#") || (st[1].size() > channel::MaxName))
 	}
 bot->MsgChanLog("REMGCHAN %s\n",st.assemble(1).c_str());
 
-ccGline *tmpGline = bot->findGline(bot->removeSqlChars(st[1]));
+ccGline *tmpGline = bot->findGline(st[1]);
 if(tmpGline != NULL)
 	{
 	if(!tmpGline->Delete())

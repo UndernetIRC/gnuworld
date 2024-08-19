@@ -123,7 +123,7 @@ else
 	if (lastfix == 0)
 		dateTimeOfLastFix = "Never";
 	else
-		dateTimeOfLastFix = tsToDateTime(lastfix, true);
+		dateTimeOfLastFix = prettyTime(lastfix);
 		
 	bot->SendTo(theClient, "Last fix: %s (%s ago)", dateTimeOfLastFix.c_str(), prettyDuration(lastfix).c_str());
 	
@@ -191,7 +191,7 @@ if (noteCount > 0) {
                                 language::info_notes,
                                 std::string("[%d:%s] %s \002%s\002%s%s")).c_str(),
                                             note_id, from.c_str(),
-                                            tsToDateTime(when, true).c_str(),
+                                            prettyTime(when).c_str(),
                                             bot->getEventName(event).c_str(),
                                             (!theMessage.empty()) ? " " : "", theMessage.c_str());
   }

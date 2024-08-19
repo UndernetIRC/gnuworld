@@ -186,12 +186,12 @@ while(pos < st.size())
 			bot->Notice(theClient,"Hostname can't be more than 128 characters");
 			return false;
 			}
-		if(!bot->UserGotHost(tmpUser,bot->removeSqlChars(st[pos+1])))
+		if(!bot->UserGotHost(tmpUser,st[pos+1]))
 			{
 			bot->Notice(theClient,"%s doesn't have the host '%s' in my access list",
 				st[1].c_str(),st[pos+1].c_str());
 			}
-		else if(bot->DelHost(tmpUser,bot->removeSqlChars(st[pos+1])))
+		else if(bot->DelHost(tmpUser,st[pos+1]))
 			{
 			bot->Notice(theClient,"Mask '%s' was deleted from %s's access list",
 				st[pos+1].c_str(),st[1].c_str());
@@ -231,7 +231,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"unknown option %s for -gl must be on/off",st[pos+1].c_str());
 			return false;
 			}
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -258,7 +258,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"unknown option %s for -sso must be on/off",st[pos+1].c_str());
 			return false;
 			}
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -296,7 +296,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"unknown option %s for -ssooo must be on/off",st[pos+1].c_str());
 			return false;
 			}
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -328,7 +328,7 @@ while(pos < st.size())
 			{
 			bot->Notice(theClient,"unknown option %s. -autoop must be on/off",st[pos+1].c_str());
 			}
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -354,7 +354,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"unknown option %s for -mt must be n/m/notice/message",st[pos+1].c_str());
 			return false;
 			}
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -381,7 +381,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"unknown option %s for -glag must be on/off",st[pos+1].c_str());
 			return false;
 			}
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -417,8 +417,8 @@ while(pos < st.size())
 			}
 		else
 			{
-			tmpUser->setServer(bot->removeSqlChars(SName));
-			tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+			tmpUser->setServer(SName);
+			tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 			if(tmpUser->Update())
 				{
 				bot->Notice(theClient,"%s has been associated with %s",st[1].c_str(),SName.c_str());
@@ -458,7 +458,7 @@ while(pos < st.size())
 			{
 			bot->Notice(theClient,"unknown option %s for -no must be on/off",st[pos+1].c_str());
 			}
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		tmpUser->Update();
 		pos += 2;
 		}	
@@ -472,7 +472,7 @@ while(pos < st.size())
 		else
 			{
 			tmpUser->updateAccessFromFlags();
-			tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+			tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 			if(tmpUser->Update())
 				{
 				bot->Notice(theClient,"Successfully updated access level for %s.",st[1].c_str());
@@ -555,7 +555,7 @@ while(pos < st.size())
 				bot->Notice(theClient, "This account already belongs to another user: %s", otherUser->getUserName().c_str());
 				return false;
 			}
-			tmpUser->setAccount(bot->removeSqlChars(cAC));
+			tmpUser->setAccount(cAC);
 			tmpUser->setAccountID(theClient->getAccountID());
 			bot->accountsMapAdd(tmpUser, cAC);
 			bot->Notice(theClient,"Successfully set your account to: %s.",cAC.c_str());
@@ -568,7 +568,7 @@ while(pos < st.size())
 			bot->Notice(theClient,"Successfully removed your account.");
 		}
 
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		if(!tmpUser->Update())
 			{
 			bot->Notice(theClient,"Error while updating account");
@@ -582,8 +582,8 @@ while(pos < st.size())
 			bot->Notice(theClient,"-e option requires an e-mail address.");
 			return false;
 			}
-		tmpUser->setEmail(bot->removeSqlChars(st[pos+1]));
-		tmpUser->setLast_Updated_By(bot->removeSqlChars(theClient->getRealNickUserHost()));
+		tmpUser->setEmail(st[pos+1]);
+		tmpUser->setLast_Updated_By(theClient->getRealNickUserHost());
 		if(tmpUser->Update())
 			{
 			bot->Notice(theClient,"Successfully updated e-mail address for %s.",st[1].c_str());
