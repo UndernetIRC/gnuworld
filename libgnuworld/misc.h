@@ -27,7 +27,6 @@
 
 #include	<string>
 #include	<iostream>
-#include	<format>
 #include	<chrono>
 
 #include	<cctype>
@@ -200,7 +199,6 @@ const string prettyNumber( int ) ;
 
 /* Formats a timestamp into %F %H:%M:%S */
 const std::string prettyTime( const std::time_t&, bool = true ) ;
-const std::string prettyTime( const std::time_t&, const std::string& ) ;
 
 /* Checks whether a timezone string is valid for use with prettyTime(). */
 bool isValidTimezone( const std::string& ) ;
@@ -216,11 +214,6 @@ int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 
 /* General assemble parameters into one result string (C-style) */
 const string TokenStringsParams(const char*, ...);
-
-/* General assemble parameters into one result string (std::vformat) */
-template<typename Format, typename... Args>
-std::string formatString( const Format& format, Args&&... args )
-{ return std::vformat( format, std::make_format_args( std::forward< Args >( args )... ) ) ; }
 
 /**
  * Global method to replace ' with \' in strings for safe placement in

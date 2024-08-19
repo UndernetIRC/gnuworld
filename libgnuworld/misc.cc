@@ -550,32 +550,6 @@ else
 return oss.str() ;
 }
 
-const string prettyTime( const time_t& theTime, const std::string& timezone )
-{
-// Convert the epoch time to a chrono time_point
-std::chrono::system_clock::time_point tp = std::chrono::system_clock::from_time_t( theTime ) ;
-
-// Ensure the time_point is floored to seconds
-auto floored_tp = std::chrono::floor<std::chrono::seconds>( tp ) ;
-
-std::chrono::zoned_time<std::chrono::seconds> zt ;
-try
-	{
-	// Attempt to create a zoned_time with the provided timezone
-	zt = std::chrono::zoned_time{ timezone, floored_tp } ;
-	}
-catch( const std::runtime_error& e )
-	{
-	// If an exception occurs, default to UTC
-	zt = std::chrono::zoned_time{ "UTC", floored_tp } ;
-	}
-
-std::ostringstream oss ;
-oss << std::format( "{:%Y-%m-%d %H:%M:%S}", zt ) ;
-
-return oss.str() ;
-}
-
 bool isValidTimezone( const std::string& timezone )
 {
 try
