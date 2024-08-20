@@ -185,7 +185,7 @@ bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 							theChan->getName().c_str());
 					} else
 					{
-						bot->Notice(target, bot->getResponse(theUser, language::youre_devoiced_by).c_str(),
+						bot->Notice(target, bot->getResponse(NULL, language::youre_devoiced_by).c_str(),
 							theClient->getNickName().c_str(),
 							theUser->getUserName().c_str(),
 							theChan->getName().c_str());

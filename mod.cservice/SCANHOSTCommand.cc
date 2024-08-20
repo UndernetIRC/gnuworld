@@ -134,7 +134,7 @@ while (ptr != st.end())
 		Usage(theClient);
 		return true;
 	}
-	ptr++;
+	if(ptr != st.end()) ptr++;
 }
 //Special case: for timestamp ordering we want inverse
 if (sortby == "timestamp")

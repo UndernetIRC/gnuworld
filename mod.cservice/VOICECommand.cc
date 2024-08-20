@@ -240,7 +240,7 @@ while (counter < st2.size())
 			else
 				{
 				bot->Notice(target,
-					bot->getResponse(theUser,
+					bot->getResponse(NULL,
 						language::youre_voiced_by).c_str(),
 					theClient->getNickName().c_str(),
 					theUser->getUserName().c_str(),
