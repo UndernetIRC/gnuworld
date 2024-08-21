@@ -120,7 +120,7 @@ memset( eventTotal, 0, sizeof( eventTotal ) ) ;
 
 stats::~stats()
 {
-for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+for( eventType whichEvent = 0 ; whichEvent <= EVT_BURST ; ++whichEvent )
 	{
 	if( EVT_RAW == whichEvent )
 		{
@@ -137,7 +137,7 @@ void stats::openLogFiles()
 // event totals.
 // Note that the file names will be retrieve from the eventNames
 // array, and spaces (' ') will be substituted with underscore ('_').
-for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+for( eventType whichEvent = 0 ; whichEvent <= EVT_BURST ; ++whichEvent )
 	{
 	if( EVT_RAW == whichEvent )
 		{
@@ -419,7 +419,7 @@ if( !logDuringBurst && MyUplink->isBursting() )
 time_t now = ::time(0) ;
 struct tm* nowTM = gmtime( &now ) ;
 
-for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+for( eventType whichEvent = 0 ; whichEvent <= EVT_BURST ; ++whichEvent )
 	{
 	if( EVT_RAW == whichEvent )
 		{
@@ -454,7 +454,7 @@ if( 0 == startTime )
 	startTime = ::time( 0 ) ;
 	}
 
-assert( whichEvent <= EVT_CREATE ) ;
+assert( whichEvent <= EVT_BURST ) ;
 
 eventMinuteTotal[ whichEvent ]++ ;
 eventTotal[ whichEvent ]++ ;
@@ -496,7 +496,7 @@ if( 0 == startTime )
 	startTime = ::time( 0 ) ;
 	}
 
-assert( whichEvent <= EVT_CREATE ) ;
+assert( whichEvent <= EVT_BURST ) ;
 
 eventMinuteTotal[ whichEvent ]++ ;
 eventTotal[ whichEvent ]++ ;
@@ -644,7 +644,7 @@ Notice( theClient, "Length of last burst: %d seconds, "
 unsigned long int totalEvents = 0 ;
 
 // First, find the total number of events to occur
-for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+for( eventType whichEvent = 0 ; whichEvent <= EVT_BURST ; ++whichEvent )
 	{
 	if( EVT_RAW == whichEvent )
 		{
@@ -655,7 +655,7 @@ for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
 
 // Now output number of each event, and percentage of that
 // event to the total events received
-for( eventType whichEvent = 0 ; whichEvent <= EVT_CREATE ; ++whichEvent )
+for( eventType whichEvent = 0 ; whichEvent <= EVT_BURST ; ++whichEvent )
 	{
 	if( EVT_RAW == whichEvent )
 		{
