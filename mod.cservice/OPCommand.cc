@@ -303,7 +303,7 @@ for( ; counter < st2.size() ; ++counter )
 			else
 				{
 				bot->Notice(target,
-					bot->getResponse(theUser,
+					bot->getResponse(NULL,
 					language::youre_opped_by).c_str(),
 					theClient->getNickName().c_str(),
 					theUser->getUserName().c_str(),

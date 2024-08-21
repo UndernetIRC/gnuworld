@@ -182,16 +182,16 @@ protected:
 	/// This variable holds the totals for each event,
 	/// and is reset each minute when the log files are
 	/// written.
-	unsigned long int	eventMinuteTotal[ EVT_CREATE + 1 ] ;
+	unsigned long int	eventMinuteTotal[ EVT_BURST + 1 ] ;
 
 	/// This variable holds the totals for each event
 	/// since time of connect (optionally excluding net
 	/// bursts).
-	unsigned long int	eventTotal[ EVT_CREATE + 1 ] ;
+	unsigned long int	eventTotal[ EVT_BURST + 1 ] ;
 
 	/// This variable holds pointers to the individual
 	/// log files.
-	std::ofstream		fileTable[ EVT_CREATE + 1 ] ;
+	std::ofstream		fileTable[ EVT_BURST + 1 ] ;
 
 	/// The name of the file to which channel information will
 	/// be written.

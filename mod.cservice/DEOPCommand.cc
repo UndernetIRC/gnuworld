@@ -246,7 +246,7 @@ while( counter < st2.size())
 		else
 			{
 			bot->Notice(target,
-				bot->getResponse(theUser, language::youre_deopped_by).c_str(),
+				bot->getResponse(NULL, language::youre_deopped_by).c_str(),
 				theClient->getNickName().c_str(),
 				theUser->getUserName().c_str(),
 				theChan->getName().c_str());

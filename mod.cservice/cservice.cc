@@ -4646,7 +4646,7 @@ void cservice::checkTrafficPass()
 			if ((!uniqueJoinsPass) || (!JoinsPass))
 				rejectReason = "Insufficient channel activity";
 			if ((!minSupportersPass) || (!minSupportersJoinPass))
-				rejectReason = "Insufficient supporter activity";
+				rejectReason = "Insufficient supporter activity. *All* supporters need to be active users of the channel";
 			if (!rejectReason.empty())
 			{
 				RejectChannel(pendingChan->channel_id,rejectReason);
@@ -8618,6 +8618,18 @@ if(totpAuthEnabled && theUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
 #endif
 
 /*
+ * Check if this is a privileged user, if so check against IP restrictions
+ */
+if (needIPRcheck(theUser))
+{
+	/* ok, they have "*" access (excluding alumni's) */
+	if (!checkIPR(ip, theUser, ipr_ts))
+	{
+		return AUTH_FAILED_IPR;
+	}
+}
+
+/*
  * Check password, if its wrong, bye bye.
  */
 if (!isPasswordRight(theUser, st.assemble(0,pass_end)))
@@ -8639,18 +8651,6 @@ if(totp_enabled) {
         }
 }
 #endif
-
-/*
- * Check if this is a privileged user, if so check against IP restrictions
- */
-if (needIPRcheck(theUser))
-{
-	/* ok, they have "*" access (excluding alumni's) */
-	if (!checkIPR(ip, theUser, ipr_ts))
-	{
-		return AUTH_FAILED_IPR;
-	}
-}
 
 /*
  * Don't exceed MAXLOGINS.
@@ -9197,7 +9197,7 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 		}
 	}
 	/* update their details */
-	theUser->setLastSeen(currentTime(), theClient->getNickUserHost(), xIP( theClient->getIP()).GetNumericIP());
+	theUser->setLastSeen(currentTime(), theClient->getRealNickUserHost(), xIP( theClient->getIP()).GetNumericIP());
 	theUser->setFlag(sqlUser::F_LOGGEDIN);
 
 	theUser->addAuthedClient(theClient);

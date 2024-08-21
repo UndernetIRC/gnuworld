@@ -237,57 +237,50 @@ std::cout << "Before configuration" << endl;
 log4cplus::PropertyConfigurator::doConfigure("logging.properties");
 #endif
 
-optind = 0 ;
-int c = EOF ;
-while( (c = getopt( argc, argv, "cd:Df:l:Lhs:")) != -1 )
-	{
-	switch( c )
-		{
-		case 0:
-		case 'c':
-			verbose = true ;
-			break ;
-		case 1:
-		case 'd':
-			doDebug = true ;
-			elogFileName = optarg ;
-			break ;
-		case 'D':
-			doDebug = false ;
-			break ;
-		case 2:
-		case 'f':
-			configFileName = optarg ;
-			break ;
-		case 3:
-		case 'h':
-			usage( argv[ 0 ] ) ;
-			::exit( 0 ) ;
-		case 'l':
-			logSocket = true ;
-			socketFileName = optarg ;
-			break ;
-		case 'L':
-			logSocket = false ;
-			break ;
-		case 4:
-		case 's':
-			simFileName = optarg ;
-			clog	<< "*** Running in simulation mode..."
-				<< endl ;
-			break ;
-		case ':':
-			clog << "*** Missing parameter\n" ;
-			usage( argv[ 0 ] ) ;
-			::exit( 0 ) ;
-		case '?':
-			break ;
-		default:
-			clog << "Unknown option " << (char) c << endl ;
-			usage( argv[ 0 ] ) ;
-			::exit( 0 ) ;
-		} // close switch
-	} // close while
+int c;
+while ((c = getopt(argc, argv, "cd:Df:l:Lhs:")) != -1) {
+    switch (c) {
+        case 'c':
+            verbose = true;
+            break;
+        case 'd':
+            doDebug = true;
+            elogFileName = optarg;
+            break;
+        case 'D':
+            doDebug = false;
+            break;
+        case 'f':
+            configFileName = optarg;
+            break;
+        case 'h':
+            usage(argv[0]);
+            ::exit(0);
+        case 'l':
+            logSocket = true;
+            socketFileName = optarg;
+            break;
+        case 'L':
+            logSocket = false;
+            break;
+        case 's':
+            simFileName = optarg;
+            clog << "*** Running in simulation mode..." << endl;
+            break;
+        case ':':
+            clog << "*** Missing parameter\n";
+            usage(argv[0]);
+            ::exit(0);
+        case '?':
+            // Unrecognized option
+            usage(argv[0]);
+            ::exit(0);
+        default:
+            clog << "Unknown option " << static_cast<char>(c) << endl;
+            usage(argv[0]);
+            ::exit(0);
+    }
+}
 
 startLogging(false) ;
 // Sets up the server internals

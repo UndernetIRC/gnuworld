@@ -24,6 +24,8 @@ UPDATE translations SET text = '%s muharram min qabl fi qaimat al-hazr!' WHERE l
 UPDATE translations SET text = 'אין כניסה זו %s כבר ברשימה שלי!' WHERE language_id=15 AND response_id=22;
 UPDATE translations SET text = '%s e veke na mojata ban lista!' WHERE language_id=16 AND response_id=22;
 UPDATE translations SET text = 'The destructor %s is already in my war path' WHERE language_id=22 AND response_id=22;
+UPDATE translations SET text = 'The villager with host %s is already lynched!' WHERE language_id=23 AND response_id=22;
+UPDATE translations SET text = 'The citizen with host %s is already imprisoned!' WHERE language_id=24 AND response_id=22;
 
 UPDATE translations SET text = 'Removed %i channel ban(s) and %i internal ban(s) that matched %s' WHERE language_id=1 AND response_id=143;
 UPDATE translations SET text = '%i canal ban(s) et %i interne ban(s) correpondant à %s ont été supprimés.' WHERE language_id=2 AND response_id=143;
@@ -42,6 +44,8 @@ UPDATE translations SET text = 'Azalat %i hazr kanat wa %i hazr dakheli mutabiq 
 UPDATE translations SET text = 'הוסר ערוץ %i ללא כניסות ו-%i פנימי ללא כניסה (ים) שתואמים ל-%s' WHERE language_id=15 AND response_id=143;
 UPDATE translations SET text = 'Trgnati %i banovi na kanalot i %i vnatresni banovi shto go pokrivaat %s' WHERE language_id=16 AND response_id=143;
 UPDATE translations SET text = 'Removed %i channel destructors and %i internal destructors that matched %s' WHERE language_id=22 AND response_id=143;
+UPDATE translations SET text = 'Removed %i channel lynches and %i internal lynches that matched %s' WHERE language_id=23 AND response_id=143;
+UPDATE translations SET text = 'Released %i channel detainees and %i internal detainees that matched %s' WHERE language_id=24 AND response_id=143;
 
 INSERT INTO help VALUES ('MODE', '1', E'/msg X mode <#channel> <modes> [parameters]\nMakes X set or remove a channel mode in your channel.\nThe mode must start with either + or - to specify whether a mode shall be set or removed.\nFor channel mode l(imit) or k(ey), the limit or key must be provided.\nUse the OP, DEOP, VOICE and DEVOICE commands to give or remove ops or voice.');
 
