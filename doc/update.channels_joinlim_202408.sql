@@ -14,7 +14,7 @@ UPDATE channels SET limit_joinsecs = 1;
 UPDATE channels SET limit_joinperiod = 180;
 UPDATE channels SET limit_joinmode = '+rb *!~*@*';
 
-UPDATE help VALUES ('SET', 1, E'/msg X set <#channel> <variable> <value>\n/msg X set <variable> <value>\nThis will set a channel or user account setting. \nUseraccount settings: INVISIBLE MAXLOGINS LANG\nChannel settings: AUTOJOIN AUTOTOPIC DESCRIPTION FLOATLIM FLOODPRO JOINLIM KEYWORDS MASSDEOPPRO MODE NOOP OPLOG STRICTOP URL USERFLAGS\nFor more help type /msg X help SET <variable>');
+UPDATE help SET contents = E'/msg X set <#channel> <variable> <value>\n/msg X set <variable> <value>\nThis will set a channel or user account setting. \nUseraccount settings: INVISIBLE MAXLOGINS LANG\nChannel settings: AUTOJOIN AUTOTOPIC DESCRIPTION FLOATLIM FLOODPRO JOINLIM KEYWORDS MASSDEOPPRO MODE NOOP OPLOG STRICTOP URL USERFLAGS\nFor more help type /msg X help SET <variable>' WHERE topic = 'SET' and language_id = 1;
 
 INSERT INTO help VALUES ('SET JOINLIM', 1, E'/msg X set <#channel> JOINLIM ON|OFF\nMakes X set a mode (see SET JOINMODE) on the channel if a defined number of unidented and unauthenticated clients join the channel during a defined period (see SET JOINMAX).\nThe JOINMODE will automatically be unset by X after a defined period (see SET JOINPERIOD). The JOINPERIOD timer will be reset if additional unidented and unauthenticated clients join the channel during this period.');
 INSERT INTO help VALUES ('SET JOINMAX', 1, E'/msg X set <#channel> JOINMAX <joins:secs>\nDefines the threshold for when JOINLIM (if activated) shall be triggered.\nThe threshold is defined by <JOINS> unidented and unauthenticated clients joining the channel within <SECS> seconds (JOINS:SECS).');
