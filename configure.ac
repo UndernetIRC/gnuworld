@@ -356,7 +356,7 @@ if test "$check_liboath" = "yes"; then
     )
 
     LDFLAGS="${LDFLAGS} -L${OATH_LIB}"
-    CXXFLAGS="${CXXFLAGS} -I${OATH_INCLUDE} -L${OATH_LIB}"
+    CXXFLAGS="${CXXFLAGS} -I${OATH_INCLUDE}"
     dnl AC_CHECK_FILE("$OATH_LIB/liboath.so",, [AC_MSG_ERROR([Unable to find liboath.so, \
     dnl                 please use the --with-liboath-lib argument to point to the right path],1)])
     AC_CHECK_LIB(oath,oath_totp_validate,, [AC_MSG_ERROR([Unable to find liboath.so, please use the --with-liboath-lib argument to point to the right path],1)])

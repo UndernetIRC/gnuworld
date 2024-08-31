@@ -163,26 +163,26 @@ public:
 	 * This method is called when a Connection is disconnected.
 	 * Inherited from ConnectionHandler.
 	 */
-	virtual void OnDisconnect( Connection* ) ;
+	virtual void OnDisconnect( Connection* ) override ;
 
 	/**
 	 * This method is called when a Connection attempt succeeds.
 	 * Inherited from ConnectionHandler.
 	 */
-	virtual void OnConnect( Connection* ) ;
+	virtual void OnConnect( Connection* ) override ;
 
 	/**
 	 * This method is called when a Connection attempt fails.
 	 * Inherited from ConnectionHandler.
 	 */
-	virtual void OnConnectFail( Connection* ) ;
+	virtual void OnConnectFail( Connection* ) override ;
 
 	/**
 	 * This method is called when a line of data is read from
 	 * Connection.
 	 * Inherited from ConnectionHandler.
 	 */
-	virtual void OnRead( Connection*, const std::string& ) ;
+	virtual void OnRead( Connection*, const std::string& ) override ;
 
 	/**
 	 * Request that all data in the output buffer be flushed to

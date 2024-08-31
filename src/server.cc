@@ -82,7 +82,6 @@ using std::list ;
 using std::endl ;
 using std::stringstream ;
 using std::stack ;
-using std::unary_function ;
 using std::clog ;
 using std::cout ;
 using std::ends ;
