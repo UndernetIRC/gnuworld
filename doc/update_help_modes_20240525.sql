@@ -23,6 +23,10 @@ UPDATE translations SET text = '%s er allerede i min banliste!' WHERE language_i
 UPDATE translations SET text = '%s muharram min qabl fi qaimat al-hazr!' WHERE language_id=14 AND response_id=22;
 UPDATE translations SET text = 'אין כניסה זו %s כבר ברשימה שלי!' WHERE language_id=15 AND response_id=22;
 UPDATE translations SET text = '%s e veke na mojata ban lista!' WHERE language_id=16 AND response_id=22;
+UPDATE translations SET text = 'The pitchfork %s is already in my pitchfork-list!' WHERE language_id=18 AND response_id=22;
+UPDATE translations SET text = 'Ban %s einai eidi stin lista twn bans mou!' WHERE language_id=19 AND response_id=22;
+UPDATE translations SET text = 'Banen %s finns redan i min banlista!' WHERE language_id=20 AND response_id=22;
+UPDATE translations SET text = 'The curse %s is already in my curse-list!' WHERE language_id=21 AND response_id=22;
 UPDATE translations SET text = 'The destructor %s is already in my war path' WHERE language_id=22 AND response_id=22;
 UPDATE translations SET text = 'The villager with host %s is already lynched!' WHERE language_id=23 AND response_id=22;
 UPDATE translations SET text = 'The citizen with host %s is already imprisoned!' WHERE language_id=24 AND response_id=22;
@@ -43,6 +47,10 @@ UPDATE translations SET text = 'Slettet %i kanalbans og %i interne bans som stem
 UPDATE translations SET text = 'Azalat %i hazr kanat wa %i hazr dakheli mutabiq li %s' WHERE language_id=14 AND response_id=143;
 UPDATE translations SET text = 'הוסר ערוץ %i ללא כניסות ו-%i פנימי ללא כניסה (ים) שתואמים ל-%s' WHERE language_id=15 AND response_id=143;
 UPDATE translations SET text = 'Trgnati %i banovi na kanalot i %i vnatresni banovi shto go pokrivaat %s' WHERE language_id=16 AND response_id=143;
+UPDATE translations SET text = 'Removed %i channel pitchforks and %i internal pitchforks that matched %s' WHERE language_id=18 AND response_id=143;
+UPDATE translations SET text = 'Aferethikan %i kanáli bans kai %i esoterikós bans pou teriazan sto %s' WHERE language_id=19 AND response_id=143;
+UPDATE translations SET text = 'Tog bort %i kanal banar och %i interne banar som matchade %s' WHERE language_id=20 AND response_id=143;
+UPDATE translations SET text = 'Removed %i channel curses and %i internal curses that matched %s' WHERE language_id=21 AND response_id=143;
 UPDATE translations SET text = 'Removed %i channel destructors and %i internal destructors that matched %s' WHERE language_id=22 AND response_id=143;
 UPDATE translations SET text = 'Removed %i channel lynches and %i internal lynches that matched %s' WHERE language_id=23 AND response_id=143;
 UPDATE translations SET text = 'Released %i channel detainees and %i internal detainees that matched %s' WHERE language_id=24 AND response_id=143;

@@ -164,6 +164,7 @@ if (admLevel > 0)
 	if (theChan->getFlag(sqlChannel::F_CAUTION)) flagsSet += "CAUTION ";
 	if (theChan->getFlag(sqlChannel::F_LOCKED)) flagsSet += "LOCKED ";
 	if (theChan->getFlag(sqlChannel::F_MIA)) flagsSet += "MIA ";
+	if (theChan->getFlag(sqlChannel::F_NOFORCE)) flagsSet += "NOFORCE ";
 }
 /* anyone with access can view the rest of the flags (below) */
 if (theChan->getFlag(sqlChannel::F_SUSPEND)) flagsSet += "SUSPEND ";
@@ -180,14 +181,10 @@ if (((level >= level::set::oplog) || (admLevel)) &&
 	(theChan->getFlag(sqlChannel::F_OPLOG)))
 		flagsSet += "OPLOG ";
 
-/* NOFORCE flag for protected channels */
-if ((admLevel) && (theChan->getFlag(sqlChannel::F_NOFORCE)))
-	flagsSet += "NOFORCE ";
-
 if (((level >= level::set::notake) || (admLevel)) &&
         (theChan->getFlag(sqlChannel::F_NOTAKE)))
 {
-    flagsSet += "NOTAKE (REV:";
+    flagsSet += "NOTAKE (\002REV:\002";
     if (theChan->getNoTake() == 1) flagsSet += "NONE)";
     if (theChan->getNoTake() == 2) flagsSet += "BAN)";
     if (theChan->getNoTake() == 3) flagsSet += "SUSPEND)";
@@ -200,7 +197,6 @@ bot->Notice(theClient,
 if (((level >= level::set::floodpro) || (admLevel)) &&
 		(theChan->getFlag(sqlChannel::F_FLOODPRO)))
 {
-	//flagsSet.empty();
 	stringstream floodperiods;
 	if (theChan->getFloodproLevel())
 	{
@@ -219,15 +215,15 @@ if (((level >= level::set::floodpro) || (admLevel)) &&
 		floodperiods << " FLOODPRO";
 	floodperiods
 		//<< std::hex << theChan->getFloodPro()
-		<< " -- (MSG:"
+		<< " -- (\002MSG:\002"
 		<< theChan->getFloodMsg()
-		<< ", NOTICE:"
+		<< ", \002NOTICE:\002"
 		<< theChan->getFloodNotice()
-		<< ", CTCP:"
+		<< ", \002CTCP:\002"
 		<< theChan->getFloodCTCP()
-		<< ", REP:"
+		<< ", \002REP:\002"
 		<< theChan->getRepeatCount()
-		<< ", PERIOD:"
+		<< ", \002PERIOD:\002"
 		<< theChan->getFloodPeriod()
 		<< ")"
 		<< ends;
@@ -235,40 +231,38 @@ if (((level >= level::set::floodpro) || (admLevel)) &&
 	bot->Notice(theClient, floodperiods.str().c_str());
 }
 
-
-flagsSet.clear();
-
 if (theChan->getFlag(sqlChannel::F_FLOATLIM))
 {
 	stringstream floatLim;
 	floatLim
-    << " FLOATLIM (MGN:"
+    << " FLOATLIM (\002MGN:\002"
 	<< theChan->getLimitOffset()
-	<< ", PRD:"
+	<< ", \002PRD:\002"
 	<< theChan->getLimitPeriod()
-	<< ", GRC:"
+	<< ", \002GRC:\002"
 	<< theChan->getLimitGrace()
-	<< ", MAX:"
+	<< ", \002MAX:\002"
 	<< theChan->getLimitMax()
 	<< ") "
 	<< ends;
-	flagsSet += floatLim.str().c_str();
+
+	bot->Notice(theClient, floatLim.str().c_str());
 }
 
 if (theChan->getFlag(sqlChannel::F_JOINLIM))
 {
 	stringstream joinLim;
-	joinLim << " JOINLIM (MAX:"
+	joinLim << " JOINLIM (\002MAX:\002"
 		<< theChan->getLimitJoinMax()
-		<< ", SECS:"
+		<< ", \002SECS:\002"
 		<< theChan->getLimitJoinSecs()
-		<< ", PRD:"
+		<< ", \002PRD:\002"
 		<< theChan->getLimitJoinPeriod()
-		<< ", MODE: "
+		<< ", \002MODE:\002 "
 		<< theChan->getLimitJoinMode().c_str()
 		<< ")"
 		<< ends;
-	flagsSet += joinLim.str().c_str();
+	bot->Notice(theClient, joinLim.str().c_str());
 }
 
 if (theChan->getLimitJoinActive())
@@ -279,10 +273,12 @@ if (theChan->getLimitJoinActive())
 			theChan->getLimitJoinTimeExpire() - time(nullptr));
 
 /* show userflags (if not 'NONE') */
-if (theChan->getUserFlags() == 1) flagsSet += "USERFLAGS=OP ";
-else if (theChan->getUserFlags() == 2) flagsSet += "USERFLAGS=VOICE ";
+flagsSet.clear();
+if (theChan->getUserFlags() == 1) flagsSet += " USERFLAGS=OP ";
+else if (theChan->getUserFlags() == 2) flagsSet += " USERFLAGS=VOICE ";
 
-bot->Notice(theClient,flagsSet.c_str());
+if (!flagsSet.empty())
+	bot->Notice(theClient,flagsSet.c_str());
 
 /*
  *  Get a list of authenticated users on this channel.

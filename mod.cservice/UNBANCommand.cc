@@ -150,7 +150,7 @@ string respUnban ;
 string respNotOnChan ;
 
 /* Counter of deleted internal bans */
-int banCount ;
+int banCount = 0 ;
 
 for( ; counter < st2.size() ; counter++ )
 	{
