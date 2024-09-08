@@ -3209,7 +3209,7 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 
 		newChanData* newChan = new (std::nothrow) newChanData;
 		newChan->chanName = SQLDb->GetValue(i, 1);
-		newChan->mngr_userId = (unsigned int)atoi(SQLDb->GetValue(i, 21).c_str());
+		newChan->mngr_userId = (unsigned int)atoi(SQLDb->GetValue(i, 25).c_str());
 		newChanList.push_back(newChan);
 
 		logDebugMessage("[DB-UPDATE]: Found new channel: %s", newChan->chanName.c_str());
