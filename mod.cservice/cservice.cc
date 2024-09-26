@@ -2685,18 +2685,16 @@ if( !SQLDb->Exec(expireQuery, true ) )
  *  we might have to execute other queries inside the
  *  loop which will invalidate our results set.
  */
-typedef vector < pair < unsigned int, unsigned int > > expireVectorType;
-expireVectorType expireVector;
-typedef vector < unsigned int > channelsVectorType;
-channelsVectorType	channelsVector;
+std::vector < pair < unsigned int, unsigned int > > expireVector ;
+std::vector < unsigned int > channelsVector ;
 
-for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
+for (size_t i = 0 ; i < SQLDb->Tuples(); i++)
 	{
-	expireVector.push_back(expireVectorType::value_type(
-		atoi(SQLDb->GetValue(i, 0).c_str()),
-		atoi(SQLDb->GetValue(i, 1).c_str()) )
+	expireVector.emplace_back(
+		atoi(SQLDb->GetValue(i, 0)),
+		atoi(SQLDb->GetValue(i, 1))
 		);
-	channelsVector.push_back(atoi(SQLDb->GetValue(i, 0).c_str()));
+	channelsVector.push_back(atoi(SQLDb->GetValue(i, 0)));
 	}
 
 /* Delete duplicates from channelsVector. */
@@ -2704,39 +2702,42 @@ sort( channelsVector.begin(), channelsVector.end() ) ;
 auto it = unique( channelsVector.begin(), channelsVector.end() ) ;
 channelsVector.erase( it, channelsVector.end() ) ;
 
-for (channelsVectorType::const_iterator chanPtr = channelsVector.begin();
-	chanPtr != channelsVector.end(); ++chanPtr)
+for (const auto& chanPtr : channelsVector)
 	{
-	sqlChannel* theChan = getChannelRecord( *chanPtr );
-	Channel* tmpChan = Network->findChannel( theChan->getName() ) ;
-
+	sqlChannel* theChan = getChannelRecord( chanPtr );
 	if (!theChan)
 		{
 		elog 	<< "cservice::expireBans> Unable to find channel-ID "
-					<< *chanPtr
-					<< endl ;
+			<< chanPtr
+			<< endl ;
 
 		continue;
 		}
 
+	Channel* tmpChan = Network->findChannel( theChan->getName() ) ;
+	if (!tmpChan)
+		{
+		elog	<< "cservice::expireBans> Unable to find network channel "
+			<< theChan->getName()
+			<< endl;
+		}
+
 	#ifdef LOG_DEBUG
 	elog	<< "Checking bans for "
-				<< theChan->getName()
-				<< endl;
+		<< theChan->getName()
+		<< endl;
 	#endif
 
 	/* Vector to store bans for each channel. */
 	xServer::banVectorType	banVector ;
 
-	for (expireVectorType::const_iterator resultPtr = expireVector.begin();
-		resultPtr != expireVector.end(); ++resultPtr)
+	for( const auto& [chanID, banID] : expireVector )
 		{
 		/* Skip bans not related to the present channel. */
-		if( resultPtr->first != theChan->getID() ) continue ;
+		if( chanID != theChan->getID() ) continue ;
 
 		/* Attempt to find the ban according to its id */
-		map< int,sqlBan* >::iterator ptr =
-			theChan->banList.find(resultPtr->second);
+		auto ptr = theChan->banList.find( banID ) ;
 
 		/* Was a ban found ? */
 		if (ptr != theChan->banList.end())
@@ -2763,14 +2764,16 @@ for (channelsVectorType::const_iterator chanPtr = channelsVector.begin();
 		else
 			{
 			#ifdef LOG_DEBUG
-			elog << "Unable to find ban "
-					<< " with id "
-					<< resultPtr->second
-					<< endl;
+			elog 	<< "Unable to find ban "
+				<< " with id "
+				<< banID
+				<< endl;
 			#endif
 			}
 		} // for() expireVector
-		UnBan( tmpChan, banVector ) ;
+
+		if (tmpChan && !banVector.empty())
+			UnBan( tmpChan, banVector ) ;
 	} // for() channelsVector
 
 stringstream deleteQuery;
@@ -7243,42 +7246,6 @@ if( Connected && MyUplink )
 return returnMe ;
 }
 
-bool cservice::Notice( const iClient* Target, const char* Message, 
-	... )
-{
-if( Connected && MyUplink && Message && Message[ 0 ] != 0 )
-	{
-	char buffer[ 512 ] = { 0 } ;
-	va_list list;
-
-	va_start(list, Message);
-	vsnprintf(buffer, 512, Message, list);
-	va_end(list);
-
-	setOutputTotal( Target, getOutputTotal(Target) + strlen(buffer) );
-	return MyUplink->Write("%s O %s :%s\r\n",
-		getCharYYXXX().c_str(),
-		Target->getCharYYXXX().c_str(),
-		buffer ) ;
-	}
-return false ;
-}
-
-bool cservice::Notice( const string& Channel, const char* Message, ... )
-{
-	return xClient::Notice(Channel, Message);
-}
-
-bool cservice::Notice( const Channel* theChan, const char* Message, ... )
-{
-	return xClient::Notice(theChan, Message);
-}
-
-bool cservice::Notice( const Channel* theChan, const string& Message)
-{
-	return xClient::Notice(theChan, Message);
-}
-
 bool cservice::Topic(Channel* theChan, const string& Message)
 {
 	return xClient::Topic(theChan, Message);
@@ -8327,7 +8294,6 @@ void cservice::doCoderStats(iClient* theClient)
 	/*
 	 * Count how many users are actually logged in right now.
 	 */
-	unsigned int authCount = 0;
 	unsigned int iprCount = 0;
 	unsigned int totpCount = 0;
 	unsigned int ipr_totp_Count = 0;
@@ -8339,7 +8305,6 @@ void cservice::doCoderStats(iClient* theClient)
 		tmpUser = ptr->second;
 		if (tmpUser->isAuthed()) 
 		{
-			authCount++;
 			if (hasIPR(tmpUser))
 			{
 				iprCount++;
@@ -8364,6 +8329,7 @@ void cservice::doCoderStats(iClient* theClient)
 	unsigned int plusXCount = 0;
 	unsigned int plusWCount = 0;
 	unsigned int plusDCount = 0;
+	unsigned int authCount = 0;
 
 	xNetwork::const_clientIterator ptr2 = Network->clients_begin();
 	while(ptr2 != Network->clients_end())
@@ -8372,6 +8338,7 @@ void cservice::doCoderStats(iClient* theClient)
 		if (tmpClient->isModeX()) plusXCount++;
 		if (tmpClient->isModeW()) plusWCount++;
 		if (tmpClient->isModeD()) plusDCount++;
+		if (tmpClient->isModeR()) authCount++;
 		++ptr2;
 	}
 
@@ -9316,13 +9283,12 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 	/*
 	 * Check they aren't banned < 75 in any chan.
 	 */
-	for (iClient::channelIterator chItr = theClient->channels_begin(); chItr != theClient->channels_end(); ++chItr)
+	for (const auto& theChan : theClient->channels())
 	{
-		sqlChannel* theChan = getChannelRecord((*chItr)->getName());
-		//Channel* netChan = Network->findChannel(theChan->getName());
-		if (theChan)
+		sqlChannel* sqlChan = getChannelRecord(theChan->getName());
+		if (sqlChan)
 		{
-			checkBansOnJoin((*chItr), theChan, theClient);
+			checkBansOnJoin(theChan, sqlChan, theClient);
 		}
 	}
 

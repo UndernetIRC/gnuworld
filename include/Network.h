@@ -491,6 +491,12 @@ public:
 	typedef nickMapType::iterator	clientIterator ;
 
 	/**
+	 * Return the network iClient list.
+	 */
+	inline const nickMapType clients() const
+		{ return nickMap ; }
+
+	/**
 	 * Return a mutator to the beginning of the network client
 	 * data structure.  The client referenced is mutable.
 	 */

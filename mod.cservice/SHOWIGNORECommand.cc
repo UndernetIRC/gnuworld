@@ -41,8 +41,6 @@ if( st.size() < 1 )
 	return true;
 	}
 
-size_t count = 0;
-
 sqlUser* theUser = bot->isAuthed(theClient, false);
 
 // TODO: Violation of encapsulation
@@ -66,7 +64,6 @@ for( cservice::silenceListType::const_iterator ptr = bot->silenceList.begin() ;
 		language::rpl_ignorelist, "%s for %i minutes").c_str(),
 		ptr->first.c_str(),
 		(((ptr->second.first - bot->currentTime()) / 60) % 60));
-	count++;
 	}
 
 bot->Notice(theClient,

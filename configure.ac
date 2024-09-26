@@ -107,6 +107,16 @@ AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h getopt.h)
 AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
 AC_CHECK_HEADERS(time.h sys/time.h)
 
+dnl Check for C++20 std::format
+AC_CHECK_HEADERS([format],
+  [have_format=yes],
+  [have_format=no])
+
+if test "$have_format" = yes; then
+  AC_DEFINE([HAVE_FORMAT], [1],
+  [Define if std::format is available])
+fi
+
 AC_TYPE_MODE_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
