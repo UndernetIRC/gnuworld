@@ -527,10 +527,7 @@ if( isConnected() && Message && Message[ 0 ] != 0 )
 	va_end(list);
 
 	// O is the token for NOTICE, *shrug*
-	return MyUplink->Write("%s O %s :%s\r\n",
-		getCharYYXXX().c_str(),
-		Target->getCharYYXXX().c_str(),
-		buffer ) ;
+	return Notice( Target, string( Message ) ) ;
 	}
 return false ;
 }
@@ -592,10 +589,7 @@ if( isConnected() && Message && Message[ 0 ] != 0 )
 	vsnprintf(buffer, 1024, Message, list);
 	va_end(list);
 
-	return MyUplink->Write("%s O %s :%s\r\n",
-		getCharYYXXX().c_str(),
-		theChan->getName().c_str(),
-		buffer ) ;
+	return Notice( theChan, string( Message ) ) ;
 	}
 return false ;
 }

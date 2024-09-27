@@ -59,7 +59,6 @@ if( 1 == st.size() )
 	{
 	// Spit out all commands
 	string Show;
-	int Num = 0;
 	for( ccontrol::constCommandIterator ptr = bot->command_begin() ;
 		ptr != bot->command_end() ; ++ptr )
 		{
@@ -68,11 +67,9 @@ if( 1 == st.size() )
 		if((ComLevel & commandLevel::flg_NOLOGIN) || ((tmpAuth) && (tmpAuth->gotAccess(ptr->second))) )
 			{
 			Show += (ptr->second->getName() + " ");
-			++Num;
 			if(Show.size() > 80)
 				{
 				bot->Notice( theClient, "%s", Show.c_str()) ;
-				Num = 0;
 				Show.assign("");
 				}
 			}

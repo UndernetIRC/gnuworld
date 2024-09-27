@@ -107,6 +107,16 @@ AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h getopt.h)
 AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
 AC_CHECK_HEADERS(time.h sys/time.h)
 
+dnl Check for C++20 std::format
+AC_CHECK_HEADERS([format],
+  [have_format=yes],
+  [have_format=no])
+
+if test "$have_format" = yes; then
+  AC_DEFINE([HAVE_FORMAT], [1],
+  [Define if std::format is available])
+fi
+
 AC_TYPE_MODE_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
@@ -356,7 +366,7 @@ if test "$check_liboath" = "yes"; then
     )
 
     LDFLAGS="${LDFLAGS} -L${OATH_LIB}"
-    CXXFLAGS="${CXXFLAGS} -I${OATH_INCLUDE} -L${OATH_LIB}"
+    CXXFLAGS="${CXXFLAGS} -I${OATH_INCLUDE}"
     dnl AC_CHECK_FILE("$OATH_LIB/liboath.so",, [AC_MSG_ERROR([Unable to find liboath.so, \
     dnl                 please use the --with-liboath-lib argument to point to the right path],1)])
     AC_CHECK_LIB(oath,oath_totp_validate,, [AC_MSG_ERROR([Unable to find liboath.so, please use the --with-liboath-lib argument to point to the right path],1)])

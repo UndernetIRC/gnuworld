@@ -94,6 +94,8 @@ protected:
 #endif
 
 public:
+	using xClient::Notice ;
+
 	dbHandle* SQLDb; /* PostgreSQL Database */
 	string confSqlHost;
 	string confSqlPass;
@@ -152,14 +154,7 @@ public:
                 bool Secure = false ) ;
 	virtual void OnTimer(const xServer::timerID&, void*);
 	virtual void OnJoin( const std::string& ) ;
-	virtual bool Notice( const iClient* Target,
-		const char* Message, ... ) ;
-	virtual bool Notice( const iClient* Target, const string& ) ;
-	virtual bool Notice( const std::string& Channel,
-		const char* Message, ... ) ;
-	virtual bool Notice( const Channel* theChan,
-		const char* Message, ... ) ;
-	virtual bool Notice( const Channel*, const std::string& ) ;
+	virtual bool Notice( const iClient*, const string& ) ;
 
 	virtual bool Topic( Channel*, const std::string& ) ;
 

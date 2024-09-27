@@ -326,6 +326,12 @@ public:
 		{ return numericIP ; }
 
 	/**
+	 * Return the iClient's channelList.
+	 */
+	inline const channelListType channels() const
+		{ return channelList ; }
+
+	/**
 	 * Obtain const iterator to beginning of this user's channel
 	 * membership structure.
 	 */

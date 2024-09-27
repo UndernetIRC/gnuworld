@@ -54,7 +54,6 @@ using std::make_pair ;
 using std::string ;
 using std::endl ;
 using std::list ;
-using std::unary_function ;
 
 xNetwork::xNetwork()
 {}
