@@ -527,7 +527,7 @@ if( isConnected() && Message && Message[ 0 ] != 0 )
 	va_end(list);
 
 	// O is the token for NOTICE, *shrug*
-	return Notice( Target, string( Message ) ) ;
+	return Notice( Target, string( buffer ) ) ;
 	}
 return false ;
 }
@@ -589,7 +589,7 @@ if( isConnected() && Message && Message[ 0 ] != 0 )
 	vsnprintf(buffer, 1024, Message, list);
 	va_end(list);
 
-	return Notice( theChan, string( Message ) ) ;
+	return Notice( theChan, string( buffer ) ) ;
 	}
 return false ;
 }
