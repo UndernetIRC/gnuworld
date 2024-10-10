@@ -40,18 +40,17 @@ bool HELPCommand::Exec( iClient* theClient, const string& Message )
 	bot->incStat("COMMANDS.HELP");
 	StringTokenizer st( Message ) ;
 
+	string topic = "" ;
 	if( st.size() < 2 )
-	{
-		Usage(theClient);
-		return true;
-	}
+		topic = "HELP" ;
+	else
+		topic = string_upper(st.assemble(1));
 
 	sqlUser* theUser = bot->isAuthed(theClient, false);
-	string topic = string_upper(st.assemble(1));
 	string msg = bot->getHelpMessage(theUser, topic);
 
 	if (msg.empty())
-	msg = bot->getHelpMessage(theUser, "INDEX");
+		msg = bot->getHelpMessage(theUser, "INDEX");
 
 	if (!msg.empty())
 	{
