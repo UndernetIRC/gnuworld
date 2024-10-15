@@ -150,7 +150,7 @@ string respUnban ;
 string respNotOnChan ;
 
 /* Counter of deleted internal bans */
-int banCount = 0 ;
+unsigned int banCount = 0 ;
 
 for( ; counter < st2.size() ; counter++ )
 	{
@@ -323,14 +323,15 @@ if( !respNotOnChan.empty() )
 			string( "I don't see %s anywhere" ) ).c_str(),
 			respNotOnChan.c_str() ) ;
 
-bot->Notice( theClient,
-	bot->getResponse( theUser,
-		language::bans_removed,
-		string( "Removed %i channel bans and %i internal bans that matched %s" ) ).c_str(),
-		banVector.size(), banCount, respUnban.c_str() ) ;
+if( !respUnban.empty() )
+	bot->Notice( theClient,
+		bot->getResponse( theUser,
+			language::bans_removed,
+			string( "Removed %i channel bans and %i internal bans that matched %s" ) ).c_str(),
+			banVector.size(), banCount, respUnban.c_str() ) ;
 
 // Send action opnotice to channel if OPLOG is enabled
-if( theChan->getFlag( sqlChannel::F_OPLOG ) )
+if( !respUnban.empty() && theChan->getFlag( sqlChannel::F_OPLOG ) )
 	bot->NoticeChannelOps( theChan->getName(),
 		"%s (%s) removed %i channel bans and %i internal bans that matched %s",
 		theClient->getNickName().c_str(), theUser->getUserName().c_str(),

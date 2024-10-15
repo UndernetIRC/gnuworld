@@ -588,10 +588,10 @@ for( string::const_iterator ptr = theString.begin() ;
 		//retMe += "\\\047" ;
 		retMe += "''";
 		}
-	else if ( *ptr == '\\' )
-		{
-		retMe += "\\\134" ;
-		}
+//	else if ( *ptr == '\\' )
+//		{
+//		retMe += "\\\134" ;
+//		}
 	else
 		{
 		retMe += *ptr ;
