@@ -404,7 +404,14 @@ public:
 
 	inline size_type userList_size()
 		{ return userList.size() ; }
-/**
+
+	/**
+	 *  Return the Channel's userlist.
+	 */
+	inline const userListType users() const
+		{ return userList ; }
+
+	/**
 	 * Retrieve a const iterator to the beginning of
 	 * this channel's user structure.
 	 */
