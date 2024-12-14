@@ -327,7 +327,16 @@ RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
-RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
+RegisterCommand( new TOPICCommand( this, "TOPIC", "<#channel> <topic> "
+	"Change channel topic",
+	false,
+	commandLevel::flg_TOPIC,
+	false,
+	true,
+	false,
+	operLevel::OPERLEVEL,
+	false ) ) ;
+RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric> "
 	"Translate a numeric into user information",
 	false,
 	commandLevel::flg_TRANS,
@@ -336,7 +345,7 @@ RegisterCommand( new TRANSLATECommand( this, "TRANSLATE", "<numeric>"
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
-RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
+RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname> "
 	"Obtain information on a given nickname",
 	false,
 	commandLevel::flg_WHOIS,
@@ -345,7 +354,7 @@ RegisterCommand( new WHOISCommand( this, "WHOIS", "<nickname>"
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
-RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason>"
+RegisterCommand( new KICKCommand( this, "KICK", "<channel> <nick> <reason> "
 	"Kick a user from a channel",
 	false,
 	commandLevel::flg_KICK,

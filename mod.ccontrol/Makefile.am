@@ -65,6 +65,7 @@ libccontrol_la_SOURCES = \
 	mod.ccontrol/STATUSCommand.cc \
 	mod.ccontrol/SUSPENDCommand.cc \
 	mod.ccontrol/TRANSLATECommand.cc \
+	mod.ccontrol/TOPICCommand.cc \
 	mod.ccontrol/UNJUPECommand.cc \
 	mod.ccontrol/UNMODERATECommand.cc \
 	mod.ccontrol/UNSUSPENDCommand.cc \

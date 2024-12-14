@@ -333,7 +333,8 @@ am__libccontrol_la_SOURCES_DIST = mod.ccontrol/ccontrol.cc \
 	mod.ccontrol/SCHANGLINECommand.cc \
 	mod.ccontrol/SGLINECommand.cc mod.ccontrol/SHUTDOWNCommand.cc \
 	mod.ccontrol/STATUSCommand.cc mod.ccontrol/SUSPENDCommand.cc \
-	mod.ccontrol/TRANSLATECommand.cc mod.ccontrol/UNJUPECommand.cc \
+	mod.ccontrol/TRANSLATECommand.cc mod.ccontrol/TOPICCommand.cc \
+	mod.ccontrol/UNJUPECommand.cc \
 	mod.ccontrol/UNMODERATECommand.cc \
 	mod.ccontrol/UNSUSPENDCommand.cc \
 	mod.ccontrol/USERINFOCommand.cc mod.ccontrol/WHOISCommand.cc \
@@ -401,6 +402,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-STATUSCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-SUSPENDCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-TRANSLATECommand.lo \
+@COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-TOPICCommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-UNJUPECommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-UNMODERATECommand.lo \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/libccontrol_la-UNSUSPENDCommand.lo \
@@ -1064,6 +1066,7 @@ am__depfiles_remade = db/$(DEPDIR)/gnuworldDB.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo \
+	mod.ccontrol/$(DEPDIR)/libccontrol_la-TOPICCommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-TRANSLATECommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo \
 	mod.ccontrol/$(DEPDIR)/libccontrol_la-UNMODERATECommand.Plo \
@@ -1817,6 +1820,7 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/STATUSCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/SUSPENDCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/TRANSLATECommand.cc \
+@COND_MODCCONTROL_TRUE@	mod.ccontrol/TOPICCommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/UNJUPECommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/UNMODERATECommand.cc \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/UNSUSPENDCommand.cc \
@@ -2447,6 +2451,9 @@ mod.ccontrol/libccontrol_la-SUSPENDCommand.lo:  \
 	mod.ccontrol/$(am__dirstamp) \
 	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
 mod.ccontrol/libccontrol_la-TRANSLATECommand.lo:  \
+	mod.ccontrol/$(am__dirstamp) \
+	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
+mod.ccontrol/libccontrol_la-TOPICCommand.lo:  \
 	mod.ccontrol/$(am__dirstamp) \
 	mod.ccontrol/$(DEPDIR)/$(am__dirstamp)
 mod.ccontrol/libccontrol_la-UNJUPECommand.lo:  \
@@ -3470,6 +3477,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-TOPICCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-TRANSLATECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.ccontrol/$(DEPDIR)/libccontrol_la-UNMODERATECommand.Plo@am__quote@ # am--include-marker
@@ -4150,6 +4158,13 @@ mod.ccontrol/libccontrol_la-TRANSLATECommand.lo: mod.ccontrol/TRANSLATECommand.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.ccontrol/TRANSLATECommand.cc' object='mod.ccontrol/libccontrol_la-TRANSLATECommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.ccontrol/libccontrol_la-TRANSLATECommand.lo `test -f 'mod.ccontrol/TRANSLATECommand.cc' || echo '$(srcdir)/'`mod.ccontrol/TRANSLATECommand.cc
+
+mod.ccontrol/libccontrol_la-TOPICCommand.lo: mod.ccontrol/TOPICCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT mod.ccontrol/libccontrol_la-TOPICCommand.lo -MD -MP -MF mod.ccontrol/$(DEPDIR)/libccontrol_la-TOPICCommand.Tpo -c -o mod.ccontrol/libccontrol_la-TOPICCommand.lo `test -f 'mod.ccontrol/TOPICCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/TOPICCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.ccontrol/$(DEPDIR)/libccontrol_la-TOPICCommand.Tpo mod.ccontrol/$(DEPDIR)/libccontrol_la-TOPICCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.ccontrol/TOPICCommand.cc' object='mod.ccontrol/libccontrol_la-TOPICCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.ccontrol/libccontrol_la-TOPICCommand.lo `test -f 'mod.ccontrol/TOPICCommand.cc' || echo '$(srcdir)/'`mod.ccontrol/TOPICCommand.cc
 
 mod.ccontrol/libccontrol_la-UNJUPECommand.lo: mod.ccontrol/UNJUPECommand.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libccontrol_la_CXXFLAGS) $(CXXFLAGS) -MT mod.ccontrol/libccontrol_la-UNJUPECommand.lo -MD -MP -MF mod.ccontrol/$(DEPDIR)/libccontrol_la-UNJUPECommand.Tpo -c -o mod.ccontrol/libccontrol_la-UNJUPECommand.lo `test -f 'mod.ccontrol/UNJUPECommand.cc' || echo '$(srcdir)/'`mod.ccontrol/UNJUPECommand.cc
@@ -6577,6 +6592,7 @@ distclean: distclean-recursive
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo
+	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-TOPICCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-TRANSLATECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-UNMODERATECommand.Plo
@@ -6946,6 +6962,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SHUTDOWNCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-STATUSCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-SUSPENDCommand.Plo
+	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-TOPICCommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-TRANSLATECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-UNJUPECommand.Plo
 	-rm -f mod.ccontrol/$(DEPDIR)/libccontrol_la-UNMODERATECommand.Plo

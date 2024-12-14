@@ -107,6 +107,7 @@ const unsigned long int flg_REMSGLINE = 0x1000000;
 const unsigned long int flg_UNJUPE     = 0x2000000;
 const unsigned long int flg_SCHANGLINE = 0x4000000;
 const unsigned long int flg_FORCECHANGLINE = 0x8000000;
+const unsigned long int flg_TOPIC = 0x10000000;
 const unsigned long int flg_ANNOUNCE = 0x20000000;
 const unsigned long int flg_LIMITS = 0x40000000;
 
@@ -124,7 +125,7 @@ const unsigned long int SUHS = flg_ANNOUNCE;
 			| flg_MODOP;
 const unsigned long int SOPER = flg_CHECKNET | flg_LISTIGNORES | flg_LIST 
 			| flg_NOTES | flg_USERINFO | flg_SCAN | flg_MAXUSERS
-			| flg_LASTCOM | flg_REOP | flg_UNJUPE | flg_ANNOUNCE;
+			| flg_LASTCOM | flg_REOP | flg_UNJUPE | flg_ANNOUNCE | flg_TOPIC;
 const unsigned long int ADMIN = OPER | flg_JUPE | flg_REMOPCHN | flg_ADDOPCHN 
 			| flg_ADDNOP | flg_REMOP | flg_ADDCMD 
 			| flg_DELCMD | flg_SUSPEND | flg_UNSUSPEND;

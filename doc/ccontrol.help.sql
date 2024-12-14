@@ -336,6 +336,10 @@ SUSPEND		4	<username> - username to suspend
 SUSPEND		5	<duration> - the duration of the suspend (supports s,m,h,d for secs,mins,hours,days)
 SUSPEND		6	[-l level] - level at which the user is suspended (required minimum to unsuspend)
 SUSPEND		7	<reason> - reason for suspension
+TOPIC		1	****** TOPIC COMMAND ******
+TOPIC		2	Change a channel topic
+TOPIC		3	Syntax: /msg $BOT$ topic <#channel> [topic]
+TOPIC		4	Note: topic is cleared if [topic] parameter is missing
 TRANSLATE		1	****** TRANSLATE COMMAND ******
 TRANSLATE		2	Translates a numeric into a nick
 TRANSLATE		3	Syntax: /msg $BOT$ translate <numeric>
