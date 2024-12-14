@@ -327,7 +327,7 @@ RegisterCommand( new REMGLINECommand( this, "REMGLINE", "<user@host> "
 	false,
 	operLevel::OPERLEVEL,
 	false ) ) ;
-RegisterCommand( new TOPICCommand( this, "TOPIC", "<#channel> <topic> "
+RegisterCommand( new TOPICCommand( this, "TOPIC", "<#channel> [topic] "
 	"Change channel topic",
 	false,
 	commandLevel::flg_TOPIC,

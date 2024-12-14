@@ -44,7 +44,7 @@ bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 {
 StringTokenizer st( Message ) ;
 
-if( st.size() < 3 )
+if( st.size() < 2 )
 	{
 	// send help
 	Usage( theClient ) ;
@@ -66,7 +66,12 @@ if( chanName[ 0 ] != '#' )
 	chanName.insert( chanName.begin(), '#' ) ;
 	}
 
-string topic = st.assemble(2);
+string topic;
+if (st.size() == 2)
+	topic = "";
+else
+	topic = "(" + theClient->getNickName() + ") " + st.assemble(2);
+
 if ( topic.size() > 145 )
 	{
 	bot->Notice(theClient, "Topic cannot exceed 145 chars");
@@ -81,13 +86,12 @@ if (theChan == NULL)
 	return true;
 	}
 
+
 stringstream s;
 s	<< bot->getCharYY()
 	<< " T "
 	<< st[1]
-	<< " :("
-	<< theClient->getNickName()
-	<< ") "
+	<< " :"
 	<< topic
 	<< ends;
 
