@@ -661,7 +661,7 @@ RegisterCommand( new REMSGLINECommand( this, "REMSGLINE",
 	true ) ) ;
 
 RegisterCommand( new LIMITSCommand( this, "LIMITS",
-	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chilimit / chname / chemail / forcecount / glunidented / active / nogline / group / chccidr / clearall / userinfo / info)",
+	"(addisp / addnetblock / delisp / delnetblock / list / chlimit / chilimit / chname / chemail / forcecount / glunidented / active / nogline / group / chccidr / clearall / userinfo / info / ipinfo)",
 	true,
 	commandLevel::flg_LIMITS,
 	false,
@@ -6527,6 +6527,106 @@ for (ipLnbListType::iterator nptr = ipLnbList.begin(); nptr != ipLnbList.end(); 
 Notice(theClient, "--- End of limits infos ---");
 return true;
 }
+
+bool ccontrol::ipLipInfo( iClient *theClient, const string &the_ip )
+{
+ccIpLnb* nb;
+int clonecidr;
+ipLnbListType ipLnbList;
+int widestCidr = 129;
+int smallestCidr = 0;
+int isv6 = 1;
+ipLnbVectorType tmpVector;
+std::list<int> nonForcecountCidrList;
+string username;
+string ip;
+
+StringTokenizer st(the_ip, '@');
+if (st.size() > 1) {
+	username = st[0];
+	ip = st[1];
+}
+else {
+	ip = the_ip;
+	username = "(null)";
+}
+
+
+Notice(theClient, "--- Listing limits infos for %s ---", ip.c_str());
+if (irc_in_addr_is_ipv4(&theClient->getIP()))
+	isv6 = 0;
+
+for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++) {
+	nb = nptr->second;
+	if (nb->ipLisp->isv6() != isv6)
+		continue;
+	if (match(nb->getCidr(), ip) == 0) {
+		/* Only keep going if the cidr < the previous one matched, except for forcecount netblocks, which show first in the list
+		 * Note: ptr is of type ipLnbVectorType (pair<int, ccIpLnb*>) that is always sorted with netblocks
+		 * that have forcecount at the top with nptr->first = 129, and all the others have nptr->first == ntpr->second->getCidr2()
+		 */
+		if ((nptr->first < 129) && (nb->getCidr2() < smallestCidr)) { /* cidr/129 means we have forcecount set */
+			break;
+		}
+		tmpVector.push_back(*nptr);
+		if (nptr->first < 129)
+			nonForcecountCidrList.push_back(nb->getCloneCidr());
+		if ((nb->getCidr2() > smallestCidr) && (nb->isActive()))
+			smallestCidr = nb->getCidr2();
+	}
+}
+for (ipLnbIterator nptr = tmpVector.begin(); nptr != tmpVector.end(); nptr++) {
+	nb = nptr->second;
+	clonecidr = nb->getCloneCidr();
+
+	/* New code to handle forcecount differently */
+	if ((nptr->first == 129) && (std::find(nonForcecountCidrList.begin(), nonForcecountCidrList.end(), nb->getCloneCidr()) != nonForcecountCidrList.end())) {
+		// This forcecount cloneCidr is already handled by another non-forcecount isp. Skip.
+		continue;
+	}
+
+	if (match(nb->getCidr(), ip) != 0) {
+		elog << "ccontrol::ipLuserInfo> This shouldn't have happened" << endl;
+	}
+	clonecidr = nb->getCloneCidr();
+
+	int tclonecidr = clonecidr;
+	if (nb->getCidr().find(':') == string::npos)
+		tclonecidr += 96;
+	string m;
+	if (nb->ipLisp->isGroup())
+		m = nb->getCidr();
+	else
+		m = IPCIDRMinIP(ip, tclonecidr) + "/" + std::to_string(clonecidr);
+	string userip = username + "@" + (nb->ipLisp->isGroup() ? nb->ipLisp->getName() : m);
+	int identCount = 0;
+	int identLimit = 0;
+	ipLclonesMapIterator itr = nb->ipLisp->ipLidentclonesMap.find(userip);
+	if (itr != nb->ipLisp->ipLidentclonesMap.end()) {
+		identCount = itr->second;
+		identLimit = nb->getIdentLimit();
+	}
+	else {
+		elog << "ccontrol::ipLuserInfo> bug: Did we really get here? Line #" << __LINE__ << endl;
+	}
+	itr = nb->ipLclonesMap.find(m);
+	if (itr != nb->ipLclonesMap.end()) {
+		Notice(theClient, "%s: %d/%d connections for %s (ref: %s) - %d/%d connections for %s",
+			nb->ipLisp->getName().c_str(), itr->second, nb->getLimit(), m.c_str(),
+			nb->getCidr().c_str(), identCount, identLimit, userip.c_str());
+	}
+	else {
+		elog << "ccontrol::ipLuserInfo> bug: Did we really get here? Line #" << __LINE__ << endl;
+	}
+}
+
+for (ipLnbListType::iterator nptr = ipLnbList.begin(); nptr != ipLnbList.end(); nptr++) {
+}
+Notice(theClient, "--- End of limits infos ---");
+return true;
+}
+
+
 bool ccontrol::ipLDropClient( iClient *theClient )
 {
 ccIpLnb* nb;

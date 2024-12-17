@@ -750,6 +750,8 @@ public:
 
 	bool ipLuserInfo( iClient *, iClient * );
 
+	bool ipLipInfo( iClient *, const string & );
+
 	size_t iauthXQCheck(iServer*, const string&, const string&);
 
 	ccFloodData *findLogin( const string & );

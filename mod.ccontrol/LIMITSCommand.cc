@@ -584,6 +584,16 @@ else if(!strcasecmp(st[1].c_str(),"userinfo"))
 	return bot->ipLuserInfo(theClient, Target);
 	}
 
+else if(!strcasecmp(st[1].c_str(),"ipinfo"))
+	{
+	if(st.size() < 3)
+		{
+		bot->Notice(theClient,"Syntax: IPINFO <[user@]ip>");
+		return true;
+		}
+	return bot->ipLipInfo(theClient, st[2]);
+	}
+
 else if(!strcasecmp(st[1].c_str(),"delnetblock"))
 	{
 	if(st.size() < 4) 
