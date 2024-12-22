@@ -63,8 +63,20 @@ if( 0 == theChan )
 // srcClient may be NULL if a server is setting the topic
 iClient* srcClient = Network->findClient( Param[ 0 ] ) ;
 std::string newTopic;
+bool hasWhoSet = false;
 
-if (Param.size() == 5)
+if (Param.size() == 6)
+{
+	/* this is a >.12.19 hub! */
+	/* params = numeric, channel, channel creation ts, topic ts, topic nick, topic */
+	newTopic = Param[ 5 ];
+#ifdef TOPIC_TRACK
+	theChan->setTopic(Param[5]);
+	theChan->setTopicTS(atoi(Param[3]));
+	theChan->setTopicWhoSet(Param[4]);
+	hasWhoSet = true;
+#endif // TOPIC_TRACK
+} else if (Param.size() == 5)
 {
 	/* this is a .12 hub! */
 	/* params = numeric, channel, channel creation ts, topic ts, topic */
@@ -82,20 +94,22 @@ if (Param.size() == 5)
 	theChan->setTopicTS(::time(NULL));
 #endif // TOPIC_TRACK
 }
+
 #ifdef TOPIC_TRACK
-if (srcClient == NULL)
+/* Even if we have the topic nick (>.12.19) we use srcClient if it was not a burst message */
+if (srcClient == NULL && !hasWhoSet)
 {
 	theChan->setTopicWhoSet("unknown");
-} else {
+} else if (srcClient != NULL) {
 	std::string client_ip;
 	client_ip = xIP(srcClient->getIP()).GetNumericIP();
 	theChan->setTopicWhoSet(srcClient->getNickUserHost() + " [" + client_ip + "]");
 }
 #endif // TOPIC_TRACK
 
-
 // No need to pass the new topic, it has already been stored
 // in the theChan
+// For bursted topics, srcClient will be NULL but getTopicWhoSet() will have been updated (>.12.19).
 theServer->PostChannelEvent( EVT_TOPIC,
 	theChan,
 	static_cast< void* >( srcClient ),
