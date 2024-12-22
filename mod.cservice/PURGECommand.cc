@@ -259,6 +259,9 @@ bot->writeChannelLog(theChan,
 	"has purged " + theChan->getName() + " (" + reason + "), " +
 	"Manager was " + manager + " (" + managerEmail + ")" );
 
+/* Notify services - currently disabled. */
+//bot->doXQToAllServices("AnyCServiceRouting", "REMCHAN " + theChan->getName());
+
 /* no longer interested in this channel */
 bot->getUplink()->UnRegisterChannelEvent( theChan->getName(), bot ) ;
 /* remove mode 'R' (no longer registered) */

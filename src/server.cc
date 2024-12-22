@@ -3572,6 +3572,19 @@ if( Message.empty() || !isConnected() )
         {
         return false ;
         }
+
+/* If we are sending an XREPLY to ourselves; PostEvent instead. */
+if( theServer == getMe() )
+	{
+	void *const thisRouting = const_cast< char* >( Routing.c_str() ) ;
+	void *const thisMessage = const_cast< char* >( Message.c_str() ) ;
+        PostEvent( EVT_XREPLY,
+		static_cast< void* >( theServer ),
+		reinterpret_cast< void* >( thisRouting ),
+		reinterpret_cast< void* >( thisMessage ) ) ;
+	return true ;
+	}
+
 stringstream s ;
 s       << getCharYY()
         << " XR "
@@ -3581,7 +3594,7 @@ s       << getCharYY()
 	<< " :"
         << Message ;
 return Write( s.str() ) ;
-	
+
 }
 
 bool xServer::XQuery (iServer* theServer, const string& Routing,
@@ -3593,6 +3606,19 @@ if( Message.empty() || !isConnected() )
         {
         return false ;
         }
+
+/* If we are sending an XQUERY to ourselves; PostEvent instead. */
+if( theServer == getMe() )
+	{
+	void *const thisRouting = const_cast< char* >( Routing.c_str() ) ;
+	void *const thisMessage = const_cast< char* >( Message.c_str() ) ;
+        PostEvent( EVT_XQUERY,
+		static_cast< void* >( theServer ),
+		reinterpret_cast< void* >( thisRouting ),
+		reinterpret_cast< void* >( thisMessage ) ) ;
+	return true ;
+ 	}
+
 stringstream s ;
 s       << getCharYY()
         << " XQ "

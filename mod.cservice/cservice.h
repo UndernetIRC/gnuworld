@@ -294,6 +294,8 @@ public:
 	int authenticateUser(const string& username, const string& password, iClient*, sqlUser**);
 
 	bool doXQLogin(iServer* , const string&, const string&);
+	bool doXQIsCheck(iServer*, const string&, const string&, const string&);
+	void doXQToAllServices(const string&, const string&);
 
 	bool doCommonAuth(iClient* , string username = string() );
 
