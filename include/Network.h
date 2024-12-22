@@ -543,6 +543,12 @@ public:
 	typedef serverMapType::const_iterator const_serverIterator ;
 
 	/**
+	 * Return the servers table
+	 */
+	inline const serverMapType servers() const
+		{ return serverMap ; }
+
+	/**
 	 * Return a non-const iterator to the beginning of the
 	 * remote servers table.
 	 */

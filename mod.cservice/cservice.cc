@@ -3032,6 +3032,9 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 	deleteUserFromTable(userId,"users_lastseen");
 	deleteUserFromTable(userId,"users");
 
+	/* Notify services. */
+	doXQToAllServices( "AnyCServiceRouting", "REMUSER " + std::to_string(userId));
+
 	deleted = true;
 
 	if (expired)
@@ -5206,6 +5209,11 @@ switch( theEvent )
 		if ((Command == "LOGIN") || (Command == "LOGIN2"))
 			{
 			doXQLogin(theServer, Routing, Message);
+			}
+
+		if ((Command == "ISUSER") || (Command == "ISCHAN"))
+			{
+			doXQIsCheck(theServer, Routing, Command, Message);
 			}
 		break;
 		}
@@ -8874,6 +8882,210 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 elog << "cservice::doXQLogin: FAILED login for " << username << endl;
 
 return true;
+}
+
+void cservice::doXQToAllServices(const string& Routing, const string& Message)
+{
+for( const auto& [_, theServer] : Network->servers() )
+	{
+	if( !theServer->isService() )
+		continue ;
+
+	MyUplink->XQuery( theServer, Routing, Message ) ;
+	}
+}
+
+bool cservice::doXQIsCheck(iServer* theServer, const string& Routing, const string& Command, const string& Message)
+{
+// AB XQ Az AnyCServiceRouting :ISUSER <user#> <user#> <user#...N>
+// AB XQ Az AnyCServiceRouting :ISCHAN <#chan> <#chan2> <#chan..N>
+elog << "cservice::doXQIsCheck: Command: " << Command << " Routing: " << Routing << " Message: " << Message << "\n" ;
+StringTokenizer st( Message ) ;
+
+if( st.size() < 2 )
+	return false ;
+
+StringTokenizer st2( st.assemble( 1 ) ) ;
+string firstArg = st2[ 0 ] ;
+
+if( Command == "ISUSER")
+	{
+	std::stringstream theQuery ;
+	if( firstArg[ 0 ] == '+')
+		{
+		theQuery << "SELECT id,user_name FROM users WHERE LOWER(user_name) IN (" ;
+		firstArg.erase( 0, 1 ) ;
+		}
+	else
+		theQuery << "SELECT id,user_name FROM users WHERE id IN (" ;
+
+	for( size_t i = 0 ; i < st2.size() ; ++i )
+		{
+		theQuery << string_lower( st2[ i ] ) ;
+		if( i < st2.size() - 1 )
+			theQuery << "," ;
+		}
+	theQuery << ") " << std::endl ;
+
+#ifdef LOG_SQL
+	elog	<< "cservice::doXQIsCheck> "
+		<< theQuery.str()
+		<< std::endl ;
+#endif
+
+	if( !SQLDb->Exec( theQuery, true ) )
+		{
+		elog 	<< "cservice::doXQIsCheck> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< std::endl ;
+		return false ;
+	}
+
+	/* Store matching user IDs from the SQL results */
+	std::map< std::string, std::string > retUsers ;
+	for( size_t i = 0 ; i < SQLDb->Tuples() ; i++ )
+		retUsers[ SQLDb->GetValue( i, 0 ) ] = SQLDb->GetValue( i, 1 ) ;
+
+	std::string trueString ;
+	std::string falseString ;
+
+	for( const std::string& id : st2 )
+		{
+		auto it = retUsers.find( id ) ;
+		if( it != retUsers.end())
+			{
+			/* Flush buffer. */
+			if( trueString.length() + id.length() + 1 > 450 )
+				{
+				const string theMessage = Command + " YES " + trueString ;
+				MyUplink->XReply( theServer, Routing, theMessage ) ;
+				trueString.clear() ;
+				}
+
+			/* Add to buffer. */
+			trueString += it->first  + ":" + it->second + " " ;
+			}
+		else
+			{
+			/* Flush buffer. */
+			if( falseString.length() + id.length() + 1 > 450 )
+				{
+				const string theMessage = Command + " NO " + falseString ;
+				MyUplink->XReply( theServer, Routing, theMessage ) ;
+				}
+
+			/* Add to buffer. */
+			falseString += id + " " ;
+			}
+		}
+
+	/* Send messages not already flushed. */
+	if( !trueString.empty() )
+		{
+		const string theMessage = Command + " YES " + trueString ;
+		MyUplink->XReply( theServer, Routing, theMessage ) ;
+		}
+
+	if( !falseString.empty() )
+		{
+		const string theMessage = Command + " NO " + falseString ;
+		MyUplink->XReply( theServer, Routing, theMessage ) ;
+		}
+
+	MyUplink->XReply( theServer, Routing, Command + " EOL" ) ;
+
+	return true ;
+	}
+else if ( Command == "ISCHAN" )
+	{
+	/* Create the SQL query string to check for registered channels and fetch managers' userID.
+	 * It can be multiple managers. */
+	std::stringstream theQuery ;
+	theQuery	<< "SELECT channels.name, STRING_AGG(levels.user_id::TEXT, ',') AS managers "
+			<< "FROM channels "
+			<< "JOIN levels ON channels.id = levels.channel_id "
+			<< "WHERE levels.access = 500 AND LOWER(channels.name) IN (" ;
+	for( size_t i = 0 ; i < st2.size() ; ++i )
+		{
+		theQuery << "LOWER('" << st2[ i ] << "')" ;
+		if( i < st2.size() - 1 )
+			theQuery << "," ;
+		}
+	theQuery << ") GROUP BY channels.name" << std::endl ;
+
+#ifdef LOG_SQL
+	elog	<< "cservice::doXQIsCheck> "
+		<< theQuery.str()
+		<< std::endl ;
+#endif
+
+	if( !SQLDb->Exec( theQuery, true ) )
+		{
+		elog 	<< "cservice::doXQIsCheck> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< std::endl ;
+		return false ;
+		}
+
+	/* Store registered channels and the manager uids from the SQL results */
+	std::map< std::string, std::string, noCaseCompare > foundChannels ;
+	for( size_t i = 0 ; i < SQLDb->Tuples() ; i++ )
+		foundChannels[ SQLDb->GetValue( i, 0 ) ] = SQLDb->GetValue( i, 1 ) ;
+
+	/* Create output strings for matching and non-matching channels */
+	std::string trueString ;
+	std::string falseString ;
+
+	for( const std::string& chan : st2 )
+		{
+		auto it = foundChannels.find( chan ) ;
+		if( it != foundChannels.end() )
+			{
+			/* Flush buffer. */
+			if( trueString.length() + chan.length() + ( it->second ).length() + 2 > 450 )
+				{
+				const string theMessage = Command + " YES " + trueString ;
+				MyUplink->XReply( theServer, Routing, theMessage ) ;
+				trueString.clear() ;
+				}
+
+			/* Add to buffer. */
+			trueString += it->first + ":" + it->second + " " ;
+			}
+		else
+			{
+			/* Flush buffer. */
+			if( falseString.length() + chan.length() + 1 > 450 )
+				{
+				const string theMessage = Command + " NO " + falseString ;
+				MyUplink->XReply( theServer, Routing, theMessage ) ;
+				falseString.clear() ;
+				}
+
+			/* Add to buffer. */
+			falseString += chan + " " ;
+			}
+		}
+
+	/* Send messages not already flushed. */
+	if( !trueString.empty() )
+		{
+		const string theMessage = Command + " YES " + trueString ;
+		MyUplink->XReply( theServer, Routing, theMessage ) ;
+		}
+
+	if( !falseString.empty() )
+		{
+		const string theMessage = Command + " NO " + falseString ;
+		MyUplink->XReply( theServer, Routing, theMessage ) ;
+		}
+
+	MyUplink->XReply( theServer, Routing, Command + " EOL" ) ;
+
+	return true ;
+	}
+
+return false ;
 }
 
 bool cservice::doXQOplist(const string& chanName)
