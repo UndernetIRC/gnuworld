@@ -6533,7 +6533,6 @@ bool ccontrol::ipLipInfo( iClient *theClient, const string &the_ip )
 ccIpLnb* nb;
 int clonecidr;
 ipLnbListType ipLnbList;
-int widestCidr = 129;
 int smallestCidr = 0;
 int isv6 = 1;
 ipLnbVectorType tmpVector;
