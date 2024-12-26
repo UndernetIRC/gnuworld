@@ -86,7 +86,7 @@ if(tmpGline != NULL)
 	}
 bot->MsgChanLog("REMGLINE %s %s\n", st[1].c_str(), st.assemble(2).c_str());	
 server->removeGline(st[1], bot);
-bot->Notice( theClient, "Removal of gline succeeded\n" ) ;
+bot->Notice(theClient, "Removal of gline succeeded: %s\n", st[1].c_str());
 return true ;
 }
 
