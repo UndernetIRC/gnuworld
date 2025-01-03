@@ -8898,6 +8898,7 @@ for( const auto& [_, theServer] : Network->servers() )
 bool cservice::doXQIsCheck(iServer* theServer, const string& Routing, const string& Command, const string& Message)
 {
 // AB XQ Az AnyCServiceRouting :ISUSER <user#> <user#> <user#...N>
+// AB XQ Az AnyCServiceRouting :ISUSER +<username1> <username2> <username... N>
 // AB XQ Az AnyCServiceRouting :ISCHAN <#chan> <#chan2> <#chan..N>
 elog << "cservice::doXQIsCheck: Command: " << Command << " Routing: " << Routing << " Message: " << Message << "\n" ;
 StringTokenizer st( Message ) ;
@@ -8906,25 +8907,42 @@ if( st.size() < 2 )
 	return false ;
 
 StringTokenizer st2( st.assemble( 1 ) ) ;
-string firstArg = st2[ 0 ] ;
 
 if( Command == "ISUSER")
 	{
-	std::stringstream theQuery ;
-	if( firstArg[ 0 ] == '+')
+	std::stringstream theQuery;
+	theQuery << "SELECT id,user_name,flags FROM users WHERE " ;
+
+	/* Lookup usernames. */
+	if( st2[ 0 ][ 0 ] == '+')
 		{
-		theQuery << "SELECT id,user_name FROM users WHERE LOWER(user_name) IN (" ;
-		firstArg.erase( 0, 1 ) ;
+		theQuery << "LOWER(user_name) IN ("
+			 << "'" << string_lower( st2[ 0 ].substr( 1 ) ) << "'" ;
+
+		if( st2.size() > 1 )
+			theQuery << "," ;
+
+		for( size_t i = 1 ; i < st2.size() ; ++i )
+			{
+			theQuery << "'" << string_lower( st2[ i ] ) << "'" ;
+
+			if( i < st2.size() - 1 )
+				theQuery << "," ;
+			}
 		}
 	else
-		theQuery << "SELECT id,user_name FROM users WHERE id IN (" ;
-
-	for( size_t i = 0 ; i < st2.size() ; ++i )
 		{
-		theQuery << string_lower( st2[ i ] ) ;
-		if( i < st2.size() - 1 )
-			theQuery << "," ;
+		theQuery << "id IN (" ;
+
+		for( size_t i = 0 ; i < st2.size() ; ++i )
+			{
+			theQuery << st2[ i ] ;
+
+			if( i < st2.size() - 1 )
+				theQuery << "," ;
+			}
 		}
+
 	theQuery << ") " << std::endl ;
 
 #ifdef LOG_SQL
@@ -8941,21 +8959,47 @@ if( Command == "ISUSER")
 		return false ;
 	}
 
-	/* Store matching user IDs from the SQL results */
-	std::map< std::string, std::string > retUsers ;
+	/* Store matching users from the SQL results */
+	std::map< std::string, std::pair< std::string, unsigned short int > > retUsers ;
 	for( size_t i = 0 ; i < SQLDb->Tuples() ; i++ )
-		retUsers[ SQLDb->GetValue( i, 0 ) ] = SQLDb->GetValue( i, 1 ) ;
+		retUsers[ SQLDb->GetValue( i, 0 ) ] = std::make_pair( SQLDb->GetValue( i, 1 ),
+		static_cast< unsigned short int >( std::stoi( SQLDb->GetValue( i, 2 ) ) ) ) ;
 
 	std::string trueString ;
 	std::string falseString ;
 
 	for( const std::string& id : st2 )
 		{
-		auto it = retUsers.find( id ) ;
+		std::string user ;
+		if( id[ 0 ] == '+' )
+			user = id.substr( 1 ) ;
+		else
+			user = id ;
+
+		/* Declare iterator. */
+		auto it = retUsers.end() ;
+
+		if( st2[ 0 ][ 0 ] == '+' )
+			it = std::find_if( retUsers.begin(), retUsers.end(),
+					[ &user ]( const std::pair<std::string, std::pair<std::string, unsigned short int>>& pair )
+					{ return pair.second.first == user ; } ) ;
+		else
+			it = retUsers.find( user ) ;
+
 		if( it != retUsers.end())
 			{
+			/**
+			 * Add flags (t/f):
+			 * 1. TOTP_ENABLED
+			 */
+			string flagString ;
+			if( it->second.second & sqlUser::F_TOTP_ENABLED )
+				flagString += ":t" ;
+			else
+				flagString += ":f" ;
+
 			/* Flush buffer. */
-			if( trueString.length() + id.length() + 1 > 450 )
+			if( trueString.length() + it->first.length() + it->second.first.length() + flagString.length() + 2 > 450 )
 				{
 				const string theMessage = Command + " YES " + trueString ;
 				MyUplink->XReply( theServer, Routing, theMessage ) ;
@@ -8963,10 +9007,12 @@ if( Command == "ISUSER")
 				}
 
 			/* Add to buffer. */
-			trueString += it->first  + ":" + it->second + " " ;
+			trueString += it->first  + ":" + it->second.first + flagString + " " ;
 			}
 		else
 			{
+			/* We use 'id' here as we want to return the + (if any) */
+
 			/* Flush buffer. */
 			if( falseString.length() + id.length() + 1 > 450 )
 				{
