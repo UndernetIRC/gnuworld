@@ -8960,10 +8960,10 @@ if( Command == "ISUSER")
 	}
 
 	/* Store matching users from the SQL results */
-	std::map< std::string, std::pair< std::string, unsigned short int > > retUsers ;
+	std::map< std::string, std::pair< std::string, std::string > > retUsers ;
 	for( size_t i = 0 ; i < SQLDb->Tuples() ; i++ )
 		retUsers[ SQLDb->GetValue( i, 0 ) ] = std::make_pair( SQLDb->GetValue( i, 1 ),
-		static_cast< unsigned short int >( std::stoi( SQLDb->GetValue( i, 2 ) ) ) ) ;
+		std::to_string( makeAccountFlags( SQLDb->GetValue( i, 2 ) ) ) ) ;
 
 	std::string trueString ;
 	std::string falseString ;
@@ -8981,25 +8981,15 @@ if( Command == "ISUSER")
 
 		if( st2[ 0 ][ 0 ] == '+' )
 			it = std::find_if( retUsers.begin(), retUsers.end(),
-					[ &user ]( const std::pair<std::string, std::pair<std::string, unsigned short int>>& pair )
+					[ &user ]( const std::pair<std::string, std::pair<std::string, std::string>>& pair )
 					{ return pair.second.first == user ; } ) ;
 		else
 			it = retUsers.find( user ) ;
 
 		if( it != retUsers.end())
 			{
-			/**
-			 * Add flags (t/f):
-			 * 1. TOTP_ENABLED
-			 */
-			string flagString ;
-			if( it->second.second & sqlUser::F_TOTP_ENABLED )
-				flagString += ":t" ;
-			else
-				flagString += ":f" ;
-
 			/* Flush buffer. */
-			if( trueString.length() + it->first.length() + it->second.first.length() + flagString.length() + 2 > 450 )
+			if( trueString.length() + it->first.length() + it->second.first.length() + it->second.second.length() + 2 > 450 )
 				{
 				const string theMessage = Command + " YES " + trueString ;
 				MyUplink->XReply( theServer, Routing, theMessage ) ;
@@ -9007,7 +8997,7 @@ if( Command == "ISUSER")
 				}
 
 			/* Add to buffer. */
-			trueString += it->first  + ":" + it->second.first + flagString + " " ;
+			trueString += it->second.first  + ":" + it->first + ":" + it->second.second + " " ;
 			}
 		else
 			{
@@ -10241,6 +10231,36 @@ bool cservice::InsertUserHistory(iClient* theClient, const string& command)
 	}
 
 	return true;
+}
+
+/* Translates the sqlUser flags into account flags. */
+cservice::flagType cservice::makeAccountFlags( sqlUser* theUser ) const
+{
+cservice::flagType retMe = 0 ;
+
+for( const auto& [ sqlFlag, xFlag ] : flagMap )
+	if( theUser->getFlag( sqlFlag ) )
+		retMe |= xFlag ;
+
+return retMe ;
+}
+
+/* This method translates sqlUser flags into accountFlags taking the flags (as a string) as an argument. */
+cservice::flagType cservice::makeAccountFlags( string flagString ) const
+{
+return makeAccountFlags( static_cast< sqlUser::flagType >( std::stoul( flagString ) ) ) ;
+}
+
+/* This method translates sqlUser flags into accountFlags taking the flags as an argument. */
+cservice::flagType cservice::makeAccountFlags( sqlUser::flagType existingFlags ) const
+{
+cservice::flagType retMe = 0 ;
+
+for( const auto& [ sqlFlag, xFlag ] : flagMap )
+	if( existingFlags & sqlFlag )
+		retMe |= xFlag;
+
+return retMe ;
 }
 
 } // namespace gnuworld

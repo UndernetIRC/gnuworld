@@ -827,6 +827,36 @@ string welcomeNewChanTopic;
 
 bool InsertUserHistory(iClient*, const string&);
 
+/**
+ * Flags that will be returned in an ISUSER XQuery.
+ * makeAccountFlags will generate the flags based on
+ * the equivalent sqlUser flags set out in flagMap array.
+ */
+typedef unsigned short int flagType;
+static constexpr flagType   X_TOTP_ENABLED     = 0x001 ;
+static constexpr flagType   X_TOTP_REQ_IPR     = 0x002 ;
+static constexpr flagType   X_GLOBAL_SUSPENDED = 0x004 ;
+static constexpr flagType   X_FRAUD            = 0x008 ;
+
+/**
+ * Array of sqlUser flags and the corresponding accountFlags
+ * to be returned in an ISUSER XQUERY.
+ */
+static constexpr std::array< std::pair< sqlUser::flagType, flagType >, 4 > flagMap = { {
+	{ sqlUser::F_TOTP_ENABLED, X_TOTP_ENABLED },
+	{ sqlUser::F_TOTP_REQ_IPR, X_TOTP_REQ_IPR },
+	{ sqlUser::F_GLOBAL_SUSPEND, X_GLOBAL_SUSPENDED },
+	{ sqlUser::F_FRAUD, X_FRAUD }
+} } ;
+
+/**
+ * Translates sqlUser flags into accountFlags.
+ * Taking the sqlUser, or the flags as an argument.
+ */
+flagType makeAccountFlags( sqlUser* ) const ;
+flagType makeAccountFlags( sqlUser::flagType ) const ;
+flagType makeAccountFlags( std::string ) const ;
+
 } ;
 
 } // namespace gnuworld

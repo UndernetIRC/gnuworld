@@ -43,19 +43,6 @@ using std::endl ;
 using std::ends ;
 using std::stringstream ;
 
-const sqlUser::flagType sqlUser::F_GLOBAL_SUSPEND =	0x01 ;
-const sqlUser::flagType sqlUser::F_LOGGEDIN =		0x02 ;
-const sqlUser::flagType sqlUser::F_INVIS =		0x04 ;
-const sqlUser::flagType sqlUser::F_FRAUD =		0x08 ;
-const sqlUser::flagType sqlUser::F_NONOTES =		0x10 ;
-const sqlUser::flagType sqlUser::F_NOPURGE =		0x20 ;
-const sqlUser::flagType sqlUser::F_NOADMIN =		0x40 ;
-const sqlUser::flagType sqlUser::F_ALUMNI =		0x80 ;
-const sqlUser::flagType sqlUser::F_OPER =		0x100 ;
-const sqlUser::flagType sqlUser::F_NOADDUSER =		0x200 ;
-const sqlUser::flagType sqlUser::F_TOTP_ENABLED = 	0x400;
-const sqlUser::flagType sqlUser::F_TOTP_REQ_IPR =       0x800;
-
 const unsigned int sqlUser::EV_SUSPEND		= 1;
 const unsigned int sqlUser::EV_UNSUSPEND	= 2;
 const unsigned int sqlUser::EV_ADMINMOD		= 3;
