@@ -203,9 +203,19 @@ const std::string prettyTime( const std::time_t&, bool = true ) ;
 /* Returns the number of milliseconds having lapsed from the startTime,
  * provided as an argument.
  */
-template <typename Clock = std::chrono::high_resolution_clock, typename Duration = std::chrono::milliseconds>
+template < typename Clock = std::chrono::high_resolution_clock, typename Duration = std::chrono::milliseconds >
 long long elapsedMs( const typename Clock::time_point& startTime )
-{ return std::chrono::duration_cast<Duration>( Clock::now() - startTime ).count() ; }
+{ return std::chrono::duration_cast< Duration >( Clock::now() - startTime ).count() ; }
+
+/* Returns the current timepoint. */
+template < typename Clock = std::chrono::high_resolution_clock >
+typename Clock::time_point currentTimePoint()
+{ return Clock::now() ; }
+
+/* Converts a timepoint into a time_t epoch timestamp. */
+template < typename Clock = std::chrono::high_resolution_clock, typename Duration = std::chrono::seconds >
+time_t timePointToEpoch( const typename Clock::time_point& timePoint )
+{ return std::chrono::duration_cast< Duration >( timePoint.time_since_epoch() ).count() ; }
 
 int getCurrentGMTHour(); /* returns the current hour in GMT (00-23) */
 

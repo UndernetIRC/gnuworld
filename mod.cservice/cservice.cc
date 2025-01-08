@@ -8898,6 +8898,7 @@ for( const auto& [_, theServer] : Network->servers() )
 bool cservice::doXQIsCheck(iServer* theServer, const string& Routing, const string& Command, const string& Message)
 {
 // AB XQ Az AnyCServiceRouting :ISUSER <user#> <user#> <user#...N>
+// AB XQ Az AnyCServiceRouting :ISUSER +<username1> <username2> <username... N>
 // AB XQ Az AnyCServiceRouting :ISCHAN <#chan> <#chan2> <#chan..N>
 elog << "cservice::doXQIsCheck: Command: " << Command << " Routing: " << Routing << " Message: " << Message << "\n" ;
 StringTokenizer st( Message ) ;
@@ -8906,25 +8907,42 @@ if( st.size() < 2 )
 	return false ;
 
 StringTokenizer st2( st.assemble( 1 ) ) ;
-string firstArg = st2[ 0 ] ;
 
 if( Command == "ISUSER")
 	{
-	std::stringstream theQuery ;
-	if( firstArg[ 0 ] == '+')
+	std::stringstream theQuery;
+	theQuery << "SELECT id,user_name,flags FROM users WHERE " ;
+
+	/* Lookup usernames. */
+	if( st2[ 0 ][ 0 ] == '+')
 		{
-		theQuery << "SELECT id,user_name FROM users WHERE LOWER(user_name) IN (" ;
-		firstArg.erase( 0, 1 ) ;
+		theQuery << "LOWER(user_name) IN ("
+			 << "'" << string_lower( st2[ 0 ].substr( 1 ) ) << "'" ;
+
+		if( st2.size() > 1 )
+			theQuery << "," ;
+
+		for( size_t i = 1 ; i < st2.size() ; ++i )
+			{
+			theQuery << "'" << string_lower( st2[ i ] ) << "'" ;
+
+			if( i < st2.size() - 1 )
+				theQuery << "," ;
+			}
 		}
 	else
-		theQuery << "SELECT id,user_name FROM users WHERE id IN (" ;
-
-	for( size_t i = 0 ; i < st2.size() ; ++i )
 		{
-		theQuery << string_lower( st2[ i ] ) ;
-		if( i < st2.size() - 1 )
-			theQuery << "," ;
+		theQuery << "id IN (" ;
+
+		for( size_t i = 0 ; i < st2.size() ; ++i )
+			{
+			theQuery << st2[ i ] ;
+
+			if( i < st2.size() - 1 )
+				theQuery << "," ;
+			}
 		}
+
 	theQuery << ") " << std::endl ;
 
 #ifdef LOG_SQL
@@ -8941,21 +8959,37 @@ if( Command == "ISUSER")
 		return false ;
 	}
 
-	/* Store matching user IDs from the SQL results */
-	std::map< std::string, std::string > retUsers ;
+	/* Store matching users from the SQL results */
+	std::map< std::string, std::pair< std::string, std::string > > retUsers ;
 	for( size_t i = 0 ; i < SQLDb->Tuples() ; i++ )
-		retUsers[ SQLDb->GetValue( i, 0 ) ] = SQLDb->GetValue( i, 1 ) ;
+		retUsers[ SQLDb->GetValue( i, 0 ) ] = std::make_pair( SQLDb->GetValue( i, 1 ),
+		std::to_string( makeAccountFlags( SQLDb->GetValue( i, 2 ) ) ) ) ;
 
 	std::string trueString ;
 	std::string falseString ;
 
 	for( const std::string& id : st2 )
 		{
-		auto it = retUsers.find( id ) ;
+		std::string user ;
+		if( id[ 0 ] == '+' )
+			user = id.substr( 1 ) ;
+		else
+			user = id ;
+
+		/* Declare iterator. */
+		auto it = retUsers.end() ;
+
+		if( st2[ 0 ][ 0 ] == '+' )
+			it = std::find_if( retUsers.begin(), retUsers.end(),
+					[ &user ]( const std::pair<std::string, std::pair<std::string, std::string>>& pair )
+					{ return pair.second.first == user ; } ) ;
+		else
+			it = retUsers.find( user ) ;
+
 		if( it != retUsers.end())
 			{
 			/* Flush buffer. */
-			if( trueString.length() + id.length() + 1 > 450 )
+			if( trueString.length() + it->first.length() + it->second.first.length() + it->second.second.length() + 2 > 450 )
 				{
 				const string theMessage = Command + " YES " + trueString ;
 				MyUplink->XReply( theServer, Routing, theMessage ) ;
@@ -8963,10 +8997,12 @@ if( Command == "ISUSER")
 				}
 
 			/* Add to buffer. */
-			trueString += it->first  + ":" + it->second + " " ;
+			trueString += it->second.first  + ":" + it->first + ":" + it->second.second + " " ;
 			}
 		else
 			{
+			/* We use 'id' here as we want to return the + (if any) */
+
 			/* Flush buffer. */
 			if( falseString.length() + id.length() + 1 > 450 )
 				{
@@ -10195,6 +10231,36 @@ bool cservice::InsertUserHistory(iClient* theClient, const string& command)
 	}
 
 	return true;
+}
+
+/* Translates the sqlUser flags into account flags. */
+cservice::flagType cservice::makeAccountFlags( sqlUser* theUser ) const
+{
+cservice::flagType retMe = 0 ;
+
+for( const auto& [ sqlFlag, xFlag ] : flagMap )
+	if( theUser->getFlag( sqlFlag ) )
+		retMe |= xFlag ;
+
+return retMe ;
+}
+
+/* This method translates sqlUser flags into accountFlags taking the flags (as a string) as an argument. */
+cservice::flagType cservice::makeAccountFlags( string flagString ) const
+{
+return makeAccountFlags( static_cast< sqlUser::flagType >( std::stoul( flagString ) ) ) ;
+}
+
+/* This method translates sqlUser flags into accountFlags taking the flags as an argument. */
+cservice::flagType cservice::makeAccountFlags( sqlUser::flagType existingFlags ) const
+{
+cservice::flagType retMe = 0 ;
+
+for( const auto& [ sqlFlag, xFlag ] : flagMap )
+	if( existingFlags & sqlFlag )
+		retMe |= xFlag;
+
+return retMe ;
 }
 
 } // namespace gnuworld

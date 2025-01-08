@@ -42,18 +42,18 @@ public:
 	virtual ~sqlUser() ;
 
 	typedef unsigned short int	flagType ;
-	static const flagType F_GLOBAL_SUSPEND;
-	static const flagType F_LOGGEDIN; // Deprecated.
-	static const flagType F_INVIS;
-	static const flagType F_FRAUD;
-	static const flagType F_NONOTES;
-	static const flagType F_NOPURGE;
-	static const flagType F_NOADMIN;
-	static const flagType F_ALUMNI;
-	static const flagType F_OPER;
-	static const flagType F_NOADDUSER;
-	static const flagType F_TOTP_ENABLED;
-	static const flagType F_TOTP_REQ_IPR;
+	static constexpr flagType F_GLOBAL_SUSPEND  	= 0x01 ;
+	static constexpr flagType F_LOGGEDIN 		= 0x02 ; // Deprecated
+	static constexpr flagType F_INVIS 		= 0x04 ;
+	static constexpr flagType F_FRAUD 		= 0x08 ;
+	static constexpr flagType F_NONOTES 		= 0x10 ;
+	static constexpr flagType F_NOPURGE 		= 0x20 ;
+	static constexpr flagType F_NOADMIN 		= 0x40 ;
+	static constexpr flagType F_ALUMNI 		= 0x80 ;
+	static constexpr flagType F_OPER 		= 0x100 ;
+	static constexpr flagType F_NOADDUSER 		= 0x200 ;
+	static constexpr flagType F_TOTP_ENABLED 	= 0x400 ;
+	static constexpr flagType F_TOTP_REQ_IPR 	= 0x800 ;
 
 	/*
 	 *   User 'Event' Flags, used in the userlog table.
