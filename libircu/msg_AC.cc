@@ -64,15 +64,15 @@ if( !theClient )
 
 std::string account( Param[2] );
 unsigned int account_id = 0;
-unsigned short int account_flags = 0;
+iClient::flagType account_flags = 0;
 
 /* If we have an account, does it have an id? */
 if( ! account.empty() ) {
 	std::string::size_type pos = account.find(':');
 	if( ! ( pos == std::string::npos ) ) {
-		/* We have a timestamp */
+		/* We have an account id */
 		if ( pos == ( account.length() - 1 ) ) {
-			/* Bizarre - colon but no following TS */
+			/* Bizarre - colon but no following account id */
 			elog	<< "msg_N> Invalid account format: "
 				<< account
 				<< std::endl;
@@ -80,7 +80,7 @@ if( ! account.empty() ) {
 			std::string account_id_s = account;
 			account_id_s.erase(0, pos + 1);
 			account.erase(pos);
-			
+
 			account_id = atoi(account_id_s.c_str());
 		}
 	}

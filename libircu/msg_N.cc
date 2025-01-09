@@ -213,7 +213,7 @@ if( !account.empty() )
 				<< endl ;
 			// non-fatal error
 			}
-		} // if( 2 == st.size() )
+		} // if( 2 <= st.size() )
 	if( 3 == st.size() )
 		{
 		// flags present

@@ -95,7 +95,7 @@ public:
 	static constexpr modeType	MODE_SERVNOTICES 	= 0x0100 ;
 
 	/** MODE_FAKE is true if this user is a fake client. */
-	static constexpr modeType MODE_FAKE			= 0x0200 ;
+	static constexpr modeType 	MODE_FAKE		= 0x0200 ;
 
 	/**
 	 * Define a type to be used for storing the

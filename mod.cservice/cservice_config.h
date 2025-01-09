@@ -145,6 +145,6 @@
  * All servers on the network must run the appropriate version of ircu
  * in order not to get protocol violation messages.
  */
-#define USE_AC_XFLAGS
+#undef USE_AC_XFLAGS
 
 #endif // __CSERVICE_CONFIG_H
