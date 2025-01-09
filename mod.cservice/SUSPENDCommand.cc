@@ -115,6 +115,7 @@ if ((st[1][0] != '#') && (st[1][0] != '*'))
 
 	// Suspend them.
 	targetUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
+	bot->sendAccountFlags(targetUser);
 	targetUser->commit(theClient);
 	bot->Notice(theClient, "%s has been globally suspended and will have level 0 access in all"
 		" channels until unsuspended.",

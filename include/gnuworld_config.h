@@ -64,6 +64,12 @@
 #define MAX_KEY_LENGTH 23
 
 /**
+ * MAX_TOPIC_LENGTH
+ * The maximum number of characters in a topic
+ */
+#define MAX_TOPIC_LENGTH 145
+
+/**
  * TOPIC_TRACK
  * Set if you want gnuworld to track topics in the network channels
  */

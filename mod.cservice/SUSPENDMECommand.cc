@@ -75,6 +75,7 @@ if(theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 
 // Suspend them.
 theUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
+bot->sendAccountFlags(theUser);
 theUser->commit(theClient);
 bot->Notice(theClient, "You have been globally suspended and will have level 0 access in all"
 	" channels until you are unsuspended by a CService administrator.");

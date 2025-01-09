@@ -158,7 +158,8 @@ const char* modes = "+" ;
  */
 
 string account ;
-time_t account_ts = 0 ;
+unsigned int account_id = 0 ;
+unsigned short int account_flags = 0;
 string sethost ;
 string fakehost ;
 
@@ -200,19 +201,32 @@ if( !account.empty() )
 	{
 	StringTokenizer st( account, ':' ) ;
 	account = st[ 0 ] ;
-	if( 2 == st.size() )
+	if( 2 <= st.size() )
 		{
-		// timestamp present
+		// id present
 		std::stringstream ss ;
 		ss	<< st[ 1 ] ;
-		if( !(ss >> account_ts) )
+		if( !(ss >> account_id) )
 			{
-			elog	<< "msg_N> Invalid account timestamp: "
+			elog	<< "msg_N> Invalid account id: "
 				<< st[ 1 ]
 				<< endl ;
 			// non-fatal error
 			}
 		} // if( 2 == st.size() )
+	if( 3 == st.size() )
+		{
+		// flags present
+		std::stringstream ss ;
+		ss	<< st[ 2 ] ;
+		if( !(ss >> account_flags) )
+			{
+			elog	<< "msg_N> Invalid account flags: "
+				<< st[ 2 ]
+				<< endl ;
+			// non-fatal error
+			}
+		} // if( 3 == st.size() )
 	} // if( !account.empty() )
 
 /*
@@ -234,7 +248,8 @@ iClient* newClient = new (std::nothrow) iClient(
 		params[ 5 ],	// realInsecureHost
 		modes,		// modes (default: +)
 		account,	// account
-		account_ts,	// account timestamp
+		account_id,	// account id
+		account_flags,  // account flags
 		sethost,	// asuka sethost
 		fakehost,	// srvx fakehost
 		description,	// real name / infoline

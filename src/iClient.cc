@@ -42,17 +42,6 @@ namespace gnuworld
 using std::string ;
 using std::map ;
 
-const iClient::modeType iClient::MODE_OPER        = 0x0001 ;
-const iClient::modeType iClient::MODE_WALLOPS     = 0x0002 ;
-const iClient::modeType iClient::MODE_INVISIBLE   = 0x0004 ;
-const iClient::modeType iClient::MODE_DEAF        = 0x0008 ;
-const iClient::modeType iClient::MODE_SERVICES    = 0x0010 ;
-const iClient::modeType iClient::MODE_REGISTERED  = 0x0020 ;
-const iClient::modeType iClient::MODE_HIDDEN_HOST = 0x0040 ;
-const iClient::modeType iClient::MODE_G           = 0x0080 ;
-const iClient::modeType iClient::MODE_SERVNOTICES = 0x0100 ;
-const iClient::modeType iClient::MODE_FAKE        = 0x0200 ;
-
 string iClient::hiddenHostSuffix( "we.all.worship.mrbean.org" ) ;
 
 iClient::iClient( const unsigned int& /* _uplink */,
@@ -64,7 +53,8 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	const string& _realInsecureHost,
 	const string& _mode,
 	const string& _account,
-	const time_t _account_ts,
+	const unsigned int _account_id,
+	const flagType _account_flags,
 	const string& _description,
 	const time_t& _nick_ts )
 : NetworkTarget( _yyxxx ),
@@ -78,7 +68,8 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	first_nick_ts( _nick_ts ),
 	mode( 0 ),
 	account( _account ),
-	account_ts( _account_ts )
+	account_id( _account_id ),
+	account_flags( _account_flags )
 {
 setModes( _mode ) ;
 customDataMap = 0 ;
@@ -94,7 +85,8 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	const string& _realInsecureHost,
 	const string& _mode,
 	const string& _account,
-	const time_t _account_ts,
+	const unsigned int _account_id,
+	const flagType _account_flags,
 	const string& _setHost,
 	const string& _fakeHost,
 	const string& _description,
@@ -110,7 +102,8 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	first_nick_ts( _nick_ts ),
 	mode( 0 ),
 	account( _account ),
-	account_ts( _account_ts )
+	account_id( _account_id ),
+	account_flags( _account_flags )
 #ifdef ASUKA
 	,setHost( _setHost )
 #endif

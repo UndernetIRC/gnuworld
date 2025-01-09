@@ -3467,6 +3467,7 @@ void cservice::updateUsers()
 			{
 			/* Found something! Update it */
 			(ptr->second)->setAllMembers(i);
+			sendAccountFlags(ptr->second);
 			updates++;
 			}
 		}
@@ -5331,6 +5332,9 @@ switch( theEvent )
 				{
 					newData->currentUser = theUser;
 					theUser->addAuthedClient(tmpUser);
+
+					/* This function check whether the account flags are correct, if not send update. */
+					sendAccountFlags(theUser, tmpUser);
 				}
 			}
 			else
@@ -8865,7 +8869,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			elog << "cservice::doXQLogin: Auth res = AUTH_ML_EXCEEDED" << endl;
 			break;
 		case AUTH_SUCCEEDED:
-			doXResponse(theServer, Routing, theUser->getUserName() + ":" + itoa(theUser->getID()));
+			doXResponse(theServer, Routing, theUser->getUserName() + ":" + std::to_string(theUser->getID()) + ":" + std::to_string(makeAccountFlags(theUser)));
 			elog    << "cservice::doXQLogin: "
 					<< "Succesful auth for "
 					<< username
@@ -8986,7 +8990,7 @@ if( Command == "ISUSER")
 		else
 			it = retUsers.find( user ) ;
 
-		if( it != retUsers.end())
+		if( it != retUsers.end() )
 			{
 			/* Flush buffer. */
 			if( trueString.length() + it->first.length() + it->second.first.length() + it->second.second.length() + 2 > 450 )
@@ -9512,7 +9516,7 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 	 * Eg: AX AC APAFD gte
 	 */
 	if (!LoC)
-		this->MyUplink->UserLogin(theClient, theUser->getUserName(), static_cast<time_t>(theUser->getID()), this);
+		this->MyUplink->UserLogin(theClient, theUser->getUserName(), theUser->getID(), makeAccountFlags(theUser), this);
 
 	/*
 	 * If the user account has been suspended, make sure they don't get
@@ -10233,10 +10237,46 @@ bool cservice::InsertUserHistory(iClient* theClient, const string& command)
 	return true;
 }
 
-/* Translates the sqlUser flags into account flags. */
-cservice::flagType cservice::makeAccountFlags( sqlUser* theUser ) const
+/**
+ * This method translates the sqlUser flags of a sqlUser into account flags,
+ * and if there are changes, sends a new AC message for each iClient authed
+ * as the relevant sqlUser.
+ */
+void cservice::sendAccountFlags( sqlUser* theUser ) const
 {
-cservice::flagType retMe = 0 ;
+for( sqlUser::networkClientListType::iterator ptr = theUser->networkClientList.begin() ;
+	ptr != theUser->networkClientList.end() ; ++ptr )
+	sendAccountFlags( theUser, *ptr ) ;
+}
+
+/**
+ * This method translates the sqlUser flags of a sqlUser into account flags,
+ * and if there are changes, sends a new AC message for the iClient.
+ */
+void cservice::sendAccountFlags( sqlUser* theUser, iClient* theClient ) const
+{
+const iClient::flagType newFlags = makeAccountFlags( theUser ) ;
+
+if( theClient->getAccountFlags() == newFlags )
+	return ;
+
+#ifdef USE_AC_XFLAGS
+MyUplink->Write( "%s AC %s %s %u %u",
+	getCharYY().c_str(), theClient->getCharYYXXX().c_str(), theClient->getAccount().c_str(),
+	theClient->getAccountID(), newFlags ) ;
+#endif
+
+theClient->setAccountFlags( newFlags ) ;
+
+MyUplink->PostEvent( EVT_ACCOUNT_FLAGS,
+	static_cast< void* >( theClient ), 0, 0, 0,
+	this ) ;
+}
+
+/* Translates the sqlUser flags into account flags. */
+iClient::flagType cservice::makeAccountFlags( sqlUser* theUser ) const
+{
+iClient::flagType retMe = 0 ;
 
 for( const auto& [ sqlFlag, xFlag ] : flagMap )
 	if( theUser->getFlag( sqlFlag ) )
@@ -10246,15 +10286,15 @@ return retMe ;
 }
 
 /* This method translates sqlUser flags into accountFlags taking the flags (as a string) as an argument. */
-cservice::flagType cservice::makeAccountFlags( string flagString ) const
+iClient::flagType cservice::makeAccountFlags( string flagString ) const
 {
 return makeAccountFlags( static_cast< sqlUser::flagType >( std::stoul( flagString ) ) ) ;
 }
 
 /* This method translates sqlUser flags into accountFlags taking the flags as an argument. */
-cservice::flagType cservice::makeAccountFlags( sqlUser::flagType existingFlags ) const
+iClient::flagType cservice::makeAccountFlags( sqlUser::flagType existingFlags ) const
 {
-cservice::flagType retMe = 0 ;
+iClient::flagType retMe = 0 ;
 
 for( const auto& [ sqlFlag, xFlag ] : flagMap )
 	if( existingFlags & sqlFlag )

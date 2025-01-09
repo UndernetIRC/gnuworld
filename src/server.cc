@@ -950,6 +950,7 @@ iClient* theIClient = new (std::nothrow) iClient(
 	Client->getModes(),
 	string(),
 	0,
+	0,
 	string(),
 	string(),
 	Client->getDescription(),
@@ -1112,7 +1113,7 @@ if( !fakeClient->getDescription().empty() )
 
 string accountString { } ;
 if( fakeClient->getMode( iClient::MODE_REGISTERED ) )
-	accountString += " " + fakeClient->getAccount() + ":" + itoa( fakeClient->getAccountID() ) ;
+	accountString += " " + fakeClient->getAccount() + ":" + std::to_string( fakeClient->getAccountID() ) + ":" + std::to_string( fakeClient->getAccountFlags() ) ;
 
 Write( "%s N %s %d %d %s %s %s%s %s %s :%s\n",
 	fakeServer->getCharYY().c_str(),
@@ -2851,7 +2852,7 @@ return true ;
 }
 
 void xServer::UserLogin( iClient* destClient, const string& account,
-	const time_t account_id, xClient* sourceClient )
+	const unsigned int account_id, const iClient::flagType flags, xClient* sourceClient )
 {
 assert( destClient != 0 ) ;
 
@@ -2864,7 +2865,8 @@ if( account.empty() )
 	}
 
 destClient->setAccount( account ) ;
-destClient->setAccountID(account_id);
+destClient->setAccountID( account_id ) ;
+destClient->setAccountFlags( flags ) ;
 
 stringstream	outStream ;
 outStream	<< getCharYY()
@@ -2873,7 +2875,9 @@ outStream	<< getCharYY()
 		<< " "
 		<< account
 		<< " "
-		<< account_id;
+		<< account_id
+		<< " "
+		<< flags ;
 Write( outStream ) ;
 
 PostEvent( EVT_ACCOUNT,
