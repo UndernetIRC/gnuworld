@@ -8982,7 +8982,7 @@ if( Command == "ISUSER")
 		if( st2[ 0 ][ 0 ] == '+' )
 			it = std::find_if( retUsers.begin(), retUsers.end(),
 					[ &user ]( const std::pair<std::string, std::pair<std::string, std::string>>& pair )
-					{ return pair.second.first == user ; } ) ;
+					{ return string_lower( pair.second.first ) == string_lower( user ) ; } ) ;
 		else
 			it = retUsers.find( user ) ;
 
