@@ -100,6 +100,7 @@ if ((st[1][0] != '#') && (st[1][0] != '*'))
 	// Unsuspend them.
 	targetUser->removeFlag(sqlUser::F_GLOBAL_SUSPEND);
 	targetUser->commit(theClient);
+	bot->sendAccountFlags(targetUser);
 	bot->Notice(theClient, "%s has been unsuspended.",
 		targetUser->getUserName().c_str());
 

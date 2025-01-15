@@ -38,14 +38,14 @@ CREATE_HANDLER(msg_AC)
 
 /**
  * ACCOUNT message handler.
- * SOURCE AC TARGET ACCOUNT CREATION_TS
+ * SOURCE AC TARGET ACCOUNT ACCOUNT_ID ACCOUNT_FLAGS
  * Eg:
- * AXAAA AC BQrTd Hidden 1694970265
- * Note: CREATION_TS is optional
+ * AXAAA AC BQrTd Hidden 1694970265 1024
+ * Note: ACCOUNT_ID and ACCOUNT_FLAGS are optional
  */
 bool msg_AC::Execute( const xParameters& Param )
 {
-if (( Param.size() != 3 ) && ( Param.size() != 4 ))
+if( Param.size() < 3 )
 	{
 	elog	<< "msg_AC> Invalid number of parameters"
 		<< std::endl ;
@@ -63,41 +63,53 @@ if( !theClient )
 	}
 
 std::string account( Param[2] );
-time_t account_ts = 0;
+unsigned int account_id = 0;
+iClient::flagType account_flags = 0;
 
-/* If we have an account, does it have a timestamp? */
+/* If we have an account, does it have an id? */
 if( ! account.empty() ) {
 	std::string::size_type pos = account.find(':');
 	if( ! ( pos == std::string::npos ) ) {
-		/* We have a timestamp */
+		/* We have an account id */
 		if ( pos == ( account.length() - 1 ) ) {
-			/* Bizarre - colon but no following TS */
+			/* Bizarre - colon but no following account id */
 			elog	<< "msg_N> Invalid account format: "
 				<< account
 				<< std::endl;
 		} else {
-			std::string account_ts_s = account;
-			account_ts_s.erase(0, pos + 1);
+			std::string account_id_s = account;
+			account_id_s.erase(0, pos + 1);
 			account.erase(pos);
-			
-			account_ts = atoi(account_ts_s.c_str());
+
+			account_id = atoi(account_id_s.c_str());
 		}
 	}
-	if (Param.size() == 4) {
-		std::string account_ts_s = Param[3];
-		if (!account_ts_s.empty()) {
-			account_ts = atoi(account_ts_s);
+	if (Param.size() > 3) {
+		std::string account_id_s = Param[3];
+		if (!account_id_s.empty()) {
+			account_id = atoi(account_id_s);
+		}
+	}
+	if (Param.size() > 4) {
+		std::string account_flags_s = Param[4];
+		if (!account_flags_s.empty()) {
+			account_flags = atoi(account_flags_s);
 		}
 	}
 }
 
+// Is this a change of flags or a new login?
+bool alreadyAuthed = false ;
+if( theClient->isModeR() )
+	alreadyAuthed = true ;
 
 // Update user information
 theClient->setAccount( account ) ;
-theClient->setAccountID( account_ts );
+theClient->setAccountID( account_id ) ;
+theClient->setAccountFlags( account_flags ) ;
 
 // Post event to listening clients
-theServer->PostEvent( EVT_ACCOUNT, static_cast< void* >( theClient ) ) ;
+theServer->PostEvent( alreadyAuthed ? EVT_ACCOUNT_FLAGS : EVT_ACCOUNT, static_cast< void* >( theClient ) ) ;
 
 // Return success
 return true;

@@ -1,5 +1,5 @@
 /**
- * INVITECommand.cc
+ * TOPICCommand.cc
  * Cause the bot to invite you to a channel
  *
  * This program is free software; you can redistribute it and/or
@@ -56,7 +56,6 @@ if(st[1].size() > channel::MaxName)
 		channel::MaxName);
 	return false;
 	}
-ccUser* tmpUser = bot->IsAuth(theClient);
 bot->MsgChanLog("TOPIC %s\n",st.assemble(1).c_str());
 
 //If the channel doesnt begin with # add it
@@ -72,9 +71,9 @@ if (st.size() == 2)
 else
 	topic = "(" + theClient->getNickName() + ") " + st.assemble(2);
 
-if ( topic.size() > 145 )
+if ( topic.size() > MAX_TOPIC_LENGTH )
 	{
-	bot->Notice(theClient, "Topic cannot exceed 145 chars");
+	bot->Notice(theClient, "Topic cannot exceed %d characters", MAX_TOPIC_LENGTH);
 	return true;
 	}
 
@@ -90,7 +89,7 @@ if (theChan == NULL)
 stringstream s;
 s	<< bot->getCharYY()
 	<< " T "
-	<< st[1]
+	<< theChan->getName()
 	<< " :"
 	<< topic
 	<< ends;

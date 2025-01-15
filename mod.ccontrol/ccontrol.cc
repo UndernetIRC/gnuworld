@@ -6205,6 +6205,7 @@ void ccontrol::announce(iClient* theClient, const string& text)
 		"+ok",
 		string(),
 		0,
+		0,
 		"Announcement Service.",
 		::time( 0 ) ) ;
 	assert( newClient != 0 );
@@ -7380,6 +7381,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		st[4],
 		"+",
 		string(),
+		0,
 		0,
 		fullname,
 		::time( 0 ) ) ;

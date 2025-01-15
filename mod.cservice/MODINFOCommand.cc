@@ -98,6 +98,7 @@ if (command == "TOTP") {
 	if(string_upper(st[3]) == "OFF") {
 		if(modUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
 			modUser->removeFlag(sqlUser::F_TOTP_ENABLED);
+			bot->sendAccountFlags(modUser);
 			if(!modUser->commit(theClient)) {
 				bot->Notice(theClient,"Failed to disable totp for %s",st[1].c_str());
 				return false;

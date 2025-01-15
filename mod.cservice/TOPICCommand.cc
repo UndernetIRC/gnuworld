@@ -107,9 +107,7 @@ if(!tmpChan)
 
 string topic = st.assemble(2);
 
-// Default ircu TOPICLEN - maxusername?
-// TODO: Put into config somewhere
-if( topic.size() > 145 )
+if( topic.size() > MAX_TOPIC_LENGTH )
 	{
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
@@ -121,7 +119,7 @@ if( topic.size() > 145 )
 stringstream s;
 s	<< bot->getCharYYXXX()
 	<< " T "
-	<< st[1]
+	<< theChan->getName()
 	<< " :("
 	<< theUser->getUserName()
 	<< ") "

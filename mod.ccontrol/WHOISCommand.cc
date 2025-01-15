@@ -98,10 +98,22 @@ bot->Notice(theClient, "%s has been connected for %s [since %ld]",
 
 if (Target->isModeR())
 {
+	string accountFlags;
+	if(Target->getAccountFlag(iClient::X_GLOBAL_SUSPEND))
+		accountFlags += "SUSPENDED ";
+	if(Target->getAccountFlag(iClient::X_TOTP_ENABLED))
+		accountFlags += "TOTP ";
+	if(Target->getAccountFlag(iClient::X_TOTP_REQ_IPR))
+		accountFlags += "TOTP_REQ_IPR ";
+	if(Target->getAccountFlag(iClient::X_FRAUD))
+		accountFlags += "FRAUD ";
+
 	/* client is authed - show it here */
 	bot->Notice(theClient, "%s is authed as [%s]",
 		st[1].c_str(),
 		Target->getAccount().c_str());
+	if( !accountFlags.empty())
+		bot->Notice(theClient, "   Flags: %s", accountFlags.c_str());
 }
 
 bot->Notice( theClient, "Numeric: %s, UserModes: %s, Server Numeric: %s (%s)",

@@ -140,5 +140,11 @@
  */
 #undef GLINE_ON_FLOODPRO
 
+/*
+ * Enable this to send new AC messages upon changes of sqlUser flags.
+ * All servers on the network must run the appropriate version of ircu
+ * in order not to get protocol violation messages.
+ */
+#undef USE_AC_XFLAGS
 
 #endif // __CSERVICE_CONFIG_H

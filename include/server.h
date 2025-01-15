@@ -623,13 +623,13 @@ public:
 	 * that an iClient has logged into that particular service.
 	 * The iClient's internal state will be updated to reflect this
 	 * login, and the message will be sent to the network.
-	 * The third argument (the source xClient) is the xClient issuing
+	 * The fifth argument (the source xClient) is the xClient issuing
 	 * the login event.  If this argument is NULL, then all xClients
 	 * will receive the EVT_ACCOUNT event.  If the argument is non-NULL,
 	 * then all but the sourceClient will receive the event.
 	 */
 	virtual void	UserLogin( iClient*, const std::string&,
-				const time_t, xClient* = 0 ) ;
+				const unsigned int, const unsigned short int, xClient* = 0 ) ;
 
 	/**
 	 * Post a system event to the rest of the system.  Note

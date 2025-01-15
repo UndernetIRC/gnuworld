@@ -67,35 +67,45 @@ public:
 	typedef unsigned int modeType ;
 
 	/// MODE_OPER is true if the iClient is an IRC operator.
-	static const modeType	MODE_OPER ;
+	static constexpr modeType	MODE_OPER		= 0x0001 ;
 
 	/// MODE_WALLOPS is true if the iClient is receiving wallops.
-	static const modeType	MODE_WALLOPS ;
+	static constexpr modeType	MODE_WALLOPS 		= 0x0002 ;
 
 	/// MODE_INVISIBLE is true if the iClient is user mode invisible.
-	static const modeType	MODE_INVISIBLE ;
+	static constexpr modeType	MODE_INVISIBLE 		= 0x0004 ;
 
 	/// MODE_DEAF is true if the iClient is not receiving messages.
-	static const modeType	MODE_DEAF ;
+	static constexpr modeType	MODE_DEAF 		= 0x0008 ;
 
 	/// MODE_SERVICES is true if the iClient is a service agent.
-	static const modeType	MODE_SERVICES ;
+	static constexpr modeType	MODE_SERVICES 		= 0x0010 ;
 
 	/// MODE_REGISTERED is true if the iClient has an account set.
-	static const modeType	MODE_REGISTERED ;
+	static constexpr modeType	MODE_REGISTERED 	= 0x0020 ;
 
 	/// MODE_HIDDEN_HOST is true if the iClient has HIDDEN_HOST (+x) set.
-	static const modeType	MODE_HIDDEN_HOST ;
+	static constexpr modeType	MODE_HIDDEN_HOST 	= 0x0040 ;
 
 	/// MODE_G is true if the iCilent has user mode g set.
-	static const modeType	MODE_G ;
+	static constexpr modeType	MODE_G 			= 0x0080 ;
 
 	/// MODE_SERVNOTICES is true if this user is receiving server
 	/// notices.  This may not be transmitted on all networks.
-	static const modeType	MODE_SERVNOTICES ;
-	
+	static constexpr modeType	MODE_SERVNOTICES 	= 0x0100 ;
+
 	/** MODE_FAKE is true if this user is a fake client. */
-	static const modeType MODE_FAKE;
+	static constexpr modeType 	MODE_FAKE		= 0x0200 ;
+
+	/**
+	 * Define a type to be used for storing the
+	 * iClient's account's flags.
+	 */
+	typedef unsigned short int flagType ;
+	static constexpr flagType X_TOTP_ENABLED   		= 0x001 ;
+	static constexpr flagType X_TOTP_REQ_IPR   		= 0x002 ;
+	static constexpr flagType X_GLOBAL_SUSPEND 		= 0x004 ;
+	static constexpr flagType X_FRAUD          		= 0x008 ;
 
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;
@@ -119,7 +129,8 @@ public:
 		const std::string& _realInsecureHost,
 		const std::string& _mode,
 		const std::string& _account,
-		const time_t _account_ts,
+		const unsigned int _account_id,
+		const flagType _account_flags,
 		const std::string& _description,
 		const time_t& _nick_ts ) ;
 
@@ -138,7 +149,8 @@ public:
 		const std::string& _realInsecureHost,
 		const std::string& _mode,
 		const std::string& _account,
-		const time_t _account_ts,
+		const unsigned int _account_id,
+		const flagType _account_flags,
 		const std::string& _setHost,
 		const std::string& _fakeHost,
 		const std::string& _description,
@@ -227,13 +239,27 @@ public:
 		{ return account ; }
 
 	/**
-	 * Retrieve client's account timestamp.
+	 * Retrieve client's account id.
 	 *
-	 * @return the timestamp of the account if set, else 0.
-	 * Note: the value in ircu is a timestamp, but gnuworld uses it as the account ID
+	 * @return the id of the account if set, else 0.
 	 */
-	inline const time_t& getAccountID() const
-		{ return account_ts; }
+	inline const unsigned int& getAccountID() const
+		{ return account_id; }
+
+	/**
+	 * Retrieve client's account flags.
+	 *
+	 * @return the flags of the account if set, else 0.
+	 */
+	inline const flagType& getAccountFlags() const
+		{ return account_flags; }
+
+	/**
+	 * Return true if this client's account has the given flag set,
+	 * false otherwise.
+	 */
+	inline bool getAccountFlag( const flagType& theFlag ) const
+		{ return (theFlag == (account_flags & theFlag)) ; }
 
 	/**
 	 * Return the suffix hostname to be appended to the
@@ -258,12 +284,29 @@ public:
 	/**
 	 * Set the account ID for this iClient.
 	 * Only valid if the iClient isModeR()
-	 * Note: the value in ircu is a timestamp, but gnuworld uses it as the account ID
 	 */
-	inline void setAccountID( const time_t _account_ts )
+	inline void setAccountID( const unsigned int& _account_id )
 		{
 		if( ! isModeR() ) { return ; }
-		account_ts = _account_ts;
+		account_id = _account_id ;
+		}
+
+	/**
+	 * Set the account flags for this iClient.
+	 */
+	inline void setAccountFlags( const flagType& newFlags )
+		{
+		if( ! isModeR() ) { return ; }
+		account_flags = newFlags ;
+		}
+
+	/**
+	 * Set an account flag for this iClient.
+	 */
+	inline void setAccountFlag( const flagType& newFlag )
+		{
+		if( ! isModeR() ) { return ; }
+		account_flags |= newFlag ;
 		}
 
 #ifdef ASUKA
@@ -719,8 +762,11 @@ protected:
 	/** This client's "Account". */
 	std::string	account ;
 	
-	/** The timestamp of this client's account. */
-	time_t		account_ts ;
+	/** The id of this client's account. */
+	unsigned int account_id ;
+
+	/** The flags of this client's account. */
+	unsigned short int account_flags;
 
 #ifdef ASUKA
 	/**

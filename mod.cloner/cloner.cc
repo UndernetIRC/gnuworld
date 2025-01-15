@@ -895,7 +895,7 @@ void cloner::addClone()
 string yyxxx( fakeServer->getCharYY() + "]]]" ) ;
 string account ;
 string ident ;
-time_t account_ts { 0 };
+unsigned int account_id { 0 };
 
 string thisMode = cloneMode ;
 if( cloneModeK )
@@ -909,7 +909,7 @@ if( cloneModeR )
   thisMode +='r' ;
   StringTokenizer st( randomAccount(), ':' ) ;
   account = st[ 0 ] ;
-  account_ts = atoi( st[ 1 ] ) ;
+  account_id = atoi( st[ 1 ] ) ;
   }
 if( cloneIdent )
   ident += "~" ;
@@ -924,7 +924,8 @@ iClient* newClient = new iClient(
     randomHost(),
     thisMode,
     account,
-    account_ts,
+    account_id,
+    0,
     cloneDescription,
     ::time( nullptr ) ) ;
 assert( newClient != nullptr ) ;
