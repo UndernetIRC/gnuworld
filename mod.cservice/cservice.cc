@@ -446,6 +446,11 @@ void cservice::BurstChannels()
 			tempModes = "+";
 		if (tempModes.find('R') == string::npos)
 			tempModes += 'R';
+
+		/* If FLOATLIM is activated, we don't set +l. The correct limit will be set shortly after burst. */
+		if (theChan->getFlag(sqlChannel::F_FLOATLIM))
+			stripModes(tempModes, "l");
+
 		MyUplink->JoinChannel( this,
 			theChan->getName(),
 			tempModes,

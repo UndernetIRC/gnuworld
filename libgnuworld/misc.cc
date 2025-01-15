@@ -32,6 +32,7 @@
 #include	<iomanip>
 #include	<sstream>
 #include	<locale>
+#include	<unordered_map>
 
 #include	"misc.h"
 #include	"StringTokenizer.h"
@@ -625,6 +626,58 @@ for( string::const_iterator ptr = theString.begin() ;
 		}
 	}
 return retMe ;
+}
+
+/**
+ * Takes as the first arugment a reference to a string containing modes (and args if any),
+ * and as the second argument the modes (without args) to be stripped from the modestring.
+ *
+ * Example: stripModes("+ntkl key 12", "l") will amend the string to "+ntk key".
+ */
+void stripModes( std::string& tempModes, const std::string& modesToStrip )
+{
+std::istringstream iss( tempModes ) ;
+std::string modes ;
+iss >> modes ;
+
+std::vector< std::string > args ;
+std::string arg ;
+while( iss >> arg )
+	args.push_back( arg ) ;
+
+// Helper set to identify modes with arguments
+const std::string modesWithArgs = "lkAU";
+
+// Create a map to match each mode with its argument
+std::unordered_map< char, std::string > modeArgMap ;
+size_t argIndex = 0 ;
+
+for( char mode : modes )
+	{
+	if( modesWithArgs.find( mode ) != std::string::npos && argIndex < args.size() )
+		modeArgMap[mode] = args[argIndex++] ;
+	}
+
+// Remove specified modes and their arguments
+std::string newModes ;
+std::vector< std::string > newArgs ;
+
+for( char mode : modes )
+	{
+	if( modesToStrip.find( mode ) == std::string::npos )
+		{
+		newModes += mode ;
+		if( modesWithArgs.find( mode ) != std::string::npos && modeArgMap.find( mode ) != modeArgMap.end() )
+			newArgs.push_back( modeArgMap[mode] ) ;
+		}
+	}
+
+std::ostringstream oss ;
+oss << newModes ;
+for( const auto& a : newArgs )
+	oss << " " << a ;
+
+tempModes = oss.str() ;
 }
 
 } // namespace gnuworld
