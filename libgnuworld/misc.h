@@ -234,6 +234,14 @@ const std::string escapeSQLChars( const std::string& ) ;
  */
 const std::string searchSQL( const std::string& ) ;
 
+/**
+ * Takes as the first arugment a reference to a string containing modes (and args if any),
+ * and as the second argument the modes (without args) to be stripped from the modestring.
+ *
+ * Example: stripModes("+ntkl key 12", "l") will amend the string to "+ntk key".
+ */
+void stripModes( std::string& , const std::string& ) ;
+
 } // namespace gnuworld
 
 #endif /* __MISC__ */

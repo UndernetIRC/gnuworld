@@ -1799,7 +1799,12 @@ else
 			return false;
 		}
 
-	    theChan->setChannelMode(tmpChan->getModeString());
+		/* If FLOATLIM is activated, we don't store the +l. */
+		string tempModes = tmpChan->getModeString();
+		if (theChan->getFlag(sqlChannel::F_FLOATLIM))
+			stripModes(tempModes, "l");
+
+	    theChan->setChannelMode(tempModes);
 	    theChan->commit();
 
 	    bot->Notice(theClient,
