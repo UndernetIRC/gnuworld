@@ -20,6 +20,7 @@
  * $Id: misc.cc,v 1.6 2007/12/27 20:45:15 kewlio Exp $
  */
 
+#include	<sys/resource.h>
 #include	<string>
 #include	<algorithm>
 
@@ -678,6 +679,14 @@ for( const auto& a : newArgs )
 	oss << " " << a ;
 
 tempModes = oss.str() ;
+}
+
+/* Returns the memory usage of gnuworld in KB. */
+size_t getMemoryUsage()
+{
+struct rusage usage ;
+getrusage( RUSAGE_SELF, &usage ) ;
+return usage.ru_maxrss ;
 }
 
 } // namespace gnuworld
