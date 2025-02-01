@@ -67,6 +67,7 @@ protected:
 CREATE_LOADER(msg_M)
 
 // Mode change
+// AeAAA M #zt +l 47 963549578
 // OAD M ripper_ :+owg
 //
 // i M #3dx +o eAA
@@ -384,6 +385,21 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 
 		} // switch()
 	} // for()
+
+if (argPos < Param.size())
+	{
+	// Last argument is creation time
+	// Update creation timestamp if older
+	time_t newCreationTime =
+		static_cast< time_t >( ::atoi( Param[ argPos++ ] ) ) ;
+
+	// Is the old TS greater than the new TS?
+	if( theChan->getCreationTime() > newCreationTime )
+		{
+		// Nope, update the timestamp
+		theChan->setCreationTime( newCreationTime ) ;
+		}
+	}
 
 if( !modeVector.empty() )
 	{
