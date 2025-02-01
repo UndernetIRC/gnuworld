@@ -127,10 +127,7 @@ for( std::string::size_type i = 0 ; i < Modes.size() ; i++ )
 //				<< "msg_CM> Doing CLEAR_REGISTER"
 //				<< endl;
 			break ;
-		case 'R':
-			modeVector.push_back( make_pair(
-				false, Channel::MODE_REG ) ) ;
-			break ;
+		// Do not remove mode R (Channel::MODE_REG)
 		case 'D':
 			modeVector.push_back( make_pair(
 				false, Channel::MODE_D ) ) ;

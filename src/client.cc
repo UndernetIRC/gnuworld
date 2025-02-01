@@ -2643,11 +2643,7 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			modeVector.push_back( make_pair( false,
 				Channel::MODE_R ) ) ;
 			break;
-		case 'R':  // Registered Channel
-			theChan->removeMode(Channel::MODE_REG);
-			modeVector.push_back( make_pair( false,
-				Channel::MODE_R ) ) ;
-			break;
+		// Do not remove 'R' mode (Channel::MODE_REG)
 		case 'D':  // new .12 mode for busy channels
 			theChan->removeMode(Channel::MODE_D);
 			modeVector.push_back( make_pair( false,
