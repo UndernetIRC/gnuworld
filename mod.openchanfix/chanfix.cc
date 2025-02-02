@@ -1054,11 +1054,14 @@ switch(whichEvent)
 		authMapType::iterator ptr = authMap.find(theClient->getAccount());
 		
 		if (ptr != authMap.end()) {
-		  ptr->second.erase(std::find(ptr->second.begin(), ptr->second.end(), theClient));
-			
-		  /* If the list is empty, remove the map entry */
-		  if (ptr->second.empty())
-		    authMap.erase(theClient->getAccount());
+			authMapType::mapped_type::iterator listPtr = ::find(ptr->second.begin(), ptr->second.end(), theClient);
+			assert(listPtr != ptr->second.end());
+			if (listPtr != ptr->second.end()) {
+				ptr->second.erase(listPtr);
+				/* If the list is empty, remove the map entry */
+				if (ptr->second.empty())
+				authMap.erase(theClient->getAccount());
+			}
 		}
 		//Cleanup
 		theClient->removeCustomData(this);
