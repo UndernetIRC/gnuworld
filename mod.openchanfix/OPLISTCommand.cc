@@ -41,7 +41,7 @@ void OPLISTCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::stri
 StringTokenizer st(Message);
 
 bool all = false;
-bool days = false;
+bool days = true;
 
 unsigned int pos = 2;
 while (pos < st.size()) {
@@ -56,6 +56,9 @@ while (pos < st.size()) {
 
   if (!strcasecmp(st[pos],"-days"))
     days = true;
+
+  if (!strcasecmp(st[pos],"-nodays"))
+    days = false;
 
   pos++;
 }
