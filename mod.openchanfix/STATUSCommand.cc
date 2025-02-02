@@ -97,11 +97,9 @@ bot->SendTo(theClient,
 bot->SendTo(theClient,
 	std::string("Number of channels being manually fixed: %i").c_str(),bot->countManFixes());
 
-int who = RUSAGE_SELF;
-struct rusage usage;
-getrusage(who, &usage);
 bot->SendTo(theClient,
-	std::string("Memory Usage (kB): %ld").c_str(), usage.ru_maxrss);
+	std::string("Memory Usage (kB): %s").c_str(),
+    prettyNumber(getMemoryUsage()).c_str());
 
 
 bot->logAdminMessage("%s (%s) STATUS",

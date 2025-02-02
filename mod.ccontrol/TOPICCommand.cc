@@ -1,6 +1,6 @@
 /**
  * TOPICCommand.cc
- * Cause the bot to invite you to a channel
+ * Sets or clears the topic in a channel
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
