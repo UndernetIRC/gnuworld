@@ -6551,10 +6551,12 @@ else {
 	username = "(null)";
 }
 
+irc_in_addr theIP;
+ipmask_parse(the_ip.c_str(), &theIP, NULL);
+if (irc_in_addr_is_ipv4(&theIP))
+	isv6 = 0;
 
 Notice(theClient, "--- Listing limits infos for %s ---", ip.c_str());
-if (irc_in_addr_is_ipv4(&theClient->getIP()))
-	isv6 = 0;
 
 for (ipLnbIterator nptr = ipLnbVector.begin(); nptr != ipLnbVector.end(); nptr++) {
 	nb = nptr->second;
@@ -6591,7 +6593,7 @@ for (ipLnbIterator nptr = tmpVector.begin(); nptr != tmpVector.end(); nptr++) {
 	clonecidr = nb->getCloneCidr();
 
 	int tclonecidr = clonecidr;
-	if (nb->getCidr().find(':') == string::npos)
+	if (!isv6)
 		tclonecidr += 96;
 	string m;
 	if (nb->ipLisp->isGroup())
@@ -6606,18 +6608,14 @@ for (ipLnbIterator nptr = tmpVector.begin(); nptr != tmpVector.end(); nptr++) {
 		identCount = itr->second;
 		identLimit = nb->getIdentLimit();
 	}
-	else {
-		elog << "ccontrol::ipLuserInfo> bug: Did we really get here? Line #" << __LINE__ << endl;
-	}
 	itr = nb->ipLclonesMap.find(m);
+	int connCount = 0;
 	if (itr != nb->ipLclonesMap.end()) {
-		Notice(theClient, "%s: %d/%d connections for %s (ref: %s) - %d/%d connections for %s",
-			nb->ipLisp->getName().c_str(), itr->second, nb->getLimit(), m.c_str(),
-			nb->getCidr().c_str(), identCount, identLimit, userip.c_str());
+		connCount = itr->second;
 	}
-	else {
-		elog << "ccontrol::ipLuserInfo> bug: Did we really get here? Line #" << __LINE__ << endl;
-	}
+	Notice(theClient, "%s: %d/%d connections for %s (ref: %s) - %d/%d connections for %s",
+		nb->ipLisp->getName().c_str(), connCount, nb->getLimit(), m.c_str(),
+		nb->getCidr().c_str(), identCount, identLimit, userip.c_str());
 }
 
 for (ipLnbListType::iterator nptr = ipLnbList.begin(); nptr != ipLnbList.end(); nptr++) {
