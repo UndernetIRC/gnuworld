@@ -223,7 +223,7 @@ RegisterCommand(new LISTHOSTSCommand(this, "LISTHOSTS",
 	sqlcfUser::F_LOGGEDIN
 	));
 RegisterCommand(new OPLISTCommand(this, "OPLIST",
-	"<#channel> [-all] [-days]",
+	"<#channel> [-all] [-nodays]",
 	2,
 	0
 	));
