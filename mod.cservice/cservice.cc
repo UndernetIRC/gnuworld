@@ -9543,7 +9543,8 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 	for (const auto& theChan : theClient->channels())
 	{
 		sqlChannel* sqlChan = getChannelRecord(theChan->getName());
-		if (sqlChan)
+		/* Do not attempt to enforce bans if I am not in the channel */
+		if (sqlChan && sqlChan->getInChan())
 		{
 			checkBansOnJoin(theChan, sqlChan, theClient);
 		}
