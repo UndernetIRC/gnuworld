@@ -8409,6 +8409,9 @@ void cservice::doCoderStats(iClient* theClient)
 	Notice(theClient, "I've received %i commands since I started (%.2f commands per second).",
 		totalCommands, cPerSec);
 
+	Notice(theClient, "\002Memory usage:\002 %s KB",
+		prettyNumber( getMemoryUsage() ).c_str() ) ;
+
 	Notice(theClient,"\002Uptime:\002 %s",
 		prettyDuration(getUplink()->getStartTime() + dbTimeOffset).c_str());
 

@@ -64,8 +64,14 @@
 #define MAX_KEY_LENGTH 23
 
 /**
+ * MAX_NICK_LENGTH
+ * The maximum number of characters in a nickname.
+ */
+#define MAX_NICK_LENGTH 12
+
+/**
  * MAX_TOPIC_LENGTH
- * The maximum number of characters in a topic
+ * The maximum number of characters in a topic.
  */
 #define MAX_TOPIC_LENGTH 145
 

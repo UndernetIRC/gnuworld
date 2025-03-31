@@ -242,6 +242,9 @@ const std::string searchSQL( const std::string& ) ;
  */
 void stripModes( std::string& , const std::string& ) ;
 
+/* Returns the memory usage of gnuworld in KB. */
+size_t getMemoryUsage() ;
+
 } // namespace gnuworld
 
 #endif /* __MISC__ */

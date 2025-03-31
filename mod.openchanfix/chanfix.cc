@@ -3117,10 +3117,8 @@ void chanfix::updateDB()
 
 void chanfix::printResourceStats()
 {
-  int who = RUSAGE_SELF;
-  struct rusage usage;
-  getrusage(who, &usage);
-  logDebugMessage("Max. resident size used by chanfix (kB): %ld", usage.ru_maxrss);
+  logDebugMessage("Max. resident size used by chanfix (kB): %s",
+    prettyNumber(getMemoryUsage()).c_str());
 }
 
 bool chanfix::isTempBlocked(const std::string& theChan)
