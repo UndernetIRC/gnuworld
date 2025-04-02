@@ -1,285 +1,336 @@
 ------------------------------------------------------------------------------------
--- "$Id: cservice.web.sql,v 1.37 2005/12/12 18:01:24 kewlio Exp $"
 -- Channel service DB SQL file for PostgreSQL.
 --
--- Tables specific to website
+-- .. if you wonder why some tables have moved and you have them here when
+-- you set up your dbs, then you may need to have a look in the script 'movetables'
+-- after you modified the parameters in it to fit your configuration, run it to
+-- properly move your tables from the 'local' db to the 'remote' db.
+-- If you use a single db for both cservice*.sql and local_db.sql then just dont run anything.
 --
--- Perry Lorier <perry@coders.net>
 -- nighty <nighty@undernet.org>
 
+CREATE TABLE custom_cookies (
+    user_id integer,
+    session_time integer
+);
+
+CREATE TABLE exclusions (
+    excluded character varying(40) DEFAULT '0.0.0.0'::character varying NOT NULL
+);
+
+CREATE TABLE gfxcodes (
+    code character varying(25) NOT NULL,
+    crc character varying(128) NOT NULL,
+    expire integer NOT NULL
+);
+
+CREATE TABLE ip_restrict (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    allowmask character varying(255) NOT NULL,
+    allowrange1 integer NOT NULL,
+    allowrange2 integer NOT NULL,
+    added integer NOT NULL,
+    added_by integer NOT NULL,
+    type integer NOT NULL
+);
+
+CREATE SEQUENCE ip_restrict_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
-CREATE TABLE acl (
-	acl_id SERIAL,
-	user_id INT4 NOT NULL,
-	isstaff INT2 NOT NULL,
-	flags INT4 DEFAULT '0' NOT NULL,
--- 0x0001 - ACL_XCHGMGR_REVIEW
--- 0x0002 - ACL_XCHGMGR_ADMIN
--- 0x0004 - ACL_XMAILCH_REVIEW
--- 0x0008 - ACL_XMAILCH_ADMIN
--- 0x0016 - ACL_XHELP
--- 0x0032 - ACL_XHELP_CAN_ADD
--- 0x0064 - ACL_XHELP_CAN_EDIT
--- 0x0128 - ACL_WEBAXS_2
--- 0x0256 - ACL_WEBAXS_3
--- .. to be completed in the future ..
-	xtra INT4 NOT NULL,
--- may vary, for example if 0x0016 is set in 'flags',
--- 'xtra' will contain the 'language_id' the user have power over (or '0' for *all*)
---
-	last_updated INT4 NOT NULL,
-	last_updated_by INT4 NOT NULL,
-	suspend_expire INT4 DEFAULT '0' NOT NULL,
-	suspend_by INT4 DEFAULT '0' NOT NULL,
-	deleted INT2 DEFAULT '0' NOT NULL
+CREATE TABLE ips (
+    ipnum character varying(255) DEFAULT '0.0.0.0'::character varying NOT NULL,
+    user_name character varying(20) NOT NULL,
+    expiration integer NOT NULL,
+    hit_counts integer,
+    set_on integer NOT NULL
+);
+
+CREATE TABLE logmsg (
+    ts integer,
+    name character varying(128),
+    event integer,
+    message text
+);
+
+CREATE TABLE newu_ipcheck (
+    ts integer NOT NULL,
+    ip inet NOT NULL,
+    expiration integer NOT NULL
+);
+
+CREATE SEQUENCE nickserv_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE themes (
+    id integer DEFAULT nextval(('"themes_id_seq"'::text)::regclass) NOT NULL,
+    name character varying(50) NOT NULL,
+    tstart character varying(5) DEFAULT '01/01'::character varying NOT NULL,
+    tend character varying(5) DEFAULT '12/31'::character varying NOT NULL,
+    created_ts integer NOT NULL,
+    created_by integer DEFAULT 0 NOT NULL,
+    sub_dir character varying(128) NOT NULL,
+    left_bgcolor character varying(6) NOT NULL,
+    left_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    left_textcolor character varying(6) NOT NULL,
+    left_linkcolor character varying(6) NOT NULL,
+    left_linkover character varying(6) NOT NULL,
+    left_loadavg0 character varying(6) NOT NULL,
+    left_loadavg1 character varying(6) NOT NULL,
+    left_loadavg2 character varying(6) NOT NULL,
+    top_bgcolor character varying(6) NOT NULL,
+    top_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    top_logo character varying(255) NOT NULL,
+    bottom_bgcolor character varying(6) NOT NULL,
+    bottom_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    bottom_textcolor character varying(6) NOT NULL,
+    bottom_linkcolor character varying(6) NOT NULL,
+    bottom_linkover character varying(6) NOT NULL,
+    main_bgcolor character varying(6) NOT NULL,
+    main_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    main_textcolor character varying(6) NOT NULL,
+    main_textlight character varying(6) NOT NULL,
+    main_linkcolor character varying(6) NOT NULL,
+    main_linkover character varying(6) NOT NULL,
+    main_warnmsg character varying(6) NOT NULL,
+    main_no character varying(6) NOT NULL,
+    main_yes character varying(6) NOT NULL,
+    main_appst0 character varying(6) NOT NULL,
+    main_appst1 character varying(6) NOT NULL,
+    main_appst2 character varying(6) NOT NULL,
+    main_appst3 character varying(6) NOT NULL,
+    main_appst4 character varying(6) NOT NULL,
+    main_appst8 character varying(6) NOT NULL,
+    main_appst9 character varying(6) NOT NULL,
+    main_vlinkcolor character varying(6) NOT NULL,
+    main_support character varying(6) NOT NULL,
+    main_nonsupport character varying(6) NOT NULL,
+    main_notyet character varying(6) NOT NULL,
+    main_frauduser character varying(6) NOT NULL,
+    main_xat_revert character varying(6) NOT NULL,
+    main_xat_goperm character varying(6) NOT NULL,
+    main_xat_deny character varying(6) NOT NULL,
+    main_xat_accept character varying(6) NOT NULL,
+    main_acl_create character varying(6) NOT NULL,
+    main_acl_edit character varying(6) NOT NULL,
+    table_bgcolor character varying(6) NOT NULL,
+    table_bgimage character varying(255) DEFAULT ''::character varying NOT NULL,
+    table_headcolor character varying(6) NOT NULL,
+    table_headtextcolor character varying(6) NOT NULL,
+    table_sepcolor character varying(6) NOT NULL,
+    table_septextcolor character varying(6) NOT NULL,
+    table_tr_enlighten character varying(6) NOT NULL,
+    table_tr_enlighten2 character varying(6) NOT NULL,
+    table_tr_enlighten3 character varying(6) NOT NULL,
+    table_headimage character varying(255) DEFAULT ''::character varying NOT NULL
 );
 
 
-CREATE TABLE fraud_lists (
-	id SERIAL,
-	name VARCHAR(255) NOT NULL
+CREATE SEQUENCE themes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE totp_ips (
+    ipnum character varying(255),
+    user_name character varying(20),
+    expiration integer,
+    hit_counts integer,
+    set_on integer
 );
 
-CREATE TABLE fraud_list_data (
-	list_id INT4 NOT NULL,
-	user_id INT4 REFERENCES users(id) NOT NULL
+CREATE TABLE types (
+    id integer DEFAULT nextval(('types_id_seq'::text)::regclass) NOT NULL,
+    label character varying(128) NOT NULL
 );
 
+CREATE SEQUENCE types_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
 
-CREATE TABLE pending_pwreset (
-        cookie VARCHAR(128) NOT NULL,
-        user_id INT4 NOT NULL,
-        question_id INT2 NOT NULL,
-        verificationdata VARCHAR(30) NOT NULL,
-        expiration INT4 NOT NULL
+CREATE TABLE userlogmsg (
+    ts integer,
+    name character varying(128),
+    event integer,
+    message text,
+    last_updated integer
 );
 
-CREATE INDEX pending_pwreset_cookie_idx ON pending_pwreset(cookie);
-CREATE INDEX pending_pwreset_user_id_idx ON pending_pwreset(user_id);
-CREATE INDEX pending_pwreset_expiration_idx ON pending_pwreset(expiration);
-
-CREATE TABLE locks (
-	section INT2,
--- section: 1 : GLOBAL SITE LOCK
--- section: 2 : NEW REGISTRATIONS LOCK
--- section: 3 : NEW USERS LOCK
-	since INT4,
-	by INT4
+CREATE TABLE users (
+    id integer DEFAULT nextval(('users_id_seq'::text)::regclass) NOT NULL,
+    username character varying(20) NOT NULL,
+    real_name character varying(128) DEFAULT ''::character varying NOT NULL,
+    url character varying(255) DEFAULT ''::character varying NOT NULL,
+    type integer DEFAULT 7 NOT NULL,
+    picture character varying(50) DEFAULT 'undernet.jpg'::character varying NOT NULL,
+    uniqid character varying(50) NOT NULL,
+    location character varying(128),
+    is_alumni integer
 );
 
-CREATE TABLE counts (
--- OBSOLETE !!!
-	count_type INT2,
--- type: 1 : NEW USERS
-	count_count INT4
-);
+CREATE SEQUENCE users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
 
-CREATE TABLE statistics (
-	users_id	INT4 NOT NULL,
-	stats_type	INT4 NOT NULL,
---	1	Total reviewed applications count
---	...	more capabilities
-	stats_value_int	INT4 DEFAULT 0 NOT NULL,
-	stats_value_chr	VARCHAR(255) DEFAULT '' NOT NULL,
-	last_updated	INT4 NOT NULL
-);
-
-CREATE INDEX statistics_users_id_idx ON statistics(users_id);
-
---CREATE TABLE helpmgr_users (
---	user_id INT4 NOT NULL,
---	language_id INT2,
---	flags INT2 DEFAULT '1'
--- CAN_EDIT	: 0x01
--- CAN_ADD	: 0x02
---);
-
---CREATE INDEX helpmgr_users_user_id_idx ON helpmgr_users(user_id);
---CREATE INDEX helpmgr_language_id_idx ON helpmgr_users(language_id);
---CREATE INDEX helpmgr_flags_idx ON helpmgr_users(flags);
-
-CREATE TABLE pending_mgrchange (
-	id SERIAL,
-	channel_id INT4 NOT NULL,
-	manager_id INT4 NOT NULL,
-	new_manager_id INT4 NOT NULL,
-	change_type INT2,
--- change_type : 0 : temporary
--- change_type : 1 : permanent
-	opt_duration INT4,
--- duration in seconds if temporary, 0 if permanent.
-	reason TEXT,
-	expiration INT4 DEFAULT 0,
-	crc VARCHAR(128),
-	confirmed INT2 DEFAULT 0,
-	from_host VARCHAR(15) DEFAULT '0.0.0.0'
-);
-
-CREATE INDEX pending_mgrchange_id_idx ON pending_mgrchange(id);
-CREATE INDEX pending_mgrchange_channel_id_idx ON pending_mgrchange(channel_id);
-CREATE INDEX pending_mgrchange_manager_id_idx ON pending_mgrchange(manager_id);
-CREATE INDEX pending_mgrchange_new_manager_id_idx ON pending_mgrchange(new_manager_id);
-CREATE INDEX pending_mgrchange_change_type_idx ON pending_mgrchange(change_type);
-CREATE INDEX pending_mgrchange_opt_duration_idx ON pending_mgrchange(opt_duration);
-CREATE INDEX pending_mgrchange_expiration_idx ON pending_mgrchange(expiration);
-CREATE INDEX pending_mgrchange_crc_idx ON pending_mgrchange(crc);
-CREATE INDEX pending_mgrchange_confirmed_idx ON pending_mgrchange(confirmed);
-
---CREATE TABLE xatadmins (
---	admin_id INT4 NOT NULL,
---	admin_type INT2 DEFAULT 0
---);
-
---CREATE INDEX xatadmins_admin_id_idx ON xatadmins(admin_id);
-
-
-CREATE TABLE pendingusers (
-	user_name VARCHAR(12),
-	cookie VARCHAR(32),
-	email VARCHAR(255),
-	expire INT4,
-	question_id INT2,
-	verificationdata VARCHAR(30),
-	poster_ip VARCHAR(15) DEFAULT '',
-	language INT4 NOT NULL
-);
-
-CREATE INDEX pendingusers_cookie_idx ON pendingusers(cookie);
-
-CREATE TABLE pending_emailchanges (
-	cookie VARCHAR(128) NOT NULL,
-	user_id INT4 NOT NULL,
-	old_email VARCHAR(255) NOT NULL,
-	new_email VARCHAR(255) NOT NULL,
-	expiration INT4 NOT NULL,
-	phase INT4 NOT NULL
-);
-
-CREATE INDEX pending_emailchanges_cookie_idx ON pending_emailchanges(cookie);
-CREATE INDEX pending_emailchanges_user_id_idx ON pending_emailchanges(user_id);
-CREATE INDEX pending_emailchanges_expiration_idx ON pending_emailchanges(expiration);
-
-CREATE TABLE pending_passwordchanges (
-	cookie VARCHAR(128) NOT NULL,
-	user_id INT4 NOT NULL,
-	old_crypt VARCHAR(40) NOT NULL,
-	new_crypt VARCHAR(40) NOT NULL,
-	new_clrpass VARCHAR(255) NOT NULL,
-	created_ts INT4 NOT NULL
-);
-
--- This table stores the timestamp of the last request
--- from a particular IP.
--- Used to block abuse, such as requesting a password 50,000
--- times a minute.
-
-CREATE TABLE lastrequests (
-	ip VARCHAR(15) DEFAULT '0.0.0.0',
-	last_request_ts INT4
-);
-
-CREATE INDEX lastrequests_ip_idx ON lastrequests(ip);
-
- -- list of admins that have the ability to modify NOREG entries (other admins may only list them)
-
---CREATE TABLE webaccessteam (
---	admin_id int4 REFERENCES users(id) NOT NULL,
---	level INT4 NOT NULL DEFAULT '0'
---);
-
--- recorded objections for channels.
-CREATE TABLE objections (
-	channel_id int4 REFERENCES channels(id) NOT NULL,
-	user_id int4 REFERENCES users(id) NOT NULL,
-	comment text NOT NULL,
-	created_ts int4 NOT NULL,
-	admin_only varchar(1) DEFAULT 'N'
--- 'Y' : the objection is an admin comment on only * users sees it.
--- 'N' : the objection is a regular one and everyone can see it.
-);
-
-CREATE TABLE timezones (
-	tz_index SERIAL,
-	tz_name VARCHAR(128) NOT NULL,
-	tz_countrycode VARCHAR(5) NOT NULL,
-	tz_acronym VARCHAR(10) NOT NULL,
-	deleted INT2 DEFAULT '0',
-	last_updated INT4 NOT NULL
-);
-
-CREATE TABLE complaints (
-	id SERIAL,
-	from_id int4 NOT NULL,
-	from_email varchar (255) NOT NULL,
-	inrec_email varchar (255) NOT NULL,
-	complaint_type int4 NOT NULL,
-	complaint_text text NOT NULL,
-	complaint_logs text NOT NULL,
-	complaint_channel1_id int4 NOT NULL,
-	complaint_channel1_name text NOT NULL,
-	complaint_channel2_id int4 NOT NULL,
-	complaint_channel2_name text NOT NULL,
-	complaint_users_id int4 NOT NULL,
-	status int4 NOT NULL,
-	nicelevel int4 NOT NULL,
-	reviewed_by_id int4 NOT NULL,
-	reviewed_ts int4 NOT NULL,
-	created_ts int4 NOT NULL,
-	created_ip varchar (15) DEFAULT '0.0.0.0' NOT NULL,
-	created_crc varchar (128) NOT NULL,
-	crc_expiration int4 NOT NULL,
-	ticket_number varchar(32) NOT NULL,
-	current_owner int4 NOT NULL,
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE complaints_threads (
-	id SERIAL,
-	complaint_ref int4 NOT NULL CONSTRAINT complaints_threads_ref REFERENCES complaints (id),
-	reply_by int4 NOT NULL,
-	reply_ts int4 NOT NULL,
-	reply_text text NOT NULL,
-	actions_text text NOT NULL,
-	in_reply_to int4 NOT NULL,
-	PRIMARY KEY (id)
+CREATE TABLE webcookies (
+    user_id integer,
+    cookie character varying(32),
+    expire integer,
+    tz_setting character varying(255) DEFAULT ''::character varying,
+    is_admin smallint DEFAULT 0,
+    totp_cookie character varying(40)
 );
 
 
-CREATE TABLE complaint_types (
-	-- not used for now...
-	id SERIAL,
-	complaint_label varchar(255) NOT NULL,
-	PRIMARY KEY (id)
+ALTER TABLE ONLY ip_restrict ALTER COLUMN id SET DEFAULT nextval('ip_restrict_id_seq'::regclass);
+ALTER TABLE ONLY exclusions
+    ADD CONSTRAINT exclusions_pkey PRIMARY KEY (excluded);
+ALTER TABLE ONLY ips
+    ADD CONSTRAINT ips_pkey PRIMARY KEY (expiration, ipnum, user_name);
+ALTER TABLE ONLY newu_ipcheck
+    ADD CONSTRAINT newu_ipcheck_pkeys PRIMARY KEY (ip);
+ALTER TABLE ONLY custom_cookies
+    ADD CONSTRAINT one_user UNIQUE (user_id);
+ALTER TABLE ONLY themes
+    ADD CONSTRAINT themes_pkey PRIMARY KEY (name);
+ALTER TABLE ONLY types
+    ADD CONSTRAINT types_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+CREATE INDEX exclusions_excluded_key ON exclusions USING btree (excluded);
+CREATE INDEX gfxcodes_code_idx ON gfxcodes USING btree (code);
+CREATE INDEX gfxcodes_crc_idx ON gfxcodes USING btree (crc);
+CREATE INDEX gfxcodes_exp_idx ON gfxcodes USING btree (expire);
+CREATE INDEX hit_counts_ips_key ON ips USING btree (hit_counts);
+CREATE INDEX ip_restrict_idx ON ip_restrict USING btree (user_id, type);
+CREATE INDEX ip_restrict_uidx ON ip_restrict USING btree (user_id);
+CREATE INDEX ips_expiration_key ON ips USING btree (expiration);
+CREATE INDEX ips_ipnum_key ON ips USING btree (ipnum);
+CREATE INDEX ips_set_on_key ON ips USING btree (set_on);
+CREATE INDEX ips_user_name_key ON ips USING btree (user_name);
+CREATE INDEX logmsg_idx_name ON logmsg USING btree (name);
+CREATE INDEX logmsg_idx_namevt ON logmsg USING btree (name, event);
+CREATE INDEX newu_ipcheck_expiration ON newu_ipcheck USING btree (expiration);
+CREATE INDEX newu_ipcheck_ip ON newu_ipcheck USING btree (ip);
+CREATE INDEX newu_ipcheck_ts ON newu_ipcheck USING btree (ts);
+CREATE UNIQUE INDEX themes_id_key ON themes USING btree (id);
+CREATE INDEX types_id_key ON types USING btree (id);
+CREATE INDEX ulogmsg_idx_name ON userlogmsg USING btree (name);
+CREATE INDEX ulogmsg_idx_namevt ON userlogmsg USING btree (name, event);
+CREATE INDEX users_id_key ON users USING btree (id);
+CREATE INDEX users_type_key ON users USING btree (type);
+CREATE INDEX webcook_ce_idx ON webcookies USING btree (cookie, expire);
+CREATE INDEX webcook_cu_idx ON webcookies USING btree (cookie, user_id);
+CREATE INDEX webcook_ia_idx ON webcookies USING btree (is_admin);
+CREATE INDEX webcookies_cookie_idx ON webcookies USING btree (cookie);
+CREATE UNIQUE INDEX webcookies_cookie_key ON webcookies USING btree (cookie);
+CREATE INDEX webcookies_expire_idx ON webcookies USING btree (expire);
+CREATE INDEX webcookies_user_id_idx ON webcookies USING btree (user_id);
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_type_fkey FOREIGN KEY (type) REFERENCES types(id);
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_type_fkey1 FOREIGN KEY (type) REFERENCES types(id);
+
+INSERT INTO themes VALUES (
+-- head
+'1',
+'default',
+'01/01',
+'12/31',
+'31337',
+'0',
+
+'default',
+
+-- left
+'60659c',
+'',
+'000000',
+'aaaaaa',
+'ffffff',
+
+'aaaaaa',
+'000000',
+'ffff00',
+
+-- top
+'60659c',
+'',
+'default_logo.jpg',
+
+-- bottom (footer)
+'60659c',
+'',
+'000000',
+'aaaaaa',
+'ffffff',
+
+-- main
+'aaafe4',
+'',
+'000000',
+'505050',
+'60659c',
+'ff7700',
+'ff0000',
+
+'990000',
+'009900',
+
+-- main/regproc
+'ffff00',
+'0000ff',
+'0000ff',
+'00ff00',
+'eeeeee',
+
+'990099',
+'ff0000',
+
+'60659c',
+
+'00ff00',
+'ff0000',
+'ffffff',
+'ffeeff',
+
+'00ffff',
+'eeeeee',
+'990000',
+'007700',
+
+'ddffdd',
+'ffdddd',
+
+-- tables
+'ffffff',
+'',
+'60659c',
+'ffffff',
+'dddddd',
+'4c4c4c',
+'ffff00',
+'777777',
+'60659c',
+''
+
 );
-
-DELETE FROM complaint_types;
-COPY "complaint_types" FROM stdin;
-1	My username is suspended
-2	Members of a registered channel are spamming my channel
-3	I object to this channel application but I want to do so anonymously
-4	My channel was purged and I want you to reconsider
-5	My channel was purged and I want to know why
-99	Other complaint
-\.
-
-CREATE TABLE complaints_reference (
-	complaints_ref int4 NOT NULL CONSTRAINT complaints_reference_ref REFERENCES complaints (id),
-	referenced_by int4 NOT NULL,
-	referenced_to int4 NOT NULL,
-	reference_ts int4 NOT NULL,
-	is_new int4 DEFAULT '1' NOT NULL
-);
-
-CREATE INDEX complaints_ref_ref ON complaints_reference(complaints_ref,referenced_to);
-
-
-CREATE TABLE default_msgs (
-	id	SERIAL,
-	type	int4 NOT NULL,
-	label	varchar(255) NOT NULL,
-	content	text NOT NULL
-);
-
-CREATE INDEX default_msgs_idx ON default_msgs(type);
-
