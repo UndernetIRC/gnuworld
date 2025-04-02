@@ -12,3 +12,4 @@ autom4te.cache/
 *.o
 Makefile
 stamp-h1
+.DS_Store

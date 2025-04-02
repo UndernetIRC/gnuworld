@@ -3,6 +3,12 @@
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2025-04-01: Empus
+--             Added ident column to user_sec_history table
+--             Added deleted column to user_sec_history table
+--             Added materialized views functions to track linked users by IP and ident
+--             Added indexes on user_sec_history table to improve performance
+--             Added get_linked_users function to get the linked users for a given username
 -- 2024-08-05: MrIron
 --             Added columns for the JOINLIM feature written by Telac.
 -- 2017-01-24:Empus
@@ -79,7 +85,6 @@
 
 -- The service supports multiple languages, defined in language
 -- files.
-
 CREATE TABLE languages (
 	id SERIAL,
 	code VARCHAR( 16 ) UNIQUE,
@@ -90,7 +95,6 @@ CREATE TABLE languages (
 );
 
 -- Translations for multi-lingual support.
-
 CREATE TABLE translations (
 	language_id INT4 CONSTRAINT translations_language_id_ref REFERENCES languages ( id ),
 	response_id INT4 NOT NULL DEFAULT '0',
@@ -112,7 +116,6 @@ CREATE INDEX help_language_id_idx ON help (language_id);
 
 -- Create the channel table first since we'll be referring back to it
 -- frequently.
-
 CREATE TABLE channels (
 	id SERIAL,
 	name TEXT NOT NULL UNIQUE,
@@ -181,11 +184,9 @@ CREATE TABLE channels (
 );
 
 -- A channel is inactive if the manager hasn't logged in for 21 days
-
 CREATE UNIQUE INDEX channels_name_idx ON channels(LOWER(name));
 
 -- Table for bans; channel_id references the channel entry this ban belongs to.
-
 CREATE TABLE bans (
 
 	id SERIAL,
@@ -206,7 +207,6 @@ CREATE INDEX bans_expires_idx ON bans(expires);
 CREATE INDEX bans_channelkey_idx ON bans(channel_id);
 
 -- Access entries; admin access kept on channel '*'.
-
 CREATE TABLE users (
 
 	id SERIAL,
@@ -252,7 +252,6 @@ CREATE INDEX users_signup_ip_idx ON users( signup_ip );
 
 -- This table used to store the "Last Seen" informatation previously
 -- routinely updated in the users table.
-
 CREATE TABLE users_lastseen (
 	user_id INT4 CONSTRAINT lastseen_users_id_ref REFERENCES users ( id ),
 	last_seen INT4,
@@ -262,15 +261,102 @@ CREATE TABLE users_lastseen (
 	PRIMARY KEY (user_id)
 );
 
+-- Create a table to track user login history
 CREATE TABLE user_sec_history (
 	user_id INT4 NOT NULL,
 	user_name TEXT NOT NULL,
 	command TEXT NOT NULL,
 	ip VARCHAR( 256 ) NOT NULL,
+	ident TEXT NOT NULL,
 	hostmask VARCHAR( 256 ) NOT NULL,
-	timestamp INT4 NOT NULL
+	timestamp INT4 NOT NULL,
+	deleted TEXT NOT NULL DEFAULT 'N'
 );
 
+CREATE INDEX idx_user_sec_history_user_id ON user_sec_history(user_id);
+CREATE INDEX idx_user_sec_history_hostmask ON user_sec_history(hostmask);
+CREATE INDEX idx_user_sec_history_deleted ON user_sec_history(deleted);
+CREATE INDEX idx_user_sec_history_ip_hostmask ON user_sec_history(ip, hostmask);
+CREATE INDEX idx_ip_ident_username ON user_sec_history(ip, ident, user_name);
+
+-- Create a materialized view to track the number of unique users per IP and ident
+CREATE MATERIALIZED VIEW multiusers_ip_ident AS
+SELECT 
+  ip,
+  ident,
+  COUNT(*) AS user_count,
+  array_agg(user_name ORDER BY user_name) AS user_names
+FROM (
+  SELECT DISTINCT ip, ident, user_name
+  FROM user_sec_history
+  WHERE deleted = 'N'
+) AS unique_rows
+GROUP BY ip, ident
+HAVING COUNT(*) > 3;
+
+CREATE INDEX idx_multiusers_ip_ident_usercount ON multiusers_ip_ident(user_count DESC);
+-- REFRESH MATERIALIZED VIEW multiusers_ip_ident;
+
+-- Create a materialized view to correlate linked users by IP and ident, with a linked_count and list of users
+CREATE MATERIALIZED VIEW multiusers_linked AS
+WITH user_fingerprints AS (
+  SELECT DISTINCT ip, ident, user_name
+  FROM user_sec_history
+  WHERE ident IS NOT NULL AND deleted = 'N'
+),
+linked_pairs AS (
+  SELECT DISTINCT a.user_name AS user_name, b.user_name AS linked_user
+  FROM user_fingerprints a
+  JOIN user_fingerprints b
+    ON a.ip = b.ip AND a.ident = b.ident
+   AND a.user_name <> b.user_name
+)
+SELECT
+  user_name,
+  COUNT(*) AS user_count,
+  array_agg(linked_user ORDER BY linked_user) AS linked_usernames
+FROM linked_pairs
+GROUP BY user_name
+HAVING COUNT(*) > 0
+ORDER BY user_count DESC;
+
+CREATE INDEX idx_multiusers_linked_username ON multiusers_linked(user_name);
+CREATE INDEX idx_multiusers_linked_usercount ON multiusers_linked(user_count DESC);
+-- REFRESH MATERIALIZED VIEW multiusers_linked;
+
+-- Create a function to get the linked users for a given username
+CREATE OR REPLACE FUNCTION get_linked_users(user_id INTEGER)
+RETURNS TABLE (
+  total_usernames INTEGER,
+  all_usernames TEXT[]
+)
+AS $$
+  SELECT
+    COUNT(DISTINCT uname),
+    array_agg(DISTINCT uname ORDER BY uname)
+  FROM (
+    SELECT unnest(linked_usernames) AS uname
+    FROM multiusers_linked
+    WHERE user_name = (
+      SELECT user_name
+      FROM user_sec_history
+      WHERE user_id = get_linked_users.user_id
+      AND deleted = 'N'
+      LIMIT 1
+    )
+  ) AS related
+  WHERE uname IS DISTINCT FROM (
+    SELECT user_name
+    FROM user_sec_history
+    WHERE user_id = get_linked_users.user_id
+    AND deleted = 'N'
+    LIMIT 1
+  );
+$$ LANGUAGE sql STABLE;
+
+
+
+-- Channel access table
 CREATE TABLE levels (
 
 	channel_id INT4 CONSTRAINT levels_channel_id_ref REFERENCES channels ( id ),
@@ -380,8 +466,9 @@ CREATE TABLE supporters (
 );
 
 CREATE INDEX supporters_support_idx ON supporters(support);
-create index supporters_user_id_idx ON supporters(user_id);
+CREATE INDEX supporters_user_id_idx ON supporters(user_id);
 
+-- Pending channel applications table
 CREATE TABLE pending (
 	channel_id INT4 CONSTRAINT pending_channel_ref REFERENCES channels (id),
 	manager_id INT4 CONSTRAINT pending_manager_ref REFERENCES users (id),
@@ -414,6 +501,7 @@ CREATE TABLE pending (
 CREATE INDEX pending_status_idx ON pending(status);
 CREATE INDEX pending_manager_id_idx ON pending(manager_id);
 
+-- Traffic checking during channel applications
 CREATE TABLE pending_traffic (
 	channel_id INT4 CONSTRAINT pending_traffic_channel_ref REFERENCES channels (id),
 	ip_number inet,
@@ -423,7 +511,7 @@ CREATE TABLE pending_traffic (
 
 CREATE INDEX pending_traffic_channel_id_idx ON pending_traffic(channel_id);
 
-
+-- Chanfix scores during channel applications
 CREATE TABLE pending_chanfix_scores (
 	channel_id INT4 CONSTRAINT pending_chanfix_scores_channel_ref REFERENCES channels (id),
 	user_id TEXT NOT NULL DEFAULT '0',
@@ -477,7 +565,6 @@ CREATE TABLE deletion_transactions (
 -- to make sure certain email address's remain unable to register, etc.
 -- Specific flags are INT4's becuase postgres does not want to index on anything
 -- smaller :/
-
 CREATE TABLE noreg (
 	id SERIAL,
 	user_name TEXT,
@@ -505,6 +592,7 @@ CREATE INDEX noreg_email_idx ON noreg (lower(email));
 CREATE INDEX noreg_channel_name_idx ON noreg (lower(channel_name));
 CREATE INDEX noreg_expire_time_idx ON noreg (expire_time);
 
+-- User notes table
 CREATE TABLE notes (
 	message_id SERIAL,
 	user_id INT4 CONSTRAINT users_notes_ref REFERENCES users( id ),
@@ -657,7 +745,6 @@ END;
 CREATE TRIGGER t_delete_ban AFTER DELETE ON bans FOR EACH ROW EXECUTE PROCEDURE delete_ban();
 
 -- Table used to store run-time configurable settings.
-
 CREATE TABLE variables (
 	var_name VARCHAR(30),
 	contents text,
@@ -667,7 +754,6 @@ CREATE TABLE variables (
 );
 
 -- Table used to store the admin log (converted from file to db).
-
 CREATE TABLE adminlog (
 	id SERIAL,
 	user_id INT4 NOT NULL,
@@ -683,7 +769,7 @@ CREATE INDEX adminlog_u_idx ON adminlog(user_id,timestamp);
 CREATE INDEX adminlog_a_idx ON adminlog(args);
 CREATE INDEX adminlog_i_idx ON adminlog(issue_by);
 
-
+-- IPR entries table
 CREATE TABLE ip_restrict (
 	id		SERIAL,
 	user_id		int4 NOT NULL,
@@ -699,6 +785,7 @@ CREATE TABLE ip_restrict (
 
 CREATE INDEX ip_restrict_idx ON ip_restrict(user_id,type);
 
+-- Table to store messages from website for channel relay
 CREATE TABLE webnotices (
 	id 	SERIAL,
 	created_ts 	int4 NOT NULL,
@@ -706,6 +793,7 @@ CREATE TABLE webnotices (
 	PRIMARY KEY(id)
 );
 
+-- Network glines table
 CREATE TABLE glines (
         Id SERIAL,
         Host VARCHAR(128) UNIQUE NOT NULL,
@@ -716,7 +804,7 @@ CREATE TABLE glines (
         Reason VARCHAR(255)
 );
 
-
+-- Whitelist entry table to be read by website
 CREATE TABLE whitelist (
         Id SERIAL,
         IP inet UNIQUE NOT NULL,

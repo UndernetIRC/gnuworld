@@ -445,7 +445,65 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 		bot->outputChannelAccesses(theClient, theUser, tmpUser, 500);
 	}
 
-	
+	/* List any suspected associated usernames 
+	   identified by logins from common IP and ident combination.
+	*/
+	if (adminAccess >= adminlevel::linkedusers)
+	{
+		stringstream linkedQuery;
+		linkedQuery << "SELECT * FROM get_linked_users("
+			<< theUser->getID()
+			<< ")" << ends;
+
+		if (bot->SQLDb->Exec(linkedQuery, true))
+		{
+			if (bot->SQLDb->Tuples() > 0)
+			{
+				int totalUsernames = atoi(bot->SQLDb->GetValue(0, 0));
+				string allUsernames = bot->SQLDb->GetValue(0, 1);
+				
+				/* Remove the curly braces from array if present */
+				if (allUsernames.length() >= 2 && 
+				    allUsernames[0] == '{' && 
+				    allUsernames[allUsernames.length()-1] == '}') {
+					allUsernames = allUsernames.substr(1, allUsernames.length() - 2);
+				}
+				
+				if (totalUsernames > 0)
+				{
+					/* Split usernames into a vector */
+					StringTokenizer st(allUsernames, ',');
+					vector<string> usernames;
+					for(size_t i = 0; i < st.size(); i++) {
+						usernames.push_back(st[i]);
+					}
+
+					/* First line starts with header */
+					string header = "Suspected other usernames (" + std::to_string(totalUsernames) + "): ";
+					string currentLine = header;
+					
+					/* Build and output lines, wrapping for long lists */
+					for(size_t i = 0; i < usernames.size(); i++) {
+						if (i > 0) {
+							currentLine += ", ";
+						}
+						
+						if (currentLine.length() + usernames[i].length() + (i < usernames.size() - 1 ? 2 : 0) > 400) {
+							bot->Notice(theClient, "%s", currentLine.c_str());
+							currentLine = "    "; // 4 spaces for continuation lines
+						}
+						currentLine += usernames[i];
+					}
+					
+					/* Output the last line */
+					if (currentLine.length() > 0) {
+						bot->Notice(theClient, "%s", currentLine.c_str());
+					}
+				}
+			}
+		}
+	}
+
 	return true;
 }
 stringstream theQuery;
@@ -558,7 +616,7 @@ if( !theChan )
 				<< ends;
 		if (!bot->SQLDb->Exec(theQuery, true))
 		{
-			bot->logDebugMessage("Error on CHANINFO.supporters.usernames query");
+			bot->logDebugMessage("Error on CHANINFO.supporters query");
 			#ifdef LOG_SQL
 			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
 			elog << "CHANINFO.supporters query> SQL Error: "

@@ -35,6 +35,7 @@ namespace gnuworld {
   const int modinfo = 800;
   const int suspend = 600;
   const int unsuspend = 800;
+  const int linkedusers = 800;
  }
 
  namespace level {
