@@ -42,6 +42,8 @@ namespace gnuworld
 class cloner : public xClient
 {
 
+typedef std::list< std::string > channelListType ;
+
 public:
   cloner( const std::string& configFileName ) ;
   virtual ~cloner() ;
@@ -53,6 +55,8 @@ public:
                                 bool secure = false ) ;
   virtual void                OnNetworkKick( Channel*, iClient*,
                                 iClient*, const string&, bool ) ;
+private:
+
   virtual void                addClone() ;
   virtual size_t              joinClone( iClient*, Channel* ) ;
   virtual size_t              joinClone( const size_t, Channel* ) ;
@@ -63,9 +67,8 @@ public:
   virtual bool                banMatch( const Channel*, const iClient* ) ;
 
   gnuworld::xServer::timerID	loadCloneTimer ;
-  gnuworld::xServer::timerID	delayJoinTimer ;
-
-protected:
+  gnuworld::xServer::timerID	cycleCloneTimer = 0 ;
+  gnuworld::xServer::timerID	delayJoinTimer = 0 ;
 
   virtual bool                hasAccess( const std::string& ) const ;
 
@@ -76,6 +79,21 @@ protected:
   virtual std::string         randomAccount() ;
   virtual char                randomChar() ;
   virtual iClient*            randomClone() ;
+
+  struct cloneSettings {
+    bool ident = false ;
+    bool modeO = false ;
+    bool modeK = false ;
+    bool modeR = false ;
+    bool modeX = false ;
+    channelListType channels = {} ;
+  } ;
+
+  std::vector< struct cloneSettings > cloneQueue ;
+
+  bool                        cycleRun = false ;
+  float                       cyclePercentage = 0 ;
+  unsigned int                cycleTime = 0 ;
 
   std::list< std::string >    allowAccess ;
   std::vector< std::string >  userNames ;
@@ -89,28 +107,20 @@ protected:
 
   iServer*                    fakeServer ;
 
-  /* Options for loading clones. */
-  bool                        cloneIdent ;
-  bool                        cloneModeO ;
-  bool                        cloneModeK ;
-  bool                        cloneModeR ;
-  bool                        cloneModeX ;
-
   bool                        allowOpers ;
 
-  size_t                      makeCloneCount ;
   size_t                      cloneBurstCount ;
   size_t                      minNickLength ;
   size_t                      maxNickLength ;
-  size_t                      delayCount ;
-  size_t                      joinCloneCount ;
+  size_t                      delayCount = 0 ;
+  size_t                      joinCloneCount = 0 ;
 
   std::string                 cloneDescription ;
   std::string                 cloneMode ;
   std::string                 fakeServerName ;
   std::string                 fakeServerDescription ;
 
-  Channel*                    delayChan ;
+  Channel*                    delayChan = nullptr ;
 } ;
 
 } // namespace gnuworld
