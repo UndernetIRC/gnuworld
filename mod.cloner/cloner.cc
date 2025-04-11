@@ -596,7 +596,6 @@ else if( command == "KILLALL" || command == "QUITALL" )
 
   size_t res = quitClone( clones.size(), quitMsg ) ;
   Notice( theClient, "Done. %i clones have been killed.", res ) ;
-  clones.clear() ;
 
   } // KILLALL/QUITALL
 else if( command == "SAYALL" || command == "MSGALL" )
