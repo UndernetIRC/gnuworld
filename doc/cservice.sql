@@ -331,28 +331,41 @@ RETURNS TABLE (
   all_usernames TEXT[]
 )
 AS $$
-  SELECT
-    COUNT(DISTINCT uname),
-    array_agg(DISTINCT uname ORDER BY uname)
-  FROM (
-    SELECT unnest(linked_usernames) AS uname
-    FROM multiusers_linked
-    WHERE user_name = (
-      SELECT user_name
-      FROM user_sec_history
-      WHERE user_id = get_linked_users.user_id
-      AND deleted = 'N'
-      LIMIT 1
-    )
-  ) AS related
-  WHERE uname IS DISTINCT FROM (
+DECLARE
+  uname TEXT;
+BEGIN
+  -- Get the most recent user_name for this user_id (in case of renames)
+  SELECT ush.user_name INTO uname
+  FROM user_sec_history ush
+  WHERE ush.user_id = get_linked_users.user_id AND deleted = 'N'
+  ORDER BY timestamp DESC
+  LIMIT 1;
+
+  IF uname IS NULL THEN
+    RETURN;
+  END IF;
+
+  -- Recursively get all linked usernames
+  RETURN QUERY
+  WITH RECURSIVE link_graph(user_name) AS (
     SELECT user_name
-    FROM user_sec_history
-    WHERE user_id = get_linked_users.user_id
-    AND deleted = 'N'
-    LIMIT 1
-  );
-$$ LANGUAGE sql STABLE;
+    FROM multiusers_linked
+    WHERE user_name = uname
+
+    UNION
+
+    SELECT unnest(linked_usernames)
+    FROM multiusers_linked
+    JOIN link_graph ON multiusers_linked.user_name = link_graph.user_name
+  )
+  SELECT
+    COUNT(DISTINCT user_name)::INTEGER,
+    array_agg(DISTINCT user_name ORDER BY user_name)
+  FROM link_graph
+  WHERE user_name <> uname;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 
 
 
