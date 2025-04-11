@@ -58,6 +58,7 @@ public:
 	virtual bool		StopCopyIn() ;
 
 	virtual unsigned int	countTuples() const ;
+	virtual unsigned int 	affectedRows() const ;
 	virtual const std::string	ErrorMessage() const ;
 
 	// tuple number, field number (row,col)

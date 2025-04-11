@@ -185,6 +185,14 @@ if( 0 == lastResult )
 return PQntuples( lastResult ) ;
 }
 
+unsigned int pgsqlDB::affectedRows() const
+{
+if( 0 == lastResult )
+	return 0 ;
+
+return std::atoi( PQcmdTuples( lastResult ) ) ;
+}
+
 const string pgsqlDB::ErrorMessage() const
 {
 return string( PQerrorMessage( theDB ) ) ;

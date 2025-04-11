@@ -82,6 +82,7 @@ public:
 	{ return !isConnected() ; }
 
 	virtual unsigned int	countTuples() const = 0 ;
+	virtual unsigned int 	affectedRows() const = 0 ;
 	virtual unsigned int	Tuples() const
 	{ return countTuples() ; }
 

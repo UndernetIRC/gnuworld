@@ -148,18 +148,6 @@ if( accountNames.empty() || confError )
   ::exit( 0 ) ;
   }
 
-makeCloneCount = 0 ;
-joinCloneCount = 0 ;
-cloneIdent = false ;
-cloneModeK = false ;
-cloneModeO = false ;
-cloneModeR = false ;
-cloneModeX = false ;
-
-delayChan = nullptr ;
-delayCount = 0 ;
-delayJoinTimer = 0 ;
-
 minNickLength = atoi( conf.Require( "minnicklength" )->second.c_str() ) ;
 maxNickLength = atoi( conf.Require( "maxnicklength" )->second.c_str() ) ;
 
@@ -198,6 +186,7 @@ xClient::OnConnect() ;
 void cloner::OnAttach()
 {
 MyUplink->RegisterChannelEvent( xServer::CHANNEL_ALL, this ) ;
+loadCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + 1, this, 0 ) ;
 }
 
 void cloner::OnNetworkKick( Channel* theChan, iClient*,
@@ -270,7 +259,7 @@ if( command == "SHOWCOMMANDS" )
   if( st.size() >= 1 )
     {
     Notice( theClient, "_-=[Cloner Commands]=-_" ) ;
-    Notice( theClient, "LOADCLONES JOIN PART "
+    Notice( theClient, "LOADCLONES CYCLE JOIN PART "
       "KILLALL/QUITALL SAYALL/MSGALL "
       "ACTALL/DOALL/DESCRIBEALL NOTICEALL" ) ;
     Notice( theClient, "_-=[End of Cloner Commands]=-_" ) ;
@@ -305,7 +294,14 @@ else if( command == "HELP" )
     Notice( theClient, "-r: the clones will be logged into an account") ;
     Notice( theClient, "-x: the clones will be +x (hidden host)") ;
     }
-  else if( topic == "JOIN" )
+    else if( topic == "CYCLE" )
+    {
+    Notice( theClient, "%s <OFF | time:pst> - Cycling (quitting and reconnecting) "
+      "  of clone(s)", topic.c_str() ) ;
+    Notice( theClient, "time: the number of seconds to run a cycle") ;
+    Notice( theClient, "pst : the percentage of clones to be cycled") ;
+    }
+    else if( topic == "JOIN" )
     {
     Notice( theClient, "%s <#channel> [# of clones] [-d # of clones per second]- Make clones "
       "/join a #channel. If # is not specified, all loaded clones will /join.", topic.c_str() ) ;
@@ -351,13 +347,7 @@ else if( command == "LOADCLONES" )
     return ;
     }
 
-  if( makeCloneCount > 0 )
-    {
-    Notice( theClient, "Loading of clones ongoing. Please wait." ) ;
-    return ;
-    }
-
-  int numClones = atoi( st[ 1 ].c_str() ) ;
+  size_t numClones = static_cast< size_t> ( atoi( st[ 1 ] ) ) ;
   if( numClones < 1 )
     {
     Notice( theClient,
@@ -365,12 +355,12 @@ else if( command == "LOADCLONES" )
     return ;
     }
 
-  /* Reset settings. */
-  cloneIdent = false ;
-  cloneModeK = false ;
-  cloneModeO = false ;
-  cloneModeR = false ;
-  cloneModeX = false ;
+  /* Settings. */
+  bool cloneIdent = false ;
+  bool cloneModeK = false ;
+  bool cloneModeO = false ;
+  bool cloneModeR = false ;
+  bool cloneModeX = false ;
 
   if( st.size() == 3 && st[2][0] == '-' )
     {
@@ -399,18 +389,82 @@ else if( command == "LOADCLONES" )
       }
     }
 
-  if( 0 == makeCloneCount )
+  for( size_t i = 0 ; i < numClones ; ++i )
     {
-    loadCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + 1, this, 0 ) ;
-    }
+    cloneSettings settings ;
+    settings.ident = cloneIdent ;
+    settings.modeO = cloneModeO ;
+    settings.modeK = cloneModeK ;
+    settings.modeR = cloneModeR ;
+    settings.modeX = cloneModeX ;
 
-  makeCloneCount += static_cast< size_t >( numClones ) ;
-//	elog	<< "cloner::OnPrivateMessage> makeCloneCount: "
-//		<< makeCloneCount
-//		<< endl ;
+    cloneQueue.push_back( settings ) ;
+    }
 
   Notice( theClient, "Queuing %d Clones", numClones ) ;
   } // "LOADCLONES"
+else if( command == "CYCLE" )
+  {
+  if( st.size() < 2 )
+    {
+    Notice( theClient, "Usage: %s <OFF | time:pst>",
+      command.c_str() ) ;
+    return ;
+    }
+
+  if( string_upper( st[ 1 ] ) == "OFF" )
+    {
+    if( cycleRun )
+      {
+      cycleRun = false ;
+      cycleTime = 0 ;
+      cyclePercentage = 0.0 ;
+      MyUplink->UnRegisterTimer( cycleCloneTimer, nullptr ) ;
+      Notice( theClient, "Cycle stopped." ) ;
+      return ;
+      }
+    else
+      {
+      Notice( theClient, "Cycle not running." ) ;
+      return ;
+      }
+    }
+
+    StringTokenizer st2( st[ 1 ], ':' ) ;
+  if( st2.size() != 2 )
+    {
+    Notice( theClient, "Usage: %s <OFF | time:pst>",
+      command.c_str() ) ;
+    return ;
+    }
+
+  if( atoi( st2[ 0 ] ) < 1 )
+    {
+    Notice( theClient, "Cycle time must be greater than 0." ) ;
+    return ;
+    }
+
+  float tempPst = 0.0 ;
+  try {
+    tempPst = std::stof( st2[ 1 ] ) ;
+  } catch (...) {
+    Notice( theClient, "Invalid percentage." ) ;
+    return ;
+  }
+
+  if( tempPst < 0.0 || tempPst > 100.0 )
+    {
+    Notice( theClient, "Cycle percentage must be between 0 and 100." ) ;
+    return ;
+    }
+
+  cycleTime = atoi( st2[ 0 ] ) ;
+  cyclePercentage = tempPst ;
+  cycleRun = true ;
+  cycleCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + cycleTime, this, 0 ) ;
+  Notice( theClient, "Cycle set to %d:%f", cycleTime, cyclePercentage ) ;
+  return ;
+  }
 else if( command == "JOIN" )
   {
   if( st.size() < 2 )
@@ -542,7 +596,6 @@ else if( command == "KILLALL" || command == "QUITALL" )
 
   size_t res = quitClone( clones.size(), quitMsg ) ;
   Notice( theClient, "Done. %i clones have been killed.", res ) ;
-  clones.clear() ;
 
   } // KILLALL/QUITALL
 else if( command == "SAYALL" || command == "MSGALL" )
@@ -662,41 +715,64 @@ else if( command == "NOTICEALL" )
 
 void cloner::OnTimer( const xServer::timerID& timer_id, void* )
 {
+if( timer_id == cycleCloneTimer )
+  {
+  //elog << "cloner::OnTimer> cycleCloneTimer" << endl ;
+
+  /* Are we running? */
+  if( !cycleRun )
+    return ;
+
+  /* The number of clones to cycle. */
+  size_t cycleCount = ( clones.size() / 100 ) * cyclePercentage ;
+
+  /* Cycle the clones. */
+  for( size_t i = 0 ; i < cycleCount ; ++i )
+    {
+    iClient* tmpClone = randomClone() ;
+    if( tmpClone != nullptr )
+      {
+      cloneSettings settings ;
+      settings.ident = tmpClone->getUserName().find( "~" ) != string::npos ;
+      settings.modeO = tmpClone->isModeO() ;
+      settings.modeK = tmpClone->isModeK() ;
+      settings.modeR = tmpClone->isModeR() ;
+      settings.modeX = tmpClone->isModeX() ;
+
+      for( const auto& channel : tmpClone->channels() )
+        {
+        settings.channels.push_back( channel->getName() ) ;
+        }
+
+      cloneQueue.push_back( settings ) ;
+
+      quitClone( tmpClone, "" ) ;
+      }
+    }
+
+    cycleCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + cycleTime, this, 0 ) ;
+  }
+
 if( timer_id == loadCloneTimer )
   {
 //  elog	<< "cloner::OnTimer> makeCloneCount: "
 //  	    << makeCloneCount
 //  	    << endl ;
 
-  if( makeCloneCount > 0 )
+  /* Reset timer. */
+  loadCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + 1, this, 0 ) ;
+
+  if( !cloneQueue.empty() )
     {
-    size_t cloneCount = makeCloneCount ;
-    if( cloneCount > cloneBurstCount )
-      {
-      // Too many
-      cloneCount = cloneBurstCount ;
-      }
-
-    makeCloneCount -= cloneCount ;
-
-    //elog	<< "cloner::OnTimer> cloneCount: "
-    //	<< cloneCount
-    //	<< endl ;
+    size_t cloneCount = std::min( cloneQueue.size(), cloneBurstCount ) ;
 
     for( size_t i = 0 ; i < cloneCount ; ++i )
       {
       addClone() ;
       }
 
-    if( makeCloneCount > 0 )
-      {
-      loadCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + 1, this, 0 ) ;
-      }
-    else
-      {
-      std::random_device rd ;
-      std::shuffle( clones.begin(), clones.end(), rd ) ;
-      }
+    std::random_device rd ;
+    std::shuffle( clones.begin(), clones.end(), rd ) ;
     }
   }
 
@@ -878,11 +954,11 @@ size_t cloner::quitClone( iClient* theClone, const string quitMsg )
 {
 if( MyUplink->DetachClient( theClone, quitMsg ) )
   {
-  delete theClone ; theClone = nullptr ;
   auto pos = std::find( clones.begin() , clones.end() , theClone ) ;
   if( pos != clones.end() )
     clones.erase( pos ) ;
 
+  delete theClone ; theClone = nullptr ;
   return 1 ;
   }
 return 0 ;
@@ -890,28 +966,48 @@ return 0 ;
 
 void cloner::addClone()
 {
-// The XXX doesn't matter here, the core will choose an
+
+if( cloneQueue.empty() )
+  {
+  elog << "addClone() called, but no clones to add." << endl ;
+  return ;
+  }
+
+  // The XXX doesn't matter here, the core will choose an
 // appropriate value.
 string yyxxx( fakeServer->getCharYY() + "]]]" ) ;
 string account ;
 string ident ;
 unsigned int account_id { 0 };
 
+string cloneHost = randomHost() ;
+string cloneBase64 ;
+
+/* Check whether the random host is an IP. If it is, lets send the correct Base64 IP. */
+unsigned char ipmask_len ;
+irc_in_addr ip ;
+if( ipmask_parse( cloneHost.c_str(), &ip, &ipmask_len ) )
+  cloneBase64 = string( xIP( ip ).GetBase64IP() ) ;
+else
+  cloneBase64 = randomNick( 6, 6 ) ;
+
+cloneSettings settings = cloneQueue.front() ;
+
 string thisMode = cloneMode ;
-if( cloneModeK )
+if( settings.modeK )
   thisMode += 'k' ;
-if( cloneModeO )
+if( settings.modeO )
   thisMode += 'o' ;
-if( cloneModeX )
+if( settings.modeX )
   thisMode += 'x' ;
-if( cloneModeR )
+if( settings.modeR )
   {
   thisMode +='r' ;
   StringTokenizer st( randomAccount(), ':' ) ;
   account = st[ 0 ] ;
   account_id = atoi( st[ 1 ] ) ;
   }
-if( cloneIdent )
+if( settings.ident )
   ident += "~" ;
 
 iClient* newClient = new iClient(
@@ -919,9 +1015,9 @@ iClient* newClient = new iClient(
     yyxxx,
     randomNick( minNickLength, maxNickLength ),
     ident + randomUser(),
-    randomNick( 6, 6 ),
-    randomHost(),
-    randomHost(),
+    cloneBase64,
+    cloneHost,
+    cloneHost,
     thisMode,
     account,
     account_id,
@@ -933,6 +1029,14 @@ assert( newClient != nullptr ) ;
 if( MyUplink->AttachClient( newClient, this ) )
   {
   clones.push_back( newClient ) ;
+  cloneQueue.erase( cloneQueue.begin() ) ;
+  }
+
+for( const auto& channel : settings.channels )
+  {
+  Channel* theChan = Network->findChannel( channel ) ;
+  if( theChan != nullptr )
+    joinClone( newClient, theChan ) ;
   }
 }
 
