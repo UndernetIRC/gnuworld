@@ -5328,19 +5328,19 @@ switch( theEvent )
 		 */
 		if (tmpUser->isModeR())
 		{
-			iServer* tmpServer = Network->findServer(tmpUser->getIntYY());
-			if ((this->getUplink()->isBursting()) || (tmpServer->isBursting()))
+			/* Lookup this user account, if its not there.. trouble */
+			sqlUser* theUser = getUserRecord(tmpUser->getAccount());
+			if (theUser)
 			{
-				/* Lookup this user account, if its not there.. trouble */
-				sqlUser* theUser = getUserRecord(tmpUser->getAccount());
-				if (theUser)
-				{
-					newData->currentUser = theUser;
-					theUser->addAuthedClient(tmpUser);
+				/* This function check whether the account flags are correct, if not send update. */
+				sendAccountFlags(theUser, tmpUser);
+			}
 
-					/* This function check whether the account flags are correct, if not send update. */
-					sendAccountFlags(theUser, tmpUser);
-				}
+			iServer* tmpServer = Network->findServer(tmpUser->getIntYY());
+			if ((this->getUplink()->isBursting() || tmpServer->isBursting()) && theUser)
+			{
+				newData->currentUser = theUser;
+				theUser->addAuthedClient(tmpUser);
 			}
 			else
 				doCommonAuth(tmpUser);
