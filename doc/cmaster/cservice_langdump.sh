@@ -13,6 +13,9 @@ echo "Dumping languages table...";
 {
   echo "$header";
   echo "";
+  echo "-- Zap everything!"
+  echo "DELETE FROM languages;"
+  echo "";
   echo "COPY languages FROM stdin;";
   psql -d $database -c "COPY (SELECT * FROM languages ORDER BY id) TO STDOUT;"
   echo "\.";

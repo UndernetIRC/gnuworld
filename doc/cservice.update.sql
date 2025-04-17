@@ -95,3 +95,7 @@ AS $$
   );
 $$ LANGUAGE sql STABLE;
 
+
+-- 2025-04-17: Empus
+--             Added deleted column to languages table
+ALTER TABLE languages ADD COLUMN deleted INT2 DEFAULT 0;
