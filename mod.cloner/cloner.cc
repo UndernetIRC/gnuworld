@@ -259,7 +259,7 @@ if( command == "SHOWCOMMANDS" )
   if( st.size() >= 1 )
     {
     Notice( theClient, "_-=[Cloner Commands]=-_" ) ;
-    Notice( theClient, "LOADCLONES CYCLE JOIN PART "
+    Notice( theClient, "LOADCLONES CYCLE JOIN PART QUIT "
       "KILLALL/QUITALL SAYALL/MSGALL "
       "ACTALL/DOALL/DESCRIBEALL NOTICEALL" ) ;
     Notice( theClient, "_-=[End of Cloner Commands]=-_" ) ;
@@ -598,6 +598,39 @@ else if( command == "KILLALL" || command == "QUITALL" )
   Notice( theClient, "Done. %i clones have been killed.", res ) ;
 
   } // KILLALL/QUITALL
+else if( command == "QUIT" )
+  {
+  if( st.size() < 2 )
+    {
+    Notice( theClient, "Usage: %s <#> [reason]",
+      command.c_str() ) ;
+    return ;
+    }
+
+  if( !IsNumeric( st[ 1 ] ) )
+    {
+    Notice( theClient, "Usage: %s <#> [reason]",
+      command.c_str() ) ;
+    return ;
+    }
+
+  size_t numClones = atoi( st[ 1 ] ) ;
+  if( numClones < 1 || numClones > clones.size() )
+    {
+    Notice( theClient, "Invalid number of clones." ) ;
+    return ;
+    }
+
+  string quitMsg ;
+  if( st.size() >= 3 )
+    {
+    quitMsg = st.assemble( 2 ) ;
+    }
+
+  size_t res = quitClone( numClones, quitMsg ) ;
+  Notice( theClient, "Done. %i clones have been killed.", res ) ;
+
+  } // QUIT
 else if( command == "SAYALL" || command == "MSGALL" )
   {
   if( st.size() < 3 )
@@ -939,10 +972,19 @@ size_t cloner::quitClone( const size_t n, const string quitMsg )
 {
 size_t count { 0 } ;
 
-for( cloneVectorType::const_iterator ptr = clones.begin(),
-  endPtr = clones.end() ; ptr != endPtr ; ++ptr )
+for( auto ptr = clones.begin(); ptr != clones.end() ; )
   {
-  count += quitClone( *ptr, quitMsg ) ;
+  iClient* theClone = *ptr ;
+
+  if( MyUplink->DetachClient( theClone, quitMsg ) )
+    {
+    ptr = clones.erase( ptr ) ;
+
+    delete theClone ; theClone = nullptr ;
+    ++count ;
+    }
+  else
+    ++ptr ;
 
   if( count == n ) break ;
   }
