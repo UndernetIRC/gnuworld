@@ -508,7 +508,11 @@ string createClass(const string& address, bool wildcard)
 const string prettyNumber( int number )
 {
 std::stringstream ss ;
-ss.imbue( std::locale("en_US.UTF-8") ) ;
+try {
+    ss.imbue( std::locale( "en_US.UTF-8" )  ) ;
+} catch( const std::exception& e ) {
+    ss.imbue( std::locale("") ) ;
+}
 ss << number ;
 return ss.str() ;
 }
