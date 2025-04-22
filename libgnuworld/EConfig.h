@@ -28,11 +28,12 @@
 #include	<string>
 #include	<list>
 #include	<map>
+#include	<concepts>
 
 #include	"ELog.h"
 #include	"misc.h" // noCaseCompare
 
-namespace gnuworld 
+namespace gnuworld
 {
 
 /**
@@ -48,13 +49,21 @@ namespace gnuworld
  *   NOT continue onto the next line
  * - value fields may NOT have a '=' character in it
  */
+
+template <typename T>
+concept ConfigType = std::is_same_v< T, std::string > ||
+			std::is_same_v< T, int > ||
+			std::is_same_v< T, unsigned int > ||
+			std::is_same_v< T, double > ||
+			std::is_same_v< T, bool > ;
+
 class EConfig
 {
 
 	/**
 	 * The type of the map used to store the key/value pairs.
 	 */
-	typedef std::multimap< std::string, std::string, noCaseCompare > 
+	typedef std::multimap< std::string, std::string, noCaseCompare >
 			mapType ;
 
 	/**
@@ -166,7 +175,7 @@ public:
 	 * Destroy the EConfig object.  This will also close the
 	 * input file.
 	 */
-	virtual ~EConfig() ;
+	~EConfig() ;
 
 	/**
 	 * Obtain a const iterator to the beginning of the map
@@ -212,12 +221,12 @@ public:
 	/**
 	 * Find the first key/value pair for the given key.
 	 */
-	virtual iterator Find( const std::string& findMe ) ;
+	iterator Find( const std::string& findMe ) ;
 
 	/**
 	 * Find the first key/value pair for the given key.
 	 */
-	virtual const_iterator Find( const std::string& findMe ) const ;
+	const_iterator Find( const std::string& findMe ) const ;
 
 	/**
 	 * Call this method to retrieve a const_iterator to the first
@@ -225,7 +234,89 @@ public:
 	 * not found, then an error message will be output and the
 	 * program will terminate.
 	 */
-	virtual iterator Require( const std::string& findMe ) ;
+	iterator Require( const std::string& findMe ) ;
+
+
+	/**
+	 * Call this method to retrieve a value with the type specified.
+	 * If the value does not match the given type, an error message
+	 * will be output and the program will terminate.
+	 */
+	template <ConfigType T>
+	T Require( const std::string& key )
+		{
+		// Call the non-template version to get the iterator
+		iterator it = Require( key ) ;
+
+		const std::string& value = it->second ;
+
+		// Type conversion based on the template type requested
+		if constexpr( std::is_same_v<T, std::string> )
+			{
+			return value ;
+			}
+		else if constexpr( std::is_same_v<T, int> )
+			{
+			try
+				{
+				return std::stoi( value ) ;
+				}
+			catch( const std::invalid_argument& )
+				{
+				elog	<< "EConfig::Require<>: Invalid value for key \""
+					<< key << "\". Must be an integer." << std::endl ;
+				::exit( 0 ) ;
+				}
+			}
+		else if constexpr( std::is_same_v<T, unsigned int> )
+			{
+			try
+				{
+				return static_cast< unsigned int>( std::stoul( value ) ) ;
+				}
+			catch( const std::invalid_argument& )
+				{
+				elog	<< "EConfig::Require<>: Invalid value for key \""
+					<< key << "\". Must be an unsigned integer." << std::endl ;
+				::exit( 0 ) ;
+				}
+			}
+		else if constexpr( std::is_same_v<T, double> )
+			{
+			try
+				{
+				return std::stod( value ) ;
+				}
+			catch( const std::invalid_argument& )
+				{
+				throw std::runtime_error( "EConfig::Require<>: Cannot convert value to double" ) ;
+				}
+			}
+		else if constexpr( std::is_same_v<T, bool> )
+			{
+			// Convert to lowercase for case-insensitive comparison
+			std::string lower_value = string_lower( value ) ;
+
+			if( lower_value == "true" ||
+				lower_value == "yes" ||
+				lower_value == "on" ||
+				lower_value == "1" )
+				return true ;
+			else if( lower_value == "false" ||
+				lower_value == "no" ||
+				lower_value == "off" ||
+				lower_value == "0" )
+				return false ;
+			else
+				{
+				elog	<< "EConfig::Require<>: Invalid value for key \""
+					<< key << "\". Must be true/false, on/off, yes/no or 1/0." << std::endl ;
+				::exit(0) ;
+				}
+			}
+
+		throw std::runtime_error( "EConfig::Require<>: Unsupported type requested" ) ;
+		}
 
 	/**
 	 * Add a key/value pair to the config file.
@@ -233,14 +324,14 @@ public:
 	 * will add a duplicate, which is supported by the EConfig
 	 * class.
 	 */
-	virtual bool	Add( const std::string& key,
-				const std::string& value ) ;
+	bool	Add( const std::string& key,
+			const std::string& value ) ;
 
 	/**
 	 * Add a comment to the end of the file.
 	 * This comment line may be empty.
 	 */
-	virtual bool	AddComment( const std::string& newComment ) ;
+	bool	AddComment( const std::string& newComment ) ;
 
 	/**
 	 * Delete a key/value pair by key.  Only one pair whose key
@@ -249,30 +340,30 @@ public:
 	 * If you have duplicates, and would like to remove a specific
 	 * entry, use the other form of Delete().
 	 */
-	virtual bool	Delete( const std::string& key ) ;
+	bool	Delete( const std::string& key ) ;
 
 	/**
 	 * Remove a key value pair given its iterator.
 	 */
-	virtual bool	Delete( iterator itr ) ;
+	bool	Delete( iterator itr ) ;
 
 	/**
 	 * Replace the value of a given key/value pair.
 	 * It is important to use this method rather than just
 	 * modifying the iterator itself.
 	 */
-	virtual bool	Replace( iterator itr,
-		const std::string& newValue ) ;
+	bool	Replace( iterator itr,
+			const std::string& newValue ) ;
 
 	/*
 	 * Clear valueMap
 	 */
-	virtual void Clear();
+	void Clear();
 
 	/**
 	 * Open the input file.
 	 */
-	virtual bool	openConfigFile();
+	bool	openConfigFile();
 
 	/**
 	 * Debugging function for outputting the entire map to
@@ -305,17 +396,17 @@ protected:
 	/**
 	 * Remove blank spaces from the line of text.
 	 */
-	virtual bool	removeSpaces( std::string& ) ;
+	bool	removeSpaces( std::string& ) ;
 
 	/**
 	 * Parse the input file.
 	 */
-	virtual bool	readFile( std::ifstream& ) ;
+	bool	readFile( std::ifstream& ) ;
 
 	/**
 	 * Write the current memory configuration to disk.
 	 */
-	virtual bool	writeFile() ;
+	bool	writeFile() ;
 
 	/**
 	 * Record that an error has occured.
