@@ -218,7 +218,14 @@ public:
 	inline bool		hasError() const
 		{ return error ; }
 
+
 	/**
+	 * Returns the config errors.
+	 */
+	inline const std::vector< std::string >& getErrors() const
+		{ return configErrors ; }
+
+		/**
 	 * Find the first key/value pair for the given key.
 	 */
 	iterator Find( const std::string& findMe ) ;
@@ -242,81 +249,108 @@ public:
 	 * If the value does not match the given type, an error message
 	 * will be output and the program will terminate.
 	 */
-	template <ConfigType T>
-	T Require( const std::string& key )
+	template<ConfigType T>
+	T Require( const std::string& key, bool fatal = true )
+	{
+	iterator it = Require( key ) ;
+	const std::string& value = it->second ;
+
+	try
 		{
-		// Call the non-template version to get the iterator
-		iterator it = Require( key ) ;
-
-		const std::string& value = it->second ;
-
-		// Type conversion based on the template type requested
 		if constexpr( std::is_same_v<T, std::string> )
-			{
 			return value ;
-			}
+
 		else if constexpr( std::is_same_v<T, int> )
 			{
-			try
-				{
-				return std::stoi( value ) ;
-				}
-			catch( const std::invalid_argument& )
-				{
-				elog	<< "EConfig::Require<>: Invalid value for key \""
-					<< key << "\". Must be an integer." << std::endl ;
-				::exit( 0 ) ;
-				}
+			size_t idx ;
+			int result = std::stoi( value, &idx ) ;
+			if( idx != value.length() )
+				throw std::invalid_argument("contains trailing characters") ;
+			return result ;
 			}
-		else if constexpr( std::is_same_v<T, unsigned int> )
+		else if constexpr (std::is_same_v<T, unsigned int>)
 			{
-			try
-				{
-				return static_cast< unsigned int>( std::stoul( value ) ) ;
-				}
-			catch( const std::invalid_argument& )
-				{
-				elog	<< "EConfig::Require<>: Invalid value for key \""
-					<< key << "\". Must be an unsigned integer." << std::endl ;
-				::exit( 0 ) ;
-				}
+			size_t idx ;
+			unsigned long result = std::stoul( value, &idx ) ;
+			if( idx != value.length() )
+				throw std::invalid_argument("contains trailing characters") ;
+			return static_cast<unsigned int>( result ) ;
 			}
 		else if constexpr( std::is_same_v<T, double> )
 			{
-			try
-				{
-				return std::stod( value ) ;
-				}
-			catch( const std::invalid_argument& )
-				{
-				throw std::runtime_error( "EConfig::Require<>: Cannot convert value to double" ) ;
-				}
+			size_t idx ;
+			double result = std::stod( value, &idx ) ;
+			if( idx != value.length() )
+				throw std::invalid_argument("contains trailing characters") ;
+			return result ;
 			}
 		else if constexpr( std::is_same_v<T, bool> )
 			{
-			// Convert to lowercase for case-insensitive comparison
-			std::string lower_value = string_lower( value ) ;
-
-			if( lower_value == "true" ||
-				lower_value == "yes" ||
-				lower_value == "on" ||
-				lower_value == "1" )
+			std::string lower = string_lower( value ) ;
+			if( lower == "true" || lower == "yes" || lower == "on" || lower == "1" )
 				return true ;
-			else if( lower_value == "false" ||
-				lower_value == "no" ||
-				lower_value == "off" ||
-				lower_value == "0" )
+			if( lower == "false" || lower == "no" || lower == "off" || lower == "0" )
 				return false ;
-			else
-				{
-				elog	<< "EConfig::Require<>: Invalid value for key \""
-					<< key << "\". Must be true/false, on/off, yes/no or 1/0." << std::endl ;
-				::exit(0) ;
-				}
+			throw std::invalid_argument("must be true/false, yes/no, on/off, or 1/0") ;
 			}
-
-		throw std::runtime_error( "EConfig::Require<>: Unsupported type requested" ) ;
+		else
+			{
+			throw std::invalid_argument("unsupported config type");
+			}
 		}
+	catch( const std::invalid_argument& e )
+		{
+		std::ostringstream msg;
+		msg << "Invalid value for key \"" << key << "\": \"" << value << "\" - "
+			<< e.what();
+
+		if constexpr (std::is_same_v<T, int>)
+			msg << " (must be a signed integer)";
+		else if constexpr (std::is_same_v<T, unsigned int>)
+			msg << " (must be an unsigned integer)";
+		else if constexpr (std::is_same_v<T, double>)
+			msg << " (must be a floating point number)";
+		else if constexpr (std::is_same_v<T, bool>)
+			msg << " (must be true/false, yes/no, on/off, or 1/0)";
+
+		elog << "EConfig::Require<>: " << msg.str() << std::endl;
+		if( fatal )
+			::exit(1) ;
+		throw std::runtime_error( msg.str() ) ;
+		}
+	catch( const std::out_of_range& e )
+		{
+		std::string msg = "Value out of range for key \"" + key + "\": " + e.what() ;
+		elog << "EConfig::Require<>: " << msg << std::endl ;
+		if( fatal )
+			::exit(1) ;
+		throw std::runtime_error( msg ) ;
+		}
+	}
+
+	/**
+	 * Call this method to try to retrieve a value with the type specified.
+	 * The function takes the existing value as an argument (fallback).
+	 * If the config value does not match the given type, the function will return
+	 * the fallback value and not exit.
+	 */
+	template<ConfigType T>
+	T TryRequire( const std::string& key, const T& fallback )
+	{
+	try
+		{
+		return Require<T>( key, false ) ; // non-fatal
+		}
+	catch( const std::exception& e )
+		{
+		std::ostringstream err ;
+		err << "Failed to parse key \"" << key << "\". Keeping old value. Reason: " << e.what();
+		elog << "EConfig::TryRequire<>: " << err.str() << std::endl;
+		configErrors.push_back( err.str() ) ;
+		setError() ;
+		return fallback ;
+		}
+	}
 
 	/**
 	 * Add a key/value pair to the config file.
@@ -423,6 +457,11 @@ protected:
 	 * The error status field.
 	 */
 	bool		error ;
+
+	/**
+	 * A vector containing config errors.
+	 */
+	std::vector< std::string >	configErrors ;
 
 	/**
 	 * The map used to store the file's key/value pairs.
