@@ -459,6 +459,8 @@ return writeFile() ;
 
 void EConfig::Clear()
 {
+	error = false;
+	configErrors.clear();
 	valueMap.clear();
 }
 
