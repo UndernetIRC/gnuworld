@@ -3001,6 +3001,38 @@ elog	<< "xServer::doShutdown> Removed "
 	<< " glines"
 	<< endl ;
 
+count = 0;
+// Remove server command handlers
+for( auto cItr = commandMap.begin() ; cItr != commandMap.end() ; )
+        {
+        ServerCommandHandler* tmpCommand = cItr->second ;
+        ++count ;
+        commandMap.erase( cItr++ ) ;
+        delete tmpCommand ;
+        }
+elog    << "xServer::doShutdown> Removed "
+        << count
+        << " server command handlers"
+        << endl ;
+
+commandMap.clear() ;
+
+count = 0;
+// Remove server command modules
+for( auto cmItr = commandModuleList.begin() ; cmItr != commandModuleList.end() ; )
+		{
+		commandModuleType* tmpCommand = *cmItr ;
+		++count ;
+		delete tmpCommand ;
+		cmItr = commandModuleList.erase( cmItr ) ;
+		}
+elog    << "xServer::doShutdown> Removed "
+		<< count
+		<< " server command modules"
+		<< endl ;
+
+commandModuleList.clear() ;
+
 //elog	<< "xServer::doShutdown> Removing timers..."
 //	<< endl ;
 
