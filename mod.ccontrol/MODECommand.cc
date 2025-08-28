@@ -63,7 +63,7 @@ if( NULL == theChan )
 		st[ 1 ].c_str() ) ;
 	return true ;
 	}
-bot->MsgChanLog("MODE  %s\n",st.assemble(1).c_str());
+bot->MsgChanLog("MODE %s\n",st.assemble(1).c_str());
 
 ccBadChannel* Chan = bot->isBadChannel(st[1]);
 if(Chan)
