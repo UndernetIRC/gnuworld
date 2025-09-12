@@ -99,8 +99,7 @@
 
 /**
  * Define this if you want to enable the 'cs.log' file (log of all commands
- * including login) - Default is to NOT enable the log as it poses a security
- * risk (it contains passwords)
+ * including login).
  */
 #define USE_COMMAND_LOG
 
