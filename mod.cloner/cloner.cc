@@ -70,18 +70,11 @@ cloner::cloner( const string& configFileName )
 {
 EConfig conf( configFileName ) ;
 
-cloneDescription = conf.Require( "clonedescription" )->second ;
-cloneMode = conf.Require( "clonemode" )->second ;
-fakeServerName = conf.Require( "fakeservername" )->second ;
-fakeServerDescription = conf.Require( "fakeserverdescription" )->second ;
-
-allowOpers = false ;
-string stringOperAccess = conf.Require( "allow_opers" )->second ;
-if( !strcasecmp( stringOperAccess, "yes" ) ||
-  !strcasecmp( stringOperAccess, "true" ) )
-  {
-  allowOpers = true ;
-  }
+cloneDescription = conf.Require< string >( "clonedescription" ) ;
+cloneMode = conf.Require< string >( "clonemode" ) ;
+fakeServerName = conf.Require< string >( "fakeservername" ) ;
+fakeServerDescription = conf.Require< string> ( "fakeserverdescription" ) ;
+allowOpers = conf.Require< bool >( "allow_opers" ) ;
 
 EConfig::const_iterator ptr = conf.Find( "permit_user" ) ;
 while( ptr != conf.end() && ptr->first == "permit_user" )
@@ -90,7 +83,7 @@ while( ptr != conf.end() && ptr->first == "permit_user" )
   ++ptr ;
   }
 
-cloneBurstCount = atoi( conf.Require( "cloneburstcount" )->second.c_str() ) ;
+cloneBurstCount = conf.Require< unsigned int >( "cloneburstcount" ) ;
 if( cloneBurstCount < 1 )
   {
   elog	<< "cloner> cloneBurstCount must be at least 1"
@@ -148,8 +141,8 @@ if( accountNames.empty() || confError )
   ::exit( 0 ) ;
   }
 
-minNickLength = atoi( conf.Require( "minnicklength" )->second.c_str() ) ;
-maxNickLength = atoi( conf.Require( "maxnicklength" )->second.c_str() ) ;
+minNickLength = conf.Require< unsigned int >( "minnicklength" ) ;
+maxNickLength = conf.Require< unsigned int >( "maxnicklength" ) ;
 
 if( minNickLength < 1 )
   {
@@ -421,7 +414,7 @@ else if( command == "CYCLE" )
   {
   if( st.size() < 2 )
     {
-    Notice( theClient, "Usage: %s <OFF | time:pst>",
+    Notice( theClient, "Usage: %s <OFF | time:pct>",
       command.c_str() ) ;
     return ;
     }
@@ -447,7 +440,7 @@ else if( command == "CYCLE" )
     StringTokenizer st2( st[ 1 ], ':' ) ;
   if( st2.size() != 2 )
     {
-    Notice( theClient, "Usage: %s <OFF | time:pst>",
+    Notice( theClient, "Usage: %s <OFF | time:pct>",
       command.c_str() ) ;
     return ;
     }
@@ -797,7 +790,7 @@ if( timer_id == cycleCloneTimer )
       }
     }
 
-    cycleCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + cycleTime, this, 0 ) ;
+  cycleCloneTimer = MyUplink->RegisterTimer( ::time( nullptr ) + cycleTime, this, 0 ) ;
   }
 
 if( timer_id == loadCloneTimer )
@@ -879,41 +872,8 @@ if( theChan->getMode( Channel::MODE_R )
 if( banMatch( theChan, theClone ) )
   return 0 ;
 
-stringstream s ;
-s	<< theClone->getCharYYXXX()
-  << " J "
-  << theChan->getName()
-  << " "
-  << theChan->getCreationTime() ;
-
-MyUplink->Write( s ) ;
-
-/* Creating ChannelUser, and adding to network table. */
-ChannelUser* theUser = new (std::nothrow) ChannelUser( theClone ) ;
-assert( theUser != nullptr ) ;
-
-if( !theChan->addUser( theUser ) )
-  {
-  elog  << "clone::OnPrivateMessage> Failed to addUser()."
-        << endl ;
-  delete theUser ; theUser = nullptr ;
+if( !MyUplink->JoinChannel( theClone, theChan->getName() ) )
   return 0 ;
-  }
-
-if( !theClone->addChannel( theChan ) )
-  {
-  elog  << "clone::OnPrivateMessage> Failed to addChannel()."
-        << endl ;
-  theChan->removeUser( theClone ) ;
-  delete theUser ; theUser = nullptr ;
-  return 0 ;
-  }
-
-// Post the event to the clients listening for events on this
-// channel, if any.
-MyUplink->PostChannelEvent( EVT_JOIN, theChan,
-  static_cast< void* >( theClone ),
-  static_cast< void* >( theUser ) ) ;
 
 return 1 ;
 }

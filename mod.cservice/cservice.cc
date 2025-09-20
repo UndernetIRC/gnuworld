@@ -195,9 +195,6 @@ cservice::cservice(const string& args)
  : xClient( args )
 {
 
-#ifdef USE_COMMAND_LOG
-commandLog.open(commandlogPath.c_str());
-#endif
 /*
  *  Register command handlers.
  */
@@ -340,6 +337,18 @@ else
 
 loadConfigVariables();
 loadConfigData();
+
+#ifdef USE_COMMAND_LOG
+/* Init command log file. */
+commandLog.open( commandlogPath ) ;
+if( !commandLog.is_open() )
+	{
+	clog	<< "*** Unable to open CMaster command log file: "
+			<< commandlogPath
+			<< endl ;
+	::exit( 0 ) ;
+	}
+#endif
 
 userHits = 0;
 userCacheHits = 0;
@@ -831,10 +840,6 @@ if( st.empty() )
 	return ;
 	}
 
-#ifdef USE_COMMAND_LOG
-commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Message << endl;
-#endif
-
 /*
  * Do flood checking - admins at 750 or above are excempt.
  * N.B: Only check that *after* someone has flooded ;)
@@ -854,6 +859,15 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 		getUplinkName().c_str());
 	return ;
 	}
+
+#ifdef USE_COMMAND_LOG
+if( Command == "NEWPASS" || Command == "SUSPENDME")
+	commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Command << endl;
+else if( Command == "LOGIN" && st.size() > 1 )
+	commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Command << " " << st[1] << endl;
+else
+	commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Message << endl;
+#endif
 
 /*
  * If the person issuing this command is an authenticated admin, we need to log
