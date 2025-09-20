@@ -50,6 +50,7 @@ public:
 
   virtual void                OnAttach() ;
   virtual void                OnConnect() ;
+  virtual void                OnDetach( const string& ) ;
   virtual void                OnTimer( const xServer::timerID&, void* ) ;
   virtual void                OnPrivateMessage( iClient*, const std::string&,
                                 bool secure = false ) ;
