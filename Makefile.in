@@ -725,7 +725,7 @@ libgnutest_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(libgnutest_la_CXXFLAGS) $(CXXFLAGS) $(libgnutest_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 @COND_MODGNUTEST_TRUE@am_libgnutest_la_rpath = -rpath $(libdir)
-libgnuworld_la_LIBADD =
+libgnuworld_la_DEPENDENCIES =
 am_libgnuworld_la_OBJECTS = libgnuworld/la-Buffer.lo \
 	libgnuworld/la-Connection.lo \
 	libgnuworld/la-ConnectionHandler.lo \
@@ -733,19 +733,21 @@ am_libgnuworld_la_OBJECTS = libgnuworld/la-Buffer.lo \
 	libgnuworld/la-ELog.lo libgnuworld/la-Signal.lo \
 	libgnuworld/la-StringTokenizer.lo libgnuworld/la-gThread.lo \
 	libgnuworld/la-match.lo libgnuworld/la-md5hash.lo \
-	libgnuworld/la-misc.lo
+	libgnuworld/la-logger.lo libgnuworld/la-threadworker.lo \
+	libgnuworld/la-pushover.lo libgnuworld/la-misc.lo
 libgnuworld_la_OBJECTS = $(am_libgnuworld_la_OBJECTS)
 libgnuworld_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) \
 	$(libgnuworld_la_LDFLAGS) $(LDFLAGS) -o $@
 libgnuworldDB_la_LIBADD =
-am_libgnuworldDB_la_OBJECTS = db/gnuworldDB.lo db/pgsqlDB.lo
+am_libgnuworldDB_la_OBJECTS = db/libgnuworldDB_la-gnuworldDB.lo \
+	db/libgnuworldDB_la-pgsqlDB.lo
 libgnuworldDB_la_OBJECTS = $(am_libgnuworldDB_la_OBJECTS)
 libgnuworldDB_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libgnuworldDB_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+	$(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libgnuworldDB_la_LDFLAGS) $(LDFLAGS) -o $@
 am__DEPENDENCIES_1 =
 libgnuworldcore_la_DEPENDENCIES = libgnuworld.la $(am__DEPENDENCIES_1)
 am_libgnuworldcore_la_OBJECTS = src/libgnuworldcore_la-Channel.lo \
@@ -976,8 +978,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = db/$(DEPDIR)/gnuworldDB.Plo \
-	db/$(DEPDIR)/pgsqlDB.Plo libgnuworld/$(DEPDIR)/la-Buffer.Plo \
+am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
+	db/$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo \
+	libgnuworld/$(DEPDIR)/la-Buffer.Plo \
 	libgnuworld/$(DEPDIR)/la-Connection.Plo \
 	libgnuworld/$(DEPDIR)/la-ConnectionHandler.Plo \
 	libgnuworld/$(DEPDIR)/la-ConnectionManager.Plo \
@@ -986,9 +989,12 @@ am__depfiles_remade = db/$(DEPDIR)/gnuworldDB.Plo \
 	libgnuworld/$(DEPDIR)/la-Signal.Plo \
 	libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo \
 	libgnuworld/$(DEPDIR)/la-gThread.Plo \
+	libgnuworld/$(DEPDIR)/la-logger.Plo \
 	libgnuworld/$(DEPDIR)/la-match.Plo \
 	libgnuworld/$(DEPDIR)/la-md5hash.Plo \
 	libgnuworld/$(DEPDIR)/la-misc.Plo \
+	libgnuworld/$(DEPDIR)/la-pushover.Plo \
+	libgnuworld/$(DEPDIR)/la-threadworker.Plo \
 	libircu/$(DEPDIR)/la-msg_AC.Plo \
 	libircu/$(DEPDIR)/la-msg_AD.Plo libircu/$(DEPDIR)/la-msg_B.Plo \
 	libircu/$(DEPDIR)/la-msg_C.Plo libircu/$(DEPDIR)/la-msg_CM.Plo \
@@ -1555,6 +1561,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
+curl_config_bin = @curl_config_bin@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
@@ -1664,6 +1671,8 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	libgnuworld/ELog.h libgnuworld/gThread.h \
 	libgnuworld/ircd_chattr.h libgnuworld/match.h \
 	libgnuworld/match_table.h libgnuworld/md5hash.h \
+	libgnuworld/logger.h libgnuworld/threadworker.h \
+	libgnuworld/notifier.h libgnuworld/pushover.h \
 	libgnuworld/misc.h libgnuworld/MTrie.h libgnuworld/MTrie.cc \
 	libgnuworld/Signal.h libgnuworld/StringTokenizer.h \
 	libgnuworld/xparameters.h $(am__append_2) $(am__append_4) \
@@ -1674,6 +1683,10 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 libgnuworldDB_la_SOURCES = \
 	db/gnuworldDB.cc \
 	db/pgsqlDB.cc
+
+libgnuworldDB_la_CXXFLAGS = \
+	-I$(top_srcdir)/libgnuworld \
+	-I$(top_srcdir)/include
 
 libgnuworldDB_la_LDFLAGS = -L$(pgsql_libdir) -lpq
 libgnuworld_la_SOURCES = \
@@ -1688,9 +1701,13 @@ libgnuworld_la_SOURCES = \
 	libgnuworld/gThread.cc \
 	libgnuworld/match.cc \
 	libgnuworld/md5hash.cc \
+	libgnuworld/logger.cc \
+	libgnuworld/threadworker.cc \
+	libgnuworld/pushover.cc \
 	libgnuworld/misc.cc
 
 libgnuworld_la_LDFLAGS = $(threadLib)
+@COND_LIBCURL_TRUE@libgnuworld_la_LIBADD = -lcurl
 libgnuworld_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/libgnuworld
@@ -1842,7 +1859,7 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODCCONTROL_TRUE@libccontrol_la_LIBADD = libgnuworldDB.la
 @COND_MODCHANFIX_TRUE@libchanfix_la_CXXFLAGS = -I${top_srcdir}/include		\
 @COND_MODCHANFIX_TRUE@				-I${top_srcdir}/libgnuworld	\
-@COND_MODCHANFIX_TRUE@				-Werror -ansi -pedantic
+@COND_MODCHANFIX_TRUE@				-Werror
 
 @COND_MODOPENCHANFIX_TRUE@libchanfix_la_CXXFLAGS = -I$(top_srcdir)db -I${top_srcdir}/include \
 @COND_MODOPENCHANFIX_TRUE@	-I${top_srcdir}/libgnuworld \
@@ -3000,6 +3017,12 @@ libgnuworld/la-match.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-md5hash.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
+libgnuworld/la-logger.lo: libgnuworld/$(am__dirstamp) \
+	libgnuworld/$(DEPDIR)/$(am__dirstamp)
+libgnuworld/la-threadworker.lo: libgnuworld/$(am__dirstamp) \
+	libgnuworld/$(DEPDIR)/$(am__dirstamp)
+libgnuworld/la-pushover.lo: libgnuworld/$(am__dirstamp) \
+	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-misc.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 
@@ -3011,8 +3034,10 @@ db/$(am__dirstamp):
 db/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) db/$(DEPDIR)
 	@: >>db/$(DEPDIR)/$(am__dirstamp)
-db/gnuworldDB.lo: db/$(am__dirstamp) db/$(DEPDIR)/$(am__dirstamp)
-db/pgsqlDB.lo: db/$(am__dirstamp) db/$(DEPDIR)/$(am__dirstamp)
+db/libgnuworldDB_la-gnuworldDB.lo: db/$(am__dirstamp) \
+	db/$(DEPDIR)/$(am__dirstamp)
+db/libgnuworldDB_la-pgsqlDB.lo: db/$(am__dirstamp) \
+	db/$(DEPDIR)/$(am__dirstamp)
 
 libgnuworldDB.la: $(libgnuworldDB_la_OBJECTS) $(libgnuworldDB_la_DEPENDENCIES) $(EXTRA_libgnuworldDB_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libgnuworldDB_la_LINK) -rpath $(libdir) $(libgnuworldDB_la_OBJECTS) $(libgnuworldDB_la_LIBADD) $(LIBS)
@@ -3363,8 +3388,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@db/$(DEPDIR)/gnuworldDB.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@db/$(DEPDIR)/pgsqlDB.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@db/$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-Buffer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-Connection.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-ConnectionHandler.Plo@am__quote@ # am--include-marker
@@ -3374,9 +3399,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-Signal.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-gThread.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-logger.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-match.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-md5hash.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-misc.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-pushover.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-threadworker.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_AC.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_AD.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_B.Plo@am__quote@ # am--include-marker
@@ -5334,12 +5362,47 @@ libgnuworld/la-md5hash.lo: libgnuworld/md5hash.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-md5hash.lo `test -f 'libgnuworld/md5hash.cc' || echo '$(srcdir)/'`libgnuworld/md5hash.cc
 
+libgnuworld/la-logger.lo: libgnuworld/logger.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-logger.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-logger.Tpo -c -o libgnuworld/la-logger.lo `test -f 'libgnuworld/logger.cc' || echo '$(srcdir)/'`libgnuworld/logger.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-logger.Tpo libgnuworld/$(DEPDIR)/la-logger.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/logger.cc' object='libgnuworld/la-logger.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-logger.lo `test -f 'libgnuworld/logger.cc' || echo '$(srcdir)/'`libgnuworld/logger.cc
+
+libgnuworld/la-threadworker.lo: libgnuworld/threadworker.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-threadworker.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-threadworker.Tpo -c -o libgnuworld/la-threadworker.lo `test -f 'libgnuworld/threadworker.cc' || echo '$(srcdir)/'`libgnuworld/threadworker.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-threadworker.Tpo libgnuworld/$(DEPDIR)/la-threadworker.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/threadworker.cc' object='libgnuworld/la-threadworker.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-threadworker.lo `test -f 'libgnuworld/threadworker.cc' || echo '$(srcdir)/'`libgnuworld/threadworker.cc
+
+libgnuworld/la-pushover.lo: libgnuworld/pushover.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-pushover.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-pushover.Tpo -c -o libgnuworld/la-pushover.lo `test -f 'libgnuworld/pushover.cc' || echo '$(srcdir)/'`libgnuworld/pushover.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-pushover.Tpo libgnuworld/$(DEPDIR)/la-pushover.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/pushover.cc' object='libgnuworld/la-pushover.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-pushover.lo `test -f 'libgnuworld/pushover.cc' || echo '$(srcdir)/'`libgnuworld/pushover.cc
+
 libgnuworld/la-misc.lo: libgnuworld/misc.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-misc.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-misc.Tpo -c -o libgnuworld/la-misc.lo `test -f 'libgnuworld/misc.cc' || echo '$(srcdir)/'`libgnuworld/misc.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-misc.Tpo libgnuworld/$(DEPDIR)/la-misc.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/misc.cc' object='libgnuworld/la-misc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-misc.lo `test -f 'libgnuworld/misc.cc' || echo '$(srcdir)/'`libgnuworld/misc.cc
+
+db/libgnuworldDB_la-gnuworldDB.lo: db/gnuworldDB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT db/libgnuworldDB_la-gnuworldDB.lo -MD -MP -MF db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo -c -o db/libgnuworldDB_la-gnuworldDB.lo `test -f 'db/gnuworldDB.cc' || echo '$(srcdir)/'`db/gnuworldDB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='db/gnuworldDB.cc' object='db/libgnuworldDB_la-gnuworldDB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o db/libgnuworldDB_la-gnuworldDB.lo `test -f 'db/gnuworldDB.cc' || echo '$(srcdir)/'`db/gnuworldDB.cc
+
+db/libgnuworldDB_la-pgsqlDB.lo: db/pgsqlDB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT db/libgnuworldDB_la-pgsqlDB.lo -MD -MP -MF db/$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo -c -o db/libgnuworldDB_la-pgsqlDB.lo `test -f 'db/pgsqlDB.cc' || echo '$(srcdir)/'`db/pgsqlDB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) db/$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Tpo db/$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='db/pgsqlDB.cc' object='db/libgnuworldDB_la-pgsqlDB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -c -o db/libgnuworldDB_la-pgsqlDB.lo `test -f 'db/pgsqlDB.cc' || echo '$(srcdir)/'`db/pgsqlDB.cc
 
 src/libgnuworldcore_la-Channel.lo: src/Channel.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldcore_la_CXXFLAGS) $(CXXFLAGS) -MT src/libgnuworldcore_la-Channel.lo -MD -MP -MF src/$(DEPDIR)/libgnuworldcore_la-Channel.Tpo -c -o src/libgnuworldcore_la-Channel.lo `test -f 'src/Channel.cc' || echo '$(srcdir)/'`src/Channel.cc
@@ -6478,8 +6541,8 @@ clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -f db/$(DEPDIR)/gnuworldDB.Plo
-	-rm -f db/$(DEPDIR)/pgsqlDB.Plo
+	-rm -f db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo
+	-rm -f db/$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-Buffer.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-Connection.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-ConnectionHandler.Plo
@@ -6489,9 +6552,12 @@ distclean: distclean-recursive
 	-rm -f libgnuworld/$(DEPDIR)/la-Signal.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-gThread.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-logger.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-match.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-md5hash.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-misc.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-pushover.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-threadworker.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_AC.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_AD.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_B.Plo
@@ -6848,8 +6914,8 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -f db/$(DEPDIR)/gnuworldDB.Plo
-	-rm -f db/$(DEPDIR)/pgsqlDB.Plo
+	-rm -f db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo
+	-rm -f db/$(DEPDIR)/libgnuworldDB_la-pgsqlDB.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-Buffer.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-Connection.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-ConnectionHandler.Plo
@@ -6859,9 +6925,12 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f libgnuworld/$(DEPDIR)/la-Signal.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-gThread.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-logger.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-match.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-md5hash.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-misc.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-pushover.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-threadworker.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_AC.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_AD.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_B.Plo
