@@ -88,18 +88,9 @@ scanemailQuery << "SELECT user_name, email FROM users WHERE "
                 << "lower(email) LIKE '" << escapeSQLChars(searchSQL(email)) << "' LIMIT 50"
                 << ends;
 
-#ifdef LOG_SQL
-	elog	<< "SCANEMAIL::sqlQuery> "
-		<< scanemailQuery.str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec( scanemailQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
         {
-        elog    << "SCANEMAIL> SQL Error: "
-                << bot->SQLDb->ErrorMessage()
-                << endl ;
+        LOGSQL_ERROR( bot->SQLDb ) ;
         return false ;
         }
 

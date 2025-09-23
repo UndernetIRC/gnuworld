@@ -89,8 +89,21 @@ AC_CHECK_LIB(nsl,gethostbyname)
 dnl Check for pcre for building a test program.
 dnl If it is not present, just don't build the program.
 AC_CHECK_LIB(pcre,pcre_compile,
-	AM_CONDITIONAL(COND_PCRE,[/bin/true]),
-	AM_CONDITIONAL(COND_PCRE,[/bin/false]))
+	AM_CONDITIONAL(COND_PCRE,[true]),
+	AM_CONDITIONAL(COND_PCRE,[false]))
+
+dnl Check for libcurl using pkg-config
+PKG_CHECK_MODULES([LIBCURL], [libcurl],
+    [AC_DEFINE([HAVE_LIBCURL], [1], [Define if you have libcurl])
+     AM_CONDITIONAL(COND_LIBCURL,[true])
+     CXXFLAGS="$CXXFLAGS $LIBCURL_CFLAGS"
+     CPPFLAGS="$CPPFLAGS $LIBCURL_CFLAGS"
+     LIBS="$LIBS $LIBCURL_LIBS"
+     libcurl_found=yes],
+    [AM_CONDITIONAL(COND_LIBCURL,[false])
+     libcurl_found=no
+     AC_MSG_WARN([libcurl not found - HTTP features will be disabled])])
+
 dnl AC_CHECK_LIB(z,inflate)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)

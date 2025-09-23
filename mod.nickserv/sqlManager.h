@@ -32,6 +32,8 @@ namespace gnuworld {
 
 namespace ns {
 
+class nickserv;
+
 using std::string ;
 using std::vector ;
 
@@ -41,7 +43,7 @@ class sqlManager {
      * Implement sqlManager as a singleton
      * Only way to get a reference to the manager is through this method
      */
-    static sqlManager* getInstance(const string&, int);
+    static sqlManager* getInstance(nickserv*, const string&, int);
 
     /** Allow checking out of database connections */
     dbHandle* getConnection();
@@ -61,7 +63,7 @@ class sqlManager {
      * through getInstance()
      * @see #getInstance
      */
-    sqlManager(const string&, int);
+    sqlManager(nickserv*, const string&, int);
 
     /**
      * Disable the default destructor so that other objects cannot destruct
@@ -71,6 +73,9 @@ class sqlManager {
 
     /** The string storing our DB connection path */
     string dbString;
+
+    /** The bot instance */
+    nickserv* bot;
 
     /** Our PgDatabase instance */
     dbHandle* SQLDb;

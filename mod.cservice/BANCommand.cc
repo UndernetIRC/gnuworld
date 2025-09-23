@@ -488,15 +488,9 @@ for( ; counter < st2.size() ; counter++ ) {
 	 *  Fill out new ban details.
 	 */
 
-	sqlBan* newBan = new (std::nothrow) sqlBan(bot->SQLDb);
+	sqlBan* newBan = new (std::nothrow) sqlBan(bot, theChan->getID(), banTarget, theUser->getUserName(), bot->currentTime(), banLevel);
 	assert( newBan != 0 ) ;
 
-	// TODO: Use a decent constructor for this
-	newBan->setChannelID(theChan->getID());
-	newBan->setBanMask(banTarget);
-	newBan->setSetBy(theUser->getUserName());
-	newBan->setSetTS(bot->currentTime());
-	newBan->setLevel(banLevel);
 	//Leave 0 to 0, meaning a permanent ban.
 	if(banTime > 0)
 		newBan->setExpires(banTime + bot->currentTime());

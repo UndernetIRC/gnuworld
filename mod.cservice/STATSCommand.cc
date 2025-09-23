@@ -113,10 +113,9 @@ return true;
 
 
 bot->Notice(theClient, "CMaster Command/SQL Query Statistics:");
-for( cservice::statsMapType::iterator ptr = bot->statsMap.begin();
-	ptr != bot->statsMap.end() ; ++ptr )
+for( const auto& [key, value] : bot->getStatsMap() )
 	{
-	bot->Notice(theClient, "%s: %i", ptr->first.c_str(), ptr->second);
+	bot->Notice( theClient, "%s: %i", key.c_str(), value ) ;
 	}
 
 bot->Notice(theClient, "-- End of STATS");

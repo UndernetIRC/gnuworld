@@ -30,6 +30,7 @@
 #include "gnuworld_config.h"
 #include "ELog.h"
 #include "sqlManager.h"
+#include "chanfix.h"
 
 namespace gnuworld
 {
@@ -50,12 +51,12 @@ sqlManager* sqlManager::theManager = 0;
  * initialise must be called prior to attempted to obtain an instance.
  * This method is static.
  */
-sqlManager* sqlManager::getInstance(const std::string& _dbString)
+sqlManager* sqlManager::getInstance(chanfix* _bot, const std::string& _dbString)
 {
 if(theManager) return theManager;
 
 /* There is currently no sqlManager instance */
-return new sqlManager(_dbString);
+return new sqlManager(_bot, _dbString);
 } // static sqlManager* sqlManager::getInstance(const std::string&)
 
 
@@ -73,7 +74,7 @@ dbHandle* sqlManager::getConnection()
 elog << "*** [sqlManager:getConnection] Attempting DB connection to: "
   << dbString << std::endl;
 
-dbHandle* tempCon = new (std::nothrow) dbHandle(dbString);
+dbHandle* tempCon = new (std::nothrow) dbHandle(bot, dbString);
 assert(tempCon != 0);
 
 if(tempCon->ConnectionBad()) {
@@ -123,10 +124,11 @@ delete theManager; theManager = 0;
  * This is our constructor that initialises DB communications.
  * It is only ever called from initialize().
  */
-sqlManager::sqlManager(const std::string& _dbString)
+sqlManager::sqlManager(chanfix* _bot, const std::string& _dbString)
 {
 /* Construct our DB object */
 dbString = _dbString;
+bot = _bot;
 SQLDb = getConnection();
 } // sqlManager::sqlManager(const std::string&)
 

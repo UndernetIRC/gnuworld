@@ -177,15 +177,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 		<< " AND user_id = " << targetUser->getID()
 		<< ";" << ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlQuery> "
-		<< theQuery.str()
-		<< endl;
-#endif
-
 	if (bot->SQLDb->Exec(theQuery))
-//	if ((status = bot->SQLDb->Exec(theQuery.str().c_str())) == 
-//PGRES_COMMAND_OK)
 	{
 		bot->Notice(theClient,
 			bot->getResponse(theUser,
@@ -200,14 +192,12 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 			//bot->Notice(theClient,"I will always remember you!");
 		}
 	} else {
+		LOGSQL_ERROR( bot->SQLDb ) ;
 		bot->dbErrorMessage(theClient);
  	}
 
 	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..) */
-
-	pair<int, int> thePair;
-	thePair = std::make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
-	bot->sqlLevelCache.erase(thePair);
+	bot->removeLevelCache(tmpLevel);
 	delete(tmpLevel);
 	
 	// If strictop is set, the client has no longer right for op

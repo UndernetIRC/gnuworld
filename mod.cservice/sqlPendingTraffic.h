@@ -34,7 +34,7 @@ class sqlPendingTraffic
 {
 
 public:
-	sqlPendingTraffic(dbHandle*);
+	sqlPendingTraffic(cservice*);
 	bool insertRecord();
 	bool commit();
 
@@ -42,6 +42,7 @@ public:
 	string ip_number;
 	unsigned int join_count; 
 
+	Logger*		logger;
 	dbHandle*	SQLDb;
 };
 

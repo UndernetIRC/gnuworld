@@ -98,20 +98,17 @@ if (level < level::rehash_coder)
 
 if (option == "CONFIG")
 	{
-		bot->configTable.clear();
-		bot->loadConfigData();
-		bot->Notice(theClient, "Done. %i entries in config table.",
-			bot->configTable.size());
+		bot->rehashConfigData();
+		bot->Notice(theClient, "Done. %zu entries in config table.",
+			bot->getConfigData_size());
 		// TODO: Free up the memory allocated in building this table ;)
 	}
 
 if (option == "VARIABLES")
 {
-	bot->clearConfigVariables();
-	bot->parseConfigFile();
-	bot->loadConfigVariables();
-	bot->Notice(theClient, "Done. Red %i configuration variables.",
-		bot->getConfigVariableSize());
+	bot->rehashConfigVariables();
+	bot->Notice(theClient, "Done. Red %zu configuration variables.",
+		bot->getConfigVariables_size());
 }
 
 return true ;

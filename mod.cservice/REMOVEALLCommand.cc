@@ -103,18 +103,10 @@ clearAllQuery	<< "SELECT user_id FROM levels WHERE"
 		<< theChan->getID()
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlQuery> "
-		<< clearAllQuery.str().c_str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec(clearAllQuery, true ) )
-//if( status != PGRES_TUPLES_OK )
 	{
-	elog	<< "REMOVEALL> SQL Error: "
-		<< bot->SQLDb->ErrorMessage()
-		<< endl ;
+	LOG( ERROR, "REMOVEALLCommand SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false ;
 	}
 
@@ -128,10 +120,11 @@ int delCounter = bot->SQLDb->Tuples();
 
 for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 {
-	pair<int, int> thePair( atoi(bot->SQLDb->GetValue(i, 0)), theChan->getID() );
+	const std::pair<int, int> thePair{ atoi(bot->SQLDb->GetValue(i, 0)), theChan->getID() };
 
-	cservice::sqlLevelHashType::iterator ptr = bot->sqlLevelCache.find(thePair);
-	if(ptr != bot->sqlLevelCache.end())
+	const auto& levelCache = bot->getLevelCache();
+	auto ptr = levelCache.find(thePair);
+	if(ptr != levelCache.end())
 		{
 		/*
 		 *  Found it in the cache, free the memory and
@@ -139,7 +132,7 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		 */
 
 		delete(ptr->second);
-		bot->sqlLevelCache.erase(thePair);
+		bot->removeLevelCache( atoi( bot->SQLDb->GetValue(i, 0) ), theChan->getID() ) ;
 		}
 }
 
@@ -154,12 +147,6 @@ deleteAllQuery	<< "DELETE FROM levels WHERE"
 		<< theChan->getID()
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlQuery> "
-		<< deleteAllQuery.str().c_str()
-		<< endl;
-#endif
-
 if (bot->SQLDb->Exec(deleteAllQuery))
 	{
 		bot->Notice(theClient, "Done. Zapped %i access records from %s",
@@ -169,6 +156,8 @@ if (bot->SQLDb->Exec(deleteAllQuery))
 			sqlChannel::EV_REMOVEALL, "" );
 	} else
 	{
+		LOG( ERROR, "REMOVEALLCommand SQL Error:") ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
 		bot->Notice(theClient, "A database error occured while removing the access records.");
 		bot->Notice(theClient, "Please contact a database administrator!");
 	}

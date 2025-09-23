@@ -190,7 +190,8 @@ connectString	<< "host=" << sqlHost << " "
 elog << "dronescan::dronescan> Connecting to SQL Server." << std::endl;
 
 //SQLDb = new PgDatabase(connectString.str().c_str());
-SQLDb = new dbHandle( sqlHost,
+SQLDb = new dbHandle( this,
+	sqlHost,
 	atoi( sqlPort ),
 	sqlDB,
 	sqlUsername,

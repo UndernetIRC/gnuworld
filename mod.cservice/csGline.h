@@ -31,6 +31,8 @@
 namespace gnuworld
 { 
 
+class cservice;
+
 using std::string ;
 using std::list ;
 
@@ -38,7 +40,7 @@ class csGline
 {
 public:
 
-	csGline(dbHandle*);
+	csGline(cservice*);
 	
 	virtual ~csGline();
 	//Mehods for getting info
@@ -113,6 +115,8 @@ protected:
 	time_t Expires;
 	time_t LastUpdated;
 	string Reason;
+
+	Logger*		logger;
 	dbHandle* SQLDb;
 	
 }; // class csGline

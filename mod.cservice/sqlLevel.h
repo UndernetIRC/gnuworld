@@ -31,10 +31,12 @@ using std::string ;
 namespace gnuworld
 {
 
+class cservice;
+
 class sqlLevel
 {
 public:
-	sqlLevel(dbHandle*) ;
+	sqlLevel(cservice*) ;
 	virtual ~sqlLevel() ;
 
 	typedef unsigned int	flagType ;
@@ -169,6 +171,7 @@ protected:
 	time_t			last_updated ;
 	time_t			last_used;
 
+	Logger*			logger;
 	dbHandle*		SQLDb;
 } ;
 

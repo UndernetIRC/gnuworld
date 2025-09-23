@@ -54,6 +54,8 @@ public:
 
         void    setServer( xServer* _server )
                 { server = _server ; }
+        void    setLogger( Logger* _logger )
+                { logger = _logger ; }
         virtual string getInfo() const
                 { return commName + ' ' + help ; }
         virtual void Usage( iClient* theClient ) ;
@@ -71,6 +73,7 @@ protected:
         string          commName ;
         string          help ;
 	unsigned short  flood_points ;
+        Logger*         logger ;
 
 } ;
 

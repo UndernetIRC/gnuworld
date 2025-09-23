@@ -38,6 +38,7 @@
 #include	"cservice_config.h"
 #include	"sqlPendingChannel.h"
 #include	"sqlPendingTraffic.h"
+#include	"cservice.h"
  
 namespace gnuworld
 {
@@ -46,12 +47,14 @@ using std::endl ;
 using std::ends ;
 using std::stringstream ;
 
-sqlPendingChannel::sqlPendingChannel(dbHandle* _SQLDb)
+sqlPendingChannel::sqlPendingChannel(cservice* _bot)
 :channel_id(0), 
 join_count(0),
 unique_join_count(0),
 initialised(false),
-SQLDb(_SQLDb)
+bot(_bot),
+logger(_bot->getLogger()),
+SQLDb(_bot->SQLDb)
 { 
 }
 
@@ -89,21 +92,14 @@ theQuery 	<< "SELECT ip_number, join_count FROM pending_traffic"
 			<< " WHERE channel_id = " << channel_id
 			<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlPendingChannel::loadTrafficCache> "
-		<< theQuery.str().c_str()
-		<< endl; 
-#endif
-
 if( SQLDb->Exec(theQuery, true ) )
-//if( PGRES_TUPLES_OK == status )
 	{
 	for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{ 
 			string theIp = SQLDb->GetValue(i, 0);
 //			elog << "IP: " << theIp << endl;
 
-			sqlPendingTraffic* trafRecord = new sqlPendingTraffic(SQLDb);
+			sqlPendingTraffic* trafRecord = new sqlPendingTraffic(bot);
 			trafRecord->ip_number = theIp;
 			trafRecord->join_count = atoi(SQLDb->GetValue(i, 1));
 			trafRecord->channel_id = channel_id; 
@@ -120,19 +116,12 @@ void sqlPendingChannel::loadSupportersTraffic()
 				<< " WHERE channel_id = " << channel_id
 				<< ends;
 
-	#ifdef LOG_SQL
-		elog	<< "sqlPendingChannel::loadUniqueTrafficCache> "
-			<< theQuery.str().c_str()
-			<< endl;
-	#endif
-
 	if( SQLDb->Exec(theQuery, true ) )
-	//if( PGRES_TUPLES_OK == status )
 	{
 		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		{
 			string userId = SQLDb->GetValue(i, 0);
-			sqlPendingTraffic* trafRecord = new sqlPendingTraffic(SQLDb);
+			sqlPendingTraffic* trafRecord = new sqlPendingTraffic(bot);
 			trafRecord->ip_number = userId;
 			trafRecord->join_count = atoi(SQLDb->GetValue(i, 1));
 			trafRecord->channel_id = channel_id;
@@ -173,22 +162,11 @@ queryString << "UPDATE pending SET "
 			<< channel_id
 			<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlPendingChannel::commit> "
-			<< queryString.str().c_str()
-			<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-
-	elog	<< "sqlPendingChannel::commit> Something went wrong: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
-
-	return false ;
- 	} 
+	LOGSQL_ERROR( SQLDb ) ;
+	return false;
+ 	}
 
 	/*
 	 *  Next, iterate over the supporters and commit those details.
@@ -214,18 +192,10 @@ bool sqlPendingChannel::commitSupporter(unsigned int sup_id, unsigned int count)
 				<< " AND user_id = "
 				<< sup_id
 				<< ends;
-	
-	#ifdef LOG_SQL
-		elog	<< "sqlPendingChannel::commit> "
-				<< queryString.str().c_str()
-				<< endl;
-	#endif
-	
+		
 	if( !SQLDb->Exec(queryString ) )
-//	if( PGRES_COMMAND_OK != status )
 		{
-			elog << "sqlPendingChannel::commit> Error updating supporter "
-				 << "record for " << sup_id << endl;
+		LOGSQL_ERROR( SQLDb ) ;
 		}
 
 	return true;

@@ -96,7 +96,7 @@ if (!theUser)
 		return false;
 	}
 
-sqlChannel* theChan = bot->getChannelRecord(bot->coderChan);
+sqlChannel* theChan = bot->getChannelRecord(bot->getConfcoderChan());
 //if (!theChan)
 //	{
 //	return true;

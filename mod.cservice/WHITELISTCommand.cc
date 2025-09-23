@@ -107,17 +107,10 @@ stringstream whitelistQuery;
 whitelistQuery 	<< "SELECT ip, addedby, addedon, expiresat, reason FROM whitelist WHERE "
 		<< "IP = '" << strIP << "'" << ends;
 
-#ifdef LOG_SQL
-        elog    << "WHITELIST::sqlQuery> "
-                << whitelistQuery.str()
-                << endl;
-#endif
-
 if( !bot->SQLDb->Exec( whitelistQuery, true ) )
         {
-        elog    << "WHITELIST> SQL Error: "
-                << bot->SQLDb->ErrorMessage()
-                << endl ;
+		LOG( ERROR, "WHITELISTCommand SQL Error:") ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
         return false ;
         }
 
@@ -187,17 +180,10 @@ if (option == "ADD")
 			<< whiteReason << "')"
 	                << ends;
 
-#ifdef LOG_SQL
-        elog    << "WHITELIST::sqlQuery> "
-                << whitelistQuery.str()
-                << endl;
-#endif
-
 if( !bot->SQLDb->Exec( whitelistQuery, true ) )
         {
-        elog    << "WHITELIST> SQL Error: "
-                << bot->SQLDb->ErrorMessage()
-                << endl ;
+		LOG( ERROR, "WHITELISTCommand SQL Error:") ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
 		return false;
         }
 	bot->Notice(theClient, "IP %s added to the whitelist.", strIP.c_str());
@@ -225,18 +211,12 @@ if (option == "REM" || option == "DEL")
 	whitelistQuery  << "DELETE FROM whitelist "
 			<< "WHERE ip = '" << dbIP
 			<< "'" << ends;
-#ifdef LOG_SQL
-        elog    << "WHITELIST::sqlQuery> "
-                << whitelistQuery.str()
-	        << endl;
-#endif
 
 if( !bot->SQLDb->Exec( whitelistQuery, true ) )
         {
-	elog    << "WHITELIST> SQL Error: "
-                << bot->SQLDb->ErrorMessage()
-                << endl ;
-                return false;
+		LOG( ERROR, "WHITELISTCommand SQL Error:") ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
+		return false;
         }
 	bot->Notice(theClient, "Removed IP %s from the whitelist.", strIP.c_str());
         return true;

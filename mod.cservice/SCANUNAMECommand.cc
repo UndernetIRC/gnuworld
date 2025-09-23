@@ -92,18 +92,9 @@ scanunameQuery << "SELECT user_name, signup_ip FROM users WHERE "
                 << "lower(user_name) LIKE '" << escapeSQLChars(searchSQL(uname)) << "' LIMIT 50"
                 << ends;
 
-#ifdef LOG_SQL
-	elog	<< "SCANUNAME::sqlQuery> "
-		<< scanunameQuery.str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec( scanunameQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
         {
-        elog    << "SCANUNAME> SQL Error: "
-                << bot->SQLDb->ErrorMessage()
-                << endl ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
         return false ;
         }
 

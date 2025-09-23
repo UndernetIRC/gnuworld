@@ -86,18 +86,10 @@ theQuery	<< "SELECT channels.id FROM pending,channels"
 			<< " AND pending.status = 0"
 			<< ends;
 
-#ifdef LOG_SQL
-elog	<< "SUPPORTCommand::sqlQuery> "
-		<< theQuery.str().c_str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "SUPPORTCommand> SQL Error: "
-			<< bot->SQLDb->ErrorMessage()
-			<< endl ;
+	LOG( ERROR, "SUPPORTCommand SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false ;
 	}
 
@@ -123,18 +115,10 @@ supQuery 	<< "SELECT support FROM supporters"
 			<< theUser->getID()
 			<< ends;
 
-#ifdef LOG_SQL
-elog	<< "SUPPORTCommand::sqlQuery> "
-		<< supQuery.str().c_str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec( supQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "SUPPORTCommand> SQL Error: "
-			<< bot->SQLDb->ErrorMessage()
-			<< endl ;
+	LOG( ERROR, "SUPPORTCommand SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false ;
 	}
 
@@ -171,18 +155,10 @@ updateQuery	<< "UPDATE supporters SET support = '"
 			<< theUser->getID()
 			<< ends;
 
-#ifdef LOG_SQL
-elog	<< "SUPPORTCommand::sqlQuery> "
-		<< updateQuery.str().c_str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec( updateQuery ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-	elog	<< "SUPPORTCommand> SQL Error: "
-			<< bot->SQLDb->ErrorMessage()
-			<< endl ;
+	LOG( ERROR, "SUPPORTCommand SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 
 	bot->Notice(theClient, "An Error occured whilst processing your support. Please contact a CService Administrator.");
 	return false ;
@@ -191,8 +167,8 @@ if( !bot->SQLDb->Exec( updateQuery ) )
 bot->Notice(theClient, "Done. Set your support for %s to %s.",
 	channelName.c_str(), support.c_str());
 
-bot->logDebugMessage("%s has set their support for %s to %c.",
-	theUser->getUserName().c_str(), channelName.c_str(), supportChar);
+LOG( INFO, "{} has set their support for {} to {}.",
+	theUser->getUserName(), channelName, supportChar);
 
 /*
  * Right, now if they've voted "YES", and there are 10 supporters who have said YES
@@ -211,18 +187,10 @@ if (supportChar == 'Y')
 				<< channel_id
 				<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "SUPPORTCommand::sqlQuery> "
-			<< tenQuery.str().c_str()
-			<< endl;
-#endif
-
 	if( !bot->SQLDb->Exec( tenQuery, true ) )
-//	if( PGRES_TUPLES_OK != status )
 		{
-		elog	<< "SUPPORTCommand> SQL Error: "
-				<< bot->SQLDb->ErrorMessage()
-				<< endl ;
+		LOG( ERROR, "SUPPORTCommand SQL Error:") ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
 		return false ;
 		}
 
@@ -236,7 +204,7 @@ if (supportChar == 'Y')
 
 	string support;
 	unsigned int supporterCount = bot->SQLDb->Tuples();
-	if (supporterCount < bot->RequiredSupporters) return false;
+	if (supporterCount < bot->getConfRequiredSupporters()) return false;
 
 	for (unsigned int i = 0 ; i < supporterCount; i++)
 		{
@@ -255,15 +223,9 @@ if (supportChar == 'Y')
 							<< " AND status = '0'"
 							<< ends;
 
-#ifdef LOG_SQL
-		elog	<< "SUPPORTCommand::sqlQuery> "
-				<< updatePendingQuery.str().c_str()
-				<< endl;
-#endif
-
 		bot->SQLDb->Exec( updatePendingQuery.str().c_str() ) ;
-		bot->logDebugMessage("%s has just made it to traffic check phase with %i supporters.",
-			channelName.c_str(), supporterCount);
+		LOG( INFO, "{} has just made it to traffic check phase with {} supporters.",
+			channelName, supporterCount);
 	}
 
 return true;
@@ -290,15 +252,8 @@ if (supportChar == 'N')
 						<< " AND status = '0'"
 						<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "SUPPORTCommand::sqlQuery> "
-			<< updatePendingQuery.str().c_str()
-			<< endl;
-#endif
-
 	bot->SQLDb->Exec( updatePendingQuery.str().c_str() ) ;
-	bot->logDebugMessage("%s has just been declined due to non-support.",
-		channelName.c_str());
+	LOG( INFO, "{} has just been declined due to non-support.", channelName ) ;
 
 	/*
 	 * Now, add some non-support entries.
@@ -313,27 +268,19 @@ if (supportChar == 'N')
 				<< " AND pending.status = '9'"
 				<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "SUPPORTCommand::sqlQuery> "
-			<< mgrQuery.str().c_str()
-			<< endl;
-#endif
-
 	if( !bot->SQLDb->Exec( mgrQuery, true ) )
-//	if( PGRES_TUPLES_OK != status )
-	{
-		elog	<< "SUPPORTCommand> SQL Error: "
-				<< bot->SQLDb->ErrorMessage()
-				<< endl ;
+		{
+		LOG( ERROR, "SUPPORTCommand SQL Error:") ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
 		return false ;
-	}
+		}
 
 	// TODO: Comparing unsigned against 0
 	if(bot->SQLDb->Tuples() > 0)
 	{
 		string managerName = bot->SQLDb->GetValue(0,0);
 		string managerEmail = bot->SQLDb->GetValue(0,1);
-		int noregTime = bot->JudgeDaySeconds * bot->NoRegDaysOnNOSupport;
+		int noregTime = bot->getConfJudgeDaySeconds() * bot->getConfNoRegDaysOnNOSupport();
 		static const char* cmdHeader = "INSERT INTO noreg (user_name,email,channel_name,type,expire_time,created_ts,set_by,reason) VALUES ";
 
 		stringstream noregQuery;
@@ -345,12 +292,6 @@ if (supportChar == 'N')
 					<< noregTime
 					<< ")), date_part('epoch', CURRENT_TIMESTAMP)::int, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
-
-#ifdef LOG_SQL
-		elog	<< "SUPPORTCommand::sqlQuery> "
-				<< noregQuery.str().c_str()
-				<< endl;
-#endif
 
 		bot->SQLDb->Exec( noregQuery.str().c_str() ) ;
 
@@ -367,12 +308,6 @@ if (supportChar == 'N')
 					<< "1, (date_part('epoch', CURRENT_TIMESTAMP)::int + (86400*3)), date_part('epoch', CURRENT_TIMESTAMP)::int, '* REGPROC', '-NON SUPPORT-'"
 					<< ")" << ends;
 
-#ifdef LOG_SQL
-		elog	<< "SUPPORTCommand::sqlQuery> "
-				<< usernoregQuery.str().c_str()
-				<< endl;
-#endif
-
 		bot->SQLDb->Exec( usernoregQuery.str().c_str() ) ;
 
 		/*
@@ -387,12 +322,6 @@ if (supportChar == 'N')
 					<< escapeSQLChars(theUser->getUserName()) << "', "
 					<< "date_part('epoch', CURRENT_TIMESTAMP)::int)"
 					<< ends;
-
-#ifdef LOG_SQL
-		elog	<< "SUPPORTCommand::sqlQuery> "
-				<< clogQuery.str().c_str()
-				<< endl;
-#endif
 
 		bot->SQLDb->Exec( clogQuery.str().c_str() ) ;
 	}

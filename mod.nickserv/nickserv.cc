@@ -83,7 +83,7 @@ int commitCount = atoi(nickservConfig->Require("commitCount")->second.c_str());
 string dbString = "host=" + dbHost + " port=" + dbPort + " dbname=" + dbDb
   + " user="+dbUser + " password=" + dbPass;
 
-theManager = sqlManager::getInstance(dbString, commitCount);
+theManager = sqlManager::getInstance(this, dbString, commitCount);
 
 /* Precache the users */
 precacheUsers();

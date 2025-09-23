@@ -34,6 +34,7 @@
 #include	"constants.h"
 #include	"cservice_config.h"
 #include	"sqlPendingTraffic.h"
+#include	"cservice.h"
  
 namespace gnuworld
 {
@@ -42,11 +43,12 @@ using std::endl ;
 using std::ends ;
 using std::stringstream ;
 
-sqlPendingTraffic::sqlPendingTraffic(dbHandle* _SQLDb)
+sqlPendingTraffic::sqlPendingTraffic(cservice* _bot)
 :channel_id(0),
 ip_number(string()),
 join_count(0),
-SQLDb(_SQLDb)
+logger(_bot->getLogger()),
+SQLDb(_bot->SQLDb)
 { 
 }
 
@@ -61,19 +63,9 @@ queryString << "INSERT INTO pending_traffic (channel_id, ip_number, join_count) 
 			<< join_count << ")"
 			<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlPendingTraffic::insertRecord> "
-		<< queryString.str().c_str()
-		<< endl; 
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
-	{ 
-	elog	<< "sqlPendingTraffic::commit> Something went wrong: "
-			<< SQLDb->ErrorMessage()
-			<< endl;
-
+	{
+	LOGSQL_ERROR( SQLDb ) ;
 	return false;
  	} 
 
@@ -95,22 +87,13 @@ bool sqlPendingTraffic::commit()
 				<< "'"
 				<< ends;
 	
-	#ifdef LOG_SQL
-		elog	<< "sqlPendingTraffic::commit> "
-				<< queryString.str().c_str()
-				<< endl;
-	#endif
-	
 	if( !SQLDb->Exec(queryString ) )
-//	if( PGRES_COMMAND_OK != status )
 		{
-			elog << "sqlPendingTraffic::commit> Error updating pending_traffic "
-				 << "record for " << ip_number << endl;
+		LOGSQL_ERROR( SQLDb ) ;
+		return false;
 		}
 
 	return true;
 }
 
- 
 }
-

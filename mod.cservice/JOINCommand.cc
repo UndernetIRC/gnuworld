@@ -100,7 +100,7 @@ bot->Join(theChan->getName(),
 	"+R",
 	theChan->getChannelTS(),
 	true);
-bot->joinCount++;
+bot->incrementJoinCount();
 
 return true;
 }

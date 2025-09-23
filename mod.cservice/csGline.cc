@@ -43,14 +43,15 @@ using std::ends ;
 
 unsigned int csGline::numAllocated = 0;
 
-csGline::csGline(dbHandle* _SQLDb)
+csGline::csGline(cservice* _bot)
  : Id(),
    AddedBy(),
    AddedOn( 0 ),
    Expires( 0 ),
    LastUpdated( 0 ),
    Reason(),
-   SQLDb( _SQLDb )
+   logger(_bot->getLogger()),
+   SQLDb(_bot->SQLDb)
 {
 ++numAllocated;
 }
@@ -72,14 +73,11 @@ delQuery	<< Del
 
 
 if( !SQLDb->Exec( delQuery ) )
-//if( PGRES_COMMAND_OK != status ) 
 	{
-	elog	<< "csGline::DeleteOnInsert> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
-	return false ;
+	LOGSQL_ERROR( SQLDb ) ;
+	return false;
 	}
+
 //Now insert the new one
 static const char *Main = "INSERT INTO Glines (Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason) VALUES ('";
 
@@ -93,20 +91,13 @@ theQuery	<< Main
 		<< escapeSQLChars(Reason) << "')"
 		<< ends;
 
-elog	<< "Gline::Insert::sqlQuery> "
-	<< theQuery.str().c_str()
-	<< endl; 
-
 if( SQLDb->Exec( theQuery ) )
-//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
 else
 	{
-	elog	<< "cservice::Gline::Insert> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
+	LOGSQL_ERROR( SQLDb ) ;
 	return false;
 	}
 
@@ -143,15 +134,12 @@ elog	<< "cservice::Gline::Update> "
 	<< endl; 
 
 if( SQLDb->Exec( theQuery ) )
-//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
 else
 	{
-	elog	<< "cservice::Gline::Update> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
+	LOGSQL_ERROR( SQLDb ) ;
 	return false;
 	}
 }
@@ -165,17 +153,9 @@ theQuery	<< Main
 		<< GlineId
 		<< ends;
 
-elog	<< "cservice::glineload> "
-	<< theQuery.str().c_str()
-	<< endl; 
-
 if( !SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "csGline::load> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
+	LOGSQL_ERROR( SQLDb ) ;
 	return false ;
 	}
 
@@ -204,19 +184,12 @@ theQuery	<< Main
 		<< escapeSQLChars(HostName.c_str())
 		<< "'" << ends;
 
-elog	<< "cservice::loadData> "
-	<< theQuery.str().c_str()
-	<< endl; 
-
 if( !SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "csGline::loadData> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
-	return false ;
+	LOGSQL_ERROR( SQLDb ) ;
+	return false;
 	}
+
 
 if(SQLDb->Tuples() == 0) //If no gline was found
 	return false;
@@ -245,21 +218,13 @@ theQuery	<< Main
 		<< Id
 		<< ends;
 
-elog	<< "cservice::glineDelete> "
-	<< theQuery.str().c_str()
-	<< endl; 
-
 if( SQLDb->Exec( theQuery ) )
-//if( PGRES_COMMAND_OK == status ) 
 	{
 	return true;
 	}
 else
 	{
-	elog	<< "csGline::csDelete> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
+	LOGSQL_ERROR( SQLDb ) ;
 	return false ;
 	}
 return true;
