@@ -18,7 +18,9 @@
  *
  */
 #include <string>
+#ifdef HAVE_FORMAT
 #include <format>
+#endif
 
 #include "Channel.h"
 #include "Network.h"
