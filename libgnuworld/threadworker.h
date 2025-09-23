@@ -60,7 +60,7 @@ private:
   std::unique_ptr< Logger > logger ;
 
   /* The bot. */
-  xClient* bot = nullptr ;
+  [[maybe_unused]] xClient* bot = nullptr ;
 
   void run() ;
 } ;

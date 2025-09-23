@@ -63,12 +63,20 @@ while( true )
   catch( const std::exception& e )
     {
     if( logger )
+#ifdef HAVE_FORMAT
       logger->write( ERROR, "ThreadWorker: Exception in job execution: {}", e.what() ) ;
+#else
+      elog << "ThreadWorker: Exception in job execution: " << e.what() << std::endl ;
+#endif
     }
   catch( ... )
     {
     if( logger )
+#ifdef HAVE_FORMAT
       logger->write( ERROR, "ThreadWorker: Unknown exception in job execution" ) ;
+#else
+      elog << "ThreadWorker: Unknown exception in job execution" << std::endl ;
+#endif
     }
   }
 }

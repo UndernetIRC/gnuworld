@@ -61,6 +61,7 @@ if( v >= logVerbose )
         << endl ;
   }
 
+#ifdef HAVE_FORMAT
 /* Send notification. */
 for( const auto& [ notifier, logLevel ] : notifiers )
   {
@@ -94,6 +95,7 @@ if( v >= chanVerbose && bot->isConnected() && !debugChan.empty() )
             getColourReset( v ) ) ) ;
     }
   }
+#endif
 }
 
 std::string Logger::parseFunction( std::string pretty )

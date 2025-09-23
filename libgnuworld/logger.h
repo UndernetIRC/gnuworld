@@ -21,7 +21,9 @@
 #pragma once
 
 #include <string>
+#ifdef HAVE_FORMAT
 #include <format>
+#endif
 #include <map>
 #include <array>
 #include <memory>
@@ -32,8 +34,13 @@
 #include "notifier.h"
 
 /* Logger macro. Passes on the caller function. */
+#ifdef HAVE_FORMAT
 #define LOG(x, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, __VA_ARGS__)
 #define LOGSQL_ERROR(x)  logger->writeFunc(ERROR, __PRETTY_FUNCTION__, "SQL Error: {}", x->ErrorMessage())
+#else
+#define LOG(x, ...)  
+#define LOGSQL_ERROR(x) elog << "SQL Error: " << x->ErrorMessage() << std::endl ;
+#endif
 
 namespace gnuworld
 {
@@ -193,7 +200,7 @@ public:
 
   /* Log to the debug and admin channel */
   void write( Verbose, const std::string& ) ;
-
+#ifdef HAVE_FORMAT
   template< typename Format, typename... Args >
   void write( Verbose v, const Format& format, Args&&... args )
   {
@@ -213,6 +220,7 @@ public:
     std::make_format_args( args... ) ) ;
   write( v, fmtString ) ;
   }
+#endif
 } ; // class Logger
 
 } // namespace gnuworld
