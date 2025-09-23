@@ -87,6 +87,10 @@ bool Channel::addUser( ChannelUser* newUser )
 {
 assert( newUser != 0 ) ;
 
+#ifdef USE_THREAD
+std::unique_lock< std::shared_mutex > lock( chanMutex ) ;
+#endif
+
 //elog	<< "Channel::addUser> ("
 //	<< getName()
 //	<< ") Number of users: "
@@ -136,6 +140,10 @@ return removeUser( theClient->getIntYYXXX() ) ;
 
 ChannelUser* Channel::removeUser( const unsigned int& intYYXXX )
 {
+#ifdef USE_THREAD
+std::unique_lock< std::shared_mutex > lock( chanMutex ) ;
+#endif
+
 ChannelUser* tmpUser;
 
 // Attempt to find the user in question

@@ -23,22 +23,24 @@ class dbHandle
 #endif
 {
 public:
-	dbHandle( const std::string& dbHost,
+	dbHandle( xClient* bot,
+		const std::string& dbHost,
 		const unsigned short int dbPort,
 		const std::string& dbName,
 		const std::string& userName,
 		const std::string& password )
 #ifdef HAVE_PGSQL
-	: pgsqlDB( dbHost,
+		: pgsqlDB( bot,
+		dbHost,
 		dbPort,
 		dbName,
 		userName,
 		password )
 #endif
 	{}
-	dbHandle( const std::string& connectInfo )
+	dbHandle( xClient* bot, const std::string& connectInfo )
 #ifdef HAVE_PGSQL
-	: pgsqlDB( connectInfo )
+	: pgsqlDB( bot, connectInfo )
 #endif
 	{}
 	virtual ~dbHandle() {}

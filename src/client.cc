@@ -73,6 +73,9 @@ hostName = conf.Require( "hostname" )->second ;
 userDescription = conf.Require( "userdescription" )->second ;
 
 Mode( conf.Require( "mode" )->second ) ;
+
+/* Initialize logger */
+logger = std::make_unique< Logger >( this ) ;
 }
 
 xClient::~xClient()

@@ -91,6 +91,41 @@ dnl If it is not present, just don't build the program.
 AC_CHECK_LIB(pcre,pcre_compile,
 	AM_CONDITIONAL(COND_PCRE,[/bin/true]),
 	AM_CONDITIONAL(COND_PCRE,[/bin/false]))
+
+dnl Check for libcurl (required if using raw libcurl code paths)
+AC_CHECK_LIB(curl, curl_easy_init,
+    [AC_DEFINE([HAVE_LIBCURL], [1], [Define if you have libcurl])
+     AM_CONDITIONAL(COND_LIBCURL,[/bin/true])
+     libcurl_found=yes],
+    [AM_CONDITIONAL(COND_LIBCURL,[/bin/false])
+     libcurl_found=no])
+
+AC_CHECK_HEADER([curl/curl.h], [],
+    [if test "$libcurl_found" = "yes"; then
+        AC_MSG_WARN([libcurl library found but headers missing - some features may not work])
+     fi])
+
+if test "x$libcurl_found" = "xyes" ; then
+    AC_PATH_PROG([curl_config_bin], [curl-config])
+    if test -n "$curl_config_bin" ; then
+        AC_MSG_RESULT([Using curl-config: $curl_config_bin])
+        CURL_CFLAGS=`$curl_config_bin --cflags 2>/dev/null`
+        CURL_LIBS=`$curl_config_bin --libs 2>/dev/null`
+        if test -n "$CURL_CFLAGS" ; then
+            CXXFLAGS="$CXXFLAGS $CURL_CFLAGS"
+            CPPFLAGS="$CPPFLAGS $CURL_CFLAGS"
+        fi
+        if test -n "$CURL_LIBS" ; then
+            LDFLAGS="$LDFLAGS $CURL_LIBS"
+        else
+            LDFLAGS="$LDFLAGS -lcurl"
+        fi
+    else
+        dnl Fallback: add -lcurl to linker flags
+        LDFLAGS="$LDFLAGS -lcurl"
+    fi
+fi
+
 dnl AC_CHECK_LIB(z,inflate)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)

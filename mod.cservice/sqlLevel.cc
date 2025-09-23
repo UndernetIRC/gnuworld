@@ -51,7 +51,7 @@ const sqlLevel::flagType sqlLevel::F_AUTOVOICE =0x08 ;
 const sqlLevel::flagType sqlLevel::F_ONDB =		0x10 ;
 const sqlLevel::flagType sqlLevel::F_AUTOINVITE = 0x20;
 
-sqlLevel::sqlLevel(dbHandle* _SQLDb)
+sqlLevel::sqlLevel(cservice* _bot)
  :channel_id(0),
  user_id(0),
  access(0),
@@ -66,7 +66,8 @@ sqlLevel::sqlLevel(dbHandle* _SQLDb)
  last_modif(::time(NULL)),
  last_modif_by(),
  last_used(0),
- SQLDb( _SQLDb )
+ logger(_bot->getLogger()),
+ SQLDb(_bot->SQLDb)
 {
 }
 
@@ -93,12 +94,6 @@ queryString	<< "SELECT "
 		<< " AND user_id = "
 		<< userID
 		<< ends;
-
-#ifdef LOG_SQL
-	elog 	<< "sqlLevel::loadData> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
 
 if( SQLDb->Exec(queryString, true ) )
 //if( PGRES_TUPLES_OK == status )
@@ -170,20 +165,9 @@ queryString	<< queryHeader
 		<< " AND user_id = " << user_id
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlLevel::commit> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-	// TODO: Log to msgchan here.
-	elog	<< "sqlLevel::commit> Something went wrong: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
-
+	LOGSQL_ERROR( SQLDb ) ;
 	return false;
  	}
 
@@ -207,21 +191,10 @@ queryString	<< queryHeader
 			<< "date_part('epoch', CURRENT_TIMESTAMP)::int)"
 			<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlLevel::insertRecord> "
-			<< queryString.str().c_str()
-			<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-	// TODO: Log to msgchan here.
-	elog	<< "sqlLevel::commit> Something went wrong: "
-			<< SQLDb->ErrorMessage()
-			<< endl;
-
-	return false ;
+	LOGSQL_ERROR( SQLDb ) ;
+	return false;
  	}
 
 return true;

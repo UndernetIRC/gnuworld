@@ -134,21 +134,13 @@ managerQuery	<< "SELECT users.user_name,users.email "
 		<< " LIMIT 1"
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlQuery> "
-		<< managerQuery.str().c_str()
-		<< endl;
-#endif
-
 string manager = "No Manager";
 string managerEmail = "No Email Address";
 
 if( !bot->SQLDb->Exec(managerQuery, true ) )
-//if( status != PGRES_TUPLES_OK )
 	{
-	elog	<< "PURGE> SQL Error: "
-		<< bot->SQLDb->ErrorMessage()
-		<< endl ;
+	LOG( ERROR, "PURGECommand SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false ;
 	}
 else
@@ -269,10 +261,9 @@ Channel* tmpChan = Network->findChannel(theChan->getName());
 if (tmpChan)
 	bot->getUplink()->Mode(NULL, tmpChan, string("-R"), string() );
 bot->Part(theChan->getName());
-bot->joinCount--;
+bot->decrementJoinCount();
 
-bot->sqlChannelCache.erase(theChan->getName());
-bot->sqlChannelIDCache.erase(theChan->getID());
+bot->removeChannelCache(theChan);
 delete(theChan);
 
 return true ;

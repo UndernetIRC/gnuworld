@@ -30,12 +30,19 @@ using std::string ;
 
 namespace gnuworld
 { 
+
+class cservice;
  
 class sqlBan
 {
 
 public:
-	sqlBan(dbHandle*) ;
+	sqlBan(cservice* _bot) ;
+	sqlBan(cservice* _bot, int _channelID, const std::string& _banMask, 
+		const std::string& _setBy, time_t _setTS, int _level);
+	sqlBan(cservice* _bot, int _channelID, const std::string& _banMask, 
+		const std::string& _setBy, time_t _setTS, int _level, 
+		time_t _expires, const std::string& _reason);
 	virtual ~sqlBan() ;
  
 	/*
@@ -113,6 +120,7 @@ protected:
 	string		reason ; 
 	time_t		last_updated ;
 	
+	Logger*		logger;
 	dbHandle*	SQLDb;
 } ;
 

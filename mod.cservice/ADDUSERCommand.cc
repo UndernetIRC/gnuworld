@@ -203,14 +203,7 @@ theQuery	<< queryHeader
 		<< ");"
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "ADDUSER::sqlQuery> "
-		<< theQuery.str().c_str()
-		<< endl;
-#endif
-
 if( bot->SQLDb->Exec(theQuery ) )
-//if( PGRES_COMMAND_OK == status )
 {
 	bot->Notice(theClient,
 		bot->getResponse(theUser,
@@ -228,7 +221,7 @@ if( bot->SQLDb->Exec(theQuery ) )
 	 * Add this new record to the level cache.
 	 */
 
-	sqlLevel* newLevel = new (std::nothrow) sqlLevel(bot->SQLDb);
+	sqlLevel* newLevel = new (std::nothrow) sqlLevel(bot);
 	newLevel->setChannelId(theChan->getID());
 	newLevel->setUserId(targetUser->getID());
 	newLevel->setAccess(targetAccess);
@@ -238,8 +231,7 @@ if( bot->SQLDb->Exec(theQuery ) )
 	newLevel->setLastModif(bot->currentTime());
 	newLevel->setLastModifBy("(" + theUser->getUserName() + ") " + theClient->getNickUserHost());
 
-	pair<int, int> thePair( newLevel->getUserId(), newLevel->getChannelId());
-	bot->sqlLevelCache.insert(cservice::sqlLevelHashType::value_type(thePair, newLevel));
+	bot->insertLevelCache(newLevel);
 
 	/*
 	 *  "If they where added to *, set their invisible flag" (Ace).
@@ -259,7 +251,9 @@ if( bot->SQLDb->Exec(theQuery ) )
 }
 else
 	{
-	bot->dbErrorMessage(theClient);
+	LOG( ERROR, "ADDUSER SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
+	bot->dbErrorMessage( theClient ) ;
 	}
 
 return true ;

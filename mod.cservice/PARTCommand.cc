@@ -98,7 +98,7 @@ if (level < level::part)
 	}
 
 theChan->setInChan(false);
-bot->joinCount--;
+bot->decrementJoinCount();
 
 /* Forced access. */
 if (bot->isForced(theChan, theUser))

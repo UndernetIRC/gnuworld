@@ -82,7 +82,7 @@ if ((maxFailedLogins > 0) && (failedLogins >= maxFailedLogins))
 
 sqlUser* theUser;
 int auth_res =  bot->authenticateUser(st[1],st.assemble(2),theClient,&theUser);
-unsigned int loginTime = bot->getUplink()->getStartTime() + bot->loginDelay;
+unsigned int loginTime = bot->getUplink()->getStartTime() + bot->getConfloginDelay();
 unsigned int max_failed_logins = bot->getConfigVar("FAILED_LOGINS")->asInt();
 unsigned int failed_login_rate = bot->getConfigVar("FAILED_LOGINS_RATE")->asInt();
 string clientList;

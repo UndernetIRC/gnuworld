@@ -109,7 +109,7 @@ const int sqlChannel::EV_CLRREVIEW	= 18 ;
 const int sqlChannel::EV_SUSPEND	= 19 ;
 const int sqlChannel::EV_UNSUSPEND	= 20 ;
 
-sqlChannel::sqlChannel(dbHandle* _SQLDb)
+sqlChannel::sqlChannel(cservice* _bot)
  : id(0),
    name(),
    flags(0),
@@ -147,7 +147,8 @@ sqlChannel::sqlChannel(dbHandle* _SQLDb)
    limit_jointimerID(0),
    max_bans(0),
    no_take(0),
-   SQLDb( _SQLDb )
+   logger(_bot->getLogger()),
+   SQLDb(_bot->SQLDb)
 {
 }
 
@@ -174,12 +175,6 @@ queryString	<< "SELECT "
 		<< escapeSQLChars(string_lower(channelName))
 		<< "'"
 		<< ends ;
-
-#ifdef LOG_SQL
-	elog	<< "sqlChannel::loadData> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
 
 if( SQLDb->Exec(queryString, true ) )
 //if( PGRES_TUPLES_OK == status )
@@ -220,12 +215,6 @@ queryString	<< "SELECT "
 		<< " FROM channels WHERE id = "
 		<< channelID
 		<< ends ;
-
-#ifdef LOG_SQL
-	elog	<< "sqlChannel::loadData> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
 
 if( SQLDb->Exec(queryString, true ) )
 //if( PGRES_TUPLES_OK == status )
@@ -321,18 +310,9 @@ queryString	<< queryHeader
 		<< queryCondition << id
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlChannel::commit> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-	elog	<< "sqlChannel::commit> Something went wrong: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
+	LOGSQL_ERROR( SQLDb ) ;
 	return false;
  	}
 
@@ -355,20 +335,9 @@ queryString	<< queryHeader
 			<< ")"
 			<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlChannel::insertRecord> "
-			<< queryString.str().c_str()
-			<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-	// TODO: Log to msgchan here.
-	elog	<< "sqlChannel::commit> Something went wrong: "
-			<< SQLDb->ErrorMessage()
-			<< endl;
-
+	LOGSQL_ERROR( SQLDb ) ;
 	return false ;
  	}
 

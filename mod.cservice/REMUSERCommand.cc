@@ -204,10 +204,7 @@ bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
  	}
 
 	/* Remove tmpLevel from the cache. (It has to be there, we just got it even if it wasnt..) */
-
-	pair<int, int> thePair;
-	thePair = std::make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
-	bot->sqlLevelCache.erase(thePair);
+	bot->removeLevelCache(tmpLevel);
 	delete(tmpLevel);
 	
 	// If strictop is set, the client has no longer right for op

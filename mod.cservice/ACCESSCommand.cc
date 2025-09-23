@@ -274,12 +274,6 @@ theQuery	<< queryHeader
 		<< queryFooter
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "ACCESS::sqlQuery> "
-		<< theQuery.str().c_str()
-		<< endl;
-#endif
-
 // If theChan is no needed after this point, better to delete it now
 if (historysearch)
 {
@@ -292,11 +286,9 @@ if (historysearch)
  */
 
 if( !bot->SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "ACCESS> SQL Error: "
-		<< bot->SQLDb->ErrorMessage()
-		<< endl ;
+	LOG( ERROR, "ACCESS SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false ;
 	}
 

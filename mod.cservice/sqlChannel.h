@@ -113,7 +113,7 @@ class sqlChannel
 {
 
 public:
-	sqlChannel(dbHandle*) ;
+	sqlChannel(cservice*) ;
 	virtual ~sqlChannel() ;
 
 	typedef unsigned int	flagType ;
@@ -593,6 +593,7 @@ protected:
 	unsigned int no_take;
 	time_t		now;
 
+	Logger*		logger;
 	dbHandle*	SQLDb;
 
  } ;

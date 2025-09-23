@@ -292,18 +292,10 @@ authQuery	<< "SELECT users.user_name,levels.access FROM "
 		<< " ORDER BY levels.access DESC"
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlQuery> "
-		<< authQuery.str().c_str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec( authQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "STATUS> SQL Error: "
-		<< bot->SQLDb->ErrorMessage()
-		<< endl ;
+	LOG( ERROR, "STATUSCommand SQL Error:") ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false ;
 	}
 
@@ -317,13 +309,9 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	/*
 	 *  Look up this username in the cache.
 	 */
-
-	cservice::sqlUserHashType::iterator ptr =
-		bot->sqlUserCache.find(bot->SQLDb->GetValue(i, 0));
-
-	if(ptr != bot->sqlUserCache.end())
+	sqlUser* currentUser = bot->getUserRecord(bot->SQLDb->GetValue(i, 0));
+	if(currentUser)
 		{
-		sqlUser* currentUser = ptr->second;
 		if( !currentUser->isAuthed() )
 			{
 			continue ;

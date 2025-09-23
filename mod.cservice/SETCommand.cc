@@ -842,8 +842,7 @@ else
 				ptr != theChan->forceMap.end(); ++ptr)
 			{
 				// Look up this username in the cache.
-				cservice::sqlUserHashType::iterator ptr2 = bot->sqlUserCache.find(ptr->second.second);
-				sqlUser* AdminUser = ptr2->second;
+				sqlUser* AdminUser = bot->getUserRecord(ptr->second.second);
 				int ForceLevel = ptr->second.first;
 
 				//Now Remove force access who is not privileged :)
@@ -1476,7 +1475,7 @@ else
 			theChan->setInChan(true);
 			bot->Join(theChan->getName(), "+R",
 				theChan->getChannelTS(), true);
-			bot->joinCount++;
+			bot->incrementJoinCount();
 		    bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::set_cmd_status,
@@ -1496,7 +1495,7 @@ else
 				theChan->getName().c_str(),
 				theChan->getFlag(sqlChannel::F_AUTOJOIN) ? "ON" : "OFF");
 			theChan->setInChan(false);
-			bot->joinCount--;
+			bot->decrementJoinCount();
 			bot->Part(theChan->getName());
 		}
 	    else
@@ -1921,23 +1920,23 @@ else
 		// Extract numbers based on colon if present
 		if (ss >> limit_joins >> colon >> limit_secs && colon == ':')
 		{
-			if (limit_joins < (int)bot->limitJoinMaxLowest || limit_joins > (int)bot->limitJoinMaxHighest)
+			if (limit_joins < (int)bot->getConflimitJoinMaxLowest() || limit_joins > (int)bot->getConflimitJoinMaxHighest())
 			{
 				bot->Notice(theClient,
 					bot->getResponse(theUser,
 						language::set_joinmax_joinrange,
 						string("Value of joins has to be %i-%i")).c_str(),
-						(int)bot->limitJoinMaxLowest, (int)bot->limitJoinMaxHighest);
+						(int)bot->getConflimitJoinMaxLowest(), (int)bot->getConflimitJoinMaxHighest());
 				return true;
 			}
 
-			if (limit_secs < (int)bot->limitJoinSecsLowest || limit_secs > (int)bot->limitJoinSecsHighest)
+			if (limit_secs < (int)bot->getConflimitJoinSecsLowest() || limit_secs > (int)bot->getConflimitJoinSecsHighest())
 			{
 				bot->Notice(theClient,
 					bot->getResponse(theUser,
 						language::set_joinmax_secrange,
 						string("Value of seconds has to be %i-%i")).c_str(),
-						(int)bot->limitJoinSecsLowest, (int)bot->limitJoinSecsHighest);
+						(int)bot->getConflimitJoinSecsLowest(), (int)bot->getConflimitJoinSecsHighest());
 				return true;
 			}
 
@@ -1988,7 +1987,7 @@ else
 			return false;
 		}
 
-		std::string allowedModes = bot->limitJoinAllowedModes;
+		std::string allowedModes = bot->getConflimitJoinAllowedModes();
 		std::string resultModes = "";
 
 		StringTokenizer::size_type numParam = 0;
@@ -2038,7 +2037,7 @@ else
 				bot->getResponse(theUser,
 					language::set_joinmode_allowed,
 					string("The allowed JOINMODE modes are: %s")).c_str(),
-					bot->limitJoinAllowedModes.c_str());
+					bot->getConflimitJoinAllowedModes().c_str());
 			return true;
 		}
 
@@ -2087,13 +2086,13 @@ else
 		}
 
 		unsigned int limit_period = atoi(value.c_str());
-		if ((limit_period < 1) || (limit_period > bot->limitJoinPeriodHighest))
+		if ((limit_period < 1) || (limit_period > bot->getConflimitJoinPeriodHighest()))
 		{
 			bot->Notice(theClient,
 				bot->getResponse(theUser,
 					language::set_joinperiod_range,
 					string("Value of JOINPERIOD has to be 1-%i")).c_str(),
-					(int) bot->limitJoinPeriodHighest);
+					(int) bot->getConflimitJoinPeriodHighest());
 			return true;
 		}
 

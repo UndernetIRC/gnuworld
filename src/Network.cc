@@ -607,6 +607,11 @@ if( ptr == channels_end() )
 	return 0 ;
 	}
 tmpChan = ptr->second;
+
+#ifdef USE_THREAD
+std::unique_lock< std::shared_mutex > lock( tmpChan->getMutex() ) ;
+#endif
+
 channelMap.erase( ptr ) ;
 return tmpChan;
 }

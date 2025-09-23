@@ -53,7 +53,7 @@ bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 
 	bool instantReg = false;
 
-	if (bot->RequiredSupporters == 0)
+	if (bot->getConfRequiredSupporters() == 0)
 		instantReg = true;
 
 	/*

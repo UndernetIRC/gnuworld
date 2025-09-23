@@ -26,6 +26,7 @@
 #include "ELog.h"
 #include "sqlManager.h"
 #include	"dbHandle.h"
+#include	"nickserv.h"
 #include <cstdlib>
 
 using std::endl ;
@@ -47,12 +48,12 @@ sqlManager* sqlManager::theManager = 0;
  * initialise must be called prior to attempted to obtain an instance.
  * This method is static.
  */
-sqlManager* sqlManager::getInstance(const string& _dbString, int _commitQueueMax)
+sqlManager* sqlManager::getInstance(nickserv* _bot, const string& _dbString, int _commitQueueMax)
 {
 if(theManager) return theManager;
 
 /* There is currently no sqlManager instance */
-return new sqlManager(_dbString, _commitQueueMax);
+return new sqlManager(_bot, _dbString, _commitQueueMax);
 } // static sqlManager* sqlManager::getInstance(const string&)
 
 /*********************************
@@ -68,7 +69,7 @@ dbHandle* sqlManager::getConnection()
 elog << "*** [sqlManager:getConnection] Attempting DB connection to: "
   << dbString << endl;
 
-dbHandle* tempCon = new (std::nothrow) dbHandle(dbString.c_str());
+dbHandle* tempCon = new (std::nothrow) dbHandle(bot, dbString.c_str());
 assert(tempCon != 0);
 
 if(tempCon->ConnectionBad()) {
@@ -154,10 +155,11 @@ void sqlManager::queueCommit(const string& theStatement)
  * and any of the queues that will be used
  * It is only ever called from initialise()
  */
-sqlManager::sqlManager(const string& _dbString, int _commitQueueMax)
+sqlManager::sqlManager(nickserv* _bot, const string& _dbString, int _commitQueueMax)
 {
 /* Construct our DB object and initialise queues */
 dbString = _dbString;
+bot = _bot;
 SQLDb = getConnection();
 commitQueueMax = _commitQueueMax;
 

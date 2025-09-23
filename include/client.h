@@ -33,6 +33,7 @@
 #include	"iClient.h"
 #include	"events.h"
 #include	"TimerHandler.h"
+#include	"logger.h"
 
 namespace gnuworld
 {
@@ -891,6 +892,12 @@ public:
 		{ return configFileName ; }
 
 	/**
+	 * Returns a pointer to the logger object of this client.
+	 */
+	inline Logger* getLogger()
+		{ return logger.get() ; }
+
+	/**
 	 * Return true if the server is connected to a network.
 	 */
 	inline bool isConnected() const
@@ -1013,6 +1020,11 @@ protected:
 	 * its configuration information.
 	 */
 	std::string	configFileName ;
+
+	/**
+	 * Logger instance.
+	 */
+	std::unique_ptr< Logger > logger ;
 } ;
 
 } // namespace gnuworld

@@ -100,13 +100,13 @@ if (string_lower(st[1]) == "send")
 	 * send right now?
 	 */
 
-	if( (unsigned int)(bot->currentTime() - theUser->getLastNote()) >= bot->noteDuration )
+	if( (unsigned int)(bot->currentTime() - theUser->getLastNote()) >= bot->getConfnoteDuration() )
 		{
 		theUser->setLastNote(bot->currentTime());
 		theUser->setNotesSent(0);
 		}
 
-	if( ((unsigned int)(bot->currentTime() - theUser->getLastNote()) <= bot->noteDuration) && (theUser->getNotesSent() >= bot->noteLimit) )
+	if( ((unsigned int)(bot->currentTime() - theUser->getLastNote()) <= bot->getConfnoteDuration()) && (theUser->getNotesSent() >= bot->getConfnoteLimit()) )
 		{
 		bot->Notice(theClient, "You have exceeded the maximum number of notes you can send at this time, please try later.");
 		return false;
@@ -128,18 +128,10 @@ if (string_lower(st[1]) == "send")
 				<< "date_part('epoch', CURRENT_TIMESTAMP)::int);"
 				<< ends;
 
-	#ifdef LOG_SQL
-		elog	<< "NOTECommand::Insert Note> "
-				<< queryString.str().c_str()
-				<< endl;
-	#endif
-
 	if( !bot->SQLDb->Exec(queryString ) )
-//	if( PGRES_COMMAND_OK != status )
 		{
-		elog	<< "sqlBan::commit> Something went wrong: "
-				<< bot->SQLDb->ErrorMessage()
-				<< endl;
+		LOG( ERROR, "NOTECommand SQL Error:") ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
 
 		bot->Notice(theClient, "An unknown error occured delivering the note.");
 		return false ;
@@ -224,15 +216,10 @@ if (string_lower(st[1]) == "erase")
 					<< theUser->getID()
 					<< ends;
 
-		#ifdef LOG_SQL
-			elog	<< "NOTECommand::Delete Notes> "
-					<< queryString.str().c_str()
-					<< endl;
-		#endif
-
 		if( !bot->SQLDb->Exec(queryString ) )
-//		if( PGRES_COMMAND_OK != status )
 			{
+			LOG( ERROR, "NOTECommand SQL Error:") ;
+			LOGSQL_ERROR( bot->SQLDb ) ;
 			bot->Notice(theClient, "An unknown error occured while deleting your notes.");
 			return false;
 			}
@@ -259,15 +246,10 @@ if (string_lower(st[1]) == "erase")
 					<< messageId
 					<< ends;
 
-		#ifdef LOG_SQL
-			elog	<< "NOTECommand::Delete Notes> "
-					<< queryString.str().c_str()
-					<< endl;
-		#endif
-
 		if( !bot->SQLDb->Exec(queryString, true ) )
-//		if( PGRES_COMMAND_OK != status )
 			{
+			LOG( ERROR, "NOTECommand SQL Error:") ;
+			LOGSQL_ERROR( bot->SQLDb ) ;
 			bot->Notice(theClient, "An error occured while deleting note-id %i.", messageId);
 			return false;
 			}

@@ -32,6 +32,8 @@
 #include	"libpq-fe.h"
 #include	"gnuworldDB.h"
 #include	"pgsqlDB.h"
+#include	"client.h"
+#include	"logger.h"
 
 namespace gnuworld
 {
@@ -41,12 +43,14 @@ using std::ends ;
 using std::string ;
 using std::stringstream ;
 
-pgsqlDB::pgsqlDB( const string& dbHost,
+pgsqlDB::pgsqlDB( xClient* _bot,
+	const string& dbHost,
 	const unsigned short int dbPort,
 	const string& dbName,
 	const string& userName,
 	const string& password )
 : gnuworldDB( dbHost, dbPort, dbName, userName, password ),
+  bot( _bot ),
   theDB( 0 ),
   lastResult( 0 )
 {
@@ -82,7 +86,8 @@ if( !isConnected() )
 	}
 }
 
-pgsqlDB::pgsqlDB( const string& connectInfo )
+pgsqlDB::pgsqlDB( xClient* _bot, const string& connectInfo )
+: bot( _bot )
 {
 // TODO
 // Allow exception to be thrown
@@ -117,8 +122,12 @@ if( lastResult != 0 )
 	}
 }
 
-bool pgsqlDB::Exec( const string& theQuery, bool dataRet )
+bool pgsqlDB::Exec( const string& theQuery, bool log )
 {
+/* Log query. */
+if (log)
+    bot->getLogger()->write( SQL, theQuery ) ;
+
 // It is necessary to manually deallocate the last result
 // to prevent memory leaks.
 if( lastResult != 0 )
@@ -129,23 +138,10 @@ if( lastResult != 0 )
 lastResult = PQexec( theDB, theQuery.c_str() ) ;
 
 ExecStatusType status = PQresultStatus( lastResult ) ;
-if( dataRet )
-	{
-	// User is expecting data back, so return status according
-	// to tuples being returned
-	if (PGRES_COPY_IN == status) return true;
-	if (PGRES_TUPLES_OK == status) return true;
-	if (PGRES_COMMAND_OK == status) return true;
-	return false;
-	}
-else
-	{
-	// Command execution with no data returned.
-	if (PGRES_COPY_IN == status) return true;
-        if (PGRES_TUPLES_OK == status) return true;
-	if (PGRES_COMMAND_OK == status) return true;
-        return false;
-	}
+if (PGRES_COPY_IN == status) return true;
+if (PGRES_TUPLES_OK == status) return true;
+if (PGRES_COMMAND_OK == status) return true;
+return false;
 }
 
 bool pgsqlDB::Exec( const stringstream& theQuery, bool retData )

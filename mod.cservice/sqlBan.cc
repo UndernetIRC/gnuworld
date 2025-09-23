@@ -41,7 +41,7 @@ using std::endl ;
 using std::ends ;
 using std::stringstream ;
 
-sqlBan::sqlBan(dbHandle* _SQLDb)
+sqlBan::sqlBan(cservice* _bot)
   : id(0),
     channel_id(0),
     banmask(),
@@ -51,7 +51,41 @@ sqlBan::sqlBan(dbHandle* _SQLDb)
     expires(0),
     reason(),
     last_updated(0),
-    SQLDb(_SQLDb)
+	logger(_bot->getLogger()),
+    SQLDb(_bot->SQLDb)
+{
+}
+
+sqlBan::sqlBan(cservice* _bot, int _channelID, const std::string& _banMask, 
+		const std::string& _setBy, time_t _setTS, int _level)
+  : id(0),
+    channel_id(_channelID),
+    banmask(_banMask),
+    set_by(_setBy),
+    set_ts(_setTS),
+    level(_level),
+    expires(0),
+    reason(),
+    last_updated(0),
+    logger(_bot->getLogger()),
+    SQLDb(_bot->SQLDb)
+{
+}
+
+sqlBan::sqlBan(cservice* _bot, int _channelID, const std::string& _banMask, 
+	const std::string& _setBy, time_t _setTS, int _level, 
+	time_t _expires, const std::string& _reason)
+: id(0),
+channel_id(_channelID),
+banmask(_banMask),
+set_by(_setBy),
+set_ts(_setTS),
+level(_level),
+expires(_expires),
+reason(_reason),
+last_updated(0),
+logger(_bot->getLogger()),
+SQLDb(_bot->SQLDb)
 {
 }
 
@@ -95,20 +129,9 @@ queryString	<< queryHeader
 		<< " WHERE id = " << id
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlBan::commit> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-	// TODO: Log to msgchan here.
-	elog	<< "sqlBan::commit> Something went wrong: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
-
+	LOGSQL_ERROR( SQLDb ) ;
 	return false ;
  	}
 
@@ -135,20 +158,9 @@ queryString	<< queryHeader
 		<< "date_part('epoch', CURRENT_TIMESTAMP)::int); SELECT currval('bans_id_seq')"
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlBan::insertRecord> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	// TODO: Log to msgchan here.
-	elog	<< "sqlBan::commit> Something went wrong: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
-
+	LOGSQL_ERROR( SQLDb ) ;
 	return false ;
  	}
 
@@ -169,22 +181,11 @@ queryString	<< queryHeader
 		<< id
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlBan::delete> "
-		<< queryString.str()
-		<< endl;
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
 	{
-	// TODO: Log to msgchan here.
-	elog	<< "sqlBan::commit> Something went wrong: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
-
+	LOGSQL_ERROR( SQLDb ) ;
 	return false ;
- 	}
+	}
 
 return true ;
 }

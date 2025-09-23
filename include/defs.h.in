@@ -79,6 +79,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define if you have libcurl */
+#undef HAVE_LIBCURL
+
 /* Define if you have the libdl library or equivalent. */
 #undef HAVE_LIBDL
 

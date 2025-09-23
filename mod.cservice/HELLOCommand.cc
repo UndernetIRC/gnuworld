@@ -158,12 +158,8 @@ theQuery	<< "SELECT id FROM users WHERE lower(email) = '"
 			<< ends;
 if (!bot->SQLDb->Exec(theQuery, true))
 {
-	bot->logDebugMessage("SQL error on HELLOCommand, matching e-mail address");
-#ifdef LOG_SQL
-	elog 	<< "HELLOCommand> SQL Error: "
-			<< bot->SQLDb->ErrorMessage()
-			<< endl;
-#endif
+	LOG( ERROR, "SQL error on HELLOCommand, matching e-mail address" ) ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false;
 } else if (bot->SQLDb->Tuples() != 0)
 {

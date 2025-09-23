@@ -30,6 +30,7 @@
 
 #include	"libpq-fe.h"
 #include	"gnuworldDB.h"
+#include	"client.h"
 
 namespace gnuworld
 {
@@ -37,20 +38,22 @@ namespace gnuworld
 class pgsqlDB : public gnuworldDB
 {
 protected:
+	xClient			*bot ;
 	PGconn			*theDB ;
 	PGresult		*lastResult ;
 
 public:
-	pgsqlDB( const std::string& dbHost,
+	pgsqlDB( xClient* bot,
+		const std::string& dbHost,
 		const unsigned short int dbPort,
 		const std::string& dbName,
 		const std::string& userName,
 		const std::string& password );
-	pgsqlDB( const std::string& connectInfo );
+	pgsqlDB( xClient* bot, const std::string& connectInfo );
 	virtual ~pgsqlDB() ;
 
-	virtual bool		Exec( const std::string&, bool = false ) ;
-	virtual bool		Exec( const std::stringstream&, bool = false ) ;
+	virtual bool		Exec( const std::string&, bool = true ) ;
+	virtual bool		Exec( const std::stringstream&, bool = true ) ;
 	virtual bool		isConnected() const ;
 
 	virtual bool		PutLine( const std::string& ) ;

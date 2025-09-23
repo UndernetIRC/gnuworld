@@ -28,15 +28,18 @@
 #include	<vector>
 #include	<map>
 #include	<array>
+#include	<functional>
 
 #include	<ctime>
 
 #include	"misc.h"
+#include	"logger.h"
 #include	"client.h"
 #include	"iClient.h"
 #include	"iServer.h"
 #include	"EConfig.h"
 #include	"cservice_config.h"
+#include	"cservice_confvars.h"
 #include	"cserviceCommands.h"
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
@@ -45,6 +48,11 @@
 #include	"sqlPendingChannel.h"
 #include	"csGline.h"
 #include	"dbHandle.h"
+#include	"pushover.h"
+
+#ifdef USE_THREAD
+#include	"threadworker.h"
+#endif
 
 namespace gnuworld
 {
@@ -64,7 +72,7 @@ class ConfigData
 
 public:
 	string string_value;
-	unsigned int int_value;
+	unsigned int int_value = 0;
 
 	inline const string&	asString() const
 		{ return string_value ; }
@@ -83,31 +91,263 @@ class cservice : public xClient
 {
 protected:
 
-	EConfig* cserviceConfig; /* Configfile */
-	typedef map< string, Command*, noCaseCompare > commandMapType ;
-	typedef commandMapType::value_type pairType ;
+	/* Configfile */
+	EConfig* 		cserviceConfig ;
+
+#ifdef USE_THREAD
+	/* Thread object. */
+	ThreadWorker 	threadWorker ;
+#endif
+
+	/*
+	 * Method to pre-load the configTable above with everything thats
+	 * currently in the database.
+	 */
+	inline void clearConfigVariables()
+	{
+		return cserviceConfig->Clear();
+	}
+
+	inline bool parseConfigFile()
+	{
+		return cserviceConfig->openConfigFile();
+	}
+	/*
+	 * Load variable values from cservice.conf
+	 */
+	void loadConfigVariables( bool rehash = false ) ;
+
+	/* Loads the configuration bindings. This is called by loadConfigVariables. */
+	void registerConfigBindings() ;
+
+	/* Macro for declaring the configuration variables. */
+	#define CONFIG_VAR(type, name, key) type name ;
+	CONFIG_VAR_LIST
+	#undef CONFIG_VAR
+
+	struct ConfigBinding {
+		std::string key ;
+		std::function< void( bool rehash ) > load ;
+	} ;
+
+	std::vector< ConfigBinding > configBindings ;
+
+	/* Container for config variables loaded from database. */
+	typedef map< string, ConfigData*, noCaseCompare > configHashType;
+	configHashType configTable;
+
+	/* Load ConfigData table. */
+	void loadConfigData() ;
+
 	typedef map< string, unsigned int > ipMapType ;
 	ipMapType		ipFloodMap;
+
+	/* Command objects. */
+	typedef map< string, Command*, noCaseCompare > commandMapType ;
+	typedef commandMapType::value_type pairType ;
 	commandMapType          commandMap;
+
+	typedef commandMapType::const_iterator constCommandIterator ;
+	constCommandIterator command_begin() const
+                { return commandMap.begin() ; }
+
+	constCommandIterator command_end() const
+                { return commandMap.end() ; }
+
+	constCommandIterator findCommand( const string& theComm ) const
+                { return commandMap.find( theComm ) ; }
+
+
+	/* GLine objects. */
+	typedef map< string, csGline* >			glineListType ;
+        glineListType                   	glineList ;
+
+    typedef glineListType::iterator 		glineIterator;
+
+	glineIterator gline_begin()
+		{ return glineList.begin() ; }
+
+	glineIterator gline_end()
+	    { return glineList.end() ; }
+
 #ifdef USE_COMMAND_LOG
-	string			commandlogPath;
+	string				commandlogPath;
 	std::ofstream		commandLog;
 #endif
+
+	// Typedef's for user/channel Hashmaps.
+	// User hash, Key is Username.
+	typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType ;
+
+	// Channel hash, Key is channelname.
+	typedef map< string, sqlChannel*, noCaseCompare > sqlChannelHashType ;
+	typedef map< int, sqlChannel* > sqlChannelIDHashType ;
+
+	// Accesslevel cache, key is pair(userid, chanid).
+	typedef map < std::pair <int, int>, sqlLevel* > sqlLevelHashType ;
+
+	// Cache of user records.
+	sqlUserHashType sqlUserCache;
+
+	// Cache of channel records.
+	sqlChannelHashType sqlChannelCache;
+
+	// Cache of channel records indexed by channel ID.
+	sqlChannelIDHashType sqlChannelIDCache;
+
+	// Cache of Level records.
+	sqlLevelHashType sqlLevelCache;
+
+	/* Pushover object. */
+	std::shared_ptr< PushoverClient > pushover ;
+
+	/**
+	 * Non-required configurable variable for pushover API token.
+	 * Will be empty if pushoverEnable is false.
+	 */
+	std::string                       pushoverToken ;
+
+	/**
+	 * Non-required configurable list of pushover userkeys.
+	 * Will be empty if pushoverEnable is false.
+	 */
+	pushoverKeysType                  pushoverUserKeys ;
+
+	/**
+	 * Non-required configurable verbose level for pushover.
+	 * WARN is default value.
+	 */
+	unsigned short                    pushoverVerbose = 4 ;
+
+	/* Tracker for re-connection attempts to SQL database. */
+	unsigned int 					  connectRetries = 0;
+
+	/* Container for incStats. */
+	typedef map < string, int > statsMapType;
+	statsMapType statsMap;
+	
+	/* Some counters for statistical purposes. */
+	unsigned int userHits = 0;
+	unsigned int userCacheHits = 0;
+	unsigned int channelHits = 0;
+	unsigned int channelCacheHits = 0;
+	unsigned int levelHits = 0;
+	unsigned int levelCacheHits = 0;
+	unsigned int banHits = 0;
+	unsigned int banCacheHits = 0;
+	unsigned int dbErrors = 0;
+	unsigned int joinCount = 0;
+	unsigned int totalCommands = 0;
+
+	/* No of seconds offset our local time is from server time. */
+	int dbTimeOffset = 0;
+
+	// To keep track of how many custom data chunks
+	// we have allocated.
+	unsigned int customDataAlloc = 0;
+
+	/* Duration in seconds at which an idle user/chan/level/ban
+	 * record should be purged from the cache. */
+	int idleUserPeriod = 0;
+	int idleChannelPeriod = 0;
+	int idleLevelPeriod = 0;
+
+	// Timestamp's of when we last checked the database for updates.
+	time_t lastChannelRefresh = 0;
+	time_t lastUserRefresh = 0;
+	time_t lastLevelRefresh = 0;
+	time_t lastBanRefresh = 0;
+
+	/* TimerID for checking on the database connection. */
+	xServer::timerID dBconnection_timerID = 0;
+
+	/* TimerID we recieve for checking for changes in the Db. */
+	xServer::timerID update_timerID = 0;
+
+	/* TimerID we recieve every XX seconds for expiration of bans/suspend. */
+	xServer::timerID expire_timerID = 0;
+
+	/* TimerID we recieve every XX hours for expiration of cached entries. */
+	xServer::timerID cache_timerID = 0;
+
+	/* TimerID we recieve every XX hours for the notification of pending channels. */
+	xServer::timerID pending_timerID = 0;
+
+	/* TimerID we recieve every XX hours for the notification of pending channels. */
+	xServer::timerID pendingNotif_timerID = 0;
+
+	/* TimerID we recieve every seconds when we should check if a channel limit needs changing */
+	xServer::timerID limit_timerID = 0;
+
+	/* TimerID for checking for web-relay messages */
+	xServer::timerID webrelay_timerID = 0;
+
+	/* TimerID for checking channel flood cleanups */
+	xServer::timerID channels_flood_timerID = 0;
+
+	/* Checks whether the SQL database connection is active. */
+	void checkDbConnectionStatus();
+
+	/* Check if a client has passed IP restriction checks */
+	bool passedIPR( iClient* );
+
+	/* Update last_used data on login */
+	bool updateIPRlast_used(sqlUser*, const string& );
+
+	/* Set (or clear) a client's IP restriction timestamp */
+	void setIPRts( iClient*, unsigned int );
+
+	/* Checks if a user has an existing ipr for it's username
+	 * If it's type = 0 disabled also returns false
+	 */
+	bool hasIPR( sqlUser* );
+
+	/* Checks a user against IP restrictions */
+	bool checkIPR(const string&, sqlUser*, unsigned int& );
+	bool checkIPR( iClient*, sqlUser* );
+
+	/* returns true is IPR checking is required for this user */
+	bool needIPRcheck( sqlUser* );
+
+	/* Sets the flood counter for this iClient. */
+ 	void setFloodPoints(iClient*, unsigned short);
+
+	/* Determins if a client is in "Flooded" state, and if so Notice them. */
+	bool hasFlooded(iClient*, const string&);
+
+	/* XQ handlers. */
+	bool doXQLogin(iServer* , const string&, const string&);
+	bool doXQIsCheck(iServer*, const string&, const string&, const string&);
+
+	/**
+	 * Array of sqlUser flags and the corresponding accountFlags.
+	 */
+	static constexpr std::array< std::pair< sqlUser::flagType, iClient::flagType >, 4 > flagMap = { {
+		{ sqlUser::F_TOTP_ENABLED, iClient::X_TOTP_ENABLED },
+		{ sqlUser::F_TOTP_REQ_IPR, iClient::X_TOTP_REQ_IPR },
+		{ sqlUser::F_GLOBAL_SUSPEND, iClient::X_GLOBAL_SUSPEND },
+		{ sqlUser::F_FRAUD, iClient::X_FRAUD }
+	} } ;
+
+	/**
+	 * Translates sqlUser flags into accountFlags.
+	 * Taking the sqlUser, or the flags as an argument.
+	 */
+	iClient::flagType makeAccountFlags( sqlUser* ) const ;
+	iClient::flagType makeAccountFlags( sqlUser::flagType ) const ;
+	iClient::flagType makeAccountFlags( std::string ) const ;
 
 public:
 	using xClient::Notice ;
 
 	dbHandle* SQLDb; /* PostgreSQL Database */
-	string confSqlHost;
-	string confSqlPass;
-	string confSqlDb;
-	string confSqlPort;
-	string confSqlUser;
-	string confCCChan;
-	unsigned int connectRetries;
-	unsigned int connectCheckFreq;
-	unsigned int connectRetry;
-	unsigned int limitCheckPeriod;
+
+	/* Macro declaring getters for all configuration variables. */
+    #define CONFIG_VAR(type, name, key) \
+        const type& getConf##name() const { return name; }
+    CONFIG_VAR_LIST
+    #undef CONFIG_VAR
+
 	enum {
 		AUTH_SUCCEEDED,
 		AUTH_FAILED,
@@ -121,8 +361,6 @@ public:
 		AUTH_FAILED_IPR,
 		AUTH_ML_EXCEEDED
 	};
-	void checkDbConnectionStatus();
-	string pendingPageURL;
 
 	cservice(const string& args);
 	virtual ~cservice();
@@ -168,14 +406,30 @@ public:
 
 	virtual bool Kick( Channel*, const string&,	const std::string&, bool modeAsServer = false ) ;
 
+	/* Rehash config. */
+	void rehashConfigVariables() ;
+
+	/* Rehash ConfigVariables. */
+	void rehashConfigData()
+		{
+		configTable.clear();
+		loadConfigData();
+		}
+
+	inline size_t getConfigVariables_size()
+		{ return cserviceConfig->size() ; }
+
+	inline size_t getConfigData_size()
+		{ return configTable.size() ; }
+
+	inline const statsMapType& getStatsMap() const
+		{ return statsMap ; }
+
 	/* Log an administrative alert to the relay channel & log. */
 	bool logAdminMessage(const char*, ... );
 
 	/* Log a priveleged administrative alert to the priv relay channel */
 	bool logPrivAdminMessage(const char*, ... );
-
-	/* Log an debug message to the debug channel */
-	bool logDebugMessage(const char*, ... );
 
 	/* Write a channel log */
 	void writeChannelLog(sqlChannel*, iClient*, unsigned short, const string&);
@@ -183,31 +437,6 @@ public:
 	/* get last channel event for specific timestamp */
 	const string getLastChannelEvent(sqlChannel* theChannel,
 		unsigned short eventType, time_t eventTime);
-
-	typedef commandMapType::const_iterator constCommandIterator ;
-	constCommandIterator command_begin() const
-                { return commandMap.begin() ; }
-
-	constCommandIterator command_end() const
-                { return commandMap.end() ; }
-
-	constCommandIterator findCommand( const string& theComm ) const
-                { return commandMap.find( theComm ) ; }
-	
-	typedef map< string, csGline* >        glineListType ;
-        glineListType                   glineList ;
-
-        typedef glineListType::iterator  glineIterator;
-
-	glineIterator gline_begin()
-		{ return glineList.begin() ; }
-
-	glineIterator gline_end()
-	        { return glineList.end() ; }
-
-
-	/* returns true is IPR checking is required for this user */
-	bool needIPRcheck( sqlUser* );
 
 	/* Returns the access sqlUser has in channel sqlChan. */
 	short getAccessLevel( sqlUser*, sqlChannel* );
@@ -217,24 +446,6 @@ public:
 	 * If "bool" is true, then send sqlUser a notice about why they don't
 	 * have a particular access. */
 	short getEffectiveAccessLevel( sqlUser*, sqlChannel*, bool );
-
-	/* Check if a client has passed IP restriction checks */
-	bool passedIPR( iClient* );
-
-	/* Update last_used data on login */
-	bool updateIPRlast_used(sqlUser*, const string& );
-
-	/* Set (or clear) a client's IP restriction timestamp */
-	void setIPRts( iClient*, unsigned int );
-
-	/* Checks if a user has an existing ipr for it's username
-	 * If it's type = 0 disabled also returns false
-	 */
-	bool hasIPR( sqlUser* );
-
-	/* Checks a user against IP restrictions */
-	bool checkIPR(const string&, sqlUser*, unsigned int& );
-	bool checkIPR( iClient*, sqlUser* );
 
 	/* Get failed login counter for client */
 	unsigned int getFailedLogins( iClient* );
@@ -274,11 +485,38 @@ public:
 	/* Returns the current "Flood Points" this iClient has. */
  	unsigned short getFloodPoints(iClient*);
 
-	/* Sets the flood counter for this iClient. */
- 	void setFloodPoints(iClient*, unsigned short);
+	/* Increments the join count for this iClient. */
+	void incrementJoinCount()
+		{ ++joinCount ; }
 
-	/* Determins if a client is in "Flooded" state, and if so Notice them. */
-	bool hasFlooded(iClient*, const string&);
+	/* Decrements the join count for this iClient. */
+	void decrementJoinCount()
+		{ --joinCount ; }
+
+	/* A const getter of the sqlLevelCache. */
+	const sqlLevelHashType& getLevelCache() const
+		{ return sqlLevelCache ; }
+
+	/* Insert an entry to the sqlLevelCache. */
+	inline void insertLevelCache( sqlLevel* theLevel )
+		{ sqlLevelCache.emplace( std::make_pair( theLevel->getUserId(), theLevel->getChannelId() ), theLevel ) ; }
+
+	/* Remove an entry from the sqlLevelCache. */
+	inline void removeLevelCache( sqlLevel* theLevel )
+		{ sqlLevelCache.erase( std::make_pair( theLevel->getUserId(), theLevel->getChannelId() ) ) ; }
+
+	inline void removeLevelCache( int userId, int chanId )
+		{ sqlLevelCache.erase( std::make_pair( userId, chanId ) ) ; }
+
+	/* Remove a sqlChannel* from cache. */
+	inline void removeChannelCache( sqlChannel* theChan )
+	{
+		if( theChan )
+		{
+			sqlChannelCache.erase( theChan->getName() ) ;
+			sqlChannelIDCache.erase( theChan->getID() ) ;
+		}
+	}
 
 	/* Sets the timestamp for when we first recieved a msg from this client.
 	 * within the flood period. */
@@ -294,8 +532,6 @@ public:
 	int authenticateUser(const string& username, const string& password, const string& ip, const string& ident,unsigned int&, sqlUser**);
 	int authenticateUser(const string& username, const string& password, iClient*, sqlUser**);
 
-	bool doXQLogin(iServer* , const string&, const string&);
-	bool doXQIsCheck(iServer*, const string&, const string&, const string&);
 	void doXQToAllServices(const string&, const string&);
 
 	bool doCommonAuth(iClient* , string username = string() );
@@ -308,129 +544,12 @@ public:
 	/* Handles OPLIST data XREPLY from mod.openchanfix */
 	bool doXROplist(iServer*, const string&, const string&);
 
-	// Typedef's for user/channel Hashmaps.
-	// User hash, Key is Username.
-	typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType ;
-
-	// Channel hash, Key is channelname.
-	typedef map< string, sqlChannel*, noCaseCompare > sqlChannelHashType ;
-	typedef map< int, sqlChannel* > sqlChannelIDHashType ;
-
-	// Accesslevel cache, key is pair(userid, chanid).
-	typedef map < std::pair <int, int>, sqlLevel* > sqlLevelHashType ;
-
  	/* Silence List */
 	typedef map < string, std::pair < time_t, string > > silenceListType;
 	silenceListType silenceList;
 
 	bool isIgnored(iClient*);
 	void setIgnored(iClient*, bool);
-
-	// Cache of user records.
-	sqlUserHashType sqlUserCache;
-
-	// Cache of channel records.
-	sqlChannelHashType sqlChannelCache;
-
-	// Cache of channel records indexed by channel ID.
-	sqlChannelIDHashType sqlChannelIDCache;
-
-	// Cache of Level records.
-	sqlLevelHashType sqlLevelCache;
-
-	// Some counters for statistical purposes.
-	unsigned int userHits;
-	unsigned int userCacheHits;
-	unsigned int channelHits;
-	unsigned int channelCacheHits;
-	unsigned int levelHits;
-	unsigned int levelCacheHits;
-	unsigned int banHits;
-	unsigned int banCacheHits;
-	unsigned int dbErrors;
-	unsigned int joinCount;
-
-	/* No of seconds offset our local time is from server time. */
-	int dbTimeOffset;
-
-	// To keep track of how many custom data chunks
-	// we have allocated.
-	unsigned int customDataAlloc;
-
-	// Flood/Notice relay channel - Loaded via config.
-	// Added coderChan - Loaded via config.
-	string relayChan;
-	string privrelayChan;
-	string debugChan;
-	string coderChan;
-
-	// Loaded via config.
-	// Interval at which we pick up updates from the Db.
-	int updateInterval;
-
-	// Interval at which we check for expired bans/suspends.
-	int expireInterval;
-
-	// Interval at which we attempt to purge the cache(s).
-	int cacheInterval;
-
-	/* Interval at which we check for new webrelay messages. */
-	int webrelayPeriod;
-
-	/* Message for iauthd-c when login-on-connect params are wrong */
-	string locMessage;
-
-	/* Duration in seconds at which an idle user/chan/level/ban
-	 * record should be purged from the cache. */
-	int idleUserPeriod;
-	int idleChannelPeriod;
-	int idleLevelPeriod;
-
-	/* Duration in seconds at which a 'pending' channel should
-	 * be refreshed/updated */
-	int pendingChanPeriod;
-
-	/* Duration in seconds at which a 'pending' channel should
-	 * be notified that it is so. */
-	int pendingNotifPeriod;
-
-	/* After how much seconds should expire any newly created never logged in user */
-	int neverLoggedInUsersExpireTime;
-
-	/* Duration in days, after the system purge unlogged users */
-	int UsersExpireDBDays;
-
-	/* Length of a day in seconds - refers to user expiration */
-	int daySeconds;
-
-	/*  ***   The Judge   ***  */
-	/*    related variables    */
-	unsigned int RequiredSupporters;
-	unsigned int JudgeDaySeconds;
-	unsigned int NoRegDaysOnNOSupport;
-	unsigned int RejectAppOnUserFraud;
-	//int AcceptOnTrafficPass = 1;
-	unsigned int RequireReview;
-	unsigned int DecideOnObject;
-	unsigned int DecideOnCompleted;
-	unsigned int ReviewsExpireTime;
-	unsigned int PendingsExpireTime;
-	unsigned int MaxDays;
-	unsigned int Joins;
-	unsigned int UniqueJoins;
-	unsigned int MinSupporters;
-	unsigned int MinSupportersJoin;
-	unsigned int NotifyDays;
-	unsigned int SupportDays;
-	unsigned int ReviewerId;
-	unsigned int LogToAdminConsole;
-	unsigned int limitJoinMaxLowest;
-	unsigned int limitJoinMaxHighest;
-	unsigned int limitJoinSecsLowest;
-	unsigned int limitJoinSecsHighest;
-	unsigned int limitJoinPeriodHighest;
-	std::string limitJoinAllowedModes;
-	std::string ChanfixServerName;
 
 	string validResponseString;
 	void AddToValidResponseString(const string&);
@@ -454,50 +573,6 @@ public:
 	void cleanUpReviews();
 	void cleanUpPendings();
 	void loadIncompleteChanRegs();
-
-	/* End of The Judge */
-
-	// Input flood rate.
-	unsigned int input_flood;
-	unsigned int output_flood;
-	int flood_duration;
-	int topic_duration;
-
-	unsigned int channelsFloodPeriod;
-	unsigned int floodproRelaxTime;
-
-	// Timestamp's of when we last checked the database for updates.
-	time_t lastChannelRefresh;
-	time_t lastUserRefresh;
-	time_t lastLevelRefresh;
-	time_t lastBanRefresh;
-
-	/* TimerID for checking on the database connection. */
-	xServer::timerID dBconnection_timerID;
-
-	/* TimerID we recieve for checking for changes in the Db. */
-	xServer::timerID update_timerID;
-
-	/* TimerID we recieve every XX seconds for expiration of bans/suspend. */
-	xServer::timerID expire_timerID;
-
-	/* TimerID we recieve every XX hours for expiration of cached entries. */
-	xServer::timerID cache_timerID;
-
-	/* TimerID we recieve every XX hours for the notification of pending channels. */
-	xServer::timerID pending_timerID;
-
-	/* TimerID we recieve every XX hours for the notification of pending channels. */
-	xServer::timerID pendingNotif_timerID;
-
-	/* TimerID we recieve every seconds when we should check if a channel limit needs changing */
-	xServer::timerID limit_timerID;
-
-	/* TimerID for checking for web-relay messages */
-	xServer::timerID webrelay_timerID;
-
-	/* TimerID for checking channel flood cleanups */
-	xServer::timerID channels_flood_timerID;
 
 	// Language definitions table (Loaded from Db).
 	typedef map < string, std::pair <int, string> > languageTableType;
@@ -677,13 +752,6 @@ public:
 	void cacheExpireUsers();
 
 	/*
-	 *  Expire Ban records, only if the channel
-	 *  record is 'idle'.
-	 */
-
-	void cacheExpireBans();
-
-	/*
 	 *  Expire idle Level records.
 	 */
 
@@ -715,8 +783,6 @@ public:
 	 *  Misc uncategorisable functions.
 	 */
 
-	unsigned int preloadUserDays;
-
 	void preloadBanCache();
 	void preloadChannelCache();
 	void preloadLevelsCache();
@@ -740,9 +806,6 @@ public:
 
 	void addGlineToUplink(csGline* );
 
-	typedef map < string, int > statsMapType;
-	statsMapType statsMap;
-
 	void incStat(const string& name);
 	void incStat(const string& name, unsigned int amount);
 
@@ -753,21 +816,7 @@ public:
 
 	bool isPasswordRight(sqlUser*, const string&);
 
-	unsigned int totalCommands;
-
-	unsigned int loginDelay;
-
-	unsigned int noteDuration;
-	unsigned int noteLimit;
-
-	unsigned int partIdleChan;
-
-	unsigned int MAXnotes;
-
 	void doCoderStats(iClient* theClient);
-
-	typedef map< string, ConfigData*, noCaseCompare > configHashType;
-	configHashType configTable;
 
 	/* Method to retrieve a configuration variable */
 	ConfigData* getConfigVar(const string&);
@@ -775,40 +824,13 @@ public:
 	/* A dummy config entry with nothing in it. */
 	ConfigData empty_config;
 
-	/*
-	 * Method to pre-load the configTable above with everything thats
-	 * currently in the database.
-	 */
-	void loadConfigData();
-
-	inline void clearConfigVariables()
-	{
-		return cserviceConfig->Clear();
-	}
-
-	inline int getConfigVariableSize()
-	{
-		return (int)cserviceConfig->size();
-	}
-
-	inline bool parseConfigFile()
-	{
-		return cserviceConfig->openConfigFile();
-	}
-	/*
-	 * Load variable values from cservice.conf
-	 */
-	void loadConfigVariables();
-
 	void outputChannelAccesses(iClient*, sqlUser*, sqlUser*, unsigned int);
 
 	/*
  	 * Global filesystem level admin logging stream.
 	 */
 
-	std::ofstream	adminLog ;
-
-	string adminlogPath;
+//	std::ofstream	adminLog ;
 
 	static string CryptPass( const string& pass ) ;
 
@@ -822,37 +844,15 @@ public:
 	bool totpAuthEnabled;
 #endif
 
-/* Welcome messages for newly registered channels */
-string welcomeNewChanMessage;
-string welcomeNewChanTopic;
+	bool InsertUserHistory(iClient*, const string&);
 
-bool InsertUserHistory(iClient*, const string&);
-
-/**
- * Translates sqlUser flags into accountFlags.
- * Taking the sqlUser, or the flags as an argument.
- */
-iClient::flagType makeAccountFlags( sqlUser* ) const ;
-iClient::flagType makeAccountFlags( sqlUser::flagType ) const ;
-iClient::flagType makeAccountFlags( std::string ) const ;
-
-/**
- * This method translates the sqlUser flags of a sqlUser into account flags,
- * and if there are changes, sends a new AC message for each iClient authed
- * as the relevant sqlUser.
- */
-void sendAccountFlags( sqlUser* ) const ;
-void sendAccountFlags( sqlUser*, iClient* ) const ;
-
-/**
- * Array of sqlUser flags and the corresponding accountFlags.
- */
-static constexpr std::array< std::pair< sqlUser::flagType, iClient::flagType >, 4 > flagMap = { {
-	{ sqlUser::F_TOTP_ENABLED, iClient::X_TOTP_ENABLED },
-	{ sqlUser::F_TOTP_REQ_IPR, iClient::X_TOTP_REQ_IPR },
-	{ sqlUser::F_GLOBAL_SUSPEND, iClient::X_GLOBAL_SUSPEND },
-	{ sqlUser::F_FRAUD, iClient::X_FRAUD }
-} } ;
+	/**
+	 * This method translates the sqlUser flags of a sqlUser into account flags,
+	 * and if there are changes, sends a new AC message for each iClient authed
+	 * as the relevant sqlUser.
+	 */
+	void sendAccountFlags( sqlUser* ) const ;
+	void sendAccountFlags( sqlUser*, iClient* ) const ;
 
 } ;
 

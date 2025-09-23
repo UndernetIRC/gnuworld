@@ -88,4 +88,11 @@
  */
 #undef DAEMON
 
+/**
+ * USE_THREAD
+ * Set this to enable mutexes on shared objects. Relevant for running
+ * modules with threading.
+ */
+#define USE_THREAD
+
 #endif /* __GNUWORLD_CONFIG_H */

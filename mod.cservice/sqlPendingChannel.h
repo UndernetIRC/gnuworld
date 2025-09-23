@@ -32,11 +32,13 @@
 
 namespace gnuworld
 { 
- 
+
+class cservice;
+
 class sqlPendingChannel
 {
 public:
-	sqlPendingChannel(dbHandle*);
+	sqlPendingChannel(cservice*);
 	~sqlPendingChannel();
 
 	bool commit();
@@ -64,6 +66,8 @@ public:
 	 */
 	trafficListType uniqueSupporterList;
 
+	cservice*	bot;
+	Logger*		logger;
 	dbHandle*	SQLDb;
 };
 

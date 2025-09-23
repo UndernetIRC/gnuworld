@@ -32,6 +32,8 @@
 namespace gnuworld
 {
 
+class chanfix;
+
 namespace cf
 {
 
@@ -41,7 +43,7 @@ class sqlManager {
      * Implement sqlManager as a singleton
      * Only way to get a reference to the manager is through this method
      */
-    static sqlManager* getInstance(const std::string&);
+    static sqlManager* getInstance(chanfix*, const std::string&);
 
     /** Allow checking out of database connections */
     dbHandle* getConnection();
@@ -58,7 +60,7 @@ class sqlManager {
      * through getInstance()
      * @see #getInstance
      */
-    sqlManager(const std::string&);
+    sqlManager(chanfix*, const std::string&);
 
     /**
      * Disable the default destructor so that other objects cannot destruct
@@ -68,6 +70,9 @@ class sqlManager {
 
     /** The string storing our DB connection path */
     std::string dbString;
+
+    /** The bot instance */
+    chanfix* bot;
 
     /** Our PgDatabase instance */
     dbHandle* SQLDb;

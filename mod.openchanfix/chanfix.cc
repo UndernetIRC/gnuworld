@@ -108,7 +108,7 @@ updateInProgress = false;
 std::string dbString = "host=" + sqlHost + " dbname=" + sqlDB
   + " port=" + sqlPort + " user=" + sqlcfUsername + " password=" + sqlPass;
 
-theManager = sqlManager::getInstance(dbString);
+theManager = sqlManager::getInstance(this, dbString);
 
 /* Open our logfiles for writing */
 adminLog.open(adminLogFile.c_str(), std::ios::out | std::ios::app);

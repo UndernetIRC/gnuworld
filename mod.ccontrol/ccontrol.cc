@@ -139,7 +139,8 @@ elog	<< "ccontrol::ccontrol> Attempting to connect to "
 	<< sqlDb
 	<< endl;
  
-SQLDb = new dbHandle( sqlHost,
+SQLDb = new dbHandle( this,
+	sqlHost,
 	::atoi( sqlPort.c_str() ),
 	sqlDb,
 	sqlUser,
@@ -5460,7 +5461,8 @@ if( SQLDb->ConnectionBad() )
 		{
 		Query += (" password=" + sqlPass);
 		}
-	SQLDb = new dbHandle( sqlHost,
+	SQLDb = new dbHandle( this,
+		sqlHost,
 		atoi( sqlPort.c_str() ),
 		sqlDb,
 		sqlUser,

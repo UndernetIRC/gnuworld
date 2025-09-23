@@ -14,8 +14,14 @@ libgnuworld_la_SOURCES = \
 	libgnuworld/gThread.cc \
 	libgnuworld/match.cc \
 	libgnuworld/md5hash.cc \
+	libgnuworld/logger.cc \
+	libgnuworld/threadworker.cc \
+	libgnuworld/pushover.cc \
 	libgnuworld/misc.cc
 libgnuworld_la_LDFLAGS = $(threadLib)
+if COND_LIBCURL
+libgnuworld_la_LIBADD = -lcurl
+endif
 libgnuworld_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/libgnuworld
@@ -32,6 +38,10 @@ EXTRA_DIST += \
 	libgnuworld/match.h \
 	libgnuworld/match_table.h \
 	libgnuworld/md5hash.h \
+	libgnuworld/logger.h \
+	libgnuworld/threadworker.h \
+	libgnuworld/notifier.h \
+	libgnuworld/pushover.h \
 	libgnuworld/misc.h \
 	libgnuworld/MTrie.h \
 	libgnuworld/MTrie.cc \

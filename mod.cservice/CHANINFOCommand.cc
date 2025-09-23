@@ -199,20 +199,11 @@ if( string::npos == st[ 1 ].find_first_of( '#' ) )
 				<< " and deleted = 0"
 				<< ends;
 
-		#ifdef LOG_SQL
-			elog	<< "CHANINFO::sqlQuery> "
-				<< autoInviteQuery.str().c_str()
-				<< endl;
-		#endif
-
-
 		if( !bot->SQLDb->Exec(autoInviteQuery, true ) )
 //	if( PGRES_TUPLES_OK != status )
 			{
-
-			elog	<< "CHANINFO> SQL Error: "
-				<< bot->SQLDb->ErrorMessage()
-				<< endl ;
+			LOG( ERROR, "CHANINFO SQL Error:") ;
+			LOGSQL_ERROR( bot->SQLDb ) ;
 			return  false;
 			}
 		if(bot->SQLDb->Tuples() > 0)
@@ -513,7 +504,7 @@ Channel* tmpChan = Network->findChannel(st[1]);
 sqlChannel* theChan = bot->getChannelRecord(st[1]);
 if( !theChan )
 	{
-	unsigned int lastdays = (unsigned int)bot->currentTime() - ((unsigned int)bot->daySeconds*bot->PendingsExpireTime);
+	unsigned int lastdays = (unsigned int)bot->currentTime() - (bot->getConfPendingsExpireTime() * bot->getConfdaySeconds());
 	theQuery << "SELECT id,status,manager_id,managername,pending.description,decision,created_ts FROM channels,pending WHERE "
 			<< "registered_ts = 0 AND status <> 3 AND lower(channels.name) = '"
 			<< escapeSQLChars(string_lower(st[1]))
@@ -522,12 +513,10 @@ if( !theChan )
 			<< lastdays
 			<< "))"
 			<< ends;
-	#ifdef LOG_SQL
-		elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-	#endif
 	if (!bot->SQLDb->Exec(theQuery, true))
 	{
-		bot->logDebugMessage("Error on CHANInfo.status query: %s",theQuery.str().c_str());
+		LOG( ERROR, "Error on CHANInfo.status query:" ) ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
 		return false;
 	}
 	else if (bot->SQLDb->Tuples() != 0)
@@ -616,13 +605,8 @@ if( !theChan )
 				<< ends;
 		if (!bot->SQLDb->Exec(theQuery, true))
 		{
-			bot->logDebugMessage("Error on CHANINFO.supporters query");
-			#ifdef LOG_SQL
-			//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-			elog << "CHANINFO.supporters query> SQL Error: "
-			     << bot->SQLDb->ErrorMessage()
-			     << endl ;
-			#endif
+			LOG( ERROR, "Error on CHANINFO.supporters query:" ) ;
+			LOGSQL_ERROR( bot->SQLDb ) ;
 		}
 		if (bot->SQLDb->Tuples() == 0)
 		{
@@ -689,13 +673,8 @@ if( !theChan )
                                 << ends;
                 if (!bot->SQLDb->Exec(theQuery, true))
                 {
-                        bot->logDebugMessage("Error on CHANINFO.objections user objections query");
-                        #ifdef LOG_SQL
-                        //elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-                        elog << "CHANINFO.objections user objections query> SQL Error: "
-                             << bot->SQLDb->ErrorMessage()
-                             << endl ;
-                        #endif
+                        LOG( ERROR, "Error on CHANINFO.objections user objections query:" ) ;
+                        LOGSQL_ERROR( bot->SQLDb ) ;
                 }
                 if (bot->SQLDb->Tuples() > 0)
                         objCount = atoi(bot->SQLDb->GetValue(0,0));
@@ -711,13 +690,8 @@ if( !theChan )
                         	        << ends;
                 	if (!bot->SQLDb->Exec(theQuery, true))
                 	{
-                        	bot->logDebugMessage("Error on CHANINFO.objections admin comment query");
-                        	#ifdef LOG_SQL
-                        	//elog << "sqlQuery> " << theQuery.str().c_str() << endl;
-                        	elog << "CHANINFO.objections admin comment query> SQL Error: "
-                             	<< bot->SQLDb->ErrorMessage()
-                             	<< endl ;
-                        	#endif
+                        	LOG( ERROR, "Error on CHANINFO.objections admin comment query:" ) ;
+							LOGSQL_ERROR( bot->SQLDb ) ;
                 	}
                 	if (bot->SQLDb->Tuples() > 0)
                         	comCount = atoi(bot->SQLDb->GetValue(0,0));
@@ -780,12 +754,6 @@ theQuery	<< queryHeader
 		<< theChan->getID()
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "CHANINFO::sqlQuery> "
-		<< theQuery.str().c_str()
-		<< endl;
-#endif
-
 bot->Notice(theClient,
 	bot->getResponse(theUser,
 		language::reg_by,
@@ -833,12 +801,6 @@ if ((adminAccess > 0) && (theChan->getFlag(sqlChannel::F_SUSPEND)))
 			<< bot->currentTime()
 			<< " ORDER BY ts DESC LIMIT 1"
 			<< ends;
-
-#ifdef LOG_SQL
-	elog	<< "cservice::CHANINFOCommand> "
-		<< queryString.str().c_str()
-		<< endl;
-#endif
 
 	if (bot->SQLDb->Exec(queryString, true))
 	{

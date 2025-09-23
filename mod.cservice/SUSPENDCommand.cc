@@ -136,9 +136,7 @@ if ((st[1][0] != '#') && (st[1][0] != '*'))
 				sqlLevel* tmpLevel = bot->getLevelRecord(targetUser, theChan);
 				if (tmpLevel)
 				{
-					std::pair<int, int> thePair;
-					thePair = std::make_pair(tmpLevel->getUserId(), tmpLevel->getChannelId());
-					bot->sqlLevelCache.erase(thePair);
+					bot->removeLevelCache(tmpLevel);
 					delete(tmpLevel);
 				}
 				bot->deopSuspendedOnChan(*chItr,targetUser);
