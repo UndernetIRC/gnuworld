@@ -112,18 +112,9 @@ theQuery	<< queryHeader
 		<< queryFooter
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "SEARCH::sqlQuery> "
-		<< theQuery.str().c_str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec(theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
 	{
-	elog	<< "SEARCH> SQL Error: "
-		<< bot->SQLDb->ErrorMessage()
-		<< endl ;
+	LOGSQL_ERROR( bot->SQLDb ) ;
 	return false ;
 	}
 

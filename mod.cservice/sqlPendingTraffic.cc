@@ -63,19 +63,9 @@ queryString << "INSERT INTO pending_traffic (channel_id, ip_number, join_count) 
 			<< join_count << ")"
 			<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "sqlPendingTraffic::insertRecord> "
-		<< queryString.str().c_str()
-		<< endl; 
-#endif
-
 if( !SQLDb->Exec(queryString ) )
-//if( PGRES_COMMAND_OK != status )
-	{ 
-	elog	<< "sqlPendingTraffic::commit> Something went wrong: "
-			<< SQLDb->ErrorMessage()
-			<< endl;
-
+	{
+	LOGSQL_ERROR( SQLDb ) ;
 	return false;
  	} 
 
@@ -100,6 +90,7 @@ bool sqlPendingTraffic::commit()
 	if( !SQLDb->Exec(queryString ) )
 		{
 		LOGSQL_ERROR( SQLDb ) ;
+		return false;
 		}
 
 	return true;

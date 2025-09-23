@@ -146,18 +146,9 @@ scanhostQuery << "SELECT user_id, user_name, command, ip, hostmask, timestamp FR
 		<< ") OR (ip ILIKE '" << escapeSQLChars(searchSQL(host)) << "') ORDER BY " << sortby << (desc == true ? " DESC" : "") << limto
 		<< ends;
 
-#ifdef LOG_SQL
-	elog	<< "cservice::SCANHOST::sqlQuery> "
-		<< scanhostQuery.str()
-		<< endl;
-#endif
-
 if( !bot->SQLDb->Exec( scanhostQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
         {
-        elog    << "cservice::SCANHOST> SQL Error: "
-                << bot->SQLDb->ErrorMessage()
-                << endl ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
         return false ;
         }
 

@@ -1662,12 +1662,10 @@ if (theUser->loadData(id))
 	{
  	sqlUserCache.insert(sqlUserHashType::value_type(id, theUser));
 
-	#ifdef LOG_SQL
-		elog	<< "cmaster::getUserRecord> There are "
+	elog	<< "cmaster::getUserRecord> There are "
 			<< sqlUserCache.size()
 			<< " elements in the cache."
-		<< endl;
-	#endif
+			<< endl;
 
 	userHits++;
 
@@ -1733,12 +1731,10 @@ if (theUser->loadData(id))
 	{
  	sqlUserCache.insert(sqlUserHashType::value_type(id, theUser));
 
-	#ifdef LOG_SQL
-		elog	<< "cmaster::getUserRecord> There are "
+	elog	<< "cmaster::getUserRecord> There are "
 			<< sqlUserCache.size()
 			<< " elements in the cache."
-		<< endl;
-	#endif
+			<< endl;
 
 	userHits++;
 
@@ -2495,12 +2491,10 @@ if( !SQLDb->Exec(expireQuery, true ) )
  *  this level record in the cache.
  */
 
-#ifdef LOG_SQL
-	elog	<< "cservice::expireSuspends> Found "
+elog	<< "cservice::expireSuspends> Found "
 		<< SQLDb->Tuples()
 		<< " expired suspensions."
 		<< endl;
-#endif
 
 /*
  *  Place our query results into temporary storage, because
@@ -2639,12 +2633,10 @@ if( !SQLDb->Exec(expireQuery, true ) )
  *  this ban in the cache.
  */
 
-#ifdef LOG_SQL
-	elog	<< "cservice::expireBans> Found "
+elog	<< "cservice::expireBans> Found "
 		<< SQLDb->Tuples()
 		<< " expired bans."
 		<< endl;
-#endif
 
 /*
  *  Place our query results into temporary storage, because
