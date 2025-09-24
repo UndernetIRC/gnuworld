@@ -47,14 +47,14 @@ namespace gnuworld
 
 class xClient;
 
-/* Report levels */
-enum Verbose {
-  TRACE = 1,
-  DEBUG = 2,
-  INFO = 3,
-  WARN = 4,
-  ERROR = 5,
-  FATAL = 6,
+/* Verbosity levels */
+enum Verbosity {
+  TRACE = 6,
+  DEBUG = 5,
+  INFO = 4,
+  WARN = 3, 
+  ERROR = 2,
+  FATAL = 1,
   SQL = 99
 } ;
 
@@ -63,8 +63,8 @@ class Logger
 private:
   xClient*                          bot = nullptr ;
   std::string                       debugChan ;
-  unsigned short                    chanVerbose = 2 ;
-  unsigned short                    logVerbose = 1 ;
+  unsigned short                    chanVerbosity = 2 ;
+  unsigned short                    logVerbosity = 1 ;
   bool                              logSQL = false ;
   std::vector<
     std::pair<
@@ -93,7 +93,7 @@ private:
 
   std::string parseFunction( std::string ) ;
 
-  std::string getColour( Verbose v )
+  std::string getColour( Verbosity v )
     {
     switch ( v )
       {
@@ -107,14 +107,14 @@ private:
       }
     }
 
-  std::string getColourReset( Verbose v )
+  std::string getColourReset( Verbosity v )
     { return getColour( v ).empty() ? "" : "\003" ; }
 
   class LoggerStream
     {
     public:
-      LoggerStream( Logger& logger, Verbose v )
-            : logger( logger ), verbose( v ) {}
+      LoggerStream( Logger& logger, Verbosity v )
+            : logger( logger ), verbosity( v ) {}
 
       // Overload << operator to accumulate log messages
       template< typename T >
@@ -134,14 +134,14 @@ private:
 
     private:
       Logger& logger ;
-      Verbose verbose ;
+      Verbosity verbosity ;
       std::ostringstream messageBuffer ;
 
       // Flush the message to the Logger's write function
       void flush()
         {
         std::string message = messageBuffer.str() ;
-        logger.write( verbose, message ) ;
+        logger.write( verbosity, message ) ;
         messageBuffer.str( "" ) ;
         messageBuffer.clear() ;
         }
@@ -152,18 +152,18 @@ public:
   /* Constructor. */
   Logger( xClient* _bot) : bot( _bot ) {}
 
-  LoggerStream write( Verbose v )
+  LoggerStream write( Verbosity v )
     { return LoggerStream( *this, v ) ; }
 
   /* Setter functions for Admin and Debug channels */
   inline void setChannel( const std::string& channelName )
     { debugChan = channelName ; }
 
-  inline void setChanVerbose( unsigned short level )
-    { chanVerbose = level ; }
+  inline void setChanVerbosity( unsigned short level )
+    { chanVerbosity = level ; }
 
-  inline void setLogVerbose( unsigned short level )
-    { logVerbose = level ; }
+  inline void setLogVerbosity( unsigned short level )
+    { logVerbosity = level ; }
 
   inline void setLogSQL( bool enable )
     { logSQL = enable ; }
@@ -186,23 +186,23 @@ public:
     }
 
   /* Update verbosity level for a notifier. */
-  inline void updateNotifierVerbose( std::shared_ptr< notifier > _notifier, unsigned short _verbose )
+  inline void updateNotifierVerbosity( std::shared_ptr< notifier > _notifier, unsigned short _verbosity )
     {
     for( auto& pair : notifiers )
       {
       if( pair.first == _notifier )
         {
-        pair.second = _verbose ;
+        pair.second = _verbosity ;
         break ;
         }
       }
     }
 
   /* Log to the debug and admin channel */
-  void write( Verbose, const std::string& ) ;
+  void write( Verbosity, const std::string& ) ;
 #ifdef HAVE_FORMAT
   template< typename Format, typename... Args >
-  void write( Verbose v, const Format& format, Args&&... args )
+  void write( Verbosity v, const Format& format, Args&&... args )
   {
   std::string fmtString = std::vformat( format,
     std::make_format_args( args... ) ) ;
@@ -214,7 +214,7 @@ public:
    * Called by the LOG macro.
    */
   template< typename Format, typename... Args >
-  void writeFunc( Verbose v, const char* func, const Format& format, Args&&... args )
+  void writeFunc( Verbosity v, const char* func, const Format& format, Args&&... args )
   {
   std::string fmtString = ( v == INFO ? "" : parseFunction( func ) + "> " ) + std::vformat( format,
     std::make_format_args( args... ) ) ;

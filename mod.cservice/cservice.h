@@ -217,7 +217,7 @@ protected:
 	 * Non-required configurable verbose level for pushover.
 	 * WARN is default value.
 	 */
-	unsigned short                    pushoverVerbose = 4 ;
+	unsigned short                    pushoverVerbosity = 3 ;
 
 	/* Tracker for re-connection attempts to SQL database. */
 	unsigned int 					  connectRetries = 0;

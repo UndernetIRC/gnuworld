@@ -350,14 +350,14 @@ if( pushoverEnable )
 #else
   pushover = std::make_shared< PushoverClient >( pushoverToken, pushoverUserKeys ) ;
 #endif
-  logger->addNotifier( pushover, pushoverVerbose ) ;
+  logger->addNotifier( pushover, pushoverVerbosity ) ;
   pushover->sendMessage( "cmaster init", "cmaster connecting..." ) ;
   }
 
 /* Initiate logger. */
 logger->setChannel( debugChan ) ;
-logger->setLogVerbose( logVerbose ) ;
-logger->setChanVerbose( chanVerbose ) ;
+logger->setLogVerbosity( logVerbosity ) ;
+logger->setChanVerbosity( chanVerbosity ) ;
 
 #ifdef USE_COMMAND_LOG
 /* Init command log file. */
@@ -8099,12 +8099,12 @@ if( pushoverEnable )
   if( rehash )
     {
     pushoverToken = cserviceConfig->TryRequire< std::string >( "pushover_token", pushoverToken ) ;
-    pushoverVerbose = cserviceConfig->TryRequire< unsigned int >( "pushover_verbose", pushoverVerbose ) ;
+    pushoverVerbosity = cserviceConfig->TryRequire< unsigned int >( "pushover_verbosity", pushoverVerbosity ) ;
     }
   else
     {
     pushoverToken = cserviceConfig->Require< std::string >( "pushover_token" ) ;
-    pushoverVerbose = cserviceConfig->Require< unsigned int >( "pushover_verbose" ) ;
+    pushoverVerbosity = cserviceConfig->Require< unsigned int >( "pushover_verbosity" ) ;
     }
 
   auto confPtr = cserviceConfig->Find( "pushover_userkey" ) ;
@@ -8152,8 +8152,8 @@ loadConfigVariables( true ) ;
 
 /* Rehash logger. */
 logger->setChannel( debugChan ) ;
-logger->setLogVerbose( logVerbose ) ;
-logger->setChanVerbose( chanVerbose ) ;
+logger->setLogVerbosity( logVerbosity ) ;
+logger->setChanVerbosity( chanVerbosity ) ;
 
 /* Pushover is enabled in config. */
 if( pushoverEnable )
@@ -8163,7 +8163,7 @@ if( pushoverEnable )
     {
     pushover->setUserKeys( pushoverUserKeys ) ;
     pushover->setToken( pushoverToken ) ;
-    logger->updateNotifierVerbose( pushover, pushoverVerbose ) ;
+    logger->updateNotifierVerbosity( pushover, pushoverVerbosity ) ;
     }
   else
     {
@@ -8173,7 +8173,7 @@ if( pushoverEnable )
 #else
     pushover = std::make_shared< PushoverClient >( pushoverToken, pushoverUserKeys ) ;
 #endif
-    logger->addNotifier( pushover, pushoverVerbose ) ;
+    logger->addNotifier( pushover, pushoverVerbosity ) ;
     }
   }
 else
