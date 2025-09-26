@@ -104,6 +104,18 @@ PKG_CHECK_MODULES([LIBCURL], [libcurl],
      libcurl_found=no
      AC_MSG_WARN([libcurl not found - HTTP features will be disabled])])
 
+dnl Check for prometheus-cpp libraries
+PKG_CHECK_MODULES([PROMETHEUS], [prometheus-cpp-core prometheus-cpp-pull],
+    [AC_DEFINE([HAVE_PROMETHEUS], [1], [Define if you have prometheus-cpp])
+     AM_CONDITIONAL(COND_PROMETHEUS,[true])
+     CXXFLAGS="$CXXFLAGS $PROMETHEUS_CFLAGS"
+     CPPFLAGS="$CPPFLAGS $PROMETHEUS_CFLAGS"
+     LIBS="$LIBS $PROMETHEUS_LIBS"
+     prometheus_found=yes],
+    [AM_CONDITIONAL(COND_PROMETHEUS,[false])
+     prometheus_found=no
+     AC_MSG_WARN([prometheus-cpp not found - Prometheus metrics will be disabled])])
+
 dnl AC_CHECK_LIB(z,inflate)
 dnl AC_CHECK_LIB(pthread,pthread_create)
 dnl AC_SEARCH_LIBS(pthread_create,lthread pthread c c_r)

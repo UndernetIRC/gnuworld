@@ -18,9 +18,21 @@ libgnuworld_la_SOURCES = \
 	libgnuworld/threadworker.cc \
 	libgnuworld/pushover.cc \
 	libgnuworld/misc.cc
+
+if COND_PROMETHEUS
+libgnuworld_la_SOURCES += libgnuworld/prometheus.cc
+endif
 libgnuworld_la_LDFLAGS = $(threadLib)
 if COND_LIBCURL
+if COND_PROMETHEUS
+libgnuworld_la_LIBADD = -lcurl -lprometheus-cpp-core -lprometheus-cpp-pull
+else
 libgnuworld_la_LIBADD = -lcurl
+endif
+else
+if COND_PROMETHEUS
+libgnuworld_la_LIBADD = -lprometheus-cpp-core -lprometheus-cpp-pull
+endif
 endif
 libgnuworld_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
@@ -41,6 +53,7 @@ EXTRA_DIST += \
 	libgnuworld/logger.h \
 	libgnuworld/threadworker.h \
 	libgnuworld/notifier.h \
+	libgnuworld/prometheus.h \
 	libgnuworld/pushover.h \
 	libgnuworld/misc.h \
 	libgnuworld/MTrie.h \

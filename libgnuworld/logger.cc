@@ -18,8 +18,9 @@
  *
  */
 #include <string>
+
 #ifdef HAVE_FORMAT
-#include <format>
+  #include <format>
 #endif
 
 #include "Channel.h"
@@ -34,7 +35,7 @@ using std::endl ;
 using std::string ;
 
 /* Function for writing messages to the admin or debug channels. */
-void Logger::write( Verbose v, const string& theMessage )
+void Logger::write( Verbosity v, const string& theMessage )
 {
 #ifdef USE_THREAD
 /* We don't want multiple threads sharing the same logger object to interfer with each other. */
@@ -55,7 +56,7 @@ if( v == SQL )
   }
 
 /* Write to elog. */
-if( v >= logVerbose )
+if( v <= logVerbosity )
   {
   elog  << "[" << bot->getNickName() << "] - "
         << levels[ v ].prefix << " - "
@@ -67,14 +68,13 @@ if( v >= logVerbose )
 /* Send notification. */
 for( const auto& [ notifier, logLevel ] : notifiers )
   {
-  if( v >= logLevel )
+  if( v <= logLevel )
     {
-    notifier->sendMessage( std::format( "[{}] {}", bot->getNickName(), levels[ v ].name ),
-      theMessage ) ;
+    notifier->sendMessage( static_cast< int >( v ), theMessage ) ;
     }
   }
 
-if( v >= chanVerbose && bot->isConnected() && !debugChan.empty() )
+if( v >= chanVerbosity && bot->isConnected() && !debugChan.empty() )
   {
   /* Try to locate the channel. */
   Channel* theChan = Network->findChannel( debugChan ) ;

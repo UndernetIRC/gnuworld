@@ -184,6 +184,20 @@ for( std::string::size_type i = 0 ; i < Modes.size() ; i++ )
 //				<< "msg_CM> Doing CLEAR_NOPRIVMSGS"
 //				<< endl;
 			break ;
+		case 'u':
+			modeVector.push_back( make_pair(
+				false, Channel::MODE_PART ) ) ;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_PART"
+//				<< endl;
+			break ;
+		case 'M':
+			modeVector.push_back( make_pair(
+				false, Channel::MODE_MNOREG ) ) ;
+//			elog	<< tmpChan->getName()
+//				<< "msg_CM> Doing CLEAR_MNOREG"
+//				<< endl;
+			break ;
 		case 'k':
 			theServer->OnChannelModeK( tmpChan, false, 0, 
 				std::string() ) ;

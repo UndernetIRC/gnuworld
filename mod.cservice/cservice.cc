@@ -147,6 +147,10 @@ limit_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 theTime = time(NULL) + channelsFloodPeriod;
 channels_flood_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 
+// Start prometheus metrics timer rolling.
+theTime = time(NULL) + 60;
+prometheus_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+
 /* Start the web relay timer rolling.
  * First, empty out any old notices that may be present.
  */
@@ -346,18 +350,34 @@ if( pushoverEnable )
         << endl ;
 
 #ifdef USE_THREAD
-  pushover = std::make_shared< PushoverClient >( pushoverToken, pushoverUserKeys, &threadWorker ) ;
+  pushover = std::make_shared< PushoverClient >( this, pushoverToken, pushoverUserKeys, &threadWorker ) ;
 #else
-  pushover = std::make_shared< PushoverClient >( pushoverToken, pushoverUserKeys ) ;
+  pushover = std::make_shared< PushoverClient >( this, pushoverToken, pushoverUserKeys ) ;
 #endif
-  logger->addNotifier( pushover, pushoverVerbose ) ;
+  logger->addNotifier( pushover, pushoverVerbosity ) ;
   pushover->sendMessage( "cmaster init", "cmaster connecting..." ) ;
   }
 
+/* Initiate prometheus. */
+#ifdef HAVE_PROMETHEUS
+if( prometheusEnable )
+  {
+  elog  << "*** [CMaster]: Enabling Prometheus metrics at "
+        << prometheusIP
+		<< ":"
+		<< prometheusPort
+        << "..."
+        << endl ;
+
+  prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
+  logger->addNotifier( prometheus ) ;
+  }
+#endif
+
 /* Initiate logger. */
 logger->setChannel( debugChan ) ;
-logger->setLogVerbose( logVerbose ) ;
-logger->setChanVerbose( chanVerbose ) ;
+logger->setLogVerbosity( logVerbosity ) ;
+logger->setChanVerbosity( chanVerbosity ) ;
 
 #ifdef USE_COMMAND_LOG
 /* Init command log file. */
@@ -3573,6 +3593,25 @@ if (timer_id == pendingNotif_timerID)
 		time_t theTime = time(NULL) + channelsFloodPeriod;
 		channels_flood_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 	}
+
+	if (timer_id == prometheus_timerID)
+	{
+		updatePrometheusMetrics();
+		time_t theTime = time(NULL) + 60;
+		prometheus_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
+	}
+}
+
+void cservice::updatePrometheusMetrics()
+{
+	if( !prometheus)  return ;
+
+	/* Update the prometheus metrics */
+	prometheus->setGauge( "gnuworld_memory_usage_bytes", getMemoryUsage() ) ;
+	prometheus->setGauge( "gnuworld_cpu_usage_seconds", getCPUTime() ) ;
+	prometheus->setGauge( "irc_clients", Network->clientList_size() ) ;
+	prometheus->setGauge( "irc_channels", Network->channelList_size() ) ;
+	prometheus->setGauge( "irc_servers", Network->serverList_size() ) ;
 }
 /*
  * Happens when the bot Joins a channel ...
@@ -4924,7 +4963,7 @@ switch( theEvent )
 		iServer* theServer = static_cast< iServer* >( data1 );
 		const char* Routing = reinterpret_cast< char* >( data2 );
 		const char* Message = reinterpret_cast< char* >( data3 );
-		elog << "CSERVICE.CC XQUERY: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		//elog << "CSERVICE.CC XQUERY: " << theServer->getName() << " " << Routing << " " << Message << endl;
 		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
 		//If it ain't us, ignore the message, the message is probably meant for another client here.
 		StringTokenizer st( Message ) ;
@@ -7622,6 +7661,9 @@ void cservice::incStat(const string& name)
         {
 			ptr->second++;
 		}
+
+	if( prometheus )
+		prometheus->incrementCounter(name);
 }
 
 void cservice::incStat(const string& name, unsigned int amount)
@@ -8099,12 +8141,12 @@ if( pushoverEnable )
   if( rehash )
     {
     pushoverToken = cserviceConfig->TryRequire< std::string >( "pushover_token", pushoverToken ) ;
-    pushoverVerbose = cserviceConfig->TryRequire< unsigned int >( "pushover_verbose", pushoverVerbose ) ;
+    pushoverVerbosity = cserviceConfig->TryRequire< unsigned int >( "pushover_verbosity", pushoverVerbosity ) ;
     }
   else
     {
     pushoverToken = cserviceConfig->Require< std::string >( "pushover_token" ) ;
-    pushoverVerbose = cserviceConfig->Require< unsigned int >( "pushover_verbose" ) ;
+    pushoverVerbosity = cserviceConfig->Require< unsigned int >( "pushover_verbosity" ) ;
     }
 
   auto confPtr = cserviceConfig->Find( "pushover_userkey" ) ;
@@ -8114,6 +8156,23 @@ if( pushoverEnable )
     ++confPtr ;
     }
   }
+
+/* Load prometheus settings if enabled. */
+#ifdef HAVE_PROMETHEUS
+if( prometheusEnable )
+  {
+  if( rehash )
+	{
+	prometheusIP = cserviceConfig->TryRequire< std::string >( "prometheus_ip", prometheusIP ) ;
+	prometheusPort = cserviceConfig->TryRequire< unsigned int >( "prometheus_port", prometheusPort ) ;
+	}
+  else
+	{
+	prometheusIP = cserviceConfig->Require< std::string >( "prometheus_ip" ) ;
+	prometheusPort = cserviceConfig->Require< unsigned int >( "prometheus_port" ) ;
+	}
+  }
+#endif // HAVE_PROMETHEUS
 
 if (MinSupporters > RequiredSupporters)
 	MinSupporters = RequiredSupporters;
@@ -8152,8 +8211,22 @@ loadConfigVariables( true ) ;
 
 /* Rehash logger. */
 logger->setChannel( debugChan ) ;
-logger->setLogVerbose( logVerbose ) ;
-logger->setChanVerbose( chanVerbose ) ;
+logger->setLogVerbosity( logVerbosity ) ;
+logger->setChanVerbosity( chanVerbosity ) ;
+
+/* Prometheus is enabled in config but not running. */
+#ifdef HAVE_PROMETHEUS
+if( prometheusEnable && !prometheus )
+	{
+	prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
+	logger->addNotifier( prometheus ) ;
+	}
+else if( !prometheusEnable && prometheus )
+	{
+	logger->removeNotifier( prometheus ) ;
+	prometheus.reset() ;
+	}
+#endif
 
 /* Pushover is enabled in config. */
 if( pushoverEnable )
@@ -8163,17 +8236,17 @@ if( pushoverEnable )
     {
     pushover->setUserKeys( pushoverUserKeys ) ;
     pushover->setToken( pushoverToken ) ;
-    logger->updateNotifierVerbose( pushover, pushoverVerbose ) ;
+    logger->updateNotifierVerbosity( pushover, pushoverVerbosity ) ;
     }
   else
     {
     /* Pushover is enabled in config, but not in gnuworld. Enable. */
 #ifdef USE_THREAD
-    pushover = std::make_shared< PushoverClient >( pushoverToken, pushoverUserKeys, &threadWorker ) ;
+    pushover = std::make_shared< PushoverClient >( this, pushoverToken, pushoverUserKeys, &threadWorker ) ;
 #else
-    pushover = std::make_shared< PushoverClient >( pushoverToken, pushoverUserKeys ) ;
+    pushover = std::make_shared< PushoverClient >( this, pushoverToken, pushoverUserKeys ) ;
 #endif
-    logger->addNotifier( pushover, pushoverVerbose ) ;
+    logger->addNotifier( pushover, pushoverVerbosity ) ;
     }
   }
 else
@@ -8331,7 +8404,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	//What's going to be in Message?
 	// AB XQ Az iauth:15_d :LOGIN Admin temPass
 	// AB XQ Az iauth:15_d :LOGIN2 <ip-addr> <hostname> <ident> <username> <accountname password [totptoken]>
-	elog << "cservice::doXQLogin: Routing: " << Routing << " Message: " << Message << "\n";
+	// elog << "cservice::doXQLogin: Routing: " << Routing << " Message: " << Message << "\n";
 	StringTokenizer st( Message );
 	string username;
 	string password;
@@ -8354,7 +8427,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		if (username.compare(0,1,":") == 0)
 			username.erase(0,1);
 		password = st.assemble(2);
-		elog << "cservice::doXQLogin: LOGIN " << username << " " << password << endl;
+		elog << "cservice::doXQLogin: LOGIN " << username << " " << mask(password) << endl;
 	}
 	if (st[0] == "LOGIN2")
 	{
@@ -8371,7 +8444,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		ip = st[1];
 		hostname = st[2];
 		ident = st[3];
-		elog << "cservice::doXQLogin: LOGIN2 " << ip << " " << hostname << " " << ident << " " << username << " " << password << endl;
+		elog << "cservice::doXQLogin: LOGIN2 " << ip << " " << hostname << " " << ident << " " << username << " " << mask(password) << endl;
 	}
 	int auth_res = authenticateUser(username,password,ip,ident,ipr_ts,&theUser);
 	unsigned int loginTime = getUplink()->getStartTime() + loginDelay;
@@ -8509,6 +8582,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 					<< "Succesful auth for "
 					<< username
 					<< endl;
+			incStat("CORE.LOC.SUCCESS");
 			return true;
 			break;
 		default:
@@ -8519,6 +8593,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			break;
 		}
 elog << "cservice::doXQLogin: FAILED login for " << username << endl;
+incStat("CORE.LOC.FAILED");
 
 return true;
 }

@@ -28,19 +28,21 @@
 #include <algorithm>
 
 #include "ELog.h"
+#include "client.h"
 #include "pushover.h"
 #include "threadworker.h"
+#include "logger.h"
 
 namespace gnuworld
 {
 
-PushoverClient::PushoverClient( std::string token,
+PushoverClient::PushoverClient( xClient* _bot, std::string token,
                                 pushoverKeysType users
 #ifdef USE_THREAD
                                , ThreadWorker* worker
 #endif
 )
-  : apiToken( token ), userKeys( users )
+  : bot( _bot ), apiToken( token ), userKeys( users )
 #ifdef USE_THREAD
   , threadWorker( worker )
 #endif
@@ -57,6 +59,15 @@ void PushoverClient::initialise_curl()
     }
 }
 #endif
+
+bool PushoverClient::sendMessage( int level, const std::string message )
+{
+#ifdef HAVE_FORMAT
+  return sendMessage( std::format( "[{}] {}", bot->getNickName(), Logger::levels[ level ].name ), message ) ;
+#else
+  return false ;
+#endif
+}
 
 bool PushoverClient::sendMessage( const std::string title,
                                   const std::string message )
