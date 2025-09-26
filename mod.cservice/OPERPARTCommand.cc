@@ -45,7 +45,7 @@ using std::ends ;
 using std::string ;
 using std::stringstream ;
 
-bool OPERPARTCommand::Exec( iClient* theClient, const string& Message )
+bool OPERPARTCommand::Exec( [[maybe_unused]] iClient* theClient, [[maybe_unused]] const string& Message )
 {
 bot->incStat("COMMANDS.OPERPART");
 
@@ -109,12 +109,10 @@ bot->logAdminMessage("%s is asking me to leave channel %s",
 		theChan->getName().c_str());
 
 theChan->setInChan(false);
-bot->joinCount--;
+bot->decrementJoinCount();
 
 bot->Part(theChan->getName(), "At the request of an IRC Operator");
 
-#else // USE_OPERPARTJOIN
-(void)theClient; (void)Message;
 #endif // USE_OPERPARTJOIN
 
 return true;
