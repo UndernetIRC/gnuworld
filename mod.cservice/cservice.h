@@ -506,20 +506,28 @@ public:
 	/* Returns the current "Flood Points" this iClient has. */
  	unsigned short getFloodPoints(iClient*);
 
-	/* Increments the join count for this iClient. */
+	/* Increments the total command count. */
+	void incrementTotalCommands()
+	{
+		++totalCommands ;
+		if( prometheus )
+			prometheus->setGauge( "total_commands", totalCommands ) ;
+	}
+
+	/* Increments the join count. */
 	void incrementJoinCount()
 	{
 		++joinCount ;
 		if( prometheus )
-			prometheus->setGauge( "cservice_joins", joinCount ) ;
+			prometheus->setGauge( "joins", joinCount ) ;
 	}
 
-	/* Decrements the join count for this iClient. */
+	/* Decrements the join count. */
 	void decrementJoinCount()
 	{
 		--joinCount ;
 		if( prometheus )
-			prometheus->setGauge( "cservice_joins", joinCount ) ;
+			prometheus->setGauge( "joins", joinCount ) ;
 	}
 
 	/* A const getter of the sqlLevelCache. */

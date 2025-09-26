@@ -45,7 +45,7 @@ using std::ends ;
 using std::string ;
 using std::stringstream ;
 
-bool OPERJOINCommand::Exec( iClient* theClient, const string& Message )
+bool OPERJOINCommand::Exec( [[maybe_unused]] iClient* theClient, [[maybe_unused]] const string& Message )
 {
 bot->incStat("COMMANDS.OPERJOIN");
 
@@ -111,7 +111,7 @@ bot->Join(theChan->getName(),
 	theChan->getChannelMode(),
 	theChan->getChannelTS(),
 	true);
-bot->joinCount++;
+bot->incrementJoinCount();
 
 if (tmpChan)
 	{
@@ -125,8 +125,6 @@ if (tmpChan)
 		}
 	}
 
-#else // USER_OPERPARTJOIN
-(void)theClient; (void)Message;
 #endif // USE_OPERPARTJOIN
 
 return true;

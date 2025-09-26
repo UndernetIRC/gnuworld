@@ -391,19 +391,6 @@ if( !commandLog.is_open() )
 	}
 #endif
 
-userHits = 0;
-userCacheHits = 0;
-channelHits = 0;
-channelCacheHits = 0;
-levelHits = 0;
-levelCacheHits = 0;
-banHits = 0;
-banCacheHits = 0;
-dbErrors = 0;
-joinCount = 0;
-connectRetries = 0;
-totalCommands = 0;
-
 /* Load our translation tables. */
 loadTranslationTable();
 
@@ -508,7 +495,7 @@ void cservice::BurstChannels()
 			true );
 
 		theChan->setInChan(true);
-		joinCount++;
+		incrementJoinCount();
 
 		doTheRightThing(tmpChan);
 
@@ -967,7 +954,7 @@ else
 		+ commHandler->second->getFloodPoints() );
 	ipFloodMap[xIP(theClient->getIP()).GetNumericIP(true)] += commHandler->second->getFloodPoints();
 
-	totalCommands++;
+	incrementTotalCommands();
 
 	sqlUser* theUser = isAuthed(theClient, false);
 
@@ -2897,7 +2884,7 @@ void cservice::cacheExpireLevels()
 			theChan->setInChan(false);
 			theChan->removeFlag(sqlChannel::F_AUTOJOIN);
 			theChan->commit();
-			joinCount--;
+			decrementJoinCount();
 			writeChannelLog(theChan, me, sqlChannel::EV_IDLE, "");
 			LOG( INFO, "I've just left {} because its too quiet.", theChan->getName() );
 			Part(theChan->getName(), "So long! (And thanks for all the fish)");
@@ -4120,7 +4107,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	getUplink()->RegisterChannelEvent(chanName, this);
 	Join(newChan->getName(), string("+tnR"), newChan->getChannelTS(), true);
 	newChan->setInChan(true);
-	joinCount++;
+	incrementJoinCount();
 
 	//Send a welcome notice to the channel
 	if (!welcomeNewChanMessage.empty())
