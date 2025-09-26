@@ -38,9 +38,9 @@ class PushoverClient : public notifier
 {
 
 public:
-  PushoverClient( std::string token, pushoverKeysType users
+  PushoverClient( xClient*, std::string, pushoverKeysType
 #ifdef USE_THREAD
-                , ThreadWorker* worker
+                , ThreadWorker*
 #endif
                 ) ;
 
@@ -61,11 +61,11 @@ public:
   [[nodiscard]] size_t userKeys_size() const
       { return userKeys.size() ; }
 
-  // Virtual override of base class 2-parameter method
-  bool sendMessage( const std::string title,
-                    const std::string message ) override ;
+  bool sendMessage( int level, const std::string message ) override ;
 
-  // Legacy method with int parameters for backward compatibility
+  bool sendMessage( const std::string title,
+                    const std::string message ) ;
+
   bool sendMessage( const std::string title,
                     const std::string message,
                     int priority,
@@ -73,6 +73,7 @@ public:
                     int expire = 3600 ) ;
 
 private:
+  xClient*          bot ;
   std::string       apiToken ;
   pushoverKeysType  userKeys ;
   size_t            statSuccessful = 0 ;

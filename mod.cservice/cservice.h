@@ -49,6 +49,7 @@
 #include	"csGline.h"
 #include	"dbHandle.h"
 #include	"pushover.h"
+#include	"prometheus.h"
 
 #ifdef USE_THREAD
 #include	"threadworker.h"
@@ -201,6 +202,20 @@ protected:
 	/* Pushover object. */
 	std::shared_ptr< PushoverClient > pushover ;
 
+	/* Prometheus object. */
+	std::shared_ptr< PrometheusClient > prometheus ;
+
+	/**
+	 * Non-required configurable variable for prometheus metrics IP.
+	 */
+	std::string                       prometheusIP ;
+
+	/**
+	 * Non-required configurable variable for prometheus metrics port.
+	 * Will be 0 if prometheusEnable is false.
+	 */
+	unsigned short                    prometheusPort = 9091 ;
+
 	/**
 	 * Non-required configurable variable for pushover API token.
 	 * Will be empty if pushoverEnable is false.
@@ -220,7 +235,7 @@ protected:
 	unsigned short                    pushoverVerbosity = 3 ;
 
 	/* Tracker for re-connection attempts to SQL database. */
-	unsigned int 					  connectRetries = 0;
+	unsigned int 					  connectRetries = 0 ;
 
 	/* Container for incStats. */
 	typedef map < string, int > statsMapType;
@@ -285,8 +300,14 @@ protected:
 	/* TimerID for checking channel flood cleanups */
 	xServer::timerID channels_flood_timerID = 0;
 
+	/* TimerID for checking prometheus metrics */
+	xServer::timerID prometheus_timerID = 0;
+
 	/* Checks whether the SQL database connection is active. */
 	void checkDbConnectionStatus();
+
+	/* Update prometheus metrics */
+	void updatePrometheusMetrics() ;
 
 	/* Check if a client has passed IP restriction checks */
 	bool passedIPR( iClient* );
@@ -487,11 +508,19 @@ public:
 
 	/* Increments the join count for this iClient. */
 	void incrementJoinCount()
-		{ ++joinCount ; }
+	{
+		++joinCount ;
+		if( prometheus )
+			prometheus->setGauge( "cservice_joins", joinCount ) ;
+	}
 
 	/* Decrements the join count for this iClient. */
 	void decrementJoinCount()
-		{ --joinCount ; }
+	{
+		--joinCount ;
+		if( prometheus )
+			prometheus->setGauge( "cservice_joins", joinCount ) ;
+	}
 
 	/* A const getter of the sqlLevelCache. */
 	const sqlLevelHashType& getLevelCache() const

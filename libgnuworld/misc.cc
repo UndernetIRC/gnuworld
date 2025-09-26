@@ -693,4 +693,12 @@ getrusage( RUSAGE_SELF, &usage ) ;
 return usage.ru_maxrss ;
 }
 
+/* Returns the CPU time used by gnuworld in seconds. */
+double getCPUTime() {
+struct rusage usage ;
+getrusage( RUSAGE_SELF, &usage ) ;
+return usage.ru_utime.tv_sec + usage.ru_utime.tv_usec / 1e6 +
+		usage.ru_stime.tv_sec + usage.ru_stime.tv_usec / 1e6 ;
+}
+
 } // namespace gnuworld

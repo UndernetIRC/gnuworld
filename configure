@@ -697,6 +697,10 @@ BOOST_CPPFLAGS
 pg_config_binary
 COND_TESTDIR_FALSE
 COND_TESTDIR_TRUE
+COND_PROMETHEUS_FALSE
+COND_PROMETHEUS_TRUE
+PROMETHEUS_LIBS
+PROMETHEUS_CFLAGS
 COND_LIBCURL_FALSE
 COND_LIBCURL_TRUE
 LIBCURL_LIBS
@@ -914,7 +918,9 @@ PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 LIBCURL_CFLAGS
-LIBCURL_LIBS'
+LIBCURL_LIBS
+PROMETHEUS_CFLAGS
+PROMETHEUS_LIBS'
 ac_subdirs_all='libltdl'
 
 # Initialize some variables set by options.
@@ -1636,6 +1642,10 @@ Some influential environment variables:
               C compiler flags for LIBCURL, overriding pkg-config
   LIBCURL_LIBS
               linker flags for LIBCURL, overriding pkg-config
+  PROMETHEUS_CFLAGS
+              C compiler flags for PROMETHEUS, overriding pkg-config
+  PROMETHEUS_LIBS
+              linker flags for PROMETHEUS, overriding pkg-config
 
 Use these variables to override the choices made by 'configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -20908,6 +20918,112 @@ fi
 fi
 
 
+pkg_failed=no
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for prometheus-cpp-core prometheus-cpp-pull" >&5
+printf %s "checking for prometheus-cpp-core prometheus-cpp-pull... " >&6; }
+
+if test -n "$PROMETHEUS_CFLAGS"; then
+    pkg_cv_PROMETHEUS_CFLAGS="$PROMETHEUS_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"prometheus-cpp-core prometheus-cpp-pull\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "prometheus-cpp-core prometheus-cpp-pull") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_PROMETHEUS_CFLAGS=`$PKG_CONFIG --cflags "prometheus-cpp-core prometheus-cpp-pull" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$PROMETHEUS_LIBS"; then
+    pkg_cv_PROMETHEUS_LIBS="$PROMETHEUS_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"prometheus-cpp-core prometheus-cpp-pull\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "prometheus-cpp-core prometheus-cpp-pull") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_PROMETHEUS_LIBS=`$PKG_CONFIG --libs "prometheus-cpp-core prometheus-cpp-pull" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                PROMETHEUS_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "prometheus-cpp-core prometheus-cpp-pull" 2>&1`
+        else
+                PROMETHEUS_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "prometheus-cpp-core prometheus-cpp-pull" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$PROMETHEUS_PKG_ERRORS" >&5
+
+         if false; then
+  COND_PROMETHEUS_TRUE=
+  COND_PROMETHEUS_FALSE='#'
+else
+  COND_PROMETHEUS_TRUE='#'
+  COND_PROMETHEUS_FALSE=
+fi
+
+     prometheus_found=no
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: prometheus-cpp not found - Prometheus metrics will be disabled" >&5
+printf "%s\n" "$as_me: WARNING: prometheus-cpp not found - Prometheus metrics will be disabled" >&2;}
+elif test $pkg_failed = untried; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+         if false; then
+  COND_PROMETHEUS_TRUE=
+  COND_PROMETHEUS_FALSE='#'
+else
+  COND_PROMETHEUS_TRUE='#'
+  COND_PROMETHEUS_FALSE=
+fi
+
+     prometheus_found=no
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: prometheus-cpp not found - Prometheus metrics will be disabled" >&5
+printf "%s\n" "$as_me: WARNING: prometheus-cpp not found - Prometheus metrics will be disabled" >&2;}
+else
+        PROMETHEUS_CFLAGS=$pkg_cv_PROMETHEUS_CFLAGS
+        PROMETHEUS_LIBS=$pkg_cv_PROMETHEUS_LIBS
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+printf "%s\n" "#define HAVE_PROMETHEUS 1" >>confdefs.h
+
+      if true; then
+  COND_PROMETHEUS_TRUE=
+  COND_PROMETHEUS_FALSE='#'
+else
+  COND_PROMETHEUS_TRUE='#'
+  COND_PROMETHEUS_FALSE=
+fi
+
+     CXXFLAGS="$CXXFLAGS $PROMETHEUS_CFLAGS"
+     CPPFLAGS="$CPPFLAGS $PROMETHEUS_CFLAGS"
+     LIBS="$LIBS $PROMETHEUS_LIBS"
+     prometheus_found=yes
+fi
+
+
 
 ac_fn_cxx_check_header_compile "$LINENO" "sys/file.h" "ac_cv_header_sys_file_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_file_h" = xyes
@@ -23614,6 +23730,18 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COND_LIBCURL_TRUE}" && test -z "${COND_LIBCURL_FALSE}"; then
   as_fn_error $? "conditional \"COND_LIBCURL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_PROMETHEUS_TRUE}" && test -z "${COND_PROMETHEUS_FALSE}"; then
+  as_fn_error $? "conditional \"COND_PROMETHEUS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_PROMETHEUS_TRUE}" && test -z "${COND_PROMETHEUS_FALSE}"; then
+  as_fn_error $? "conditional \"COND_PROMETHEUS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_PROMETHEUS_TRUE}" && test -z "${COND_PROMETHEUS_FALSE}"; then
+  as_fn_error $? "conditional \"COND_PROMETHEUS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COND_TESTDIR_TRUE}" && test -z "${COND_TESTDIR_FALSE}"; then

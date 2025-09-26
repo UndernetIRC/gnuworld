@@ -81,16 +81,6 @@ private:
     const char* name ;
   } ;
 
-  static constexpr std::array< LevelEntry, 7 > levels { {
-    {"", "", ""},  // Dummy element at index 0
-    {"[T]", "TRACE", "TRACE"},    // TRACE = 1
-    {"[D]", "DEBUG", "DEBUG"},    // DEBUG = 2
-    {"[I]", "INFO ", "INFO"},     // INFO  = 3
-    {"[W]", "WARN ", "WARNING"},  // WARN  = 4
-    {"[E]", "ERROR", "ERROR"},    // ERROR = 5
-    {"[F]", "FATAL", "FATAL"}     // FATAL = 6
-  } } ;
-
   std::string parseFunction( std::string ) ;
 
   std::string getColour( Verbosity v )
@@ -155,6 +145,16 @@ public:
   LoggerStream write( Verbosity v )
     { return LoggerStream( *this, v ) ; }
 
+  static constexpr std::array< LevelEntry, 7 > levels { {
+    {"", "", ""},  // Dummy element at index 0
+    {"[F]", "FATAL", "FATAL"},    // FATAL = 1
+    {"[E]", "ERROR", "ERROR"},    // ERROR = 2
+    {"[W]", "WARN ", "WARNING"},  // WARN  = 3
+    {"[I]", "INFO ", "INFO"},     // INFO  = 4
+    {"[D]", "DEBUG", "DEBUG"},    // DEBUG = 5
+    {"[T]", "TRACE", "TRACE"}     // TRACE = 6
+  } } ;
+
   /* Setter functions for Admin and Debug channels */
   inline void setChannel( const std::string& channelName )
     { debugChan = channelName ; }
@@ -173,8 +173,12 @@ public:
     { return debugChan ; }
 
   /* Enables pushover by storing a shared pointer. */
-  inline void addNotifier( std::shared_ptr< notifier > _notifier, unsigned short _verbose )
-    { notifiers.push_back( std::make_pair( std::move( _notifier ), _verbose ) ) ; }
+  inline void addNotifier( std::shared_ptr< notifier > _notifier, unsigned short _verbosity )
+    { notifiers.push_back( std::make_pair( std::move( _notifier ), _verbosity ) ) ; }
+
+  /* Enables notifier with maximum verbosity level. */
+  inline void addNotifier( std::shared_ptr< notifier > _notifier )
+    { notifiers.push_back( std::make_pair( std::move( _notifier ), TRACE ) ) ; }
 
   /* Disables pushover by resetting the shared pointer. */
   inline void removeNotifier( std::shared_ptr< notifier > _notifier )

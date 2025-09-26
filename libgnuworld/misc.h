@@ -245,6 +245,13 @@ void stripModes( std::string& , const std::string& ) ;
 /* Returns the memory usage of gnuworld in KB. */
 size_t getMemoryUsage() ;
 
+/* Returns the CPU time used by gnuworld in seconds. */
+double getCPUTime() ;
+
+/* Masks a string for logging purposes. Typically used for passwords. */
+inline std::string mask( const std::string& s )
+	{ return std::string( s.size(), '*' ) ; }
+
 } // namespace gnuworld
 
 #endif /* __MISC__ */

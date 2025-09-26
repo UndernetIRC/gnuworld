@@ -50,6 +50,7 @@
 //#include	"events.h"
 //#include	"ip.h"
 
+#include	"misc.h"
 #include	"server.h"
 #include	"Network.h"
 //#include	"iServer.h"
@@ -201,15 +202,76 @@ while( ('\n' == line[ len ]) || ('\r' == line[ len ]) )
 memset( inputCharBuffer, 0, sizeof( inputCharBuffer ) ) ;
 strncpy( inputCharBuffer, line.c_str(), len + 1 ) ;
 
+struct CommandMask {
+	std::string command ;
+	size_t pos ;
+} ;
+
+/* List of commands containing sensitive information to be redacted in logging.
+ * 1. Command in upper case only.
+ * 2. The position of the sensitive information in the command.
+ */
+static const CommandMask commandMasks[] = {
+	{"LOGIN", 2},
+	{"LOGIN2", 5},
+	{"NEWPASS", 1},
+	{"SUSPENDME", 1},
+} ;
+
+std::string logLine = line;
+if( line.size() > 10
+	&& ( ( line[ 6 ] == 'P' && line[ 9 ] == '@' )
+	|| ( line[ 3 ] == 'X' && line[ 4 ] == 'Q' ) ) )
+	{
+	size_t colonPos = logLine.find(" :") ;
+	if( colonPos != std::string::npos )
+		{
+		std::istringstream iss( logLine.substr( colonPos + 2 ) ) ;
+		std::string word ;
+		iss >> word ;
+
+		// Find command in mask table
+		for( const auto& mask : commandMasks )
+			{
+			if( string_upper(word) == mask.command )
+				{
+				std::vector< std::string > fields ;
+				fields.push_back( word ) ;
+				while( iss >> word ) fields.push_back( word ) ;
+
+				// Scramble password if position exists
+				if( fields.size() > mask.pos )
+					fields[ mask.pos ] = gnuworld::mask( fields[ mask.pos ] ) ;
+
+				// Reconstruct scrambled message
+				std::ostringstream oss ;
+				for( size_t i = 0 ; i < fields.size() ; ++i )
+					{
+					if( i > 0 ) oss << " " ;
+					oss << fields[ i ] ;
+					}
+				std::string scrambled = oss.str() ;
+
+				// If the original line ended with a newline, add it back
+				if( !logLine.empty() && ( line.back() == '\n' || line.back() == '\r' ) )
+					scrambled += "\n";
+
+				logLine.replace( colonPos + 2, std::string::npos, scrambled ) ;
+				break ;
+			}
+		}
+	}
+}
+
 if( verbose )
 	{
 	clog	<< "[IN ]: "
-		<< line ;
+		<< logLine ;
 	}
 
 if( logSocket )
 	{
-	socketFile	<< line ;
+	socketFile	<< logLine ;
 	}
 
 Process( inputCharBuffer ) ;

@@ -18,8 +18,9 @@
  *
  */
 #include <string>
+
 #ifdef HAVE_FORMAT
-#include <format>
+  #include <format>
 #endif
 
 #include "Channel.h"
@@ -69,8 +70,7 @@ for( const auto& [ notifier, logLevel ] : notifiers )
   {
   if( v <= logLevel )
     {
-    notifier->sendMessage( std::format( "[{}] {}", bot->getNickName(), levels[ v ].name ),
-      theMessage ) ;
+    notifier->sendMessage( static_cast< int >( v ), theMessage ) ;
     }
   }
 

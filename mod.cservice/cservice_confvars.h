@@ -84,4 +84,5 @@
     CONFIG_VAR( unsigned int, logVerbosity,                     "log_verbosity") \
     CONFIG_VAR( unsigned int, chanVerbosity,                    "chan_verbosity") \
     CONFIG_VAR( bool,         logSQL,                           "log_sql") \
-    CONFIG_VAR( bool,         pushoverEnable,                   "pushover_enable")
+    CONFIG_VAR( bool,         pushoverEnable,                   "pushover_enable") \
+    CONFIG_VAR( bool,         prometheusEnable,                 "prometheus_enable")

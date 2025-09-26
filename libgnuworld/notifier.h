@@ -36,13 +36,12 @@ public:
     virtual ~notifier() = default ;
 
     /**
-     * Send a notification message
-     * @param title The title/subject of the message
+     * Send a notification message with verbosity level
+     * @param level The verbosity/severity level
      * @param message The message body
      * @return true if message was sent successfully, false otherwise
      */
-    virtual bool sendMessage( const std::string title,
-                              const std::string message ) = 0 ;
+    virtual bool sendMessage( int level, const std::string message ) = 0 ;
 
     /**
      * Get the number of successful notifications sent
