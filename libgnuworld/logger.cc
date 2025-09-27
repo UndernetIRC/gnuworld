@@ -74,7 +74,7 @@ for( const auto& [ notifier, logLevel ] : notifiers )
     }
   }
 
-if( v >= chanVerbosity && bot->isConnected() && !debugChan.empty() )
+if( v <= chanVerbosity && bot->isConnected() && !debugChan.empty() )
   {
   /* Try to locate the channel. */
   Channel* theChan = Network->findChannel( debugChan ) ;
