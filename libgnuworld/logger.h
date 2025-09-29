@@ -213,6 +213,9 @@ public:
   /* Helper function to write to the logfile. */
   void writeLog( Verbosity, const std::string&, const std::string&, const std::string& ) ;
 
+  void write( Verbosity v, const std::string& theMessage )
+    { writeFunc( v, "", string(), theMessage ) ; }
+
 #ifdef HAVE_FORMAT
   template< typename Format, typename... Args >
   void write( Verbosity v, const Format& format, Args&&... args )
