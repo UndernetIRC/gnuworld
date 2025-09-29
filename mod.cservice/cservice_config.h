@@ -23,11 +23,6 @@
 #define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.13 2006/09/26 17:36:04 kewlio Exp $"
 
 /**
- * Define this if you wish to log all cache hits.
- */
-#define LOG_CACHE_HITS
-
-/**
  * Define this if you wish for general debugging information
  * be logged.
  */
