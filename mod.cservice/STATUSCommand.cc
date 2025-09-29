@@ -309,10 +309,10 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 	/*
 	 *  Look up this username in the cache.
 	 */
-	sqlUser* currentUser = bot->getUserRecord(bot->SQLDb->GetValue(i, 0));
+	auto currentUser = bot->getCachedUserRecord(bot->SQLDb->GetValue(i, 0));
 	if(currentUser)
 		{
-		if( !currentUser->isAuthed() )
+		if( !(*currentUser)->isAuthed() )
 			{
 			continue ;
 			}
@@ -326,8 +326,8 @@ for (unsigned int i = 0 ; i < bot->SQLDb->Tuples(); i++)
 		 *
 		 * Loop around all people auth'd as this nick and append their nicks
 		 */
-		for( sqlUser::networkClientListType::iterator ptr = currentUser->networkClientList.begin() ;
-			ptr != currentUser->networkClientList.end() ; ++ptr )
+		for( sqlUser::networkClientListType::iterator ptr = (*currentUser)->networkClientList.begin() ;
+			ptr != (*currentUser)->networkClientList.end() ; ++ptr )
 			{
 			iClient* tmpClient = (*ptr);
 

@@ -21,22 +21,23 @@
 #pragma once
 
 #include <string>
+#include <fstream>
 #ifdef HAVE_FORMAT
-#include <format>
+ #include <format>
+#endif
+#ifdef USE_THREAD
+  #include <mutex>
 #endif
 #include <map>
 #include <array>
 #include <memory>
-#ifdef USE_THREAD
-#include <mutex>
-#endif
 
 #include "notifier.h"
 
 /* Logger macro. Passes on the caller function. */
 #ifdef HAVE_FORMAT
-#define LOG(x, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, __VA_ARGS__)
-#define LOGSQL_ERROR(x)  logger->writeFunc(ERROR, __PRETTY_FUNCTION__, "SQL Error: {}", x->ErrorMessage())
+#define LOG(x, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, "", __VA_ARGS__)
+#define LOGSQL_ERROR(x)  logger->writeFunc(ERROR, __PRETTY_FUNCTION__, "", "SQL Error: {}", x->ErrorMessage())
 #else
 #define LOG(x, ...)  
 #define LOGSQL_ERROR(x) elog << "SQL Error: " << x->ErrorMessage() << std::endl ;
@@ -45,7 +46,7 @@
 namespace gnuworld
 {
 
-class xClient;
+class xClient ;
 
 /* Verbosity levels */
 enum Verbosity {
@@ -66,6 +67,7 @@ private:
   unsigned short                    chanVerbosity = 2 ;
   unsigned short                    logVerbosity = 1 ;
   bool                              logSQL = false ;
+  std::ofstream                     logFile ;
   std::vector<
     std::pair<
       std::shared_ptr<
@@ -140,7 +142,10 @@ private:
 public:
 
   /* Constructor. */
-  Logger( xClient* _bot) : bot( _bot ) {}
+  Logger( xClient* _bot ) ;
+  
+  /* Destructor. */
+  ~Logger() ;
 
   LoggerStream write( Verbosity v )
     { return LoggerStream( *this, v ) ; }
@@ -203,14 +208,18 @@ public:
     }
 
   /* Log to the debug and admin channel */
-  void write( Verbosity, const std::string& ) ;
+  void writeFunc( Verbosity, const char*, const std::string&, const std::string& ) ;
+
+  /* Helper function to write to the logfile. */
+  void writeLog( Verbosity, const std::string&, const std::string&, const std::string& ) ;
+
 #ifdef HAVE_FORMAT
   template< typename Format, typename... Args >
   void write( Verbosity v, const Format& format, Args&&... args )
   {
   std::string fmtString = std::vformat( format,
     std::make_format_args( args... ) ) ;
-  write( v, fmtString ) ;
+  writeFunc( v, "", string(), fmtString ) ;
   }
 
   /**
@@ -218,11 +227,11 @@ public:
    * Called by the LOG macro.
    */
   template< typename Format, typename... Args >
-  void writeFunc( Verbosity v, const char* func, const Format& format, Args&&... args )
+  void writeFunc( Verbosity v, const char* func, const std::string& jsonParams, const Format& format, Args&&... args )
   {
-  std::string fmtString = ( v == INFO ? "" : parseFunction( func ) + "> " ) + std::vformat( format,
-    std::make_format_args( args... ) ) ;
-  write( v, fmtString ) ;
+    std::string fmtString = std::vformat( format,
+      std::make_format_args( args... ) ) ;
+    writeFunc( v, func, jsonParams, fmtString ) ;
   }
 #endif
 } ; // class Logger

@@ -992,13 +992,8 @@ else
 			<< ends;
 
 		if( !SQLDb->Exec(theLog ) )
-//		if( PGRES_COMMAND_OK != status )
 		{
-			elog    << "cservice::adminlog> Something went wrong: "
-				<< theLog.str().c_str()
-				<< " "
-				<< SQLDb->ErrorMessage()
-				<< endl;
+			LOGSQL_ERROR( SQLDb ) ;
 		}
 	}
 
@@ -1646,11 +1641,7 @@ sqlUserHashType::iterator ptr = sqlUserCache.find(id);
 if(ptr != sqlUserCache.end())
 	{
 	// Found something!
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getUserRecord> Cache hit for "
-			<< id
-			<< endl;
-	#endif
+	LOG( TRACE, "Cache hit for {}", id ) ;
 
 	ptr->second->setLastUsed(currentTime());
 	userCacheHits++;
@@ -1669,10 +1660,7 @@ if (theUser->loadData(id))
 	{
  	sqlUserCache.insert(sqlUserHashType::value_type(id, theUser));
 
-	elog	<< "cmaster::getUserRecord> There are "
-			<< sqlUserCache.size()
-			<< " elements in the cache."
-			<< endl;
+	LOG( TRACE, "There are {} elements in the cache.", sqlUserCache.size() ) ;
 
 	userHits++;
 
@@ -1715,11 +1703,7 @@ sqlUserHashType::iterator ptr = sqlUserCache.find(id);
 if(ptr != sqlUserCache.end())
 	{
 	// Found something!
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getUserRecord> Cache hit for "
-			<< id
-			<< endl;
-	#endif
+	LOG( TRACE, "Cache hit for {}", id ) ;
 
 	ptr->second->setLastUsed(currentTime());
 	userCacheHits++;
@@ -1738,10 +1722,7 @@ if (theUser->loadData(id))
 	{
  	sqlUserCache.insert(sqlUserHashType::value_type(id, theUser));
 
-	elog	<< "cmaster::getUserRecord> There are "
-			<< sqlUserCache.size()
-			<< " elements in the cache."
-			<< endl;
+	LOG( TRACE, "There are {} elements in the cache.", sqlUserCache.size() ) ;
 
 	userHits++;
 
@@ -1838,13 +1819,7 @@ sqlLevelHashType::iterator ptr = sqlLevelCache.find(thePair);
 if(ptr != sqlLevelCache.end())
 	{
 	// Found something!
-	#ifdef LOG_CACHE_HITS
-		elog	<< "cmaster::getLevelRecord> Cache hit for "
-			<< "user-id:chan-id "
-			<< theUser->getID() << ":"
-			<< theChan->getID()
-			<< endl;
-	#endif
+	LOG( TRACE, "Cache hit for user-id:chan-id {}:{}", theUser->getID(), theChan->getID() ) ;
 
 	levelCacheHits++;
 	ptr->second->setLastUsed(currentTime());
@@ -2084,9 +2059,7 @@ bool cservice::needIPRcheck(sqlUser* theUser)
 	sqlChannel* theChan = getChannelRecord("*");
 	if (!theChan)
 	{
-		elog	<< "cservice::needIPRcheck> Unable to "
-			<< "locate channel '*'!"
-			<< endl ;
+		LOG( FATAL, "Unable to locate channel '*'!" ) ;
 		::exit(0);
 	}
 	bool isAdmin = false;
@@ -2137,9 +2110,7 @@ if (!verify && (theUser->getFlag(sqlUser::F_ALUMNI)))
 sqlChannel* theChan = getChannelRecord("*");
 if (!theChan)
 	{
-	elog	<< "cservice::getAdminAccessLevel> Unable to "
-		<< "locate channel '*'! Sorry, I can't continue.."
-		<< endl;
+	LOG( FATAL, "Unable to locate channel '*'! Sorry, I can't continue.." ) ;
 	::exit(0);
 	}
 
@@ -2169,11 +2140,7 @@ if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
 sqlChannel* theChan = getChannelRecord(coderChan);
 if (!theChan)
 	{
-	elog	<< "cservice::getAdminAccessLevel> Unable to "
-		<< "locate channel '"
-		<< coderChan.c_str()
-		<< "'! Sorry, I can't continue.."
-		<< endl;
+	LOG( FATAL, "Unable to locate channel '{}'! Sorry, I can't continue..", coderChan ) ;
 	::exit(0);
 	}
 
@@ -2475,10 +2442,7 @@ return true;
  */
 void cservice::expireSuspends()
 {
-#ifdef LOG_DEBUG
-elog	<< "cservice::expireSuspends> Checking for expired Suspensions.."
-	<< endl;
-#endif
+LOG( TRACE, "Checking for expired Suspensions.." ) ;
 time_t expiredTime = currentTime();
 stringstream expireQuery;
 expireQuery	<< "SELECT user_id,channel_id FROM levels "
@@ -2498,10 +2462,7 @@ if( !SQLDb->Exec(expireQuery, true ) )
  *  this level record in the cache.
  */
 
-elog	<< "cservice::expireSuspends> Found "
-		<< SQLDb->Tuples()
-		<< " expired suspensions."
-		<< endl;
+LOG( TRACE, "Found {} expired suspensions.", SQLDb->Tuples() ) ;
 
 /*
  *  Place our query results into temporary storage, because
@@ -2534,14 +2495,8 @@ for (expireVectorType::const_iterator resultPtr = expireVector.begin();
 		if(Lptr != sqlLevelCache.end())
 			{
 			/* Found it in the cache, remove suspend. */
-#ifdef LOG_CACHE_HITS
-			elog	<< "cservice::expireSuspends> "
-				<< "Found level record in cache: "
-				<< resultPtr->first
-				<< ":"
-				<< resultPtr->second
-				<< endl;
-#endif
+			LOG( TRACE, "Found level record in cache: {}:{}", resultPtr->first, resultPtr->second ) ;
+
 			(Lptr->second)->setSuspendExpire(0);
 			(Lptr->second)->setSuspendLevel(0);
 			(Lptr->second)->setSuspendBy(string());
@@ -2617,10 +2572,8 @@ while (ptr != silenceList.end())
  */
 void cservice::expireBans()
 {
-#ifdef LOG_DEBUG
-elog	<< "cservice::expireBans> Checking for expired bans.."
-	<< endl;
-#endif
+LOG( TRACE, "Checking for expired bans.." ) ;
+
 time_t expiredTime = currentTime();
 stringstream expireQuery;
 expireQuery	<< "SELECT channel_id,id FROM bans "
@@ -2640,10 +2593,7 @@ if( !SQLDb->Exec(expireQuery, true ) )
  *  this ban in the cache.
  */
 
-elog	<< "cservice::expireBans> Found "
-		<< SQLDb->Tuples()
-		<< " expired bans."
-		<< endl;
+LOG( TRACE, "Found {} expired bans.", SQLDb->Tuples() ) ;
 
 /*
  *  Place our query results into temporary storage, because
@@ -2672,9 +2622,7 @@ for (const auto& chanPtr : channelsVector)
 	sqlChannel* theChan = getChannelRecord( chanPtr );
 	if (!theChan)
 		{
-		elog 	<< "cservice::expireBans> Unable to find channel-ID "
-			<< chanPtr
-			<< endl ;
+		LOG( DEBUG, "Unable to find channel-ID {}", chanPtr ) ;
 
 		continue;
 		}
@@ -2682,16 +2630,10 @@ for (const auto& chanPtr : channelsVector)
 	Channel* tmpChan = Network->findChannel( theChan->getName() ) ;
 	if (!tmpChan)
 		{
-		elog	<< "cservice::expireBans> Unable to find network channel "
-			<< theChan->getName()
-			<< endl;
+		LOG( TRACE, "Unable to find network channel {}", theChan->getName() ) ;
 		}
 
-	#ifdef LOG_DEBUG
-	elog	<< "Checking bans for "
-		<< theChan->getName()
-		<< endl;
-	#endif
+	LOG( TRACE, "Checking bans for {}", theChan->getName() ) ;
 
 	/* Vector to store bans for each channel. */
 	xServer::banVectorType	banVector ;
@@ -2717,23 +2659,13 @@ for (const auto& chanPtr : channelsVector)
 					false, theBan->getBanMask() ) ) ;
 				}
 
-			#ifdef LOG_DEBUG
-				elog	<< "Cleared Ban "
-					<< theBan->getBanMask()
-					<< " from cache"
-					<< endl;
-			#endif
+			LOG( TRACE, "Cleared ban {} from cache", theBan->getBanMask() ) ;
 
 			delete(theBan); theBan = nullptr ;
 			}
 		else
 			{
-			#ifdef LOG_DEBUG
-			elog 	<< "Unable to find ban "
-				<< " with id "
-				<< banID
-				<< endl;
-			#endif
+			LOG( DEBUG, "Unable to find ban with id {}", banID ) ;
 			}
 		} // for() expireVector
 
@@ -2817,13 +2749,7 @@ void cservice::cacheExpireUsers()
 		if ( ((tmpUser->getLastUsed() + 3600) < currentTime()) &&
 			!tmpUser->isAuthed() )
 		{
-#ifdef LOG_DEBUG
-			elog << "cservice::cacheExpireUsers> "
-			<< tmpUser->getUserName()
-			<< "; last used: "
-			<< tmpUser->getLastUsed()
-			<< endl;
-#endif
+			LOG( TRACE, "Purging user-id: {} from cache. Last used: {}", tmpUser->getID(), tmpUser->getLastUsed() ) ;
 			purgeCount++;
 			removeKey = ptr->first;
 			delete(ptr->second);
@@ -2929,7 +2855,7 @@ bool cservice::deleteUserFromTable(unsigned int userId, const string& table)
     if (!SQLDb->Exec(queryString,true))
     {
     	LOG( ERROR, "FAILED to delete user {} from {}", userId, table ) ;
-	LOGSQL_ERROR( SQLDb ) ;
+		LOGSQL_ERROR( SQLDb ) ;
     	return false;
     }
     return true;
@@ -2981,7 +2907,8 @@ bool cservice::wipeUser(unsigned int userId, bool expired)
 		else
 			LOG( INFO, "User {} ({}) has expired (Never logged in)", tmpUser->getUserName(), tmpUser->getEmail() ) ;
 	}
-	else LOG( INFO, "Deleted(wipeUser) {} ({}) from the database.", tmpUser->getUserName(), userId ) ;
+	else
+		LOG( INFO, "Deleted(wipeUser) {} ({}) from the database.", tmpUser->getUserName(), userId ) ;
 
 	cacheclean:
         sqlUserHashType::iterator usrItr = sqlUserCache.find(tmpUser->getUserName());
@@ -3008,7 +2935,6 @@ void cservice::ExpireUsers()
 
 	if( !SQLDb->Exec(queryString, true ))
 	{
-	   LOG( ERROR, "An Error occured while retrieve database information on USERS-EXPIRE query" ) ;
 	   LOGSQL_ERROR( SQLDb ) ;
 	   return;
 	}
@@ -3393,19 +3319,12 @@ void cservice::OnTimer(const xServer::timerID& timer_id, void* parms)
 
 if (parms != nullptr)
 {
-#ifdef LOG_DEBUG
-	elog	<< "cservice::OnTimer> Called with parms (JOINLIM)"
-		<< endl;
-#endif
+	LOG( TRACE, "Called with parms (JOINLIM)" ) ;
 	sqlChannel *sqlChan = static_cast<sqlChannel *>(parms);
 	if (sqlChan != nullptr && sqlChan->getLimitJoinTimer() == timer_id && sqlChan->getLimitJoinActive())
 	{
 		undoJoinLimits(sqlChan);
-#ifdef LOG_DEBUG
-		elog	<< "cservice::OnTimer> Calling undoJoinLimits for "
-			<< sqlChan->getName() << " (ID: " << sqlChan->getID() << ")"
-			<< endl;
-#endif
+		LOG( DEBUG, "Calling undoJoinLimits for {} (ID: {})", sqlChan->getName(), sqlChan->getID() ) ;
 	}
 }
 
@@ -3610,11 +3529,7 @@ void cservice::updatePrometheusMetrics()
 	Channel* tmpChan = Network->findChannel(chanName);
 	if (!tmpChan)
 	{
-#ifdef LOG_DEBUG
-		elog << "cservice::OnJoin> Could not find network channel "
-			<< chanName.c_str()
-			<< endl;
-#endif
+		LOG( TRACE, "Could not find network channel {}", chanName ) ;
 		return;
 	}
 
@@ -3639,9 +3554,7 @@ va_end( _list ) ;
 Channel* tmpChan = Network->findChannel(relayChan);
 if (!tmpChan)
 	{
-	elog	<< "cservice::logAdminMessage> Unable to locate relay "
-		<< "channel on network!"
-		<< endl;
+	LOG( WARN, "Unable to locate relay channel {} on network!", relayChan ) ;
 	return false;
 	}
 
@@ -3666,9 +3579,7 @@ bool cservice::logPrivAdminMessage(const char* format, ... )
 	Channel* tmpChan = Network->findChannel(privrelayChan);
 	if (!tmpChan)
 	{
-		elog	<< "cservice::logPrivAdminMessage> Unable to locate "
-			<< "prileved relay channel on network!"
-			<< endl;
+		LOG( WARN, "Unable to locate prileved relay channel {} on network!", privrelayChan ) ;
 		return false;
 	}
 
@@ -3699,10 +3610,7 @@ bool cservice::logTheJudgeMessage(const char* format, ... )
 	Channel* tmpChan = Network->findChannel(logChannel);
 	if (!tmpChan)
 	{
-		elog	<< "cservice::logTheJudgeMessage> Unable to locate logging channel "
-				<< logChannel
-				<< " on network!"
-				<< endl;
+		LOG( WARN, "Unable to locate logging channel {} on network!", logChannel ) ;
 		return false;
 	}
 
@@ -4016,9 +3924,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 		{
 			lvlPair = lvlptr->first;
 
-	#ifdef LOG_DEBUG
-			elog << "cservice::sqlRegisterChannel> Purging Level Record for: " << lvlPair.second << " (UID: " << lvlPair.first << ")" << endl;
-	#endif
+			LOG( DEBUG, "Purging Level Record for: {} (UID: {})", lvlPair.second, lvlPair.first ) ;
 
 			++lvlptr;
 			sqlLevelCache.erase(lvlPair);
@@ -4976,7 +4882,7 @@ switch( theEvent )
 		iServer* theServer = static_cast< iServer* >(data1);
 		const char* Routing = reinterpret_cast< char* >(data2);
 		const char* Message = reinterpret_cast< char* >(data3);
-		elog << "CSERVICE.CC XREPLY: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		//elog << "CSERVICE.CC XREPLY: " << theServer->getName() << " " << Routing << " " << Message << endl;
 		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
 		//If it ain't us, ignore the message, the message is probably meant for another client here.
 		StringTokenizer st(Message);
@@ -5031,13 +4937,7 @@ switch( theEvent )
 			{
 			tmpSqlUser->removeAuthedClient(tmpUser);
 			tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
-#ifdef LOG_DEBUG
-			elog	<< "cservice::OnEvent> Deauthenticated "
-				<< "client: " << tmpUser << " from "
-				<< "user: "
-				<< tmpSqlUser->getUserName()
-				<< endl;
-#endif
+			LOG_WITH_UID( TRACE, tmpSqlUser->getID(), "Deauthenticated client {} from user: {}", tmpUser->getRealNickUserHost(), tmpSqlUser->getUserName() ) ;
 			}
 
 		// Clear up the custom data structure we appended to
@@ -5789,8 +5689,7 @@ for( ; ptr != theChan->banList.end() ; ++ptr )
 	sqlBan* theBan = ptr->second;
 	if( 0 == theBan )
 		{
-		elog	<< "cservice::isBannedOnChan> Invalid ban!"
-			<< endl ;
+		LOG_WITH_CID( ERROR, theChan->getID(), "Null ban record in ban list." ) ;
 		continue ;
 		}
 	if (banMatch(theBan->getBanMask(), theClient))
@@ -7013,9 +6912,7 @@ void cservice::setSupporterNoticedStatus(int suppId, int chanId, bool noticed)
 
 		if (!SQLDb->Exec(theQuery, true))
 		{
-			elog    << "cservice::setSupporterNoticedStatus> "
-					<< SQLDb->ErrorMessage()
-					<< endl;
+			LOGSQL_ERROR( SQLDb ) ;
 		}
 }
 
@@ -7380,13 +7277,6 @@ if( SQLDb->Exec(theQuery, true ) )
 
 	LOG( INFO, "Loaded Pending Channels, there are currently {} channels being traffic monitored.",
 		pendingChannelList.size() ) ;
-
-#ifdef LOG_DEBUG
-	elog	<< "Loaded pending channels, there are currently "
-			<< pendingChannelList.size()
-			<< " channels being recorded."
-			<< endl;
-#endif
 
 	/*
 	 * For each pending channel, load up its IP traffic
@@ -9679,9 +9569,7 @@ stringstream eraseQuery;
 eraseQuery	<< "DELETE FROM glines";
 if( !SQLDb->Exec( eraseQuery, true ) )
 	{
-	elog    << "cservice::loadGlines::Erase> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl;
+	LOGSQL_ERROR( SQLDb ) ;
 	return false;
 	}
 
@@ -9748,9 +9636,7 @@ for(remIterator = remList.begin();remIterator != remList.end();)
         }
 
 if(totalFound > 0)
-     elog 	<< "[Refresh Glines]: "
-     		<< totalFound << " expired"
-		<< endl;
+	LOG( TRACE, "Expired %d glines", totalFound ) ;
 return true;
 
 }
@@ -9793,7 +9679,8 @@ bool cservice::InsertUserHistory(iClient* theClient, const string& command)
 	sqlUser* theUser = isAuthed(theClient, false);
 	if (!theUser)
 	{
-		elog << "cservice::InsertUserHistory> theUser not found!" << endl;
+		LOG( WARN, "theUser not found for {} ({})",
+			theClient->getNickUserHost(), theClient->getAccount() ) ;
 		return false;
 	}
 	theQuery << "INSERT INTO user_sec_history ("

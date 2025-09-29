@@ -58,6 +58,10 @@
 namespace gnuworld
 {
 
+/* Custom logger macros to provide additional json params. */
+#define LOG_WITH_UID(x, y, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, "\"user_id\":" + std::to_string(y), __VA_ARGS__)
+#define LOG_WITH_CID(x, y, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, "\"chan_id\":" + std::to_string(y), __VA_ARGS__)
+
 using std::string ;
 using std::vector ;
 using std::map ;
@@ -479,6 +483,15 @@ public:
 
 	/* Returns what access a user has in the coder channel */
 	short getCoderAccessLevel( sqlUser* );
+
+	/* Fetch a user record from cache only. */
+	inline std::optional< sqlUser* > getCachedUserRecord( const string& user_name )
+	{
+		auto ptr = sqlUserCache.find( user_name ) ;
+		if( ptr != sqlUserCache.end() )
+			return ptr->second ;
+		return std::nullopt ;
+	}
 
 	/* Fetch a user record for a user. */
 	sqlUser* getUserRecord( const string& );

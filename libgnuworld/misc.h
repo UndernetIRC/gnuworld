@@ -252,6 +252,12 @@ double getCPUTime() ;
 inline std::string mask( const std::string& s )
 	{ return std::string( s.size(), '*' ) ; }
 
+/* Escape a string for JSON logging. */
+std::string escapeJsonString( const std::string& input ) ;
+
+/* Returns current UTC timestamp in ISO 8601 format. */
+std::string getCurrentTimestamp() ;
+
 } // namespace gnuworld
 
 #endif /* __MISC__ */

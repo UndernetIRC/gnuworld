@@ -18,6 +18,10 @@
  *
  */
 #include <string>
+#include <fstream>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 #ifdef HAVE_FORMAT
   #include <format>
@@ -34,8 +38,47 @@ namespace gnuworld
 using std::endl ;
 using std::string ;
 
-/* Function for writing messages to the admin or debug channels. */
-void Logger::write( Verbosity v, const string& theMessage )
+/* Constructor - open logfile */
+Logger::Logger( xClient* _bot ) : bot( _bot )
+{
+std::string logFilePath ;
+size_t dotPos = bot->getConfigFileName().find('.');
+if( dotPos != std::string::npos )
+  logFilePath = bot->getConfigFileName().substr( 0, dotPos ) + ".log" ;
+else
+  logFilePath = bot->getConfigFileName() + ".log" ;
+  
+logFile.open( logFilePath, std::ios::app ) ;
+if( !logFile.is_open() )
+  elog << "Warning: Could not open logfile " << logFilePath << std::endl ;
+}
+
+/* Destructor - close logfile */
+Logger::~Logger() 
+{
+if( logFile.is_open() )
+  logFile.close() ;
+}
+
+void Logger::writeLog( Verbosity v, const std::string& func, const std::string& jsonParams, const std::string& theMessage )
+{
+if( logFile.is_open() )
+  {
+  logFile << "{"
+          << "\"timestamp\":\"" << getCurrentTimestamp() << "\","
+          << "\"level\":\"" << ( v == SQL ? "SQL" : levels[ v ].name ) << "\"," ;
+  if( !func.empty() )
+    logFile << "\"function\":\"" << escapeJsonString( func ) << "\"," ;
+  if( !jsonParams.empty() )
+    logFile << jsonParams << "," ;
+
+  logFile << "\"message\":\"" << escapeJsonString( theMessage ) << "\"}\n";
+  logFile.flush();
+  }
+}
+
+/* Function for writing messages to the logfile and debug channel. Accepting json params and message. */
+void Logger::writeFunc( Verbosity v, const char* func, const string& jsonParams, const string& theMessage )
 {
 #ifdef USE_THREAD
 /* We don't want multiple threads sharing the same logger object to interfer with each other. */
@@ -46,34 +89,36 @@ std::lock_guard< std::mutex > lock( logMutex ) ;
 if( v == SQL )
   {
   if( logSQL )
-    {
-    elog  << "[" << bot->getNickName() << "] - SQL   - "
-          << theMessage
-          << endl ;
-    }
+    writeLog( v, parseFunction( func ), jsonParams, theMessage ) ;
 
   return ;
   }
 
-/* Write to elog. */
+/* Write to logfile. */
 if( v <= logVerbosity )
   {
+  /* Write to logfile */
+  writeLog( v, parseFunction( func ), jsonParams, theMessage ) ;
+
+  /* Keeping elog enabled for now... */
   elog  << "[" << bot->getNickName() << "] - "
         << levels[ v ].prefix << " - "
         << theMessage
         << endl ;
   }
 
-#ifdef HAVE_FORMAT
+std::string fmtMessage = ( v == INFO ? "" : parseFunction( func ) + "> " ) + theMessage ;
+
 /* Send notification. */
 for( const auto& [ notifier, logLevel ] : notifiers )
   {
   if( v <= logLevel )
     {
-    notifier->sendMessage( static_cast< int >( v ), theMessage ) ;
+    notifier->sendMessage( static_cast< int >( v ), fmtMessage ) ;
     }
   }
 
+#ifdef HAVE_FORMAT
 if( v <= chanVerbosity && bot->isConnected() && !debugChan.empty() )
   {
   /* Try to locate the channel. */
@@ -87,7 +132,7 @@ if( v <= chanVerbosity && bot->isConnected() && !debugChan.empty() )
     }
   else
     {
-    std::istringstream stream( theMessage ) ;
+    std::istringstream stream( fmtMessage ) ;
     std::string line ;
 
     while( std::getline( stream, line ) )
