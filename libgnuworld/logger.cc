@@ -47,14 +47,14 @@ if( dotPos != std::string::npos )
   logFilePath = bot->getConfigFileName().substr( 0, dotPos ) + ".log" ;
 else
   logFilePath = bot->getConfigFileName() + ".log" ;
-  
+
 logFile.open( logFilePath, std::ios::app ) ;
 if( !logFile.is_open() )
   elog << "Warning: Could not open logfile " << logFilePath << std::endl ;
 }
 
 /* Destructor - close logfile */
-Logger::~Logger() 
+Logger::~Logger()
 {
 if( logFile.is_open() )
   logFile.close() ;

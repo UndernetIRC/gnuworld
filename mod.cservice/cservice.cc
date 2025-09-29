@@ -9636,7 +9636,7 @@ for(remIterator = remList.begin();remIterator != remList.end();)
         }
 
 if(totalFound > 0)
-	LOG( TRACE, "Expired %d glines", totalFound ) ;
+	LOG( TRACE, "Expired {} glines", totalFound ) ;
 return true;
 
 }

@@ -39,7 +39,7 @@
 #define LOG(x, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, "", __VA_ARGS__)
 #define LOGSQL_ERROR(x)  logger->writeFunc(ERROR, __PRETTY_FUNCTION__, "", "SQL Error: {}", x->ErrorMessage())
 #else
-#define LOG(x, ...)  
+#define LOG(x, ...) do { } while(0)
 #define LOGSQL_ERROR(x) elog << "SQL Error: " << x->ErrorMessage() << std::endl ;
 #endif
 
@@ -53,7 +53,7 @@ enum Verbosity {
   TRACE = 6,
   DEBUG = 5,
   INFO = 4,
-  WARN = 3, 
+  WARN = 3,
   ERROR = 2,
   FATAL = 1,
   SQL = 99
@@ -143,7 +143,7 @@ public:
 
   /* Constructor. */
   Logger( xClient* _bot ) ;
-  
+
   /* Destructor. */
   ~Logger() ;
 
@@ -188,9 +188,9 @@ public:
   /* Disables pushover by resetting the shared pointer. */
   inline void removeNotifier( std::shared_ptr< notifier > _notifier )
     {
-      notifiers.erase( 
-        std::remove_if( notifiers.begin(), notifiers.end(), 
-          [&_notifier]( const auto& pair ) { return pair.first == _notifier; } ), 
+      notifiers.erase(
+        std::remove_if( notifiers.begin(), notifiers.end(),
+          [&_notifier]( const auto& pair ) { return pair.first == _notifier; } ),
         notifiers.end() ) ;
     }
 
@@ -216,13 +216,14 @@ public:
   void write( Verbosity v, const std::string& theMessage )
     { writeFunc( v, "", string(), theMessage ) ; }
 
-#ifdef HAVE_FORMAT
   template< typename Format, typename... Args >
   void write( Verbosity v, const Format& format, Args&&... args )
   {
+#ifdef HAVE_FORMAT
   std::string fmtString = std::vformat( format,
     std::make_format_args( args... ) ) ;
   writeFunc( v, "", string(), fmtString ) ;
+#endif
   }
 
   /**
@@ -232,11 +233,12 @@ public:
   template< typename Format, typename... Args >
   void writeFunc( Verbosity v, const char* func, const std::string& jsonParams, const Format& format, Args&&... args )
   {
+#ifdef HAVE_FORMAT
     std::string fmtString = std::vformat( format,
       std::make_format_args( args... ) ) ;
     writeFunc( v, func, jsonParams, fmtString ) ;
-  }
 #endif
+  }
 } ; // class Logger
 
 } // namespace gnuworld
