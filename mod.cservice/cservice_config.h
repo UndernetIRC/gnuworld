@@ -87,12 +87,6 @@
 #define IPR_DEFAULT_REJECT
 
 /**
- * Define this if you want to enable the 'cs.log' file (log of all commands
- * including login).
- */
-#define USE_COMMAND_LOG
-
-/**
  * Define this if you want TOTP authentication, note you must have liboath
  * installed.
  */

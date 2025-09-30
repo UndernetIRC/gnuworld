@@ -164,8 +164,7 @@ if (SQLDb->Exec("DELETE FROM webnotices WHERE created_ts < (date_part('epoch', C
 	webrelay_timerID = MyUplink->RegisterTimer(theTime, this, NULL);
 } else {
 	/* log the error */
-	LOG( ERROR, "cservice::OnAttach> Unable to empty webnotices "
-		"table, not checking webnotices." );
+	LOG( ERROR, "Unable to empty webnotices table, not checking webnotices." );
 	LOGSQL_ERROR( SQLDb ) ;
 }
 
@@ -197,6 +196,9 @@ cservice::cservice(const string& args)
    , threadWorker( this )
 #endif
 {
+
+/* Register custom logger objects. */
+registerLogHandlers() ;
 
 /*
  *  Register command handlers.
@@ -378,18 +380,6 @@ if( prometheusEnable )
 logger->setChannel( debugChan ) ;
 logger->setLogVerbosity( logVerbosity ) ;
 logger->setChanVerbosity( chanVerbosity ) ;
-
-#ifdef USE_COMMAND_LOG
-/* Init command log file. */
-commandLog.open( commandlogPath ) ;
-if( !commandLog.is_open() )
-	{
-	clog	<< "*** Unable to open CMaster command log file: "
-			<< commandlogPath
-			<< endl ;
-	::exit( 0 ) ;
-	}
-#endif
 
 /* Load our translation tables. */
 loadTranslationTable();
@@ -888,15 +878,24 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 	return ;
 	}
 
-#ifdef USE_COMMAND_LOG
-if( Command == "NEWPASS" || Command == "SUSPENDME")
-	commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Command << endl;
-else if( Command == "LOGIN" && st.size() > 1 )
-	commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Command << " " << st[1] << endl;
-else
-	commandLog << (secure ? "[" : "<") << theClient->getNickUserHost() << (secure ? "] " : "> ")  << Message << endl;
-#endif
+if( commandLog )
+	{
+	std::string jsonParams = "\"command\":\"" + Command + "\"" ;
+	if( secure )
+		jsonParams += ",\"secure\":true" ;
+	else
+		jsonParams += ",\"secure\":false" ;
 
+	if( theClient->isModeR() )
+		jsonParams += ",\"user_id\":" + std::to_string( theClient->getAccountID() ) + ",\"user_name\":\"" + theClient->getAccount() + "\"" ;
+
+	jsonParams += ",\"user_host\":\"" + escapeJsonString( theClient->getNickUserHost() ) + "\"" ;
+
+	if( Command != "NEWPASS" && Command != "SUSPENDME" && Command != "LOGIN" && st.size() > 0 )
+		jsonParams += ",\"command_params\":\"" + escapeJsonString( st.assemble( 1 ) ) + "\"" ;
+
+	logger->writeLog( INFO, "cservice::OnPrivateMessage", jsonParams, string() ) ;
+	}
 /*
  * If the person issuing this command is an authenticated admin, we need to log
  * it to the admin log for accountability purposes.
@@ -1641,7 +1640,9 @@ sqlUserHashType::iterator ptr = sqlUserCache.find(id);
 if(ptr != sqlUserCache.end())
 	{
 	// Found something!
-	LOG( TRACE, "Cache hit for {}", id ) ;
+	LOG_MSG( TRACE, "Cache hit for {user_id}" )
+		.with( "user_id", id )
+		.logStructured() ;
 
 	ptr->second->setLastUsed(currentTime());
 	userCacheHits++;
@@ -1703,7 +1704,9 @@ sqlUserHashType::iterator ptr = sqlUserCache.find(id);
 if(ptr != sqlUserCache.end())
 	{
 	// Found something!
-	LOG( TRACE, "Cache hit for {}", id ) ;
+	LOG_MSG( TRACE, "Cache hit for {user_id}" )
+		.with( "user_id", id )
+		.logStructured() ;
 
 	ptr->second->setLastUsed(currentTime());
 	userCacheHits++;
@@ -1819,7 +1822,10 @@ sqlLevelHashType::iterator ptr = sqlLevelCache.find(thePair);
 if(ptr != sqlLevelCache.end())
 	{
 	// Found something!
-	LOG( TRACE, "Cache hit for user-id:chan-id {}:{}", theUser->getID(), theChan->getID() ) ;
+	LOG_MSG( TRACE, "Cache hit for user-id:chan-id {user_id}:{channel_id}" )
+		.with( "user_id", theUser->getID() )
+		.with( "channel_id", theChan->getID() )
+		.logStructured() ;
 
 	levelCacheHits++;
 	ptr->second->setLastUsed(currentTime());
@@ -2516,7 +2522,7 @@ updateQuery << "UPDATE levels SET suspend_expires = 0, suspend_level = 0, suspen
 
 if( !SQLDb->Exec(updateQuery ) )
 	{
-	LOG( ERROR, "cservice::expireSuspends> Unable to update record while unsuspending." ) ;
+	LOG( ERROR, "Unable to update record while unsuspending." ) ;
 	LOGSQL_ERROR( SQLDb ) ;
 	}
 }
@@ -2812,7 +2818,9 @@ void cservice::cacheExpireLevels()
 			theChan->commit();
 			decrementJoinCount();
 			writeChannelLog(theChan, me, sqlChannel::EV_IDLE, "");
-			LOG( INFO, "I've just left {} because its too quiet.", theChan->getName() );
+			LOG_MSG( INFO, "I've just left {channel} because its too quiet." )
+				.with( "channel", theChan->getName() )
+				.logStructured() ;
 			Part(theChan->getName(), "So long! (And thanks for all the fish)");
 		}
 
@@ -3064,7 +3072,9 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->mngr_userId = (unsigned int)atoi(SQLDb->GetValue(i, 25).c_str());
 		newChanList.push_back(newChan);
 
-		LOG( INFO, "[DB-UPDATE]: Found new channel: {}", newChan->chanName );
+		LOG_MSG( INFO, "[DB-UPDATE]: Found new channel: {channel}" )
+		.with( "channel", newChan->chanName )
+		.logStructured() ;
 		newchans++;
 	}
 }
@@ -3535,6 +3545,41 @@ void cservice::updatePrometheusMetrics()
 
 	doTheRightThing(tmpChan);
  }
+
+/**
+ * Register log handlers for custom objects.
+ */
+void cservice::registerLogHandlers() {
+// Register sqlUser* handler
+logger->registerObjectHandler<sqlUser>(
+	[](std::map<std::string, std::string>& fields, const std::string& key, sqlUser* user) -> bool {
+		if (!user) {
+			fields[key + "_name"] = "nullptr";
+			return true;
+		}
+		
+		fields[key + "_id"] = std::to_string(user->getID());
+		fields[key + "_name"] = user->getUserName();
+		fields[key + "_is_authed"] = user->isAuthed() ? "true" : "false";
+
+		return true;
+	});
+
+// Register sqlChannel* handler
+logger->registerObjectHandler<sqlChannel>(
+	[](std::map<std::string, std::string>& fields, const std::string& key, sqlChannel* channel) -> bool {
+		if (!channel) {
+			fields[key + "_name"] = "nullptr";
+			return true;
+		}
+		
+		fields[key + "_id"] = std::to_string(channel->getID());
+		fields[key + "_name"] = channel->getName();
+		fields[key + "_ts"] = std::to_string(channel->getRegisteredTS());
+
+		return true;
+	});
+}
 
 /**
  *  Log a message to the admin channel and the logfile.
@@ -4453,7 +4498,7 @@ void cservice::checkAccepts()
 		{
 			AcceptChannel(acceptList[i].first.first,"ACCEPTED");
 			if (!sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
-				LOG( ERROR, "(cservice::checkAccepts) FAILED to sqlRegisterChannel" );
+				LOG( ERROR, "FAILED to sqlRegisterChannel" );
 		}
 	}
 	acceptList.clear();
@@ -4500,7 +4545,7 @@ void cservice::checkReviews()
 		{
 			AcceptChannel(acceptList[i].first.first,"ACCEPTED");
 			if (!sqlRegisterChannel(getInstance(), mgrUsr, acceptList[i].first.second.c_str()))
-				LOG( ERROR, "(cservice::checkReviews) FAILED to sqlRegisterChannel" );
+				LOG( ERROR, "FAILED to sqlRegisterChannel" );
 		}
 	}
 	acceptList.clear();
@@ -4937,7 +4982,12 @@ switch( theEvent )
 			{
 			tmpSqlUser->removeAuthedClient(tmpUser);
 			tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
-			LOG_WITH_UID( TRACE, tmpSqlUser->getID(), "Deauthenticated client {} from user: {}", tmpUser->getRealNickUserHost(), tmpSqlUser->getUserName() ) ;
+			LOG_MSG( TRACE, "Deauthenticated client {client} from user: {username}" )
+				.with( "user_id", tmpSqlUser->getID() )
+				.with( "user_name", tmpSqlUser->getUserName() )
+				.with( "user_host", tmpUser->getNickUserHost() )
+				.with( "quit_event", (theEvent == EVT_QUIT) ? "QUIT" : "KILL" )
+				.logStructured() ;
 			}
 
 		// Clear up the custom data structure we appended to
@@ -5376,7 +5426,9 @@ void cservice::doTheRightThing(Channel* tmpChan)
 				MyUplink->Mode(this, tmpChan, reggedChan->getChannelMode().c_str(), std::string() );
 			}
 
-			LOG( INFO, "Performed reop for channel {}", tmpChan->getName() );
+			LOG_MSG( INFO, "Performed reop for channel {channel}" )
+			.with( "channel", tmpChan->getName() )
+			.logStructured();
 		}
 	}
 
@@ -5479,11 +5531,11 @@ switch( whichEvent )
 
 						ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
 								NumericIP, trafRecord));
-#ifdef LOG_DEBUG
-						LOG( INFO, "Created a new IP traffic record for IP#{} ({}) on {}",
-								NumericIP, theClient->getNickUserHost(),
-							theChan->getName() ) ;
-#endif
+						LOG_MSG( INFO, "Created a new IP traffic record for IP#{ip} ({user_host}) on {channel}" )
+							.with( "ip", NumericIP )
+							.with( "user_host", theClient->getNickUserHost() )
+							.with( "channel", theChan->getName() )
+							.logStructured() ;
 						} else
 						{
 						/* Already cached, update and save. */
@@ -5689,7 +5741,9 @@ for( ; ptr != theChan->banList.end() ; ++ptr )
 	sqlBan* theBan = ptr->second;
 	if( 0 == theBan )
 		{
-		LOG_WITH_CID( ERROR, theChan->getID(), "Null ban record in ban list." ) ;
+		LOG_MSG( ERROR, "Null ban record in {channel}'s ban list." )
+			.with( "channel", theChan->getName() )
+			.logStructured() ;
 		continue ;
 		}
 	if (banMatch(theBan->getBanMask(), theClient))
@@ -7089,7 +7143,9 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 		/* Can this happen?! what would we do?!
 		 * Maybe they are in netsplit momentarly?!
 		 */
-		LOG( WARN, "Warning: New empty channel application of {} (no users found on channel)", chanName ) ;
+		LOG_MSG( WARN, "Warning: New empty channel application of {channel} (no users found on channel)" )
+			.with( "channel", chanName )
+			.logStructured() ;
 		return;
 	}
 	int totalUsers = 0;
@@ -7126,10 +7182,12 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 				//elog << "cservice::initializeInitialIPs> Already existing supporter for channel " << chanName << " suppUser = " << loggedUser->getUserName() << " joinCount = " << Supptr->second << " reset joincount to 1" << endl;
 				Supptr->second = 1;
 			}
-#ifdef LOG_DEBUG
-			LOG( INFO, "New total for Supporter #{} ({}) on {} is {}.", loggedUser->getID(),
-				loggedUser->getUserName(), theChan->getName(), Supptr->second ) ;
-#endif
+			LOG_MSG( INFO, "New total for Supporter #{user_id} ({user_name}) on {channel} is {supporters}." )
+			.with( "user_id", loggedUser->getID() )
+			.with( "user_name", loggedUser->getUserName() )
+			.with( "channel", theChan->getName() )
+			.with( "supporters", Supptr->second )
+			.logStructured() ;
 			pendingChan->commitSupporter(Supptr->first, Supptr->second);
 		}
 		sqlPendingTraffic* trafRecord;
@@ -8056,10 +8114,6 @@ if (MinSupporters > RequiredSupporters)
 
 if (MAXnotes == 0) MAXnotes = 7;
 
-#ifdef USE_COMMAND_LOG
-	commandlogPath = cserviceConfig->Require< std::string >( "command_logfile" ) ;
-#endif // USE_COMMAND_LOG
-
 #ifdef ALLOW_HELLO
 	helloBlockPeriod = cserviceConfig->Require< unsigned int >( "hello_block_period" ) ;
 #endif // ALLOW_HELLO
@@ -8702,16 +8756,18 @@ return false ;
 
 bool cservice::doXQOplist(const string& chanName)
 {
-	LOG( TRACE, "cservice::doXQOplist> Executing XQ for {}", chanName ) ;
+	LOG_MSG( TRACE, "Executing XQ for {channel}" )
+		.with( "channel", chanName )
+		.logStructured() ;
 	//iServer* theServer = this->MyUplink->Uplink();
 	iServer* chanfixServer = Network->findServerName(ChanfixServerName);
 	if (!chanfixServer)
 	{
-		LOG( ERROR, "cservice::doXQOplist> chanfixServer({}) NOT Found!", ChanfixServerName ) ;
+		LOG( ERROR, "chanfixServer({}) NOT Found!", ChanfixServerName ) ;
 		return false;
 	}
-	else
-		elog << "<DEBUG> chanfixServer(" << ChanfixServerName << ") found" << endl;
+//	else
+//		elog << "<DEBUG> chanfixServer(" << ChanfixServerName << ") found" << endl;
 	string Message = "OPLIST " + chanName;
 	// AB XQ Az iauth:15_d :OPLIST #empfoo
 	//elog << "cservice::doXQOplist: Routing: " << Routing << " Message: " << Message << "\n";
