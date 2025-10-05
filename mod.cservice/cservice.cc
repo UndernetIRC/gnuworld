@@ -876,18 +876,18 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 if( commandLog )
 	{
 	std::string jsonParams = "\"command\":\"" + Command + "\"" ;
-	if( secure )
+	/*if( secure )
 		jsonParams += ",\"secure\":true" ;
 	else
-		jsonParams += ",\"secure\":false" ;
+		jsonParams += ",\"secure\":false" ;*/
 
 	if( theClient->isModeR() )
 		jsonParams += ",\"user_id\":" + std::to_string( theClient->getAccountID() ) + ",\"user_name\":\"" + theClient->getAccount() + "\"" ;
 
-	jsonParams += ",\"user_host\":\"" + escapeJsonString( theClient->getNickUserHost() ) + "\"" ;
+	jsonParams += ",\"client_userhost\":\"" + escapeJsonString( theClient->getNickUserHost() ) + "\"" ;
 
 	if( Command != "NEWPASS" && Command != "SUSPENDME" && Command != "LOGIN" && st.size() > 0 )
-		jsonParams += ",\"command_params\":\"" + escapeJsonString( st.assemble( 1 ) ) + "\"" ;
+		jsonParams += ",\"message\":\"" + escapeJsonString( st.assemble( 1 ) ) + "\"" ;
 
 	logger->writeLog( INFO, "cservice::OnPrivateMessage", jsonParams, string() ) ;
 	}
@@ -5539,7 +5539,7 @@ switch( whichEvent )
 
 						ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
 								NumericIP, trafRecord));
-						LOG_MSG( INFO, "Created a new IP traffic record for IP#{ip} ({client_host}) on {chan_name}" )
+						LOG_MSG( INFO, "Created a new IP traffic record for IP#{ip} ({client_userhost}) on {chan_name}" )
 							.with( "ip", NumericIP )
 							.with( "client", theClient )
 							.with( "chan", theChan )
