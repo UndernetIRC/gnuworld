@@ -1635,7 +1635,7 @@ sqlUserHashType::iterator ptr = sqlUserCache.find(id);
 if(ptr != sqlUserCache.end())
 	{
 	// Found something!
-	LOG( TRACE, "Cache hit for {user_id}" )
+	LOG_MSG( TRACE, "Cache hit for {user_id}" )
 		.with( "user_id", id )
 		.logStructured() ;
 
