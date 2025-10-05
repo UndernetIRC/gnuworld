@@ -46,14 +46,6 @@
 #define LOG(x, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, "", __VA_ARGS__)
 
 /**
- * Structured logging macro with template support and field extraction.
- * Allows mixing format arguments with named placeholders and structured fields.
- * Usage: LOG_MSG(INFO, "User {} joined {channel}", username).with("channel", chanPtr).logStructured();
- */
-#define LOG_MSG(level, template_msg, ...) \
-    logger->createMessage(level, __PRETTY_FUNCTION__, template_msg, ##__VA_ARGS__)
-
-/**
  * SQL error logging macro for database-related errors.
  * Automatically formats SQL error messages from database objects.
  */
@@ -62,6 +54,14 @@
 #define LOG(x, ...) do { } while(0)
 #define LOGSQL_ERROR(x) elog << "SQL Error: " << x->ErrorMessage() << std::endl ;
 #endif
+
+/**
+ * Structured logging macro with template support and field extraction.
+ * Allows mixing format arguments with named placeholders and structured fields.
+ * Usage: LOG_MSG(INFO, "User {} joined {channel}", username).with("channel", chanPtr).logStructured();
+ */
+#define LOG_MSG(level, template_msg, ...) \
+    logger->createMessage(level, __PRETTY_FUNCTION__, template_msg, ##__VA_ARGS__)
 
 namespace gnuworld
 {

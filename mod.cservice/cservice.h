@@ -29,6 +29,7 @@
 #include	<map>
 #include	<array>
 #include	<functional>
+#include	<optional>
 
 #include	<ctime>
 

@@ -1635,7 +1635,7 @@ sqlUserHashType::iterator ptr = sqlUserCache.find(id);
 if(ptr != sqlUserCache.end())
 	{
 	// Found something!
-	LOG_MSG( TRACE, "Cache hit for {user_id}" )
+	LOG( TRACE, "Cache hit for {user_id}" )
 		.with( "user_id", id )
 		.logStructured() ;
 
@@ -1818,8 +1818,8 @@ if(ptr != sqlLevelCache.end())
 	{
 	// Found something!
 	LOG_MSG( TRACE, "Cache hit for user-id:chan-id {user_id}:{channel_id}" )
-		.with( "user_id", theUser->getID() )
-		.with( "channel_id", theChan->getID() )
+		.with( "user", theUser )
+		.with( "channel", theChan )
 		.logStructured() ;
 
 	levelCacheHits++;
@@ -2813,8 +2813,8 @@ void cservice::cacheExpireLevels()
 			theChan->commit();
 			decrementJoinCount();
 			writeChannelLog(theChan, me, sqlChannel::EV_IDLE, "");
-			LOG_MSG( INFO, "I've just left {channel} because its too quiet." )
-				.with( "channel", theChan->getName() )
+			LOG_MSG( INFO, "I've just left {channel_name} because its too quiet." )
+				.with( "channel", theChan )
 				.logStructured() ;
 			Part(theChan->getName(), "So long! (And thanks for all the fish)");
 		}
@@ -4991,10 +4991,9 @@ switch( theEvent )
 			{
 			tmpSqlUser->removeAuthedClient(tmpUser);
 			tmpSqlUser->removeFlag(sqlUser::F_LOGGEDIN);
-			LOG_MSG( TRACE, "Deauthenticated client {client} from user: {username}" )
-				.with( "user_id", tmpSqlUser->getID() )
-				.with( "user_name", tmpSqlUser->getUserName() )
-				.with( "user_host", tmpUser->getNickUserHost() )
+			LOG_MSG( TRACE, "Deauthenticated client {client_nick} from user: {user_name}" )
+				.with( "client", tmpUser )
+				.with( "user", tmpSqlUser )
 				.with( "quit_event", (theEvent == EVT_QUIT) ? "QUIT" : "KILL" )
 				.logStructured() ;
 			}
@@ -5435,8 +5434,8 @@ void cservice::doTheRightThing(Channel* tmpChan)
 				MyUplink->Mode(this, tmpChan, reggedChan->getChannelMode().c_str(), std::string() );
 			}
 
-			LOG_MSG( INFO, "Performed reop for channel {channel}" )
-			.with( "channel", tmpChan->getName() )
+			LOG_MSG( INFO, "Performed reop for channel {channel_name}" )
+			.with( "channel", tmpChan )
 			.logStructured();
 		}
 	}
@@ -5540,10 +5539,10 @@ switch( whichEvent )
 
 						ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
 								NumericIP, trafRecord));
-						LOG_MSG( INFO, "Created a new IP traffic record for IP#{ip} ({user_host}) on {channel}" )
+						LOG_MSG( INFO, "Created a new IP traffic record for IP#{ip} ({client_host}) on {channel_name}" )
 							.with( "ip", NumericIP )
-							.with( "user_host", theClient->getNickUserHost() )
-							.with( "channel", theChan->getName() )
+							.with( "client", theClient )
+							.with( "channel", theChan )
 							.logStructured() ;
 						} else
 						{
@@ -5750,8 +5749,8 @@ for( ; ptr != theChan->banList.end() ; ++ptr )
 	sqlBan* theBan = ptr->second;
 	if( 0 == theBan )
 		{
-		LOG_MSG( ERROR, "Null ban record in {channel}'s ban list." )
-			.with( "channel", theChan->getName() )
+		LOG_MSG( ERROR, "Null ban record in {channel_name}'s ban list." )
+			.with( "channel", theChan )
 			.logStructured() ;
 		continue ;
 		}
@@ -7108,8 +7107,8 @@ void cservice::checkIncomings(bool FirstNoticing)
 			if ((FirstNoticing) && (!currItr->noticed))
 			{
 				noticeAllAuthedClients(suppUser, message.str().c_str());
-				LOG_MSG( DEBUG, "setSupporterNoticedStatus for chanId={} userId={sqluser_id}", currItr->chanId )
-				.with( "sqluser", suppUser )
+				LOG_MSG( DEBUG, "setSupporterNoticedStatus for chanId={} userId={user_id}", currItr->chanId )
+				.with( "user", suppUser )
 				.logStructured() ;
 				setSupporterNoticedStatus(suppUser->getID(), currItr->chanId, true);
 			}
@@ -7154,8 +7153,8 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 		/* Can this happen?! what would we do?!
 		 * Maybe they are in netsplit momentarly?!
 		 */
-		LOG_MSG( WARN, "Warning: New empty channel application of {channel} (no users found on channel)" )
-			.with( "channel", chanName )
+		LOG_MSG( WARN, "Warning: New empty channel application of {channel_name} (no users found on channel)" )
+			.with( "channel_name", chanName )
 			.logStructured() ;
 		return;
 	}
@@ -7193,10 +7192,10 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 				//elog << "cservice::initializeInitialIPs> Already existing supporter for channel " << chanName << " suppUser = " << loggedUser->getUserName() << " joinCount = " << Supptr->second << " reset joincount to 1" << endl;
 				Supptr->second = 1;
 			}
-			LOG_MSG( INFO, "New total for Supporter #{user_id} ({user_name}) on {channel} is {supporters}." )
+			LOG_MSG( INFO, "New total for Supporter #{user_id} ({user_name}) on {channel_name} is {supporters}." )
 			.with( "user_id", loggedUser->getID() )
 			.with( "user_name", loggedUser->getUserName() )
-			.with( "channel", theChan->getName() )
+			.with( "channel", theChan )
 			.with( "supporters", Supptr->second )
 			.logStructured() ;
 			pendingChan->commitSupporter(Supptr->first, Supptr->second);
@@ -8518,8 +8517,8 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 			break;
 		case AUTH_SUCCEEDED:
 			doXResponse(theServer, Routing, theUser->getUserName() + ":" + std::to_string(theUser->getID()) + ":" + std::to_string(makeAccountFlags(theUser)));
-			LOG_MSG( DEBUG, "Succesful auth for {sqluser_name}" )
-			.with( "sqluser", theUser )
+			LOG_MSG( DEBUG, "Succesful auth for {user_name}" )
+			.with( "user", theUser )
 			.logStructured() ;
 			incStat("CORE.LOC.SUCCESS");
 			return true;

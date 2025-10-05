@@ -461,9 +461,9 @@ for( ; counter < st2.size() ; counter++ ) {
 			theChan->banList.find( theBan->getID() ) ;
 		if( sqlBanIterator == theChan->banList.end() )
 			{
-			LOG_MSG( WARN, "Unable to find ban (id: {sqlban_id}, name: {sqlban_name}) in sqlChannel {sqlchan_name}")
+			LOG_MSG( WARN, "Unable to find ban (id: {sqlban_id}, name: {sqlban_name}) in sqlChannel {channel_name}")
 			.with( "sqlban", theBan )
-			.with( "sqlchan", theChan )
+			.with( "channel", theChan )
 			.logStructured() ;
 			}
 		else
@@ -580,9 +580,9 @@ if (level < 500 &&
 			theChan->banList.find( theBan->getID() ) ;
 		if( sqlBanIterator == theChan->banList.end() )
 			{
-			LOG_MSG( WARN, "Unable to find ban (id: {sqlban_id}, name: {sqlban_name}) in sqlChannel {sqlchan_name}")
+			LOG_MSG( WARN, "Unable to find ban (id: {sqlban_id}, name: {sqlban_name}) in sqlChannel {channel_name}")
 			.with( "sqlban", theBan )
-			.with( "sqlchan", theChan )
+			.with( "channel", theChan )
 			.logStructured() ;
 			continue ;
 			}
