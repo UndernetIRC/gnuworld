@@ -509,7 +509,7 @@ const string prettyNumber( int number )
 {
 std::stringstream ss ;
 try {
-    ss.imbue( std::locale( "en_US.UTF-8" )  ) ;
+    ss.imbue( std::locale( "en_US.UTF-8" ) ) ;
 } catch( const std::exception& e ) {
     ss.imbue( std::locale("") ) ;
 }
