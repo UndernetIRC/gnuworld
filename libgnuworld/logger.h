@@ -94,9 +94,11 @@ class Logger
 private:
   xClient*                          bot = nullptr ;
   std::string                       debugChan ;
-  unsigned short                    chanVerbosity = 2 ;
-  unsigned short                    logVerbosity = 1 ;
+  unsigned short                    chanVerbosity = 4 ;
+  unsigned short                    logVerbosity = 6 ;
+  unsigned short                    consoleVerbosity = 6 ;
   bool                              logSQL = false ;
+  bool                              consoleSQL = false ;
   std::ofstream                     logFile ;
   std::vector<
     std::pair<
@@ -493,6 +495,20 @@ public:
    */
   inline void setLogSQL( bool enable )
     { logSQL = enable ; }
+
+  /**
+   * Sets the verbosity level for console output.
+   * Only log messages at or below this level will be displayed on the console.
+   */
+  inline void setConsoleVerbosity( unsigned short level )
+    { consoleVerbosity = level ; }
+
+  /**
+   * Enables or disables SQL query logging to the console.
+   * When enabled, SQL-related log messages will be displayed on the console.
+   */
+  inline void setConsoleSQL( bool enable )
+    { consoleSQL = enable ; }
 
   /**
    * Returns the currently configured debug channel name.

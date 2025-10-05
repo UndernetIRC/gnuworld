@@ -29,6 +29,7 @@
 
 #include "Channel.h"
 #include "Network.h"
+#include "ELog.h"
 
 #include "logger.h"
 
@@ -106,29 +107,34 @@ void Logger::writeFunc( Verbosity v, const char* func, const string& jsonParams,
 std::lock_guard< std::mutex > lock( logMutex ) ;
 #endif
 
+std::string fmtMessage = ( v == INFO ? "" : parseFunction( func ) + "> " ) + theMessage ;
+
 /* Is this an SQL log? */
 if( v == SQL )
   {
   if( logSQL )
     writeLog( v, parseFunction( func ), jsonParams, theMessage ) ;
 
+  if( consoleSQL && elog.getStream() )
+    *(elog.getStream()) << elog.getLocalTime()
+                        << "[" << bot->getNickName() << "] - "
+                        << levels[ v ].prefix << " - "
+                        << fmtMessage
+                        << endl ;
   return ;
   }
 
 /* Write to logfile. */
 if( v <= logVerbosity )
-  {
-  /* Write to logfile */
   writeLog( v, parseFunction( func ), jsonParams, theMessage ) ;
 
-  /* Keeping elog enabled for now... */
-  elog  << "[" << bot->getNickName() << "] - "
-        << levels[ v ].prefix << " - "
-        << theMessage
-        << endl ;
-  }
-
-std::string fmtMessage = ( v == INFO ? "" : parseFunction( func ) + "> " ) + theMessage ;
+/* Write to console. */
+if( v <= consoleVerbosity && elog.getStream() )
+  *(elog.getStream()) << elog.getLocalTime()
+                      << "[" << bot->getNickName() << "] - "
+                      << levels[ v ].prefix << " - "
+                      << fmtMessage
+                      << endl ;
 
 /* Send notification. */
 for( const auto& [ notifier, logLevel ] : notifiers )

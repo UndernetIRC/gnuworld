@@ -376,11 +376,6 @@ if( prometheusEnable )
   }
 #endif
 
-/* Initiate logger. */
-logger->setChannel( debugChan ) ;
-logger->setLogVerbosity( logVerbosity ) ;
-logger->setChanVerbosity( chanVerbosity ) ;
-
 /* Load our translation tables. */
 loadTranslationTable();
 
@@ -3579,6 +3574,20 @@ logger->registerObjectHandler<sqlChannel>(
 
 		return true;
 	});
+
+// Register sqlBan* handler
+logger->registerObjectHandler<sqlBan>(
+		[](std::map<std::string, std::string>& fields, const std::string& key, sqlBan* ban) -> bool {
+			if (!ban) {
+				fields[key + "_id"] = "nullptr";
+				return true;
+			}
+			
+			fields[key + "_id"] = std::to_string(ban->getID());
+			fields[key + "_mask"] = ban->getBanMask();
+	
+			return true;
+		});
 }
 
 /**
@@ -7099,7 +7108,9 @@ void cservice::checkIncomings(bool FirstNoticing)
 			if ((FirstNoticing) && (!currItr->noticed))
 			{
 				noticeAllAuthedClients(suppUser, message.str().c_str());
-				elog << "cservice::checkIncomings> setSupporterNoticedStatus for chanId=" << currItr->chanId << " userId=" << suppUser->getID() << endl;
+				LOG_MSG( DEBUG, "setSupporterNoticedStatus for chanId={} userId={sqluser_id}", currItr->chanId )
+				.with( "sqluser", suppUser )
+				.logStructured() ;
 				setSupporterNoticedStatus(suppUser->getID(), currItr->chanId, true);
 			}
 			if ((!FirstNoticing) && (currItr->noticed))
@@ -7238,7 +7249,7 @@ if (pendingChannelList.size() > 0)
 	if( !SQLDb->Exec("BEGIN;" ) )
 //	if( PGRES_COMMAND_OK != beginStatus )
 	{
-		elog << "Error starting transaction." << endl;
+		LOGSQL_ERROR( SQLDb ) ;
 	}
 
 	while (ptr != pendingChannelList.end())
@@ -7259,7 +7270,7 @@ if (pendingChannelList.size() > 0)
 	if( !SQLDb->Exec("END;") )
 //	if( PGRES_COMMAND_OK != endStatus )
 	{
-		elog << "Error Ending transaction." << endl;
+		LOGSQL_ERROR( SQLDb ) ;
 	}
 
 	pendingChannelList.clear();
@@ -7361,7 +7372,7 @@ void cservice::checkDbConnectionStatus()
 //	if(SQLDb->Status() == CONNECTION_BAD)
 	{
 		logAdminMessage("\002WARNING:\002 Backend database connection has been lost, attempting to reconnect.");
-		elog	<< "cmaster::cmaster> Attempting to reconnect to database." << endl;
+		LOG( WARN, "Attempting to reconnect to database." ) ;
 
 		/* Remove the old database connection object. */
 		delete(SQLDb);
@@ -7379,11 +7390,8 @@ void cservice::checkDbConnectionStatus()
 
 		if (SQLDb->ConnectionBad())
 		{
-			elog	<< "cmaster::cmaster> Unable to connect to SQL server."
-					<< endl
-					<< "cmaster::cmaster> PostgreSQL error message: "
-					<< SQLDb->ErrorMessage()
-					<< endl ;
+			LOG( ERROR, "Unable to connect to SQL server." ) ;
+			LOGSQL_ERROR( SQLDb ) ;
 
 			connectRetries++;
 			if (connectRetries == connectRetry)
@@ -7719,7 +7727,7 @@ void cservice::NoteChannelManager(const string& theChan, const char* Message, ..
 	sqlChannel* sqlChan = getChannelRecord(theChan);
 	if (!sqlChan)
 	{
-		elog << "cservice::NoteChannelManager> not found channel " << theChan << endl;
+		LOG( ERROR, "Not found channel {}", theChan ) ;
 		return;
 	}
 	vector<sqlUser*> mngrList = getChannelManager(sqlChan->getID());
@@ -7820,7 +7828,7 @@ void cservice::doCoderStats(iClient* theClient)
 	if (SQLDb->Tuples() > 0)
 		userDBTotal = atoi(SQLDb->GetValue(0,0));
 	else
-		elog << "cservice::doCoderStats> Not found any users!" << endl;
+		LOG( ERROR, "Not found any users!" ) ;
 
 	// *** Count all database users with TOTP ***
 	int userDBTOTPTotal = 0;
@@ -8126,7 +8134,13 @@ if (daySeconds < 1)
 	daySeconds = 1;
 UsersExpireDBDays *= daySeconds;
 
+/* Initiate logger. */
+logger->setChannel( debugChan ) ;
+logger->setLogVerbosity( logVerbosity ) ;
+logger->setChanVerbosity( chanVerbosity ) ;
+logger->setConsoleVerbosity( consoleVerbosity ) ;
 logger->setLogSQL( logSQL ) ;
+logger->setConsoleSQL( consoleSQL ) ;
 }
 
 void cservice::rehashConfigVariables()
@@ -8139,11 +8153,6 @@ parseConfigFile() ;
 
 /* Load the config variables. */
 loadConfigVariables( true ) ;
-
-/* Rehash logger. */
-logger->setChannel( debugChan ) ;
-logger->setLogVerbosity( logVerbosity ) ;
-logger->setChanVerbosity( chanVerbosity ) ;
 
 /* Prometheus is enabled in config but not running. */
 #ifdef HAVE_PROMETHEUS
@@ -8350,7 +8359,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	{
 		if (st.size() < 3)
 		{
-			elog << "cservice::doXQLogin> LOGIN insufficient parameters" << endl;
+			LOG( ERROR, "XQ-LOGIN insufficient parameters" ) ;
 			doXResponse(theServer, Routing, locMessage.c_str(), true);
 			return false;
 		}
@@ -8358,13 +8367,13 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		if (username.compare(0,1,":") == 0)
 			username.erase(0,1);
 		password = st.assemble(2);
-		elog << "cservice::doXQLogin: LOGIN " << username << " " << mask(password) << endl;
+		LOG( TRACE, "XQ-LOGIN: LOGIN {} {}", username, mask(password) ) ;
 	}
 	if (st[0] == "LOGIN2")
 	{
 		if (st.size() < 6)
 		{
-			elog << "cservice::doXQLogin> LOGIN2 insufficient parameters" << endl;
+			LOG( ERROR, "XQ-LOGIN2 insufficient parameters" ) ;
 			doXResponse(theServer, Routing, locMessage.c_str(), true);
 			return false;
 		}
@@ -8375,7 +8384,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		ip = st[1];
 		hostname = st[2];
 		ident = st[3];
-		elog << "cservice::doXQLogin: LOGIN2 " << ip << " " << hostname << " " << ident << " " << username << " " << mask(password) << endl;
+		LOG( TRACE, "XQ-LOGIN2: LOGIN2 {} {} {} {} {}", ip, hostname, ident, username, mask(password) ) ;
 	}
 	int auth_res = authenticateUser(username,password,ip,ident,ipr_ts,&theUser);
 	unsigned int loginTime = getUplink()->getStartTime() + loginDelay;
@@ -8390,28 +8399,28 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		                "%i seconds)",
 	        	        username.c_str(), (loginTime - currentTime()));
 			doXResponse(theServer, Routing, AuthResponse,true);
-			elog << "cservice::doXQLogin: Auth res = TOO_EARLY_TOLOGIN" << endl;
+			LOG( DEBUG, "Auth res = TOO_EARLY_TOLOGIN" ) ;
 			break;
 		case AUTH_FAILED:
 			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Erroneus username)", username.c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_FAILED" << endl;
+			LOG( DEBUG, "Auth res = AUTH_FAILED" ) ;
 			break;
 		case AUTH_UNKNOWN_USER:
 			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s", username.c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_UNKNOWN_USER" << endl;
+			LOG( DEBUG, "Auth res = AUTH_UNKNOWN_USER" ) ;
 			break;
 		case AUTH_SUSPENDED_USER:
 			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Suspended)", theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_SUSPENDED_USER" << endl;
+			LOG( DEBUG, "Auth res = AUTH_SUSPENDED_USER" ) ;
 			break;
 		case AUTH_NO_TOKEN:
 			theUser->incFailedLogins();
 			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Missing TOTP token)", theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_NO_TOKEN" << endl;
+			LOG( DEBUG, "Auth res = AUTH_NO_TOKEN" ) ;
 			break;
 		case AUTH_INVALID_PASS:
 			if (failed_login_rate==0)
@@ -8421,7 +8430,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 						string("AUTHENTICATION FAILED as %s")).c_str(),
 				theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);	// <- this will be removed!
-			elog << "cservice::doXQLogin: Auth res = AUTH_INVALID_PASS" << endl;
+			LOG( DEBUG, "Auth res = AUTH_INVALID_PASS" ) ;
 			/* increment failed logins counter */
 			theUser->incFailedLogins();
 			if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
@@ -8465,7 +8474,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		case AUTH_ERROR:
 			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s due to an error, please contact CService represetitive", username.c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_ERROR" << endl;
+			LOG( DEBUG, "Auth res = AUTH_ERROR" ) ;
 			break;
 		case AUTH_INVALID_TOKEN:
             theUser->incFailedLogins();
@@ -8474,7 +8483,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	                        string("AUTHENTICATION FAILED as %s (Invalid Token)")).c_str(),
 	                        theUser->getUserName().c_str());
 			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_INVALID_TOKEN" << endl;
+			LOG( DEBUG, "Auth res = AUTH_INVALID_TOKEN" ) ;
 			break;
 		case AUTH_FAILED_IPR:
             /* increment failed logins counter */
@@ -8496,7 +8505,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	                                ident.c_str(), ip.c_str());
 	                }
    			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_FAILED_IPR" << endl;
+			LOG( DEBUG, "Auth res = AUTH_FAILED_IPR" ) ;
 			break;
 		case AUTH_ML_EXCEEDED:
             /* increment failed logins counter */
@@ -8505,25 +8514,24 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	                        "concurrent logins exceeded).",
 	                        theUser->getUserName().c_str());
    			doXResponse(theServer, Routing, AuthResponse, true);
-			elog << "cservice::doXQLogin: Auth res = AUTH_ML_EXCEEDED" << endl;
+			LOG( DEBUG, "Auth res = AUTH_ML_EXCEEDED" ) ;
 			break;
 		case AUTH_SUCCEEDED:
 			doXResponse(theServer, Routing, theUser->getUserName() + ":" + std::to_string(theUser->getID()) + ":" + std::to_string(makeAccountFlags(theUser)));
-			elog    << "cservice::doXQLogin: "
-					<< "Succesful auth for "
-					<< username
-					<< endl;
+			LOG_MSG( DEBUG, "Succesful auth for {sqluser_name}" )
+			.with( "sqluser", theUser )
+			.logStructured() ;
 			incStat("CORE.LOC.SUCCESS");
 			return true;
 			break;
 		default:
 			//Should never get here!
-			elog << "Response " << auth_res << " while authenticating!\n";
+			LOG( ERROR, "Response {} while authenticating!", auth_res ) ;
 			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (due to an error)\n", username.c_str());
    			doXResponse(theServer, Routing, AuthResponse, true);
 			break;
 		}
-elog << "cservice::doXQLogin: FAILED login for " << username << endl;
+LOG( DEBUG, "XQ-LOGIN: FAILED login for {}", username ) ;
 incStat("CORE.LOC.FAILED");
 
 return true;
@@ -8545,7 +8553,7 @@ bool cservice::doXQIsCheck(iServer* theServer, const string& Routing, const stri
 // AB XQ Az AnyCServiceRouting :ISUSER <user#> <user#> <user#...N>
 // AB XQ Az AnyCServiceRouting :ISUSER +<username1> <username2> <username... N>
 // AB XQ Az AnyCServiceRouting :ISCHAN <#chan> <#chan2> <#chan..N>
-elog << "cservice::doXQIsCheck: Command: " << Command << " Routing: " << Routing << " Message: " << Message << "\n" ;
+LOG( TRACE, "XQ-ISCHECK: Command: {} Routing: {} Message: {}", Command, Routing, Message ) ;
 StringTokenizer st( Message ) ;
 
 if( st.size() < 2 )
@@ -8777,19 +8785,18 @@ bool cservice::doXQOplist(const string& chanName)
 bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const string& Message)
 {
 	// AB XR Az iauth:15_d :OPLIST #empfoo
-	elog << "cservice::doXROplist: Routing: " << Routing << " Message: " << Message << "\n";
+	LOG( TRACE, "XQ-OPLIST: Routing: {} Message: {}", Routing, Message ) ;
 	StringTokenizer st(Message);
-	LOG( TRACE, "Received OpList data for {}", st[1] ) ;
 
 	if (st[2] == "NO")
 	{
-		elog << "cservice::doXROplist> NO oplist reported for channel " << st[1] << endl;
+		LOG( TRACE, "NO oplist reported for channel {}", st[1] ) ;
 		return true;
 	}
 
 	if (st.size() < 6)
 	{
-		elog << "cservice::doXROplist> OPLIST insufficient response parameters" << endl;
+		LOG( ERROR, "OPLIST insufficient response parameters" ) ;
 		return false;
 	}
 	string scoreChan = st[1];
@@ -8803,15 +8810,7 @@ bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const s
 	//st[9] == "/";
 	//string lastNick = st[10];	// ... but may not be online anymore
 
-	elog << "cservice::doXROplist: OPLIST " 
-		<< "scorechan = " << scoreChan << " "
-		<< "opCount(rank) = " << opCount << " "
-		<< "score = " << score << " "
-		<< "account = " << account << " "
-		<< "firstOpped = " << firstOpped << " "
-		<< "lastOpped = " << lastOpped << " "
-		//<< "lastNick = " << lastNick
-		<< endl;
+	LOG( TRACE, "OPLIST scorechan = {} opCount(rank) = {} score = {} account = {} firstOpped = {} lastOpped = {}", scoreChan, opCount, score, account, firstOpped, lastOpped ) ;
 
 	/*	Now we do the actual work to insert scores to SQL DB
 		Rules:
@@ -8831,7 +8830,7 @@ bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const s
 		if (SQLDb->Tuples() < 1)
 		{
 			// No rows returned - no pending record
-			elog << "cservice::doXROplist> no pending channel found: " << scoreChan << endl;
+			LOG( DEBUG, "no pending channel found: {}", scoreChan ) ;
 			return false;
 		}
 		else {
@@ -8839,7 +8838,7 @@ bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const s
 			sqlUser* tmpUser = getUserRecord(account);
 			if (!tmpUser)
 			{
-				elog << "cservice::doXROplist> tmpUser with account = " << account << " could not be found (expired or purged)" << endl;
+				LOG( ERROR, "tmpUser with account = {} could not be found (expired or purged)", account ) ;
 				return false;
 			}
 			unsigned int userID = tmpUser->getID();
@@ -8884,7 +8883,7 @@ bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const s
 					rescount--;
 					int chanID = atoi(SQLDb->GetValue(rescount, 0).c_str());
 					char first = (char)SQLDb->GetValue(rescount, 1)[0];
-					elog << " *** <DEBUG> first == " << first << endl;
+					LOG( DEBUG, " *** <DEBUG> first == {}", first ) ;
 					if (first == 'N')
 					{
 						updateQuery << "UPDATE pending_chanfix_scores SET "
@@ -8963,7 +8962,7 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 	if (!theUser)
 	{
 		//This case shouldn't be happen
-		elog << "cservice::doCommonAuth> ERROR: Unknown user: " << username << endl;
+		LOG( ERROR, "Unknown user: {}", username ) ;
 		return false;
 	}
 	/*
@@ -9023,9 +9022,9 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 		{
 		Notice( theClient,
 			"Internal error." ) ;
-		elog	<< "cservice::doCommonAuth> newData is NULL for: "
-			<< theClient
-			<< endl ;
+		LOG_MSG( ERROR, "newData is NULL for: {client_nick}" )
+			.with( "client", theClient )
+			.logStructured() ;
 		return false ;
 		}
 
@@ -9445,7 +9444,7 @@ bool cservice::doXResponse(iServer* theServer, const string& Routing, const stri
 {
 	string doKill;
 	if (kill) doKill="NO"; else doKill="OK";	
-	elog << "cservice::doXResponse: " << getCharYY().c_str() << " XR " << theServer->getCharYY().c_str() << " " << Routing.c_str() << " :" << doKill.c_str() << " " << Message.c_str() << endl;
+	LOG( TRACE, "XQ-RESPONSE: {} XR {} {} :{} {}", getCharYY().c_str(), theServer->getCharYY().c_str(), Routing.c_str(), doKill.c_str(), Message.c_str() ) ;
 	return Write("%s XR %s %s :%s %s", getCharYY().c_str(),theServer->getCharYY().c_str(),Routing.c_str(),kill == false ? "OK" : "NO", Message.c_str());
 }
 

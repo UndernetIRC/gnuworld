@@ -84,11 +84,7 @@ bool sqlUser::loadData(int userID)
  *  'userID' and fill our member variables.
  */
 
-#ifdef LOG_DEBUG
-	elog	<< "sqlUser::loadData> Attempting to load data for user-id: "
-		<< userID
-		<< endl;
-#endif
+LOG( TRACE, "Attempting to load data for user-id: {}", userID ) ;
 
 stringstream queryString;
 queryString	<< "SELECT "
@@ -123,11 +119,7 @@ bool sqlUser::loadData(const string& userName)
  *  'userID' and fill our member variables.
  */
 
-#ifdef LOG_DEBUG
-	elog	<< "sqlUser::loadData> Attempting to load data for user-name: "
-		<< userName
-		<< endl;
-#endif
+LOG( TRACE, "Attempting to load data for user-name: {}", userName ) ;
 
 stringstream queryString;
 queryString	<< "SELECT "

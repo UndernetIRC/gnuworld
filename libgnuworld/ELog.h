@@ -119,6 +119,13 @@ public:
 	inline void setStream( std::ostream* newStream )
 		{ outStream = newStream ; }
 
+	/**
+	 * Get the stream to which to log messages.
+	 */
+
+	inline std::ostream* getStream()
+		{ return outStream ; }
+
 	/*
 	 * Get local time in [hh:mm:ss] format
 	 */

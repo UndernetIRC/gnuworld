@@ -169,9 +169,7 @@ if (string_lower(st[1]) == "read")
 	if( !bot->SQLDb->Exec( allNotesQuery, true ) )
 //	if( PGRES_TUPLES_OK != status )
 		{
-		elog	<< "SUPPORTCommand> SQL Error: "
-				<< bot->SQLDb->ErrorMessage()
-				<< endl ;
+		LOGSQL_ERROR( bot->SQLDb ) ;
 
 		bot->Notice(theClient, "An unknown error occured while reading your notes.");
 		return false ;
