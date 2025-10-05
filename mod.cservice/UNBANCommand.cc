@@ -262,9 +262,9 @@ for( ; counter < st2.size() ; counter++ )
 			theChan->banList.find( theBan->getID() ) ;
 		if( sqlBanIterator == theChan->banList.end() )
 			{
-			LOG_MSG( WARN, "Unable to locate sqlBan (id: {sqlban_id}, mask: {sqlban_mask}) in sqlChannel {channel_name}")
-			.with( "sqlban", theBan )
-			.with( "channel", theChan )
+			LOG_MSG( WARN, "Unable to locate sqlBan (id: {ban_id}, mask: {ban_mask}) in sqlChannel {chan_name}")
+			.with( "ban", theBan )
+			.with( "chan", theChan )
 			.logStructured() ;
 			continue ;
 			}

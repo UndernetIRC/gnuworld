@@ -1817,9 +1817,9 @@ sqlLevelHashType::iterator ptr = sqlLevelCache.find(thePair);
 if(ptr != sqlLevelCache.end())
 	{
 	// Found something!
-	LOG_MSG( TRACE, "Cache hit for user-id:chan-id {user_id}:{channel_id}" )
+	LOG_MSG( TRACE, "Cache hit for user-id:chan-id {user_id}:{chan_id}" )
 		.with( "user", theUser )
-		.with( "channel", theChan )
+		.with( "chan", theChan )
 		.logStructured() ;
 
 	levelCacheHits++;
@@ -2813,8 +2813,8 @@ void cservice::cacheExpireLevels()
 			theChan->commit();
 			decrementJoinCount();
 			writeChannelLog(theChan, me, sqlChannel::EV_IDLE, "");
-			LOG_MSG( INFO, "I've just left {channel_name} because its too quiet." )
-				.with( "channel", theChan )
+			LOG_MSG( INFO, "I've just left {chan_name} because its too quiet." )
+				.with( "chan", theChan )
 				.logStructured() ;
 			Part(theChan->getName(), "So long! (And thanks for all the fish)");
 		}
@@ -3067,8 +3067,8 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		newChan->mngr_userId = (unsigned int)atoi(SQLDb->GetValue(i, 25).c_str());
 		newChanList.push_back(newChan);
 
-		LOG_MSG( INFO, "[DB-UPDATE]: Found new channel: {channel}" )
-		.with( "channel", newChan->chanName )
+		LOG_MSG( INFO, "[DB-UPDATE]: Found new channel: {chan}" )
+		.with( "chan", newChan->chanName )
 		.logStructured() ;
 		newchans++;
 	}
@@ -3555,7 +3555,7 @@ logger->registerObjectHandler<sqlUser>(
 		
 		fields[key + "_id"] = std::to_string(user->getID());
 		fields[key + "_name"] = user->getUserName();
-		fields[key + "_is_authed"] = user->isAuthed() ? "true" : "false";
+		//fields[key + "_is_authed"] = user->isAuthed() ? "true" : "false";
 
 		return true;
 	});
@@ -3570,7 +3570,7 @@ logger->registerObjectHandler<sqlChannel>(
 		
 		fields[key + "_id"] = std::to_string(channel->getID());
 		fields[key + "_name"] = channel->getName();
-		fields[key + "_ts"] = std::to_string(channel->getRegisteredTS());
+		//fields[key + "_ts"] = std::to_string(channel->getRegisteredTS());
 
 		return true;
 	});
@@ -5434,8 +5434,8 @@ void cservice::doTheRightThing(Channel* tmpChan)
 				MyUplink->Mode(this, tmpChan, reggedChan->getChannelMode().c_str(), std::string() );
 			}
 
-			LOG_MSG( INFO, "Performed reop for channel {channel_name}" )
-			.with( "channel", tmpChan )
+			LOG_MSG( INFO, "Performed reop for channel {chan_name}" )
+			.with( "chan", tmpChan )
 			.logStructured();
 		}
 	}
@@ -5539,10 +5539,10 @@ switch( whichEvent )
 
 						ptr->second->trafficList.insert(sqlPendingChannel::trafficListType::value_type(
 								NumericIP, trafRecord));
-						LOG_MSG( INFO, "Created a new IP traffic record for IP#{ip} ({client_host}) on {channel_name}" )
+						LOG_MSG( INFO, "Created a new IP traffic record for IP#{ip} ({client_host}) on {chan_name}" )
 							.with( "ip", NumericIP )
 							.with( "client", theClient )
-							.with( "channel", theChan )
+							.with( "chan", theChan )
 							.logStructured() ;
 						} else
 						{
@@ -5749,8 +5749,8 @@ for( ; ptr != theChan->banList.end() ; ++ptr )
 	sqlBan* theBan = ptr->second;
 	if( 0 == theBan )
 		{
-		LOG_MSG( ERROR, "Null ban record in {channel_name}'s ban list." )
-			.with( "channel", theChan )
+		LOG_MSG( ERROR, "Null ban record in {chan_name}'s ban list." )
+			.with( "chan", theChan )
 			.logStructured() ;
 		continue ;
 		}
@@ -7153,8 +7153,8 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 		/* Can this happen?! what would we do?!
 		 * Maybe they are in netsplit momentarly?!
 		 */
-		LOG_MSG( WARN, "Warning: New empty channel application of {channel_name} (no users found on channel)" )
-			.with( "channel_name", chanName )
+		LOG_MSG( WARN, "Warning: New empty channel application of {chan_name} (no users found on channel)" )
+			.with( "chan_name", chanName )
 			.logStructured() ;
 		return;
 	}
@@ -7192,10 +7192,10 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 				//elog << "cservice::initializeInitialIPs> Already existing supporter for channel " << chanName << " suppUser = " << loggedUser->getUserName() << " joinCount = " << Supptr->second << " reset joincount to 1" << endl;
 				Supptr->second = 1;
 			}
-			LOG_MSG( INFO, "New total for Supporter #{user_id} ({user_name}) on {channel_name} is {supporters}." )
+			LOG_MSG( INFO, "New total for Supporter #{user_id} ({user_name}) on {chan_name} is {supporters}." )
 			.with( "user_id", loggedUser->getID() )
 			.with( "user_name", loggedUser->getUserName() )
-			.with( "channel", theChan )
+			.with( "chan", theChan )
 			.with( "supporters", Supptr->second )
 			.logStructured() ;
 			pendingChan->commitSupporter(Supptr->first, Supptr->second);
@@ -7224,7 +7224,9 @@ void cservice::initialiseSupport(const string& chanName, sqlPendingChannel::supp
 		if (totalUsers > 50)
 		{
 			// Hmm, what a strange large channel
-			LOG( INFO, "Weird large new channel application of {}, usercount={}, clones={}", theChan->getName(), totalUsers, clonesCount ) ;
+			LOG_MSG( INFO, "Weird large new channel application of {chan_name}, usercount={}, clones={}", totalUsers, clonesCount )
+			.with( "chan", theChan )
+			.logStructured() ;
 			logAdminMessage("Weird large new channel application of %s, usercount=%i, clones=%i", theChan->getName().c_str(), totalUsers, clonesCount);
 		}
 	}
@@ -8763,8 +8765,8 @@ return false ;
 
 bool cservice::doXQOplist(const string& chanName)
 {
-	LOG_MSG( TRACE, "Executing XQ for {channel}" )
-		.with( "channel", chanName )
+	LOG_MSG( TRACE, "Executing XQ for {chan}" )
+		.with( "chan", chanName )
 		.logStructured() ;
 	//iServer* theServer = this->MyUplink->Uplink();
 	iServer* chanfixServer = Network->findServerName(ChanfixServerName);

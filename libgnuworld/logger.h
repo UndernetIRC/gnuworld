@@ -342,9 +342,9 @@ public:
           }
 
         fields[ prefix + "_nick" ] = client->getNickName() ;
-        fields[ prefix + "_user" ] = client->getUserName() ;
-        fields[ prefix + "_host" ] = client->getInsecureHost() ;
-        fields[ prefix + "_realhost" ] = client->getRealInsecureHost() ;
+        fields[ prefix + "_userhost" ] = client->getNickUserHost() ;
+        //fields[ prefix + "_host" ] = client->getInsecureHost() ;
+        //fields[ prefix + "_realhost" ] = client->getRealInsecureHost() ;
         fields[ prefix + "_ip" ] = xIP( client->getIP() ).GetNumericIP() ;
         fields[ prefix + "_numeric" ] = client->getCharYYXXX() ;
 
@@ -356,7 +356,7 @@ public:
           }
 
         fields[ prefix + "_is_oper" ] = client->isOper() ? "true" : "false" ;
-        fields[ prefix + "_is_hidden" ] = client->isModeX() ? "true" : "false" ;
+        //fields[ prefix + "_is_hidden" ] = client->isModeX() ? "true" : "false" ;
 
         return *this ;
         }
@@ -378,8 +378,8 @@ public:
         fields[ prefix + "_uplink" ] = server->getUplinkIntYY() ;
 
         // Add server flags
-        fields[ prefix + "_is_service" ] = server->isService() ? "true" : "false" ;
-        fields[ prefix + "_is_hub" ] = server->isHub() ? "true" : "false" ;
+        //fields[ prefix + "_is_service" ] = server->isService() ? "true" : "false" ;
+        //fields[ prefix + "_is_hub" ] = server->isHub() ? "true" : "false" ;
         fields[ prefix + "_is_bursting" ] = server->isBursting() ? "true" : "false" ;
 
         return *this ;
@@ -398,7 +398,7 @@ public:
           }
 
         fields[ prefix + "_name" ] = channel->getName() ;
-        fields[ prefix + "_creation_ts" ] = std::to_string( channel->getCreationTime() ) ;
+        //fields[ prefix + "_creation_ts" ] = std::to_string( channel->getCreationTime() ) ;
         fields[ prefix + "_modes" ] = channel->getModeString() ;
 
         return *this ;
@@ -415,7 +415,7 @@ public:
 
         fields[ prefix + "_is_op" ] = theUser->getMode( ChannelUser::MODE_O ) ? "true" : "false" ;
         fields[ prefix + "_is_voice" ] = theUser->getMode( ChannelUser::MODE_V ) ? "true" : "false" ;
-        fields[ prefix + "_channel_modes" ] = theUser->getModeString() ;
+        //fields[ prefix + "_channel_modes" ] = theUser->getModeString() ;
 
         return *this ;
         }
