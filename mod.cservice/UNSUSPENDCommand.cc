@@ -221,8 +221,7 @@ if( !aLevel->commit() )
 	{
 	bot->Notice( theClient,
 		"Error updating channel status." ) ;
-	elog	<< "UNSUSPEND> SQL error"
-		<< std::endl ;
+	LOG( ERROR, "Failed to commit sqlLevel record" ) ;
 	return false ;
 	}
 

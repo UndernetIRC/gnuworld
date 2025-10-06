@@ -129,10 +129,6 @@ theQuery	<< Main
 		<< " WHERE Id = " << Id
 		<<  ends;
 
-elog	<< "cservice::Gline::Update> "
-	<< theQuery.str().c_str()
-	<< endl; 
-
 if( SQLDb->Exec( theQuery ) )
 	{
 	return true;

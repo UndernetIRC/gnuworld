@@ -2060,14 +2060,18 @@ if( logSocket )
 
 void xServer::rotateLogs()
 {
-if (elog.isOpen())
+if( elog.isOpen() )
 	{
-	elog << endl << "Received SIGHUP. Rotating log files..." << endl;
+	elog << endl << "Received SIGHUP. Rotating log files..." << endl ;
 	//elog.closeFile();  /* Do not close the file, elog.openFile() will handle that.
 	}
 if( logSocket && socketFile.is_open() )
 	{
 	socketFile.close() ;
+	}
+for( const auto& client : clientModuleList )
+	{
+	client->getObject()->getLogger()->rotateLogs() ;
 	}
 startLogging(true);
 }

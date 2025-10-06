@@ -27,7 +27,6 @@
 #include	<iostream>
 #include	<cstring>
 #include	<ctime>
-#include	"ELog.h"
 #include	"misc.h"
 #include	"sqlLevel.h"
 #include	"sqlUser.h"
@@ -77,14 +76,7 @@ bool sqlLevel::loadData(unsigned int userID, unsigned int channelID)
  * Fetch a matching Level record for this channel and user ID combo.
  */
 
-#ifdef LOG_DEBUG
-	elog	<< "sqlLevel::loadData> Attempting to load level data for "
-		<< "channel-id: "
-		<< channelID
-		<< " and user-id: "
-		<< userID
-		<< endl;
-#endif
+LOG( TRACE, "Attempting to load level data for channel-id: {} and user-id: {}", channelID, userID) ;
 
 stringstream queryString;
 queryString	<< "SELECT "
