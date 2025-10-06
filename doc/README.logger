@@ -1,0 +1,456 @@
+# GNUWorld Logger System
+
+The GNUWorld logger provides a flexible, structured logging system with support for multiple output formats, custom object serialization, and extensible notification systems.
+
+6 October 2025 (mriron@undernet.org)
+MrIron
+- Initial version.
+
+## Table of Contents
+
+- [Basic Usage](#basic-usage)
+- [Structured Logging](#structured-logging)
+- [Custom Object Handlers](#custom-object-handlers)
+- [Configuration](#configuration)
+- [Output Formats](#output-formats)
+- [Verbosity Levels](#verbosity-levels)
+- [Log Rotation](#log-rotation)
+- [Advanced Features](#advanced-features)
+- [Examples](#examples)
+
+## Basic Usage
+
+### Simple Logging with Function Context
+
+Use the `LOG` macro for basic formatted logging with automatic function name inclusion:
+
+```cpp
+LOG(INFO, "Server started successfully");
+LOG(ERROR, "Failed to connect to database");
+LOG(DEBUG, "User {} connected from {}", username, ip_address);
+```
+
+**Benefits of LOG macro:**
+- ✅ **Automatic function names** - Includes `__PRETTY_FUNCTION__` in log entries
+- ✅ **Format string support** - Uses modern C++ format strings
+- ✅ **JSON metadata** - Function names appear in structured log output
+
+### Stream-based Logging (Basic)
+
+For iostream-style logging (without automatic function names):
+
+```cpp
+logger->write(INFO) << "Processing " << count << " records" << std::endl;
+logger->write(ERROR) << "Critical error in function: " << __func__ << std::endl;
+```
+
+**Note:** Stream-based logging does **not** automatically include function names. Use `LOG()` macro for function context.
+
+## Structured Logging
+
+The structured logging system allows you to create rich, machine-parseable log entries with both human-readable messages and structured JSON data.
+
+### Basic Structured Logging
+
+```cpp
+LOG_MSG(INFO, "User {user_name} authenticated")
+    .with("user_name", "johndoe")
+    .with("user_id", 12345)
+    .with("ip_address", "192.168.1.100")
+    .with("success", true)
+    .logStructured();
+```
+
+**Output:**
+- **Human message:** "User johndoe authenticated"
+- **JSON fields:** `{"user_name": "johndoe", "user_id": 12345, "ip_address": "192.168.1.100", "success": true, "message": "User johndoe authenticated"}`
+
+### Mixed Format Arguments and Named Fields
+
+You can combine positional `{}` placeholders with named `{field}` placeholders:
+
+```cpp
+LOG_MSG(INFO, "Command {} executed by {user_nick} in {duration}ms", commandName)
+    .with("user", userClient)        // iClient* - auto-extracts nick, host, etc.
+    .with("duration", executionTime)
+    .with("success", true)
+    .logStructured();
+```
+
+This replaces:
+1. `{}` with `commandName` (positional argument)
+2. `{user_nick}` with the user's nickname (from `.with("user", userClient)`)
+3. `{duration}` with the `executionTime` value
+
+## Built-in Object Support
+
+The logger has built-in support for common GNUWorld objects:
+
+### iClient* Support
+
+```cpp
+LOG_MSG(INFO, "User {client_nick} joined from {client_ip}")
+    .with("client", theClient)
+    .logStructured();
+```
+
+**Auto-extracted fields:**
+- `client_nick` - User's nickname
+- `client_user` - Username
+- `client_host` - Host/mask
+- `client_realhost` - Real hostname
+- `client_ip` - IP address
+- `client_numeric` - IRC numeric
+- `client_account` - Account name (if authenticated)
+- `client_account_id` - Account ID (if authenticated)
+- `client_is_oper` - Operator status (true/false)
+- `client_is_hidden` - Hidden host status (true/false)
+
+### Channel* Support
+
+```cpp
+LOG_MSG(INFO, "Mode change in {channel_name}")
+    .with("channel", theChannel)
+    .logStructured();
+```
+
+**Auto-extracted fields:**
+- `channel_name` - Channel name
+- `channel_creation_ts` - Creation timestamp
+- `channel_modes` - Channel mode string
+
+### iServer* Support
+
+```cpp
+LOG_MSG(INFO, "Server {server_name} connected")
+    .with("server", theServer)
+    .logStructured();
+```
+
+**Auto-extracted fields:**
+- `server_name` - Server name
+- `server_numeric` - Server numeric
+- `server_uplink` - Uplink server
+- `server_is_service` - Service status (true/false)
+- `server_is_hub` - Hub status (true/false)
+- `server_is_bursting` - Bursting status (true/false)
+
+### ChannelUser* Support
+
+```cpp
+LOG_MSG(DEBUG, "User privileges updated")
+    .with("chanuser", channelUser)
+    .logStructured();
+```
+
+**Auto-extracted fields:**
+- `chanuser_is_op` - Op status (true/false)
+- `chanuser_is_voice` - Voice status (true/false)
+- `chanuser_channel_modes` - Channel mode string
+
+## Custom Object Handlers
+
+Modules can register handlers for their own object types:
+
+### Registering Custom Handlers
+
+```cpp
+// In your module's initialization
+logger->registerObjectHandler<sqlUser>(
+    [](std::map<std::string, std::string>& fields, const std::string& key, sqlUser* user) -> bool {
+        if (!user) {
+            fields[key + "_name"] = "nullptr";
+            return true;
+        }
+        
+        fields[key + "_id"] = std::to_string(user->getID());
+        fields[key + "_name"] = user->getUserName();
+        // Note: Some fields may be commented out in actual implementation
+        // fields[key + "_is_authed"] = user->isAuthed() ? "true" : "false";
+        
+        return true;
+    });
+
+// Register sqlChannel* handler
+logger->registerObjectHandler<sqlChannel>(
+    [](std::map<std::string, std::string>& fields, const std::string& key, sqlChannel* channel) -> bool {
+        if (!channel) {
+            fields[key + "_name"] = "nullptr";
+            return true;
+        }
+        
+        fields[key + "_id"] = std::to_string(channel->getID());
+        fields[key + "_name"] = channel->getName();
+        // Note: Some fields may be commented out in actual implementation  
+        // fields[key + "_ts"] = std::to_string(channel->getRegisteredTS());
+        
+        return true;
+    });
+```
+
+### Using Custom Handlers
+
+Once registered, you can use custom objects directly:
+
+```cpp
+LOG_MSG(INFO, "User {user_name} banned {target_name}")
+    .with("user", sqlUserPtr)      // Uses registered sqlUser handler
+    .with("target", targetSqlUser) // Uses registered sqlUser handler  
+    .with("reason", "spam")
+    .logStructured();
+```
+
+## Configuration
+
+### Setting Verbosity Levels
+
+```cpp
+// Set IRC channel output level
+logger->setChanVerbosity(INFO);  // Send INFO and below to IRC
+
+// Set log file output level  
+logger->setLogVerbosity(DEBUG);  // Write DEBUG and below to file
+
+// Set console output level
+logger->setConsoleVerbosity(ERROR);  // Send ERROR and below to console when gnuworld is running in verbose mode
+
+// Enable SQL logging to file
+logger->setLogSQL(true);
+
+// Enable SQL logging to console  
+logger->setConsoleSQL(true);
+```
+
+### Setting Debug Channel
+
+```cpp
+logger->setChannel("#debug");
+```
+
+### Adding Notifiers
+
+```cpp
+// Add Pushover notifier for errors and above
+auto pushover = std::make_shared<PushoverNotifier>("your_api_token", "your_user_key");
+logger->addNotifier(pushover, ERROR);
+```
+
+### Prometheus Integration
+
+For metrics collection (separate from log notifiers), Prometheus integration can be used to export logging statistics:
+
+```cpp
+// Prometheus metrics are handled separately - not as log notifiers
+// Example: Track log message counts by level
+prometheus_log_messages_total.labels({{"level", "ERROR"}}).inc();
+```
+
+## Verbosity Levels
+
+| Level | Value | Description | Use Case |
+|-------|-------|-------------|----------|
+| `FATAL` | 1 | Critical errors that may cause shutdown | System failures, configuration errors |
+| `ERROR` | 2 | Error conditions | Failed operations, exceptions |
+| `WARN` | 3 | Warning conditions | Deprecated usage, recoverable errors |
+| `INFO` | 4 | General information | Normal operations, status updates |
+| `DEBUG` | 5 | Debug information | Development debugging |
+| `TRACE` | 6 | Detailed trace information | Detailed execution flow |
+| `SQL` | 99 | Database queries | SQL statement logging |
+
+## Output Formats
+
+The logger supports multiple output destinations with independent verbosity controls:
+
+### Console Output (elog)
+```
+[X] - INFO  - User MrIron authenticated from 192.168.1.100
+```
+
+### IRC Channel Output
+```
+[X] [I] User MrIron authenticated from 192.168.1.100
+```
+
+### JSON Log File Output
+```json
+{
+  "timestamp": "2025-09-29T13:45:42Z",
+  "level": "INFO",
+  "function": "cservice::OnPrivateMessage",
+  "user_id": 12345,
+  "user_username": "MrIron", 
+  "user_ip": "192.168.1.100",
+  "user_is_suspended": false,
+  "success": true,
+  "message": "User MrIron authenticated from 192.168.1.100"
+}
+```
+
+### Output Control
+
+Each output destination has independent verbosity settings:
+
+- **Console verbosity**: `setConsoleVerbosity()` - Controls what goes to stdout/stderr
+- **File verbosity**: `setLogVerbosity()` - Controls what goes to the log file  
+- **Channel verbosity**: `setChanVerbosity()` - Controls what goes to IRC debug channel
+- **SQL logging**: Separate controls for file (`setLogSQL()`) and console (`setConsoleSQL()`)
+
+## Log Rotation
+
+The logger supports external log rotation through the `rotateLogs()` function, which closes and reopens the log file.
+Log rotation is called when gnuworld receives SIGHUP.
+
+## Advanced Features
+
+### SQL Logging
+
+SQL queries are logged by the psql engine when `setLogSQL(true)` is enabled.
+Logging can be disabled on a per-query basis by calling `dbHandle->Exec(query, false)`.
+
+### Error Logging
+
+```cpp
+LOGSQL_ERROR(dbHandle); // Logs dbHandle->ErrorMessage() with verbosity ERROR
+```
+
+### Complex Structured Events
+
+```cpp
+LOG_MSG(INFO, "Ban applied: {ban_mask} by {source_nick} in {channel_name}")
+    .with("source", sourceClient)     // iClient* 
+    .with("target", targetClient)     // iClient*
+    .with("channel", theChannel)      // Channel*
+    .with("ban_mask", "*!*@badhost.com")
+    .with("duration", 3600)           // seconds
+    .with("reason", "Excessive flooding")
+    .with("ban_level", 75)
+    .logStructured();
+```
+
+### Performance Considerations
+
+- **Efficient**: Direct object creation (no heap allocation)
+- **Template optimized**: Compiler can inline all operations  
+- **Lazy evaluation**: Message formatting and JSON generation only occur when verbosity filtering indicates the message will be output
+- **Early filtering**: Verbosity checks prevent expensive I/O operations
+- **Thread-safe**: All logging operations are protected by mutexes when USE_THREAD is enabled
+
+## Examples
+
+### Authentication Event
+
+```cpp
+LOG_MSG(INFO, "Authentication attempt by {client_nick} from {client_ip}")
+    .with("client", theClient)
+    .with("user", sqlUser)
+    .with("method", "password")  
+    .with("totp_used", totpEnabled)
+    .with("success", authenticated)
+    .logStructured();
+```
+
+### Channel Management
+
+```cpp
+LOG_MSG(WARNING, "Unauthorized op attempt by {source_nick} in {channel_name}")
+    .with("source", sourceClient)
+    .with("target", targetClient) 
+    .with("channel", theChannel)
+    .with("source_level", sourceLevel)
+    .with("required_level", 100)
+    .logStructured();
+```
+
+### Network Events
+
+```cpp
+LOG_MSG(ERROR, "Server {server_name} lost connection to {uplink_name}")
+    .with("server", lostServer)
+    .with("uplink", uplinkServer)
+    .with("duration", connectionTime)
+    .with("clients_lost", clientCount)
+    .with("channels_affected", channelCount)
+    .logStructured();
+```
+
+### Database Operations
+
+```cpp
+LOG_MSG(TRACE, "Database query executed in {duration}ms")
+    .with("query_type", "SELECT")
+    .with("table", "users")
+    .with("duration", queryTime)
+    .with("rows_affected", rowCount)
+    .with("user", executingUser)
+    .logStructured();
+```
+
+## Migration from Old Logging
+
+### Replace Simple Logs
+
+**Old:**
+```cpp
+elog << "User " << username << " connected" << std::endl;
+```
+
+**New:**
+```cpp
+LOG(INFO, "User {} connected", username);
+```
+
+**Benefits:** The LOG macro version automatically includes function name context.
+
+### Replace Complex Logs
+
+**Old:**
+```cpp
+elog << "User " << theClient->getNickName() 
+     << " (" << theClient->getAccount() << ") "
+     << "authenticated successfully" << std::endl;
+```
+
+**New:**
+```cpp
+LOG_MSG(INFO, "User {client_nick} ({client_account}) authenticated successfully")
+    .with("client", theClient)
+    .logStructured();
+```
+
+## Best Practices
+
+1. **Use LOG() macro over streams** - Gets automatic function name context
+2. **Use appropriate verbosity levels** - Don't log everything as INFO
+3. **Include relevant context** - Add user, channel, server objects when relevant
+4. **Use structured logging for events you might query later** - Authentication, bans, etc.
+5. **Keep messages human-readable** - The structured data provides machine parsing
+6. **Register custom handlers early** - Do it in module initialization
+7. **Consider performance** - Logging should be fast, don't do expensive operations in log calls
+
+## Troubleshooting
+
+### Common Issues
+
+**Handler not called:**
+- Ensure `registerObjectHandler()` is called in the module's constructor before logging
+- Check that the type matches exactly (const, pointer, reference)
+
+**Missing fields in JSON:**
+- Verify field names don't conflict with built-in fields
+- Check that custom handler returns `true`
+- Some fields may be commented out in the actual handler implementation
+
+**Compilation errors:**
+- Include necessary headers for custom types
+- Ensure types are fully defined where handlers are registered
+
+### Debugging
+
+Enable trace-level logging to see detailed execution:
+
+```cpp
+logger->setLogVerbosity(TRACE);
+LOG(TRACE, "Debugging custom handler registration");
+```
+
+Check log files for JSON format validation - malformed JSON indicates handler issues.
