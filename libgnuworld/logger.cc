@@ -46,7 +46,7 @@ using std::string ;
  */
 Logger::Logger( xClient* _bot ) : bot( _bot )
 {
-std::string logFilePath ;
+// Build and save log file path for later use
 size_t dotPos = bot->getConfigFileName().find( '.' ) ;
 if( dotPos != std::string::npos )
   logFilePath = bot->getConfigFileName().substr( 0, dotPos ) + ".log" ;
@@ -288,4 +288,27 @@ std::string jsonFields = buildJsonFromMap() ;
 logger_instance->writeFunc( level, func, jsonFields, clean_msg ) ;
 }
 
+/**
+ * Closes and reopens the log file for external log rotation support.
+ * This function should be called after external log rotation (e.g., via logrotate)
+ * to ensure the logger writes to the new log file instead of the rotated one.
+ * Thread-safe when USE_THREAD is enabled.
+ */
+void Logger::rotateLogs()
+{
+#ifdef USE_THREAD
+std::lock_guard< std::mutex > lock( logMutex ) ;
+#endif
+
+// Close existing log file if open
+if( logFile.is_open() )
+  logFile.close() ;
+
+// Reopen log file using saved path
+logFile.open( logFilePath, std::ios::app ) ;
+if( !logFile.is_open() )
+  {
+  elog << "Warning: Could not reopen logfile " << logFilePath << " after rotation" << std::endl ;
+  }
+}
 } // namespace gnuworld

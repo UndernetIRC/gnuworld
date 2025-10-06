@@ -93,6 +93,7 @@ class Logger
 {
 private:
   xClient*                          bot = nullptr ;
+  std::string                       logFilePath ;
   std::string                       debugChan ;
   unsigned short                    chanVerbosity = 4 ;
   unsigned short                    logVerbosity = 6 ;
@@ -643,6 +644,12 @@ public:
     writeFunc( v, func, jsonParams, fmtString ) ;
 #endif
   }
+
+  /**
+   * Closes and reopens the log file for external log rotation support.
+   * Called from xServer::rotateLogs() when a SIGHUP is received.
+   */
+  void rotateLogs() ;
 } ; // class Logger
 
 } // namespace gnuworld
