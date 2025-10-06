@@ -875,7 +875,6 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 
 if( commandLog )
 	{
-	elog << "Writing command log" << endl;
 	std::string jsonMessage ;
 	std::string jsonParams = "\"command\":\"" + Command + "\"" ;
 	/*if( secure )
