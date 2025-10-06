@@ -117,9 +117,8 @@ if( v == SQL )
 
   if( consoleSQL && elog.getStream() )
     *(elog.getStream()) << elog.getLocalTime()
-                        << "[" << bot->getNickName() << "] - "
-                        << levels[ v ].prefix << " - "
-                        << fmtMessage
+                        << "[" << bot->getNickName() << "] - SQL   - "
+                        << theMessage
                         << endl ;
   return ;
   }
@@ -152,7 +151,7 @@ if( v <= chanVerbosity && bot->isConnected() && !debugChan.empty() )
   Channel* theChan = Network->findChannel( debugChan ) ;
   if( !theChan )
     {
-    elog  << "[" << bot->getNickName() << "] - WARN  - write> Unable to locate channel "
+    elog  << "[" << bot->getNickName() << "] - WARN  - Logger::writeFunc> Unable to locate channel "
           << debugChan
           << " on network!"
           << endl ;
