@@ -875,6 +875,8 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 
 if( commandLog )
 	{
+	elog << "Writing command log" << endl;
+	std::string jsonMessage ;
 	std::string jsonParams = "\"command\":\"" + Command + "\"" ;
 	/*if( secure )
 		jsonParams += ",\"secure\":true" ;
@@ -887,9 +889,9 @@ if( commandLog )
 	jsonParams += ",\"client_userhost\":\"" + escapeJsonString( theClient->getNickUserHost() ) + "\"" ;
 
 	if( Command != "NEWPASS" && Command != "SUSPENDME" && Command != "LOGIN" && st.size() > 0 )
-		jsonParams += ",\"message\":\"" + escapeJsonString( st.assemble( 1 ) ) + "\"" ;
+		jsonMessage = escapeJsonString( st.assemble( 1 ) ) ;
 
-	logger->writeLog( INFO, "cservice::OnPrivateMessage", jsonParams, string() ) ;
+	logger->writeLog( INFO, "cservice::OnPrivateMessage", jsonParams, jsonMessage ) ;
 	}
 /*
  * If the person issuing this command is an authenticated admin, we need to log
