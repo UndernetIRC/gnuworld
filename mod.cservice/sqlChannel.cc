@@ -160,12 +160,7 @@ bool sqlChannel::loadData(const string& channelName)
  *  'channelName' and fill our member variables.
  */
 
-#ifdef LOG_DEBUG
-	elog	<< "sqlChannel::loadData> Attempting to load data for"
-		<< " channel-name: "
-		<< channelName
-		<< endl;
-#endif
+LOG( TRACE, "Attempting to load data for channel-name: {}", channelName ) ;
 
 stringstream queryString ;
 queryString	<< "SELECT "
@@ -201,12 +196,7 @@ bool sqlChannel::loadData(int channelID)
  *  'channelID' and fill our member variables.
  */
 
-#ifdef LOG_DEBUG
-	elog	<< "sqlChannel::loadData> Attempting to load data for "
-		<< "channel-id: "
-		<< channelID
-		<< endl;
-#endif
+LOG_MSG( TRACE, "Attempting to load data for channel-id: {}", channelID ) ;
 
 stringstream queryString;
 queryString	<< "SELECT "

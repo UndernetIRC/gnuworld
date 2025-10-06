@@ -232,7 +232,9 @@ switch(auth_res)
 		break;
 	default:
 		//Should never get here!
-		elog << "Response " << auth_res << " while authenticating!\n";
+		LOG_MSG( ERROR, "Response {auth_res} while authenticating!")
+		.with( "client", theClient )
+		.logStructured() ;
 		bot->Notice(theClient,"AUTHENTICATION FAILED as %s (due to an error)\n",st[1].c_str());
 		return false;
 		break;

@@ -83,6 +83,9 @@
     CONFIG_VAR( unsigned int, connectRetry,                     "connection_retry_total") \
     CONFIG_VAR( unsigned int, logVerbosity,                     "log_verbosity") \
     CONFIG_VAR( unsigned int, chanVerbosity,                    "chan_verbosity") \
+    CONFIG_VAR( unsigned int, consoleVerbosity,                 "console_verbosity") \
+    CONFIG_VAR( bool,         commandLog,                       "log_commands") \
     CONFIG_VAR( bool,         logSQL,                           "log_sql") \
+    CONFIG_VAR( bool,         consoleSQL,                       "console_sql") \
     CONFIG_VAR( bool,         pushoverEnable,                   "pushover_enable") \
     CONFIG_VAR( bool,         prometheusEnable,                 "prometheus_enable")

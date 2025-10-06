@@ -29,6 +29,7 @@
 #include	<map>
 #include	<array>
 #include	<functional>
+#include	<optional>
 
 #include	<ctime>
 
@@ -57,11 +58,6 @@
 
 namespace gnuworld
 {
-
-/* Custom logger macros to provide additional json params. */
-#define LOG_WITH_UID(x, y, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, "\"user_id\":" + std::to_string(y), __VA_ARGS__)
-#define LOG_WITH_CID(x, y, ...)  logger->writeFunc(x, __PRETTY_FUNCTION__, "\"chan_id\":" + std::to_string(y), __VA_ARGS__)
-
 using std::string ;
 using std::vector ;
 using std::map ;
@@ -103,6 +99,11 @@ protected:
 	/* Thread object. */
 	ThreadWorker 	threadWorker ;
 #endif
+
+	/**
+	 * Register log handlers for custom objects.
+	 */
+	void registerLogHandlers() ;
 
 	/*
 	 * Method to pre-load the configTable above with everything thats
@@ -174,11 +175,6 @@ protected:
 
 	glineIterator gline_end()
 	    { return glineList.end() ; }
-
-#ifdef USE_COMMAND_LOG
-	string				commandlogPath;
-	std::ofstream		commandLog;
-#endif
 
 	// Typedef's for user/channel Hashmaps.
 	// User hash, Key is Username.

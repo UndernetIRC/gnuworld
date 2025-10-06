@@ -350,21 +350,18 @@ for( ; counter < st2.size() ; counter++ ) {
 		/* Ban and kick this user */
 		banTarget = Channel::createBan(aNick);
 
-#ifdef LOG_DEBUG
-		elog 	<< "cservice::BANCommand> #" << counter << ": "
-			<< aNick->getNickUserHost()
-			<< " banTarget: "
-			<< banTarget
-			<< endl ;
-#endif
+//		elog 	<< "cservice::BANCommand> #" << counter << ": "
+//			<< aNick->getNickUserHost()
+//			<< " banTarget: "
+//			<< banTarget
+//			<< endl ;
 		}
 	else
 		{
-#ifdef LOG_DEBUG
-		elog	<< "cservice::BANCommand> #" << counter << ": "
-			<< banTarget
-			<< endl ;
-#endif
+//		elog	<< "cservice::BANCommand> #" << counter << ": "
+//			<< banTarget
+//			<< endl ;
+
 		// Validate any eventual cidr range
 		if (!validCIDRLength(st2[counter]))
 			{
@@ -464,12 +461,10 @@ for( ; counter < st2.size() ; counter++ ) {
 			theChan->banList.find( theBan->getID() ) ;
 		if( sqlBanIterator == theChan->banList.end() )
 			{
-			elog	<< "cservice::BANCommand> Unable to find "
-				<< "ban in sqlChannel, id "
-				<< theBan->getID()
-				<< ", mask: "
-				<< theBan->getBanMask()
-				<< endl ;
+			LOG_MSG( WARN, "Unable to find ban (id: {ban_id}, name: {ban_name}) in sqlChannel {chan_name}")
+			.with( "ban", theBan )
+			.with( "chan", theChan )
+			.logStructured() ;
 			}
 		else
 			{
@@ -585,12 +580,10 @@ if (level < 500 &&
 			theChan->banList.find( theBan->getID() ) ;
 		if( sqlBanIterator == theChan->banList.end() )
 			{
-			elog	<< "cservice::BANCommand> Unable to find "
-				<< "ban in sqlChannel, id "
-				<< theBan->getID()
-				<< ", mask: "
-				<< theBan->getBanMask()
-				<< endl ;
+			LOG_MSG( WARN, "Unable to find ban (id: {ban_id}, name: {ban_name}) in sqlChannel {chan_name}")
+			.with( "ban", theBan )
+			.with( "chan", theChan )
+			.logStructured() ;
 			continue ;
 			}
 

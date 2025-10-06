@@ -154,11 +154,10 @@ unsigned int banCount = 0 ;
 
 for( ; counter < st2.size() ; counter++ )
 	{
-#ifdef LOG_DEBUG
-	elog	<< "cservice::UNBANCommand> #" << counter
-		<< ": " << st2[counter]
-		<< endl;
-#endif
+//	elog	<< "cservice::UNBANCommand> #" << counter
+//		<< ": " << st2[counter]
+//		<< endl;
+
 	/*
 	 *  Are they trying to unban by nick or hostmask?
 	 */
@@ -263,12 +262,10 @@ for( ; counter < st2.size() ; counter++ )
 			theChan->banList.find( theBan->getID() ) ;
 		if( sqlBanIterator == theChan->banList.end() )
 			{
-			elog	<< "cservice::UNBAN> Unable to locate sqlBan, "
-				<< "id: "
-				<< theBan->getID()
-				<< "mask: "
-				<< theBan->getBanMask()
-				<< endl ;
+			LOG_MSG( WARN, "Unable to locate sqlBan (id: {ban_id}, mask: {ban_mask}) in sqlChannel {chan_name}")
+			.with( "ban", theBan )
+			.with( "chan", theChan )
+			.logStructured() ;
 			continue ;
 			}
 
