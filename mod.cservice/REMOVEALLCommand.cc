@@ -43,8 +43,6 @@ using std::stringstream ;
 
 bool REMOVEALLCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.REMOVEALL");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

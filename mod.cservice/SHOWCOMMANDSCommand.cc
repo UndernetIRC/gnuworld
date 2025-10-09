@@ -56,8 +56,6 @@ static const char* lvl_oper_cmds = "\002Level Oper\002: ";
 
 bool SHOWCOMMANDSCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SHOWCOMMANDS");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2)
 	{

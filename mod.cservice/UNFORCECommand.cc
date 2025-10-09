@@ -33,8 +33,6 @@ using std::string ;
 
 bool UNFORCECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.UNFORCE");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

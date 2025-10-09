@@ -41,8 +41,6 @@ using std::string ;
 
 bool PARTCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.PART");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

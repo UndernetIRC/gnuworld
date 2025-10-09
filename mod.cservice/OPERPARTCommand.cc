@@ -47,8 +47,6 @@ using std::stringstream ;
 
 bool OPERPARTCommand::Exec( [[maybe_unused]] iClient* theClient, [[maybe_unused]] const string& Message )
 {
-bot->incStat("COMMANDS.OPERPART");
-
 #ifdef USE_OPERPARTJOIN
 
 StringTokenizer st( Message ) ;

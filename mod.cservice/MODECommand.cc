@@ -44,8 +44,6 @@ using std::stringstream ;
 
 bool MODECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat( "COMMANDS.MODE" ) ;
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 || ( st[2][0] != '-' && st[2][0] != '+' ) )
 	{

@@ -43,8 +43,6 @@ using std::map ;
 
 bool SERVNOTICECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SERVNOTICE");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

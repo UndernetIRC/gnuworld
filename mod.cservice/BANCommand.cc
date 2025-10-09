@@ -64,8 +64,6 @@ using namespace level;
 
 bool BANCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.BAN");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

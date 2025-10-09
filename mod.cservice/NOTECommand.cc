@@ -44,8 +44,6 @@ bool NOTECommand::Exec( iClient* theClient, const string& Message )
 	return true;
 #endif
 
-bot->incStat("COMMANDS.NOTE");
-
 /* Is the user authorised? */
 sqlUser* theUser = bot->isAuthed(theClient, false);
 if(!theUser)

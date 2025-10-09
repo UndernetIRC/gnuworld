@@ -55,9 +55,6 @@ struct scanHostData
 
 bool SCANHOSTCommand::Exec( iClient* theClient, const string& Message )
 {
-
-bot->incStat("COMMANDS.SCANHOST");
-
 StringTokenizer st( Message ) ;
 if ((st.size() < 2) || (st.size() == 3))
 {

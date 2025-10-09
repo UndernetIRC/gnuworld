@@ -58,8 +58,6 @@ using namespace level;
 
 bool SETCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SET");
-
 StringTokenizer st( Message ) ;
 
 if( st.size() < 3 )

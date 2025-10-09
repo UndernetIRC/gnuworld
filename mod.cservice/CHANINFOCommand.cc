@@ -65,8 +65,6 @@ typedef vector<SuppData> SuppDataListType;
 
 bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.INFO");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

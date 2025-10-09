@@ -35,8 +35,6 @@ using std::stringstream ;
 
 bool SUPPORTCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SUPPORT");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

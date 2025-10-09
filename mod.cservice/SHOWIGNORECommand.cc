@@ -32,8 +32,6 @@ using std::string ;
 
 bool SHOWIGNORECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SHOWIGNORE");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 1 )
 	{

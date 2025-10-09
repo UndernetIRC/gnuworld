@@ -44,8 +44,6 @@ using namespace level;
 
 bool KICKCommand::Exec( iClient* theClient, const string& Message )
 {
-	bot->incStat("COMMANDS.KICK");
-
 	StringTokenizer st( Message ) ;
 
 	if( st.size() < 3 )

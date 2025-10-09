@@ -31,8 +31,6 @@ using std::string ;
 
 bool VERIFYCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.VERIFY");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

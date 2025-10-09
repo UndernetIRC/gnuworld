@@ -343,7 +343,7 @@ public:
           }
 
         fields[ prefix + "_nick" ] = client->getNickName() ;
-        fields[ prefix + "_userhost" ] = client->getNickUserHost() ;
+        fields[ prefix + "_userhost" ] = client->getRealUserHost() ;
         //fields[ prefix + "_host" ] = client->getInsecureHost() ;
         //fields[ prefix + "_realhost" ] = client->getRealInsecureHost() ;
         fields[ prefix + "_ip" ] = xIP( client->getIP() ).GetNumericIP() ;

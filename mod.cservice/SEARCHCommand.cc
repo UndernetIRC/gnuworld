@@ -51,8 +51,6 @@ static const char* queryFooter =    "ORDER BY channels.name DESC LIMIT 100;";
 
 bool SEARCHCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SEARCH");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

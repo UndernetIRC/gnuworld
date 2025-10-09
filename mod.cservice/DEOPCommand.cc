@@ -42,8 +42,6 @@ using std::map ;
 
 bool DEOPCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.DEOP");
-
 StringTokenizer st( Message ) ;
 
 if( st.size() < 2 )

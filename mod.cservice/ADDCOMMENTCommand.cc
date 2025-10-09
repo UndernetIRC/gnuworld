@@ -33,8 +33,6 @@ using std::string ;
 
 bool ADDCOMMENTCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.ADDCOMMENT");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

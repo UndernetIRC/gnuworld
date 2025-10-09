@@ -33,8 +33,6 @@ using std::string ;
 
 bool ISREGCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.ISREG");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

@@ -56,8 +56,6 @@ using std::string ;
 
 bool OPCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.OP");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

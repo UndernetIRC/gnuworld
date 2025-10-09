@@ -32,8 +32,6 @@ using std::string ;
 
 bool REHASHCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.REHASH");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

@@ -58,8 +58,6 @@ using std::vector ;
 
 bool VOICECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.VOICE");
-
 StringTokenizer st( Message ) ;
 
 if( st.size() < 2 )

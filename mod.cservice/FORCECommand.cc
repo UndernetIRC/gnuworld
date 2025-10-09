@@ -34,8 +34,6 @@ using namespace gnuworld;
 
 bool FORCECommand::Exec( iClient* theClient, const string& Message )
 {
-	bot->incStat("COMMANDS.FORCE");
-
 	StringTokenizer st( Message ) ;
 	if( st.size() < 2 )
 	{

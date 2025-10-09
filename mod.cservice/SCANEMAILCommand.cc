@@ -40,9 +40,6 @@ using std::stringstream ;
 
 bool SCANEMAILCommand::Exec( iClient* theClient, const string& Message )
 {
-
-bot->incStat("COMMANDS.SCANEMAIL");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
         {

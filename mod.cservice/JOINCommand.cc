@@ -39,8 +39,6 @@ using std::string ;
 
 bool JOINCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.JOIN");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

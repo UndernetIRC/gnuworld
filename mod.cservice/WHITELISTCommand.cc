@@ -44,9 +44,6 @@ using std::stringstream ;
 
 bool WHITELISTCommand::Exec( iClient* theClient, const string& Message )
 {
-
-bot->incStat("COMMANDS.WHITELIST");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
         {

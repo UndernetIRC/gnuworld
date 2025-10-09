@@ -54,8 +54,6 @@ static const char* queryHeader = "INSERT INTO levels (channel_id, user_id, acces
 
 bool ADDUSERCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.ADDUSER");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 4 )
 	{
