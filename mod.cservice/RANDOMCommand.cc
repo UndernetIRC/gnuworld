@@ -31,8 +31,6 @@ using std::string ;
 
 bool RANDOMCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.RANDOM");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

@@ -41,8 +41,6 @@ using namespace level;
 
 bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.UNSUSPEND");
-
 StringTokenizer st( Message ) ;
 
 if( st.size() < 2 )

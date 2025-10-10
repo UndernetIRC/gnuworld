@@ -32,8 +32,6 @@ using std::string ;
 
 bool MOTDCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.MOTD");
-
 StringTokenizer st( Message ) ;
 if( st.size() != 1 )
 	{

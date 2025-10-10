@@ -48,8 +48,6 @@ using std::stringstream ;
 
 bool TOPICCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.TOPIC");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

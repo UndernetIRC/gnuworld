@@ -44,8 +44,6 @@ const char validChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0
 
 bool NEWPASSCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.NEWPASS");
-
 #ifndef USE_NEWPASS
 bot->Notice(theClient, "To change your account password, please use the web interface.");
 (void)Message; (void)validChars;

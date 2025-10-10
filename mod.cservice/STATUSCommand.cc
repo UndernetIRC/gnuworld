@@ -39,8 +39,6 @@ using std::stringstream ;
 
 bool STATUSCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.STATUS");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

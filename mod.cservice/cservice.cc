@@ -363,17 +363,27 @@ if( pushoverEnable )
 /* Initiate prometheus. */
 #ifdef HAVE_PROMETHEUS
 if( prometheusEnable )
-  {
-  elog  << "*** [CMaster]: Enabling Prometheus metrics at "
-        << prometheusIP
+	{
+	elog  << "*** [CMaster]: Enabling Prometheus metrics at "
+		<< prometheusIP
 		<< ":"
 		<< prometheusPort
-        << "..."
-        << endl ;
+		<< "..."
+		<< endl ;
 
-  prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
-  logger->addNotifier( prometheus ) ;
-  }
+	try
+		{
+		prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
+		logger->addNotifier( prometheus ) ;
+		}
+	catch( const std::exception& e )
+		{
+		elog << "*** [CMaster]: Unable to start Prometheus on " << prometheusIP << ":" << prometheusPort << endl ;
+		elog << "*** [CMaster]: Prometheus error message: " << e.what() << endl ;
+		prometheus.reset() ;
+		::exit( 0 ) ;
+		}
+	}
 #endif
 
 /* Load our translation tables. */
@@ -873,25 +883,6 @@ if (!secure && ((Command == "LOGIN") || (Command == "NEWPASS") || (Command == "S
 	return ;
 	}
 
-if( commandLog )
-	{
-	std::string jsonMessage ;
-	std::string jsonParams = "\"command\":\"" + Command + "\"" ;
-	/*if( secure )
-		jsonParams += ",\"secure\":true" ;
-	else
-		jsonParams += ",\"secure\":false" ;*/
-
-	if( theClient->isModeR() )
-		jsonParams += ",\"user_id\":" + std::to_string( theClient->getAccountID() ) + ",\"user_name\":\"" + theClient->getAccount() + "\"" ;
-
-	jsonParams += ",\"client_userhost\":\"" + escapeJsonString( theClient->getNickUserHost() ) + "\"" ;
-
-	if( Command != "NEWPASS" && Command != "SUSPENDME" && Command != "LOGIN" && st.size() > 0 )
-		jsonMessage = escapeJsonString( st.assemble( 1 ) ) ;
-
-	logger->writeLog( INFO, "cservice::OnPrivateMessage", jsonParams, jsonMessage ) ;
-	}
 /*
  * If the person issuing this command is an authenticated admin, we need to log
  * it to the admin log for accountability purposes.
@@ -949,8 +940,6 @@ else
 		+ commHandler->second->getFloodPoints() );
 	ipFloodMap[xIP(theClient->getIP()).GetNumericIP(true)] += commHandler->second->getFloodPoints();
 
-	incrementTotalCommands();
-
 	sqlUser* theUser = isAuthed(theClient, false);
 
 	/* Check IP restriction (if admin level) - this is in case you get added as admin AFTER logging in */
@@ -968,31 +957,58 @@ else
 			}
 		}
 	}
-	/* Log command to SQL here, if Admin */
-	if (theUser && getAdminAccessLevel(theUser) && (Command != "LOGIN") && (Command != "NEWPASS") && (Command != "SUSPENDME"))
-	{
-		stringstream theLog;
-		theLog  << "INSERT INTO adminlog (user_id,cmd,args,timestamp,issue_by)"
-			<< " VALUES("
-			<< theUser ->getID()
-			<< ","
-			<< "'" << escapeSQLChars(Command) << "'"
-			<< ","
-			<< "'" << escapeSQLChars(st.assemble(1)) << "'"
-			<< ","
-			<< currentTime()
-			<< ","
-			<< "'" << escapeSQLChars(theClient->getRealNickUserHost()) << "'"
-			<< ")"
-			<< ends;
 
-		if( !SQLDb->Exec(theLog ) )
+	if( commHandler->second->Exec( theClient, Message ) )
 		{
-			LOGSQL_ERROR( SQLDb ) ;
-		}
-	}
+		incrementTotalCommands() ;
+		incStat( "COMMANDS." + Command ) ;
 
-	commHandler->second->Exec( theClient, Message ) ;
+		/* Log command to SQL here, if Admin */
+		if (theUser && getAdminAccessLevel(theUser) && (Command != "LOGIN") && (Command != "NEWPASS") && (Command != "SUSPENDME"))
+		{
+			stringstream theLog;
+			theLog  << "INSERT INTO adminlog (user_id,cmd,args,timestamp,issue_by)"
+				<< " VALUES("
+				<< theUser ->getID()
+				<< ","
+				<< "'" << escapeSQLChars(Command) << "'"
+				<< ","
+				<< "'" << escapeSQLChars(st.assemble(1)) << "'"
+				<< ","
+				<< currentTime()
+				<< ","
+				<< "'" << escapeSQLChars(theClient->getRealNickUserHost()) << "'"
+				<< ")"
+				<< ends;
+
+			if( !SQLDb->Exec(theLog ) )
+			{
+				LOGSQL_ERROR( SQLDb ) ;
+			}
+		}
+
+		/* Log command to logfile here, if command logging enabled */
+		if( commandLog )
+			{
+			std::string jsonMessage ;
+			std::string jsonParams = "\"command\":\"" + Command + "\"" ;
+			/*if( secure )
+				jsonParams += ",\"secure\":true" ;
+			else
+				jsonParams += ",\"secure\":false" ;*/
+
+			if( theClient->isModeR() )
+				jsonParams += ",\"user_id\":" + std::to_string( theClient->getAccountID() ) + ",\"user_name\":\"" + theClient->getAccount() + "\"" ;
+
+			jsonParams += "\"client_nick\":\"" + escapeJsonString( theClient->getNickName() ) + "\",\"client_userhost\":\"" + escapeJsonString( theClient->getRealUserHost() ) + "\"" ;
+
+			jsonMessage = Command ;
+			if( Command != "NEWPASS" && Command != "SUSPENDME" && Command != "LOGIN" && st.size() > 0 )
+				jsonMessage += " " + escapeJsonString( st.assemble( 1 ) ) ;
+
+			logger->writeLog( INFO, "cservice::OnPrivateMessage", jsonParams, jsonMessage ) ;
+			}
+		}
 	}
 
 xClient::OnPrivateMessage( theClient, Message ) ;
@@ -8160,8 +8176,17 @@ loadConfigVariables( true ) ;
 #ifdef HAVE_PROMETHEUS
 if( prometheusEnable && !prometheus )
 	{
-	prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
-	logger->addNotifier( prometheus ) ;
+	try
+		{
+		prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
+		logger->addNotifier( prometheus ) ;
+		}
+	catch( const std::exception& e )
+		{
+		LOG( ERROR, "Unable to start Prometheus on {}:{} - {}",
+			prometheusIP, prometheusPort, e.what() ) ;
+		prometheus.reset() ;
+		}
 	}
 else if( !prometheusEnable && prometheus )
 	{
@@ -8361,7 +8386,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	{
 		if (st.size() < 3)
 		{
-			LOG( ERROR, "XQ-LOGIN insufficient parameters" ) ;
+			LOG( TRACE, "XQ-LOGIN insufficient parameters" ) ;
 			doXResponse(theServer, Routing, locMessage.c_str(), true);
 			return false;
 		}
@@ -8375,7 +8400,7 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	{
 		if (st.size() < 6)
 		{
-			LOG( ERROR, "XQ-LOGIN2 insufficient parameters" ) ;
+			LOG( TRACE, "XQ-LOGIN2 insufficient parameters" ) ;
 			doXResponse(theServer, Routing, locMessage.c_str(), true);
 			return false;
 		}

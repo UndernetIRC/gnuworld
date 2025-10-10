@@ -50,8 +50,6 @@ using namespace level;
 
 bool UNBANCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.UNBAN");
-
 StringTokenizer st( Message ) ;
 
 if( st.size() < 3 )

@@ -41,8 +41,6 @@ using namespace level;
 
 bool SAYCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SAY");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

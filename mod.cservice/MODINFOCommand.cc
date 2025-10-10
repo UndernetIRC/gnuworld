@@ -44,9 +44,6 @@ using std::string ;
 
 bool MODINFOCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.MODINFO");
-
-
 StringTokenizer st( Message ) ;
 if( st.size() < 4 )
 	{

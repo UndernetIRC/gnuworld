@@ -20,8 +20,6 @@ using std::stringstream ;
 bool HELLOCommand::Exec( iClient* theClient, const string& Message )
 {
 #ifdef ALLOW_HELLO
-bot->incStat("COMMANDS.HELLO");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 4 )
 	{

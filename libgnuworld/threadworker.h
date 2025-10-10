@@ -35,11 +35,25 @@ namespace gnuworld
 {
 
 class ThreadWorker {
+private:
+  std::queue< std::function< void() > > jobs ;
+  mutable std::mutex mutex ;
+  std::condition_variable cv ;
+  std::thread worker ;
+  bool stop ;
+
+  /* The bot. */
+  xClient* bot ;
+
+  /* Pointer to the xClient's logger. */
+  Logger* logger ;
+
+  void run() ;
+
 public:
   ThreadWorker( xClient* ) ;
   ~ThreadWorker() ;
 
-  // Submit any callable as a job
   template< typename Callable >
   void submitJob( Callable&& task ) {
     {
@@ -49,20 +63,17 @@ public:
     cv.notify_one() ;
   }
 
-private:
-  std::queue< std::function< void() > > jobs ;
-  std::mutex mutex ;
-  std::condition_variable cv ;
-  std::thread worker ;
-  bool stop ;
+  bool hasPendingJobs() const
+    {
+    std::lock_guard< std::mutex > lock( mutex ) ;
+    return !jobs.empty() ;
+    }
 
-  /* Logger object. */
-  std::unique_ptr< Logger > logger ;
-
-  /* The bot. */
-  [[maybe_unused]] xClient* bot = nullptr ;
-
-  void run() ;
+  size_t getPendingJobCount() const
+    {
+    std::lock_guard< std::mutex > lock( mutex ) ;
+    return jobs.size() ;
+    }
 } ;
 
 } // namespace gnuworld

@@ -49,8 +49,6 @@ using namespace gnuworld;
 
 bool CLEARMODECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.CLEARMODE");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

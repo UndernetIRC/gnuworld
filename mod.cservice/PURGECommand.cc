@@ -47,8 +47,6 @@ using std::stringstream ;
 
 bool PURGECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.PURGE");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 	{

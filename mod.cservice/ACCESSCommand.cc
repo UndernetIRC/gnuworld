@@ -56,8 +56,6 @@ static const char* queryFooter =    "ORDER BY levels.access DESC;";
 
 bool ACCESSCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.ACCESS");
-
 /*
  * This command will build up a custom SQL query and execute it on
  * the 'levels' table.

@@ -32,8 +32,6 @@ using std::string ;
 
 bool QUOTECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.QUOTE");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 1 )
 	{

@@ -37,8 +37,6 @@ using namespace level;
 
 bool SHUTDOWNCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SHUTDOWN");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

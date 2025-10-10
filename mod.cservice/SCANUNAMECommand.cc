@@ -44,9 +44,6 @@ using std::stringstream ;
 
 bool SCANUNAMECommand::Exec( iClient* theClient, const string& Message )
 {
-
-bot->incStat("COMMANDS.SCANUNAME");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
         {

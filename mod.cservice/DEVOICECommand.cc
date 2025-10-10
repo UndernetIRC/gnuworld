@@ -45,8 +45,6 @@ using namespace gnuworld;
 
 bool DEVOICECommand::Exec( iClient* theClient, const string& Message )
 {
-	bot->incStat("COMMANDS.DEVOICE");
-
 	vector< iClient* > devoiceList; // List of clients to devoice.
 	StringTokenizer st( Message ) ;
 

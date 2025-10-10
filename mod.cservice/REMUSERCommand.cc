@@ -49,8 +49,6 @@ using std::stringstream ;
 
 bool REMUSERCommand::Exec( iClient* theClient, const string& Message )
 {
-	bot->incStat("COMMANDS.REMUSER");
-
 	StringTokenizer st( Message ) ;
 	if( st.size() < 3 )
 	{

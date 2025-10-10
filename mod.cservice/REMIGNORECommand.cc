@@ -39,8 +39,6 @@ using std::stringstream ;
 
 bool REMIGNORECommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.REMIGNORE");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 2 )
 	{

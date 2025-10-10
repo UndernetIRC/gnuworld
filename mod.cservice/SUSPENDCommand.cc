@@ -41,8 +41,6 @@ using namespace level;
 
 bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.SUSPEND");
-
 StringTokenizer st( Message ) ;
 if( st.size() < 3 )
 {

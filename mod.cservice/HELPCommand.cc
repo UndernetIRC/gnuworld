@@ -37,7 +37,6 @@ using namespace gnuworld;
 
 bool HELPCommand::Exec( iClient* theClient, const string& Message )
 {
-	bot->incStat("COMMANDS.HELP");
 	StringTokenizer st( Message ) ;
 
 	string topic = "" ;

@@ -43,7 +43,6 @@ using namespace gnuworld;
 
 bool INVITECommand::Exec( iClient* theClient, const string& Message )
 {
-	bot->incStat("COMMANDS.INVITE");
 	StringTokenizer st( Message ) ;
 	if( st.size() < 2 )
 	{

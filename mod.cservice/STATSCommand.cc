@@ -32,7 +32,6 @@ using std::string ;
 
 bool STATSCommand::Exec( iClient* theClient, const string& Message )
 {
-bot->incStat("COMMANDS.STATS");
 StringTokenizer st( Message ) ;
 
 sqlUser* theUser = bot->isAuthed(theClient, false);

@@ -49,8 +49,6 @@ using namespace gnuworld;
 
 bool REGISTERCommand::Exec( iClient* theClient, const string& Message )
 {
-	bot->incStat("COMMANDS.REGISTER");
-
 	bool instantReg = false;
 
 	if (bot->getConfRequiredSupporters() == 0)
