@@ -67,7 +67,7 @@ while( true )
     }
   catch( ... )
     {
-    LOG( ERROR, "ThreadWorker: Unknown exception in job execution" ) ;
+    LOG( ERROR, "Unknown exception in job execution" ) ;
     }
   }
 }

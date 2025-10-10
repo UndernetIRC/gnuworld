@@ -363,17 +363,27 @@ if( pushoverEnable )
 /* Initiate prometheus. */
 #ifdef HAVE_PROMETHEUS
 if( prometheusEnable )
-  {
-  elog  << "*** [CMaster]: Enabling Prometheus metrics at "
-        << prometheusIP
+	{
+	elog  << "*** [CMaster]: Enabling Prometheus metrics at "
+		<< prometheusIP
 		<< ":"
 		<< prometheusPort
-        << "..."
-        << endl ;
+		<< "..."
+		<< endl ;
 
-  prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
-  logger->addNotifier( prometheus ) ;
-  }
+	try
+		{
+		prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
+		logger->addNotifier( prometheus ) ;
+		}
+	catch( const std::exception& e )
+		{
+		elog << "*** [CMaster]: Unable to start Prometheus on " << prometheusIP << ":" << prometheusPort << endl ;
+		elog << "*** [CMaster]: Prometheus error message: " << e.what() << endl ;
+		prometheus.reset() ;
+		::exit( 0 ) ;
+		}
+	}
 #endif
 
 /* Load our translation tables. */
@@ -8166,8 +8176,17 @@ loadConfigVariables( true ) ;
 #ifdef HAVE_PROMETHEUS
 if( prometheusEnable && !prometheus )
 	{
-	prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
-	logger->addNotifier( prometheus ) ;
+	try
+		{
+		prometheus = std::make_shared< PrometheusClient >( this, prometheusIP, prometheusPort ) ;
+		logger->addNotifier( prometheus ) ;
+		}
+	catch( const std::exception& e )
+		{
+		LOG( ERROR, "Unable to start Prometheus on {}:{} - {}",
+			prometheusIP, prometheusPort, e.what() ) ;
+		prometheus.reset() ;
+		}
 	}
 else if( !prometheusEnable && prometheus )
 	{

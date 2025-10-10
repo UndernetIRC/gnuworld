@@ -43,10 +43,10 @@ private:
   bool stop ;
 
   /* The bot. */
-  [[maybe_unused]] xClient* bot = nullptr ;
+  xClient* bot ;
 
   /* Pointer to the xClient's logger. */
-  Logger* logger = nullptr ;
+  Logger* logger ;
 
   void run() ;
 
