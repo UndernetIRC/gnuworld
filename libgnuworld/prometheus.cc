@@ -42,10 +42,23 @@ PrometheusClient::PrometheusClient( xClient* _bot, const std::string& ip, unsign
   exposer_.RegisterCollectable( registry_ ) ;
   
   // Set startup timestamp - monitoring tools can calculate uptime from this
-  setGauge( "gnuworld_start_time_seconds", static_cast< double >( ::time( nullptr ) ) ) ;
+  setGauge( "start_time", static_cast< double >( ::time( nullptr ) ) ) ;
   
-  elog << "PrometheusClient: Metrics server started on " << ip << ":" << port << std::endl ;
-  elog << "PrometheusClient: Metrics available at http://" << ip << ":" << port << "/metrics" << std::endl ;
+  elog << "*** [PrometheusClient]: Metrics server started on " << ip << ":" << port << std::endl ;
+  elog << "*** [PrometheusClient]: Metrics available at http://" << ip << ":" << port << "/metrics" << std::endl ;
+}
+
+std::string PrometheusClient::sanitizeMetricName( const std::string& name )
+{
+std::string sanitized = bot->getNickName() + "_" + name ;
+std::transform( sanitized.begin(), sanitized.end(), sanitized.begin(), ::tolower ) ;
+
+/* Replace invalid characters with underscores. */
+for( auto& c : sanitized )
+  if( !std::isalnum(c) && c != '_' && c != ':' )
+    c = '_' ;
+
+return sanitized ;
 }
 
 void PrometheusClient::incrementCounter( const std::string& counterName )
@@ -142,13 +155,13 @@ bool PrometheusClient::sendMessage( int level, const std::string )
   std::string levelName = string_lower( Logger::levels[ static_cast< Verbosity >( level ) ].name ) ;
   
   // Increment counter for this specific log level
-  incrementCounter( "gnuworld_log_" + levelName + "_total" );
+  incrementCounter( "log_" + levelName + "_total" ) ;
   
   // Also increment general log counter
-  incrementCounter( "gnuworld_log_messages_total" );
-  
-  ++statSuccessful;
-  return true;
+  incrementCounter( "log_messages_total" ) ;
+
+  ++statSuccessful ;
+  return true ;
 }
 
 #else
