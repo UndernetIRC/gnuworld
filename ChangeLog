@@ -1,5 +1,448 @@
 // $Id: ChangeLog,v 1.173 2010/04/10 18:56:06 danielaustin Exp $ //
 
+2025-10-17  MrIron
+		* mod.cservice/cservice.cc: Fixed channel loading query to use
+			LEFT JOIN with pending table, preventing errors when pending
+			entries are cleaned up. Added check to skip channels with no
+			manager assigned during database updates. Updated Prometheus
+			metric names to remove redundant prefix. Fixed welcome topic
+			logic to only apply during The Judge registration, not via REGISTER
+			command.
+		* libgnuworld/prometheus.cc:
+		* libgnuworld/prometheus.h: Prometheus metric name improvements.
+
+2025-10-10  MrIron
+		* doc/README.logger (new file): Documentation for logger engine.
+		* libgnuworld/logger.cc (new file):
+		* libgnuworld/logger.h (new file):
+		* libgnuworld/notifier.h (new file):
+		* libgnuworld/pushover.cc (new file):
+		* libgnuworld/pushover.h (new file):
+		* libgnuworld/threadworker.cc (new file):
+		* libgnuworld/threadworker.h (new file):
+		* libgnuworld/prometheus.cc (new file):
+		* libgnuworld/prometheus.h (new file): Added comprehensive logging,
+			monitoring, and notification infrastructure to core. Logger engine
+			initialised for each xClient with configurable verbosity levels to
+			post messages to debug channel and elog. JSON logging capability
+			with support for passing core objects to extract info. Notifier
+			base class with Pushover implementation - notifiers can be added
+			to Logger engine with configurable verbosity levels. Threadworker
+			engine for asynchronous job processing (currently used by pushover).
+			Prometheus metrics support for monitoring and statistics collection.
+			Support for external log rotation (SIGHUP).
+		* include/Channel.h:
+		* include/client.h:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/client.cc: Thread safe access to iClient and Channel objects
+			for threadworker.
+		* db/dbHandle.h:
+		* db/pgsqlDB.cc:
+		* db/pgsqlDB.h: psql engine tied into Logger to output queries for
+			debug purposes (enable with logger->setlogSQL(true)).
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h: JSON helper functions and password redacting
+			functionality.
+		* bin/cservice.example.conf:
+		* mod.cservice/*Command.cc:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice_config.h:
+		* mod.cservice/cservice_confvars.h (new file): Integration with
+			Logger, Pushover, and Prometheus. Only log and increase stats
+			for successful commands. Removed unnecessary query logging,
+			fixed proper query error logging. Redacting sensitive information
+			from logs. Config variables singled out to cservice_confvars.h.
+			Clean-up in module header.
+		* Makefile.in:
+		* configure:
+		* configure.ac: Updated build system for new dependencies (libcurl
+			via pkgconf). Conditional compilation for systems without <format>.
+
+2025-09-12  MrIron
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice_config.h: Fix command log. Redact sensitive
+			information.
+
+2025-05-27  MrIron
+		* mod.cloner/cloner.cc: Simplifications to mod.cloner, and use of
+			new config parser.
+
+2025-04-30  MrIron
+		* mod.cloner/cloner.cc:
+		* mod.cloner/cloner.h:
+		* src/server.cc: Memory cleanup in core and mod.cloner.
+
+2025-04-22  MrIron
+		* libgnuworld/EConfig.cc:
+		* libgnuworld/EConfig.h: Added TryRequire intended for rehashes to
+			retain current value and return error. Parse config to correct
+			type safely.
+
+2025-04-21  MrIron
+		* libgnuworld/misc.cc: Make prettyNumber safe when en_US.UTF-8 is
+			not installed on the system. Thanks to naka for spotting this.
+
+2025-04-18  MrIron
+		* mod.cloner/cloner.cc: Added quit command. Fixed iteration bug in
+			quitClones.
+
+2025-04-17  MrIron
+		* mod.cservice/cservice.cc: Trigger sendAccountFlags on indirect
+			net merge.
+
+2025-04-11  MrIron
+		* db/gnuworldDB.h:
+		* db/pgsqlDB.cc:
+		* db/pgsqlDB.h:
+		* mod.cloner/cloner.cc: Added affectedRows() to psql engine.
+
+2025-04-08  MrIron
+		* mod.cloner/cloner.cc:
+		* mod.cloner/cloner.h: Added new cycle feature. Parse correct
+			base64 for ip hosts.
+
+2025-01-21  MrIron
+		* include/gnuworld_config.h:
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h:
+		* mod.ccontrol/TOPICCommand.cc:
+		* mod.cservice/cservice.cc:
+		* mod.openchanfix/STATUSCommand.cc:
+		* mod.openchanfix/chanfix.cc: Added rusage to mod.cservice.
+			Function included in libgnuworld, and removed code repetition.
+
+2025-01-15  MrIron
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h:
+		* mod.cservice/SETCommand.cc:
+		* mod.cservice/cservice.cc: Don't burst +l when FLOATLIM is ON.
+
+2025-01-11  MrIron
+		* mod.cservice/cservice.cc: Make ISUSER case insensitive.
+
+2025-01-09  MrIron
+		* include/events.h:
+		* include/gnuworld_config.h:
+		* include/iClient.h:
+		* include/server.h:
+		* libircu/msg_AC.cc:
+		* libircu/msg_N.cc:
+		* mod.ccontrol/TOPICCommand.cc:
+		* mod.ccontrol/WHOISCommand.cc:
+		* mod.ccontrol/ccontrol.cc:
+		* mod.cloner/cloner.cc:
+		* mod.cservice/MODINFOCommand.cc:
+		* mod.cservice/SUSPENDCommand.cc:
+		* mod.cservice/SUSPENDMECommand.cc:
+		* mod.cservice/TOPICCommand.cc:
+		* mod.cservice/UNSUSPENDCommand.cc:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h:
+		* mod.cservice/cservice_config.h:
+		* mod.dronescan/FAKECommand.cc:
+		* mod.gnutest/gnutest.cc:
+		* mod.nickserv/nickserv.cc:
+		* mod.snoop/snoop.cc:
+		* src/iClient.cc:
+		* src/server.cc: Initial implementation of account flags (AC
+			message parsing). Misc minor fixes. Disabled USE_AC_XFLAGS
+			per default.
+
+2025-01-08  MrIron
+		* mod.cservice/cservice.h: Added missing header required by
+			certain compiler versions.
+
+2025-01-07  MrIron
+		* libgnuworld/misc.h:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h:
+		* mod.cservice/sqlUser.cc:
+		* mod.cservice/sqlUser.h: Refactored ISUSER XQuery to return
+			bitflags. Added timepoint functions to libgnuworld.
+
+2025-01-03  MrIron
+		* mod.cservice/cservice.cc: Fix to lookup of usernames in ISUSER.
+			Added TOTP flag to response.
+
+2024-12-22  MrIron
+		* include/Network.h:
+		* src/server.cc: XQuery and XReply do PostEvent instead of sending
+			to socket if destined to itself (multiple modules).
+		* mod.cservice/PURGECommand.cc:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h: New ISUSER and ISCHAN handlers, and
+			sends REMUSER when expiring usernames.
+
+2024-12-02  MrIron
+		* libircu/msg_T.cc: Added support for bursting of topic nick in P10.
+
+2024-10-23  MrIron
+		* include/Channel.h: Returning userList container to allow for
+			range-based loops.
+
+2024-10-22  MrIron
+		* doc/cmaster/cservice_langdump.sh (new file): Added language dump
+			script.
+		* mod.cservice/CLEARMODECommand.cc: Added mode cC to cservice::CLEARMODE.
+
+2024-10-10  MrIron
+		* mod.cservice/UNBANCommand.cc: Don't send bans_removed response if
+			the nick is not online.
+
+2024-10-09  MrIron
+		* mod.cservice/HELPCommand.cc: Shows default HELP message if no
+			command is specified.
+
+2024-09-30  MrIron
+		* libgnuworld/misc.cc: Fix escaping.
+
+2024-09-26  MrIron
+		* include/Network.h:
+		* include/iClient.h:
+		* src/client.cc: Made available core containers to allow for
+			range-based for loops.
+		* mod.cservice/cservice.cc: Fixed checks in cservice::expireBans.
+		* mod.ccontrol/HELPCommand.cc:
+		* mod.cservice/SHOWIGNORECommand.cc:
+		* mod.cservice/cservice.h: Clean-up in derived Notice functions.
+
+2024-08-31  MrIron
+		* configure:
+		* configure.ac:
+		* include/server.h:
+		* src/Network.cc:
+		* src/server.cc: Fixed compiler warnings.
+		* mod.cservice/STATUSCommand.cc: Improved STATUS output of flags.
+		* mod.cservice/UNBANCommand.cc: Initialise bancounter.
+
+2024-08-21  MrIron
+		* doc/update_help_modes_20240525.sql: Added updates to Werewolf
+			and GOT translation languages.
+		* mod.stats/stats.cc:
+		* mod.stats/stats.h: Fix after adding EVT_BURST caused it to break.
+
+2024-08-20  MrIron
+		* mod.cservice/DEOPCommand.cc:
+		* mod.cservice/DEVOICECommand.cc:
+		* mod.cservice/OPCommand.cc:
+		* mod.cservice/VOICECommand.cc:
+		* mod.cservice/SCANHOSTCommand.cc:
+		* mod.cservice/cservice.cc:
+		* src/main.cc: Various fixes.
+
+2024-08-18  MrIron
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h: Added function to parse an epoch timestamp
+			adjusted for a timezone, and a function to validate a suggested
+			timezone. prettyTime() replaces tsToDateTime() which returned
+			a string based on gnuworlds localtime.
+		* mod.ccontrol/LIMITSCommand.cc:
+		* mod.ccontrol/MODUSERCommand.cc:
+		* mod.ccontrol/NOMODECommand.cc:
+		* mod.ccontrol/REMCOMMANDCommand.cc:
+		* mod.ccontrol/REMGCHANCommand.cc:
+		* mod.ccontrol/REMSERVERCommand.cc:
+		* mod.ccontrol/REMUSERCommand.cc:
+		* mod.ccontrol/SGLINECommand.cc:
+		* mod.ccontrol/SUSPENDCommand.cc:
+		* mod.ccontrol/UNSUSPENDCommand.cc:
+		* mod.ccontrol/ccUser.cc:
+		* mod.ccontrol/ccontrol.cc: Removed SQL escaping for gnuworld
+			getters and setters, and added SQL escaping on SQL queries only.
+		* mod.openchanfix/CANFIXCommand.cc:
+		* mod.openchanfix/HISTORYCommand.cc:
+		* mod.openchanfix/INFOCommand.cc:
+		* mod.openchanfix/OPLISTCommand.cc:
+		* mod.openchanfix/SIMULATECommand.cc:
+		* mod.openchanfix/USERSCORESCommand.cc:
+		* mod.openchanfix/chanfix.cc: Moved to use prettyTime() instead
+			of tsToDateTime().
+
+2024-08-14  MrIron
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h: Included escapeSQLChars and searchSQL
+			functions in libgnuworld/misc.cc and removed duplicate functions
+			in modules.
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h: Fetch Db time prior to loading cache
+			(which depends on the server time (currentTime())).
+		* mod.ccontrol/LIMITSCommand.cc:
+		* mod.ccontrol/MODUSERCommand.cc:
+		* mod.ccontrol/NOMODECommand.cc:
+		* mod.ccontrol/REMCOMMANDCommand.cc:
+		* mod.ccontrol/REMGCHANCommand.cc:
+		* mod.ccontrol/REMSERVERCommand.cc:
+		* mod.ccontrol/REMUSERCommand.cc:
+		* mod.ccontrol/SGLINECommand.cc:
+		* mod.ccontrol/SUSPENDCommand.cc:
+		* mod.ccontrol/UNSUSPENDCommand.cc:
+		* mod.ccontrol/ccBadChannel.cc:
+		* mod.ccontrol/ccException.cc:
+		* mod.ccontrol/ccGline.cc:
+		* mod.ccontrol/ccServer.cc:
+		* mod.ccontrol/ccUser.cc:
+		* mod.ccontrol/ccontrol.cc:
+		* mod.ccontrol/ccontrol.h:
+		* mod.openchanfix/chanfix.cc:
+		* mod.openchanfix/chanfix.h: Implemented use of escapeSQLChars().
+		* configure:
+		* configure.ac: Locate liboath in additional include-folder.
+		* mod.dronescan/dronescan.cc:
+		* mod.dronescan/sqlFakeClient.cc:
+		* mod.dronescan/sqlUser.cc: Implemented use of escapeSQLChars()
+			in mod.dronescan.
+
+2024-08-14  MrIron
+		* Makefile.in:
+		* configure:
+		* configure.ac: Bumped up to C++-20. Configure checks for liboath
+			when mod.cservice is built, since TOTP is enabled per default.
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h: Added to libgnuworld methods for formatting
+			strings (vformat), calculating elapsed milliseconds and
+			displaying time.
+		* m4/ax_cxx_compile_stdcxx.m4:
+		* m4/ax_cxx_compile_stdcxx_11.m4: Updated C++ standard check macros.
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice_config.h:
+		* mod.dronescan/ACCESSCommand.cc: Fixed warnings.
+
+2024-08-11  MrIron
+		* include/gnuworld_config.h: Define maximum channel key length.
+		* mod.cservice/MODECommand.cc:
+		* mod.cservice/responses.h:
+		* doc/update_help_modes_20240525.sql: Check for length of channel
+			key and added translation responses.
+
+2024-08-10  MrIron
+		* mod.snoop/snoop.cc: Small fix to mod.snoop after changes to core.
+
+2024-08-05  MrIron
+		* doc/cservice.sql: Updated channels schema to include JOINLIM
+			columns.
+
+2024-08-04  MrIron
+		* include/events.h: Added EVT_BURST event.
+		* libircu/msg_B.cc:
+		* src/server.cc: gnuworld will use the correct of EVT_JOIN,
+			EVT_CREATE and EVT_BURST when joining channels. Separate event
+			handler for channel joins during a net merge.
+		* mod.ccontrol/ccontrol.cc:
+		* mod.cservice/cservice.cc:
+		* mod.dronescan/dronescan.cc:
+		* mod.gnutest/gnutest.cc:
+		* mod.nickserv/nickserv.cc:
+		* mod.openchanfix/chanfix.cc: Updated modules to handle EVT_BURST.
+
+2024-08-03  MrIron
+		* bin/cservice.example.conf:
+		* doc/update.channels_joinlim_202408.sql:
+		* doc/update_help_modes_20240525.sql:
+		* include/Channel.h:
+		* libircu/msg_B.cc:
+		* libircu/msg_M.cc:
+		* mod.cservice/MODECommand.cc:
+		* mod.cservice/SETCommand.cc:
+		* mod.cservice/STATUSCommand.cc:
+		* mod.cservice/constants.h:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h:
+		* mod.cservice/levels.h:
+		* mod.cservice/responses.h:
+		* mod.cservice/sqlChannel.cc:
+		* mod.cservice/sqlChannel.h:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/client.cc:
+		* src/iClient.cc:
+		* src/server.cc: JOINLIM feature to mod.cservice written by Telac.
+			Updated translations to BAN and UNBAN responses. Additional
+			initialisation warning fixes. Changed chanmode +P to +u as per
+			ircu (userLeavesDisabled).
+
+2024-08-01  MrIron
+		* bin/cloner.example.conf:
+		* mod.cloner/cloner.cc:
+		* mod.cloner/cloner.h:
+		* src/server.cc: Enhancements to mod.cloner. Minor fix to bursting
+			of clones.
+		* mod.ccontrol/ccUser.cc:
+		* mod.ccontrol/ccontrol.cc:
+		* mod.cservice/cservice.cc: Handle warnings regarding uninitialised
+			values.
+
+2024-07-28  MrIron
+		* include/client.h:
+		* src/client.cc: Handle bans and unbans by vectors in client.cc to
+			minimise duplication.
+		* libgnuworld/misc.cc:
+		* libgnuworld/misc.h: Added formatting of numbers.
+		* mod.cservice/BANCommand.cc:
+		* mod.cservice/UNBANCommand.cc:
+		* mod.cservice/cservice.cc:
+		* doc/update_help_modes_20240525.sql: Updated response in UNBAN
+			command to include internal and channel bans.
+
+2024-07-27  MrIron
+		* mod.cservice/BANCommand.cc:
+		* mod.cservice/cservice.cc: Stacking of expired bans.
+
+2024-07-24  MrIron
+		* include/iClient.h:
+		* src/iClient.cc:
+		* mod.ccontrol/WHOISCommand.cc: Recording the first NickTS for all
+			clients.
+
+2024-07-20  MrIron
+		* include/server.h:
+		* src/server.cc: Server notice function.
+		* include/Network.h:
+		* include/client.h:
+		* include/gnuworld_config.h:
+		* include/iClient.h:
+		* libircu/msg_N.cc:
+		* mod.ccontrol/WHOISCommand.cc:
+		* mod.ccontrol/ccontrol.cc:
+		* src/Network.cc:
+		* src/client.cc:
+		* src/iClient.cc:
+		* src/server.cc: Fixed syntax for msg_D (kill). Aligned gnuworld's
+			iClient timestamp with ircu (nickname timestamp).
+
+2024-07-05  MrIron
+		* README-NEW-Features.txt:
+		* doc/update_help_modes_20240525.sql:
+		* db/pgsqlDB.cc: Fix that caused gnuworld to core if losing
+			connection with the Db.
+		* include/Channel.h:
+		* include/gnuworld_config.h:
+		* libircu/msg_B.cc:
+		* libircu/msg_M.cc:
+		* src/Channel.cc:
+		* src/Network.cc:
+		* src/client.cc:
+		* src/server.cc: Support for chanmodes +M, +P. Parsing of userID
+			for LoC's (Levels on Channels).
+		* mod.cservice/Makefile.am:
+		* mod.cservice/BANCommand.cc:
+		* mod.cservice/KICKCommand.cc:
+		* mod.cservice/MODECommand.cc (new file):
+		* mod.cservice/PURGECommand.cc:
+		* mod.cservice/SHOWCOMMANDSCommand.cc:
+		* mod.cservice/STATSCommand.cc:
+		* mod.cservice/STATUSCommand.cc:
+		* mod.cservice/UNBANCommand.cc:
+		* mod.cservice/cservice.cc:
+		* mod.cservice/cservice.h:
+		* mod.cservice/cserviceCommands.h:
+		* mod.cservice/cservice_config.h:
+		* mod.cservice/levels.h: New MODE command for mod.cservice. Support
+			for several kicks in mod.cservice's KICK command. Stacking of
+			bans and unbans in mod.cservice's BAN and UNBAN command.
+			Properly remove purged channels from cache.
+
 2010-04-10	Dan-m00 <daniel@undernet.org>
 		* mod.cservice/ADDUSERCommand.cc:
 		* mod.cservice/MODINFOCommand.cc:

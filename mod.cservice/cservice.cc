@@ -3015,37 +3015,17 @@ stringstream theQuery ;
 
 theQuery	<< "SELECT "
 			<< sql::channel_fields
-			<< ",pending.manager_id,date_part('epoch', CURRENT_TIMESTAMP)::int as db_unixtime FROM "
-			<< "channels,pending WHERE channels.last_updated >= "
+			<< ",pending.manager_id as mngr_id,date_part('epoch', CURRENT_TIMESTAMP)::int as db_unixtime FROM "
+			<< "channels LEFT JOIN pending ON channels.id = pending.channel_id " 
+			<< "WHERE channels.last_updated >= "
 			<< lastChannelRefresh
-			<< " AND registered_ts <> 0"
-			<< " AND id = channel_id"
-			<< ends;
+			<< " AND channels.registered_ts <> 0" ;
 
-if( !SQLDb->Exec(theQuery, true ) )
+if( !SQLDb->Exec( theQuery, true ) )
 	{
 	LOGSQL_ERROR( SQLDb ) ;
 	return;
 	}
-
-// Query updates for channels which has no corresponding data in pending table (it has been cleaned up)
-if (SQLDb->Tuples() <= 0)
-{
-	theQuery.str("");
-	theQuery	<< "SELECT "
-				<< sql::channel_fields
-				<< ",date_part('epoch', CURRENT_TIMESTAMP)::int as db_unixtime FROM "
-				<< "channels WHERE channels.last_updated >= "
-				<< lastChannelRefresh
-				<< " AND registered_ts <> 0"
-				<< ends;
-
-	if( !SQLDb->Exec(theQuery, true ) )
-		{
-		LOGSQL_ERROR( SQLDb ) ;
-		return;
-		}
-}
 
 if (SQLDb->Tuples() <= 0)
 	{
@@ -3078,14 +3058,22 @@ for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
 		/*
 		 * Not in the cache.. must be a new channel.
 		 */
+		unsigned int mngr_id = (unsigned int)atoi(SQLDb->GetValue(i, "mngr_id"));
+		if( mngr_id == 0 )
+			{
+			LOG_MSG( ERROR, "Channel {chan_name} has no manager assigned, skipping for now." )
+			.with( "chan_name", SQLDb->GetValue(i, 1) )
+			.logStructured() ;
+			continue;
+			}
 
 		newChanData* newChan = new (std::nothrow) newChanData;
 		newChan->chanName = SQLDb->GetValue(i, 1);
-		newChan->mngr_userId = (unsigned int)atoi(SQLDb->GetValue(i, 25).c_str());
+		newChan->mngr_userId = mngr_id;
 		newChanList.push_back(newChan);
 
-		LOG_MSG( INFO, "[DB-UPDATE]: Found new channel: {chan}" )
-		.with( "chan", newChan->chanName )
+		LOG_MSG( INFO, "[DB-UPDATE]: Found new channel: {chan_name}" )
+		.with( "chan_name", newChan->chanName )
 		.logStructured() ;
 		newchans++;
 	}
@@ -3095,8 +3083,10 @@ if (!newChanList.empty())
 	for (vector<newChanData*>::iterator itr = newChanList.begin(); itr != newChanList.end(); itr++)
 	{
 		sqlUser* mngrUser = getUserRecord((*itr)->mngr_userId);
-		if (!sqlRegisterChannel(getInstance(), mngrUser, (*itr)->chanName.c_str()))
-			LOG( ERROR, "FAILED to sqlRegisterChannel" ) ;
+		if (!sqlRegisterChannel(getInstance(), mngrUser, (*itr)->chanName))
+			LOG_MSG( ERROR, "FAILED to sqlRegisterChannel for {chan_name} with manager {}", (*itr)->mngr_userId )
+			.with( "chan_name", (*itr)->chanName )
+			.logStructured() ;
 	}
 	newChanList.clear();
 }
@@ -3535,8 +3525,8 @@ void cservice::updatePrometheusMetrics()
 	if( !prometheus)  return ;
 
 	/* Update the prometheus metrics */
-	prometheus->setGauge( "gnuworld_memory_usage_bytes", getMemoryUsage() ) ;
-	prometheus->setGauge( "gnuworld_cpu_usage_seconds", getCPUTime() ) ;
+	prometheus->setGauge( "memory_usage", getMemoryUsage() ) ;
+	prometheus->setGauge( "cpu_usage", getCPUTime() ) ;
 	prometheus->setGauge( "irc_clients", Network->clientList_size() ) ;
 	prometheus->setGauge( "irc_channels", Network->channelList_size() ) ;
 	prometheus->setGauge( "irc_servers", Network->serverList_size() ) ;
@@ -4090,10 +4080,9 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
 	if (!welcomeNewChanMessage.empty())
 		Notice(newChan->getName(), TokenStringsParams(welcomeNewChanMessage.c_str(), newChan->getName().c_str()).c_str());
 
-	//Set a welcome topic of the new channel, only if the actual topic is empty
+	//Set a welcome topic of the new channel, only if the actual topic is empty and the channel has not been registered with the register command
 #ifdef TOPIC_TRACK
-	if (!welcomeNewChanTopic.empty())
-	if (tmpChan && tmpChan->getTopic().empty())
+	if (tmpChan && tmpChan->getTopic().empty() && !welcomeNewChanTopic.empty() && theClient == getInstance())
 		Topic(tmpChan, welcomeNewChanTopic);
 #endif
 
