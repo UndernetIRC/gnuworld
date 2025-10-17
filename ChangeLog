@@ -1,6 +1,18 @@
 // $Id: ChangeLog,v 1.173 2010/04/10 18:56:06 danielaustin Exp $ //
 
 2025-10-17  MrIron
+		* src/main.cc:
+		* include/server.h:
+		* include/gnuworld_config.h: Refactored command-line argument parsing.
+			Moved parsing from xServer constructor to main() for cleaner design.
+			Forking into background is now default behavior unless -c (verbose)
+			flag is specified. Removed DAEMON compile-time define from
+			gnuworld_config.h. Removed obsolete dupArray/releaseDup functions.
+			xServer constructor now takes parsed configuration parameters
+			instead of argc/argv. Moved GNU banner display to after forking
+			so it's shown by the actual running process.
+		* src/server_connection.cc: Fixed socket logging to flush after each
+			write, preventing empty socket.log file when running in daemon mode.
 		* mod.cservice/cservice.cc: Fixed channel loading query to use
 			LEFT JOIN with pending table, preventing errors when pending
 			entries are cleaned up. Added check to skip channels with no
