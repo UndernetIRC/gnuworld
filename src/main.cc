@@ -105,42 +105,8 @@ clog	<< "see the files named COPYING." << endl ;
 clog	<< endl ;
 }
 
-// These functions are used to duplicate/free
-// argv for reconnection of the server.
-// For some reason gcc 3.3 won't let me declare
-// argv as const char**
-char** dupArray( int argc, char** argv )
-{
-assert( argc >= 1 ) ;
-
-// Put a trailing NULL as the last element of the array
-char** retMe = new char*[ argc + 1 ] ;
-for( int i = 0 ; i < argc ; ++i )
-	{
-	retMe[ i ] = new char[ strlen( argv[ i ] ) + 1 ] ;
-	strcpy( retMe[ i ], argv[ i ] ) ;
-	}
-retMe[ argc ] = 0 ;
-return retMe ;
-}
-
-void releaseDup( int argc, char** releaseMe )
-{
-assert( argc >= 1 ) ;
-assert( releaseMe != 0 ) ;
-
-for( int i = 0 ; i < argc ; ++i )
-	{
-	delete[] releaseMe[ i ] ;
-	}
-delete[] releaseMe ;
-}
-
 int main( int argc, char** argv )
 {
-// output gnu information
-gnu() ;
-
 // This is done to intialize the hasher
 md5 dummy ;
 
@@ -156,54 +122,112 @@ if( 0 == Signal::getInstance() )
 // Seed the random number generator
 ::srand( ::time( 0 ) ) ;
 
-#ifdef DAEMON
-	/* fork into background here */
-	if (fork())
+/* Parse command line arguments */
+bool verbose = false ;
+bool doDebug = true ;
+bool logSocket = true ;
+std::string elogFileName = "debug.log" ;
+std::string socketFileName = "socket.log" ;
+std::string configFileName = CONFFILE ;
+std::string simFileName ;
+
+int c ;
+while( ( c = getopt( argc, argv, "cd:Df:l:Lhs:" ) ) != -1 )
 	{
-		fprintf(stdout, "%s: forked into background\n", argv[0]);
-		exit(0);
+	switch( c )
+		{
+		case 'c':
+			verbose = true ;
+			break ;
+		case 'd':
+			doDebug = true ;
+			elogFileName = optarg ;
+			break ;
+		case 'D':
+			doDebug = false ;
+			break ;
+		case 'f':
+			configFileName = optarg ;
+			break ;
+		case 'h':
+			usage( argv[ 0 ] ) ;
+			::exit( 0 ) ;
+		case 'l':
+			logSocket = true ;
+			socketFileName = optarg ;
+			break ;
+		case 'L':
+			logSocket = false ;
+			break ;
+		case 's':
+			simFileName = optarg ;
+			clog << "*** Running in simulation mode..." << endl ;
+			break ;
+		case ':':
+			clog << "*** Missing parameter\n" ;
+			usage( argv[ 0 ] ) ;
+			::exit( 0 ) ;
+		case '?':
+			// Unrecognized option
+			usage( argv[ 0 ] ) ;
+			::exit( 0 ) ;
+		default:
+			clog << "Unknown option " << static_cast<char>(c) << endl ;
+			usage( argv[ 0 ] ) ;
+			::exit( 0 ) ;
+		}
 	}
-	setsid();
-	if (fork())
-		exit(0);
-	/* redirect stdin, stdout, stderr to null */
-	freopen("/dev/null", "r", stdin);
-	freopen("/dev/null", "w", stdout);
-	freopen("/dev/null", "w", stderr);
-#endif
+
+/* fork into background only if not in verbose mode */
+if( !verbose )
+	{
+	if( fork() )
+		{
+		clog << argv[0] << ": forked into background" ;
+		::exit( 0 ) ;
+		}
+	setsid() ;
+	if( fork() )
+		::exit( 0 ) ;
+	}
+
+{
+std::ofstream pidFile( "gnuworld.pid", std::ios::trunc | std::ios::out ) ;
+if( !pidFile )
+	{
+	clog	<< "Unable to open pid file: gnuworld.pid"
+			<< endl ;
+	return -1 ;
+	}
+
+pidFile	<< getpid()
+		<< endl ;
+
+pidFile.close() ;
+} // pidFile
+
+/* Redirect stdin, stdout, stderr to null when running in background */
+if( !verbose )
+	{
+	clog << " with PID: " << getpid() << endl ;
+	freopen( "/dev/null", "r", stdin ) ;
+	freopen( "/dev/null", "w", stdout ) ;
+	freopen( "/dev/null", "w", stderr ) ;
+	}
+
+// Output gnu information
+gnu() ;
 
 bool autoConnect = true ;
 while( autoConnect )
 	{
-	// getopt() mutates argv, so only pass a copy so
-	// we can call getopt() again with the same option set
-	char** dupArgv = dupArray( argc, argv ) ;
-
 	// Allocate a new instance of the xServer
 	gnuworld::xServer* theServer =
-		new (std::nothrow) gnuworld::xServer( argc, dupArgv ) ;
+		new (std::nothrow) gnuworld::xServer( 
+			verbose, doDebug, logSocket,
+			elogFileName, socketFileName,
+			configFileName, simFileName ) ;
 	assert( theServer != 0 ) ;
-
-	// Write out the pid
-	// TODO: This will have to be updated when running
-	// in background.
-	{
-	std::ofstream pidFile( "gnuworld.pid", std::ios::trunc | 
-				std::ios::out ) ;
-	if( !pidFile )
-		{
-		clog	<< "Unable to open pid file: gnuworld.pid"
-			<< endl ;
-
-		delete theServer ; theServer = 0 ;
-		return -1 ;
-		}
-
-	pidFile	<< getpid()
-		<< endl ;
-
-	pidFile.close() ;
-	} // pidFile
 
 	theServer->run() ;
 
@@ -213,74 +237,29 @@ while( autoConnect )
 
 	delete theServer ; theServer = 0 ;
 
-	releaseDup( argc, dupArgv ) ;
-	dupArgv = 0 ;
-
 	::sleep( 10 ) ;
 	} // while( autoConnect )
 
 return 0 ;
 }
 
-xServer::xServer( int argc, char** argv )
+xServer::xServer( bool verbose_arg, bool doDebug_arg, bool logSocket_arg,
+                  const std::string& elogFileName_arg,
+                  const std::string& socketFileName_arg,
+                  const std::string& configFileName_arg,
+                  const std::string& simFileName_arg )
  : eventList( EVT_NOOP ),
-   elogFileName( "debug.log" ),
-   socketFileName( "socket.log" ),
-   configFileName( CONFFILE )
+   verbose( verbose_arg ),
+   doDebug( doDebug_arg ),
+   logSocket( logSocket_arg ),
+   elogFileName( elogFileName_arg ),
+   socketFileName( socketFileName_arg ),
+   configFileName( configFileName_arg ),
+   simFileName( simFileName_arg )
 {
-logSocket = true ;
-verbose = false ;
-doDebug = true ;
-
-std::cout << "Before configuration" << endl; 
 #ifdef ENABLE_LOG4CPLUS
 log4cplus::PropertyConfigurator::doConfigure("logging.properties");
 #endif
-
-int c;
-while ((c = getopt(argc, argv, "cd:Df:l:Lhs:")) != -1) {
-    switch (c) {
-        case 'c':
-            verbose = true;
-            break;
-        case 'd':
-            doDebug = true;
-            elogFileName = optarg;
-            break;
-        case 'D':
-            doDebug = false;
-            break;
-        case 'f':
-            configFileName = optarg;
-            break;
-        case 'h':
-            usage(argv[0]);
-            ::exit(0);
-        case 'l':
-            logSocket = true;
-            socketFileName = optarg;
-            break;
-        case 'L':
-            logSocket = false;
-            break;
-        case 's':
-            simFileName = optarg;
-            clog << "*** Running in simulation mode..." << endl;
-            break;
-        case ':':
-            clog << "*** Missing parameter\n";
-            usage(argv[0]);
-            ::exit(0);
-        case '?':
-            // Unrecognized option
-            usage(argv[0]);
-            ::exit(0);
-        default:
-            clog << "Unknown option " << static_cast<char>(c) << endl;
-            usage(argv[0]);
-            ::exit(0);
-    }
-}
 
 startLogging(false) ;
 // Sets up the server internals
