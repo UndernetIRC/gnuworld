@@ -29,6 +29,7 @@
 #include	<list>
 #include	<map>
 #include	<concepts>
+#include	<sstream>
 
 #include	"ELog.h"
 #include	"misc.h" // noCaseCompare
