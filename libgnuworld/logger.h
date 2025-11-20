@@ -22,6 +22,7 @@
 
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <functional>
 #include <typeindex>
 #ifdef HAVE_FORMAT
