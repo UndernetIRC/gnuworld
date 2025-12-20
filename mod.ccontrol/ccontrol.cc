@@ -2306,7 +2306,7 @@ if(dbConnected)
 						if (rs.type != 'd') {
 							ExcessiveConnNotifType::iterator Itr;
 							if ((rs.type != 'd') && ((Itr = ExcessiveConnNotif.find(GlineMask)) == ExcessiveConnNotif.end() || (::time(0) - Itr->second.lastReportTS) >= ExcessConnReportInterval || (ipLconncount - Itr->second.lastReportCount) >= 100)) {
-								MsgChanLog("Excessive connections %s from subnet %s [ref: %s's %s] (will _NOT_ GLINE)",
+								MsgChanLog("Excessive connections%s from subnet %s [ref: %s's %s] (will _NOT_ GLINE)",
 									glineLimit, GlineMask, nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
 								excessConnDataType ecd;
 								ecd.lastReportTS = ::time(0);
@@ -5140,6 +5140,8 @@ for (Itr = ExcessiveConnNotif.begin(); Itr != ExcessiveConnNotif.end(); ) {
 	if (age >= ExcessConnReportInterval) {
 		Itr = ExcessiveConnNotif.erase(Itr);
 	}
+	else
+		Itr++;
 }
 return true;
 }
@@ -5155,6 +5157,8 @@ for (iItr = ipLRecentIauthList.begin(); iItr != ipLRecentIauthList.end(); ) {
 		iItr = ipLRecentIauthList.erase(iItr);
 		delete tClient;
 	}
+	else
+		iItr++;
 }
 return true;
 }
