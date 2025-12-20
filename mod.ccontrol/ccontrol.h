@@ -244,8 +244,17 @@ protected:
 		char type;
 		string mask;
 	};
+
+	struct excessConnData {
+		int lastReportTS;
+		int lastReportCount;
+	};
 	
 	typedef struct ipLretStruct ipLretStructType;
+
+	typedef struct excessConnData excessConnDataType;
+
+	typedef map< string, excessConnData >		ExcessiveConnNotifType;
 
 	typedef list<ipLretStructType>	ipLretStructListType;
 
@@ -687,7 +696,9 @@ public:
 	bool refreshGlines();
 
 	bool refreshIauthEntries();
-	
+
+	bool refreshExcessiveConnNotif();
+
 	void queueGline(ccGline* , bool = true);
 	
 	bool processGlineQueue();
@@ -993,6 +1004,8 @@ public:
 	clientsIpMapType		clientsIpMap;
 
 	opersIPMapType			opersIPMap;
+
+	ExcessiveConnNotifType	ExcessiveConnNotif;
 	
 	clientsIpIterator clientsIp_begin()
 		{ return clientsIpMap.begin(); }
@@ -1161,6 +1174,8 @@ protected:
 	 */
 
 	int 			ExpiredInterval;
+
+	int 			ExcessConnReportInterval;
 
 	int			CClonesTime;
 
