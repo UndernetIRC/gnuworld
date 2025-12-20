@@ -1780,7 +1780,6 @@ if (timer_id == expiredTimer)
 	refreshIgnores();
 	refreshSuspention();
 	refreshIauthEntries();
-	refreshExcessiveConnNotif();
 	expiredTimer = MyUplink->RegisterTimer(::time(0) + ExpiredInterval,
 		this,NULL);
 	}
@@ -1797,6 +1796,7 @@ else if(timer_id == glineQueueCheck)
 
 else if (timer_id == timeCheck)
 	{
+	refreshExcessiveConnNotif();
 	ccServer* TmpServer;
 	for (serversconstiterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
 		{
