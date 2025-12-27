@@ -7,6 +7,7 @@ libgnuworldDB_la_SOURCES = \
 	db/pgsqlDB.cc
 libgnuworldDB_la_CXXFLAGS = \
 	-I$(top_srcdir)/libgnuworld \
+	-I$(top_srcdir)/libnotifier \
 	-I$(top_srcdir)/include
 libgnuworldDB_la_LDFLAGS = -L$(pgsql_libdir) -lpq
 

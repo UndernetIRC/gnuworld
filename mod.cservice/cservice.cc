@@ -193,7 +193,7 @@ void cservice::OnShutdown(const std::string& reason)
 cservice::cservice(const string& args)
  : xClient( args )
 #ifdef USE_THREAD
-   , threadWorker( this )
+   , threadWorker()
 #endif
 {
 

@@ -42,5 +42,5 @@ libircu_la_SOURCES = \
 	libircu/msg_XR.cc \
 	libircu/msg_Y.cc
 
-libircu_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+libircu_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld -I${top_srcdir}/libnotifier
 libircu_la_LDFLAGS = -module -export-dynamic

@@ -5,7 +5,8 @@ lib_LTLIBRARIES += libcservice.la
 libcservice_la_LDFLAGS = -module -export-dynamic
 libcservice_la_LIBADD = libgnuworldDB.la
 libcservice_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
-	-I${top_srcdir}/libgnuworld
+	-I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libnotifier
 
 libcservice_la_SOURCES = \
 	mod.cservice/banMatcher.cc \

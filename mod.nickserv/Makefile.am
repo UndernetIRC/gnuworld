@@ -24,7 +24,8 @@ libnickserv_la_SOURCES = \
 	mod.nickserv/sqlUser.cc
 
 libnickserv_la_CXXFLAGS = -I$(top_srcdir)/db \
-	-I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+	-I${top_srcdir}/include -I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libnotifier
 
 EXTRA_DIST += \
 	mod.nickserv/levels.h \

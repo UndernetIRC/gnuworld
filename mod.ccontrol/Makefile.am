@@ -75,7 +75,8 @@ libccontrol_la_SOURCES = \
 	mod.ccontrol/LIMITSCommand.cc
 
 libccontrol_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
-	-I${top_srcdir}/libgnuworld
+	-I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libnotifier
 libccontrol_la_LDFLAGS = -module -export-dynamic
 libccontrol_la_LIBADD = libgnuworldDB.la
 

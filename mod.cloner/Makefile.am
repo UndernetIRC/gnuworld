@@ -3,7 +3,8 @@
 
 lib_LTLIBRARIES += libcloner.la
 libcloner_la_SOURCES = mod.cloner/cloner.cc
-libcloner_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+libcloner_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libnotifier
 libcloner_la_LDFLAGS = -module -export-dynamic
 
 EXTRA_DIST += mod.cloner/cloner.h
