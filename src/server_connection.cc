@@ -271,7 +271,7 @@ if( verbose )
 
 if( logSocket )
 	{
-	socketFile	<< logLine ;
+	socketFile	<< ::time(0) << " " << logLine ;
 	socketFile.flush() ;
 	}
 

@@ -187,6 +187,8 @@ AbuseMail = conf.Require( "abuse_mail" )->second;
 //GLInterval is the inteval in which ccontrol will check for expired glines
 ExpiredInterval = atoi( conf.Require( "Expired_interval" )->second.c_str() );
 
+ExcessConnReportInterval = atoi( conf.Require( "excess_conn_report_interval" )->second.c_str() );
+
 //Sendmail  is the full path of the sendmail program
 Sendmail_Path = conf.Require("SendMail")->second;
 
@@ -1794,6 +1796,7 @@ else if(timer_id == glineQueueCheck)
 
 else if (timer_id == timeCheck)
 	{
+	refreshExcessiveConnNotif();
 	ccServer* TmpServer;
 	for (serversconstiterator ptr = serversMap_begin(); ptr != serversMap_end(); ++ptr)
 		{
@@ -2153,7 +2156,7 @@ void ccontrol::handleNewClient( iClient* NewUser)
 int gDuration = maxGlineLen;
 int AffectedUsers = 0;
 string client_ip;
-char Log[200], GlineMask[250], GlineReason[250];
+char Log[400], GlineMask[250], GlineReason[250];
 std::stringstream s;
 
 bool is_ipv4 = false;
@@ -2255,7 +2258,7 @@ if(dbConnected)
 			}
 			string netblocks;
 			/* check for auto-gline feature */
-			if (!ipLRetVal && nb->isActive() && !nb->isNoGline()) {
+			if (!ipLRetVal && nb->isActive()) {
 				ccIpLnb *original_nb = nb;
 				for (ipLnbVectorType::iterator nItr = ipLnbVector.begin(); nItr != ipLnbVector.end(); nItr++) {
 					if (group) {
@@ -2264,27 +2267,25 @@ if(dbConnected)
 							continue;
 						netblock = nb->getCidr();
 					}
+					char glineType[32];
+					char glineLimit[32];
 					// ip gline
 					if (rs.type == 'i') {
-						sprintf(Log,"Glining *@%s for excessive connections (%d/%d) [ref: %s's %s]",
-							netblock.c_str(), ipLconncount, rs.limit, 
-							nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
+						sprintf(glineType, "excessive");
+						sprintf(glineLimit, " (%d/%d)", ipLconncount, rs.limit);
 						sprintf(GlineMask,"*@%s", netblock.c_str());
 					}
 					// user@ip gline
 					else if (rs.type == 'u') {
-						sprintf(Log,"Glining %s@%s for excessive connections (%d/%d) [ref: %s's %s]",
-							user.c_str(), netblock.c_str(), ipLconncount, rs.limit, 
-							nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
+						sprintf(glineType, "excessive");
+						sprintf(glineLimit, " (%d/%d)", ipLconncount, rs.limit);
 						sprintf(GlineMask,"%s@%s", user.c_str(), netblock.c_str());
 					}
 					// ~*@ip gline
 					else if (rs.type == 'd') {
-						sprintf(Log,"Glining ~*@%s for unidented connections [ref: %s's %s]",
-							tIP.c_str(), 
-							nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
+						sprintf(glineType, "unidented");
+						*glineLimit = '\0';
 						sprintf(GlineMask,"~*@%s", tIP.c_str());
-						//elog << "setting GlineMask to " << GlineMask << ", tIP = " << tIP << endl;
 					}
 					else {
 						elog << "mod.ccontrol> ccontrol.cc bug line " << __LINE__ << endl;
@@ -2300,10 +2301,27 @@ if(dbConnected)
 						}
 					}
 
-					if (glineExists) {
+					if (nb->isNoGline()) {
+						// Do not report unidented glines that have NO-GLINE set.
+						if (rs.type != 'd') {
+							ExcessiveConnNotifType::iterator Itr;
+							if ((rs.type != 'd') && ((Itr = ExcessiveConnNotif.find(GlineMask)) == ExcessiveConnNotif.end() || (::time(0) - Itr->second.lastReportTS) >= ExcessConnReportInterval || (ipLconncount - Itr->second.lastReportCount) >= 100)) {
+								MsgChanLog("Excessive connections%s from subnet %s [ref: %s's %s] (will _NOT_ GLINE)",
+									glineLimit, GlineMask, nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
+								excessConnDataType ecd;
+								ecd.lastReportTS = ::time(0);
+								ecd.lastReportCount = ipLconncount;
+								ExcessiveConnNotif[GlineMask] = ecd;
+							}
+						}
+					}
+					else if (glineExists) {
 						elog << "mod.ccontrol::HandleNewClient()> Gline exists on " << exGline->getHost() << " and is <30 secs old. Not readding" << endl;
 					}
 					else {
+						sprintf(Log,"Glining %s for %s connections%s [ref: %s's %s]",
+							GlineMask, glineType, glineLimit,
+							nb->ipLisp->getName().c_str(), nb->getCidr().c_str());
 						AffectedUsers = ipLconncount;
 						/* set the gline reason */
 						if (isUserban) {
@@ -5114,6 +5132,20 @@ return true;
 
 }
 
+bool ccontrol::refreshExcessiveConnNotif()
+{
+ExcessiveConnNotifType::iterator Itr;
+for (Itr = ExcessiveConnNotif.begin(); Itr != ExcessiveConnNotif.end(); ) {
+	int age = ::time(0) - Itr->second.lastReportTS;
+	if (age >= ExcessConnReportInterval) {
+		Itr = ExcessiveConnNotif.erase(Itr);
+	}
+	else
+		Itr++;
+}
+return true;
+}
+
 bool ccontrol::refreshIauthEntries()
 {
 ipLRecentIauthListType::iterator iItr;
@@ -5125,6 +5157,8 @@ for (iItr = ipLRecentIauthList.begin(); iItr != ipLRecentIauthList.end(); ) {
 		iItr = ipLRecentIauthList.erase(iItr);
 		delete tClient;
 	}
+	else
+		iItr++;
 }
 return true;
 }
