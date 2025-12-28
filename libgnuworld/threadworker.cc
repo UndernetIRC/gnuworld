@@ -26,7 +26,7 @@
 namespace gnuworld
 {
 
-ThreadWorker::ThreadWorker( xClient* _bot ) : stop( false ), bot( _bot ), logger( _bot->getLogger() )
+ThreadWorker::ThreadWorker( ) : stop( false )
 {
 worker = std::thread( &ThreadWorker::run, this ) ;
 }
@@ -55,19 +55,19 @@ while( true )
     job = std::move( jobs.front() ) ;
     jobs.pop() ;
     }
-    
+
   try
     {
-    LOG( TRACE, "Starting job execution" ) ;
+    // elog << "Starting job execution" << endl ;
     job() ;
     }
   catch( const std::exception& e )
     {
-    LOG( ERROR, "Exception in job execution: {}", e.what() ) ;
+    elog << "Exception in job execution: " << e.what() << std::endl ;
     }
   catch( ... )
     {
-    LOG( ERROR, "Unknown exception in job execution" ) ;
+    elog << "Unknown exception in job execution" << std::endl ;
     }
   }
 }

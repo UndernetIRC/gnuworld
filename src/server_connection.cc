@@ -272,6 +272,7 @@ if( verbose )
 if( logSocket )
 	{
 	socketFile	<< ::time(0) << " " << logLine ;
+	socketFile.flush() ;
 	}
 
 Process( inputCharBuffer ) ;

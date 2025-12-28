@@ -106,7 +106,7 @@ private:
             < iClient* >      cloneVectorType ;
   cloneVectorType             clones ;
 
-  iServer*                    fakeServer ;
+  iServer*                    fakeServer = nullptr ;
 
   bool                        allowOpers ;
 

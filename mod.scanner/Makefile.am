@@ -9,7 +9,8 @@ libscanner_la_SOURCES = \
 	mod.scanner/wingateModule.cc
 libscanner_la_LDFLAGS = -module -export-dynamic
 libscanner_la_CXXFLAGS = -I$(top_srcdir)/include \
-	-I$(top_srcdir)/libgnuworld
+	-I$(top_srcdir)/libgnuworld \
+	-I$(top_srcdir)/libnotifier
 
 EXTRA_DIST += \
 	mod.scanner/dbThread.h \

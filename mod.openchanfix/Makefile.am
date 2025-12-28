@@ -55,6 +55,7 @@ libchanfix_la_SOURCES = \
 
 libchanfix_la_CXXFLAGS = -I$(top_srcdir)db -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libnotifier \
 	$(threadLib)
 libchanfix_la_LDFLAGS = -module -export-dynamic @BOOST_THREAD_LIB@
 libchanfix_la_LIBADD = libgnuworldDB.la

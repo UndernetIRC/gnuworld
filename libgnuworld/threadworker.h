@@ -28,9 +28,6 @@
 #include <atomic>
 #include <functional>
 
-#include "client.h"
-#include "logger.h"
-
 namespace gnuworld
 {
 
@@ -42,16 +39,10 @@ private:
   std::thread worker ;
   bool stop ;
 
-  /* The bot. */
-  xClient* bot ;
-
-  /* Pointer to the xClient's logger. */
-  Logger* logger ;
-
   void run() ;
 
 public:
-  ThreadWorker( xClient* ) ;
+  ThreadWorker() ;
   ~ThreadWorker() ;
 
   template< typename Callable >

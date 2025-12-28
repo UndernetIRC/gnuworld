@@ -4,6 +4,7 @@ libdronescan_la_LDFLAGS = -module -export-dynamic
 libdronescan_la_LIBADD = libgnuworldDB.la
 libdronescan_la_CXXFLAGS = -I$(top_srcdir)/db \
 	-I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libnotifier \
 	-I${top_srcdir}/include
 
 libdronescan_la_SOURCES = 	\

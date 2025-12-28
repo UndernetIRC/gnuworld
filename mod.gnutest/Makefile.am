@@ -3,7 +3,8 @@
 
 lib_LTLIBRARIES += libgnutest.la
 libgnutest_la_SOURCES = mod.gnutest/gnutest.cc
-libgnutest_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
+libgnutest_la_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld \
+	-I${top_srcdir}/libnotifier
 libgnutest_la_LDFLAGS = -module -export-dynamic
 
 EXTRA_DIST += mod.gnutest/gnutest.h

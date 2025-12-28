@@ -128,6 +128,7 @@ EXTRA_DIST = bin/ccontrol.example.conf \
 
 include db/Makefile.am
 include libgnuworld/Makefile.am
+include libnotifier/Makefile.am
 include libircu/Makefile.am
 include src/Makefile.am
 

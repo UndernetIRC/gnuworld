@@ -181,7 +181,7 @@ void cloner::OnDetach( const string& reason )
 MyUplink->UnRegisterChannelEvent( xServer::CHANNEL_ALL, this ) ;
 MyUplink->UnRegisterTimer( cycleCloneTimer, nullptr ) ;
 
-if( MyUplink->DetachServer( fakeServer ) )
+if( fakeServer && MyUplink->DetachServer( fakeServer ) )
   {
   delete fakeServer ;
   fakeServer = nullptr ;
