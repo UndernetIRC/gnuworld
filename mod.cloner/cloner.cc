@@ -868,6 +868,11 @@ if( theChan->getMode( Channel::MODE_R )
   && !theClone->getMode( iClient::MODE_REGISTERED ) )
   return 0 ;
 
+/* Chanmode +Z? */
+if( theChan->getMode( Channel::MODE_Z )
+  && !theClone->getMode( iClient::MODE_TLS ) )
+  return 0 ;
+
 /* Banned? */
 if( banMatch( theChan, theClone ) )
   return 0 ;
@@ -1038,6 +1043,7 @@ iClient* newClient = new iClient(
     account,
     account_id,
     0,
+    string(),
     cloneDescription,
     ::time( nullptr ) ) ;
 assert( newClient != nullptr ) ;

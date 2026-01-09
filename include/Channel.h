@@ -129,6 +129,9 @@ public:
 	/// Bit representing channel mode +U
 	static const modeType	MODE_U ;
 
+	/// Bit representing channel mode +Z
+	static const modeType	MODE_Z ;
+
 	/// Type used to store number of clients in channel
 	typedef userListType::size_type size_type ;
 

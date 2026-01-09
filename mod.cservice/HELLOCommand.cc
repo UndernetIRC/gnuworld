@@ -180,12 +180,24 @@ string cryptpass = bot->CryptPass(plainpass);
 string updatedBy = "HELLO used by: ";
 updatedBy += theClient->getNickUserHost().c_str();
 
-newUser = new (std::nothrow) sqlUser(bot->SQLDb);
+newUser = new (std::nothrow) sqlUser(bot);
 newUser->setUserName(escapeSQLChars(st[1].c_str()));
 newUser->setEmail(escapeSQLChars(st[2]));
 newUser->setPassword(cryptpass.c_str());
 newUser->setLastUpdatedBy(updatedBy);
 newUser->setFlag(sqlUser::F_INVIS);
+
+string err ;
+auto recOpt = make_scram_sha256_record( plainpass, &err ) ;
+if( !recOpt )
+	{
+	LOG( ERROR, "[SCRAM] Record generation error: {}", err ) ;
+	}
+else
+	{
+	std::string scram_record = *recOpt ;
+	newUser->setScramRecord( scram_record ) ;
+	}
 newUser->Insert();
 
 bot->Notice(theClient, "I generated this password for you: \002%s\002",

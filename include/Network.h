@@ -29,6 +29,7 @@
 #include	<set>
 #include	<map>
 #include	<list>
+#include	<optional>
 
 #include	<ctime>
 
@@ -141,6 +142,12 @@ private:
 	 */
 	typedef std::map< unsigned int, iServer* > serverMapType ;
 
+	/**
+	 * The type used to store Network configuration pairs (CF),
+	 * keyed by the configuration key.
+	 */
+	typedef std::map< std::string, std::pair< std::string, time_t > > netConfMapType ;
+
 public:
 
 	/**
@@ -204,6 +211,20 @@ public:
 	 * Returns false if the addition fails.
 	 */
 	virtual bool		addChannel( Channel* ) ;
+
+	/**
+	 * Add a new netconf variable to the network table.
+	 */
+	virtual void		addNetConf( const std::string& key,
+									const std::string& value,
+									time_t timestamp )
+		{ netConfMap[ key ] = std::make_pair( value, timestamp ) ; }
+
+	/**
+	 * Find a netconf variable by key.
+	 * Returns std::nullopt if not found.
+	 */
+	virtual std::optional< std::pair< std::string, time_t > > findNetConf( const std::string& key ) const ;
 
 	/*
 	 * All nickname based searches are case insensitive.
@@ -971,6 +992,12 @@ protected:
 	 * keyed by iServer numeric.
 	 */
 	serverMapType			serverMap ;
+
+	/**
+	 * This structure holds all network configuration pairs
+	 * bursted on the network (CF).
+	 */
+	netConfMapType		netConfMap ;
 
 	/**
 	 * This variable is used backwards calls to the main server.

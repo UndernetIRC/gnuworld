@@ -59,6 +59,7 @@ const Channel::modeType Channel::MODE_C       = 0x02000 ;
 const Channel::modeType Channel::MODE_CTCP    = 0x04000 ;
 const Channel::modeType Channel::MODE_PART    = 0x08000 ;
 const Channel::modeType Channel::MODE_MNOREG  = 0x10000 ;
+const Channel::modeType Channel::MODE_Z       = 0x20000 ;
 
 Channel::Channel( const string& _name,
 	const time_t& _creationTime )
@@ -500,6 +501,7 @@ if( modes & MODE_C )		modeString += 'c';
 if( modes & MODE_CTCP )		modeString += 'C';
 if( modes & MODE_PART )		modeString += 'u';
 if( modes & MODE_MNOREG )	modeString += 'M';
+if( modes & MODE_Z )		modeString += 'Z';
 
 if( modes & MODE_K )
 	{

@@ -237,6 +237,10 @@ if( '+' == Param[ whichToken ][ 0 ] )
 				modeVector.push_back( make_pair(
 					true, Channel::MODE_MNOREG ) ) ;
 				break ;
+			case 'Z':
+				modeVector.push_back( make_pair(
+					true, Channel::MODE_Z ) ) ;
+				break ;
  			case 'l':
 				theServer->OnChannelModeL( theChan, true, 
 					0,

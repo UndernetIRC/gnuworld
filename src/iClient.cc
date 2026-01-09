@@ -55,6 +55,7 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	const string& _account,
 	const unsigned int _account_id,
 	const flagType _account_flags,
+	const string& _tls_fingerprint,
 	const string& _description,
 	const time_t& _nick_ts )
 : NetworkTarget( _yyxxx ),
@@ -69,7 +70,8 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	mode( 0 ),
 	account( _account ),
 	account_id( _account_id ),
-	account_flags( _account_flags )
+	account_flags( _account_flags ),
+	tlsFingerprint( _tls_fingerprint )
 {
 setModes( _mode ) ;
 customDataMap = 0 ;
@@ -87,6 +89,7 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	const string& _account,
 	const unsigned int _account_id,
 	const flagType _account_flags,
+	const string& _tls_fingerprint,
 	const string& _setHost,
 	const string& _fakeHost,
 	const string& _description,
@@ -103,7 +106,8 @@ iClient::iClient( const unsigned int& /* _uplink */,
 	mode( 0 ),
 	account( _account ),
 	account_id( _account_id ),
-	account_flags( _account_flags )
+	account_flags( _account_flags ),
+	tlsFingerprint( _tls_fingerprint )
 #ifdef ASUKA
 	,setHost( _setHost )
 #endif
@@ -160,6 +164,9 @@ for( string::size_type i = 0 ; i < newModes.size() ; i++ )
 			break ;
 		case 'g':
 			setModeG() ;
+			break ;
+		case 'z':
+			setModeZ() ;
 			break ;
 		case 'r':
 		case 'R':
@@ -221,6 +228,7 @@ if( isModeK() )		retMe += 'k' ;
 if( isModeR() )		retMe += 'r' ;
 if( isModeX() )		retMe += 'x' ;
 if( isModeG() )		retMe += 'g' ;
+if( isModeZ() )		retMe += 'z' ;
 
 return retMe ;
 }

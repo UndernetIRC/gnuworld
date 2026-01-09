@@ -66,7 +66,7 @@ wingateModule::~wingateModule()
 
 void wingateModule::CheckIP( const string& ip )
 {
-cm->Connect( this, ip, 23 ) ;
+cm->Connect( this, ip, 23, false ) ;
 }
 
 void wingateModule::OnConnect( Connection* )

@@ -10,6 +10,7 @@ libircu msg_AC AC
 libircu msg_AD AD
 libircu msg_B B
 libircu msg_C C
+libircu msg_CF CF
 libircu msg_CM CM
 libircu msg_D D
 libircu msg_NOOP DE

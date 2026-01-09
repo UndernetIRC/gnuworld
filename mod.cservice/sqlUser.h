@@ -42,7 +42,7 @@ public:
 	sqlUser(cservice*) ;
 	virtual ~sqlUser() ;
 
-	typedef unsigned short int	flagType ;
+	typedef unsigned int	flagType ;
 	static constexpr flagType F_GLOBAL_SUSPEND  	= 0x01 ;
 	static constexpr flagType F_LOGGEDIN 		= 0x02 ; // Deprecated
 	static constexpr flagType F_INVIS 		= 0x04 ;
@@ -55,7 +55,10 @@ public:
 	static constexpr flagType F_NOADDUSER 		= 0x200 ;
 	static constexpr flagType F_TOTP_ENABLED 	= 0x400 ;
 	static constexpr flagType F_TOTP_REQ_IPR 	= 0x800 ;
-
+	static constexpr flagType F_CERTONLY 		= 0x1000 ;
+	static constexpr flagType F_CERT_DISABLE_TOTP	= 0x2000 ;
+	static constexpr flagType F_WEB_DISABLE_TOTP 	= 0x4000 ;
+	static constexpr flagType F_AUTOHIDE		= 0x8000 ;
 	/*
 	 *   User 'Event' Flags, used in the userlog table.
 	 */
@@ -152,6 +155,9 @@ public:
 	inline const std::string&	getTotpKey() const
 		{ return totp_key ; }
 
+	inline const std::string&	getScramRecord() const
+		{ return scram_record ; }
+
 	/*
 	 *  Methods to set data atrributes.
 	 */
@@ -220,12 +226,17 @@ public:
 
 	inline void setTotpKey( const std::string& _totp_key )
 		{ totp_key = _totp_key ; }
+
+	inline void setScramRecord( const std::string& _scram_record )
+		{ scram_record = _scram_record ; }
+
 	/*
 	 * Method to perform a SQL 'UPDATE' and commit changes to this
 	 * object back to the database.
 	 */
 
-	bool commit(iClient* who);
+	bool commit(iClient*);
+	bool commit(std::string);
 	bool commitLastSeen();
 	bool commitLastSeenWithoutMask();
 	time_t	getLastSeen();
@@ -269,6 +280,7 @@ protected:
 	unsigned int	failed_logins;
 	unsigned int	failed_login_ts;
 	std::string	totp_key;
+	std::string	scram_record;
 
 	Logger*		logger;
 	dbHandle*	SQLDb;

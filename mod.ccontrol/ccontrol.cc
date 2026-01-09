@@ -950,6 +950,9 @@ for(glineIterator GLptr = rnGlineList.begin(); GLptr != rnGlineList.end(); ++GLp
 
 rnGlineList.clear();
 
+// Deallocate the database handle
+delete SQLDb; SQLDb = 0;
+
 }
 
 // Register a command handler
@@ -6242,6 +6245,7 @@ void ccontrol::announce(iClient* theClient, const string& text)
 		string(),
 		0,
 		0,
+		string(),
 		"Announcement Service.",
 		::time( 0 ) ) ;
 	assert( newClient != 0 );
@@ -7417,6 +7421,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		string(),
 		0,
 		0,
+		string(),
 		fullname,
 		::time( 0 ) ) ;
 assert( newClient != 0 );

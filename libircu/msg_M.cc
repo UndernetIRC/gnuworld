@@ -232,6 +232,10 @@ for( const char* modePtr = Param[ 2 ] ; *modePtr ; ++modePtr )
 			modeVector.push_back(
 				make_pair(polarity, Channel::MODE_MNOREG));
 			break;
+		case 'Z':
+			modeVector.push_back(
+				make_pair(polarity, Channel::MODE_Z));
+			break;
 		// Channel mode l only has an argument if
 		// it is being added, but not removed
 		case 'l':

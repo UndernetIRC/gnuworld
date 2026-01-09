@@ -153,6 +153,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODCSERVICE_TRUE@	mod.cservice/constants.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/cserviceCommands.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/cservice_config.h \
+@COND_MODCSERVICE_TRUE@	mod.cservice/cservice_confvars.h \
+@COND_MODCSERVICE_TRUE@	mod.cservice/cservice_crypt.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/cservice.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/levels.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/networkData.h \
@@ -562,15 +564,16 @@ libcloner_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @COND_MODCLONER_TRUE@am_libcloner_la_rpath = -rpath $(libdir)
 @COND_MODCSERVICE_TRUE@libcservice_la_DEPENDENCIES = libgnuworldDB.la
 am__libcservice_la_SOURCES_DIST = mod.cservice/banMatcher.cc \
-	mod.cservice/cservice.cc mod.cservice/networkData.cc \
-	mod.cservice/sqlChannel.cc mod.cservice/sqlUser.cc \
-	mod.cservice/sqlLevel.cc mod.cservice/sqlBan.cc \
-	mod.cservice/sqlPendingChannel.cc \
+	mod.cservice/cservice.cc mod.cservice/cservice_crypt.cc \
+	mod.cservice/networkData.cc mod.cservice/sqlChannel.cc \
+	mod.cservice/sqlUser.cc mod.cservice/sqlLevel.cc \
+	mod.cservice/sqlBan.cc mod.cservice/sqlPendingChannel.cc \
 	mod.cservice/sqlPendingTraffic.cc mod.cservice/csGline.cc \
 	mod.cservice/ACCESSCommand.cc \
 	mod.cservice/ADDCOMMENTCommand.cc \
 	mod.cservice/ADDUSERCommand.cc mod.cservice/BANCommand.cc \
-	mod.cservice/BANLISTCommand.cc mod.cservice/CHANINFOCommand.cc \
+	mod.cservice/BANLISTCommand.cc mod.cservice/CERTCommand.cc \
+	mod.cservice/CHANINFOCommand.cc \
 	mod.cservice/CLEARMODECommand.cc mod.cservice/DEOPCommand.cc \
 	mod.cservice/DEVOICECommand.cc mod.cservice/FORCECommand.cc \
 	mod.cservice/HELPCommand.cc mod.cservice/HELLOCommand.cc \
@@ -602,6 +605,7 @@ am__libcservice_la_SOURCES_DIST = mod.cservice/banMatcher.cc \
 	mod.cservice/MODECommand.cc
 @COND_MODCSERVICE_TRUE@am_libcservice_la_OBJECTS = mod.cservice/libcservice_la-banMatcher.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-cservice.lo \
+@COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-cservice_crypt.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-networkData.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-sqlChannel.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-sqlUser.lo \
@@ -615,6 +619,7 @@ am__libcservice_la_SOURCES_DIST = mod.cservice/banMatcher.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-ADDUSERCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-BANCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-BANLISTCommand.lo \
+@COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-CERTCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-CHANINFOCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-CLEARMODECommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-DEOPCommand.lo \
@@ -775,19 +780,20 @@ libgnuworldcore_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(libgnuworldcore_la_LDFLAGS) $(LDFLAGS) -o $@
 libircu_la_LIBADD =
 am_libircu_la_OBJECTS = libircu/la-msg_AC.lo libircu/la-msg_AD.lo \
-	libircu/la-msg_B.lo libircu/la-msg_C.lo libircu/la-msg_CM.lo \
-	libircu/la-msg_D.lo libircu/la-msg_DS.lo libircu/la-msg_EA.lo \
-	libircu/la-msg_EB.lo libircu/la-msg_G.lo libircu/la-msg_GL.lo \
-	libircu/la-msg_I.lo libircu/la-msg_J.lo libircu/la-msg_JU.lo \
-	libircu/la-msg_K.lo libircu/la-msg_L.lo libircu/la-msg_M351.lo \
-	libircu/la-msg_M391.lo libircu/la-msg_M.lo libircu/la-msg_N.lo \
-	libircu/la-msg_NOOP.lo libircu/la-msg_O.lo \
-	libircu/la-msg_PA.lo libircu/la-msg_P.lo libircu/la-msg_Q.lo \
-	libircu/la-msg_R.lo libircu/la-msg_RI.lo libircu/la-msg_RO.lo \
-	libircu/la-msg_S.lo libircu/la-msg_Server.lo \
-	libircu/la-msg_SQ.lo libircu/la-msg_T.lo libircu/la-msg_V.lo \
-	libircu/la-msg_WA.lo libircu/la-msg_W.lo libircu/la-msg_XQ.lo \
-	libircu/la-msg_XR.lo libircu/la-msg_Y.lo
+	libircu/la-msg_B.lo libircu/la-msg_C.lo libircu/la-msg_CF.lo \
+	libircu/la-msg_CM.lo libircu/la-msg_D.lo libircu/la-msg_DS.lo \
+	libircu/la-msg_EA.lo libircu/la-msg_EB.lo libircu/la-msg_G.lo \
+	libircu/la-msg_GL.lo libircu/la-msg_I.lo libircu/la-msg_J.lo \
+	libircu/la-msg_JU.lo libircu/la-msg_K.lo libircu/la-msg_L.lo \
+	libircu/la-msg_M351.lo libircu/la-msg_M391.lo \
+	libircu/la-msg_M.lo libircu/la-msg_N.lo libircu/la-msg_NOOP.lo \
+	libircu/la-msg_O.lo libircu/la-msg_PA.lo libircu/la-msg_P.lo \
+	libircu/la-msg_Q.lo libircu/la-msg_R.lo libircu/la-msg_RI.lo \
+	libircu/la-msg_RO.lo libircu/la-msg_S.lo \
+	libircu/la-msg_Server.lo libircu/la-msg_SQ.lo \
+	libircu/la-msg_T.lo libircu/la-msg_V.lo libircu/la-msg_WA.lo \
+	libircu/la-msg_W.lo libircu/la-msg_XQ.lo libircu/la-msg_XR.lo \
+	libircu/la-msg_Y.lo
 libircu_la_OBJECTS = $(am_libircu_la_OBJECTS)
 libircu_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libircu_la_CXXFLAGS) \
@@ -1011,8 +1017,9 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	libgnuworld/$(DEPDIR)/la-threadworker.Plo \
 	libircu/$(DEPDIR)/la-msg_AC.Plo \
 	libircu/$(DEPDIR)/la-msg_AD.Plo libircu/$(DEPDIR)/la-msg_B.Plo \
-	libircu/$(DEPDIR)/la-msg_C.Plo libircu/$(DEPDIR)/la-msg_CM.Plo \
-	libircu/$(DEPDIR)/la-msg_D.Plo libircu/$(DEPDIR)/la-msg_DS.Plo \
+	libircu/$(DEPDIR)/la-msg_C.Plo libircu/$(DEPDIR)/la-msg_CF.Plo \
+	libircu/$(DEPDIR)/la-msg_CM.Plo libircu/$(DEPDIR)/la-msg_D.Plo \
+	libircu/$(DEPDIR)/la-msg_DS.Plo \
 	libircu/$(DEPDIR)/la-msg_EA.Plo \
 	libircu/$(DEPDIR)/la-msg_EB.Plo libircu/$(DEPDIR)/la-msg_G.Plo \
 	libircu/$(DEPDIR)/la-msg_GL.Plo libircu/$(DEPDIR)/la-msg_I.Plo \
@@ -1121,6 +1128,7 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-ADDUSERCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-BANCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-BANLISTCommand.Plo \
+	mod.cservice/$(DEPDIR)/libcservice_la-CERTCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-CHANINFOCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-CLEARMODECommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-DEOPCommand.Plo \
@@ -1176,6 +1184,7 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-cservice.Plo \
+	mod.cservice/$(DEPDIR)/libcservice_la-cservice_crypt.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-networkData.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-sqlBan.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-sqlChannel.Plo \
@@ -1700,8 +1709,8 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	libgnuworld/threadworker.h libgnuworld/misc.h \
 	libgnuworld/MTrie.h libgnuworld/MTrie.cc libgnuworld/Signal.h \
 	libgnuworld/StringTokenizer.h libgnuworld/xparameters.h \
-	libgnuworld/logger.h libgnuworld/notifier.h \
-	libgnuworld/prometheus.h libgnuworld/pushover.h \
+	libnotifier/logger.h libnotifier/notifier.h \
+	libnotifier/prometheus.h libnotifier/pushover.h \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) $(am__append_14) $(am__append_16) \
 	$(am__append_18) $(am__append_20) $(am__append_22) \
@@ -1751,6 +1760,7 @@ libircu_la_SOURCES = \
 	libircu/msg_AD.cc \
 	libircu/msg_B.cc \
 	libircu/msg_C.cc \
+	libircu/msg_CF.cc \
 	libircu/msg_CM.cc \
 	libircu/msg_D.cc \
 	libircu/msg_DS.cc \
@@ -1985,6 +1995,7 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODCSERVICE_TRUE@libcservice_la_SOURCES = \
 @COND_MODCSERVICE_TRUE@	mod.cservice/banMatcher.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/cservice.cc \
+@COND_MODCSERVICE_TRUE@	mod.cservice/cservice_crypt.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/networkData.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/sqlChannel.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/sqlUser.cc \
@@ -1998,6 +2009,7 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODCSERVICE_TRUE@	mod.cservice/ADDUSERCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/BANCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/BANLISTCommand.cc \
+@COND_MODCSERVICE_TRUE@	mod.cservice/CERTCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/CHANINFOCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/CLEARMODECommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/DEOPCommand.cc \
@@ -2753,6 +2765,9 @@ mod.cservice/libcservice_la-banMatcher.lo:  \
 	mod.cservice/$(DEPDIR)/$(am__dirstamp)
 mod.cservice/libcservice_la-cservice.lo: mod.cservice/$(am__dirstamp) \
 	mod.cservice/$(DEPDIR)/$(am__dirstamp)
+mod.cservice/libcservice_la-cservice_crypt.lo:  \
+	mod.cservice/$(am__dirstamp) \
+	mod.cservice/$(DEPDIR)/$(am__dirstamp)
 mod.cservice/libcservice_la-networkData.lo:  \
 	mod.cservice/$(am__dirstamp) \
 	mod.cservice/$(DEPDIR)/$(am__dirstamp)
@@ -2786,6 +2801,9 @@ mod.cservice/libcservice_la-BANCommand.lo:  \
 	mod.cservice/$(am__dirstamp) \
 	mod.cservice/$(DEPDIR)/$(am__dirstamp)
 mod.cservice/libcservice_la-BANLISTCommand.lo:  \
+	mod.cservice/$(am__dirstamp) \
+	mod.cservice/$(DEPDIR)/$(am__dirstamp)
+mod.cservice/libcservice_la-CERTCommand.lo:  \
 	mod.cservice/$(am__dirstamp) \
 	mod.cservice/$(DEPDIR)/$(am__dirstamp)
 mod.cservice/libcservice_la-CHANINFOCommand.lo:  \
@@ -3140,6 +3158,8 @@ libircu/la-msg_B.lo: libircu/$(am__dirstamp) \
 	libircu/$(DEPDIR)/$(am__dirstamp)
 libircu/la-msg_C.lo: libircu/$(am__dirstamp) \
 	libircu/$(DEPDIR)/$(am__dirstamp)
+libircu/la-msg_CF.lo: libircu/$(am__dirstamp) \
+	libircu/$(DEPDIR)/$(am__dirstamp)
 libircu/la-msg_CM.lo: libircu/$(am__dirstamp) \
 	libircu/$(DEPDIR)/$(am__dirstamp)
 libircu/la-msg_D.lo: libircu/$(am__dirstamp) \
@@ -3470,6 +3490,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_AD.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_B.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_C.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_CF.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_CM.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libircu/$(DEPDIR)/la-msg_DS.Plo@am__quote@ # am--include-marker
@@ -3592,6 +3613,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-ADDUSERCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-BANCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-BANLISTCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-CERTCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-CHANINFOCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-CLEARMODECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-DEOPCommand.Plo@am__quote@ # am--include-marker
@@ -3647,6 +3669,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-cservice.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-cservice_crypt.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-networkData.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-sqlBan.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-sqlChannel.Plo@am__quote@ # am--include-marker
@@ -4719,6 +4742,13 @@ mod.cservice/libcservice_la-cservice.lo: mod.cservice/cservice.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.cservice/libcservice_la-cservice.lo `test -f 'mod.cservice/cservice.cc' || echo '$(srcdir)/'`mod.cservice/cservice.cc
 
+mod.cservice/libcservice_la-cservice_crypt.lo: mod.cservice/cservice_crypt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT mod.cservice/libcservice_la-cservice_crypt.lo -MD -MP -MF mod.cservice/$(DEPDIR)/libcservice_la-cservice_crypt.Tpo -c -o mod.cservice/libcservice_la-cservice_crypt.lo `test -f 'mod.cservice/cservice_crypt.cc' || echo '$(srcdir)/'`mod.cservice/cservice_crypt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.cservice/$(DEPDIR)/libcservice_la-cservice_crypt.Tpo mod.cservice/$(DEPDIR)/libcservice_la-cservice_crypt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.cservice/cservice_crypt.cc' object='mod.cservice/libcservice_la-cservice_crypt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.cservice/libcservice_la-cservice_crypt.lo `test -f 'mod.cservice/cservice_crypt.cc' || echo '$(srcdir)/'`mod.cservice/cservice_crypt.cc
+
 mod.cservice/libcservice_la-networkData.lo: mod.cservice/networkData.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT mod.cservice/libcservice_la-networkData.lo -MD -MP -MF mod.cservice/$(DEPDIR)/libcservice_la-networkData.Tpo -c -o mod.cservice/libcservice_la-networkData.lo `test -f 'mod.cservice/networkData.cc' || echo '$(srcdir)/'`mod.cservice/networkData.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.cservice/$(DEPDIR)/libcservice_la-networkData.Tpo mod.cservice/$(DEPDIR)/libcservice_la-networkData.Plo
@@ -4809,6 +4839,13 @@ mod.cservice/libcservice_la-BANLISTCommand.lo: mod.cservice/BANLISTCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.cservice/BANLISTCommand.cc' object='mod.cservice/libcservice_la-BANLISTCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.cservice/libcservice_la-BANLISTCommand.lo `test -f 'mod.cservice/BANLISTCommand.cc' || echo '$(srcdir)/'`mod.cservice/BANLISTCommand.cc
+
+mod.cservice/libcservice_la-CERTCommand.lo: mod.cservice/CERTCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT mod.cservice/libcservice_la-CERTCommand.lo -MD -MP -MF mod.cservice/$(DEPDIR)/libcservice_la-CERTCommand.Tpo -c -o mod.cservice/libcservice_la-CERTCommand.lo `test -f 'mod.cservice/CERTCommand.cc' || echo '$(srcdir)/'`mod.cservice/CERTCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.cservice/$(DEPDIR)/libcservice_la-CERTCommand.Tpo mod.cservice/$(DEPDIR)/libcservice_la-CERTCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.cservice/CERTCommand.cc' object='mod.cservice/libcservice_la-CERTCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.cservice/libcservice_la-CERTCommand.lo `test -f 'mod.cservice/CERTCommand.cc' || echo '$(srcdir)/'`mod.cservice/CERTCommand.cc
 
 mod.cservice/libcservice_la-CHANINFOCommand.lo: mod.cservice/CHANINFOCommand.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT mod.cservice/libcservice_la-CHANINFOCommand.lo -MD -MP -MF mod.cservice/$(DEPDIR)/libcservice_la-CHANINFOCommand.Tpo -c -o mod.cservice/libcservice_la-CHANINFOCommand.lo `test -f 'mod.cservice/CHANINFOCommand.cc' || echo '$(srcdir)/'`mod.cservice/CHANINFOCommand.cc
@@ -5586,6 +5623,13 @@ libircu/la-msg_C.lo: libircu/msg_C.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libircu/msg_C.cc' object='libircu/la-msg_C.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu/la-msg_C.lo `test -f 'libircu/msg_C.cc' || echo '$(srcdir)/'`libircu/msg_C.cc
+
+libircu/la-msg_CF.lo: libircu/msg_CF.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu/la-msg_CF.lo -MD -MP -MF libircu/$(DEPDIR)/la-msg_CF.Tpo -c -o libircu/la-msg_CF.lo `test -f 'libircu/msg_CF.cc' || echo '$(srcdir)/'`libircu/msg_CF.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libircu/$(DEPDIR)/la-msg_CF.Tpo libircu/$(DEPDIR)/la-msg_CF.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libircu/msg_CF.cc' object='libircu/la-msg_CF.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -c -o libircu/la-msg_CF.lo `test -f 'libircu/msg_CF.cc' || echo '$(srcdir)/'`libircu/msg_CF.cc
 
 libircu/la-msg_CM.lo: libircu/msg_CM.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libircu_la_CXXFLAGS) $(CXXFLAGS) -MT libircu/la-msg_CM.lo -MD -MP -MF libircu/$(DEPDIR)/la-msg_CM.Tpo -c -o libircu/la-msg_CM.lo `test -f 'libircu/msg_CM.cc' || echo '$(srcdir)/'`libircu/msg_CM.cc
@@ -6634,6 +6678,7 @@ distclean: distclean-recursive
 	-rm -f libircu/$(DEPDIR)/la-msg_AD.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_B.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_C.Plo
+	-rm -f libircu/$(DEPDIR)/la-msg_CF.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_CM.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_D.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_DS.Plo
@@ -6756,6 +6801,7 @@ distclean: distclean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-ADDUSERCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-BANCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-BANLISTCommand.Plo
+	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-CERTCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-CHANINFOCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-CLEARMODECommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-DEOPCommand.Plo
@@ -6811,6 +6857,7 @@ distclean: distclean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-cservice.Plo
+	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-cservice_crypt.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-networkData.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlBan.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlChannel.Plo
@@ -7008,6 +7055,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f libircu/$(DEPDIR)/la-msg_AD.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_B.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_C.Plo
+	-rm -f libircu/$(DEPDIR)/la-msg_CF.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_CM.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_D.Plo
 	-rm -f libircu/$(DEPDIR)/la-msg_DS.Plo
@@ -7130,6 +7178,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-ADDUSERCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-BANCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-BANLISTCommand.Plo
+	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-CERTCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-CHANINFOCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-CLEARMODECommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-DEOPCommand.Plo
@@ -7185,6 +7234,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-cservice.Plo
+	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-cservice_crypt.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-networkData.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlBan.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlChannel.Plo

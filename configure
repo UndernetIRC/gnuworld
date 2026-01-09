@@ -891,6 +891,9 @@ with_pgconfig
 with_log4cplus
 with_log4cplus_lib
 with_log4cplus_include
+with_libssl
+with_libssl_lib
+with_libssl_include
 with_extra_includes
 with_extra_libraries
 with_boost
@@ -1595,6 +1598,11 @@ Optional Packages:
                           Specify location to find liblog4cplus.so
   --with-log4cplus-include=LOG4CPLUSINCLUDEDIR
                           Specify location to find logger.h
+  --with-libssl           Enable OpenSSL (default)
+  --with-libssl-lib=LIBSSLLIBDIR
+                          Specify location to find libssl.so
+  --with-libssl-include=SSLINCLUDEDIR
+                          Specify location to find ssl.h
   --with-extra-includes=INCLUDESDIR
                           Specify location to find additional include files
   --with-extra-libraries=LIBRARYDIR
@@ -21665,6 +21673,107 @@ printf "%s\n" "#define ENABLE_LOG4CPLUS /**/" >>confdefs.h
 
 	LDFLAGS="${LDFLAGS} -L${LOG4CPLUS_LIB} -llog4cplus"
 	CXXFLAGS="${CXXFLAGS} -I${LOG4CPLUS_INCLUDE}"
+fi
+
+
+
+# Check whether --with-libssl was given.
+if test ${with_libssl+y}
+then :
+  withval=$with_libssl; check_libssl=$withval
+else case e in #(
+  e) check_libssl=yes ;;
+esac
+fi
+
+
+
+# Check whether --with-libssl-lib was given.
+if test ${with_libssl_lib+y}
+then :
+  withval=$with_libssl_lib; SSL_LIB=$withval
+else case e in #(
+  e) SSL_LIB="/usr/lib" ;;
+esac
+fi
+
+
+
+# Check whether --with-libssl-include was given.
+if test ${with_libssl_include+y}
+then :
+  withval=$with_libssl_include; SSL_INCLUDE=$withval
+else case e in #(
+  e) SSL_INCLUDE="/usr/include" ;;
+esac
+fi
+
+
+if test "x$check_libssl" != "xno"; then
+	LDFLAGS="${LDFLAGS} -L${SSL_LIB} -lssl -lcrypto"
+	CXXFLAGS="${CXXFLAGS} -I${SSL_INCLUDE} -L${SSL_LIB}"
+	as_ac_File=`printf "%s\n" "ac_cv_file_"$SSL_LIB/libssl.so"" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for \"$SSL_LIB/libssl.so\"" >&5
+printf %s "checking for \"$SSL_LIB/libssl.so\"... " >&6; }
+if eval test \${$as_ac_File+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r ""$SSL_LIB/libssl.so""; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi ;;
+esac
+fi
+eval ac_res=\$$as_ac_File
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"
+then :
+
+else case e in #(
+  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Unable to find libssl.so, please use --with-libssl-lib to specify the path" >&5
+printf "%s\n" "$as_me: WARNING: Unable to find libssl.so, please use --with-libssl-lib to specify the path" >&2;} ;;
+esac
+fi
+
+	as_ac_File=`printf "%s\n" "ac_cv_file_"$SSL_INCLUDE/openssl/ssl.h"" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for \"$SSL_INCLUDE/openssl/ssl.h\"" >&5
+printf %s "checking for \"$SSL_INCLUDE/openssl/ssl.h\"... " >&6; }
+if eval test \${$as_ac_File+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r ""$SSL_INCLUDE/openssl/ssl.h""; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi ;;
+esac
+fi
+eval ac_res=\$$as_ac_File
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"
+then :
+
+else case e in #(
+  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Unable to find ssl.h, please use --with-libssl-include to specify the path" >&5
+printf "%s\n" "$as_me: WARNING: Unable to find ssl.h, please use --with-libssl-include to specify the path" >&2;} ;;
+esac
+fi
+
+
+printf "%s\n" "#define HAVE_LIBSSL /**/" >>confdefs.h
+
+else
+	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: OpenSSL support disabled (--without-libssl)" >&5
+printf "%s\n" "$as_me: WARNING: OpenSSL support disabled (--without-libssl)" >&2;}
 fi
 
 

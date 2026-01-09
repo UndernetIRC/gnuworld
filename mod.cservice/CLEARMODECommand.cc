@@ -100,7 +100,7 @@ if(!tmpChan)
 	return false;
 	}
 
-bot->ClearMode( tmpChan, string( "mstnipklrDcC" ), false ) ;
+bot->ClearMode( tmpChan, string( "mstnipklrDcCuMZ" ), false ) ;
 
 bot->Notice(theClient,
     bot->getResponse(theUser,

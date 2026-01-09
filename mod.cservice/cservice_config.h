@@ -123,10 +123,27 @@
 #undef GLINE_ON_FLOODPRO
 
 /*
- * Enable this to send new AC messages upon changes of sqlUser flags.
+ * Enable this to enable the following features currently not released in ircu:
+ * - Send new AC messages upon changes of sqlUser flags.
+ * - TLS connections
+ * - SASL authentication
+ * - Network config
+ * - Autohide hostmask (+x)
  * All servers on the network must run the appropriate version of ircu
  * in order not to get protocol violation messages.
  */
-#undef USE_AC_XFLAGS
+#undef NEW_IRCU_FEATURES
+
+/**
+ * Define the number of iterations for the SCRAM record generation.
+ * Must not exceed 4096.
+ */
+#define CRYPT_ITERATIONS 4096
+
+/**
+ * Define the length of the salt for the SCRAM record generation.
+ * Must be in the range of 12 to 64 bytes.
+ */
+#define CRYPT_SALT_LEN 16
 
 #endif // __CSERVICE_CONFIG_H

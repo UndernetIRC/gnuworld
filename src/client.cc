@@ -122,6 +122,7 @@ if( mode & iClient::MODE_SERVICES )	Mode += 'k' ;
 if( mode & iClient::MODE_OPER )		Mode += 'o' ;
 if( mode & iClient::MODE_WALLOPS )	Mode += 'w' ;
 if( mode & iClient::MODE_INVISIBLE )	Mode += 'i' ;
+if( mode & iClient::MODE_TLS )		Mode += 'z' ;
 
 return Mode ;
 }
@@ -153,6 +154,7 @@ for( ; ptr != end ; ++ptr )
 		case 'o': mode |= iClient::MODE_OPER ; break;
 		case 'w': mode |= iClient::MODE_WALLOPS ; break;
 		case 'i': mode |= iClient::MODE_INVISIBLE ; break;
+		case 'z': mode |= iClient::MODE_TLS ; break;
 
 		default:
 			elog	<< "xClient::Mode> Unknown mode: "
@@ -2667,10 +2669,15 @@ for( string::size_type modePos = 0 ; modePos < modes.size() ; ++modePos )
 			modeVector.push_back(make_pair(false,
 				Channel::MODE_PART));
 			break;
-		case 'M':  // mode to prevent part messages
+		case 'M':  // mode to moderate for non-authed users
 			theChan->removeMode(Channel::MODE_MNOREG);
 			modeVector.push_back(make_pair(false,
 				Channel::MODE_MNOREG));
+			break;
+		case 'Z':  // TLS only?
+			theChan->removeMode(Channel::MODE_Z);
+			modeVector.push_back(make_pair(false,
+				Channel::MODE_Z));
 			break;
 		case 'A':  // Apass for oplevels
 			if (theChan->getMode(Channel::MODE_A))

@@ -1,5 +1,41 @@
 // $Id: ChangeLog,v 1.173 2010/04/10 18:56:06 danielaustin Exp $ //
 
+2026-01-09  MrIron
+		* Major update: TLS support (based on Compy's initial implementation), SASL/SCRAM authentication, fingerprint features, and expanded user/channel modes.
+		* configure.ac:
+			- Added default libssl detection and configuration for TLS features.
+		* bin/server_command_map, include/Network.h, include/events.h, libircu/Makefile.am, libircu/msg_CF.cc (new), src/Network.cc:
+			- Implemented new CF network command (network configuration) to hold network-wide configuration variables, necessary for the SASL implementation.
+		* src/main.cc, src/server.cc, src/client.cc, src/Channel.cc, src/Network.cc, src/iClient.cc, libgnuworld/Connection.cc, Connection.h, ConnectionManager.cc, ConnectionManager.h, misc.cc, misc.h,
+		  include/Channel.h, include/Network.h, include/defs.h.in, include/events.h, include/gnuworld_config.h, include/iClient.h, include/server.h:
+			- Added TLS support (configurable, with certificate/key loading, TLS-only channel/user modes).
+			- Added new channel and user modes for TLS implementation.
+			- Updated connection logic, mode parsing, and display for TLS.
+			- Added TLS fingerprint field to iClient and related constructors.
+			- Updated for new TLS, fingerprint, and mode features.
+		* mod.cservice/cservice_crypt.cc, mod.cservice/cservice_crypt.h (new files):
+			- Implemented SCRAM-SHA-256 password hashing and authentication helpers.
+			- Added base64 helpers, PBKDF2, HMAC, and nonce generation.
+		* mod.cservice/CERTCommand.cc (new file):
+			- Added certificate management and fingerprint registration commands.
+		* mod.cservice/CHANINFOCommand.cc, CLEARMODECommand.cc, HELLOCommand.cc, LOGINCommand.cc, NEWPASSCommand.cc, SETCommand.cc, constants.h, cservice.cc, cservice.h, cserviceCommands.h, cservice_config.h, cservice_confvars.h, responses.h, sqlUser.cc, sqlUser.h:
+			- Added SASL/SCRAM authentication, fingerprint management, new user flags (certonly, autohide, etc.), and expanded command set.
+			- Improved error handling, logging, and configuration options.
+		* mod.dronescan/FAKECommand.cc, mod.gnutest/gnutest.cc, mod.nickserv/nickserv.cc, mod.snoop/snoop.cc:
+			- Updated iClient instantiation to include TLS fingerprint field.
+		* mod.scanner/wingateModule.cc:
+			- Updated Connect() to accept TLS flag.
+		* mod.ccontrol/CLEARCHANCommand.cc, WHOISCommand.cc, ccontrol.cc:
+			- Minor updates for compatibility with new TLS and fingerprint features.
+		* mod.cloner/cloner.cc:
+			- Minor update for compatibility.
+		* libircu/msg_B.cc, msg_CM.cc, msg_M.cc, msg_N.cc:
+			- Implemented TLS user and channel modes and fingerprint parsing.
+		* bin/GNUWorld.example.conf, bin/cservice.example.conf:
+			- Updated example configs for new TLS and authentication options.
+		* doc/cservice.sql, doc/cservice.update.sql:
+			- Updated schema for SCRAM, fingerprint, and new flags.
+
 2025-10-17  MrIron
 		* src/main.cc:
 		* include/server.h:
