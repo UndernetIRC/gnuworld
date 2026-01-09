@@ -27,7 +27,7 @@
 namespace gnuworld
 {
 
-bool CERTCommand::Exec( iClient* [[maybe_unused]] theClient, const string& [[maybe_unused]] Message )
+bool CERTCommand::Exec( [[maybe_unused]] iClient* theClient, [[maybe_unused]] const string& Message )
 {
 #ifdef NEW_IRCU_FEATURES
 
