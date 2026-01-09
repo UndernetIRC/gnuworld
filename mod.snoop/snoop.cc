@@ -197,6 +197,7 @@ iClient* newClient = new (std::nothrow) iClient(
 	string(), // account
 	0, // account_id
 	0, // account_flags
+	string(), // tls fingerprint
 	realname,
 	31337 // connect time
 	) ;

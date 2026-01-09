@@ -34,31 +34,28 @@
 namespace gnuworld
 {
 
-// Allocate these static variables in class Connection
-const Connection::flagType	Connection::F_PENDING = 0x01 ;
-const Connection::flagType	Connection::F_CONNECTED = 0x02 ;
-const Connection::flagType	Connection::F_INCOMING = 0x04 ;
-const Connection::flagType	Connection::F_LISTEN = 0x08 ;
-const Connection::flagType	Connection::F_FILE = 0x10 ;
-const Connection::flagType	Connection::F_FLUSH = 0x20 ;
-
 using std::string ;
 
 // Simply initialize the object
 Connection::Connection( const string& _hostname,
 	const unsigned short int _remotePort,
-	const char _delimiter )
+	const char _delimiter,
+	bool _tlsEnabled )
 : hostname( _hostname ),
 	localPort( 0 ),
 	remotePort( _remotePort ),
 	inputBuffer( _delimiter ),
 	outputBuffer( _delimiter ),
+	tlsEnabled( _tlsEnabled ),
 	IP( string() ),
 	sockFD( -1 ),
 	flags( F_PENDING ),
 	connectTime( 0 ),
 	bytesRead( 0 ),
 	bytesWritten( 0 )
+#ifdef HAVE_LIBSSL
+	, tlsState( nullptr )
+#endif
 {
 memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
 }
@@ -68,15 +65,28 @@ Connection::Connection( const char _delimiter )
 	remotePort( 0 ),
 	inputBuffer( _delimiter ),
 	outputBuffer( _delimiter ),
+	tlsEnabled( false ),
 	sockFD( -1 ),
-	flags( F_PENDING )
+	flags( F_PENDING ),
+	connectTime( 0 ),
+	bytesRead( 0 ),
+	bytesWritten( 0 )
+#ifdef HAVE_LIBSSL
+	, tlsState( nullptr )
+#endif
 {
 memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
 }
 
 Connection::~Connection()
 {
-/* No work to be done, no heap space allocated */
+#ifdef HAVE_LIBSSL
+if( tlsState )
+	{
+	SSL_free( tlsState ) ;
+	tlsState = nullptr ;
+	}
+#endif
 }
 
 void Connection::Write( const string& writeMe )

@@ -179,7 +179,7 @@ MyUplink->RegisterEvent( EVT_XQUERY, this );
 MyUplink->RegisterEvent( EVT_XREPLY, this );
 MyUplink->RegisterEvent( EVT_GLINE , this );
 MyUplink->RegisterEvent( EVT_REMGLINE , this );
-
+MyUplink->RegisterEvent( EVT_NETBREAK, this );
 
 xClient::OnAttach() ;
 }
@@ -218,7 +218,9 @@ RegisterCommand(new SHOWIGNORECommand(this, "SHOWIGNORE", "", 3));
 RegisterCommand(new SUPPORTCommand(this, "SUPPORT", "#channel <YES|NO>", 15));
 RegisterCommand(new NOTECommand(this, "NOTE", "send <username> <message>, read all, erase <all|message id>", 10));
 RegisterCommand(new NOTECommand(this, "NOTES", "send <username> <message>, read all, erase <all|message id>", 10));
-
+#ifdef NEW_IRCU_FEATURES
+RegisterCommand(new CERTCommand(this, "CERT", "<ADD|REM|LIST> [fingerprint] [note]", 10));
+#endif
 RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] ..", 3));
 RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] ..", 3));
@@ -404,6 +406,9 @@ preloadLevelsCache();
 /* Preload any user accounts we want to */
 preloadUserCache();
 
+/* Preload fingerprints */
+preloadFingerprintCache();
+
 /* Load the glines from db */
 loadGlines();
 
@@ -434,6 +439,8 @@ for( commandMapType::iterator ptr = commandMap.begin() ;
 	}
 
 commandMap.clear() ;
+saslRequests.clear() ;
+fingerprintMap.clear() ;
 }
 
 void cservice::BurstChannels()
@@ -516,7 +523,35 @@ void cservice::BurstChannels()
 
 void cservice::OnConnect()
 {
-// TODO: I changed this from return 0
+#ifdef NEW_IRCU_FEATURES
+auto saslServer = Network->findNetConf( "sasl.server" ) ;
+if( !saslServer || saslServer->first != MyUplink->getName() )
+  {
+  MyUplink->Write( "%s CF %d sasl.server :%s",
+    getCharYY().c_str(),
+    time(nullptr),
+    MyUplink->getName().c_str() ) ;
+  }
+
+auto saslMechanisms = Network->findNetConf( "sasl.mechanisms" ) ;
+if( !saslMechanisms || saslMechanisms->first != saslMechsAdvertiseList() )
+  {
+  MyUplink->Write( "%s CF %d sasl.mechanisms :%s",
+	getCharYY().c_str(),
+    time(nullptr),
+    saslMechsAdvertiseList().c_str() ) ;
+  }
+
+auto netSaslTimeout = Network->findNetConf( "sasl.timeout" ) ;
+if( !netSaslTimeout || std::stoul( netSaslTimeout->first ) != saslTimeout )
+  {
+  MyUplink->Write( "%s CF %d sasl.timeout :%d",
+    getCharYY().c_str(),
+    time(nullptr),
+    saslTimeout ) ;
+  }
+#endif // NEW_IRCU_FEATURES
+
 xClient::OnConnect() ;
 }
 
@@ -1931,6 +1966,30 @@ bool cservice::hasIPR( sqlUser* theUser )
 		return true;
 }
 
+unsigned int cservice::hasFP( sqlUser* theUser )
+{
+stringstream theQuery ;
+theQuery	<< "SELECT COUNT(*) FROM "
+			<< "users_fingerprints WHERE user_id = "
+			<< theUser->getID()
+			<< endl ;
+#ifdef LOG_SQL
+elog	<< "cservice::hasFP::sqlQuery> "
+		<< theQuery.str()
+		<< endl ;
+#endif
+
+if( !SQLDb->Exec(theQuery, true ) )
+	{
+	elog    << "cservice::hasFP> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl;
+	return 0 ;
+	}
+
+return SQLDb->Tuples() ;
+}
+
 /**
  *  Check a user against IP restrictions
  */
@@ -3000,6 +3059,7 @@ void cservice::processDBUpdates()
 	updateUsers();
 	updateLevels();
 	updateBans();
+	updateFingerprints();
 	LOG( INFO, "[DB-UPDATE]: Complete.");
 }
 
@@ -3308,6 +3368,39 @@ void cservice::updateUsers()
 
 	/* Set the "Last refreshed from Users table" timestamp. */
 	lastUserRefresh = atoi(SQLDb->GetValue(0,"db_unixtime").c_str());
+}
+
+/*
+ * Check the fingerpritns table to see if there have been any updates since we last looked.
+ */
+void cservice::updateFingerprints()
+{
+const std::string theQuery = "SELECT fingerprint,user_id FROM users_fingerprints" ;
+
+#ifdef LOG_SQL
+elog	<< "*** [CMaster::updateFingerprints]: sqlQuery: "
+		<< theQuery
+		<< endl ;
+#endif
+
+if( !SQLDb->Exec(theQuery, true ) )
+	{
+	elog	<< "*** [CMaster::updateFingerprints]: SQL error: "
+			<< SQLDb->ErrorMessage()
+			<< endl ;
+	return;
+	}
+
+if( SQLDb->Tuples() <= 0 )
+	{
+	return ;
+	}
+
+fingerprintMap.clear() ;
+for( unsigned int i = 0 ; i < SQLDb->Tuples() ; i++ )
+	fingerprintMap.emplace( SQLDb->GetValue( i, 0 ), std::stoul( SQLDb->GetValue( i, 1 ) ) ) ;
+
+LOG(INFO, "[DB-UPDATE]: Refreshed fingerprint(s)." ) ;
 }
 
 void cservice::updateBans()
@@ -4911,12 +5004,25 @@ void cservice::OnEvent( const eventType& theEvent,
 {
 switch( theEvent )
 	{
+	case EVT_NETBREAK:
+		{
+		iServer* theServer = static_cast< iServer* >( data1 ) ;
+		saslRequests.erase(
+			std::remove_if(
+				saslRequests.begin(),
+				saslRequests.end(),
+				[&]( const SaslRequest& req ) { return req.theServer == theServer ; }
+			),
+			saslRequests.end()
+		) ;
+		break ;
+		}
 	case EVT_XQUERY:
 		{
 		iServer* theServer = static_cast< iServer* >( data1 );
 		const char* Routing = reinterpret_cast< char* >( data2 );
 		const char* Message = reinterpret_cast< char* >( data3 );
-		//elog << "CSERVICE.CC XQUERY: " << theServer->getName() << " " << Routing << " " << Message << endl;
+		// elog << "CSERVICE.CC XQUERY: " << theServer->getName() << " " << Routing << " " << Message << endl;
 		//As it is possible to run multiple GNUWorld clients on one server, first parameter should be a nickname.
 		//If it ain't us, ignore the message, the message is probably meant for another client here.
 		StringTokenizer st( Message ) ;
@@ -4934,6 +5040,10 @@ switch( theEvent )
 		if ((Command == "ISUSER") || (Command == "ISCHAN"))
 			{
 			doXQIsCheck(theServer, Routing, Command, Message);
+			}
+		if (Command == "SASL")
+			{
+			doXQSASL(theServer, Routing, Message);
 			}
 		break;
 		}
@@ -7599,6 +7709,29 @@ void cservice::preloadUserCache()
 			<< endl;
 }
 
+void cservice::preloadFingerprintCache()
+{
+	stringstream theQuery;
+	theQuery	<< "SELECT fingerprint,user_id FROM users_fingerprints"
+				<< endl;
+
+	elog		<< "*** [CMaster::preloadFingerprintCache]: Loading TLS fingerprints : "
+				<< endl;
+
+	if( SQLDb->Exec(theQuery, true ) )
+	{
+		for (unsigned int i = 0 ; i < SQLDb->Tuples(); i++)
+			{
+			fingerprintMap.emplace(SQLDb->GetValue(i,0), std::stoul(SQLDb->GetValue(i,1)));
+			}
+	}
+
+	elog	<< "*** [CMaster::preloadFingerprintCache]: Done. Loaded "
+			<< SQLDb->Tuples()
+			<< " fingerprints."
+			<< endl;
+}
+
 void cservice::incStat(const string& name)
 {
 	statsMapType::iterator ptr = statsMap.find( name );
@@ -7881,6 +8014,26 @@ void cservice::doCoderStats(iClient* theClient)
         }
 	userDBTOTPIPRTotal = atoi(SQLDb->GetValue(0,0));
 
+	int userDBFPTotal = 0;
+	theQuery.str("");
+	theQuery	<< "SELECT COUNT(*) FROM users,users_fingerprints WHERE "
+				<< "users.id = users_fingerprints.user_id"
+				<< endl;
+#ifdef LOG_SQL
+	elog	<< "cservice::doCoderStats::sqlQuery> "
+		<< theQuery.str().c_str()
+		<< endl;
+#endif
+
+	if( !SQLDb->Exec(theQuery, true ) )
+	{
+		elog    << "cservice::doCoderStats> SQL Error: "
+			<< SQLDb->ErrorMessage()
+			<< endl;
+		return;
+        }
+	userDBFPTotal = atoi(SQLDb->GetValue(0,0));
+
 	float userTotal = userCacheHits + userHits;
 	float userEf = userCacheHits ? ((float)userCacheHits / userTotal * 100) : 0;
 
@@ -7953,6 +8106,7 @@ void cservice::doCoderStats(iClient* theClient)
 	Notice(theClient, "--- Total users in DB with IPR: %i (in cache: %i (%.2f%% of total))", userDBIPRTotal, iprCount, cacheIPRTotal);
 	float cacheIPRTOTPTotal = ((float)ipr_totp_Count / (float)sqlUserCache.size()) * 100;
 	Notice(theClient, "--- Total users in DB with TOTP&IPR: %i (in cache: %i (%.2f%% of total))", userDBTOTPIPRTotal, ipr_totp_Count, cacheIPRTOTPTotal);
+	Notice(theClient, "--- Total users in DB with TLS: %i (fingerprints in cache %i)", userDBFPTotal, fingerprintMap.size());
 
 	float authTotal = ((float)authCount / (float)Network->clientList_size()) * 100;
 	Notice(theClient, "--- Total Auth'd  : %i (%.2f%% of total)",
@@ -8216,143 +8370,915 @@ else
   }
 }
 
-int cservice::authenticateUser(const string& username, const string& password, const string& ip, const string& ident,unsigned int& ipr_ts,sqlUser** suser)
+cservice::AuthResult cservice::authenticateUser( AuthStruct& auth )
 {
+unsigned int ipr_ts ;
+bool certAuth = false ; // Set to true if the client has a certificate matching the username
+
+/* 1: Check loginDelay. */
 unsigned int useLoginDelay = getConfigVar("USE_LOGIN_DELAY")->asInt();
 unsigned int loginTime = getUplink()->getStartTime() + loginDelay;
 if ( (useLoginDelay == 1) && (loginTime >= (unsigned int)currentTime()) )
-        {
-        return TOO_EARLY_TOLOGIN;
-        }
-/*
- * Find the user record, confirm authorisation and attach the record
- * to this client.
- */
-if(username[0] == '#')
-        {
-        return AUTH_FAILED;
-        }
+    {
+    return TOO_EARLY_TOLOGIN ;
+    }
 
+/* 2: Check whether this iClient has exceeded the maximum number of failed login attempts. */
+if( auth.theClient )
+	{
+	unsigned int maxFailedLogins = getConfigVar("MAX_FAILED_LOGINS")->asInt() ;
+	unsigned int failedLogins = getFailedLogins( auth.theClient ) ;
+	if( ( maxFailedLogins > 0 ) && ( failedLogins >= maxFailedLogins ) )
+		return AUTH_FAIL_EXCEEDED ;
+	}
+
+/* 3: Check that the username exists. */
 // TODO: Force a refresh of the user's info from the db
-*suser = getUserRecord(username);
-
-sqlUser* theUser = *suser;
+sqlUser* theUser = getUserRecord( auth.username ) ;
 if( !theUser )
-        {
-        return AUTH_UNKNOWN_USER;
-        }
+    {
+	return AUTH_UNKNOWN_USER ;
+    }
 
-if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-        {
-        return AUTH_SUSPENDED_USER;
-        }
-StringTokenizer st (password);
-int pass_end = st.size();
+auth.theUser = theUser ;
+
+/* 4: Check whether the username is glbobally suspended. */
+if( theUser->getFlag( sqlUser::F_GLOBAL_SUSPEND ) )
+	{
+	return AUTH_SUSPENDED_USER ;
+	}
+
+/**
+ * 5: If the client has a fingerprint, we check whether it matches the username.
+ * If it does, we take that into account when parsing the password string to look for
+ * the TOTP token (if any). If there is no match, we treat the password string as a
+ * regular login.
+ * 
+ * If the client is authenticating with EXTERNAL, the auth fails if the fingerprint does not match the username.
+ *
+ */
+if( !auth.fingerprint.empty() )
+	{
+	auto it = fingerprintMap.find( auth.fingerprint ) ;
+	if( it != fingerprintMap.end() && it->second == theUser->getID() )
+		certAuth = true ;
+	}
+
+if( auth.sasl == SaslMechanism::EXTERNAL && !certAuth )
+	{
+	return AUTH_INVALID_FINGERPRINT ;
+	}
+
+/* 6: If CERTONLY is set for this user, the auth fails if we did not get a fingerprint match. */
+if( theUser->getFlag( sqlUser::F_CERTONLY ) && !certAuth )
+	{
+	return AUTH_CERTONLY ;
+	}
+
+/**
+ * 7: Check whether a TOTP token has been provided.
+ * TOTP is not required for fingerprint authentication if F_CERT_DISABLE_TOTP is set.
+ */
+StringTokenizer st( auth.password ) ;
+StringTokenizer::size_type pass_end = st.size() ;
 
 #ifdef TOTP_AUTH_ENABLED
-bool totp_enabled = false;
-if(totpAuthEnabled && theUser->getFlag(sqlUser::F_TOTP_ENABLED)) {
-	if(st.size() == 1 ) {
-                return AUTH_NO_TOKEN;
-        }
-        pass_end = st.size()-1;
-        totp_enabled = true;
-}
+bool totp_enabled = false ;
+
+if( totpAuthEnabled && theUser->getFlag( sqlUser::F_TOTP_ENABLED ) )
+	{
+	/* If the user has a certificate matching the username or we are using SCRAM, the password is the TOTP token. */
+    if( ( certAuth && !theUser->getFlag( sqlUser::F_CERT_DISABLE_TOTP ) )
+		|| auth.sasl == SaslMechanism::SCRAM_SHA_256 ) 
+		{
+        if( st.size() < 1 )
+            return AUTH_NO_TOKEN ;
+
+        pass_end = st.size() - 1 ;
+		totp_enabled = true ;
+		}
+	/* If the user does not have a certificate matching the username and we are not using SCRAM, the second part of the password is the TOTP token. */
+    else if( !certAuth && auth.sasl != SaslMechanism::SCRAM_SHA_256 )
+    	{
+        if( st.size() < 2 )
+            return AUTH_NO_TOKEN ;
+
+        pass_end = st.size() - 1 ;
+		totp_enabled = true ;
+		}
+	}
 #endif
 
-/*
- * Check if this is a privileged user, if so check against IP restrictions
+/**
+ * 8: IPR
+ * Check if this is a privileged user, if so check against IP restrictions.
  */
-if (needIPRcheck(theUser))
-{
+if( needIPRcheck( theUser ) )
+	{
 	/* ok, they have "*" access (excluding alumni's) */
-	if (!checkIPR(ip, theUser, ipr_ts))
-	{
-		return AUTH_FAILED_IPR;
+	if( !checkIPR( auth.ip, theUser, ipr_ts ) )
+		return AUTH_FAILED_IPR ;
 	}
-}
 
 /*
- * Check password, if its wrong, bye bye.
+ * 9: Check password.
+ * Password will not be checked for EXTERNAL or SCRAM or when a matching certificate is provided.
  */
-if (!isPasswordRight(theUser, st.assemble(0,pass_end)))
-        {
-        return AUTH_INVALID_PASS;
-        }
+if( !certAuth && auth.sasl != SaslMechanism::SCRAM_SHA_256
+	&& auth.sasl != SaslMechanism::EXTERNAL
+	&& !isPasswordRight( theUser, st.assemble( 0, pass_end ) ) )
+    {
+    return AUTH_INVALID_PASS ;
+    }
+
+/*
+ * Compute SCRAM RECORD if it does not exist.
+ */
+#ifdef HAVE_LIBSSL
+if( !certAuth && auth.sasl != SaslMechanism::SCRAM_SHA_256
+	&& auth.sasl != SaslMechanism::EXTERNAL
+	&& theUser->getScramRecord().empty() )
+	{
+	std::string err ;
+	auto recOpt = make_scram_sha256_record( st.assemble( 0, pass_end ), &err ) ;
+
+	if( !recOpt )
+		{
+		LOG( ERROR, "[SCRAM] Record generation error: {}", err ) ;
+		}
+	else
+		{
+		std::string scram_record = *recOpt ;
+		theUser->setScramRecord( scram_record ) ;
+		if( auth.theClient )
+			theUser->commit( auth.theClient ) ;
+		else
+			theUser->commit( auth.ident + "@" + auth.ip ) ;
+		}
+	}
+#endif // HAVE_LIBSSL
+
+/* 10: Check TOTP token. */
 #ifdef TOTP_AUTH_ENABLED
-if(totp_enabled) {
-        char* key;
-        size_t len;
-        int res  = oath_base32_decode(theUser->getTotpKey().c_str(),theUser->getTotpKey().size(),&key,&len);
-        if(res != OATH_OK) {
-                return AUTH_ERROR;
-        }
-        res=oath_totp_validate(key,len,time(NULL),30,0,1,st[st.size()-1].c_str());
-        free(key);
-        if(res < 0 ) {
-                return AUTH_INVALID_TOKEN;
-        }
-}
+if( totp_enabled )
+	{
+	char* key ;
+	size_t len ;
+	int res  = oath_base32_decode( theUser->getTotpKey().c_str(), theUser->getTotpKey().size(), &key, &len ) ;
+	if( res != OATH_OK )
+		return AUTH_ERROR ;
+
+	res = oath_totp_validate( key, len, time(NULL), 30, 0, 1, st[ pass_end ].c_str() ) ;
+	free( key ) ;
+	if( res < 0 )
+		return AUTH_INVALID_TOKEN;
+	}
 #endif
 
-/*
- * Don't exceed MAXLOGINS.
- */
-
-bool iploginallow = false;
-//unsigned long clip = xIP(ip.c_str(),false).GetLongIP();
-//string clip = xIP(xIP(ip.c_str(),false).GetLongIP()).GetNumericIP();
-string clip = fixToCIDR64(ip.c_str());
-if(theUser->networkClientList.size() + 1 > theUser->getMaxLogins()) {
-        /* They have exceeded their maxlogins setting, but check if they
-           are allowed to login from the same IP - only applies if their
-           maxlogins is set to ONE */
-        uint32_t iplogins = getConfigVar("LOGINS_FROM_SAME_IP")->asInt();
-        uint32_t iploginident = getConfigVar("LOGINS_FROM_SAME_IP_AND_IDENT")->asInt();
-        if ((theUser->getMaxLogins() == 1) && (iplogins > 1))
-        {
-                /* ok, we're using the multi-logins feature (0=disabled) */
-                if (theUser->networkClientList.size() + 1 <= iplogins)
-                {
-                        /* Check their IP from previous session against
-                           current IP.  If it matches, allow the login.
-                           As this only applies if their maxlogin is 1, we
-                           know there is only 1 entry in their clientlist */
-                		if (clip == (xIP(theUser->networkClientList.front()->getIP()).GetNumericIP(true)))	//->getIP()
-                        {
-                                if (iploginident==1)
-                                {
-                                        /* need to check ident here */
-                                        string oldident = theUser->networkClientList.front()->getUserName();
-                                        if ((oldident[0]=='~') || (oldident==ident))
-                                        {
-                                                /* idents match (or they are unidented) - allow this login */
-                                                iploginallow = true;
-                                        }
-                                } else {
-                                        /* don't need to check ident, this login is allowed */
-                                        iploginallow = true;
-                                }
-                        }
-                }
-        }
-      if (!iploginallow)
-        {
-	return AUTH_ML_EXCEEDED;
-        }
-}
-return AUTH_SUCCEEDED;
-}
-
-int cservice::authenticateUser(const string& username, const string& password, iClient* theClient,sqlUser** theUser) {
-	unsigned int ipr_ts;
-	const string ip = xIP(theClient->getIP()).GetNumericIP();
-	int res = authenticateUser(username,password, ip, theClient->getUserName(),ipr_ts,theUser);
-	if(res == AUTH_SUCCEEDED)
+/* 12: Don't exceed MAXLOGINS. */
+bool iploginallow = false ;
+string clip = fixToCIDR64( auth.ip.c_str() ) ;
+if( theUser->networkClientList.size() + 1 > theUser->getMaxLogins() )
 	{
-        setIPRts(theClient, ipr_ts);
+	/* They have exceeded their maxlogins setting, but check if they
+	 * are allowed to login from the same IP - only applies if their
+	 * maxlogins is set to ONE.
+	 */
+	uint32_t iplogins = getConfigVar("LOGINS_FROM_SAME_IP")->asInt() ;
+	uint32_t iploginident = getConfigVar("LOGINS_FROM_SAME_IP_AND_IDENT")->asInt() ;
+	if( ( theUser->getMaxLogins() == 1 ) && ( iplogins > 1 ) )
+    	{
+		/* ok, we're using the multi-logins feature (0=disabled) */
+		if( theUser->networkClientList.size() + 1 <= iplogins )
+			{
+			/* Check their IP from previous session against
+			 * current IP.  If it matches, allow the login.
+			 * As this only applies if their maxlogin is 1, we
+			 * know there is only 1 entry in their clientlist.
+			 */
+			if( clip == ( xIP( theUser->networkClientList.front()->getIP()).GetNumericIP( true ) ) )
+				{
+				if( iploginident == 1 )
+					{
+					/* need to check ident here */
+					string oldident = theUser->networkClientList.front()->getUserName() ;
+					if( ( oldident[0] =='~' ) || ( oldident == auth.ident ) )
+						{
+						/* idents match (or they are unidented) - allow this login */
+						iploginallow = true ;
+						}
+					}
+				else
+					{
+					/* don't need to check ident, this login is allowed */
+					iploginallow = true ;
+					}
+				}
+            }
+        }
+
+      if( !iploginallow )
+		return AUTH_ML_EXCEEDED;
 	}
-	return res;
+
+/* Success. */
+if( auth.theClient )
+	setIPRts( auth.theClient, ipr_ts ) ;
+
+return AUTH_SUCCEEDED ;
+}
+
+/* This function is called after authenticateUser() to process the authentication. */
+bool cservice::processAuthentication( AuthStruct auth, std::string* Message )
+{
+/* Get background variables. */
+unsigned int loginTime = getUplink()->getStartTime() + loginDelay ;
+unsigned int max_failed_logins = getConfigVar("FAILED_LOGINS")->asInt() ;
+unsigned int failed_login_rate = getConfigVar("FAILED_LOGINS_RATE")->asInt() ;
+
+/* Fetch client info. */
+string clientMask ;
+if( auth.theClient )
+	clientMask = auth.theClient->getRealNickUserHost() ;
+else
+	clientMask = auth.ident + "@" + auth.ip ;
+
+string authResponse ;
+bool setFailedLogin = false ;
+
+switch( auth.result )
+	{
+	case cservice::TOO_EARLY_TOLOGIN:
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s (Unable to login during reconnection, please try again in %i seconds)",
+        	        	auth.username.c_str(), ( loginTime - currentTime() ) ) ;
+		break ;
+	case cservice::AUTH_FAILED:
+	    authResponse = TokenStringsParams( getResponse( NULL, language::auth_failed,
+						string("AUTHENTICATION FAILED as %s") ).c_str(),
+						auth.username.c_str() ) ;
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_UNKNOWN_USER:
+	    authResponse = TokenStringsParams( getResponse( NULL, language::not_registered,
+						string("AUTHENTICATION FAILED as %s") ).c_str(),
+						auth.username.c_str() ) ;
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_SUSPENDED_USER:
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s (Suspended)",
+        				auth.username.c_str() ) ;
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_NO_TOKEN:
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s (Missing TOTP token)",
+						auth.username.c_str() ) ;
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_INVALID_PASS:
+		if( failed_login_rate == 0 )
+			failed_login_rate = 900 ;
+	    authResponse = TokenStringsParams( getResponse( NULL, language::auth_failed,
+						string("AUTHENTICATION FAILED as %s") ).c_str(),
+                		auth.username.c_str() ) ;
+
+        if( ( max_failed_logins > 0 ) && ( auth.theUser->getFailedLogins() > max_failed_logins ) &&
+            ( auth.theUser->getLastFailedLoginTS() < ( time(NULL) - failed_login_rate ) ) )
+		    {
+			/* we have exceeded our maximum - alert relay channel */
+			/* work out a checksum for the password.  Yes, I could have
+				* just used a checksum of the original password, but this
+				* means it's harder to 'fool' the check digit with a real
+				* password - create MD5 from original salt stored */
+			unsigned char   checksum ;
+			md5             hash ;
+			md5Digest       digest ;
+
+			if( auth.theUser->getPassword().size() < 9 )
+				checksum = 0 ;
+			else
+				{
+				string salt = auth.theUser->getPassword().substr( 0, 8 ) ;
+				string guess = salt + auth.password ;
+
+				hash.update( (const unsigned char *)guess.c_str(), guess.size() ) ;
+				hash.report( digest ) ;
+
+				checksum = 0 ;
+				for( size_t i = 0; i < MD5_DIGEST_LENGTH; i++ )
+					{
+					/* add ascii value to check digit */
+					checksum += digest[ i ] ;
+					}
+				}
+
+			auth.theUser->setLastFailedLoginTS( time(NULL) ) ;
+			logPrivAdminMessage("%d failed logins for %s (last attempt by %s%s, checksum %d).",
+					auth.theUser->getFailedLogins(),
+					auth.theUser->getUserName().c_str(),
+					clientMask.c_str(),
+					auth.type == AuthType::XQUERY ? " (LoC)" : "",
+					checksum ) ;
+	        }
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_INVALID_FINGERPRINT:
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s (Invalid fingerprint)",
+						auth.username.c_str() ) ;
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_ERROR:
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s due to an error. Please contact a CService representative",
+						auth.username.c_str() ) ;
+		break ;
+	case cservice::AUTH_INVALID_TOKEN:
+	    authResponse = TokenStringsParams( getResponse( NULL, language::auth_failed_token,
+                        string("AUTHENTICATION FAILED as %s") ).c_str(),
+                       	auth.username.c_str() ) ;
+
+        setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_FAILED_IPR:
+		authResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (IPR)",
+						auth.username.c_str() ) ;
+
+		/* notify the relay channel */
+		logAdminMessage( "%s (%s) failed IPR check.",
+				clientMask.c_str(),
+				auth.username.c_str() ) ;
+
+		if( ( max_failed_logins > 0 ) && ( auth.theUser->getFailedLogins() > max_failed_logins ) &&
+			( auth.theUser->getLastFailedLoginTS() < ( time(NULL) - failed_login_rate ) ) )
+			{
+			/* we have exceeded our maximum - alert relay channel */
+			auth.theUser->setLastFailedLoginTS( time(NULL) ) ;
+			logPrivAdminMessage( "%d failed logins for %s (last attempt by %s).",
+					auth.theUser->getFailedLogins(),
+					auth.theUser->getUserName().c_str(),
+					clientMask.c_str() ) ;
+			}
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_CERTONLY:
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s (Password login disabled and fingerprint mismatch)",
+						auth.username.c_str() ) ;
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_ML_EXCEEDED:
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s (Maximum concurrent logins exceeded)",
+						auth.theUser->getUserName().c_str() ) ;
+
+		/* Do not list the sessions for XQUERY logins. */
+		if( auth.theClient )
+			{
+			string clientList ;
+			for( sqlUser::networkClientListType::iterator ptr = auth.theUser->networkClientList.begin() ;
+					ptr != auth.theUser->networkClientList.end() ; )
+					{
+					clientList += (*ptr)->getNickUserHost() ;
+					++ptr ;
+					if( ptr != auth.theUser->networkClientList.end() )
+						clientList += ", " ;
+					} // for()
+
+			Notice( auth.theClient, "Current Sessions: %s", clientList.c_str() ) ;
+			}
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_FAIL_EXCEEDED:
+		authResponse = TokenStringsParams( getResponse( NULL, language::max_failed_logins,
+                		string("AUTHENTICATION FAILED as %s (Exceeded maximum login failures for this session)") ).c_str(),
+                		auth.username.c_str() ) ;
+		setFailedLogin = true ;
+		break ;
+	case cservice::AUTH_SUCCEEDED:
+		break ;
+	default:
+		//Should never get here!
+		elog << "Response " << auth.result << " while authenticating!" << endl ;
+		authResponse = TokenStringsParams( "AUTHENTICATION FAILED as %s (due to an error)",
+						auth.username.c_str() ) ;
+		break ;
+	}
+
+if( setFailedLogin )
+	{
+	if( auth.theClient )
+		{
+		unsigned int failedLogins = getFailedLogins( auth.theClient ) ;
+		setFailedLogins( auth.theClient, failedLogins + 1 ) ;
+		}
+
+	if( auth.theUser )
+		auth.theUser->incFailedLogins() ;
+	}
+
+/* Send response only if it fails. If it succeeds, the message is sent from doCommonAuth() */
+if( auth.theClient )
+	{
+	if( auth.result == AUTH_SUCCEEDED )
+		{
+		doCommonAuth( auth.theClient, auth.theUser->getUserName() ) ;
+		return true ;
+		}
+	else
+		{
+		Notice( auth.theClient, authResponse ) ;
+		return false ;
+		}
+	}
+/**
+ * If theClient is nullptr, it means that the authentication is done by SASL/XQUERY and auth will
+ * occurr when the client is introduced to the network.
+ */
+else
+	{
+	*Message = authResponse ;
+	}
+
+return ( auth.result == AUTH_SUCCEEDED ) ;
+}
+
+bool cservice::parseSaslMechanism( const std::string& in, cservice::SaslMechanism& out )
+{
+    std::string up = string_upper( in ) ;
+#define X(NAME, NAME_STR) if( up == NAME_STR ) { out = cservice::SaslMechanism::NAME ; return true ; }
+    CSERVICE_SASL_MECH_LIST
+#undef X
+    return false ;
+}
+
+std::string cservice::saslMechanismToString( cservice::SaslMechanism mech )
+{
+#define X(NAME, NAME_STR) if( mech == cservice::SaslMechanism::NAME ) return NAME_STR ;
+    CSERVICE_SASL_MECH_LIST
+#undef X
+    return "" ;
+}
+
+std::string cservice::saslMechsAdvertiseList()
+{
+//    std::string out = "MECHS " ;
+	string out ;
+    bool first = true ;
+#define X(NAME, NAME_STR) \
+    do { if( !first ) out += "," ; first = false ; out += string_lower( NAME_STR ) ; } while(0);
+    CSERVICE_SASL_MECH_LIST
+#undef X
+    return out ;
+}
+
+bool cservice::doXQSASL( iServer* theServer, const string& Routing, const string& Message )
+{
+	elog << "cservice::doXQSASL: Routing: " << Routing << " Message: " << Message << "\n" ;
+
+#ifdef HAVE_LIBSSL
+	StringTokenizer st( Message ) ;
+	if( st.size() < 2 )
+		{
+		elog << "Received empty SASL message... Ignoring." << endl;
+		return false ;
+		}
+
+	// Delete timed out requests.
+	auto it = saslRequests.begin() ;
+	while( it != saslRequests.end() )
+		{
+		if( currentTime() - it->last_ts > saslTimeout )
+			it = saslRequests.erase(it) ;
+		else
+			++it ;
+		}
+
+	// Check if we have an existing entry with this routing and server
+    it = std::find_if(
+        saslRequests.begin(),
+        saslRequests.end(),
+        [&]( const SaslRequest& req )
+			{ return req.routing == Routing && req.theServer == theServer ; }
+    ) ;
+
+	/* Found existing challenge. */
+	if( it != saslRequests.end() )
+    	{
+        elog << "Found matching SASL request for Routing: " << Routing << "\n" ;
+		string authMessage = st[ 1 ] ;
+
+		it->last_ts = currentTime() ;
+
+		// If the message is 400 bytes long we add it to the struct and wait for the next message.
+		if( authMessage.size() == 400 )
+			{
+			it->credentials += authMessage ;
+			return true ;
+			}
+
+		if( authMessage != "+" )
+			it->credentials += authMessage ;
+
+		if( it->mechanism == SaslMechanism::PLAIN )
+			{
+			auto bufferOpt = b64decode( it->credentials, nullptr, true ) ;
+			if( !bufferOpt )
+				{
+				elog << "[PLAIN] Failed to decode credentials: " << it->credentials << endl ;
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+				doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+
+			string decodedString = std::string( reinterpret_cast< char* >( bufferOpt->data() ), bufferOpt->size() ) ;
+			size_t p1 = decodedString.find( '\0' ) ;
+			size_t p2 = decodedString.find( '\0', p1 + 1 ) ;
+
+			if( p1 == std::string::npos || p2 == std::string::npos || p1 == 0 )
+				{
+				elog << "[PLAIN] Invalid PLAIN format in decoded credentials: " << decodedString << endl ;
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+				doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+
+			it->username = decodedString.substr( p1 + 1, p2 - ( p1 + 1 ) ) ;
+			it->password = decodedString.substr( p2 + 1 ) ;
+
+			if( it->username.empty() || it->password.empty() )
+				{
+				elog << "[PLAIN] Empty username or password in credentials" << endl ;
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+				doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+			}
+		else if( it->mechanism == SaslMechanism::EXTERNAL )
+			{
+			// A client certificate has to be provided.
+			if( it->fingerprint.empty() )
+				{
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".FAILED" ) ;
+				doXResponse( theServer, Routing, "Client certificate required for SASL EXTERNAL authentication", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+
+			// We only support EXTERNAL if a username has been provided.
+			if( it->credentials.empty() )
+				{
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".FAILED" ) ;
+				doXResponse( theServer, Routing, "Username required for SASL EXTERNAL authentication", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+
+			auto bufferOpt = b64decode( it->credentials, nullptr, true ) ;
+			if( !bufferOpt )
+				{
+				elog << "[EXTERNAL] Failed to decode username: " << it->credentials << endl ;
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+				doXResponse( theServer, Routing, "Invalid username", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+
+			string decodedString = std::string( reinterpret_cast< char* >( bufferOpt->data() ), bufferOpt->size() ) ;
+			StringTokenizer st2( decodedString ) ;
+
+			// Validate that we have at least a username
+			if( st2.size() < 1 || st2[ 0 ].empty() )
+				{
+				elog << "[EXTERNAL] Invalid username in decoded credentials" << endl ;
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+				doXResponse( theServer, Routing, "Invalid username", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+
+			it->username = st2[ 0 ] ;
+			if( st2.size() > 1 )
+				it->password = st2[ 1 ] ;
+			}
+		else if( it->mechanism == SaslMechanism::SCRAM_SHA_256 )
+			{
+			if( it->state == SaslState::INITIAL )
+				{
+				auto bufferOpt = b64decode( it->credentials, nullptr, true ) ;
+				if( !bufferOpt )
+					{
+					elog << "[SCRAM] Failed to decode client first message: " << it->credentials << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				string decodedString = std::string( reinterpret_cast< char* >( bufferOpt->data() ), bufferOpt->size() ) ;
+				if( decodedString.find("n,,") != 0 )
+					{
+					elog << "[SCRAM] Invalid client first message: " << decodedString << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				it->client_first = decodedString.substr( 3 ) ; // remove 'n,,'
+				StringTokenizer st2( it->client_first, ',' ) ;
+				for( size_t i = 0 ; i < st2.size() ; ++i )
+					{
+					if( st2[ i ].rfind( "n=", 0 ) == 0 )
+						{
+						StringTokenizer st3( st2[ i ].substr( 2 ) ) ;
+						it->username =  st3[ 0 ] ;
+						if( st3.size() > 1 )
+							it->password = st3[ 1 ] ;
+						}
+					else if( st2[ i ].rfind( "r=", 0 ) == 0 )
+						it->client_nonce = st2[ i ].substr( 2 ) ;
+					}
+
+				if( it->username.empty() || it->client_nonce.empty() )
+					{
+					elog << "[SCRAM] Missing username or client nonce in authentication: " << decodedString << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				sqlUser* theUser = getUserRecord( it->username ) ;
+				if( !theUser || theUser->getScramRecord().empty() )
+					{
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".FAILED" ) ;
+					doXResponse( theServer, Routing, "AUTHENTICATION FAILED as " + it->username, true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				it->username = theUser->getUserName() ;
+
+				auto nonceOpt = generateRandomNonce() ;
+				if( !nonceOpt )
+					{
+					elog << "[SCRAM] Failed to generate server nonce." << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					doXResponse( theServer, Routing, "Internal error", true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+				it->server_nonce = *nonceOpt ;
+				std::string combinedNonce = it->client_nonce + it->server_nonce ;
+
+				std::string err ;
+				auto parse_opt = parse_scram_sha256_record( theUser->getScramRecord(), &err ) ;
+				if( !parse_opt )
+					{
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					LOG( ERROR, "[SCRAM] Record parse error: {}", err ) ;
+					doXResponse( theServer, Routing, "Internal error", true ) ;
+					return false ;
+					}
+				it->scram = *parse_opt ;
+
+				/*elog << "Iterations: " << it->scram.iterations << endl;
+				elog << "Salt (base64): " << b64encode(it->scram.salt.data(), it->scram.salt.size()) << endl;
+				elog << "StoredKey (base64): " << b64encode(it->scram.storedKey.data(), it->scram.storedKey.size()) << endl;
+				elog << "ServerKey (base64): " << b64encode(it->scram.serverKey.data(), it->scram.serverKey.size()) << endl;
+				elog << "StoredKey (hex): ";
+				for (auto c : it->scram.storedKey) elog << std::hex << (int)c << " ";
+				elog << std::dec << "\n";
+				elog << "ServerKey (hex): ";
+				for (auto c : it->scram.serverKey) elog << std::hex << (int)c << " ";
+				elog << std::dec << "\n";*/
+
+				it->server_first = "r=" + combinedNonce + ",s=" + b64encode( it->scram.salt.data(), it->scram.salt.size() ) + ",i=" + std::to_string( it->scram.iterations ) ;
+				std::string serverFirst_b64 = b64encode( reinterpret_cast< const unsigned char* >( it->server_first.data() ), it->server_first.size() ) ;
+				MyUplink->XReply( theServer, Routing, "SASL " + serverFirst_b64 ) ;
+				it->state = SaslState::SERVER_FIRST ;
+				it->credentials.clear() ;
+				return true ;
+				}
+			else if( it->state == SaslState::SERVER_FIRST )
+				{
+				auto bufferOpt = b64decode( it->credentials, nullptr, true ) ;
+				if( !bufferOpt )
+					{
+					elog << "[SCRAM] Failed to decode client final message: " << it->credentials << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				string decodedString = std::string( reinterpret_cast< char* >( bufferOpt->data() ), bufferOpt->size() ) ;
+				if( decodedString.find("n,,") == 0 )
+    				decodedString = decodedString.substr( 3 ) ;
+
+				size_t p_pos = decodedString.rfind( ",p=" ) ;
+				if( p_pos == std::string::npos )
+					{
+					elog << "[SCRAM] Missing ,p= in client final message: " << decodedString << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+				it->client_final = decodedString.substr(0, p_pos) ; // up to but not including ",p="
+
+				std::string cbind_input, nonce, proof ;
+				StringTokenizer st( decodedString, ',' ) ;
+				for( size_t i = 0 ; i < st.size() ; ++i )
+					{
+					if( st[i].rfind("c=", 0 ) == 0 )
+						cbind_input = st[i].substr( 2 ) ;
+					else if( st[i].rfind("r=", 0 ) == 0 )
+						nonce = st[i].substr( 2 ) ;
+					else if( st[i].rfind("p=", 0 ) == 0 )
+						proof = st[i].substr( 2 ) ;
+					}
+
+				if( cbind_input.empty() || nonce.empty() || proof.empty() )
+					{
+					elog << "[SCRAM] Missing c=, r= or p= in client final message: " << decodedString << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+					doXResponse( theServer, Routing, "Invalid credentials", true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				if( nonce != it->client_nonce + it->server_nonce )
+					{
+					elog << "[SCRAM] nonce match failed: " << decodedString << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".FAILED" ) ;
+					doXResponse( theServer, Routing, "AUTHENTICATION FAILED as " + it->username, true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				std::string auth_message = it->client_first + "," + it->server_first + "," + it->client_final ;
+				bool valid = validate_scram_sha256_proof(
+					it->scram.storedKey,
+					auth_message,
+					proof
+				) ;
+
+				if( !valid )
+					{
+					elog << "[SCRAM] Proof validation failed for user " << it->username << endl ;
+					incStat("SASL." + saslMechanismToString( it->mechanism ) + ".FAILED" ) ;
+					doXResponse( theServer, Routing, "AUTHENTICATION FAILED as " + it->username, true ) ;
+					saslRequests.erase( it ) ;
+					return false ;
+					}
+
+				std::string server_signature = compute_server_signature( it->scram.serverKey, auth_message ) ;
+				std::string server_final = "v=" + server_signature ;
+				std::string server_final_b64 = b64encode( reinterpret_cast< const unsigned char* >( server_final.data() ), server_final.size() ) ;
+				MyUplink->XReply( theServer, Routing, "SASL " + server_final_b64 ) ;
+				it->state = SaslState::COMPLETE ;
+				return true ; // Waiting for the + to complete the authentication
+				}
+			else if( it->state == SaslState::COMPLETE )
+				{
+				/* Pass through to authentication. */
+				}
+			else
+				{
+				elog << "[SCRAM] Invalid state in authentication." << endl ;
+				incStat("SASL." + saslMechanismToString( it->mechanism ) + ".ERROR" ) ;
+				doXResponse( theServer, Routing, "An error occurred", true ) ;
+				saslRequests.erase( it ) ;
+				return false ;
+				}
+			}
+
+		AuthStruct auth = {
+			AuthType::XQUERY,
+			AUTH_ERROR,			// result (placeholder)
+			it->username,		// username
+			it->password,		// password/token
+			it->ident,			// ident (empty for LoC)
+			it->ip,				// ip
+			it->fingerprint,	// tls fingerprint
+			nullptr,			// sqlUser (placeholder)
+			it->theClient,		// iClient (nullptr for LoC)
+			it->mechanism
+		} ;
+
+		if( it->mechanism == SaslMechanism::SCRAM_SHA_256 )
+			elog << "Authenticating with SCRAM" << endl;
+		else
+			elog << "Authenticating with username " << it->username << " and password " << mask(it->password) << endl ;
+			
+		AuthResult auth_res = authenticateUser( auth ) ;
+		auth.result = auth_res ;
+
+		/* Process result. */
+		if( auth_res == AUTH_SUCCEEDED )
+			{
+			incStat("SASL." + saslMechanismToString( it->mechanism ) + ".SUCCESS" ) ;
+			if( !auth.theClient )
+				doXResponse( theServer, Routing, auth.theUser->getUserName() + ":" +
+								std::to_string( auth.theUser->getID() ) + ":" +
+								std::to_string( makeAccountFlags( auth.theUser ) ) +
+								(auth.theUser->getFlag( sqlUser::F_AUTOHIDE ) ? " +x" : "") ) ;
+			else
+				{
+				doCommonAuth( auth.theClient, auth.theUser->getUserName() ) ;
+				doXResponse( theServer, Routing, string() ) ;
+				}
+
+			elog    << "cservice::doXQSASL: "
+					<< "Succesful auth for "
+					<< it->username
+					<< endl ;
+
+			saslRequests.erase( it ) ;
+			return true;
+			}
+
+		/* The authentication failed. Process and send correct message. */
+		string AuthResponse ;
+		processAuthentication( auth, &AuthResponse ) ;
+
+		/* Send response. */
+		doXResponse( theServer, Routing, AuthResponse, true ) ;
+
+		incStat("SASL." + saslMechanismToString( it->mechanism ) + ".FAILED" ) ;
+
+		saslRequests.erase( it ) ;
+		return false ;
+    	}
+	// It is the initial message consisting of the mechanism.
+	else
+    	{
+		// Did we receive a numeric?
+		iClient* tmpClient = Network->findClient( st[ 1 ] ) ;
+		string IP ;
+		string fingerprint ;
+		string authMessage ;
+		if( tmpClient )
+			{
+			if( st.size() < 3 )
+				{
+				elog << "Bogus SASL message with numeric" << endl ;
+				doXResponse( theServer, Routing, "An error has occurred", true ) ;
+				return false ;
+				}
+
+			IP = xIP( tmpClient->getIP() ).GetNumericIP() ;
+			fingerprint = tmpClient->getTlsFingerprint().empty() ? "_" : tmpClient->getTlsFingerprint() ;
+			authMessage = string_upper( st[ 2 ] ) ;
+			}
+		else
+			{
+			if( st.size() < 4 )
+				{
+				elog << "Bogus SASL message without numeric" << endl ;
+				doXResponse( theServer, Routing, "An error has occurred", true ) ;
+				return false ;
+				}
+
+			IP = st[ 1 ] ;
+			fingerprint = st[ 2 ] ;
+			authMessage = string_upper( st[ 3 ] ) ;
+			}
+
+		SaslMechanism mech ;
+		if( !parseSaslMechanism( authMessage, mech ) )
+			{
+			LOG( ERROR, "Received invalid SASL mechanism: {}", authMessage ) ;
+			doXResponse( theServer, Routing, "An error has occurred", true ) ;
+			return false ;
+			}
+		
+		if( mech == SaslMechanism::EXTERNAL && fingerprint == "_" )
+			{
+			incStat("SASL." + saslMechanismToString( mech ) + ".FAILED" ) ;
+			doXResponse( theServer, Routing, "No TLS fingerprint provided", true ) ;
+			return false ;
+			}
+
+		// Valid mechanism - store in cache for further use.
+		elog << "Received valid SASL mechanism: " << authMessage << " from IP: " << IP << endl;
+		SaslRequest newRequest ;
+		newRequest.theClient = tmpClient ;
+		newRequest.routing = Routing ;
+		newRequest.theServer = theServer ;
+		newRequest.ip = IP ;
+		newRequest.added_ts = currentTime() ;
+		newRequest.last_ts = currentTime() ;
+		newRequest.fingerprint = fingerprint == "_" ? "" : fingerprint ;
+		newRequest.mechanism = mech ;
+		newRequest.ident = tmpClient ? tmpClient->getUserName() : "" ;
+
+		saslRequests.push_back( newRequest ) ;
+
+		MyUplink->XReply( theServer, Routing, "SASL +" ) ;
+	}
+#endif // HAVE_LIBSSL
+    return true;
 }
 
 bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string& Message)
@@ -8364,12 +9290,9 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 	StringTokenizer st( Message );
 	string username;
 	string password;
-	string ip = string();
-	string hostname = string();
-	string ident = string();
-	sqlUser* theUser;
-	unsigned int ipr_ts;
-	string AuthResponse = string();
+	string ip;
+	string hostname;
+	string ident;
 
 	if (st[0] == "LOGIN")
 	{
@@ -8402,155 +9325,47 @@ bool cservice::doXQLogin(iServer* theServer, const string& Routing, const string
 		ident = st[3];
 		LOG( TRACE, "XQ-LOGIN2: LOGIN2 {} {} {} {} {}", ip, hostname, ident, username, mask(password) ) ;
 	}
-	int auth_res = authenticateUser(username,password,ip,ident,ipr_ts,&theUser);
-	unsigned int loginTime = getUplink()->getStartTime() + loginDelay;
-	unsigned int max_failed_logins = getConfigVar("FAILED_LOGINS")->asInt();
-	unsigned int failed_login_rate = getConfigVar("FAILED_LOGINS_RATE")->asInt();
 
-	switch(auth_res)
+	AuthStruct auth = {
+		AuthType::XQUERY, 	// auth type
+		AUTH_ERROR,			// result (placeholder)
+		username,			// username
+		password,			// password/token
+		ident,				// ident
+		ip,					// ip
+		string(),			// tls fingerprint
+		nullptr,			// sqlUser (placeholder)
+		nullptr,			// iClient (not in use for LoC)
+		SaslMechanism::NO_SASL
+	} ;
+
+	AuthResult auth_res = authenticateUser( auth ) ;
+	auth.result = auth_res ;
+
+	/* Process result. */
+	if( auth_res == AUTH_SUCCEEDED )
 		{
-		case TOO_EARLY_TOLOGIN:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Unable "
-	                	"to login during reconnection, please try again in "
-		                "%i seconds)",
-	        	        username.c_str(), (loginTime - currentTime()));
-			doXResponse(theServer, Routing, AuthResponse,true);
-			LOG( DEBUG, "Auth res = TOO_EARLY_TOLOGIN" ) ;
-			break;
-		case AUTH_FAILED:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Erroneus username)", username.c_str());
-			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_FAILED" ) ;
-			break;
-		case AUTH_UNKNOWN_USER:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s", username.c_str());
-			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_UNKNOWN_USER" ) ;
-			break;
-		case AUTH_SUSPENDED_USER:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Suspended)", theUser->getUserName().c_str());
-			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_SUSPENDED_USER" ) ;
-			break;
-		case AUTH_NO_TOKEN:
-			theUser->incFailedLogins();
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Missing TOTP token)", theUser->getUserName().c_str());
-			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_NO_TOKEN" ) ;
-			break;
-		case AUTH_INVALID_PASS:
-			if (failed_login_rate==0)
-			        failed_login_rate = 900;
-			AuthResponse = TokenStringsParams(getResponse(theUser,
-						language::auth_failed,
-						string("AUTHENTICATION FAILED as %s")).c_str(),
-				theUser->getUserName().c_str());
-			doXResponse(theServer, Routing, AuthResponse, true);	// <- this will be removed!
-			LOG( DEBUG, "Auth res = AUTH_INVALID_PASS" ) ;
-			/* increment failed logins counter */
-			theUser->incFailedLogins();
-			if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
-					(theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
-				{
-					/* we have exceeded our maximum - alert relay channel */
-					/* work out a checksum for the password.  Yes, I could have
-					 * just used a checksum of the original password, but this
-					 * means it's harder to 'fool' the check digit with a real
-					 * password - create MD5 from original salt stored */
-					unsigned char   checksum;
-					md5             hash;
-					md5Digest       digest;
-
-					if (theUser->getPassword().size() < 9)
-					{
-							checksum = 0;
-					} else {
-							string salt = theUser->getPassword().substr(0, 8);
-							string guess = salt + st.assemble(2);
-
-							hash.update( (const unsigned char *)guess.c_str(), guess.size() );
-							hash.report( digest );
-
-							checksum = 0;
-							for (size_t i = 0; i < MD5_DIGEST_LENGTH; i++)
-							{
-									/* add ascii value to check digit */
-									checksum += digest[i];
-							}
-					}
-					theUser->setLastFailedLoginTS(time(NULL));
-					logPrivAdminMessage("%d failed logins for %s (last attempt by %s@%s (LoC), checksum %d).",
-							theUser->getFailedLogins(),
-							theUser->getUserName().c_str(),
-							ident.c_str(),
-							ip.c_str(),
-							checksum);
-			}
-			break;
-		case AUTH_ERROR:
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s due to an error, please contact CService represetitive", username.c_str());
-			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_ERROR" ) ;
-			break;
-		case AUTH_INVALID_TOKEN:
-            theUser->incFailedLogins();
-            AuthResponse = TokenStringsParams(getResponse(theUser,
-	                 	language::auth_failed_token,
-	                        string("AUTHENTICATION FAILED as %s (Invalid Token)")).c_str(),
-	                        theUser->getUserName().c_str());
-			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_INVALID_TOKEN" ) ;
-			break;
-		case AUTH_FAILED_IPR:
-            /* increment failed logins counter */
-            theUser->incFailedLogins();
-            AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (IPR)", theUser->getUserName().c_str());
-	                /* notify the relay channel */
-	                logAdminMessage("%s@%s (%s) failed IPR check.",
-	                        ident.c_str(),
-	                        ip.c_str(),
-	                        theUser->getUserName().c_str());
-	                if ((max_failed_logins > 0) && (theUser->getFailedLogins() > max_failed_logins) &&
-	                        (theUser->getLastFailedLoginTS() < (time(NULL) - failed_login_rate)))
-	                {
-	                        /* we have exceeded our maximum - alert relay channel */
-	                        theUser->setLastFailedLoginTS(time(NULL));
-	                        logPrivAdminMessage("%d failed logins for %s (last attempt by %s@%s).",
-	                                theUser->getFailedLogins(),
-	                                theUser->getUserName().c_str(),
-	                                ident.c_str(), ip.c_str());
-	                }
-   			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_FAILED_IPR" ) ;
-			break;
-		case AUTH_ML_EXCEEDED:
-            /* increment failed logins counter */
-            theUser->incFailedLogins();
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (Maximum "
-	                        "concurrent logins exceeded).",
-	                        theUser->getUserName().c_str());
-   			doXResponse(theServer, Routing, AuthResponse, true);
-			LOG( DEBUG, "Auth res = AUTH_ML_EXCEEDED" ) ;
-			break;
-		case AUTH_SUCCEEDED:
-			doXResponse(theServer, Routing, theUser->getUserName() + ":" + std::to_string(theUser->getID()) + ":" + std::to_string(makeAccountFlags(theUser)));
-			LOG_MSG( DEBUG, "Succesful auth for {user_name}" )
-			.with( "user", theUser )
-			.logStructured() ;
-			incStat("CORE.LOC.SUCCESS");
-			return true;
-			break;
-		default:
-			//Should never get here!
-			LOG( ERROR, "Response {} while authenticating!", auth_res ) ;
-			AuthResponse = TokenStringsParams("AUTHENTICATION FAILED as %s (due to an error)\n", username.c_str());
-   			doXResponse(theServer, Routing, AuthResponse, true);
-			break;
+		incStat( "LOC." + st[0] + ".SUCCESS" ) ;
+		doXResponse(theServer, Routing, auth.theUser->getUserName() + ":" +
+						std::to_string(auth.theUser->getID()) + ":" +
+						std::to_string(makeAccountFlags(auth.theUser)) +
+							(auth.theUser->getFlag( sqlUser::F_AUTOHIDE ) ? " +x" : "") ) ;
+		elog    << "cservice::doXQLogin: "
+				<< "Succesful auth for "
+				<< username
+				<< endl;
+		return true;
 		}
-LOG( DEBUG, "XQ-LOGIN: FAILED login for {}", username ) ;
-incStat("CORE.LOC.FAILED");
 
-return true;
+	/* The authentication failed. Process and send correct message. */
+	string AuthResponse;
+	processAuthentication(auth, &AuthResponse);
+
+	/* Send response. */
+	doXResponse(theServer, Routing, AuthResponse, true);
+	incStat( "LOC." + st[0] + ".FAILED" ) ;
+
+	return true;
 }
 
 void cservice::doXQToAllServices(const string& Routing, const string& Message)
@@ -9128,6 +9943,11 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 	if (!LoC)
 		this->MyUplink->UserLogin(theClient, theUser->getUserName(), theUser->getID(), makeAccountFlags(theUser), this);
 
+#ifdef NEW_IRCU_FEATURES
+	/* Set remote +x if user has AUTOHIDE set */
+	if (theUser->getFlag(sqlUser::F_AUTOHIDE) && !theClient->isModeX())
+		MyUplink->Write("%s OM %s :+x", getCharYY().c_str(), theClient->getCharYYXXX().c_str());
+#endif
 	/*
 	 * If the user account has been suspended, make sure they don't get
 	 * auto-opped.
@@ -9141,7 +9961,7 @@ bool cservice::doCommonAuth(iClient* theClient, string username)
 		return true;
 		}
 
-	
+
 	/*
 	 * Check they aren't banned < 75 in any chan.
 	 */
@@ -9796,7 +10616,7 @@ const iClient::flagType newFlags = makeAccountFlags( theUser ) ;
 if( theClient->getAccountFlags() == newFlags )
 	return ;
 
-#ifdef USE_AC_XFLAGS
+#ifdef NEW_IRCU_FEATURES
 MyUplink->Write( "%s AC %s %s %u %u",
 	getCharYY().c_str(), theClient->getCharYYXXX().c_str(), theClient->getAccount().c_str(),
 	theClient->getAccountID(), newFlags ) ;

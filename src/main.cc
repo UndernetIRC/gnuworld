@@ -249,6 +249,7 @@ xServer::xServer( bool verbose_arg, bool doDebug_arg, bool logSocket_arg,
                   const std::string& configFileName_arg,
                   const std::string& simFileName_arg )
  : eventList( EVT_NOOP ),
+   tlsEnabled( false ),
    verbose( verbose_arg ),
    doDebug( doDebug_arg ),
    logSocket( logSocket_arg ),
@@ -310,7 +311,7 @@ while( keepRunning )
 				<< "... "
 				<< endl ;
 
-			serverConnection = Connect( this, UplinkName, Port ) ;
+			serverConnection = Connect( this, UplinkName, Port, tlsEnabled ) ;
 			}
 		} // if( NULL == serverConnection )
 

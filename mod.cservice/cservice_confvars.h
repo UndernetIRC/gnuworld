@@ -81,6 +81,8 @@
     CONFIG_VAR( unsigned int, preloadUserDays,                  "preload_user_days") \
     CONFIG_VAR( unsigned int, partIdleChan,                     "part_idle_chan") \
     CONFIG_VAR( unsigned int, connectRetry,                     "connection_retry_total") \
+    CONFIG_VAR( unsigned int, saslTimeout,                      "sasl_timeout") \
+    CONFIG_VAR( unsigned int, maxFingerprints,                  "max_fingerprints") \
     CONFIG_VAR( unsigned int, logVerbosity,                     "log_verbosity") \
     CONFIG_VAR( unsigned int, chanVerbosity,                    "chan_verbosity") \
     CONFIG_VAR( unsigned int, consoleVerbosity,                 "console_verbosity") \

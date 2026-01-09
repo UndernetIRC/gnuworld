@@ -100,6 +100,9 @@
 /* Define to 1 if you have the 'socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
+/* Using LIBSSL */
+#undef HAVE_LIBSSL
+
 /* Define this if a modern libltdl is already installed */
 #undef HAVE_LTDL
 

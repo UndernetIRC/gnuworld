@@ -11,6 +11,7 @@ libcservice_la_CXXFLAGS = -I$(top_srcdir)/db -I${top_srcdir}/include \
 libcservice_la_SOURCES = \
 	mod.cservice/banMatcher.cc \
 	mod.cservice/cservice.cc \
+	mod.cservice/cservice_crypt.cc \
 	mod.cservice/networkData.cc \
 	mod.cservice/sqlChannel.cc \
 	mod.cservice/sqlUser.cc \
@@ -24,6 +25,7 @@ libcservice_la_SOURCES = \
 	mod.cservice/ADDUSERCommand.cc \
 	mod.cservice/BANCommand.cc \
 	mod.cservice/BANLISTCommand.cc \
+	mod.cservice/CERTCommand.cc \
 	mod.cservice/CHANINFOCommand.cc \
 	mod.cservice/CLEARMODECommand.cc \
 	mod.cservice/DEOPCommand.cc \
@@ -82,6 +84,8 @@ EXTRA_DIST += \
 	mod.cservice/constants.h \
 	mod.cservice/cserviceCommands.h \
 	mod.cservice/cservice_config.h \
+	mod.cservice/cservice_confvars.h \
+	mod.cservice/cservice_crypt.h \
 	mod.cservice/cservice.h \
 	mod.cservice/levels.h \
 	mod.cservice/networkData.h \

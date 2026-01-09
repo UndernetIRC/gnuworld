@@ -1295,6 +1295,12 @@ protected:
 	long			Version ;
 
 	/**
+	 * Whether or not TLS encrypted connections are enabled (and required)
+	 * for the server uplink
+	 */
+	bool			tlsEnabled ;
+
+	/**
 	 * This variable is true when this server is bursting.
 	 */
 	bool			bursting ;
@@ -1523,6 +1529,16 @@ protected:
 	std::string	simFileName ;
 
 	/**
+	 * The path to the TLS key file
+	 */
+	std::string tlsKeyFile ;
+
+	/**
+	 * The path to the TLS cert file
+	 */
+	std::string tlsCertFile ;
+
+	/**
 	 * True if autoreconnect is enabled, false otherwise.
 	 */
 	bool		autoConnect ;
@@ -1542,6 +1558,11 @@ protected:
 	 */
 	bool		loadCommandHandlers() ;
 
+
+	/**
+	 * This method initializes all of the TLS contexts
+	 */
+	bool		initTls() ;
 
 	/**
 	 * Load an individual command handler from a file (fileName),

@@ -139,6 +139,19 @@ output << ends;
 // Prepend the md5 hash to the salt
 string finalPassword = salt + output.str().c_str();
 tmpUser->setPassword(finalPassword);
+std::string err ;
+//	elog << "Generating SCRAM record for user " << theUser->getUserName() << " and password: [" << st.assemble( 0, pass_end ) << "]\n" ;
+auto recOpt = make_scram_sha256_record( st.assemble( 1 ), &err ) ;
+
+if( !recOpt )
+	{
+	LOG( ERROR, "SCRAM generation error: {}", err ) ;
+	}
+else
+	{
+	std::string scram_record = *recOpt ;
+	tmpUser->setScramRecord( scram_record ) ;
+	}
 
 if( tmpUser->commit(theClient) )
 	{

@@ -162,6 +162,7 @@ unsigned int account_id = 0 ;
 unsigned short int account_flags = 0;
 string sethost ;
 string fakehost ;
+string tlsFingerprint ;
 
 xParameters::size_type currentArgIndex = 6 ;
 
@@ -190,6 +191,11 @@ if( '+' == params[ currentArgIndex ][ 0 ] )
 			case 'f':
 				fakehost = params[ currentArgIndex++ ] ;
 				break ;
+#ifndef NO_FINGERPRINT_BURST
+			case 'z':
+				tlsFingerprint = params[ currentArgIndex++ ] ;
+				break ;
+#endif
 			default: break ;
 			} // switch( *modePtr )
 		} // for()
@@ -229,6 +235,10 @@ if( !account.empty() )
 		} // if( 3 == st.size() )
 	} // if( !account.empty() )
 
+/* Set the fingerprint to empty if it is empty. */
+if( tlsFingerprint == "_" )
+	tlsFingerprint.clear() ;
+
 /*
  * -3 <base64 IP>
  * -2 <numeric>
@@ -250,6 +260,7 @@ iClient* newClient = new (std::nothrow) iClient(
 		account,	// account
 		account_id,	// account id
 		account_flags,  // account flags
+		tlsFingerprint, // TLS fingerprint
 		sethost,	// asuka sethost
 		fakehost,	// srvx fakehost
 		description,	// real name / infoline

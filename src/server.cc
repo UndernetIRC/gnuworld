@@ -264,8 +264,69 @@ glineUpdateInterval = static_cast< time_t >( atoi(
 pingUpdateInterval = static_cast< time_t >( atoi(
 	conf.Require( "pingupdateinterval" )->second.c_str() ) ) ;
 
+// Check TLS configuration settings
+#ifdef HAVE_LIBSSL
+EConfig::const_iterator tlsItr = conf.Find( "tls" ) ;
+if ( tlsItr == conf.end() || tlsItr->second != "yes" )
+{
+	tlsEnabled = false ;
+} else {
+	tlsEnabled = true ;
+
+	// If TLS is enabled, parse the other configuration options
+	tlsKeyFile = conf.Require( "tlsKeyFile" )->second ;
+	tlsCertFile = conf.Require( "tlsCertFile" )->second ;
+
+	if (!initTls()) {
+		elog << "TLS initialization error. Exiting." << endl;
+		::exit(1);
+	}
+}
+#endif
 return true ;
 }
+
+/**
+ * This function is only called if TLS is enabled in config. We exit if gnuworld
+ * is not compiled with TLS support.
+ */
+#ifdef HAVE_LIBSSL
+bool xServer::initTls()
+{
+	elog << "xServer::initTls - Spinning up TLS" << endl;
+	SSL_library_init();
+	SSL_load_error_strings();
+	sslCtx = SSL_CTX_new(TLS_method());
+
+	SSL_CTX_set_min_proto_version(sslCtx, TLS1_2_VERSION); // Allow TLS 1.2 and above
+	SSL_CTX_set_max_proto_version(sslCtx, TLS1_3_VERSION); // Allow up to TLS 1.3
+	SSL_CTX_set_verify(sslCtx, SSL_VERIFY_NONE, NULL);
+
+	int res = SSL_CTX_use_certificate_chain_file(sslCtx, tlsCertFile.c_str());
+	if (res != 1) {
+		elog << "xServer::initTls - Could not load certificate file" << endl;
+		SSL_CTX_free(sslCtx);
+		return false;
+	}
+
+	res = SSL_CTX_use_PrivateKey_file(sslCtx, tlsKeyFile.c_str(), SSL_FILETYPE_PEM);
+	if (res != 1) {
+		elog << "xServer::initTls - Could not load key file" << endl;
+		SSL_CTX_free(sslCtx);
+		return false;
+	}
+
+	res = SSL_CTX_check_private_key(sslCtx);
+	if (res != 1) {
+		elog << "xServer::initTls - Private key validation failed" << endl;
+		SSL_CTX_free(sslCtx);
+		return false;
+	}
+
+	SSL_CTX_set_cipher_list(sslCtx, SSL_DEFAULT_CIPHER_LIST);
+	return true;
+}
+#endif
 
 bool xServer::loadCommandHandlers()
 {
@@ -951,6 +1012,7 @@ iClient* theIClient = new (std::nothrow) iClient(
 	string(),
 	0,
 	0,
+	string(),
 	string(),
 	string(),
 	Client->getDescription(),
@@ -1805,6 +1867,12 @@ if( !chanModes.empty() &&
 				else
 					theChan->removeMode(Channel::MODE_MNOREG);
 				break;
+			case 'Z':
+				if (plus)
+					theChan->setMode(Channel::MODE_Z);
+				else
+					theChan->removeMode(Channel::MODE_Z);
+				break;
 
 			// TODO: Finish with polarity
 			// TODO: Add in support for modes b,v,o
@@ -1951,8 +2019,12 @@ s	<< theClient->getCharYY() << " N "
 	<< hopCount << " 31337 "
 	<< theClient->getUserName() << ' '
 	<< theClient->getHostName() << ' '
-	<< theClient->getModes() << ' '
-	<< "AAAAAA "
+	<< theClient->getModes() << ' ' ;
+
+if( theClient->getMode( iClient::MODE_TLS ) )
+	s << "_ " ;
+
+s	<< "AAAAAA "
 	<< theClient->getCharYYXXX() << " :"
 	<< theClient->getDescription() ;
 Write( s ) ;
@@ -2138,6 +2210,10 @@ if( theChan->getMode( Channel::MODE_MNOREG ) )
 	{
 	modeVector.push_back( make_pair( false, Channel::MODE_MNOREG ) ) ;
 	}
+if( theChan->getMode( Channel::MODE_Z ) )
+	{
+	modeVector.push_back( make_pair( false, Channel::MODE_Z ) ) ;
+	}
 if( theChan->getMode( Channel::MODE_L ) )
 	{
 	OnChannelModeL( theChan, false, 0, 0 ) ;
@@ -2303,6 +2379,7 @@ chanModes[ 'c' ] = Channel::MODE_C ;
 chanModes[ 'C' ] = Channel::MODE_CTCP ;
 chanModes[ 'u' ] = Channel::MODE_PART ;
 chanModes[ 'M' ] = Channel::MODE_MNOREG ;
+chanModes[ 'Z' ] = Channel::MODE_Z ;
 
 // This vector is used for argument-less types that can be passed
 // to OnChannelMode()
@@ -2379,6 +2456,7 @@ for( ; tokenIndex < st.size() ; )
 			case 'u':
 			case 'M':
 			case 'D':
+			case 'Z':
 //				elog	<< "xServer::Mode> General mode: "
 //					<< theChar
 //					<< ", polarity: "
@@ -3369,6 +3447,9 @@ for( string::const_iterator ptr = st[ 0 ].begin() ; ptr != st[ 0 ].end() ;
 			break;
 		case 'M':
 			theChan->setMode( Channel::MODE_MNOREG ) ;
+			break;
+		case 'Z':
+			theChan->setMode( Channel::MODE_Z ) ;
 			break;
 		case 'k':
 			{

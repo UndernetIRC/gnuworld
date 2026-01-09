@@ -34,6 +34,7 @@
 #include	<sstream>
 #include	<locale>
 #include	<unordered_map>
+#include	<regex>
 
 #include	"misc.h"
 #include	"StringTokenizer.h"
@@ -691,6 +692,40 @@ size_t getMemoryUsage()
 struct rusage usage ;
 getrusage( RUSAGE_SELF, &usage ) ;
 return usage.ru_maxrss ;
+}
+
+// Converts "12asb23b..." to "12:AS:B2:3B..."
+std::string compactToCanonical( const std::string& fingerprint )
+{
+std::string result ;
+for( size_t i = 0 ; i < fingerprint.size() ; ++i )
+	{
+	result += std::toupper( fingerprint[ i ] ) ;
+	if( ( i + 1 ) % 2 == 0 && i + 1 < fingerprint.size() )
+		result += ':' ;
+}
+return result ;
+}
+
+// Converts "12:AS:B2:3B..." back to "12asb23b..."
+std::string canonicalToCompact( const std::string& fingerprint )
+{
+std::string result ;
+for( char c : fingerprint )
+	if( c != ':' )
+		result += std::tolower( c ) ;
+return result ;
+}
+
+// SHA-256 fingerprint format: 32-byte hash in uppercase hex, separated by colons
+bool isValidSHA256Fingerprint( const std::string& fingerprint )
+{
+const std::regex fingerprintRegex( "^([A-F0-9]{2}:){31}[A-F0-9]{2}$" ) ;
+
+if( fingerprint.length() != 95 )
+	return false ;
+
+return std::regex_match( fingerprint, fingerprintRegex ) ;
 }
 
 /* Returns the CPU time used by gnuworld in seconds. */

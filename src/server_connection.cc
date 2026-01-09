@@ -50,7 +50,6 @@
 //#include	"events.h"
 //#include	"ip.h"
 
-#include	"misc.h"
 #include	"server.h"
 #include	"Network.h"
 //#include	"iServer.h"
@@ -64,6 +63,7 @@
 //#include	"ServerTimerHandlers.h"
 //#include	"LoadClientTimerHandler.h"
 //#include	"UnloadClientTimerHandler.h"
+#include	"misc.h"
 #include	"ConnectionManager.h"
 #include	"ConnectionHandler.h"
 #include	"Connection.h"
