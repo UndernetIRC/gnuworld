@@ -116,13 +116,9 @@ CREATE TABLE users_fingerprints (
 );
 
 ALTER TABLE users
-  ADD COLUMN scram_record TEXT;
-
-ALTER TABLE users
+  ADD COLUMN scram_record TEXT,
   ALTER COLUMN flags TYPE INT4;
 
-INSERT INTO translations (language_id, response_id, text, last_updated) VALUES(1, 197, 'Your AUTOHIDE setting is now ON.', 31337);
-INSERT INTO translations (language_id, response_id, text, last_updated) VALUES(1, 198, 'Your AUTOHIDE setting is now OFF.', 31337);
 INSERT INTO translations (language_id, response_id, text, last_updated) VALUES(1, 195, 'Your CERTONLY setting is now ON.', 31337);
 INSERT INTO translations (language_id, response_id, text, last_updated) VALUES(1, 196, 'Your CERTONLY setting is now OFF.', 31337);
 INSERT INTO translations (language_id, response_id, text, last_updated) VALUES(1, 197, 'Your AUTOHIDE setting is now ON.', 31337);
@@ -139,3 +135,5 @@ INSERT INTO translations (language_id, response_id, text, last_updated) VALUES(1
 INSERT INTO translations (language_id, response_id, text, last_updated) VALUES(1, 234, 'That fingerprint was not found on your username.', 31337);
 
 INSERT INTO help VALUES ('CERT', '1', E'/msg X cert <add|rem|list> [fingerprint] [note]\nThis command allows you to add, remove and list TLS fingerprints added to your username.\nBy connecting to Undernet using TLS and a certificate, you may login to X without using a password if the certificate''s fingerprint has been added to your username.\nTo login to X with a fingerprint, use ''/msg X@channels.undernet.org login <username> [TOTP token]''.\nUsing CERT ADD or REM without specifying a fingerprint will add or remove the fingerprint you are currently connected with (if any).\nA specified fingerprint must be in a SHA-256 format (i.e. AB:CD:12:ED:34 ...).\nWhen having a fingerprint added to your account, you may deactivate password login on IRC using ''SET CERTONLY ON/OFF''. You will still be able to login to the website with your password.');
+INSERT INTO help VALUES ('SET CERTONLY', '1', E'/msg X set CERTONLY <ON|OFF>\nThis command allows you to enable or disable CERTONLY mode on your username.\nWhen CERTONLY is enabled, you will only be able to login to X using a TLS certificate that has a fingerprint added to your username. Password logins will be disabled while this setting is ON.\nYou must have at least one fingerprint added to your username before enabling CERTONLY.');
+INSERT INTO help VALUES ('SET AUTOHIDE', '1', E'/msg X set AUTOHIDE <ON|OFF>\nThis command allows you to enable or disable AUTOHIDE mode on your username.\nWhen AUTOHIDE is enabled, you will receive usermode +x automatically upon authenticating with X resulting in your real hostmask being hidden to other users.');

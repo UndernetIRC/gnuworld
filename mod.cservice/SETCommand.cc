@@ -189,7 +189,7 @@ if( st[1][0] != '#' ) // Didn't find a hash?
 				bot->Notice(theClient,
 					bot->getResponse(theUser,
 						language::no_fingerprints_registered,
-						string("You currently don't have any fingerprints added to your account. For more information, use '/msg X help fingerprint'")));
+						string("You currently don't have any fingerprints added to your account. For more information, use '/msg X help cert'")));
 				return true;
 			}
 			theUser->setFlag(sqlUser::F_CERTONLY);
