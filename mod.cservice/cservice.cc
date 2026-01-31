@@ -9755,12 +9755,13 @@ bool cservice::InsertUserHistory(iClient* theClient, const string& command)
 		return false;
 	}
 	theQuery << "INSERT INTO user_sec_history ("
-			<< "user_id, user_name, command, ip, hostmask, timestamp) VALUES ("
+			<< "user_id, user_name, command, ip, hostmask, ident, timestamp) VALUES ("
 			<< theUser->getID() << ", '"
 			<< escapeSQLChars(theUser->getUserName()) << "', '"
 			<< escapeSQLChars(string_upper(command)) << "', '"
 			<< escapeSQLChars(xIP(theClient->getIP()).GetNumericIP()) << "', '"
-			<< escapeSQLChars(theClient->getRealNickUserHost()) << "', "
+			<< escapeSQLChars(theClient->getRealNickUserHost()) << "', '"
+			<< escapeSQLChars(theClient->getUserName()) << "', "
 			<< "date_part('epoch', CURRENT_TIMESTAMP)::int)"
 			<< ends;
 
