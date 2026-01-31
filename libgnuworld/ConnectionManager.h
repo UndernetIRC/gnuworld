@@ -37,6 +37,12 @@
 #include	"Connection.h"
 #include	"ConnectionHandler.h"
 
+#ifdef HAVE_LIBSSL
+#include	<openssl/err.h>
+#include	<openssl/rand.h>
+#include	<openssl/ssl.h>
+#endif
+
 namespace gnuworld
 {
 
@@ -188,7 +194,8 @@ public:
 	virtual Connection*	Connect(
 				ConnectionHandler*,
 				const std::string& host,
-				const unsigned short int remotePort ) ;
+				const unsigned short int remotePort,
+				bool tlsEnabled ) ;
 
 	/**
 	 * Connect to a file instead of a network host.  This method
@@ -334,6 +341,13 @@ protected:
 	 */
 	char*		inputBuffer ;
 
+#ifdef HAVE_LIBSSL
+	/**
+	 * The OpenSSL context for TLS connections
+	 */
+	SSL_CTX*	sslCtx ;
+#endif
+
 	/**
 	 * Open a socket.
 	 * Return -1 on error
@@ -421,6 +435,9 @@ protected:
 	 */
 	virtual bool	disconnectAll( ConnectionHandler* ) ;
 
+#ifdef HAVE_LIBSSL
+	virtual bool 	negotiateTLS( ConnectionHandler*, Connection* ) ;
+#endif
 } ;
 
 } // namespace gnuworld

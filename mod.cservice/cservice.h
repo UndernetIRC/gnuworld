@@ -41,6 +41,7 @@
 #include	"EConfig.h"
 #include	"cservice_config.h"
 #include	"cservice_confvars.h"
+#include	"cservice_crypt.h"
 #include	"cserviceCommands.h"
 #include	"sqlChannel.h"
 #include	"sqlUser.h"
@@ -53,7 +54,7 @@
 #include	"prometheus.h"
 
 #ifdef USE_THREAD
-#include	"threadworker.h"
+  #include	"threadworker.h"
 #endif
 
 namespace gnuworld
@@ -61,6 +62,11 @@ namespace gnuworld
 using std::string ;
 using std::vector ;
 using std::map ;
+
+enum class AuthType {
+	LOGIN,
+	XQUERY
+} ;
 
 /*
  * Class for the configuration variables extracted from the database.
@@ -90,6 +96,62 @@ class Command;
 
 class cservice : public xClient
 {
+private:
+    /*
+     * Declare SASL mechanisms once using an X-macro list. Each entry:
+     *   X(EnumName, CanonicalName)
+     * CanonicalName may be any consistent casing; helpers will convert as needed.
+     */
+#define CSERVICE_SASL_MECH_LIST \
+	X( PLAIN,          "PLAIN" ) \
+	X( SCRAM_SHA_256,  "SCRAM-SHA-256" ) \
+	X( EXTERNAL,       "EXTERNAL" )
+
+    enum class SaslMechanism {
+        NO_SASL,
+#define X(NAME, NAME_STR) NAME,
+        CSERVICE_SASL_MECH_LIST
+#undef X
+    } ;
+
+    enum class SaslState {
+		INITIAL,            // Waiting for the first client message
+		CLIENT_FIRST,       // Received client-first-message (SCRAM step 1)
+		SERVER_FIRST,       // Sent server-first-message, waiting for client-final-message (SCRAM step 2)
+		CLIENT_FINAL,       // Received client-final-message (SCRAM step 3)
+		COMPLETE,           // Authentication complete (success or failure)
+		FAILED              // Authentication failed
+    } ;
+
+	struct SaslRequest {
+		iServer* theServer ;
+		iClient* theClient = nullptr ;
+		time_t added_ts ;
+		time_t last_ts ;
+        string routing ;
+		string ip ;
+		string ident ;
+		string fingerprint ;
+		string username ;
+		string password ;
+        SaslMechanism mechanism ;
+        string credentials ;
+		string client_nonce ;
+		string server_nonce ;
+		string client_first ;
+		string server_first ;
+		string client_final ;
+		SaslState state = SaslState::INITIAL ;
+		#ifdef HAVE_LIBSSL
+		ScramParsed scram ;
+		#endif
+    } ;
+
+    std::vector< SaslRequest > saslRequests ;
+	static bool parseSaslMechanism( const std::string&, SaslMechanism& ) ;
+	static std::string saslMechanismToString( cservice::SaslMechanism ) ;
+    static std::string saslMechsAdvertiseList() ;
+
 protected:
 
 	/* Configfile */
@@ -187,6 +249,9 @@ protected:
 	// Accesslevel cache, key is pair(userid, chanid).
 	typedef map < std::pair <int, int>, sqlLevel* > sqlLevelHashType ;
 
+	// Fingerprints. Key is fingerprint, value is userID.
+	typedef map< string, unsigned int > fpMapType ;
+
 	// Cache of user records.
 	sqlUserHashType sqlUserCache;
 
@@ -198,6 +263,9 @@ protected:
 
 	// Cache of Level records.
 	sqlLevelHashType sqlLevelCache;
+
+	// Cache of TLS fingerprints.
+	fpMapType fingerprintMap;
 
 	/* Pushover object. */
 	std::shared_ptr< PushoverClient > pushover ;
@@ -339,15 +407,19 @@ protected:
 	/* XQ handlers. */
 	bool doXQLogin(iServer* , const string&, const string&);
 	bool doXQIsCheck(iServer*, const string&, const string&, const string&);
+	bool doXQSASL(iServer* , const string&, const string&);
 
 	/**
 	 * Array of sqlUser flags and the corresponding accountFlags.
 	 */
-	static constexpr std::array< std::pair< sqlUser::flagType, iClient::flagType >, 4 > flagMap = { {
+	static constexpr std::array< std::pair< sqlUser::flagType, iClient::flagType >, 7 > flagMap = { {
 		{ sqlUser::F_TOTP_ENABLED, iClient::X_TOTP_ENABLED },
 		{ sqlUser::F_TOTP_REQ_IPR, iClient::X_TOTP_REQ_IPR },
 		{ sqlUser::F_GLOBAL_SUSPEND, iClient::X_GLOBAL_SUSPEND },
-		{ sqlUser::F_FRAUD, iClient::X_FRAUD }
+		{ sqlUser::F_FRAUD, iClient::X_FRAUD },
+		{ sqlUser::F_CERTONLY, iClient::X_CERTONLY },
+		{ sqlUser::F_CERT_DISABLE_TOTP, iClient::X_CERT_DISABLE_TOTP },
+		{ sqlUser::F_WEB_DISABLE_TOTP, iClient::X_WEB_DISABLE_TOTP }
 	} } ;
 
 	/**
@@ -369,7 +441,7 @@ public:
     CONFIG_VAR_LIST
     #undef CONFIG_VAR
 
-	enum {
+	enum AuthResult {
 		AUTH_SUCCEEDED,
 		AUTH_FAILED,
 		TOO_EARLY_TOLOGIN,
@@ -377,10 +449,13 @@ public:
 		AUTH_SUSPENDED_USER,
 		AUTH_NO_TOKEN,
 		AUTH_INVALID_PASS,
+		AUTH_INVALID_FINGERPRINT,
 		AUTH_ERROR,
 		AUTH_INVALID_TOKEN,
 		AUTH_FAILED_IPR,
-		AUTH_ML_EXCEEDED
+		AUTH_CERTONLY,
+		AUTH_ML_EXCEEDED,
+		AUTH_FAIL_EXCEEDED
 	};
 
 	cservice(const string& args);
@@ -480,6 +555,26 @@ public:
 	/* Returns what access a user has in the coder channel */
 	short getCoderAccessLevel( sqlUser* );
 
+	/* Checks if a user has an existing TLS fingerprint for it's username
+	 * Returns the COUNT(*) 
+	 */
+	unsigned int hasFP( sqlUser* );
+
+	/* Returns true if the fingerprint exists and matches the user_id. */
+	bool checkFP( const string& fingerprint, unsigned int userId )
+	{
+		auto it = fingerprintMap.find( fingerprint ) ;
+		return ( it != fingerprintMap.end() && it->second == userId ) ;
+	}
+
+	/* Adds a fingerprint to cache. */
+	auto addFP( const string& fingerprint, unsigned int userId )
+		{ return fingerprintMap.emplace( fingerprint, userId ) ; }
+
+	/* Removes a fingerprint from cache. */
+	void removeFP( const string& fingerprint )
+		{ fingerprintMap.erase( fingerprint ) ; }
+
 	/* Fetch a user record from cache only. */
 	inline std::optional< sqlUser* > getCachedUserRecord( const string& user_name )
 	{
@@ -575,8 +670,21 @@ public:
 	unsigned int getOutputTotal(const iClient* theClient);
 	bool hasOutputFlooded(iClient*);
 
-	int authenticateUser(const string& username, const string& password, const string& ip, const string& ident,unsigned int&, sqlUser**);
-	int authenticateUser(const string& username, const string& password, iClient*, sqlUser**);
+	using AuthStruct = struct {
+		AuthType type ;
+		unsigned int result ;
+		std::string username ;
+		std::string password ;
+		std::string ident ;
+		std::string ip ;
+		std::string fingerprint ;
+		sqlUser* theUser ;
+		iClient* theClient ;
+		SaslMechanism sasl ;
+	} ;
+
+	AuthResult authenticateUser( AuthStruct& ) ;
+	bool processAuthentication( AuthStruct, std::string* Message = nullptr ) ;
 
 	void doXQToAllServices(const string&, const string&);
 
@@ -833,11 +941,13 @@ public:
 	void preloadChannelCache();
 	void preloadLevelsCache();
 	void preloadUserCache();
+	void preloadFingerprintCache();
 
 	bool loadGlines();
 
 	void updateChannels();
 	void updateUsers();
+	void updateFingerprints();
 	void updateUserLevels(sqlUser* );
 	void updateLevels(int channelId = 0);
 	vector<sqlUser*> getChannelManager(int channelId);

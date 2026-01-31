@@ -97,6 +97,9 @@ public:
 	/** MODE_FAKE is true if this user is a fake client. */
 	static constexpr modeType 	MODE_FAKE		= 0x0200 ;
 
+	/** MODE_TLS is true if this user is using TLS. */
+	static constexpr modeType 	MODE_TLS		= 0x0400 ;
+
 	/**
 	 * Define a type to be used for storing the
 	 * iClient's account's flags.
@@ -106,6 +109,9 @@ public:
 	static constexpr flagType X_TOTP_REQ_IPR   		= 0x002 ;
 	static constexpr flagType X_GLOBAL_SUSPEND 		= 0x004 ;
 	static constexpr flagType X_FRAUD          		= 0x008 ;
+	static constexpr flagType X_CERTONLY       		= 0x010 ;
+	static constexpr flagType X_CERT_DISABLE_TOTP 		= 0x020 ;
+	static constexpr flagType X_WEB_DISABLE_TOTP 		= 0x040 ;
 
 	/// Iterator for channels this user is on.
 	typedef channelListType::iterator channelIterator ;
@@ -131,6 +137,7 @@ public:
 		const std::string& _account,
 		const unsigned int _account_id,
 		const flagType _account_flags,
+		const std::string& _tls_fingerprint,
 		const std::string& _description,
 		const time_t& _nick_ts ) ;
 
@@ -151,6 +158,7 @@ public:
 		const std::string& _account,
 		const unsigned int _account_id,
 		const flagType _account_flags,
+		const std::string& _tls_fingerprint,
 		const std::string& _setHost,
 		const std::string& _fakeHost,
 		const std::string& _description,
@@ -212,6 +220,19 @@ public:
 	 */
 	inline const std::string getRealNickUserHost() const
 		{ return (nickName + '!' + userName + '@' + realInsecureHost) ; }
+
+	/**
+	 * Retrieve client's TLS fingerprint.
+	 * Will return empty if the client is not using TLS.
+	 */
+	inline const std::string& getTlsFingerprint() const
+		{ return tlsFingerprint ; }
+
+	/**
+	 * Returns true if the client has a fingerprint.
+	 */
+	inline bool hasTlsFingerprint() const
+		{ return !tlsFingerprint.empty() ; }
 
 	/**
 	 * Retrieve client's 'real-name' field.
@@ -307,6 +328,15 @@ public:
 		{
 		if( ! isModeR() ) { return ; }
 		account_flags |= newFlag ;
+		}
+
+	/**
+	 * Set the TLS fingerprint for this iClient.
+	 */
+	inline void setTlsFingerprint( const std::string& _tls_fingerprint )
+		{
+		if( ! isModeZ() ) { return ; }
+		tlsFingerprint = _tls_fingerprint ;
 		}
 
 #ifdef ASUKA
@@ -499,6 +529,13 @@ public:
 		{ return getMode( MODE_G ) ; }
 
 	/**
+	 * Return true if this client has the +z mode set,
+	 * indicating that the client is using TLS. False otherwise.
+	 */
+	inline bool isModeZ() const
+		{ return getMode( MODE_TLS ) ; }
+
+	/**
 	 * Return true if this iClient is a fake, false otherwise.
 	 */
 	inline bool isFake() const
@@ -572,6 +609,12 @@ public:
 	 */
 	inline void setModeR()
 		{ setMode( MODE_REGISTERED ) ; }
+
+	/**
+	 * Set mode +z for this user.
+	 */
+	inline void setModeZ()
+		{ setMode( MODE_TLS ) ; }
 
 	/**
 	 * Designate this iClient as a fake.
@@ -766,7 +809,10 @@ protected:
 	unsigned int account_id ;
 
 	/** The flags of this client's account. */
-	unsigned short int account_flags;
+	unsigned short int account_flags ;
+
+	/** The TLS fingerprint of this client. */
+	std::string tlsFingerprint ;
 
 #ifdef ASUKA
 	/**

@@ -3,6 +3,9 @@
 -- Channel service DB SQL file for PostgreSQL.
 
 -- ChangeLog:
+-- 2026-01-09: MrIron
+--			   Added column for scram records.
+--             Added table for TLS fingerprints.
 -- 2025-04-01: Empus
 --             Added ident column to user_sec_history table
 --             Added deleted column to user_sec_history table
@@ -221,7 +224,7 @@ CREATE TABLE users (
 	language_id INT4 CONSTRAINT language_channel_id_ref REFERENCES languages (id),
 	public_key TEXT,
 	post_forms int4 DEFAULT 0 NOT NULL,
-	flags INT2 NOT NULL DEFAULT '0',
+	flags INT4 NOT NULL DEFAULT '0',
 -- 0x00 01 -- Suspended globally.
 -- 0x00 02 -- Logged in (Depricated).
 -- 0x00 04 -- Invisible.
@@ -241,6 +244,7 @@ CREATE TABLE users (
 	signup_ts INT4,
 	signup_ip VARCHAR(15),
 	maxlogins INT4 DEFAULT 1,
+	scram_record TEXT,
 	totp_key  VARCHAR(60) DEFAULT '',
 	PRIMARY KEY ( id )
 ) ;
@@ -249,6 +253,16 @@ CREATE INDEX users_username_idx ON users( lower(user_name) );
 CREATE INDEX users_email_idx ON users( lower(email) );
 CREATE INDEX users_signup_ts_idx ON users( signup_ts );
 CREATE INDEX users_signup_ip_idx ON users( signup_ip );
+
+-- This table used to store TLS fingerprints.
+
+CREATE TABLE users_fingerprints (
+    user_id INT4 NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    fingerprint VARCHAR(128) NOT NULL UNIQUE,
+    added_ts BIGINT NOT NULL,
+    added_by VARCHAR(128) NOT NULL,
+	note TEXT
+);
 
 -- This table used to store the "Last Seen" informatation previously
 -- routinely updated in the users table.

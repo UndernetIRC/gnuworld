@@ -267,6 +267,36 @@ if test "x$check_log4cplus" != "x" ; then
 	CXXFLAGS="${CXXFLAGS} -I${LOG4CPLUS_INCLUDE}"
 fi
 
+dnl Enable OpenSSL if required
+
+dnl Enable OpenSSL by default unless --without-libssl is specified
+AC_ARG_WITH([libssl],
+	AS_HELP_STRING([--with-libssl],[Enable OpenSSL (default)]),
+	[check_libssl=$withval],
+	[check_libssl=yes])
+
+AC_ARG_WITH([libssl-lib],
+	AS_HELP_STRING([--with-libssl-lib=LIBSSLLIBDIR],[Specify location to find libssl.so]),
+	[SSL_LIB=$withval],
+	[SSL_LIB="/usr/lib"])
+
+AC_ARG_WITH([libssl-include],
+	AS_HELP_STRING([--with-libssl-include=SSLINCLUDEDIR],[Specify location to find ssl.h]),
+	[SSL_INCLUDE=$withval],
+	[SSL_INCLUDE="/usr/include"])
+
+if test "x$check_libssl" != "xno"; then
+	LDFLAGS="${LDFLAGS} -L${SSL_LIB} -lssl -lcrypto"
+	CXXFLAGS="${CXXFLAGS} -I${SSL_INCLUDE} -L${SSL_LIB}"
+	AC_CHECK_FILE("$SSL_LIB/libssl.so",,
+		[AC_MSG_WARN([Unable to find libssl.so, please use --with-libssl-lib to specify the path])])
+	AC_CHECK_FILE("$SSL_INCLUDE/openssl/ssl.h",,
+		[AC_MSG_WARN([Unable to find ssl.h, please use --with-libssl-include to specify the path])])
+	AC_DEFINE([HAVE_LIBSSL], [], [Using LIBSSL])
+else
+	AC_MSG_WARN([OpenSSL support disabled (--without-libssl)])
+fi
+
 dnl Allow selection of additional includes and libraries paths
 dnl just in case!
 

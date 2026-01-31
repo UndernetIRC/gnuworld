@@ -7,6 +7,7 @@ libircu_la_SOURCES = \
 	libircu/msg_AD.cc \
 	libircu/msg_B.cc \
 	libircu/msg_C.cc \
+	libircu/msg_CF.cc \
 	libircu/msg_CM.cc \
 	libircu/msg_D.cc \
 	libircu/msg_DS.cc \

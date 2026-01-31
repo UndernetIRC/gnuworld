@@ -230,7 +230,10 @@ namespace gnuworld
 		const int reason_must =				192;
 		const int susp_reason =				193;
 		const int unsusp_reason =			194;
-
+		const int certonly_on =				195;
+		const int certonly_off =			196;
+		const int autohide_on =				197;
+		const int autohide_off =			198;
 		// Allow for merge of other features
 
 		const int welcome_max_len = 			205;
@@ -255,6 +258,17 @@ namespace gnuworld
 		const int mode_banset = 222;
 		const int mode_wrongkey = 223;
 		const int mode_keylength = 224;
+
+		const int no_fingerprints_registered = 225;
+		const int no_fingerprints_found = 226;
+		const int your_fingerprint_is = 227;
+		const int max_fingerprints = 228;
+		const int invalid_fingerprint = 229;
+		const int fingerprint_already_exists = 230;
+		const int fingerprint_added = 231;
+		const int fingerprint_removed = 232;
+		const int fingerprint_norem_certonly = 233;
+		const int fingerprint_not_found = 234;
 
 		const int greeting = 				9998;
 		const int motd =				9999;

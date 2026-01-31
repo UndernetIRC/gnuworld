@@ -82,6 +82,13 @@
 #define TOPIC_TRACK
 
 /**
+ * NO_FINGERPRINT_BURST
+ * Disable this if gnuworld is linked to a hub that doesn't support fingerprint burst.
+ * This should only be enabled when the uplink is running ircu with tls support.
+ */
+#define NO_FINGERPRINT_BURST
+
+/**
  * USE_THREAD
  * Set this to enable mutexes on shared objects. Relevant for running
  * modules with threading.

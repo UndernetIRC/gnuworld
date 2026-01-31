@@ -174,6 +174,14 @@ return channelMap.insert(
 		theChan ) ).second ;
 }
 
+std::optional< std::pair< std::string, time_t > > xNetwork::findNetConf( const std::string& key ) const
+{
+auto it = netConfMap.find( key ) ;
+if( it != netConfMap.end() )
+	return it->second;
+return std::nullopt;
+}
+
 iClient* xNetwork::findClient( const unsigned int& intYYXXX ) const
 {
 numericMapType::const_iterator ptr = numericMap.find( intYYXXX ) ;
