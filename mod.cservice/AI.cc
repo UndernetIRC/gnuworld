@@ -20,21 +20,19 @@
  * $Id: AI.cc,v 1.2 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include	<universe.h>
-#include	"sqlUser.h"
+#include <universe.h>
+#include "sqlUser.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-bool AICommand::Exec( iClient* theClient, const string& Message )
-{
-bot->incStat("COMMANDS.AI");
+bool AICommand::Exec(iClient* theClient, const string& Message) {
+    bot->incStat("COMMANDS.AI");
 
-/*
- *  a2b57e6118e750f3b8cde7fa8d7c4114
- */
+    /*
+     *  a2b57e6118e750f3b8cde7fa8d7c4114
+     */
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld.

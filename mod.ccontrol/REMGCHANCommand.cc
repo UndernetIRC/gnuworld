@@ -20,57 +20,52 @@
  * $Id: REMGCHANCommand.cc,v 1.14 2006/09/26 17:36:00 kewlio Exp $
  */
 
-#include	<string>
-#include	<iomanip>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
 // remgline user@host
-bool REMGCHANCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
+bool REMGCHANCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-if((st[1].substr(0,1) != "#") || (st[1].size() > channel::MaxName))
-	{
-	bot->Notice(theClient,"Invalid channel name. It must begin with # and can't be "
-			"more than %d characters in length.",
-			channel::MaxName);
-	return false;
-	}
-bot->MsgChanLog("REMGCHAN %s\n",st.assemble(1).c_str());
+    if ((st[1].substr(0, 1) != "#") || (st[1].size() > channel::MaxName)) {
+        bot->Notice(theClient,
+                    "Invalid channel name. It must begin with # and can't be "
+                    "more than %d characters in length.",
+                    channel::MaxName);
+        return false;
+    }
+    bot->MsgChanLog("REMGCHAN %s\n", st.assemble(1).c_str());
 
-ccGline *tmpGline = bot->findGline(st[1]);
-if(tmpGline != NULL)
-	{
-	if(!tmpGline->Delete())
-		bot->MsgChanLog("Error while removing gline for channel %s from the db\n",st[1].c_str());
-	bot->remGline(tmpGline);
-	delete tmpGline;
-	}	
-//bot->setRemoving(st[1]);
-server->removeGline( st [ 1 ] ,bot);
-//bot->unSetRemoving();
-return true ;
+    ccGline* tmpGline = bot->findGline(st[1]);
+    if (tmpGline != NULL) {
+        if (!tmpGline->Delete())
+            bot->MsgChanLog("Error while removing gline for channel %s from the db\n",
+                            st[1].c_str());
+        bot->remGline(tmpGline);
+        delete tmpGline;
+    }
+    // bot->setRemoving(st[1]);
+    server->removeGline(st[1], bot);
+    // bot->unSetRemoving();
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld
-

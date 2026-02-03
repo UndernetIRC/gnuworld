@@ -25,44 +25,37 @@
 
 #include "nickserv.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
 using std::string;
 
-bool RELEASECommand::Exec(iClient* theClient, const string& )
-{
-bot->theStats->incStat("NS.CMD.RELEASE");
+bool RELEASECommand::Exec(iClient* theClient, const string&) {
+    bot->theStats->incStat("NS.CMD.RELEASE");
 
-string account = theClient->getAccount();
+    string account = theClient->getAccount();
 
-if(account.empty()) {
-  bot->Notice(theClient, "You have not authenticated. Please login before"
-                         " trying to use RELEASE.");
-  return false;
-}
+    if (account.empty()) {
+        bot->Notice(theClient, "You have not authenticated. Please login before"
+                               " trying to use RELEASE.");
+        return false;
+    }
 
-iClient *fakeClient = Network->findNick(account);
+    iClient* fakeClient = Network->findNick(account);
 
-if(fakeClient == 0 || ! fakeClient->isFake()) {
-  bot->Notice(theClient, "No jupe exists for %s.",
-              account.c_str()
-             );
-  return false;
-}
+    if (fakeClient == 0 || !fakeClient->isFake()) {
+        bot->Notice(theClient, "No jupe exists for %s.", account.c_str());
+        return false;
+    }
 
-/* The fakeClient now points to the juped client */
-bot->getUplink()->DetachClient(fakeClient, "Jupe released.");
-delete fakeClient;
+    /* The fakeClient now points to the juped client */
+    bot->getUplink()->DetachClient(fakeClient, "Jupe released.");
+    delete fakeClient;
 
-bot->Notice(theClient, "%s successfully released.",
-            account.c_str()
-           );
+    bot->Notice(theClient, "%s successfully released.", account.c_str());
 
-return true;
+    return true;
 } // RELEASECommand::Exec(iClient*, const string&)
 
 } // namespace ns

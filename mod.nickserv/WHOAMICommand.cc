@@ -17,44 +17,38 @@
  * USA.
  */
 
-#include	<sstream>
+#include <sstream>
 
-#include	"gnuworld_config.h"
-#include	"nickserv.h"
+#include "gnuworld_config.h"
+#include "nickserv.h"
 
-using std::stringstream ;
-using std::ends ;
+using std::ends;
+using std::stringstream;
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
 using std::string;
 
-bool WHOAMICommand::Exec(iClient* theClient, const string&)
-{
-bot->theStats->incStat("NS.CMD.WHOAMI");
+bool WHOAMICommand::Exec(iClient* theClient, const string&) {
+    bot->theStats->incStat("NS.CMD.WHOAMI");
 
-sqlUser* theUser = bot->isAuthed(theClient);
+    sqlUser* theUser = bot->isAuthed(theClient);
 
-stringstream theResponse;
-theResponse << "Nick: " << theClient->getNickName()
-  << "; Account: " << theClient->getAccount();
+    stringstream theResponse;
+    theResponse << "Nick: " << theClient->getNickName() << "; Account: " << theClient->getAccount();
 
-if(theUser) {
-  theResponse << "; Level: " << theUser->getLevel()
-    << "; Flags: " << theUser->getFlags()
-    << "; LogMask: " << theUser->getLogMask()
-    ;
-}
+    if (theUser) {
+        theResponse << "; Level: " << theUser->getLevel() << "; Flags: " << theUser->getFlags()
+                    << "; LogMask: " << theUser->getLogMask();
+    }
 
-theResponse << ends;
+    theResponse << ends;
 
-bot->Notice(theClient, theResponse.str());
+    bot->Notice(theClient, theResponse.str());
 
-return true;
+    return true;
 }
 
 } // namespace ns

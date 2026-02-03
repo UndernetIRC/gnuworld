@@ -21,77 +21,54 @@
  * $Id: Connection.cc,v 1.5 2004/01/07 18:33:42 dan_karrels Exp $
  */
 
-#include	<sys/types.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<sys/socket.h>
-#include	<netdb.h>
-#include	<string>
-#include	<cstring>
-#include	"Connection.h"
-#include	"Buffer.h"
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <string>
+#include <cstring>
+#include "Connection.h"
+#include "Buffer.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
 // Simply initialize the object
-Connection::Connection( const string& _hostname,
-	const unsigned short int _remotePort,
-	const char _delimiter,
-	bool _tlsEnabled )
-: hostname( _hostname ),
-	localPort( 0 ),
-	remotePort( _remotePort ),
-	inputBuffer( _delimiter ),
-	outputBuffer( _delimiter ),
-	tlsEnabled( _tlsEnabled ),
-	IP( string() ),
-	sockFD( -1 ),
-	flags( F_PENDING ),
-	connectTime( 0 ),
-	bytesRead( 0 ),
-	bytesWritten( 0 )
+Connection::Connection(const string& _hostname, const unsigned short int _remotePort,
+                       const char _delimiter, bool _tlsEnabled)
+    : hostname(_hostname), localPort(0), remotePort(_remotePort), inputBuffer(_delimiter),
+      outputBuffer(_delimiter), tlsEnabled(_tlsEnabled), IP(string()), sockFD(-1), flags(F_PENDING),
+      connectTime(0), bytesRead(0), bytesWritten(0)
 #ifdef HAVE_LIBSSL
-	, tlsState( nullptr )
+      ,
+      tlsState(nullptr)
 #endif
 {
-memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
+    memset(&addr, 0, sizeof(struct sockaddr_in));
 }
 
-Connection::Connection( const char _delimiter )
-: localPort( 0 ),
-	remotePort( 0 ),
-	inputBuffer( _delimiter ),
-	outputBuffer( _delimiter ),
-	tlsEnabled( false ),
-	sockFD( -1 ),
-	flags( F_PENDING ),
-	connectTime( 0 ),
-	bytesRead( 0 ),
-	bytesWritten( 0 )
+Connection::Connection(const char _delimiter)
+    : localPort(0), remotePort(0), inputBuffer(_delimiter), outputBuffer(_delimiter),
+      tlsEnabled(false), sockFD(-1), flags(F_PENDING), connectTime(0), bytesRead(0), bytesWritten(0)
 #ifdef HAVE_LIBSSL
-	, tlsState( nullptr )
+      ,
+      tlsState(nullptr)
 #endif
 {
-memset( &addr, 0, sizeof( struct sockaddr_in ) ) ;
+    memset(&addr, 0, sizeof(struct sockaddr_in));
 }
 
-Connection::~Connection()
-{
+Connection::~Connection() {
 #ifdef HAVE_LIBSSL
-if( tlsState )
-	{
-	SSL_free( tlsState ) ;
-	tlsState = nullptr ;
-	}
+    if (tlsState) {
+        SSL_free(tlsState);
+        tlsState = nullptr;
+    }
 #endif
 }
 
-void Connection::Write( const string& writeMe )
-{
-outputBuffer += writeMe ;
-}
+void Connection::Write(const string& writeMe) { outputBuffer += writeMe; }
 
 } // namespace gnuworld

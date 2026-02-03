@@ -20,26 +20,25 @@
  * $Id: msg_S.cc,v 1.7 2007/05/12 13:20:00 mrbean_ Exp $
  */
 
-#include	<new>
-#include	<string>
-#include	<iostream>
+#include <new>
+#include <string>
+#include <iostream>
 
-#include	<cassert>
+#include <cassert>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"events.h"
-#include	"Network.h"
-#include	"iServer.h"
-#include	"ELog.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "events.h"
+#include "Network.h"
+#include "iServer.h"
+#include "ELog.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::endl ;
+using std::endl;
+using std::string;
 
 CREATE_HANDLER(msg_S)
 
@@ -64,74 +63,61 @@ CREATE_HANDLER(msg_S)
  * As always, the second token, the command, is not
  * included in the xParameters passed here.
  */
-bool msg_S::Execute( const xParameters& params )
-{
-// We need at least 9 tokens
-if( params.size() < 9 )
-	{
-	elog	<< "msg_S> Not enough parameters"
-		<< endl ;
-	return false ;
-	}
+bool msg_S::Execute(const xParameters& params) {
+    // We need at least 9 tokens
+    if (params.size() < 9) {
+        elog << "msg_S> Not enough parameters" << endl;
+        return false;
+    }
 
-int uplinkIntYY = base64toint( params[ 0 ] ) ;
-iServer* uplinkServer = Network->findServer( uplinkIntYY ) ;
+    int uplinkIntYY = base64toint(params[0]);
+    iServer* uplinkServer = Network->findServer(uplinkIntYY);
 
-if( NULL == uplinkServer )
-	{
-	elog	<< "msg_S> Unable to find uplink server"
-		<< endl ;
-	return false ;
-	}
+    if (NULL == uplinkServer) {
+        elog << "msg_S> Unable to find uplink server" << endl;
+        return false;
+    }
 
-const string serverName( params[ 1 ] ) ;
-// Don't care about hop count
-// Don't care about start time
-time_t connectTime = static_cast< time_t >( atoi( params[ 4 ] ) ) ;
-// Don't care about version
+    const string serverName(params[1]);
+    // Don't care about hop count
+    // Don't care about start time
+    time_t connectTime = static_cast<time_t>(atoi(params[4]));
+    // Don't care about version
 
-int serverIntYY = base64toint( params[ 6 ], 2 ) ;
+    int serverIntYY = base64toint(params[6], 2);
 
-// Does the new server's numeric already exist?
-if( NULL != Network->findServer( serverIntYY ) )
-	{
-	elog	<< "msg_S> Server numeric collision, numeric: "
-		<< params[ 6 ]
-		<< ", old name: "
-		<< Network->findServer( serverIntYY )->getName()
-		<< ", new name: "
-		<< serverName
-		<< endl ;
-	delete Network->removeServer( serverIntYY ) ;
-	}
+    // Does the new server's numeric already exist?
+    if (NULL != Network->findServer(serverIntYY)) {
+        elog << "msg_S> Server numeric collision, numeric: " << params[6]
+             << ", old name: " << Network->findServer(serverIntYY)->getName()
+             << ", new name: " << serverName << endl;
+        delete Network->removeServer(serverIntYY);
+    }
 
-// Dun really care about the server description
-iServer* newServer = new (std::nothrow) iServer( uplinkIntYY,
-		params[ 6 ], // yxx
-		serverName,
-		connectTime ) ;
-assert( newServer != 0 ) ;
+    // Dun really care about the server description
+    iServer* newServer = new (std::nothrow) iServer(uplinkIntYY,
+                                                    params[6], // yxx
+                                                    serverName, connectTime);
+    assert(newServer != 0);
 
-// params[ 5 ] is either "P10", or "J10".  The J10 means
-// that the server is bursting
-if( 'J' == params[ 5 ][ 0 ] )
-	{
-	newServer->setBursting( true ) ;
-	}
+    // params[ 5 ] is either "P10", or "J10".  The J10 means
+    // that the server is bursting
+    if ('J' == params[5][0]) {
+        newServer->setBursting(true);
+    }
 
-// Set any appropriate server flags
-newServer->setFlags( params[ 7 ] ) ;
+    // Set any appropriate server flags
+    newServer->setFlags(params[7]);
 
-Network->addServer( newServer ) ;
-//elog	<< "msg_S> Added server: "
-//	<< *newServer
-//	<< endl ;
+    Network->addServer(newServer);
+    // elog	<< "msg_S> Added server: "
+    //	<< *newServer
+    //	<< endl ;
 
-theServer->PostEvent( EVT_NETJOIN,
-	static_cast< void* >( newServer ),
-	static_cast< void* >( uplinkServer ) ) ;
+    theServer->PostEvent(EVT_NETJOIN, static_cast<void*>(newServer),
+                         static_cast<void*>(uplinkServer));
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld

@@ -24,115 +24,98 @@
 #ifndef __SQLCHANOP_H
 #define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.6 2010/03/04 04:24:12 hidden1 Exp $"
 
-#include	<string>
-#include	"dbHandle.h"
-#include	"chanfix_config.h"
+#include <string>
+#include "dbHandle.h"
+#include "chanfix_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace cf
-{
+namespace cf {
 
 class sqlManager;
 
 class sqlChanOp {
 
-public:
-	sqlChanOp(sqlManager*);
-	virtual ~sqlChanOp();
+  public:
+    sqlChanOp(sqlManager*);
+    virtual ~sqlChanOp();
 
-	/*
-	 *  Methods to get data attributes.
-	 */
+    /*
+     *  Methods to get data attributes.
+     */
 
-	inline const std::string&	getChannel() const
-		{ return channel ; }
+    inline const std::string& getChannel() const { return channel; }
 
-	inline const std::string&	getAccount() const
-		{ return account ; }
+    inline const std::string& getAccount() const { return account; }
 
-	inline const int&	getPoints() const
-		{ return points ; }	
+    inline const int& getPoints() const { return points; }
 #ifdef ENABLE_NEWSCORES
-    inline const int&   getBonus() const
-        { return bonus; }
-#endif	
-
-	inline const std::string&	getLastSeenAs() const
-		{ return nickUserHost ; }
-
-	inline time_t	getTimeFirstOpped() const
-		{ return ts_firstopped ; }
-
-	inline time_t	getTimeLastOpped() const
-		{ return ts_lastopped ; }
-
-	inline const short&	getDay(int _dayval) const
-		{ return day[_dayval] ; }
-		
-	inline bool isOldestOp() const
-        { return OldestOp; }
-
-	/*
-	 *  Methods to set data attributes.
-	 */
-
-	inline void	setChannel(std::string _channel)
-		{ channel = _channel ; }
-
-	inline void	setAccount(std::string _account)
-		{ account = _account ; }
-		
-#ifdef ENABLE_NEWSCORES
-    inline void setBonus(int _bonus)
-        { bonus = _bonus; }
+    inline const int& getBonus() const { return bonus; }
 #endif
 
-	inline void	setPoints(short _points)
-		{ day[currentDay] = _points; calcTotalPoints(); }
+    inline const std::string& getLastSeenAs() const { return nickUserHost; }
 
-	inline void	addPoint()
-		{ day[currentDay]++; calcTotalPoints(); }
+    inline time_t getTimeFirstOpped() const { return ts_firstopped; }
 
-	inline void	setLastSeenAs(std::string _nickUserHost)
-		{ nickUserHost = _nickUserHost ; }
+    inline time_t getTimeLastOpped() const { return ts_lastopped; }
 
-	inline void     setTimeFirstOpped(time_t _ts_firstopped)
-		{ ts_firstopped = _ts_firstopped ; }
+    inline const short& getDay(int _dayval) const { return day[_dayval]; }
 
-	inline void	setTimeLastOpped(time_t _ts_lastopped)
-		{ ts_lastopped = _ts_lastopped ; }
+    inline bool isOldestOp() const { return OldestOp; }
 
-	inline void	setDay(int _dayval, short _pointsval)
-		{ day[_dayval] = _pointsval ; }
-		
-	inline void setIsOldestOp( bool _oldestOp )
-	    { OldestOp = _oldestOp; }
+    /*
+     *  Methods to set data attributes.
+     */
 
-	void setAllMembers(dbHandle*, int);
-	void calcTotalPoints();
+    inline void setChannel(std::string _channel) { channel = _channel; }
 
-private:
+    inline void setAccount(std::string _account) { account = _account; }
 
-	std::string	channel;
-	std::string	account;
-	std::string	nickUserHost;
-	int		points;
 #ifdef ENABLE_NEWSCORES
-	int     bonus;
+    inline void setBonus(int _bonus) { bonus = _bonus; }
 #endif
-	time_t		ts_firstopped;
-	time_t		ts_lastopped;
-	short		day[DAYSAMPLES];
-	bool   OldestOp;
 
-	sqlManager*	myManager;
+    inline void setPoints(short _points) {
+        day[currentDay] = _points;
+        calcTotalPoints();
+    }
+
+    inline void addPoint() {
+        day[currentDay]++;
+        calcTotalPoints();
+    }
+
+    inline void setLastSeenAs(std::string _nickUserHost) { nickUserHost = _nickUserHost; }
+
+    inline void setTimeFirstOpped(time_t _ts_firstopped) { ts_firstopped = _ts_firstopped; }
+
+    inline void setTimeLastOpped(time_t _ts_lastopped) { ts_lastopped = _ts_lastopped; }
+
+    inline void setDay(int _dayval, short _pointsval) { day[_dayval] = _pointsval; }
+
+    inline void setIsOldestOp(bool _oldestOp) { OldestOp = _oldestOp; }
+
+    void setAllMembers(dbHandle*, int);
+    void calcTotalPoints();
+
+  private:
+    std::string channel;
+    std::string account;
+    std::string nickUserHost;
+    int points;
+#ifdef ENABLE_NEWSCORES
+    int bonus;
+#endif
+    time_t ts_firstopped;
+    time_t ts_lastopped;
+    short day[DAYSAMPLES];
+    bool OldestOp;
+
+    sqlManager* myManager;
 }; // class
 
 } // namespace cf
 
 } // namespace gnuworld
-
 
 #endif // __SQLCHANOP_H

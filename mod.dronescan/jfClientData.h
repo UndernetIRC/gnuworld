@@ -29,16 +29,14 @@ namespace gnuworld {
 namespace ds {
 
 class jfClientData {
-public:
-	
-	jfClientData() :
-	    numOfJoins(0),numOfParts(0),seenOper(false),seenLoggedInUser(false) {} 
-	unsigned int numOfJoins;
-	unsigned int numOfParts;
-	bool seenOper;
-	bool seenLoggedInUser;
-	std::list<std::string> numerics;
-	std::list<std::pair<std::string,std::string> > userNames;
+  public:
+    jfClientData() : numOfJoins(0), numOfParts(0), seenOper(false), seenLoggedInUser(false) {}
+    unsigned int numOfJoins;
+    unsigned int numOfParts;
+    bool seenOper;
+    bool seenLoggedInUser;
+    std::list<std::string> numerics;
+    std::list<std::pair<std::string, std::string>> userNames;
 
 }; // class jfClientData
 

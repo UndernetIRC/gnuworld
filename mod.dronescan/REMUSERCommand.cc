@@ -30,58 +30,55 @@ namespace gnuworld {
 
 namespace ds {
 
-void REMUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
-{
-	if(theUser->getAccess() < level::remuser) return ;
+void REMUSERCommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser) {
+    if (theUser->getAccess() < level::remuser)
+        return;
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	/* Usage:
-	 *  REMUSER <username>
-	 */
+    /* Usage:
+     *  REMUSER <username>
+     */
 
-	if(st.size() != 2) {
-		Usage(theClient);
-		return ;
-	}
+    if (st.size() != 2) {
+        Usage(theClient);
+        return;
+    }
 
-	/* Conditions:
-	 *  i) The target user must exist
-	 * ii) The removee's access must be < the removers access
-	 */
+    /* Conditions:
+     *  i) The target user must exist
+     * ii) The removee's access must be < the removers access
+     */
 
-	/* Does the user exist? */
-	sqlUser *targetUser = bot->getSqlUser(st[1]);
-	if(!targetUser) {
-		bot->Reply(theClient, "The user %s does not exist.",
-			st[1].c_str()
-			);
-		return ;
-	}
+    /* Does the user exist? */
+    sqlUser* targetUser = bot->getSqlUser(st[1]);
+    if (!targetUser) {
+        bot->Reply(theClient, "The user %s does not exist.", st[1].c_str());
+        return;
+    }
 
-	/* Is the removees access lower than the removers? */
-	if(targetUser->getAccess() >= theUser->getAccess()) {
-		bot->Reply(theClient, "You cannot remove someone with higher or equal access.");
-		return ;
-	}
+    /* Is the removees access lower than the removers? */
+    if (targetUser->getAccess() >= theUser->getAccess()) {
+        bot->Reply(theClient, "You cannot remove someone with higher or equal access.");
+        return;
+    }
 
-	/* Conditions satisfied.
-	 *  i) Remove user from the database
-	 * ii) Flush cache
-	 */
+    /* Conditions satisfied.
+     *  i) Remove user from the database
+     * ii) Flush cache
+     */
 
-	/* Remove the user from the database */
-	if(targetUser->remove()) {
-		bot->Reply(theClient, "User %s successfully removed.",
-			targetUser->getUserName().c_str());
-	} else {
-		bot->Reply(theClient, "There was a problem removing the user.");
-	}
+    /* Remove the user from the database */
+    if (targetUser->remove()) {
+        bot->Reply(theClient, "User %s successfully removed.", targetUser->getUserName().c_str());
+    } else {
+        bot->Reply(theClient, "There was a problem removing the user.");
+    }
 
-	/* Flush the cache */
-	bot->preloadUserCache();
+    /* Flush the cache */
+    bot->preloadUserCache();
 
-	return ;
+    return;
 
 } // REMUSERCommand::Exec(iClient*, const string&, const sqlUser*)
 

@@ -25,44 +25,40 @@
 
 #include "nickserv.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
 using std::string;
 
-bool RECOVERCommand::Exec(iClient* theClient, const string& )
-{
-bot->theStats->incStat("NS.CMD.RECOVER");
+bool RECOVERCommand::Exec(iClient* theClient, const string&) {
+    bot->theStats->incStat("NS.CMD.RECOVER");
 
-string authedNick = theClient->getAccount();
+    string authedNick = theClient->getAccount();
 
-iClient* targetClient = Network->findNick(authedNick);
+    iClient* targetClient = Network->findNick(authedNick);
 
-if(!targetClient) {
-  bot->Notice(theClient, "Unable to find the nick %s.",
-    authedNick.c_str());
-  return true;
-}
+    if (!targetClient) {
+        bot->Notice(theClient, "Unable to find the nick %s.", authedNick.c_str());
+        return true;
+    }
 
-if(theClient == targetClient) {
-  bot->Notice(theClient, "Recovering yourself is a bad idea.");
-  return true;
-}
+    if (theClient == targetClient) {
+        bot->Notice(theClient, "Recovering yourself is a bad idea.");
+        return true;
+    }
 
-sqlUser* theUser = bot->isRegistered(authedNick);
-if(theUser && !theUser->hasFlag(sqlUser::F_RECOVER)) {
-  bot->Notice(theClient, "This user has disabled use of the RECOVER command.");
-  return true;
-}
+    sqlUser* theUser = bot->isRegistered(authedNick);
+    if (theUser && !theUser->hasFlag(sqlUser::F_RECOVER)) {
+        bot->Notice(theClient, "This user has disabled use of the RECOVER command.");
+        return true;
+    }
 
-bot->Kill(targetClient, "Nick recovered by " + theClient->getNickName());
+    bot->Kill(targetClient, "Nick recovered by " + theClient->getNickName());
 
-bot->Notice(theClient, "Nick successfully recovered.");
+    bot->Notice(theClient, "Nick successfully recovered.");
 
-return true;
+    return true;
 }
 
 } // namespace ns

@@ -20,61 +20,44 @@
  */
 
 #ifndef __SERVERCOMMANDHANDLER_H
-#define __SERVERCOMMANDHANDLER_H "$Id: ServerCommandHandler.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $"
+#define __SERVERCOMMANDHANDLER_H                                                                   \
+    "$Id: ServerCommandHandler.h,v 1.3 2003/06/28 01:21:18 dan_karrels Exp $"
 
-#include	"xparameters.h"
-#include	"ELog.h"
+#include "xparameters.h"
+#include "ELog.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-class xServer ;
+class xServer;
 
-class ServerCommandHandler
-{
-protected:
-	xServer		*theServer ;
+class ServerCommandHandler {
+  protected:
+    xServer* theServer;
 
-public:
+  public:
+    ServerCommandHandler(xServer* _theServer) : theServer(_theServer) {}
+    virtual ~ServerCommandHandler() {}
 
-	ServerCommandHandler( xServer* _theServer )
-	 : theServer( _theServer )
-	{}
-	virtual ~ServerCommandHandler()
-	{}
+    virtual bool Execute(const xParameters&) = 0;
+};
 
-	virtual bool Execute( const xParameters& ) = 0 ;
-} ;
+#define CREATE_HANDLER(name)                                                                       \
+    class name : public ServerCommandHandler {                                                     \
+      public:                                                                                      \
+        name(xServer* theServer) : ServerCommandHandler(theServer) {}                              \
+        virtual ~name() {}                                                                         \
+                                                                                                   \
+        virtual bool Execute(const xParameters&);                                                  \
+    };                                                                                             \
+                                                                                                   \
+    extern "C" {                                                                                   \
+    name* _gnuwinit_##name(xServer* theServer) { return new name(theServer); }                     \
+    }
 
-#define CREATE_HANDLER(name) \
-class name : public ServerCommandHandler \
-{ \
-public: \
-	name( xServer* theServer ) \
-	 : ServerCommandHandler( theServer ) \
-	{} \
-	virtual ~name() \
-	{} \
-\
-	virtual bool Execute( const xParameters& ) ; \
-} ; \
-\
-extern "C" \
-{ \
-  name* _gnuwinit_##name( xServer* theServer ) \
-    { \
-      return new name( theServer ) ; \
-    } \
-}
-
-#define CREATE_LOADER(name) \
-extern "C" \
-{ \
-  name* _gnuwinit_##name( xServer* theServer ) \
-    { \
-      return new name( theServer ) ; \
-    } \
-}
+#define CREATE_LOADER(name)                                                                        \
+    extern "C" {                                                                                   \
+    name* _gnuwinit_##name(xServer* theServer) { return new name(theServer); }                     \
+    }
 
 } // namespace gnuworld
 

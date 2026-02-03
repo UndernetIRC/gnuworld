@@ -27,22 +27,18 @@
 #ifndef __CHANFIX_MISC_H
 #define __CHANFIX_MISC_H "$Id: chanfix_misc.h,v 1.5 2010/03/04 04:24:12 hidden1 Exp $"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace cf
-{
+namespace cf {
 
 bool compare_points_new(sqlChanOp* a, sqlChanOp* b) {
-  return (a->getPoints() + a->getBonus()) > (b->getPoints() + b->getBonus());
+    return (a->getPoints() + a->getBonus()) > (b->getPoints() + b->getBonus());
 }
 
-bool compare_points(sqlChanOp* a, sqlChanOp* b) {
-  return a->getPoints() > b->getPoints();
-}
+bool compare_points(sqlChanOp* a, sqlChanOp* b) { return a->getPoints() > b->getPoints(); }
 
-} //namespace cf
+} // namespace cf
 
-} //namespace gnuworld
+} // namespace gnuworld
 
 #endif // __CHANFIX_MISC_H

@@ -20,76 +20,66 @@
  * $Id: REMGLINECommand.cc,v 1.27 2009/06/14 01:29:54 hidden1 Exp $
  */
 
-#include	<string>
-#include	<iomanip>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
 // remgline user@host
-bool REMGLINECommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
+bool REMGLINECommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
-//bot->MsgChanLog("REMGLINE %s\n",st.assemble(1).c_str());
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
+    // bot->MsgChanLog("REMGLINE %s\n",st.assemble(1).c_str());
 
-if(st[1].substr(0,1) == "#")
-	{
-	bot->Notice(theClient,"Please use REMGCHAN to remove a BADCHAN gline");
-	return false;
-	}
-if(st[1].substr(0,1) == "$")
-	{
-	bot->Notice(theClient,"Please use REMSGLINE to remove a realname gline");
-	return false;
-	}
+    if (st[1].substr(0, 1) == "#") {
+        bot->Notice(theClient, "Please use REMGCHAN to remove a BADCHAN gline");
+        return false;
+    }
+    if (st[1].substr(0, 1) == "$") {
+        bot->Notice(theClient, "Please use REMSGLINE to remove a realname gline");
+        return false;
+    }
 
-if (st[1].find('@',1) == string::npos)
-	{
-	bot->Notice(theClient, "Invalid G-line. Please specify a user@. i.e: REMGLINE *@ip");
-	return false;
-	}
+    if (st[1].find('@', 1) == string::npos) {
+        bot->Notice(theClient, "Invalid G-line. Please specify a user@. i.e: REMGLINE *@ip");
+        return false;
+    }
 
-unsigned int dummy;
+    unsigned int dummy;
 
-string gHost = st[1];
+    string gHost = st[1];
 
-if(bot->checkGline(gHost,0,dummy) & gline::HUH_NO_HOST)
-	{
-	bot->Notice(theClient,"Please use REMSGLINE to remove a this gline");
-	return false;
-	}
-	
-ccGline *tmpGline = bot->findGline(st[1]);
-if(tmpGline != NULL)
-	{
-	if(!tmpGline->Delete())
-		bot->MsgChanLog("Error while removing gline for host %s from the db\n",st[1].c_str());
-	bot->remGline(tmpGline);
-	delete tmpGline;
-	}
-bot->MsgChanLog("REMGLINE %s %s\n", st[1].c_str(), st.assemble(2).c_str());	
-server->removeGline(st[1], bot);
-bot->Notice(theClient, "Removal of gline succeeded: %s\n", st[1].c_str());
-return true ;
+    if (bot->checkGline(gHost, 0, dummy) & gline::HUH_NO_HOST) {
+        bot->Notice(theClient, "Please use REMSGLINE to remove a this gline");
+        return false;
+    }
+
+    ccGline* tmpGline = bot->findGline(st[1]);
+    if (tmpGline != NULL) {
+        if (!tmpGline->Delete())
+            bot->MsgChanLog("Error while removing gline for host %s from the db\n", st[1].c_str());
+        bot->remGline(tmpGline);
+        delete tmpGline;
+    }
+    bot->MsgChanLog("REMGLINE %s %s\n", st[1].c_str(), st.assemble(2).c_str());
+    server->removeGline(st[1], bot);
+    bot->Notice(theClient, "Removal of gline succeeded: %s\n", st[1].c_str());
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld
-

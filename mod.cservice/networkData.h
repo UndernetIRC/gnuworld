@@ -22,46 +22,43 @@
 #ifndef __NETWORKDATA_H
 #define __NETWORKDATA_H "$Id: networkData.h,v 1.9 2005/12/27 13:27:59 kewlio Exp $"
 
-#include	<string>
-#include	<ctime>
+#include <string>
+#include <ctime>
 
 class sqlUser;
- 
-using std::string ;
 
-namespace gnuworld
-{
- 
-class networkData
-{
+using std::string;
 
-public:
+namespace gnuworld {
 
-	networkData() ;
-	virtual ~networkData() ; 
+class networkData {
 
- 	// Timestamp of when last message was recieved from this user.
-	time_t messageTime;
+  public:
+    networkData();
+    virtual ~networkData();
 
-	// Count of all bytes outputted to this client.
-	unsigned int outputCount;
+    // Timestamp of when last message was recieved from this user.
+    time_t messageTime;
 
-	// Total flood points accumulated by input from this client.
-	unsigned int flood_points;
+    // Count of all bytes outputted to this client.
+    unsigned int outputCount;
 
-	// Pointer to the sqlUser record of this user (if it exists).
-	// Ie: If they're authed.
-	sqlUser* currentUser; 
+    // Total flood points accumulated by input from this client.
+    unsigned int flood_points;
 
-	// Are we ignored or not..
-	bool ignored;
+    // Pointer to the sqlUser record of this user (if it exists).
+    // Ie: If they're authed.
+    sqlUser* currentUser;
 
-	/* timestamp of the IP restriction that this client matched */
-	unsigned int ipr_ts;
+    // Are we ignored or not..
+    bool ignored;
 
-	/* number of failed login attempts by this client */
-	unsigned int failed_logins;
-} ;
+    /* timestamp of the IP restriction that this client matched */
+    unsigned int ipr_ts;
+
+    /* number of failed login attempts by this client */
+    unsigned int failed_logins;
+};
 
 #endif // __NETWORKDATA_H
 

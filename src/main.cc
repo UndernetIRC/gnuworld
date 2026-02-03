@@ -20,20 +20,20 @@
  * $Id: main.cc,v 1.67 2007/09/01 20:16:56 mrbean_ Exp $
  */
 
-#include	<sys/time.h>
-#include	<sys/types.h>
-#include	<unistd.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include	<new>
-#include	<fstream>
-#include	<iostream>
+#include <new>
+#include <fstream>
+#include <iostream>
 
-#include	<cstdio>
-#include	<cassert>
-#include	<cstdlib>
-#include	<cstring>
+#include <cstdio>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 
-#include	"gnuworld_config.h"
+#include "gnuworld_config.h"
 
 /*
 #ifdef HAVE_GETOPT_H
@@ -41,11 +41,11 @@
 #endif
 */
 
-#include	"ELog.h"
-#include	"server.h"
-#include	"moduleLoader.h"
-#include	"md5hash.h"
-#include	"Signal.h"
+#include "ELog.h"
+#include "server.h"
+#include "moduleLoader.h"
+#include "md5hash.h"
+#include "Signal.h"
 
 #ifdef ENABLE_LOG4CPLUS
 #include <log4cplus/configurator.h>
@@ -53,378 +53,317 @@
 #endif
 
 // main() must be in the global namespace
-using namespace gnuworld ;
+using namespace gnuworld;
 
-using std::cerr ;
-using std::clog ;
-using std::endl ;
-using std::string ;
+using std::cerr;
+using std::clog;
+using std::endl;
+using std::string;
 
 // Output the GNU greeting
-void		gnu() ;
+void gnu();
 
 /// Output the command line arguments for gnuworld
-void usage( const string& progName )
-{
-clog	<< "Usage: " << progName << " [options]"
-	<< endl ;
-clog	<< endl
-	<< "Options:"
-	<< endl ;
-clog	<< "  -c\t\t\tVerbose output"
-	<< endl ;
-clog	<< "  -d <debug filename>\tSpecify the debug output file"
-	<< endl ;
-clog	<< "  -D\t\t\tDisable debug logging"
-	<< endl ;
-clog	<< "  -f <conf filename>\tSpecify the config file name"
-	<< endl ;
-clog	<< "  -h\t\t\tPrint this help menu" 
-	<< endl ;
-clog	<< "  -l <log file>\t\tCapture raw socket data to log file"
-	<< endl ; 
-clog	<< "  -L\t\t\tDisable logging of socket data to file"
-	<< endl ;
-clog	<< "  -s <socket file>\tRun in simulation mode"
-	<< endl ;
-clog	<< endl ;
+void usage(const string& progName) {
+    clog << "Usage: " << progName << " [options]" << endl;
+    clog << endl << "Options:" << endl;
+    clog << "  -c\t\t\tVerbose output" << endl;
+    clog << "  -d <debug filename>\tSpecify the debug output file" << endl;
+    clog << "  -D\t\t\tDisable debug logging" << endl;
+    clog << "  -f <conf filename>\tSpecify the config file name" << endl;
+    clog << "  -h\t\t\tPrint this help menu" << endl;
+    clog << "  -l <log file>\t\tCapture raw socket data to log file" << endl;
+    clog << "  -L\t\t\tDisable logging of socket data to file" << endl;
+    clog << "  -s <socket file>\tRun in simulation mode" << endl;
+    clog << endl;
 }
 
 /// Output the GNUWorld/GNU welcome message
-void gnu()
-{
-clog	<< endl ;
-clog	<< "GNUWorld version " << VERSION << endl ;
-clog	<< "Copyright (C) 2002 Free Software Foundation, Inc." << endl ;
-clog	<< "GNUWorld comes with NO WARRANTY," << endl ;
-clog	<< "to the extent permitted by law." << endl ;
-clog	<< "You may redistribute copies of GNUWorld" << endl ;
-clog	<< "under the terms of the GNU General Public License." << endl ;
-clog	<< "For more information about these matters," << endl ;
-clog	<< "see the files named COPYING." << endl ;
-clog	<< endl ;
+void gnu() {
+    clog << endl;
+    clog << "GNUWorld version " << VERSION << endl;
+    clog << "Copyright (C) 2002 Free Software Foundation, Inc." << endl;
+    clog << "GNUWorld comes with NO WARRANTY," << endl;
+    clog << "to the extent permitted by law." << endl;
+    clog << "You may redistribute copies of GNUWorld" << endl;
+    clog << "under the terms of the GNU General Public License." << endl;
+    clog << "For more information about these matters," << endl;
+    clog << "see the files named COPYING." << endl;
+    clog << endl;
 }
 
-int main( int argc, char** argv )
-{
-// This is done to intialize the hasher
-md5 dummy ;
+int main(int argc, char** argv) {
+    // This is done to intialize the hasher
+    md5 dummy;
 
-// Load signal handlers.  This need only be done once
-// for the entire system, no matter if the xServer is reloaded.
-if( 0 == Signal::getInstance() )
-	{
-	clog	<< "Unable to initialize signal handlers"
-		<< endl ;
-	return -1 ;
-	}
+    // Load signal handlers.  This need only be done once
+    // for the entire system, no matter if the xServer is reloaded.
+    if (0 == Signal::getInstance()) {
+        clog << "Unable to initialize signal handlers" << endl;
+        return -1;
+    }
 
-// Seed the random number generator
-::srand( ::time( 0 ) ) ;
+    // Seed the random number generator
+    ::srand(::time(0));
 
-/* Parse command line arguments */
-bool verbose = false ;
-bool doDebug = true ;
-bool logSocket = true ;
-std::string elogFileName = "debug.log" ;
-std::string socketFileName = "socket.log" ;
-std::string configFileName = CONFFILE ;
-std::string simFileName ;
+    /* Parse command line arguments */
+    bool verbose = false;
+    bool doDebug = true;
+    bool logSocket = true;
+    std::string elogFileName = "debug.log";
+    std::string socketFileName = "socket.log";
+    std::string configFileName = CONFFILE;
+    std::string simFileName;
 
-int c ;
-while( ( c = getopt( argc, argv, "cd:Df:l:Lhs:" ) ) != -1 )
-	{
-	switch( c )
-		{
-		case 'c':
-			verbose = true ;
-			break ;
-		case 'd':
-			doDebug = true ;
-			elogFileName = optarg ;
-			break ;
-		case 'D':
-			doDebug = false ;
-			break ;
-		case 'f':
-			configFileName = optarg ;
-			break ;
-		case 'h':
-			usage( argv[ 0 ] ) ;
-			::exit( 0 ) ;
-		case 'l':
-			logSocket = true ;
-			socketFileName = optarg ;
-			break ;
-		case 'L':
-			logSocket = false ;
-			break ;
-		case 's':
-			simFileName = optarg ;
-			clog << "*** Running in simulation mode..." << endl ;
-			break ;
-		case ':':
-			clog << "*** Missing parameter\n" ;
-			usage( argv[ 0 ] ) ;
-			::exit( 0 ) ;
-		case '?':
-			// Unrecognized option
-			usage( argv[ 0 ] ) ;
-			::exit( 0 ) ;
-		default:
-			clog << "Unknown option " << static_cast<char>(c) << endl ;
-			usage( argv[ 0 ] ) ;
-			::exit( 0 ) ;
-		}
-	}
+    int c;
+    while ((c = getopt(argc, argv, "cd:Df:l:Lhs:")) != -1) {
+        switch (c) {
+        case 'c':
+            verbose = true;
+            break;
+        case 'd':
+            doDebug = true;
+            elogFileName = optarg;
+            break;
+        case 'D':
+            doDebug = false;
+            break;
+        case 'f':
+            configFileName = optarg;
+            break;
+        case 'h':
+            usage(argv[0]);
+            ::exit(0);
+        case 'l':
+            logSocket = true;
+            socketFileName = optarg;
+            break;
+        case 'L':
+            logSocket = false;
+            break;
+        case 's':
+            simFileName = optarg;
+            clog << "*** Running in simulation mode..." << endl;
+            break;
+        case ':':
+            clog << "*** Missing parameter\n";
+            usage(argv[0]);
+            ::exit(0);
+        case '?':
+            // Unrecognized option
+            usage(argv[0]);
+            ::exit(0);
+        default:
+            clog << "Unknown option " << static_cast<char>(c) << endl;
+            usage(argv[0]);
+            ::exit(0);
+        }
+    }
 
-/* fork into background only if not in verbose mode */
-if( !verbose )
-	{
-	if( fork() )
-		{
-		clog << argv[0] << ": forked into background" ;
-		::exit( 0 ) ;
-		}
-	setsid() ;
-	if( fork() )
-		::exit( 0 ) ;
-	}
+    /* fork into background only if not in verbose mode */
+    if (!verbose) {
+        if (fork()) {
+            clog << argv[0] << ": forked into background";
+            ::exit(0);
+        }
+        setsid();
+        if (fork())
+            ::exit(0);
+    }
 
-{
-std::ofstream pidFile( "gnuworld.pid", std::ios::trunc | std::ios::out ) ;
-if( !pidFile )
-	{
-	clog	<< "Unable to open pid file: gnuworld.pid"
-			<< endl ;
-	return -1 ;
-	}
+    {
+        std::ofstream pidFile("gnuworld.pid", std::ios::trunc | std::ios::out);
+        if (!pidFile) {
+            clog << "Unable to open pid file: gnuworld.pid" << endl;
+            return -1;
+        }
 
-pidFile	<< getpid()
-		<< endl ;
+        pidFile << getpid() << endl;
 
-pidFile.close() ;
-} // pidFile
+        pidFile.close();
+    } // pidFile
 
-/* Redirect stdin, stdout, stderr to null when running in background */
-if( !verbose )
-	{
-	clog << " with PID: " << getpid() << endl ;
-	freopen( "/dev/null", "r", stdin ) ;
-	freopen( "/dev/null", "w", stdout ) ;
-	freopen( "/dev/null", "w", stderr ) ;
-	}
+    /* Redirect stdin, stdout, stderr to null when running in background */
+    if (!verbose) {
+        clog << " with PID: " << getpid() << endl;
+        freopen("/dev/null", "r", stdin);
+        freopen("/dev/null", "w", stdout);
+        freopen("/dev/null", "w", stderr);
+    }
 
-// Output gnu information
-gnu() ;
+    // Output gnu information
+    gnu();
 
-bool autoConnect = true ;
-while( autoConnect )
-	{
-	// Allocate a new instance of the xServer
-	gnuworld::xServer* theServer =
-		new (std::nothrow) gnuworld::xServer( 
-			verbose, doDebug, logSocket,
-			elogFileName, socketFileName,
-			configFileName, simFileName ) ;
-	assert( theServer != 0 ) ;
+    bool autoConnect = true;
+    while (autoConnect) {
+        // Allocate a new instance of the xServer
+        gnuworld::xServer* theServer = new (std::nothrow) gnuworld::xServer(
+            verbose, doDebug, logSocket, elogFileName, socketFileName, configFileName, simFileName);
+        assert(theServer != 0);
 
-	theServer->run() ;
+        theServer->run();
 
-	// update autoConnect here so we can tell how the server
-	// terminated.
-	autoConnect = theServer->getAutoConnect() ;
+        // update autoConnect here so we can tell how the server
+        // terminated.
+        autoConnect = theServer->getAutoConnect();
 
-	delete theServer ; theServer = 0 ;
+        delete theServer;
+        theServer = 0;
 
-	::sleep( 10 ) ;
-	} // while( autoConnect )
+        ::sleep(10);
+    } // while( autoConnect )
 
-return 0 ;
+    return 0;
 }
 
-xServer::xServer( bool verbose_arg, bool doDebug_arg, bool logSocket_arg,
-                  const std::string& elogFileName_arg,
-                  const std::string& socketFileName_arg,
-                  const std::string& configFileName_arg,
-                  const std::string& simFileName_arg )
- : eventList( EVT_NOOP ),
-   tlsEnabled( false ),
-   verbose( verbose_arg ),
-   doDebug( doDebug_arg ),
-   logSocket( logSocket_arg ),
-   elogFileName( elogFileName_arg ),
-   socketFileName( socketFileName_arg ),
-   configFileName( configFileName_arg ),
-   simFileName( simFileName_arg )
-{
+xServer::xServer(bool verbose_arg, bool doDebug_arg, bool logSocket_arg,
+                 const std::string& elogFileName_arg, const std::string& socketFileName_arg,
+                 const std::string& configFileName_arg, const std::string& simFileName_arg)
+    : eventList(EVT_NOOP), tlsEnabled(false), verbose(verbose_arg), doDebug(doDebug_arg),
+      logSocket(logSocket_arg), elogFileName(elogFileName_arg), socketFileName(socketFileName_arg),
+      configFileName(configFileName_arg), simFileName(simFileName_arg) {
 #ifdef ENABLE_LOG4CPLUS
-log4cplus::PropertyConfigurator::doConfigure("logging.properties");
+    log4cplus::PropertyConfigurator::doConfigure("logging.properties");
 #endif
 
-startLogging(false) ;
-// Sets up the server internals
-initializeSystem() ;
+    startLogging(false);
+    // Sets up the server internals
+    initializeSystem();
 }
 
-void xServer::mainLoop()
-{
-// If this variable is true, check for a signal
-// Otherwise, there was a critical failure in the signal
-// subsystem, and do not check for new signals.
-bool checkSignals = true ;
+void xServer::mainLoop() {
+    // If this variable is true, check for a signal
+    // Otherwise, there was a critical failure in the signal
+    // subsystem, and do not check for new signals.
+    bool checkSignals = true;
 
-// When this method is first invoked, the server is not connected
-while( keepRunning )
-	{
-	// Check if a reconnection is necessary
-	// Do not reconnect if the server is in the process of
-	// shutting down.
-	if( !serverConnection && !isLastLoop() )
-		{
-		// Connect to the server/file
-		clog	<< "*** Connecting " ;
+    // When this method is first invoked, the server is not connected
+    while (keepRunning) {
+        // Check if a reconnection is necessary
+        // Do not reconnect if the server is in the process of
+        // shutting down.
+        if (!serverConnection && !isLastLoop()) {
+            // Connect to the server/file
+            clog << "*** Connecting ";
 
-		// Not connected
-		if( !simFileName.empty() )
-			{
-			// Run in simulation mode
-			clog	<< "to file "
-				<< simFileName
-				<< "... "
-				<< endl ;
+            // Not connected
+            if (!simFileName.empty()) {
+                // Run in simulation mode
+                clog << "to file " << simFileName << "... " << endl;
 
-			serverConnection = ConnectToFile( this, simFileName ) ;
-			if( NULL == serverConnection )
-				{
-				// Failed to connect to file, quit
-				keepRunning = false ;
+                serverConnection = ConnectToFile(this, simFileName);
+                if (NULL == serverConnection) {
+                    // Failed to connect to file, quit
+                    keepRunning = false;
 
-				continue ;
-				}
-			}
-		else
-			{
-			// Run in real mode
-			clog	<< "to "
-				<< UplinkName
-				<< "... "
-				<< endl ;
+                    continue;
+                }
+            } else {
+                // Run in real mode
+                clog << "to " << UplinkName << "... " << endl;
 
-			serverConnection = Connect( this, UplinkName, Port, tlsEnabled ) ;
-			}
-		} // if( NULL == serverConnection )
+                serverConnection = Connect(this, UplinkName, Port, tlsEnabled);
+            }
+        } // if( NULL == serverConnection )
 
-	// Check if this is the last iteration of the main processing
-	// loop.  If so, set keepRunning to false.
-	// The server Shutdown() (setting lastLoop to true) can occur
-	// in the timers or during the processing of network
-	// connections (Poll()), or possibly in a signal handler.
-	// That means that is lastLoop is already true at this point,
-	// then it was set thus on the last iteration, and this is indeed
-	// the final iteration of the processing loop.
-	if( isLastLoop() )
-		{
-		keepRunning = false ;
+        // Check if this is the last iteration of the main processing
+        // loop.  If so, set keepRunning to false.
+        // The server Shutdown() (setting lastLoop to true) can occur
+        // in the timers or during the processing of network
+        // connections (Poll()), or possibly in a signal handler.
+        // That means that is lastLoop is already true at this point,
+        // then it was set thus on the last iteration, and this is indeed
+        // the final iteration of the processing loop.
+        if (isLastLoop()) {
+            keepRunning = false;
 
-		// All output for the xClients should be in the
-		// output buffer by now, go ahead and put the
-		// server's SQ message there as well
-		Write( "%s SQ %s :%s",
-			getCharYY().c_str(),
-			getCharYY().c_str(),
-			getShutDownReason().c_str() ) ;
+            // All output for the xClients should be in the
+            // output buffer by now, go ahead and put the
+            // server's SQ message there as well
+            Write("%s SQ %s :%s", getCharYY().c_str(), getCharYY().c_str(),
+                  getShutDownReason().c_str());
 
-		// Make sure the SQ and all previous data are flushed
-		// to the network before disconnecting.
-		FlushData() ;
-		}
+            // Make sure the SQ and all previous data are flushed
+            // to the network before disconnecting.
+            FlushData();
+        }
 
-	// Check for pending timers before calling Poll()
-	// If timers are pending, then set the duration until the next
-	// arriving timer expiration to be the maximum wait time
-	// for Poll()
+        // Check for pending timers before calling Poll()
+        // If timers are pending, then set the duration until the next
+        // arriving timer expiration to be the maximum wait time
+        // for Poll()
 
-	// If there are timers waiting, this variable will be set to
-	// true.  A value of false means that no timers are pending,
-	// and that Poll() can block indefinitely.
+        // If there are timers waiting, this variable will be set to
+        // true.  A value of false means that no timers are pending,
+        // and that Poll() can block indefinitely.
 
-	long seconds = -1 ;
-	time_t now = ::time( 0 ) ;
+        long seconds = -1;
+        time_t now = ::time(0);
 
-	if( !timerQueue.empty() )
-                {
-//		elog	<< "mainLoop> Found a timer"
-//			<< endl ;
+        if (!timerQueue.empty()) {
+            //		elog	<< "mainLoop> Found a timer"
+            //			<< endl ;
 
-                // Yes, set select() timeout to time at which
-                // the nearest timer will expire
+            // Yes, set select() timeout to time at which
+            // the nearest timer will expire
 
-		// Set tv.tv_sec to the duration (in seconds) until
-		// the first timer will expire.
-                seconds = timerQueue.top().second->absTime - now ;
+            // Set tv.tv_sec to the duration (in seconds) until
+            // the first timer will expire.
+            seconds = timerQueue.top().second->absTime - now;
 
-		if( seconds < 0 )
-			{
-			// A negative value here will result
-			// in inifinite blocking in Poll(),
-			// which is exactly opposite of what is needed here
-			seconds = 0 ;
-			}
-                } // if( !timerQueue.empty() )
+            if (seconds < 0) {
+                // A negative value here will result
+                // in inifinite blocking in Poll(),
+                // which is exactly opposite of what is needed here
+                seconds = 0;
+            }
+        } // if( !timerQueue.empty() )
 
-	// If not fully connected to uplink, make sure timeout is checked every second
-	if (!serverConnection->isConnected())
-		seconds = 1;
+        // If not fully connected to uplink, make sure timeout is checked every second
+        if (!serverConnection->isConnected())
+            seconds = 1;
 
-	// Give this loop a chance to run at least once every 2 minutes
-	if (seconds > 120)
-		seconds = 120;
+        // Give this loop a chance to run at least once every 2 minutes
+        if (seconds > 120)
+            seconds = 120;
 
-	// Process all available data
-	ConnectionManager::Poll( seconds ) ;
+        // Process all available data
+        ConnectionManager::Poll(seconds);
 
-	// Poll() will call all appropriate data handlers
-	// Check the timers
-	CheckTimers() ;
+        // Poll() will call all appropriate data handlers
+        // Check the timers
+        CheckTimers();
 
-	if( !checkSignals )
-		{
-		// There was a critical failure in the Signal handling
-		// system, do not check for new signals.
-		continue ;
-		}
+        if (!checkSignals) {
+            // There was a critical failure in the Signal handling
+            // system, do not check for new signals.
+            continue;
+        }
 
         // Did we catch a signal?
-	int theSignal = -1 ;
-	while( Signal::getSignal( theSignal ) )
-		{
-		if( -1 == theSignal )
-			{
-			elog	<< "xServer::mainLoop> Criticial failure "
-				<< "in the signal handling system"
-				<< endl ;
-			checkSignals = false ;
-			break ;
-			}
+        int theSignal = -1;
+        while (Signal::getSignal(theSignal)) {
+            if (-1 == theSignal) {
+                elog << "xServer::mainLoop> Criticial failure "
+                     << "in the signal handling system" << endl;
+                checkSignals = false;
+                break;
+            }
 
-		elog	<< "xServer::mainLoop> Received signal: "
-			<< theSignal
-			<< endl ;
+            elog << "xServer::mainLoop> Received signal: " << theSignal << endl;
 
-		if( !PostSignal( theSignal ) )
-			{
-			keepRunning = false ;
-			// No need to set checkSignals to false here,
-			// since this big while() loop will not be
-			// executed again.
-			break ;
-			}
-                } // while( Signal::getSignal() )
+            if (!PostSignal(theSignal)) {
+                keepRunning = false;
+                // No need to set checkSignals to false here,
+                // since this big while() loop will not be
+                // executed again.
+                break;
+            }
+        } // while( Signal::getSignal() )
 
-	} // while( keepRunning )
+    } // while( keepRunning )
 
-// We are shutting down
-doShutdown() ;
+    // We are shutting down
+    doShutdown();
 
 } // mainLoop()

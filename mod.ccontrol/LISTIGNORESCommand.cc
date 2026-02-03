@@ -1,5 +1,5 @@
 /**
- * LISTIGNORESCommand.cc 
+ * LISTIGNORESCommand.cc
  * Shows all ignored masks
  *
  * This program is free software; you can redistribute it and/or
@@ -20,28 +20,24 @@
  * $Id: LISTIGNORESCommand.cc,v 1.10 2006/09/26 17:35:59 kewlio Exp $
  */
 
-#include	<string>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::endl ;
+using std::endl;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool LISTIGNORESCommand::Exec( iClient* theClient, const string& )
-{
-bot->MsgChanLog("LISTIGNORES \n");
-bot->listIgnores(theClient);
-return true;
+bool LISTIGNORESCommand::Exec(iClient* theClient, const string&) {
+    bot->MsgChanLog("LISTIGNORES \n");
+    bot->listIgnores(theClient);
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld
-

@@ -31,85 +31,69 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
-void LISTBLOCKEDCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
+namespace gnuworld {
+namespace cf {
+void LISTBLOCKEDCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
 
-/* Check if channel blocking has been disabled in the config. */
-if (!bot->doChanBlocking()) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_blocking_disabled,
-                              std::string("Channel blocking is disabled.")).c_str());
-  return;
-}
+    /* Check if channel blocking has been disabled in the config. */
+    if (!bot->doChanBlocking()) {
+        bot->SendTo(theClient, bot->getResponse(theUser, language::channel_blocking_disabled,
+                                                std::string("Channel blocking is disabled."))
+                                   .c_str());
+        return;
+    }
 
-/* List blocks */
+    /* List blocks */
 
-dbHandle* cacheCon = bot->getLocalDBHandle();
+    dbHandle* cacheCon = bot->getLocalDBHandle();
 
-std::stringstream theQuery;
-theQuery << "SELECT channel FROM channels WHERE (flags & "
-	 << sqlChannel::F_BLOCKED
-	 << ") = "
-	 << sqlChannel::F_BLOCKED
-	 << " ORDER BY channel ASC";
+    std::stringstream theQuery;
+    theQuery << "SELECT channel FROM channels WHERE (flags & " << sqlChannel::F_BLOCKED
+             << ") = " << sqlChannel::F_BLOCKED << " ORDER BY channel ASC";
 
-if (!cacheCon->Exec(theQuery.str(),true)) {
-  elog	<< "chanfix::LISTBLOCKEDCommand> SQL Error: "
-		<< cacheCon->ErrorMessage()
-		<< std::endl;
-  return;
-}
+    if (!cacheCon->Exec(theQuery.str(), true)) {
+        elog << "chanfix::LISTBLOCKEDCommand> SQL Error: " << cacheCon->ErrorMessage() << std::endl;
+        return;
+    }
 
+    // SQL query returned no errors
+    unsigned int numBlocks = 0;
+    std::string strBlocks;
+    bot->SendTo(theClient, bot->getResponse(theUser, language::listblocks_blocked_chans,
+                                            std::string("List of all blocked channels:"))
+                               .c_str());
 
+    for (unsigned int i = 0; i < cacheCon->Tuples(); i++) {
+        strBlocks += cacheCon->GetValue(i, 0);
 
-// SQL query returned no errors
-unsigned int numBlocks = 0;
-std::string strBlocks;
-bot->SendTo(theClient,
-	bot->getResponse(theUser,
-		language::listblocks_blocked_chans,
-		std::string("List of all blocked channels:")).c_str());
+        strBlocks += " ";
+        if (strBlocks.size() >= 410) {
+            bot->SendTo(theClient, strBlocks);
+            strBlocks = "";
+        }
+        numBlocks++;
+    }
 
+    /* Dispose of our connection instance */
+    // bot->theManager->removeConnection(cacheCon);
 
-for (unsigned int i = 0 ; i < cacheCon->Tuples(); i++) {
-  strBlocks += cacheCon->GetValue(i, 0);
+    if (strBlocks.size())
+        bot->SendTo(theClient, strBlocks.c_str());
 
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::listblocked_total_blocked,
+                                 std::string("%d channels blocked."))
+                    .c_str(),
+                numBlocks);
 
-  strBlocks += " ";
-  if (strBlocks.size() >= 410) {
-    bot->SendTo(theClient, strBlocks);
-    strBlocks = "";
-  }
-  numBlocks++;
-}
+    bot->logAdminMessage("%s (%s) LISTBLOCKED",
+                         theUser ? theUser->getUserName().c_str()
+                                 : theClient->getNickName().c_str(),
+                         theClient->getRealNickUserHost().c_str());
 
-/* Dispose of our connection instance */
-//bot->theManager->removeConnection(cacheCon);
+    bot->logLastComMessage(theClient, Message);
 
-
-if (strBlocks.size())
-  bot->SendTo(theClient, strBlocks.c_str());
-
-
-bot->SendTo(theClient,
-	bot->getResponse(theUser,
-		language::listblocked_total_blocked,
-		std::string("%d channels blocked.")).c_str(),
-		numBlocks);
-
-bot->logAdminMessage("%s (%s) LISTBLOCKED",
-		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
-		     theClient->getRealNickUserHost().c_str());
-
-
-bot->logLastComMessage(theClient, Message);
-
-return;
+    return;
 }
 } // namespace cf
 } // namespace gnuworld

@@ -17,26 +17,23 @@ namespace gnuworld {
 
 namespace ds {
 
-void QUOTECommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
-{
-	if(theUser->getAccess() < level::quote) return ;
+void QUOTECommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser) {
+    if (theUser->getAccess() < level::quote)
+        return;
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	if(st.size() < 2) {
-		Usage(theClient);
-		return ;
-	}
+    if (st.size() < 2) {
+        Usage(theClient);
+        return;
+    }
 
-	bot->log(INFO, "%s (%s) is quoting: %s",
-		theClient->getNickName().c_str(),
-		theClient->getAccount().c_str(),
-		st.assemble(1).c_str()
-		);
+    bot->log(INFO, "%s (%s) is quoting: %s", theClient->getNickName().c_str(),
+             theClient->getAccount().c_str(), st.assemble(1).c_str());
 
-	bot->Write(st.assemble(1));
+    bot->Write(st.assemble(1));
 
-	return ;
+    return;
 }
 
 } // namespace ds

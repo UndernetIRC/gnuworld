@@ -19,73 +19,66 @@
  * $Id: SUSPENDMECommand.cc,v 1.4 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include	<string>
-#include	<ctime>
+#include <string>
+#include <ctime>
 
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"Network.h"
-#include	"levels.h"
-#include	"responses.h"
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "Network.h"
+#include "levels.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 using namespace level;
 
-bool SUSPENDMECommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool SUSPENDMECommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if (!theUser)
-	{
-	return false;
-	}
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
+        return false;
+    }
 
-/*
- * Check password, if its wrong, bye bye.
- */
+    /*
+     * Check password, if its wrong, bye bye.
+     */
 
-if (!bot->isPasswordRight(theUser, st.assemble(1)))
-	{
-	bot->Notice(theClient, "Self-suspension failed.");
-	return false;
-	}
+    if (!bot->isPasswordRight(theUser, st.assemble(1))) {
+        bot->Notice(theClient, "Self-suspension failed.");
+        return false;
+    }
 
-if (theUser->networkClientList.size() <= 1)
-	{
-	bot->Notice(theClient, "Self-suspension failed.");
-	return false;
-	}
+    if (theUser->networkClientList.size() <= 1) {
+        bot->Notice(theClient, "Self-suspension failed.");
+        return false;
+    }
 
-if(theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-	{
-	bot->Notice(theClient, "Self-suspension failed.");
-	return false;
-	}
+    if (theUser->getFlag(sqlUser::F_GLOBAL_SUSPEND)) {
+        bot->Notice(theClient, "Self-suspension failed.");
+        return false;
+    }
 
-// Suspend them.
-theUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
-bot->sendAccountFlags(theUser);
-theUser->commit(theClient);
-bot->Notice(theClient, "You have been globally suspended and will have level 0 access in all"
-	" channels until you are unsuspended by a CService administrator.");
+    // Suspend them.
+    theUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
+    bot->sendAccountFlags(theUser);
+    theUser->commit(theClient);
+    bot->Notice(theClient, "You have been globally suspended and will have level 0 access in all"
+                           " channels until you are unsuspended by a CService administrator.");
 
-theUser->writeEvent(sqlUser::EV_SUSPEND, theUser, "Self-Suspension");
+    theUser->writeEvent(sqlUser::EV_SUSPEND, theUser, "Self-Suspension");
 
-bot->logAdminMessage("%s (%s) has globally suspended their own account.",
-	theClient->getNickUserHost().c_str(), theUser->getUserName().c_str());
+    bot->logAdminMessage("%s (%s) has globally suspended their own account.",
+                         theClient->getNickUserHost().c_str(), theUser->getUserName().c_str());
 
-bot->InsertUserHistory(theClient, "SUSPENDME");
+    bot->InsertUserHistory(theClient, "SUSPENDME");
 
-return false;
+    return false;
 }
 
 } // namespace gnuworld.

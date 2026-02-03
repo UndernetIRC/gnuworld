@@ -26,29 +26,29 @@ namespace ds {
 
 namespace level {
 
-	/* Try to keep anything non-authed opers need below 200 */
+/* Try to keep anything non-authed opers need below 200 */
 
-	/* Standard level is 300 */
+/* Standard level is 300 */
 
-	const unsigned short access	= 300;
-	const unsigned short check	= 300;
-	const unsigned short fake	= 300;
-	const unsigned short list	= 300;
-	const unsigned short status	= 300;
+const unsigned short access = 300;
+const unsigned short check = 300;
+const unsigned short fake = 300;
+const unsigned short list = 300;
+const unsigned short status = 300;
 
-	/* Higher admin commands */
+/* Higher admin commands */
 
-	const unsigned short adduser	= 750;
-	const unsigned short moduser	= 750;
-	const unsigned short remuser	= 750;
-	const unsigned short addExceptionalChannel = 750;
-	const unsigned short remExceptionalChannel = 750;
-	const unsigned short reload = 750;
+const unsigned short adduser = 750;
+const unsigned short moduser = 750;
+const unsigned short remuser = 750;
+const unsigned short addExceptionalChannel = 750;
+const unsigned short remExceptionalChannel = 750;
+const unsigned short reload = 750;
 
-	/* Commands at 1000 should really be debug commands only */
+/* Commands at 1000 should really be debug commands only */
 
-	const unsigned short analyse	= 1000;
-	const unsigned short quote	= 1000;
+const unsigned short analyse = 1000;
+const unsigned short quote = 1000;
 
 } // namespace level
 

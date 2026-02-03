@@ -20,24 +20,23 @@
  * $Id: msg_XR.cc,v 1.1 2010/08/31 21:16:46 denspike Exp $
  */
 
-#include	<string>
-#include	<iostream>
+#include <string>
+#include <iostream>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"Network.h"
-#include	"iClient.h"
-#include	"client.h"
-#include	"ELog.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
-#include	"StringTokenizer.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "Network.h"
+#include "iClient.h"
+#include "client.h"
+#include "ELog.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
+#include "StringTokenizer.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::endl ;
+using std::endl;
+using std::string;
 
 CREATE_HANDLER(msg_XR)
 
@@ -49,53 +48,40 @@ CREATE_HANDLER(msg_XR)
  * <target>: Our servernumeric
  * <routing>: Token to supply in XR
  * <query>: Message, can be spaced
- * 
+ *
  * [IN ]: AB XR Az tokengoeshere :message goes here :)
  */
-bool msg_XR::Execute( const xParameters& Param )
-{
-if( Param.size() < 4 )
-	{
-	elog	<< "msg_XR> Invalid number of arguments"
-		<< endl ;
-	return false ;
-	}
+bool msg_XR::Execute(const xParameters& Param) {
+    if (Param.size() < 4) {
+        elog << "msg_XR> Invalid number of arguments" << endl;
+        return false;
+    }
 
-iServer* serverSource = Network->findServer( Param[ 0 ] ) ; 
+    iServer* serverSource = Network->findServer(Param[0]);
 
-if( NULL == serverSource) 
-        {
-        elog    << "msg_XR> Unable to find source: "
-                << Param[ 0 ]
-                << endl ;
-        return false ;
-        }
+    if (NULL == serverSource) {
+        elog << "msg_XR> Unable to find source: " << Param[0] << endl;
+        return false;
+    }
 
-if (Network->findServer(Param[ 1 ]) != theServer->getMe())
-	{
-	//Should we do something here?
-        elog    << "msg_XR> Received XQ not meant for us but for: "
-                << Param[ 1 ]
-                << endl ;
-        return false ;
-        }
+    if (Network->findServer(Param[1]) != theServer->getMe()) {
+        // Should we do something here?
+        elog << "msg_XR> Received XQ not meant for us but for: " << Param[1] << endl;
+        return false;
+    }
 
-elog 	<< "msg_XR> Received, from: "
-	<< Param[ 0 ] << " To: "
-	<< Param[ 1 ] << " Token: "
-	<< Param[ 2 ] << " Message: "
-	<< Param[ 3 ]
-	<< endl;
+    elog << "msg_XR> Received, from: " << Param[0] << " To: " << Param[1] << " Token: " << Param[2]
+         << " Message: " << Param[3] << endl;
 
-string Routing( Param[2] );
-string Message( Param[3] );
+    string Routing(Param[2]);
+    string Message(Param[3]);
 
-theServer->OnXReply(serverSource, Routing, Message);
-//string Routing = Param[2];
-//string Message = Param[3];
-//elog << "STRINGS:: " << Routing << " " << Message << endl;
+    theServer->OnXReply(serverSource, Routing, Message);
+    // string Routing = Param[2];
+    // string Message = Param[3];
+    // elog << "STRINGS:: " << Routing << " " << Message << endl;
 
-return true;
+    return true;
 } // msg_XR
 
 } // namespace gnuworld

@@ -25,82 +25,70 @@
  *
  * $Id: JOINCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $
  */
-#include	<string>
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"levels.h"
-#include	"responses.h"
-#include	"Network.h"
+#include <string>
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "levels.h"
+#include "responses.h"
+#include "Network.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-bool JOINCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool JOINCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-/*
- *  Fetch the sqlUser record attached to this client. If there isn't one,
- *  they aren't logged in - tell them they should be.
- */
+    /*
+     *  Fetch the sqlUser record attached to this client. If there isn't one,
+     *  they aren't logged in - tell them they should be.
+     */
 
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if (!theUser)
-	{
-	return false;
-	}
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
+        return false;
+    }
 
-/*
- *  Check the channel is actually registered.
- */
+    /*
+     *  Check the channel is actually registered.
+     */
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_not_reg).c_str(),
-		st[1].c_str());
-	return false;
-	}
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
+                    st[1].c_str());
+        return false;
+    }
 
-/*
- *  Check the user has sufficient access on this channel.
- */
+    /*
+     *  Check the user has sufficient access on this channel.
+     */
 
-int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-if (level < level::join)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::insuf_access).c_str());
-	return false;
-	}
+    int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+    if (level < level::join) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
+        return false;
+    }
 
-/* Check the bot isn't in the channel. */
-if (theChan->getInChan())
-	{
-	bot->Notice(theClient, bot->getResponse(theUser,
-		language::already_on_chan, "I'm already in that channel!"));
-	return false;
-	}
+    /* Check the bot isn't in the channel. */
+    if (theChan->getInChan()) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::already_on_chan,
+                                                "I'm already in that channel!"));
+        return false;
+    }
 
-bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, "");
+    bot->writeChannelLog(theChan, theClient, sqlChannel::EV_JOIN, "");
 
-theChan->setInChan(true);
-/* force setting mode +R - it is probably set already, but doesn't hurt to check */
-bot->Join(theChan->getName(),
-	"+R",
-	theChan->getChannelTS(),
-	true);
-bot->incrementJoinCount();
+    theChan->setInChan(true);
+    /* force setting mode +R - it is probably set already, but doesn't hurt to check */
+    bot->Join(theChan->getName(), "+R", theChan->getChannelTS(), true);
+    bot->incrementJoinCount();
 
-return true;
+    return true;
 }
 
 } // namespace gnuworld

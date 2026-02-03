@@ -25,17 +25,17 @@
 #include "gnuworld_config.h"
 #include "sqlManager.h"
 #include "sqlUser.h"
-#include	"misc.h"
+#include "misc.h"
 
 namespace gnuworld {
 
 namespace ns {
 
-using std::stringstream ;
+using std::stringstream;
 
-const sqlUser::flagType sqlUser::F_SUSPEND  = 0x0001;
+const sqlUser::flagType sqlUser::F_SUSPEND = 0x0001;
 const sqlUser::flagType sqlUser::F_AUTOKILL = 0x0002;
-const sqlUser::flagType sqlUser::F_RECOVER  = 0x0004;
+const sqlUser::flagType sqlUser::F_RECOVER = 0x0004;
 
 unsigned long int sqlUser::maxUserId = 0;
 
@@ -43,52 +43,38 @@ unsigned long int sqlUser::maxUserId = 0;
  * Default constructor.
  * This simply creates an empty, zeroed sqlUser
  */
-sqlUser::sqlUser(sqlManager* _myManager) :
-  id(0),
-  name(""),
-  flags(0),
-  level(0),
-  lastseen_ts(0),
-  registered_ts(0),
-  logmask(0)
-{
-  myManager = _myManager;
+sqlUser::sqlUser(sqlManager* _myManager)
+    : id(0), name(""), flags(0), level(0), lastseen_ts(0), registered_ts(0), logmask(0) {
+    myManager = _myManager;
 }
 
 /**
  * Default destructor.
  * This does nothing as we have no heap space allocated
  */
-sqlUser::~sqlUser()
-{
-}
+sqlUser::~sqlUser() {}
 
 /**
  * This function commits the current state of the sqlUser back to
  * the backend DB
  */
-void sqlUser::commit()
-{
-  /* Use reference to sqlManager to queue a commit request */
-  stringstream userCommit;
-  userCommit << "UPDATE users SET"
-    << " name = '" << name << "'"
-    << ", flags = " << flags
-    << ", level = " << level
-    << ", lastseen_ts = " << lastseen_ts
-    << ", registered_ts = " << registered_ts
-    << ", logmask = " << logmask
-    << " WHERE id = " << id;
-  myManager->queueCommit(userCommit.str());
+void sqlUser::commit() {
+    /* Use reference to sqlManager to queue a commit request */
+    stringstream userCommit;
+    userCommit << "UPDATE users SET"
+               << " name = '" << name << "'"
+               << ", flags = " << flags << ", level = " << level
+               << ", lastseen_ts = " << lastseen_ts << ", registered_ts = " << registered_ts
+               << ", logmask = " << logmask << " WHERE id = " << id;
+    myManager->queueCommit(userCommit.str());
 }
 
 /**
  * This function updates this users lastseen back to the DB
  */
-void sqlUser::commitLastSeen()
-{
-  lastseen_ts = time(NULL);
-  commit();
+void sqlUser::commitLastSeen() {
+    lastseen_ts = time(NULL);
+    commit();
 }
 
 /**
@@ -96,13 +82,12 @@ void sqlUser::commitLastSeen()
  * It is possible to call insertUser() on a sqlUser that has
  * just been deleteUser()'d
  */
-void sqlUser::deleteUser()
-{
-  /* Construct our delete statement */
-  stringstream commitStatement;
-  commitStatement << "DELETE FROM users WHERE"
-    << " id = " << id;
-  myManager->queueCommit(commitStatement.str());
+void sqlUser::deleteUser() {
+    /* Construct our delete statement */
+    stringstream commitStatement;
+    commitStatement << "DELETE FROM users WHERE"
+                    << " id = " << id;
+    myManager->queueCommit(commitStatement.str());
 }
 
 /**
@@ -112,37 +97,34 @@ void sqlUser::deleteUser()
  * so that any new fields added will automatically be dealt with in commit()
  * instead of in 50 different functions.
  */
-void sqlUser::insertUser()
-{
-  /* Grab the next available user id */
-  id = ++maxUserId;
+void sqlUser::insertUser() {
+    /* Grab the next available user id */
+    id = ++maxUserId;
 
-  /* Construct our insert statement */
-  stringstream commitStatement;
-  commitStatement << "INSERT INTO users (id,name) VALUES ("
-    << id
-    << ", '" << name << "'"
-    << ")";
-  myManager->queueCommit(commitStatement.str());
-  commit();
+    /* Construct our insert statement */
+    stringstream commitStatement;
+    commitStatement << "INSERT INTO users (id,name) VALUES (" << id << ", '" << name << "'"
+                    << ")";
+    myManager->queueCommit(commitStatement.str());
+    commit();
 }
 
 /**
  * This function loads in data from a DB handle,
  * to initialise the object properly
  */
-void sqlUser::setAllMembers(dbHandle* theDB, int row)
-{
-  /* Grab the data, set the members */
-id = atoi(theDB->GetValue(row, 0));
-name = theDB->GetValue(row, 1);
-flags = atoi(theDB->GetValue(row, 2));
-level = atoi(theDB->GetValue(row, 3));
-lastseen_ts = atoi(theDB->GetValue(row, 4));
-registered_ts = atoi(theDB->GetValue(row, 5));
-logmask = atoi(theDB->GetValue(row, 6));
+void sqlUser::setAllMembers(dbHandle* theDB, int row) {
+    /* Grab the data, set the members */
+    id = atoi(theDB->GetValue(row, 0));
+    name = theDB->GetValue(row, 1);
+    flags = atoi(theDB->GetValue(row, 2));
+    level = atoi(theDB->GetValue(row, 3));
+    lastseen_ts = atoi(theDB->GetValue(row, 4));
+    registered_ts = atoi(theDB->GetValue(row, 5));
+    logmask = atoi(theDB->GetValue(row, 6));
 
-if(id > maxUserId) maxUserId = id;
+    if (id > maxUserId)
+        maxUserId = id;
 }
 
 } // namespace ns

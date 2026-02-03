@@ -23,72 +23,69 @@
  *
  * $Id: REHASHCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
-#include	"gnuworld_config.h"
-#include	"StringTokenizer.h"
-#include	"chanfix.h"
-#include	"responses.h"
+#include "gnuworld_config.h"
+#include "StringTokenizer.h"
+#include "chanfix.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void REHASHCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void REHASHCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-std::string option;
-if (st.size() > 1)
-  option = string_upper(st[1]);
+    std::string option;
+    if (st.size() > 1)
+        option = string_upper(st[1]);
 
-if (option == "CONFIG" || option.empty()) {
-  bot->readConfigFile(bot->getConfigFileName());
+    if (option == "CONFIG" || option.empty()) {
+        bot->readConfigFile(bot->getConfigFileName());
 
-  bot->SendTo(theClient,
-	bot->getResponse(theUser,
-		language::reloaded_conf,
-		std::string("Successfully rehashed configuration file.")).c_str());
-  bot->logDebugMessage("%s (%s) rehashed the chanfix module.",
-		       theUser->getUserName().c_str(),
-		       theClient->getRealNickUserHost().c_str());
-  return;
-}
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::reloaded_conf,
+                                     std::string("Successfully rehashed configuration file."))
+                        .c_str());
+        bot->logDebugMessage("%s (%s) rehashed the chanfix module.", theUser->getUserName().c_str(),
+                             theClient->getRealNickUserHost().c_str());
+        return;
+    }
 
-if (option == "HELP") {
-  bot->helpTable.clear();
-  bot->loadHelpTable();
+    if (option == "HELP") {
+        bot->helpTable.clear();
+        bot->loadHelpTable();
 
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::reloaded_help,
-                              std::string("Successfully reloaded help tables. %i entries in table.", bot->helpTable.size())).c_str());
-  bot->logDebugMessage("%s (%s) rehashed the chanfix help tables.",
-		       theUser->getUserName().c_str(),
-		       theClient->getRealNickUserHost().c_str());
-  return;
-}
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::reloaded_help,
+                             std::string("Successfully reloaded help tables. %i entries in table.",
+                                         bot->helpTable.size()))
+                .c_str());
+        bot->logDebugMessage("%s (%s) rehashed the chanfix help tables.",
+                             theUser->getUserName().c_str(),
+                             theClient->getRealNickUserHost().c_str());
+        return;
+    }
 
-if (option == "TRANSLATIONS") {
-  bot->languageTable.clear();
-  bot->translationTable.clear();
-  bot->loadTranslationTable();
+    if (option == "TRANSLATIONS") {
+        bot->languageTable.clear();
+        bot->translationTable.clear();
+        bot->loadTranslationTable();
 
-  bot->SendTo(theClient, "Successfully reloaded translation tables. %i entries in table.",
-              bot->translationTable.size());
-  bot->logDebugMessage("%s (%s) rehashed the chanfix translation tables.",
-		       theUser->getUserName().c_str(),
-		       theClient->getRealNickUserHost().c_str());
-  return;
-}
+        bot->SendTo(theClient, "Successfully reloaded translation tables. %i entries in table.",
+                    bot->translationTable.size());
+        bot->logDebugMessage("%s (%s) rehashed the chanfix translation tables.",
+                             theUser->getUserName().c_str(),
+                             theClient->getRealNickUserHost().c_str());
+        return;
+    }
 
-bot->logAdminMessage("%s (%s) REHASH %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     !option.empty() ? option.c_str() : "");
+    bot->logAdminMessage(
+        "%s (%s) REHASH %s", theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+        theClient->getRealNickUserHost().c_str(), !option.empty() ? option.c_str() : "");
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
+    return;
 }
 
 } // namespace cf

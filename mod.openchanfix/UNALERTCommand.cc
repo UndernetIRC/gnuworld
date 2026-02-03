@@ -30,59 +30,55 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void UNALERTCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void UNALERTCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_entry_in_db,
-                              std::string("There is no entry in the database for %s.")).c_str(),
-                                          st[1].c_str());
-  return;
-}
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::no_entry_in_db,
+                                     std::string("There is no entry in the database for %s."))
+                        .c_str(),
+                    st[1].c_str());
+        return;
+    }
 
-if (!theChan->getFlag(sqlChannel::F_ALERT)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_alert_set,
-                              std::string("The channel %s does not have the ALERT flag.")).c_str(),
-                                          theChan->getChannel().c_str());
-  return;
-}
+    if (!theChan->getFlag(sqlChannel::F_ALERT)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::no_alert_set,
+                                     std::string("The channel %s does not have the ALERT flag."))
+                        .c_str(),
+                    theChan->getChannel().c_str());
+        return;
+    }
 
-theChan->removeFlag(sqlChannel::F_ALERT);
+    theChan->removeFlag(sqlChannel::F_ALERT);
 
-if (!theChan->useSQL())
-  theChan->Insert(bot->getLocalDBHandle());
-else
-  theChan->commit(bot->getLocalDBHandle());
+    if (!theChan->useSQL())
+        theChan->Insert(bot->getLocalDBHandle());
+    else
+        theChan->commit(bot->getLocalDBHandle());
 
-/* Add note to the channel about this command */
-theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_UNALERT, theClient, "");
+    /* Add note to the channel about this command */
+    theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_UNALERT, theClient, "");
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::alert_removed,
-                            std::string("ALERT flag removed from channel %s")).c_str(),
-                                        theChan->getChannel().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::alert_removed,
+                                 std::string("ALERT flag removed from channel %s"))
+                    .c_str(),
+                theChan->getChannel().c_str());
 
-/* Log command */
-bot->logAdminMessage("%s (%s) UNALERT %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     theChan->getChannel().c_str());
+    /* Log command */
+    bot->logAdminMessage("%s (%s) UNALERT %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), theChan->getChannel().c_str());
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
+    return;
 }
 } // namespace cf
 } // namespace gnuworld

@@ -23,91 +23,81 @@
 #ifndef __SCANNER_H
 #define __SCANNER_H
 
-#include	<string>
+#include <string>
 
-#include	"client.h"
-#include	"server.h"
-#include	"iClient.h"
-#include	"dbThread.h"
-#include	"ScannerModule.h"
+#include "client.h"
+#include "server.h"
+#include "iClient.h"
+#include "dbThread.h"
+#include "ScannerModule.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 /**
  * A scanner client for gnuworld.  It will attempt to determine if clients
  * connecting to the network have insecure proxies/socks/etc running.
  */
-class scanner : public xClient
-{
+class scanner : public xClient {
 
-	/// The database interface thread, this thread performs all db
-	/// related processing, including the db communications
-	dbThread		theThread ;
+    /// The database interface thread, this thread performs all db
+    /// related processing, including the db communications
+    dbThread theThread;
 
-public:
-	/**
-	 * Constructor receives a configuration file name.
-	 */
-	scanner( const std::string& ) ;
+  public:
+    /**
+     * Constructor receives a configuration file name.
+     */
+    scanner(const std::string&);
 
-	/**
-	 * Destructor does normal stuff.
-	 */
-	virtual ~scanner() ;
+    /**
+     * Destructor does normal stuff.
+     */
+    virtual ~scanner();
 
-	/**
-	 * This method is called when a network client sends
-	 * a private message (PRIVMSG or NOTICE) to this xClient.
-	 * The first argument is a pointer to the source client,
-	 * and the second argument is the actual message (minus
-	 * all of the server command stuff).
-	 */
-	virtual void OnPrivateMessage( iClient*, const std::string&,
-		bool secure = false ) ;
+    /**
+     * This method is called when a network client sends
+     * a private message (PRIVMSG or NOTICE) to this xClient.
+     * The first argument is a pointer to the source client,
+     * and the second argument is the actual message (minus
+     * all of the server command stuff).
+     */
+    virtual void OnPrivateMessage(iClient*, const std::string&, bool secure = false);
 
-	/**
-	 * This method is invoked when the module is fully loaded
-	 * and it is safe to interact with the xServer.
-	 */
-	virtual void	OnAttach() ;
+    /**
+     * This method is invoked when the module is fully loaded
+     * and it is safe to interact with the xServer.
+     */
+    virtual void OnAttach();
 
-	/**
-	 * This method is called by the server when a server connection
-	 * is established.  The purpose of this method is to inform
-	 * the xServer of the channels this client wishes to burst.
-	 */
-	virtual void BurstChannels() ;
+    /**
+     * This method is called by the server when a server connection
+     * is established.  The purpose of this method is to inform
+     * the xServer of the channels this client wishes to burst.
+     */
+    virtual void BurstChannels();
 
-	/**
-	 * The event handler method, all network events will cause this
-	 * method to be invoked.
-	 */
-	virtual void	OnEvent( const eventType&,
-				void* = 0,
-				void* = 0,
-				void* = 0,
-				void* = 0 ) ;
+    /**
+     * The event handler method, all network events will cause this
+     * method to be invoked.
+     */
+    virtual void OnEvent(const eventType&, void* = 0, void* = 0, void* = 0, void* = 0);
 
-	/* For use by scanner modules */
+    /* For use by scanner modules */
 
-	/**
-	 * RejectClient() is called to notify the scanner that the
-	 * given Connection represents an insecurity.
-	 * If the optional second argument is specified, then it will
-	 * be used in log messages and G-Line.
-	 */
-	virtual void	RejectClient( Connection*,
-				const std::string& = std::string() ) ;
+    /**
+     * RejectClient() is called to notify the scanner that the
+     * given Connection represents an insecurity.
+     * If the optional second argument is specified, then it will
+     * be used in log messages and G-Line.
+     */
+    virtual void RejectClient(Connection*, const std::string& = std::string());
 
-protected:
-
-	/**
-	 * This method is called when a new client connects to the network.
-	 */
-	virtual void	handleNewClient( iClient* ) ;
-
-} ;
+  protected:
+    /**
+     * This method is called when a new client connects to the network.
+     */
+    virtual void handleNewClient(iClient*);
+};
 
 } // namespace gnuworld
 

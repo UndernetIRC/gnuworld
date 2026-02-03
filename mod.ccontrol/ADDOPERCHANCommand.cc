@@ -1,6 +1,6 @@
 /**
  * ADDOPERCHANCommand.cc
- * Add a new irc operator channel 
+ * Add a new irc operator channel
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,56 +19,44 @@
  *
  * $Id: ADDOPERCHANCommand.cc,v 1.12 2006/09/26 17:35:57 kewlio Exp $
  */
- 
-#include	<string>
 
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Constants.h"
+#include <string>
 
-namespace gnuworld
-{
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Constants.h"
 
-namespace uworld
-{
+namespace gnuworld {
 
-using std::string ;
+namespace uworld {
 
-bool ADDOPERCHANCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
+using std::string;
 
-string chanName = st[ 1 ] ;
-if( '#' != chanName[ 0 ] )
-	{
-	bot->Notice( theClient, "Invalid channel name" ) ;
-	return true ;
-	}
+bool ADDOPERCHANCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-if(chanName.length() >  channel::MaxName)
-	{
-	bot->Notice( theClient,"Channel name too long" );
-	return true;
-	}
+    string chanName = st[1];
+    if ('#' != chanName[0]) {
+        bot->Notice(theClient, "Invalid channel name");
+        return true;
+    }
 
-if( bot->addOperChan( chanName ) )
-	{
-	bot->Notice( theClient, "Addition of %s as oper chan has SUCCEEDED",
-		chanName.c_str() ) ;
-	}
-else
-	{
-	bot->Notice( theClient, "Addition of %s as oper chan has FAILED",
-		chanName.c_str() ) ;
-	}
-return true ;
+    if (chanName.length() > channel::MaxName) {
+        bot->Notice(theClient, "Channel name too long");
+        return true;
+    }
+
+    if (bot->addOperChan(chanName)) {
+        bot->Notice(theClient, "Addition of %s as oper chan has SUCCEEDED", chanName.c_str());
+    } else {
+        bot->Notice(theClient, "Addition of %s as oper chan has FAILED", chanName.c_str());
+    }
+    return true;
 }
-}
-}
-
+} // namespace uworld
+} // namespace gnuworld

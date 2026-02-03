@@ -26,262 +26,219 @@
  * $Id: DEOPCommand.cc,v 1.13 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include	<string>
-#include	<map>
+#include <string>
+#include <map>
 
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"Network.h"
-#include	"levels.h"
-#include	"responses.h"
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "Network.h"
+#include "levels.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::map ;
+namespace gnuworld {
+using std::map;
 
-bool DEOPCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
+bool DEOPCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-/*
- *  Fetch the sqlUser record attached to this client. If there isn't one,
- *  they aren't logged in - tell them they should be.
- */
+    /*
+     *  Fetch the sqlUser record attached to this client. If there isn't one,
+     *  they aren't logged in - tell them they should be.
+     */
 
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if (!theUser)
-	{
-	return false;
-	}
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
+        return false;
+    }
 
-/*
- *  Check the channel is actually registered.
- */
+    /*
+     *  Check the channel is actually registered.
+     */
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_not_reg).c_str(),
-		st[1].c_str());
-	return false;
-	}
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
+                    st[1].c_str());
+        return false;
+    }
 
-/* Check the bot is in the channel. */
+    /* Check the bot is in the channel. */
 
-if (!theChan->getInChan())
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::i_am_not_on_chan,
-			string("I'm not in that channel!")));
-	return false;
-	}
+    if (!theChan->getInChan()) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::i_am_not_on_chan,
+                                                string("I'm not in that channel!")));
+        return false;
+    }
 
-/*
- *  Check the user has sufficient access on this channel.
- */
+    /*
+     *  Check the user has sufficient access on this channel.
+     */
 
-int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-if (level < level::deop)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::insuf_access).c_str());
-	return false;
-	}
+    int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+    if (level < level::deop) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
+        return false;
+    }
 
-Channel* tmpChan = Network->findChannel(theChan->getName());
-if (!tmpChan)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_is_empty).c_str(),
-		theChan->getName().c_str());
-	return false;
-	}
+    Channel* tmpChan = Network->findChannel(theChan->getName());
+    if (!tmpChan) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::chan_is_empty).c_str(),
+                    theChan->getName().c_str());
+        return false;
+    }
 
-/*
- * Check we're actually opped first..
- */
+    /*
+     * Check we're actually opped first..
+     */
 
-ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
-if (!tmpBotUser)
-	{
-	return false;
-	}
+    ChannelUser* tmpBotUser = tmpChan->findUser(bot->getInstance());
+    if (!tmpBotUser) {
+        return false;
+    }
 
-if(!tmpBotUser->getMode(ChannelUser::MODE_O))
-	{
-	bot->Notice(theClient, "I'm not opped in %s", theChan->getName().c_str());
-	return false;
-	}
+    if (!tmpBotUser->getMode(ChannelUser::MODE_O)) {
+        bot->Notice(theClient, "I'm not opped in %s", theChan->getName().c_str());
+        return false;
+    }
 
-/*
- *  Loop over the remaining 'nick' parameters, opping them all.
- */
+    /*
+     *  Loop over the remaining 'nick' parameters, opping them all.
+     */
 
-char delim = 0 ;
-string source;
-iClient* target = 0 ;
+    char delim = 0;
+    string source;
+    iClient* target = 0;
 
-// Offset of first nick in list.
-StringTokenizer::size_type counter = 2 ;
+    // Offset of first nick in list.
+    StringTokenizer::size_type counter = 2;
 
-typedef map < iClient*, int > duplicateMapType;
-duplicateMapType duplicateMap;
+    typedef map<iClient*, int> duplicateMapType;
+    duplicateMapType duplicateMap;
 
-vector< iClient* > deopList ;
+    vector<iClient*> deopList;
 
-// No nicks provided, assume we op the requesting client
-if( st.size() < 3 )
-	{
-    source = Message + " " + theClient->getNickName();
-	delim = ' ';
-	}
-else
-	{
-	string::size_type pos = st[2].find_first_of( ',' ) ;
+    // No nicks provided, assume we op the requesting client
+    if (st.size() < 3) {
+        source = Message + " " + theClient->getNickName();
+        delim = ' ';
+    } else {
+        string::size_type pos = st[2].find_first_of(',');
 
-	// Found a comma?
-	if( string::npos != pos )
-		{
-		// We'll do a comma seperated search then.
-		source = st.assemble(2);
-		delim = ',';
-		counter = 0;
-		}
-	else
-		{
-		source = Message;
-		delim = ' ';
-		}
-	}
+        // Found a comma?
+        if (string::npos != pos) {
+            // We'll do a comma seperated search then.
+            source = st.assemble(2);
+            delim = ',';
+            counter = 0;
+        } else {
+            source = Message;
+            delim = ' ';
+        }
+    }
 
-StringTokenizer st2( source, delim );
+    StringTokenizer st2(source, delim);
 
-while( counter < st2.size())
-	{
-	target = Network->findNick(st2[counter]);
+    while (counter < st2.size()) {
+        target = Network->findNick(st2[counter]);
 
-	if(!target)
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser, language::dont_see_them).c_str(),
-			st2[counter].c_str());
+        if (!target) {
+            bot->Notice(theClient, bot->getResponse(theUser, language::dont_see_them).c_str(),
+                        st2[counter].c_str());
 
-		++counter ;
-		continue ;
-		}
+            ++counter;
+            continue;
+        }
 
-	/* Don't deop +k things */
-	if( target->getMode(iClient::MODE_SERVICES) )
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::wouldnt_appreciate,
-				string("I don't think %s would appreciate that.")).c_str(),
-			target->getNickName().c_str());
+        /* Don't deop +k things */
+        if (target->getMode(iClient::MODE_SERVICES)) {
+            bot->Notice(theClient,
+                        bot->getResponse(theUser, language::wouldnt_appreciate,
+                                         string("I don't think %s would appreciate that."))
+                            .c_str(),
+                        target->getNickName().c_str());
 
-		++counter ;
-		continue ;
-		}
+            ++counter;
+            continue;
+        }
 
-	ChannelUser* tmpChanUser = tmpChan->findUser(target) ;
+        ChannelUser* tmpChanUser = tmpChan->findUser(target);
 
-	// User isn't on the channel?
-	if( !tmpChanUser )
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser, language::cant_find_on_chan).c_str(),
-			target->getNickName().c_str(), theChan->getName().c_str());
+        // User isn't on the channel?
+        if (!tmpChanUser) {
+            bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(),
+                        target->getNickName().c_str(), theChan->getName().c_str());
 
-		++counter ;
-		continue ;
-		}
+            ++counter;
+            continue;
+        }
 
-	// User isn't opped?
-	if( !tmpChanUser->getMode(ChannelUser::MODE_O))
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser, language::not_opped).c_str(),
-			target->getNickName().c_str(), theChan->getName().c_str());
+        // User isn't opped?
+        if (!tmpChanUser->getMode(ChannelUser::MODE_O)) {
+            bot->Notice(theClient, bot->getResponse(theUser, language::not_opped).c_str(),
+                        target->getNickName().c_str(), theChan->getName().c_str());
 
-		++counter ;
-		continue ;
-		}
+            ++counter;
+            continue;
+        }
 
-	// Check for duplicates.
-	duplicateMapType::iterator ptr = duplicateMap.find(target);
+        // Check for duplicates.
+        duplicateMapType::iterator ptr = duplicateMap.find(target);
 
-	if( ptr != duplicateMap.end() )
-		{
-		// Duplicate
-		++counter ;
-		continue ;
-		}
+        if (ptr != duplicateMap.end()) {
+            // Duplicate
+            ++counter;
+            continue;
+        }
 
-	deopList.push_back(target);
-	duplicateMap.insert(duplicateMapType::value_type(target, 0));
+        deopList.push_back(target);
+        duplicateMap.insert(duplicateMapType::value_type(target, 0));
 
-	// Don't send a notice to the person who issued the command.
-	if(target != theClient)
-		{
-		sqlUser* tmpTargetUser = bot->isAuthed(target, false);
-		if (tmpTargetUser)
-			{
-			bot->Notice(target,
-				bot->getResponse(tmpTargetUser, language::youre_deopped_by).c_str(),
-				theClient->getNickName().c_str(),
-				theUser->getUserName().c_str(),
-				theChan->getName().c_str());
-			}
-		else
-			{
-			bot->Notice(target,
-				bot->getResponse(NULL, language::youre_deopped_by).c_str(),
-				theClient->getNickName().c_str(),
-				theUser->getUserName().c_str(),
-				theChan->getName().c_str());
-			}
-		} // Don't send to person who issued.
+        // Don't send a notice to the person who issued the command.
+        if (target != theClient) {
+            sqlUser* tmpTargetUser = bot->isAuthed(target, false);
+            if (tmpTargetUser) {
+                bot->Notice(target,
+                            bot->getResponse(tmpTargetUser, language::youre_deopped_by).c_str(),
+                            theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+                            theChan->getName().c_str());
+            } else {
+                bot->Notice(target, bot->getResponse(NULL, language::youre_deopped_by).c_str(),
+                            theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+                            theChan->getName().c_str());
+            }
+        } // Don't send to person who issued.
 
-	++counter ;
-	} // while()
+        ++counter;
+    } // while()
 
+    // Avoid if there are no modes
+    if (!deopList.empty()) {
+        // deOp them.
+        bot->DeOp(tmpChan, deopList);
 
-// Avoid if there are no modes
-if (!deopList.empty())
-{
-	// deOp them.
-	bot->DeOp(tmpChan, deopList);
+        // Send action opnotice to channel if OPLOG is enabled
+        if (theChan->getFlag(sqlChannel::F_OPLOG)) {
+            string deopStr;
+            vector<iClient*>::iterator itr = deopList.begin();
+            while (itr != deopList.end()) {
+                iClient* tmpUser = *itr;
+                deopStr += tmpUser->getNickName().c_str() + string(", ");
+                ++itr;
+            }
+            deopStr = deopStr.substr(0, deopStr.length() - 2);
+            bot->NoticeChannelOps(theChan->getName(), "%s (%s) deopped: %s",
+                                  theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+                                  deopStr.c_str());
+        }
+    }
 
-	// Send action opnotice to channel if OPLOG is enabled
-	if (theChan->getFlag(sqlChannel::F_OPLOG))
-	{
-		string deopStr;
-		vector<iClient*>::iterator itr = deopList.begin();
-		while (itr != deopList.end())
-		{
-			iClient* tmpUser = *itr;
-			deopStr += tmpUser->getNickName().c_str() + string(", ");
-			++itr;
-		}
-		deopStr = deopStr.substr(0, deopStr.length() - 2);
-		bot->NoticeChannelOps(theChan->getName(),
-			"%s (%s) deopped: %s",
-			theClient->getNickName().c_str(), theUser->getUserName().c_str(), deopStr.c_str());
-	}
-}
-
-return true ;
-
+    return true;
 }
 
 } // namespace gnuworld.
-

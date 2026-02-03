@@ -20,25 +20,24 @@
  * $Id: msg_Server.cc,v 1.7 2006/12/22 06:41:41 kewlio Exp $
  */
 
-#include	<new>
-#include	<iostream>
+#include <new>
+#include <iostream>
 
-#include	<cstring>
-#include	<cassert>
+#include <cstring>
+#include <cassert>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"events.h"
-#include	"Network.h"
-#include	"iServer.h"
-#include	"ELog.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "events.h"
+#include "Network.h"
+#include "iServer.h"
+#include "ELog.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::endl ;
+using std::endl;
 
 CREATE_HANDLER(msg_Server)
 
@@ -59,87 +58,76 @@ CREATE_HANDLER(msg_Server)
  *
  * Remember that the "SERVER" parameter is removed.
  */
-bool msg_Server::Execute( const xParameters& Param )
-{
-theServer->setBurstEnd( 0 ) ;
-theServer->setBurstStart( ::time( 0 ) ) ;
+bool msg_Server::Execute(const xParameters& Param) {
+    theServer->setBurstEnd(0);
+    theServer->setBurstStart(::time(0));
 
-// Check the hopcount
-// 1: It's our uplink
-if( Param[ 1 ][ 0 ] == '1' )
-	{
+    // Check the hopcount
+    // 1: It's our uplink
+    if (Param[1][0] == '1') {
 
-//	elog	<< "msg_Server> Got Uplink: "
-//		<< Param[ 0 ]
-//		<< endl ;
+        //	elog	<< "msg_Server> Got Uplink: "
+        //		<< Param[ 0 ]
+        //		<< endl ;
 
-	// It's our uplink
-	if( Param.size() < 6 )
-		{
-		elog	<< "msg_Server> Invalid number of parameters"
-			<< endl ;
-		return false ;
-		}
+        // It's our uplink
+        if (Param.size() < 6) {
+            elog << "msg_Server> Invalid number of parameters" << endl;
+            return false;
+        }
 
-	// Here's the deal:
-	// We are just connecting to the network
-	// We have just received the first server command,
-	// telling us who our uplink server is.
-	// We need to add our uplink to network tables.
+        // Here's the deal:
+        // We are just connecting to the network
+        // We have just received the first server command,
+        // telling us who our uplink server is.
+        // We need to add our uplink to network tables.
 
-	// Assume 5 character numerics
-	unsigned int uplinkIntYY = base64toint( Param[ 5 ], 2 ) ;
+        // Assume 5 character numerics
+        unsigned int uplinkIntYY = base64toint(Param[5], 2);
 
-	// Our uplink has its own numeric as its uplinkIntYY.
-	iServer* tmpUplink = new (std::nothrow) iServer( 
-		uplinkIntYY,
-		Param[ 5 ], // yyxxx
-		Param[ 0 ], // name
-		atoi( Param[ 3 ] ) ) ; // connect time
-	assert( tmpUplink != 0 ) ;
+        // Our uplink has its own numeric as its uplinkIntYY.
+        iServer* tmpUplink = new (std::nothrow) iServer(uplinkIntYY,
+                                                        Param[5],        // yyxxx
+                                                        Param[0],        // name
+                                                        atoi(Param[3])); // connect time
+        assert(tmpUplink != 0);
 
-	// Check for P10 versus J10, J10 means the server is
-	// bursting.
-	if( 'J' == Param[ 4 ][ 0 ] )
-		{
-		tmpUplink->setBursting( true ) ;
-		}
+        // Check for P10 versus J10, J10 means the server is
+        // bursting.
+        if ('J' == Param[4][0]) {
+            tmpUplink->setBursting(true);
+        }
 
-	// Set any appropriate server flags
-	tmpUplink->setFlags( Param[ 6 ] ) ;
+        // Set any appropriate server flags
+        tmpUplink->setFlags(Param[6]);
 
-	theServer->setUplink( tmpUplink ) ;
+        theServer->setUplink(tmpUplink);
 
-	// Find this server (me)
-	iServer* me = Network->findServer( theServer->getIntYY() ) ;
-	if( NULL == me )
-		{
-		elog	<< "msg_Server> Unable to find myself "
-			<< " ("
-			<< theServer->getIntYY()
-			<< ")"
-			<< endl ;
-		::exit( 0 ) ;
-		}
+        // Find this server (me)
+        iServer* me = Network->findServer(theServer->getIntYY());
+        if (NULL == me) {
+            elog << "msg_Server> Unable to find myself "
+                 << " (" << theServer->getIntYY() << ")" << endl;
+            ::exit(0);
+        }
 
-	// Now that I know my uplink, I can set its numeric
-	// in my own iServer info
-	me->setUplinkIntYY( uplinkIntYY ) ;
+        // Now that I know my uplink, I can set its numeric
+        // in my own iServer info
+        me->setUplinkIntYY(uplinkIntYY);
 
-	// We now have a pointer to our own uplink
-	// Add it to the tables
-	// We maintain a local pointer just for speed reasons
-	Network->addServer( theServer->getUplink() ) ;
+        // We now have a pointer to our own uplink
+        // Add it to the tables
+        // We maintain a local pointer just for speed reasons
+        Network->addServer(theServer->getUplink());
 
-//	elog	<< "msg_Server> Added server: "
-//		<< *(theServer->getUplink())
-//		<< endl ;
-	}
+        //	elog	<< "msg_Server> Added server: "
+        //		<< *(theServer->getUplink())
+        //		<< endl ;
+    }
 
-// Not posting message here because this method is only called once
-// using tokenized commands - when the xServer connects
-return true ;
+    // Not posting message here because this method is only called once
+    // using tokenized commands - when the xServer connects
+    return true;
 }
-
 
 } // namespace gnuworld

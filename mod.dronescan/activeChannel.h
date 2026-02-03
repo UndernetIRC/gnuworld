@@ -28,48 +28,42 @@ namespace gnuworld {
 namespace ds {
 
 class activeChannel {
-public:
-	/**
-	 * Constructor to set up initial state.
-	 *
-	 * @param _name		the name of the active channel
-	 * @param _lastjoin	the time of the last join to this channel
-	 */
-	inline activeChannel( const std::string& _name, const time_t& _lastjoin, const time_t& _lastnick=0 ) :
-		name(_name),
-		lastjoin(_lastjoin),
-		lastnick(_lastnick)
-		{ }
+  public:
+    /**
+     * Constructor to set up initial state.
+     *
+     * @param _name		the name of the active channel
+     * @param _lastjoin	the time of the last join to this channel
+     */
+    inline activeChannel(const std::string& _name, const time_t& _lastjoin,
+                         const time_t& _lastnick = 0)
+        : name(_name), lastjoin(_lastjoin), lastnick(_lastnick) {}
 
-	/** Empty destructor as we allocate no memory. */
-	inline ~activeChannel() { } ;
+    /** Empty destructor as we allocate no memory. */
+    inline ~activeChannel() {};
 
-	/************************
-	 ** A C C E S S O  R S **
-	 ************************/
+    /************************
+     ** A C C E S S O  R S **
+     ************************/
 
-	inline const std::string& getName() const
-		{ return name; }
+    inline const std::string& getName() const { return name; }
 
-	inline const time_t& getLastJoin() const
-		{ return lastjoin; }
+    inline const time_t& getLastJoin() const { return lastjoin; }
 
-	inline const time_t& getLastNick() const
-		{ return lastnick; }
+    inline const time_t& getLastNick() const { return lastnick; }
 
-	/*********************
-	 ** M U T A T O R S **
-	 *********************/
+    /*********************
+     ** M U T A T O R S **
+     *********************/
 
-	inline void setLastJoin( const time_t& _lastjoin )
-		{ lastjoin = _lastjoin; }
+    inline void setLastJoin(const time_t& _lastjoin) { lastjoin = _lastjoin; }
 
-	inline void setLastNick( const time_t& _lastnick )
-		{ lastjoin = _lastnick; }
-protected:
-	std::string	name;
-	time_t		lastjoin;
-	time_t		lastnick;
+    inline void setLastNick(const time_t& _lastnick) { lastjoin = _lastnick; }
+
+  protected:
+    std::string name;
+    time_t lastjoin;
+    time_t lastnick;
 
 }; // class activeChannel
 

@@ -20,25 +20,24 @@
  * $Id: msg_SQ.cc,v 1.8 2007/04/27 19:30:43 mrbean_ Exp $
  */
 
-#include	<iostream>
-#include	<string>
+#include <iostream>
+#include <string>
 
-#include	<cstring>
+#include <cstring>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"events.h"
-#include	"Network.h"
-#include	"iServer.h"
-#include	"ELog.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "events.h"
+#include "Network.h"
+#include "iServer.h"
+#include "ELog.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::endl ;
+using std::endl;
+using std::string;
 
 CREATE_HANDLER(msg_SQ)
 
@@ -55,66 +54,51 @@ CREATE_HANDLER(msg_SQ)
  * 0 SQ Asheville-R.NC.US.KrushNet.Org 0 :Ping timeout
  * Az SQ Seattle-R.WA.US.KrushNet.Org 0 :Ping timeout
  */
-bool msg_SQ::Execute( const xParameters& Param )
-{
+bool msg_SQ::Execute(const xParameters& Param) {
 
-if( Param.size() < 2 )
-	{
-	elog	<< "msg_SQ> Invalid number of parameters"
-		<< endl ;
-	return false ;
-	}
+    if (Param.size() < 2) {
+        elog << "msg_SQ> Invalid number of parameters" << endl;
+        return false;
+    }
 
-iServer* squitServer = 0 ;
-if( strchr( Param[ 1 ], '.' ) != NULL )
-	{
-	// Full server name specified
-	squitServer = Network->findServerName( Param[ 1 ] ) ;
-	}
-else
-	{
-	// Numeric
-	squitServer = Network->findServer( Param[ 1 ] ) ;
-	}
+    iServer* squitServer = 0;
+    if (strchr(Param[1], '.') != NULL) {
+        // Full server name specified
+        squitServer = Network->findServerName(Param[1]);
+    } else {
+        // Numeric
+        squitServer = Network->findServer(Param[1]);
+    }
 
-if( NULL == squitServer )
-	{
-	elog	<< "msg_SQ> Unable to find server: "
-		<< Param[ 1 ]
-		<< endl ;
-	return false ;
-	}
+    if (NULL == squitServer) {
+        elog << "msg_SQ> Unable to find server: " << Param[1] << endl;
+        return false;
+    }
 
-if( squitServer->getIntYY() == theServer->getUplinkIntYY() )
-	{
-	elog	<< "msg_SQ> Ive been delinked!!"
-		<< endl ;
+    if (squitServer->getIntYY() == theServer->getUplinkIntYY()) {
+        elog << "msg_SQ> Ive been delinked!!" << endl;
 
-	// It's my uplink, we have been squit...those bastards!
-	theServer->Shutdown() ;
-	return true ;
-	}
-else
-	{
-//	elog	<< "msg_SQ> " << squitServer->getName()
-//		<< " has been squit"
-//		<< endl ;
+        // It's my uplink, we have been squit...those bastards!
+        theServer->Shutdown();
+        return true;
+    } else {
+        //	elog	<< "msg_SQ> " << squitServer->getName()
+        //		<< " has been squit"
+        //		<< endl ;
 
-	string source( Param[ 0 ] ) ;
-	string reason( Param[ 3 ] ) ;
-	squitServer->setBursting(false); //If the server was in bursting state, its not anymore :)
-	theServer->PostEvent( EVT_NETBREAK,
-		static_cast< void* >( squitServer ),
-		static_cast< void* >( &source ),
-		static_cast< void* >( &reason ) ) ;
+        string source(Param[0]);
+        string reason(Param[3]);
+        squitServer->setBursting(false); // If the server was in bursting state, its not anymore :)
+        theServer->PostEvent(EVT_NETBREAK, static_cast<void*>(squitServer),
+                             static_cast<void*>(&source), static_cast<void*>(&reason));
 
-	// Otherwise, it's just some server.
-	// xNetwork::OnSplit() will deallocate all servers
-	// which are split
-	Network->OnSplit( squitServer->getIntYY() ) ;
-	}
+        // Otherwise, it's just some server.
+        // xNetwork::OnSplit() will deallocate all servers
+        // which are split
+        Network->OnSplit(squitServer->getIntYY());
+    }
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld

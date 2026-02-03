@@ -22,8 +22,6 @@
 
 namespace gnuworld {
 
-namespace chanfix {
-
-} // namespace chanfix
+namespace chanfix {} // namespace chanfix
 
 } // namespace gnuworld

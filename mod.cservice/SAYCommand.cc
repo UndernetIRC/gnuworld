@@ -26,80 +26,72 @@
  * $Id: SAYCommand.cc,v 1.9 2005/12/01 04:04:59 kewlio Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"StringTokenizer.h"
-#include	"cservice.h"
-#include	"levels.h"
-#include	"Network.h"
-#include	"responses.h"
+#include "StringTokenizer.h"
+#include "cservice.h"
+#include "levels.h"
+#include "Network.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 using namespace level;
 
-bool SAYCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 3 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool SAYCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 3) {
+        Usage(theClient);
+        return true;
+    }
 
-/*
- *  Fetch the sqlUser record attached to this client. If there isn't one,
- *  they aren't logged in - tell them they should be.
- */
+    /*
+     *  Fetch the sqlUser record attached to this client. If there isn't one,
+     *  they aren't logged in - tell them they should be.
+     */
 
-sqlUser* theUser = bot->isAuthed(theClient, false);
-if (!theUser)
-	{
-	return false;
-	}
+    sqlUser* theUser = bot->isAuthed(theClient, false);
+    if (!theUser) {
+        return false;
+    }
 
-int admLevel = bot->getAdminAccessLevel(theUser);
-if (admLevel < level::say)
-	{
-/* CSC get far too many questions as to how to use these commands
- * so they prefer it kept quiet about 'em.  Fair enough too.
- *
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::insuf_access,
-			string("Sorry, you have insufficient access to perform that command.")));
- */
-	return false;
-	}
-/*
- *  First, check the channel is registered.
- */
+    int admLevel = bot->getAdminAccessLevel(theUser);
+    if (admLevel < level::say) {
+        /* CSC get far too many questions as to how to use these commands
+         * so they prefer it kept quiet about 'em.  Fair enough too.
+         *
+                bot->Notice(theClient,
+                        bot->getResponse(theUser,
+                                language::insuf_access,
+                                string("Sorry, you have insufficient access to perform that
+         command.")));
+         */
+        return false;
+    }
+    /*
+     *  First, check the channel is registered.
+     */
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::chan_not_reg,
-			string("Sorry, %s isn't registered with me.")).c_str(),
-			st[1].c_str());
-	return false;
-	}
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->Notice(theClient,
+                    bot->getResponse(theUser, language::chan_not_reg,
+                                     string("Sorry, %s isn't registered with me."))
+                        .c_str(),
+                    st[1].c_str());
+        return false;
+    }
 
-Channel* tmpChan = Network->findChannel(theChan->getName());
-/* is this a "say" or "do" command? */
-if (tmpChan)
-{
-	if (!match("SAY", st[0]))
-		bot->Message(tmpChan, st.assemble(2));
-	else
-		bot->Message(tmpChan, "%cACTION %s%c",
-			1, st.assemble(2).c_str(), 1);
-}
+    Channel* tmpChan = Network->findChannel(theChan->getName());
+    /* is this a "say" or "do" command? */
+    if (tmpChan) {
+        if (!match("SAY", st[0]))
+            bot->Message(tmpChan, st.assemble(2));
+        else
+            bot->Message(tmpChan, "%cACTION %s%c", 1, st.assemble(2).c_str(), 1);
+    }
 
-return true;
+    return true;
 }
 
 } // namespace gnuworld.
-

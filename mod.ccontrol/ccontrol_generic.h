@@ -19,6 +19,5 @@
  * $Id: ccontrol_generic.h,v 1.2 2005/06/19 12:09:56 kewlio Exp $
  */
 
-char *Ago(long ts);
-char *Duration(long ts);
-
+char* Ago(long ts);
+char* Duration(long ts);

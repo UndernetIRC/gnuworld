@@ -20,95 +20,79 @@
  * $Id: JUPECommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $
  */
 
-#include	<new>
-#include	<string>
-#include	<iomanip>
+#include <new>
+#include <string>
+#include <iomanip>
 
-#include	<cstdlib>
+#include <cstdlib>
 
-#include	"ccontrol.h"
-#include	"iServer.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Network.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
+#include "ccontrol.h"
+#include "iServer.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Network.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool JUPECommand::Exec( iClient* theClient, const string& Message )
-{
+bool JUPECommand::Exec(iClient* theClient, const string& Message) {
 
-StringTokenizer st( Message ) ;
-if( st.size() < 3 )
-	{
-	Usage( theClient ) ;
-	return false ;
-	}
+    StringTokenizer st(Message);
+    if (st.size() < 3) {
+        Usage(theClient);
+        return false;
+    }
 
-// The server name to be juped must have at least 1 '.'
-if( st[1].length() > server::MaxName) 
-	{
-	bot->Notice( theClient, "Bogus server name" ) ;
-	return false ;
-	}
-bot->MsgChanLog("JUPE %s\n",st.assemble(1).c_str());
+    // The server name to be juped must have at least 1 '.'
+    if (st[1].length() > server::MaxName) {
+        bot->Notice(theClient, "Bogus server name");
+        return false;
+    }
+    bot->MsgChanLog("JUPE %s\n", st.assemble(1).c_str());
 
-iServer* Server;
-string SName;
-if(string::npos != st[ 1 ].find_first_of( '*' ))
-	{
-	bot->Notice(theClient,"Sorry, but you must give a full server name when juping!");
-	return false;
-	}	
-else if(string::npos == st[ 1 ].find_first_of( '.' ))
-	{
-	bot->Notice( theClient, "Bogus server name" ) ;
-	return false ;
-	}
+    iServer* Server;
+    string SName;
+    if (string::npos != st[1].find_first_of('*')) {
+        bot->Notice(theClient, "Sorry, but you must give a full server name when juping!");
+        return false;
+    } else if (string::npos == st[1].find_first_of('.')) {
+        bot->Notice(theClient, "Bogus server name");
+        return false;
+    }
 
-Server = Network->findServerName(st[1]);
-if(Server)
-	{
-	bot->Notice(theClient,"%s is currently linked to the network"
-		    ", it will be automatically squit.",
-		    st[1].c_str());
-	}
-SName = st[1];
+    Server = Network->findServerName(st[1]);
+    if (Server) {
+        bot->Notice(theClient,
+                    "%s is currently linked to the network"
+                    ", it will be automatically squit.",
+                    st[1].c_str());
+    }
+    SName = st[1];
 
-if(!strcasecmp(SName,Network->findServer(bot->getUplink()->getUplinkCharYY())->getName()))
-	{
-	bot->Notice(theClient,"What are you trying to do? kill me?");
-	bot->MsgChanLog("%s just tried to jupe my uplink!\n",theClient->getNickName().c_str());
-	return false;
-	}
-bot->MsgChanLog("%s is asking me to jupe %s because: %s\n",
-	theClient->getNickName().c_str(),
-	SName.c_str(),
-	st.assemble(2).c_str());
+    if (!strcasecmp(SName, Network->findServer(bot->getUplink()->getUplinkCharYY())->getName())) {
+        bot->Notice(theClient, "What are you trying to do? kill me?");
+        bot->MsgChanLog("%s just tried to jupe my uplink!\n", theClient->getNickName().c_str());
+        return false;
+    }
+    bot->MsgChanLog("%s is asking me to jupe %s because: %s\n", theClient->getNickName().c_str(),
+                    SName.c_str(), st.assemble(2).c_str());
 
-string yyxxx( "00]]]" ) ;
-iServer* jupeServer = new (std::nothrow) iServer(
-	bot->getUplinkIntYY(), // uplinkIntYY
-	yyxxx,
-	SName,
-	time( 0 ),
-	st.assemble( 2 ) ) ;
-assert( jupeServer != 0 ) ;
-jupeServer->setJupe();
+    string yyxxx("00]]]");
+    iServer* jupeServer = new (std::nothrow) iServer(bot->getUplinkIntYY(), // uplinkIntYY
+                                                     yyxxx, SName, time(0), st.assemble(2));
+    assert(jupeServer != 0);
+    jupeServer->setJupe();
 
-// Attach the new (fake) server.
-server->AttachServer( jupeServer, bot ) ;
+    // Attach the new (fake) server.
+    server->AttachServer(jupeServer, bot);
 
-return true ;
-
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld

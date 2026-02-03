@@ -23,51 +23,47 @@
  *
  * $Id: SHUTDOWNCommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
-#include	<string>
-#include	"gnuworld_config.h"
-#include	"StringTokenizer.h"
-#include	"chanfix.h"
-#include	"responses.h"
+#include <string>
+#include "gnuworld_config.h"
+#include "StringTokenizer.h"
+#include "chanfix.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void SHUTDOWNCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
-	
-if (bot->isUpdateRunning()) {
-  bot->SendTo(theClient,
-	      bot->getResponse(theUser,
-			language::update_in_progress,
-			std::string("This command cannot proceed while an update is in progress. Please try again later.")).c_str());
-  return;
-}
+void SHUTDOWNCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::shutting_down,
-                            std::string("Shutting down the server as per your request.")).c_str());
+    if (bot->isUpdateRunning()) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::update_in_progress,
+                                     std::string("This command cannot proceed while an update is "
+                                                 "in progress. Please try again later."))
+                        .c_str());
+        return;
+    }
 
-bot->logDebugMessage("%s (%s) is shutting me down.",
-		     theUser->getUserName().c_str(),
-		     theClient->getRealNickUserHost().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::shutting_down,
+                                 std::string("Shutting down the server as per your request."))
+                    .c_str());
 
-bot->logAdminMessage("%s (%s) SHUTDOWN %s",
-		     theUser->getUserName().c_str(),
-		     theClient->getRealNickUserHost().c_str(),
-		     (st.size() < 2) ? "" : st.assemble(1).c_str());
+    bot->logDebugMessage("%s (%s) is shutting me down.", theUser->getUserName().c_str(),
+                         theClient->getRealNickUserHost().c_str());
 
-if (st.size() < 2)
-  server->Shutdown();
-else
-  server->Shutdown( st.assemble(1) );
+    bot->logAdminMessage("%s (%s) SHUTDOWN %s", theUser->getUserName().c_str(),
+                         theClient->getRealNickUserHost().c_str(),
+                         (st.size() < 2) ? "" : st.assemble(1).c_str());
 
-bot->logLastComMessage(theClient, Message);
+    if (st.size() < 2)
+        server->Shutdown();
+    else
+        server->Shutdown(st.assemble(1));
 
-return;
+    bot->logLastComMessage(theClient, Message);
+
+    return;
 }
 
 } // namespace cf

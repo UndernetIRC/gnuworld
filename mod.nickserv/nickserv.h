@@ -37,7 +37,6 @@ namespace ns {
 
 class nickserv : public xClient, public logging::logTarget {
   public:
-
     /***********************************************************
      ** O V E R R I D E N   L O G T A R G E T   M E T H O D S **
      ***********************************************************/
@@ -50,45 +49,44 @@ class nickserv : public xClient, public logging::logTarget {
      *******************************************************/
 
     /** Constructor receives a configuration file name */
-    nickserv( const string& ) ;
+    nickserv(const string&);
 
     /** Destructor to remove anything interesting we've done */
-    virtual ~nickserv() ;
+    virtual ~nickserv();
 
     /** This method is called after server connection */
-    virtual void BurstChannels() ;
+    virtual void BurstChannels();
 
     /** This is called when we have attached to the xServer */
-    virtual void OnAttach() ;
+    virtual void OnAttach();
 
     /** This is called when a channel event we are listening for happens */
-    virtual void OnChannelEvent( const channelEventType&, Channel*, void*,
-                                 void*, void*, void* ) ;
+    virtual void OnChannelEvent(const channelEventType&, Channel*, void*, void*, void*, void*);
 
     /** This is called when we receive a CTCP */
-    virtual void OnCTCP( iClient*, const string&, const string&, bool ) ;
+    virtual void OnCTCP(iClient*, const string&, const string&, bool);
 
     /** This is called when a network event happens */
-    virtual void OnEvent( const eventType&, void* , void*, void*, void* ) ;
+    virtual void OnEvent(const eventType&, void*, void*, void*, void*);
 
     /** This method is called when the bot gets a PRIVMSG */
-    virtual void OnPrivateMessage( iClient*, const string&, bool secure ) ;
+    virtual void OnPrivateMessage(iClient*, const string&, bool secure);
 
     /** This method is called when a timer expires */
-    virtual void OnTimer(const gnuworld::xServer::timerID&, void*) ;
+    virtual void OnTimer(const gnuworld::xServer::timerID&, void*);
 
     /*********************************
      ** N I C K S E R V   T Y P E S **
      *********************************/
 
-    typedef map< string, Command*, noCaseCompare > commandMapType;
+    typedef map<string, Command*, noCaseCompare> commandMapType;
     typedef commandMapType::value_type commandPairType;
 
-    typedef vector< iClient* > QueueType;
+    typedef vector<iClient*> QueueType;
 
-    typedef map< string, sqlUser*, noCaseCompare > sqlUserHashType;
+    typedef map<string, sqlUser*, noCaseCompare> sqlUserHashType;
 
-    typedef vector< iClient* > logUsersType;
+    typedef vector<iClient*> logUsersType;
 
     /*************************************
      ** N I C K S E R V   M E T H O D S **
@@ -98,11 +96,10 @@ class nickserv : public xClient, public logging::logTarget {
     void addUserToCache(string, sqlUser*);
 
     /* Accessor for consoleChannel */
-    inline const string getConsoleChannel() const
-      { return consoleChannel; }
+    inline const string getConsoleChannel() const { return consoleChannel; }
 
     /** Log a message to the console channel */
-    void logAdminMessage(const char*, ... );
+    void logAdminMessage(const char*, ...);
 
     /** Load all users into the user cache */
     void precacheUsers();
@@ -112,7 +109,6 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** Change the console level */
     void setConsoleLevel(logging::events::eventType&);
-
 
     /***********************************
      * Q U E U E   P R O C E S S I N G *
@@ -127,7 +123,6 @@ class nickserv : public xClient, public logging::logTarget {
     /** Remove an iClient from the processing queue */
     int removeFromQueue(iClient*);
 
-
     /*********************************
      ** U S E R   R E S O U R C E S **
      *********************************/
@@ -141,7 +136,6 @@ class nickserv : public xClient, public logging::logTarget {
     /** Returns a sqlUser for a given user name */
     sqlUser* isRegistered(string);
 
-
     /*******************************
      ** M I S C E L L A N E O U S **
      *******************************/
@@ -151,7 +145,6 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** Holds a reference to our Logger instance */
     logging::Logger* theLogger;
-
 
     /*****************************************
      ** N I C K S E R V   V A R I A B L E S **
@@ -166,7 +159,6 @@ class nickserv : public xClient, public logging::logTarget {
      *********************************************/
 
     commandMapType commandMap;
-
 
     /*************************************
      ** C O N F I G   V A R I A B L E S **
@@ -187,7 +179,6 @@ class nickserv : public xClient, public logging::logTarget {
     /** How frequently to commit to the database */
     int commitFreq;
 
-
     /** What messages should be sent to the console channel */
     logging::events::eventType consoleLevel;
 
@@ -203,7 +194,6 @@ class nickserv : public xClient, public logging::logTarget {
 
     /** The list of log users */
     logUsersType logUsers;
-
 
     /***********************
      ** T I M E R   I D S **

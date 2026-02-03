@@ -23,15 +23,14 @@
 #ifndef __XPARAMETERS_H
 #define __XPARAMETERS_H "$Id: xparameters.h,v 1.4 2003/12/29 23:59:36 dan_karrels Exp $"
 
-#include	<string>
-#include        <vector>
+#include <string>
+#include <vector>
 
-#include	<cassert>
+#include <cassert>
 
-#include	"ELog.h"
+#include "ELog.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 /**
  * This class is similar to StringTokenizer, except that it accepts
@@ -41,180 +40,167 @@ namespace gnuworld
  * at zero.
  * This class is mutable.
  */
-class xParameters
-{
+class xParameters {
 
-private:
-	/**
-	 * The structure type for storing the tokens internally.
-	 */
-	typedef std::vector< char* > vectorType ;
+  private:
+    /**
+     * The structure type for storing the tokens internally.
+     */
+    typedef std::vector<char*> vectorType;
 
-public:
+  public:
+    /**
+     * The variable type used to represent this class's
+     * size (number of tokens in the object).
+     */
+    typedef vectorType::size_type size_type;
 
-	/**
-	 * The variable type used to represent this class's
-	 * size (number of tokens in the object).
-	 */
-	typedef vectorType::size_type size_type ;
+    /**
+     * Construct an xParameters object.
+     */
+    xParameters() {}
 
-	/**
-	 * Construct an xParameters object.
-	 */
-	xParameters() {}
+    /**
+     * Destroy an xParameters object.
+     * No streams have been opened, and no memory explicitly
+     * dynamically allocated, so this method is a NOOP.
+     */
+    ~xParameters() {}
 
-	/**
-	 * Destroy an xParameters object.
-	 * No streams have been opened, and no memory explicitly
-	 * dynamically allocated, so this method is a NOOP.
-	 */
-	~xParameters() {}
+    /**
+     * This type is used to perform a read only iteration
+     * of this objects array of strings.
+     */
+    typedef vectorType::const_iterator const_iterator;
 
-	/**
-	 * This type is used to perform a read only iteration
-	 * of this objects array of strings.
-	 */
-	typedef vectorType::const_iterator const_iterator ;
+    /**
+     * Return a const_iterator to the beginning of the array
+     * of strings.
+     */
+    inline const_iterator begin() const { return myVector.begin(); }
 
-	/**
-	 * Return a const_iterator to the beginning of the array
-	 * of strings.
-	 */
-	inline const_iterator	begin() const
-		{ return myVector.begin() ; }
+    /**
+     * Return a const_iterator to the end of the array
+     * of strings.
+     */
+    inline const_iterator end() const { return myVector.end(); }
 
-	/**
-	 * Return a const_iterator to the end of the array
-	 * of strings.
-	 */
-	inline const_iterator	end() const
-		{ return myVector.end() ; }
+    /**
+     * Insert a pointer to a character array (token) into the
+     * xParameters instance.
+     */
+    inline xParameters& operator<<(char* Parameter) {
+        myVector.push_back(Parameter);
+        return *this;
+    }
 
-	/**
-	 * Insert a pointer to a character array (token) into the
-	 * xParameters instance.
-	 */
-	inline xParameters& operator<<( char* Parameter )
-		{ myVector.push_back( Parameter ) ; return *this ; }
+    /**
+     * Return a pointer to a mutable character array token.
+     * The tokens are indexed beginning at zero.
+     * This method will assert false if the requested index
+     * is out of bounds, according to validSubscript.
+     */
+    inline char* operator[](const size_type& pos) const {
+        assert(validSubscript(pos));
+        return myVector[pos];
+    }
 
-	/**
-	 * Return a pointer to a mutable character array token.
-	 * The tokens are indexed beginning at zero.
-	 * This method will assert false if the requested index
-	 * is out of bounds, according to validSubscript.
-	 */
-	inline char* operator[]( const size_type& pos ) const
-	{ assert( validSubscript( pos ) ) ; return myVector[ pos ] ; }
+    /**
+     * Set a particular element to a new value, NULL is
+     * permitted.
+     */
+    void setValue(const size_t pos, char* newVal) {
+        assert(validSubscript(pos));
+        myVector[pos] = newVal;
+    }
 
-	/**
-	 * Set a particular element to a new value, NULL is
-	 * permitted.
-	 */
-	void setValue( const size_t pos, char* newVal )
-	{ assert( validSubscript( pos ) ) ; myVector[ pos ] = newVal ; }
+    /**
+     * Remove all tokens, if any, from this xParameters object.
+     */
+    inline void Clear() { myVector.clear(); }
 
-	/**
-	 * Remove all tokens, if any, from this xParameters object.
-	 */
-	inline void Clear()
-		{ myVector.clear() ; }
+    /**
+     * Return the number of tokens held in this xParameters object.
+     */
+    inline size_type Count() const { return myVector.size(); }
 
-	/**
-	 * Return the number of tokens held in this xParameters object.
-	 */
-	inline size_type Count() const
-		{ return myVector.size() ; }
+    /**
+     * Return the number of tokens held in this xParameters object.
+     */
+    inline size_type size() const { return myVector.size(); }
 
-	/**
-	 * Return the number of tokens held in this xParameters object.
-	 */
-	inline size_type size() const
-		{ return myVector.size() ; }
+    /**
+     * Return true if there exist no tokens represented by this
+     * class.
+     */
+    inline bool empty() const { return myVector.empty(); }
 
-	/**
-	 * Return true if there exist no tokens represented by this
-	 * class.
-	 */
-	inline bool empty() const
-		{ return myVector.empty() ; }
+    /**
+     * Return true if the given variable (i) is a valid index
+     * into the table of tokens.
+     * Return false otherwise.
+     */
+    inline bool validSubscript(const size_type& i) const { return (i < myVector.size()); }
 
-	/**
-	 * Return true if the given variable (i) is a valid index
-	 * into the table of tokens.
-	 * Return false otherwise.
-	 */
-	inline bool validSubscript( const size_type& i ) const
-		{ return (i < myVector.size()) ; }
+    /**
+     * Return a string containing all tokens beginning
+     * with the zero based index beginIndex.  A ' ' will
+     * be placed between token in the string returned.
+     */
+    inline std::string assemble(const size_type& beginIndex) const {
+        assert(validSubscript(beginIndex));
+        if (myVector.empty()) {
+            return std::string();
+        }
+        std::string retMe("");
+        for (vectorType::size_type i = beginIndex; i < myVector.size(); ++i) {
+            retMe += myVector[i];
+            if ((i + 1) < myVector.size()) {
+                retMe += ' ';
+            }
+        }
+        return retMe;
+    }
 
-	/**
-	 * Return a string containing all tokens beginning
-	 * with the zero based index beginIndex.  A ' ' will
-	 * be placed between token in the string returned.
-	 */
-	inline std::string assemble( const size_type& beginIndex ) const
-	{
-	assert( validSubscript( beginIndex ) ) ;
-	if( myVector.empty() )
-		{
-		return std::string() ;
-		}
-	std::string retMe( "" ) ;
-	for( vectorType::size_type i = beginIndex ;
-		i < myVector.size() ; ++i )
-		{
-		retMe += myVector[ i ] ;
-		if( (i + 1) < myVector.size() )
-			{
-			retMe += ' ' ;
-			}
-		}
-	return retMe ;
-	}
+    /**
+     * A simple operator to output an xParameters object to
+     * an ELog stream.
+     */
+    friend ELog& operator<<(ELog& out, const xParameters& param) {
+        // Iterate through to each element
+        for (size_type i = 0; i < param.size(); ++i) {
+            // Place this element into the ELog stream
+            out << param[i];
 
-	/**
-	 * A simple operator to output an xParameters object to
-	 * an ELog stream.
-	 */
-	friend ELog& operator<<( ELog& out, const xParameters& param )
-		{
-		// Iterate through to each element
-		for( size_type i = 0 ; i < param.size() ; ++i )
-			{
-			// Place this element into the ELog stream
-			out	<< param[ i ] ;
+            // If there is at least one more token left,
+            // place a space character into the stream
+            if ((i + 1) < param.size()) {
+                out << ' ';
+            }
+        }
+        // Return the ELog stream so that it may be used
+        // for further pipelining of output
+        return out;
+    }
 
-			// If there is at least one more token left,
-			// place a space character into the stream
-			if( (i + 1) < param.size() )
-				{
-				out	<< ' ' ;
-				}
-			}
-		// Return the ELog stream so that it may be used
-		// for further pipelining of output
-		return out ;
-		}
+  protected:
+    /**
+     * Disable copy constructing.
+     * This method is declared, but NOT defined.
+     */
+    xParameters(const xParameters&);
 
-protected:
+    /**
+     * Disable default assignment.
+     * This method is declared but NOT defined.
+     */
+    xParameters operator=(const xParameters&);
 
-	/**
-	 * Disable copy constructing.
-	 * This method is declared, but NOT defined.
-	 */
-	xParameters( const xParameters& ) ;
-
-	/**
-	 * Disable default assignment.
-	 * This method is declared but NOT defined.
-	 */
-	xParameters operator=( const xParameters& ) ;
-
-	/**
-	 * This is the structure used to store tokens internally.
-	 */
-	vectorType      myVector ;
-
-} ;
+    /**
+     * This is the structure used to store tokens internally.
+     */
+    vectorType myVector;
+};
 
 } // namespace gnuworld
 

@@ -1,7 +1,7 @@
 /**
  * csGline.cc
  * Gline class
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,212 +19,155 @@
  *
  */
 
-#include	<sstream>
-#include	<string> 
+#include <sstream>
+#include <string>
 
-#include	<ctime>
-#include	<cstring> 
-#include	<cstdlib>
+#include <ctime>
+#include <cstring>
+#include <cstdlib>
 
-#include	"dbHandle.h"
-#include	"ELog.h"
-#include	"misc.h"
-#include	"csGline.h" 
-#include	"cservice.h"
-#include	"gnuworld_config.h"
+#include "dbHandle.h"
+#include "ELog.h"
+#include "misc.h"
+#include "csGline.h"
+#include "cservice.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ; 
-using std::endl ; 
-using std::stringstream ;
-using std::ends ;
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
 
 unsigned int csGline::numAllocated = 0;
 
 csGline::csGline(cservice* _bot)
- : Id(),
-   AddedBy(),
-   AddedOn( 0 ),
-   Expires( 0 ),
-   LastUpdated( 0 ),
-   Reason(),
-   logger(_bot->getLogger()),
-   SQLDb(_bot->SQLDb)
-{
-++numAllocated;
+    : Id(), AddedBy(), AddedOn(0), Expires(0), LastUpdated(0), Reason(), logger(_bot->getLogger()),
+      SQLDb(_bot->SQLDb) {
+    ++numAllocated;
 }
 
-csGline::~csGline()
-{
---numAllocated;
+csGline::~csGline() { --numAllocated; }
+
+bool csGline::Insert() {
+    // First we gotta make sure, there is no old gline in the database
+    static const char* Del = "DELETE FROM glines WHERE lower(host) = '";
+
+    stringstream delQuery;
+    delQuery << Del << escapeSQLChars(string_lower(Host)) << "'" << ends;
+
+    if (!SQLDb->Exec(delQuery)) {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
+
+    // Now insert the new one
+    static const char* Main =
+        "INSERT INTO Glines (Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason) VALUES ('";
+
+    stringstream theQuery;
+    theQuery << Main << escapeSQLChars(Host) << "','" << escapeSQLChars(AddedBy) << "'," << AddedOn
+             << "," << Expires << "," << LastUpdated << ",'" << escapeSQLChars(Reason) << "')"
+             << ends;
+
+    if (SQLDb->Exec(theQuery)) {
+        return true;
+    } else {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
 }
 
-bool csGline::Insert()
-{
-//First we gotta make sure, there is no old gline in the database
-static const char *Del = "DELETE FROM glines WHERE lower(host) = '";
+bool csGline::Update() {
+    if (atoi(Id.c_str()) == -1) // saveGlines was false when this gline was added
+    {
+        return true;
+    }
+    static const char* Main = "UPDATE Glines SET Id = '";
 
-stringstream delQuery;
-delQuery	<< Del
-		<< escapeSQLChars(string_lower(Host)) << "'"
-		<< ends;
+    stringstream theQuery;
+    theQuery << Main << Id << "', Host = '" << escapeSQLChars(Host) << "', AddedBy = '"
+             << escapeSQLChars(AddedBy) << "', AddedOn = " << AddedOn << ",ExpiresAt = " << Expires
+             << ",LastUpdated = " << LastUpdated << ",Reason = '" << escapeSQLChars(Reason) << "'"
+             << " WHERE Id = " << Id << ends;
 
-
-if( !SQLDb->Exec( delQuery ) )
-	{
-	LOGSQL_ERROR( SQLDb ) ;
-	return false;
-	}
-
-//Now insert the new one
-static const char *Main = "INSERT INTO Glines (Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason) VALUES ('";
-
-stringstream theQuery;
-theQuery	<< Main
-		<< escapeSQLChars(Host) << "','"
-		<< escapeSQLChars(AddedBy) << "',"
-		<< AddedOn << ","
-		<< Expires << ","
-		<< LastUpdated << ",'"
-		<< escapeSQLChars(Reason) << "')"
-		<< ends;
-
-if( SQLDb->Exec( theQuery ) )
-	{
-	return true;
-	}
-else
-	{
-	LOGSQL_ERROR( SQLDb ) ;
-	return false;
-	}
-
+    if (SQLDb->Exec(theQuery)) {
+        return true;
+    } else {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
 }
 
-bool csGline::Update()
-{
-if(atoi(Id.c_str()) == -1) //saveGlines was false when this gline was added
-	{
-	return true;
-	} 
-static const char *Main = "UPDATE Glines SET Id = '";
+bool csGline::loadData(int GlineId) {
+    static const char* Main =
+        "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Id = ";
 
-stringstream theQuery;
-theQuery	<< Main
-		<< Id
-		<< "', Host = '"
-		<< escapeSQLChars(Host)
-		<< "', AddedBy = '"
-		<< escapeSQLChars(AddedBy)
-		<< "', AddedOn = "
-		<< AddedOn
-		<< ",ExpiresAt = "
-		<< Expires
-		<< ",LastUpdated = "
-		<< LastUpdated
-		<<  ",Reason = '"
-		<< escapeSQLChars(Reason) << "'"
-		<< " WHERE Id = " << Id
-		<<  ends;
+    stringstream theQuery;
+    theQuery << Main << GlineId << ends;
 
-if( SQLDb->Exec( theQuery ) )
-	{
-	return true;
-	}
-else
-	{
-	LOGSQL_ERROR( SQLDb ) ;
-	return false;
-	}
+    if (!SQLDb->Exec(theQuery, true)) {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
+
+    if (SQLDb->Tuples() < 6)
+        return false;
+    Id = SQLDb->GetValue(0, 0);
+    Host = SQLDb->GetValue(0, 1);
+    AddedBy = SQLDb->GetValue(0, 2);
+    AddedOn = static_cast<time_t>(unsigned(atoi(SQLDb->GetValue(0, 3).c_str())));
+    Expires = static_cast<time_t>(unsigned(atoi(SQLDb->GetValue(0, 4).c_str())));
+    LastUpdated = static_cast<time_t>(unsigned(atoi(SQLDb->GetValue(0, 5).c_str())));
+    Reason = SQLDb->GetValue(0, 6);
+
+    return true;
 }
 
-bool csGline::loadData(int GlineId)
-{
-static const char *Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Id = ";
+bool csGline::loadData(const string& HostName) {
+    static const char* Main =
+        "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Host = '";
 
-stringstream theQuery;
-theQuery	<< Main
-		<< GlineId
-		<< ends;
+    stringstream theQuery;
+    theQuery << Main << escapeSQLChars(HostName.c_str()) << "'" << ends;
 
-if( !SQLDb->Exec( theQuery, true ) )
-	{
-	LOGSQL_ERROR( SQLDb ) ;
-	return false ;
-	}
+    if (!SQLDb->Exec(theQuery, true)) {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
 
-if(SQLDb->Tuples() < 6)
-    return false;
-Id = SQLDb->GetValue(0,0);
-Host = SQLDb->GetValue(0,1);
-AddedBy = SQLDb->GetValue(0,2) ;
-AddedOn = static_cast< time_t >( unsigned(
-	atoi( SQLDb->GetValue(0,3).c_str() ) )) ;
-Expires = static_cast< time_t >( unsigned(
-	atoi( SQLDb->GetValue(0,4).c_str() ) )) ;
-LastUpdated = static_cast< time_t >( unsigned(
-	atoi( SQLDb->GetValue(0,5).c_str() ) )) ;
-Reason = SQLDb->GetValue(0,6);
+    if (SQLDb->Tuples() == 0) // If no gline was found
+        return false;
+    Id = SQLDb->GetValue(0, 0);
+    Host = SQLDb->GetValue(0, 1);
+    AddedBy = SQLDb->GetValue(0, 2);
+    AddedOn = static_cast<time_t>(atoi(SQLDb->GetValue(0, 3).c_str()));
+    Expires = static_cast<time_t>(atoi(SQLDb->GetValue(0, 4).c_str()));
+    LastUpdated = static_cast<time_t>(atoi(SQLDb->GetValue(0, 5).c_str()));
+    Reason = SQLDb->GetValue(0, 6);
 
-return true;
+    return true;
 }
 
-bool csGline::loadData( const string & HostName)
-{
-static const char *Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Host = '";
+bool csGline::Delete() {
+    if (atoi(Id.c_str()) == -1) // saveGlines was false when this gline was added
+    {
+        return true;
+    }
 
-stringstream theQuery;
-theQuery	<< Main
-		<< escapeSQLChars(HostName.c_str())
-		<< "'" << ends;
+    static const char* Main = "DELETE FROM glines WHERE Id = ";
 
-if( !SQLDb->Exec( theQuery, true ) )
-	{
-	LOGSQL_ERROR( SQLDb ) ;
-	return false;
-	}
+    stringstream theQuery;
+    theQuery << Main << Id << ends;
 
-
-if(SQLDb->Tuples() == 0) //If no gline was found
-	return false;
-Id = SQLDb->GetValue(0,0);
-Host = SQLDb->GetValue(0,1);
-AddedBy = SQLDb->GetValue(0,2) ;
-AddedOn = static_cast< time_t >( atoi( SQLDb->GetValue(0,3).c_str() ) ) ;
-Expires = static_cast< time_t >( atoi( SQLDb->GetValue(0,4).c_str() ) ) ;
-LastUpdated = static_cast< time_t >( atoi( SQLDb->GetValue(0,5).c_str() ) ) ;
-Reason = SQLDb->GetValue(0,6);
-
-return true;
+    if (SQLDb->Exec(theQuery)) {
+        return true;
+    } else {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
+    return true;
 }
 
-bool csGline::Delete()
-{
-if(atoi(Id.c_str()) == -1) //saveGlines was false when this gline was added
-	{
-	return true;
-	} 
-
-static const char *Main = "DELETE FROM glines WHERE Id = ";
-
-stringstream theQuery;
-theQuery	<< Main
-		<< Id
-		<< ends;
-
-if( SQLDb->Exec( theQuery ) )
-	{
-	return true;
-	}
-else
-	{
-	LOGSQL_ERROR( SQLDb ) ;
-	return false ;
-	}
-return true;
-}
-
-
-} //Namespace Gnuworld
+} // namespace gnuworld

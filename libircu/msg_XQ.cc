@@ -20,24 +20,23 @@
  * $Id: msg_XQ.cc,v 1.1 2010/08/31 21:16:46 denspike Exp $
  */
 
-#include	<string>
-#include	<iostream>
+#include <string>
+#include <iostream>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"Network.h"
-#include	"iClient.h"
-#include	"client.h"
-#include	"ELog.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
-#include	"StringTokenizer.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "Network.h"
+#include "iClient.h"
+#include "client.h"
+#include "ELog.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
+#include "StringTokenizer.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::endl ;
+using std::endl;
+using std::string;
 
 CREATE_HANDLER(msg_XQ)
 
@@ -49,71 +48,59 @@ CREATE_HANDLER(msg_XQ)
  * <target>: Our servernumeric
  * <routing>: Token to supply in XR
  * <query>: Message, can be spaced
- * 
+ *
  * [IN ]: ABAAA XQ Az tokengoeshere :message goes here :)
  */
-bool msg_XQ::Execute( const xParameters& Param )
-{
-if( Param.size() < 4 )
-	{
-	elog	<< "msg_XQ> Invalid number of arguments"
-		<< endl ;
-	return false ;
-	}
+bool msg_XQ::Execute(const xParameters& Param) {
+    if (Param.size() < 4) {
+        elog << "msg_XQ> Invalid number of arguments" << endl;
+        return false;
+    }
 
-iServer* serverSource = 0 ;
-iClient* clientSource = 0 ;
+    iServer* serverSource = 0;
+    iClient* clientSource = 0;
 
-if( strlen( Param[ 0 ] ) >= 3 )
-        {
-        clientSource = Network->findClient( Param[ 0 ] ) ;
-	//This is an oper debugging, treat messages as originated from his server
-	serverSource = Network->findServer(clientSource->getIntYY());
-        }
-else
-        {
-        serverSource = Network->findServer( Param[ 0 ] ) ;
-        }
+    if (strlen(Param[0]) >= 3) {
+        clientSource = Network->findClient(Param[0]);
+        // This is an oper debugging, treat messages as originated from his server
+        serverSource = Network->findServer(clientSource->getIntYY());
+    } else {
+        serverSource = Network->findServer(Param[0]);
+    }
 
-if( (NULL == clientSource) && (NULL == serverSource) )
-        {
-        elog    << "msg_XQ> Unable to find source: "
-                << Param[ 0 ]
-                << endl ;
-        return false ;
-        }
+    if ((NULL == clientSource) && (NULL == serverSource)) {
+        elog << "msg_XQ> Unable to find source: " << Param[0] << endl;
+        return false;
+    }
 
-if (Network->findServer(Param[ 1 ]) != theServer->getMe())
-	{
-	//Should we do something here?
-        elog    << "msg_XQ> Received XQ not meant for us but for: "
-                << Param[ 1 ]
-                << endl ;
-        return false ;
-        }
+    if (Network->findServer(Param[1]) != theServer->getMe()) {
+        // Should we do something here?
+        elog << "msg_XQ> Received XQ not meant for us but for: " << Param[1] << endl;
+        return false;
+    }
 
-/*
-elog 	<< "msg_XQ> Received, from: "
-	<< Param[ 0 ] << " To: "
-	<< Param[ 1 ] << " Token: "
-	<< Param[ 2 ] << " Message: "
-	<< Param[ 3 ]
-	<< endl;
-*/
+    /*
+    elog 	<< "msg_XQ> Received, from: "
+            << Param[ 0 ] << " To: "
+            << Param[ 1 ] << " Token: "
+            << Param[ 2 ] << " Message: "
+            << Param[ 3 ]
+            << endl;
+    */
 
-string Routing( Param[2] );
-string Message( Param[3] );
+    string Routing(Param[2]);
+    string Message(Param[3]);
 
-theServer->OnXQuery(serverSource, Routing, Message);
-//string Routing = Param[2];
-//string Message = Param[3];
-//elog << "STRINGS:: " << Routing << " " << Message << endl;
+    theServer->OnXQuery(serverSource, Routing, Message);
+    // string Routing = Param[2];
+    // string Message = Param[3];
+    // elog << "STRINGS:: " << Routing << " " << Message << endl;
 
-//theServer->PostEvent( EVT_XQUERY,
-//	static_cast< void* >( serverSource ),
-//	reinterpret_cast< void* > ( &Routing ), reinterpret_cast< void* >( &Message ));
+    // theServer->PostEvent( EVT_XQUERY,
+    //	static_cast< void* >( serverSource ),
+    //	reinterpret_cast< void* > ( &Routing ), reinterpret_cast< void* >( &Message ));
 
-return true;
+    return true;
 } // msg_XQ
 
 } // namespace gnuworld

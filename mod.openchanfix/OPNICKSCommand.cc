@@ -29,74 +29,73 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void OPNICKSCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void OPNICKSCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-Channel* netChan = Network->findChannel(st[1]);
-if (!netChan) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_such_channel,
-                              std::string("No such channel %s.")).c_str(), st[1].c_str());
-  return;
-}
-
-/* Send list of opped clients. */
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::opped_clients_on,
-                            std::string("Opped clients on channel %s:")).c_str(),
-                                        netChan->getName().c_str());
-
-ChannelUser* curUser;
-std::string oppedUsers;
-unsigned int numOppedUsers = 0;
-for (Channel::userIterator ptr = netChan->userList_begin(); ptr != netChan->userList_end(); ptr++) {
-  curUser = ptr->second;
-  if (curUser->isModeO()) {
-    if ((oppedUsers.size() + std::string(curUser->getNickName().c_str()).size() + 1) >= 450) {
-      bot->SendTo(theClient, "%s", oppedUsers.c_str());
-      oppedUsers.erase(oppedUsers.begin(), oppedUsers.end());
+    Channel* netChan = Network->findChannel(st[1]);
+    if (!netChan) {
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::no_such_channel, std::string("No such channel %s."))
+                .c_str(),
+            st[1].c_str());
+        return;
     }
-    if (numOppedUsers++ && !oppedUsers.empty())
-      oppedUsers += " ";
-    oppedUsers += curUser->getNickName();
-  }
-}
 
-if (numOppedUsers)
-  bot->SendTo(theClient, "%s", oppedUsers.c_str());
+    /* Send list of opped clients. */
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::opped_clients_on,
+                                 std::string("Opped clients on channel %s:"))
+                    .c_str(),
+                netChan->getName().c_str());
 
-if (numOppedUsers == 1)
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::one_opped_client,
-                              std::string("I see 1 opped client in %s.")).c_str(),
-                                          netChan->getName().c_str());
-else
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::opped_clients,
-                              std::string("I see %u opped clients in %s.")).c_str(),
-                                          numOppedUsers, netChan->getName().c_str());
+    ChannelUser* curUser;
+    std::string oppedUsers;
+    unsigned int numOppedUsers = 0;
+    for (Channel::userIterator ptr = netChan->userList_begin(); ptr != netChan->userList_end();
+         ptr++) {
+        curUser = ptr->second;
+        if (curUser->isModeO()) {
+            if ((oppedUsers.size() + std::string(curUser->getNickName().c_str()).size() + 1) >=
+                450) {
+                bot->SendTo(theClient, "%s", oppedUsers.c_str());
+                oppedUsers.erase(oppedUsers.begin(), oppedUsers.end());
+            }
+            if (numOppedUsers++ && !oppedUsers.empty())
+                oppedUsers += " ";
+            oppedUsers += curUser->getNickName();
+        }
+    }
 
-/* Log command */
-/* ... */
+    if (numOppedUsers)
+        bot->SendTo(theClient, "%s", oppedUsers.c_str());
 
-bot->logAdminMessage("%s (%s) OPNICKS %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     netChan->getName().c_str());
+    if (numOppedUsers == 1)
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::one_opped_client,
+                                     std::string("I see 1 opped client in %s."))
+                        .c_str(),
+                    netChan->getName().c_str());
+    else
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::opped_clients,
+                                     std::string("I see %u opped clients in %s."))
+                        .c_str(),
+                    numOppedUsers, netChan->getName().c_str());
 
-bot->logLastComMessage(theClient, Message);
+    /* Log command */
+    /* ... */
 
-return;
+    bot->logAdminMessage("%s (%s) OPNICKS %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), netChan->getName().c_str());
+
+    bot->logLastComMessage(theClient, Message);
+
+    return;
 }
 
 } // namespace cf

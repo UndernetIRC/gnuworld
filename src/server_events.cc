@@ -26,52 +26,48 @@
  * $Id: server_events.cc,v 1.3 2005/09/29 17:40:06 kewlio Exp $
  */
 
-#include	<new>
-#include	<string>
-#include	<list>
-#include	<stack>
-#include	<iostream>
+#include <new>
+#include <string>
+#include <list>
+#include <stack>
+#include <iostream>
 
-#include	<csignal>
+#include <csignal>
 
-#include	"server.h"
-#include	"Network.h"
-#include	"iClient.h"
-#include	"ELog.h"
+#include "server.h"
+#include "Network.h"
+#include "iClient.h"
+#include "ELog.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::list ;
-using std::endl ;
-using std::stack ;
-using std::string ;
+using std::endl;
+using std::list;
+using std::stack;
+using std::string;
 
 /**
  * This method will register the given xClient to receive
  * all events of the given type.
  * Available events are listed in include/events.h
  */
-bool xServer::RegisterEvent( const eventType& theEvent,
-	xClient* theClient )
-{
-assert( theClient != NULL ) ;
+bool xServer::RegisterEvent(const eventType& theEvent, xClient* theClient) {
+    assert(theClient != NULL);
 
-// Make sure that the given event is valid
-// (in the interval of possible events).
-if( !validEvent( theEvent ) )
-	{
-	return false ;
-	}
+    // Make sure that the given event is valid
+    // (in the interval of possible events).
+    if (!validEvent(theEvent)) {
+        return false;
+    }
 
-// Make sure not to add a client more than once
-UnRegisterEvent( theEvent, theClient ) ;
+    // Make sure not to add a client more than once
+    UnRegisterEvent(theEvent, theClient);
 
-// Add this client as listener for this event
-eventList[ theEvent ].push_back( theClient ) ;
+    // Add this client as listener for this event
+    eventList[theEvent].push_back(theClient);
 
-// Registration succeeded
-return true ;
+    // Registration succeeded
+    return true;
 }
 
 /**
@@ -79,30 +75,26 @@ return true ;
  * channel event that occurs in channel chanName, case
  * insensitive.
  */
-bool xServer::RegisterChannelEvent( const string& chanName,
-	xClient* theClient )
-{
-assert( theClient != NULL ) ;
+bool xServer::RegisterChannelEvent(const string& chanName, xClient* theClient) {
+    assert(theClient != NULL);
 
-// Prevent duplicates of the same channel/client pair
-UnRegisterChannelEvent( chanName, theClient ) ;
+    // Prevent duplicates of the same channel/client pair
+    UnRegisterChannelEvent(chanName, theClient);
 
-// Obtain a pointer to the list of xClient's registered for events
-// on the given channel.
-channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// Channel event list doesn't exist yet
-	channelEventMap.insert( channelEventMapType::value_type( chanName,
-		new list< xClient* > ) ) ;
-	chanPtr = channelEventMap.find( chanName ) ;
-	}
+    // Obtain a pointer to the list of xClient's registered for events
+    // on the given channel.
+    channelEventMapType::iterator chanPtr = channelEventMap.find(chanName);
+    if (chanPtr == channelEventMap.end()) {
+        // Channel event list doesn't exist yet
+        channelEventMap.insert(channelEventMapType::value_type(chanName, new list<xClient*>));
+        chanPtr = channelEventMap.find(chanName);
+    }
 
-// Add the xClient as a listener for events in this channel.
-chanPtr->second->push_back( theClient ) ;
+    // Add the xClient as a listener for events in this channel.
+    chanPtr->second->push_back(theClient);
 
-// Addition successful
-return true ;
+    // Addition successful
+    return true;
 }
 
 /**
@@ -112,82 +104,70 @@ return true ;
  * the xClient is not found as being registered for
  * event theEvent.
  */
-bool xServer::UnRegisterEvent( const eventType& theEvent, xClient* theClient )
-{
-assert( theClient != NULL ) ;
+bool xServer::UnRegisterEvent(const eventType& theEvent, xClient* theClient) {
+    assert(theClient != NULL);
 
-// Make sure this is a valid event.
-if( !validEvent( theEvent ) )
-	{
-	return false ;
-	}
+    // Make sure this is a valid event.
+    if (!validEvent(theEvent)) {
+        return false;
+    }
 
-// Iterate through the list of registered listeners for
-// this event and attempt to find the xClient wishing to be removed.
-//
-list< xClient* >::iterator ptr =	eventList[ theEvent ].begin(),
-					end = eventList[ theEvent ].end() ;
+    // Iterate through the list of registered listeners for
+    // this event and attempt to find the xClient wishing to be removed.
+    //
+    list<xClient*>::iterator ptr = eventList[theEvent].begin(), end = eventList[theEvent].end();
 
-// Continue until we find the xClient.
-// Since each xClient may only be registered for any given
-// we may return as soon as we find the client.
-while( ptr != end )
-	{
-	// Is this the one?
-	if( (*ptr) == theClient )
-		{
-		// Yup, remove it and return true
-		eventList[ theEvent ].erase( ptr ) ;
-		return true ;
-		}
-	++ptr ;
-	}
+    // Continue until we find the xClient.
+    // Since each xClient may only be registered for any given
+    // we may return as soon as we find the client.
+    while (ptr != end) {
+        // Is this the one?
+        if ((*ptr) == theClient) {
+            // Yup, remove it and return true
+            eventList[theEvent].erase(ptr);
+            return true;
+        }
+        ++ptr;
+    }
 
-// Unable to find the client in the list of registered
-// listeners for this event. *shrug*
-return false ;
+    // Unable to find the client in the list of registered
+    // listeners for this event. *shrug*
+    return false;
 }
 
 /**
  * This method will stop the given xClient from receiving any
  * events in the channel chanName, case insensitive.
  */
-bool xServer::UnRegisterChannelEvent( const string& chanName,
-	xClient* theClient )
-{
-assert( theClient != NULL ) ;
+bool xServer::UnRegisterChannelEvent(const string& chanName, xClient* theClient) {
+    assert(theClient != NULL);
 
-channelEventMapType::iterator chanPtr = channelEventMap.find( chanName ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// Channel has no xClient's registered for channel events
-	// No big deal.
-	return true ;
-	}
+    channelEventMapType::iterator chanPtr = channelEventMap.find(chanName);
+    if (chanPtr == channelEventMap.end()) {
+        // Channel has no xClient's registered for channel events
+        // No big deal.
+        return true;
+    }
 
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	if( *ptr == theClient )
-		{
-		listPtr->erase( ptr ) ;
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        if (*ptr == theClient) {
+            listPtr->erase(ptr);
 
-		// Are there any listeners remaining for this channel?
-		if( listPtr->empty() )
-			{
-			// Nope, remove the listener list from the
-			// channelEventMap and deallocat the list.
-			channelEventMap.erase( chanName ) ;
-			delete listPtr ;
-			}
+            // Are there any listeners remaining for this channel?
+            if (listPtr->empty()) {
+                // Nope, remove the listener list from the
+                // channelEventMap and deallocat the list.
+                channelEventMap.erase(chanName);
+                delete listPtr;
+            }
 
-		return true ;
-		}
-	}
+            return true;
+        }
+    }
 
-// Unable to find the key/xClient pair.
-return false ;
+    // Unable to find the key/xClient pair.
+    return false;
 }
 
 /**
@@ -197,34 +177,25 @@ return false ;
  * Events are not guaranteed to be distributed in any
  * particular order.
  */
-void xServer::PostEvent( const eventType& theEvent,
-	void* Data1, void* Data2,
-	void* Data3, void* Data4,
-	const xClient* excludeMe )
-{
-// Make sure the event is valid.
-if( !validEvent( theEvent ) )
-	{
-	elog	<< "xServer::PostEvent> Invalid event number: "
-		<< theEvent
-		<< endl ;
-	return ;
-	}
+void xServer::PostEvent(const eventType& theEvent, void* Data1, void* Data2, void* Data3,
+                        void* Data4, const xClient* excludeMe) {
+    // Make sure the event is valid.
+    if (!validEvent(theEvent)) {
+        elog << "xServer::PostEvent> Invalid event number: " << theEvent << endl;
+        return;
+    }
 
-// Iterate through the list of listeners for this event.
-list< xClient* >::iterator ptr = eventList[ theEvent ].begin(),
-	end = eventList[ theEvent ].end() ;
+    // Iterate through the list of listeners for this event.
+    list<xClient*>::iterator ptr = eventList[theEvent].begin(), end = eventList[theEvent].end();
 
-// Continue while there are more listeners for this event.
-for( ; ptr != end ; ++ptr )
-	{
-	// Notify this client of the event
-	// if he didnt cause the event to trigger
-	if( (*ptr) != excludeMe )
-		{
-		(*ptr)->OnEvent( theEvent, Data1, Data2, Data3, Data4 ) ;
-		}
-	}
+    // Continue while there are more listeners for this event.
+    for (; ptr != end; ++ptr) {
+        // Notify this client of the event
+        // if he didnt cause the event to trigger
+        if ((*ptr) != excludeMe) {
+            (*ptr)->OnEvent(theEvent, Data1, Data2, Data3, Data4);
+        }
+    }
 }
 
 /**
@@ -234,153 +205,120 @@ for( ; ptr != end ; ++ptr )
  * Events are not guaranteed to be distributed in any
  *  particular order.
  */
-void xServer::PostChannelEvent( const channelEventType& theEvent,
-	Channel* theChan,
-	void* Data1, void* Data2,
-	void* Data3, void* Data4 )
-{
-assert( theChan != 0 ) ;
-string channelName = theChan->getName();
+void xServer::PostChannelEvent(const channelEventType& theEvent, Channel* theChan, void* Data1,
+                               void* Data2, void* Data3, void* Data4) {
+    assert(theChan != 0);
+    string channelName = theChan->getName();
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelEvent( theEvent, theChan,
-			Data1, Data2, Data3, Data4 ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelEvent(theEvent, theChan, Data1, Data2, Data3, Data4);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find(channelName) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(channelName);
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-/* 2024-01-05 (by Hidden): It is possible that the channel was destroyed (only one user in the channel
- * was kicked or killed by the service right after the creation of the channel in the above onChannelEvent()).
- * We have to make sure theChan is still valid.
- */
-Channel *theChan2 = Network->findChannel(channelName.c_str());
-if (!theChan2) {
-	channelEventMap.erase(chanPtr);
-	return;
-}
+    /* 2024-01-05 (by Hidden): It is possible that the channel was destroyed (only one user in the
+     * channel was kicked or killed by the service right after the creation of the channel in the
+     * above onChannelEvent()). We have to make sure theChan is still valid.
+     */
+    Channel* theChan2 = Network->findChannel(channelName.c_str());
+    if (!theChan2) {
+        channelEventMap.erase(chanPtr);
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelEvent( theEvent, theChan,
-		Data1, Data2, Data3, Data4 ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelEvent(theEvent, theChan, Data1, Data2, Data3, Data4);
+    }
 }
 
 // srcClient may be NULL, when the source is a server
-void xServer::PostChannelKick( Channel* theChan,
-	iClient* srcClient,
-	iClient* destClient,
-	const string& kickMessage,
-	bool authoritative )
-{
-// Public method, verify arguments
-assert( theChan != 0 ) ;
-assert( destClient != 0 ) ;
+void xServer::PostChannelKick(Channel* theChan, iClient* srcClient, iClient* destClient,
+                              const string& kickMessage, bool authoritative) {
+    // Public method, verify arguments
+    assert(theChan != 0);
+    assert(destClient != 0);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnNetworkKick( theChan,
-			srcClient,
-			destClient,
-			kickMessage,
-			authoritative ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnNetworkKick(theChan, srcClient, destClient, kickMessage, authoritative);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnNetworkKick( theChan,
-		srcClient,
-		destClient,
-		kickMessage,
-		authoritative ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnNetworkKick(theChan, srcClient, destClient, kickMessage, authoritative);
+    }
 }
 
-bool xServer::PostSignal( int whichSig )
-{
-// First, notify the server signal handler
-bool handledSignal = OnSignal( whichSig ) ;
+bool xServer::PostSignal(int whichSig) {
+    // First, notify the server signal handler
+    bool handledSignal = OnSignal(whichSig);
 
-// Pass this signal on to each xClient.
-xNetwork::localClientIterator ptr = Network->localClient_begin() ;
-for( ; ptr != Network->localClient_end() ; ++ptr )
-	{
-//	if( NULL == *ptr )
-//		{
-//		continue ;
-//		}
-	ptr->second->OnSignal( whichSig ) ;
-	}
+    // Pass this signal on to each xClient.
+    xNetwork::localClientIterator ptr = Network->localClient_begin();
+    for (; ptr != Network->localClient_end(); ++ptr) {
+        //	if( NULL == *ptr )
+        //		{
+        //		continue ;
+        //		}
+        ptr->second->OnSignal(whichSig);
+    }
 
-return handledSignal ;
+    return handledSignal;
 }
 
-bool xServer::OnSignal( int whichSig )
-{
-bool retMe = false ;
-switch( whichSig )
-	{
-	case SIGUSR1:
-		dumpStats() ;
-		retMe = true ;
-		break ;
-	case SIGHUP:
-		rotateLogs() ;
-		retMe = true ;
-		break ;
-	case SIGUSR2:
-		retMe = true;
-		break ;
-	case SIGINT:
-	case SIGTERM:
-		Shutdown() ;
-		retMe = true ;
-		break ;
-	default:
-		break ;
-	}
-return retMe ;
+bool xServer::OnSignal(int whichSig) {
+    bool retMe = false;
+    switch (whichSig) {
+    case SIGUSR1:
+        dumpStats();
+        retMe = true;
+        break;
+    case SIGHUP:
+        rotateLogs();
+        retMe = true;
+        break;
+    case SIGUSR2:
+        retMe = true;
+        break;
+    case SIGINT:
+    case SIGTERM:
+        Shutdown();
+        retMe = true;
+        break;
+    default:
+        break;
+    }
+    return retMe;
 }
 
 // Handle a channel mode change
@@ -390,41 +328,34 @@ return retMe ;
 // modeVector contains pairs of bool (polarity) and Channel::modeType
 // (which mode).
 // This method is invoked only for simple (no argument) modes.
-void xServer::OnChannelMode( Channel* theChan, ChannelUser* sourceUser,
-	const xServer::modeVectorType& modeVector )
-{
-theChan->onMode( modeVector ) ;
+void xServer::OnChannelMode(Channel* theChan, ChannelUser* sourceUser,
+                            const xServer::modeVectorType& modeVector) {
+    theChan->onMode(modeVector);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelMode( theChan, sourceUser, modeVector ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelMode(theChan, sourceUser, modeVector);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelMode( theChan, sourceUser, modeVector ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelMode(theChan, sourceUser, modeVector);
+    }
 }
 
 // Handle a channel mode change
@@ -432,42 +363,34 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::OnChannelModeL( Channel* theChan, bool polarity,
-	ChannelUser* sourceUser, unsigned int limit )
-{
-theChan->onModeL( polarity, limit ) ;
+void xServer::OnChannelModeL(Channel* theChan, bool polarity, ChannelUser* sourceUser,
+                             unsigned int limit) {
+    theChan->onModeL(polarity, limit);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelModeL( theChan, polarity,
-			sourceUser, limit ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelModeL(theChan, polarity, sourceUser, limit);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelModeL( theChan, polarity, sourceUser, limit ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelModeL(theChan, polarity, sourceUser, limit);
+    }
 }
 
 // Handle a channel mode change
@@ -475,42 +398,34 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::OnChannelModeK( Channel* theChan, bool polarity,
-	ChannelUser* sourceUser, const string& key )
-{
-theChan->onModeK( polarity, key ) ;
+void xServer::OnChannelModeK(Channel* theChan, bool polarity, ChannelUser* sourceUser,
+                             const string& key) {
+    theChan->onModeK(polarity, key);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelModeK( theChan, polarity,
-			sourceUser, key ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelModeK(theChan, polarity, sourceUser, key);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelModeK( theChan, polarity, sourceUser, key ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelModeK(theChan, polarity, sourceUser, key);
+    }
 }
 
 // Handle a channel mode change
@@ -518,42 +433,34 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::OnChannelModeA( Channel* theChan, bool polarity,
-	ChannelUser* sourceUser, const string& Apass )
-{
-theChan->onModeA( polarity, Apass ) ;
+void xServer::OnChannelModeA(Channel* theChan, bool polarity, ChannelUser* sourceUser,
+                             const string& Apass) {
+    theChan->onModeA(polarity, Apass);
 
-// First delivery this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelModeA( theChan, polarity,
-			sourceUser, Apass ) ;
-		}
-	}
+    // First delivery this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelModeA(theChan, polarity, sourceUser, Apass);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners fort his channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ ptr )
-	{
-	(*ptr)->OnChannelModeA( theChan, polarity, sourceUser, Apass ) ;
-	}
+    // Iterate through the listeners fort his channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelModeA(theChan, polarity, sourceUser, Apass);
+    }
 }
 
 // Handle a channel mode change
@@ -561,42 +468,34 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::OnChannelModeU( Channel* theChan, bool polarity,
-	ChannelUser* sourceUser, const string& Upass )
-{
-theChan->onModeU( polarity, Upass ) ;
+void xServer::OnChannelModeU(Channel* theChan, bool polarity, ChannelUser* sourceUser,
+                             const string& Upass) {
+    theChan->onModeU(polarity, Upass);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelModeU( theChan, polarity,
-			sourceUser, Upass ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelModeU(theChan, polarity, sourceUser, Upass);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listenersfor this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelModeU( theChan, polarity, sourceUser, Upass ) ;
-	}
+    // Iterate through the listenersfor this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelModeU(theChan, polarity, sourceUser, Upass);
+    }
 }
 
 // Handle a channel mode change
@@ -604,41 +503,34 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::OnChannelModeO( Channel* theChan, ChannelUser* sourceUser,
-	const xServer::opVectorType& opVector )
-{
-theChan->onModeO( opVector ) ;
+void xServer::OnChannelModeO(Channel* theChan, ChannelUser* sourceUser,
+                             const xServer::opVectorType& opVector) {
+    theChan->onModeO(opVector);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelModeO( theChan, sourceUser, opVector ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelModeO(theChan, sourceUser, opVector);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelModeO( theChan, sourceUser, opVector ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelModeO(theChan, sourceUser, opVector);
+    }
 }
 
 // Handle a channel mode change
@@ -646,42 +538,34 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::OnChannelModeV( Channel* theChan, ChannelUser* sourceUser,
-	const xServer::voiceVectorType& voiceVector )
-{
-theChan->onModeV( voiceVector ) ;
+void xServer::OnChannelModeV(Channel* theChan, ChannelUser* sourceUser,
+                             const xServer::voiceVectorType& voiceVector) {
+    theChan->onModeV(voiceVector);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelModeV( theChan, sourceUser,
-			voiceVector ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelModeV(theChan, sourceUser, voiceVector);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelModeV( theChan, sourceUser, voiceVector ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelModeV(theChan, sourceUser, voiceVector);
+    }
 }
 
 // Handle a channel mode change
@@ -689,45 +573,37 @@ for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
 // polarity is true if the mode is being set, false otherwise
 // sourceUser is the source of the mode change; this variable
 // may be NULL if a server is setting the mode
-void xServer::OnChannelModeB( Channel* theChan, ChannelUser* sourceUser,
-	xServer::banVectorType& banVector )
-{
+void xServer::OnChannelModeB(Channel* theChan, ChannelUser* sourceUser,
+                             xServer::banVectorType& banVector) {
 
-// Channel::onModeB() may modify banVector with the extra bans
-// that have been removed due to overlaps
-theChan->onModeB( banVector ) ;
+    // Channel::onModeB() may modify banVector with the extra bans
+    // that have been removed due to overlaps
+    theChan->onModeB(banVector);
 
-// First deliver this channel event to any listeners for all channel
-// events.
-channelEventMapType::iterator allChanPtr =
-	channelEventMap.find( CHANNEL_ALL ) ;
-if( allChanPtr != channelEventMap.end() )
-	{
-	for( list< xClient* >::iterator ptr = allChanPtr->second->begin(),
-		endPtr = allChanPtr->second->end() ; ptr != endPtr ; ++ptr )
-		{
-		(*ptr)->OnChannelModeB( theChan, sourceUser,
-			banVector ) ;
-		}
-	}
+    // First deliver this channel event to any listeners for all channel
+    // events.
+    channelEventMapType::iterator allChanPtr = channelEventMap.find(CHANNEL_ALL);
+    if (allChanPtr != channelEventMap.end()) {
+        for (list<xClient*>::iterator ptr = allChanPtr->second->begin(),
+                                      endPtr = allChanPtr->second->end();
+             ptr != endPtr; ++ptr) {
+            (*ptr)->OnChannelModeB(theChan, sourceUser, banVector);
+        }
+    }
 
-// Find listeners for this specific channel
-channelEventMapType::iterator chanPtr =
-	channelEventMap.find( theChan->getName() ) ;
-if( chanPtr == channelEventMap.end() )
-	{
-	// No listeners for this channel's events
-	return ;
-	}
+    // Find listeners for this specific channel
+    channelEventMapType::iterator chanPtr = channelEventMap.find(theChan->getName());
+    if (chanPtr == channelEventMap.end()) {
+        // No listeners for this channel's events
+        return;
+    }
 
-// Iterate through the listeners for this channel's events
-// and notify each listener of the event
-list< xClient* >* listPtr = chanPtr->second ;
-for( list< xClient* >::iterator ptr = listPtr->begin(), end = listPtr->end() ;
-	ptr != end ; ++ptr )
-	{
-	(*ptr)->OnChannelModeB( theChan, sourceUser, banVector ) ;
-	}
+    // Iterate through the listeners for this channel's events
+    // and notify each listener of the event
+    list<xClient*>* listPtr = chanPtr->second;
+    for (list<xClient*>::iterator ptr = listPtr->begin(), end = listPtr->end(); ptr != end; ++ptr) {
+        (*ptr)->OnChannelModeB(theChan, sourceUser, banVector);
+    }
 }
 
 } // namespace gnuworld

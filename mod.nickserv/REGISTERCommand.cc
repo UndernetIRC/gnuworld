@@ -25,52 +25,49 @@
 #include "netData.h"
 #include "nickserv.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
 using std::string;
 
-bool REGISTERCommand::Exec(iClient* theClient, const string& )
-{
-bot->theStats->incStat("NS.CMD.REGISTER");
+bool REGISTERCommand::Exec(iClient* theClient, const string&) {
+    bot->theStats->incStat("NS.CMD.REGISTER");
 
-/* Is this nick already registered? */
-sqlUser* theUser = bot->isRegistered(theClient->getAccount());
+    /* Is this nick already registered? */
+    sqlUser* theUser = bot->isRegistered(theClient->getAccount());
 
-if(theUser) {
-  bot->Notice(theClient, "The nickname %s has already been registered.",
-    theUser->getName().c_str());
-  return true;
-}
+    if (theUser) {
+        bot->Notice(theClient, "The nickname %s has already been registered.",
+                    theUser->getName().c_str());
+        return true;
+    }
 
-/* This nick is not currently registered. First, create a sqlUser for them */
-/* TODO: The sqlManager instance should not be a public variable */
-theUser = new sqlUser(bot->theManager);
+    /* This nick is not currently registered. First, create a sqlUser for them */
+    /* TODO: The sqlManager instance should not be a public variable */
+    theUser = new sqlUser(bot->theManager);
 
-theUser->setName(theClient->getAccount());
+    theUser->setName(theClient->getAccount());
 
-/* Enable AUTOKILL and RECOVER by default */
-theUser->setFlag(sqlUser::F_AUTOKILL | sqlUser::F_RECOVER);
+    /* Enable AUTOKILL and RECOVER by default */
+    theUser->setFlag(sqlUser::F_AUTOKILL | sqlUser::F_RECOVER);
 
-theUser->setLastSeenTS(time(NULL));
-theUser->setRegisteredTS(time(NULL));
-theUser->insertUser();
+    theUser->setLastSeenTS(time(NULL));
+    theUser->setRegisteredTS(time(NULL));
+    theUser->insertUser();
 
-/* Assign the new user to the iClient */
-netData* theData = static_cast< netData* >( theClient->getCustomData(bot) );
-theData->authedUser = theUser;
+    /* Assign the new user to the iClient */
+    netData* theData = static_cast<netData*>(theClient->getCustomData(bot));
+    theData->authedUser = theUser;
 
-/* Insert the new user into the cache */
-bot->addUserToCache(theUser->getName(), theUser);
+    /* Insert the new user into the cache */
+    bot->addUserToCache(theUser->getName(), theUser);
 
-bot->Notice(theClient, "Your nickname, %s, has been successfully registered.",
-  theClient->getAccount().c_str());
-bot->Notice(theClient, "Note: AUTOKILL and RECOVER are enabled by default.");
+    bot->Notice(theClient, "Your nickname, %s, has been successfully registered.",
+                theClient->getAccount().c_str());
+    bot->Notice(theClient, "Note: AUTOKILL and RECOVER are enabled by default.");
 
-return true;
+    return true;
 }
 
 } // namespace ns

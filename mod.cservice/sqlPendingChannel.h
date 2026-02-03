@@ -25,51 +25,49 @@
 #ifndef __SQLPENDINGCHANNEL_H
 #define __SQLPENDINGCHANNEL_H "$Id: sqlPendingChannel.h,v 1.8 2007/08/28 16:10:12 dan_karrels Exp $"
 
-#include	<map>
+#include <map>
 
-#include	"sqlPendingTraffic.h"
-#include	"dbHandle.h"
+#include "sqlPendingTraffic.h"
+#include "dbHandle.h"
 
-namespace gnuworld
-{ 
+namespace gnuworld {
 
 class cservice;
 
-class sqlPendingChannel
-{
-public:
-	sqlPendingChannel(cservice*);
-	~sqlPendingChannel();
+class sqlPendingChannel {
+  public:
+    sqlPendingChannel(cservice*);
+    ~sqlPendingChannel();
 
-	bool commit();
-	bool commitSupporter(unsigned int, unsigned int);
-	void loadTrafficCache();
-	void loadSupportersTraffic();
+    bool commit();
+    bool commitSupporter(unsigned int, unsigned int);
+    void loadTrafficCache();
+    void loadSupportersTraffic();
 
-	unsigned int channel_id;
-	unsigned int join_count;
-	unsigned int unique_join_count;
-	time_t checkStart;
+    unsigned int channel_id;
+    unsigned int join_count;
+    unsigned int unique_join_count;
+    time_t checkStart;
 
-	typedef std::map < int, int > supporterListType;
-	supporterListType supporterList;
+    typedef std::map<int, int> supporterListType;
+    supporterListType supporterList;
 
-	typedef std::map < string, sqlPendingTraffic* > trafficListType;
-	trafficListType trafficList;
+    typedef std::map<string, sqlPendingTraffic*> trafficListType;
+    trafficListType trafficList;
 
-	//Is this channel first time inited?!
-	bool initialised;
+    // Is this channel first time inited?!
+    bool initialised;
 
-	/* With loadSupportersTraffic() we load the joincounts of every supporter for a given channel
-	 * in a trafficListType array.
-	 * The sqlPendingTraffic->ip_number we will use for supporter user_id
-	 */
-	trafficListType uniqueSupporterList;
+    /* With loadSupportersTraffic() we load the joincounts of every supporter for a given channel
+     * in a trafficListType array.
+     * The sqlPendingTraffic->ip_number we will use for supporter user_id
+     */
+    trafficListType uniqueSupporterList;
 
-	cservice*	bot;
-	Logger*		logger;
-	dbHandle*	SQLDb;
+    cservice* bot;
+    Logger* logger;
+    dbHandle* SQLDb;
 };
 
-}
+} // namespace gnuworld
 #endif // __SQLPENDINGCHANNEL_H

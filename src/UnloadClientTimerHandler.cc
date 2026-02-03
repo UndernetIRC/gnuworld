@@ -20,26 +20,24 @@
  * $Id: UnloadClientTimerHandler.cc,v 1.9 2005/01/12 03:50:38 dan_karrels Exp $
  */
 
-#include	<iostream>
+#include <iostream>
 
-#include	"UnloadClientTimerHandler.h"
-#include	"server.h"
-#include	"ELog.h"
-#include	"gnuworld_config.h"
+#include "UnloadClientTimerHandler.h"
+#include "server.h"
+#include "ELog.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-void UnloadClientTimerHandler::OnTimer( const timerID& , void* )
-{
-//elog	<< "UnloadClientTimerHandler::OnTimer("
-//	<< moduleName
-//	<< ")"
-//	<< std::endl ;
+void UnloadClientTimerHandler::OnTimer(const timerID&, void*) {
+    // elog	<< "UnloadClientTimerHandler::OnTimer("
+    //	<< moduleName
+    //	<< ")"
+    //	<< std::endl ;
 
-theServer->DetachClient( moduleName, reason ) ;
+    theServer->DetachClient(moduleName, reason);
 
-delete this ;
+    delete this;
 }
 
 } // namespace gnuworld

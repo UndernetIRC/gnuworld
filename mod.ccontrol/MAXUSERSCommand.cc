@@ -1,5 +1,5 @@
 /**
- * MAXUSERSCommand.cc 
+ * MAXUSERSCommand.cc
  * Shows the maximum number of online users ever recorded
  *
  * This program is free software; you can redistribute it and/or
@@ -20,30 +20,27 @@
  * $Id: MAXUSERSCommand.cc,v 1.7 2006/09/26 17:35:59 kewlio Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"StringTokenizer.h"
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"ccontrol_generic.h"
-#include	"gnuworld_config.h"
+#include "StringTokenizer.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "ccontrol_generic.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace uworld
-{
+namespace uworld {
 
-bool MAXUSERSCommand::Exec( iClient* theClient, const string& )
-{
-bot->Notice(theClient,"Current number of users is: %d",bot->getCurUsers());
-bot->Notice(theClient,"Maximum number of users ever recorded is: %d",bot->getMaxUsers());
-bot->Notice(theClient,"Recorded on %s (%s ago)",bot->convertToAscTime(bot->getDateMax()),
-	Ago(bot->getDateMax()));
+bool MAXUSERSCommand::Exec(iClient* theClient, const string&) {
+    bot->Notice(theClient, "Current number of users is: %d", bot->getCurUsers());
+    bot->Notice(theClient, "Maximum number of users ever recorded is: %d", bot->getMaxUsers());
+    bot->Notice(theClient, "Recorded on %s (%s ago)", bot->convertToAscTime(bot->getDateMax()),
+                Ago(bot->getDateMax()));
 
-return true;
+    return true;
 }
 
-}
+} // namespace uworld
 
 } // namespace gnuworld

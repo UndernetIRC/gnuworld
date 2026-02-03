@@ -23,53 +23,41 @@
 #include "threadworker.h"
 #include "misc.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-ThreadWorker::ThreadWorker( ) : stop( false )
-{
-worker = std::thread( &ThreadWorker::run, this ) ;
+ThreadWorker::ThreadWorker() : stop(false) { worker = std::thread(&ThreadWorker::run, this); }
+
+ThreadWorker::~ThreadWorker() {
+    {
+        std::lock_guard lock(mutex);
+        stop = true;
+    }
+    cv.notify_one();
+    if (worker.joinable())
+        worker.join();
 }
 
-ThreadWorker::~ThreadWorker()
-{
-  {
-  std::lock_guard lock( mutex ) ;
-  stop = true ;
-  }
-cv.notify_one() ;
-if( worker.joinable() )
-  worker.join() ;
-}
+void ThreadWorker::run() {
+    while (true) {
+        std::function<void()> job;
+        {
+            std::unique_lock lock(mutex);
+            cv.wait(lock, [&] { return stop || !jobs.empty(); });
+            if (stop && jobs.empty())
+                return;
+            job = std::move(jobs.front());
+            jobs.pop();
+        }
 
-void ThreadWorker::run()
-{
-while( true )
-  {
-  std::function< void() > job ;
-    {
-    std::unique_lock lock( mutex ) ;
-    cv.wait( lock, [&] { return stop || !jobs.empty() ; } ) ;
-    if( stop && jobs.empty() )
-      return ;
-    job = std::move( jobs.front() ) ;
-    jobs.pop() ;
+        try {
+            // elog << "Starting job execution" << endl ;
+            job();
+        } catch (const std::exception& e) {
+            elog << "Exception in job execution: " << e.what() << std::endl;
+        } catch (...) {
+            elog << "Unknown exception in job execution" << std::endl;
+        }
     }
-
-  try
-    {
-    // elog << "Starting job execution" << endl ;
-    job() ;
-    }
-  catch( const std::exception& e )
-    {
-    elog << "Exception in job execution: " << e.what() << std::endl ;
-    }
-  catch( ... )
-    {
-    elog << "Unknown exception in job execution" << std::endl ;
-    }
-  }
 }
 
 } // namespace gnuworld

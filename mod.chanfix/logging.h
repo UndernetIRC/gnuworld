@@ -26,14 +26,14 @@ namespace chanfix {
 
 namespace logging {
 
-	typedef unsigned short loglevel;
+typedef unsigned short loglevel;
 
-	const loglevel DEBUG	= 0x01 ;
-	const loglevel INFO	= 0x02 ;
-	const loglevel NOTICE	= 0x04 ;
-	const loglevel WARNING	= 0x08 ;
-	const loglevel ERROR	= 0x10 ;
-	const loglevel CRITICAL	= 0x20 ;
+const loglevel DEBUG = 0x01;
+const loglevel INFO = 0x02;
+const loglevel NOTICE = 0x04;
+const loglevel WARNING = 0x08;
+const loglevel ERROR = 0x10;
+const loglevel CRITICAL = 0x20;
 
 } // namespace logging
 

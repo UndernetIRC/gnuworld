@@ -27,14 +27,14 @@ namespace gnuworld {
 
 namespace ds {
 
-bool HASALLOPTest::isNormal( const Channel *theChannel )
-{
-	Channel::const_userIterator chanItr = theChannel->userList_begin();
+bool HASALLOPTest::isNormal(const Channel* theChannel) {
+    Channel::const_userIterator chanItr = theChannel->userList_begin();
 
-	for( ; chanItr != theChannel->userList_end() ; ++chanItr )
-		if(!chanItr->second->isModeO()) return true;
+    for (; chanItr != theChannel->userList_end(); ++chanItr)
+        if (!chanItr->second->isModeO())
+            return true;
 
-	return false;
+    return false;
 } // bool HASALLOPTest::isNormal(const Channel*)
 
 } // namespace ds

@@ -29,41 +29,37 @@
 #include "responses.h"
 #include "StringTokenizer.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void CHECKCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void CHECKCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-Channel* netChan = Network->findChannel(st[1]);
-if (!netChan) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_such_channel,
-                              std::string("No such channel %s.")).c_str(), st[1].c_str());
-  return;
-}
+    Channel* netChan = Network->findChannel(st[1]);
+    if (!netChan) {
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::no_such_channel, std::string("No such channel %s."))
+                .c_str(),
+            st[1].c_str());
+        return;
+    }
 
-/* Reports ops and total clients. */
+    /* Reports ops and total clients. */
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::check_results,
-                            std::string("I see %d opped out of %d total clients in %s.")).c_str(),
-                                        bot->countChanOps(netChan), netChan->size(),
-                                        netChan->getName().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::check_results,
+                                 std::string("I see %d opped out of %d total clients in %s."))
+                    .c_str(),
+                bot->countChanOps(netChan), netChan->size(), netChan->getName().c_str());
 
-bot->logAdminMessage("%s (%s) CHECK %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     netChan->getName().c_str());
+    bot->logAdminMessage("%s (%s) CHECK %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), netChan->getName().c_str());
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
+    return;
 }
 
 } // namespace cf

@@ -23,8 +23,7 @@
 #ifndef __TIMERHANDLER_H
 #define __TIMERHANDLER_H "$Id: TimerHandler.h,v 1.6 2004/05/19 19:46:33 jeekay Exp $"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 /**
  * This is the abstract base class used in the GNUWorld timer system.
@@ -32,56 +31,52 @@ namespace gnuworld
  * abstract method OnTimer().  The OnTimer() method will be called
  * by the timer system when the timer has expired.
  */
-class TimerHandler
-{
+class TimerHandler {
 
-public:
+  public:
+    /**
+     * The constructor does nothing.
+     */
+    TimerHandler() {}
 
-	/**
-	 * The constructor does nothing.
-	 */
-	TimerHandler() {}
+    /**
+     * The destructor does nothing.
+     */
+    virtual ~TimerHandler() {}
 
-	/**
-	 * The destructor does nothing.
-	 */
-	virtual ~TimerHandler() {}
+    /**
+     * The type used to represent timer events.
+     */
+    typedef unsigned int timerID;
 
-	/**
-	 * The type used to represent timer events.
-	 */
-	typedef unsigned int timerID ;
+    /**
+     * Handle a timer event.  The first argument is the
+     * handle for the timer registration, and the second
+     * is the argument that was passed when registering the
+     * timer.
+     */
+    virtual void OnTimer(const timerID&, void*) = 0;
 
-	/**
-	 * Handle a timer event.  The first argument is the
-	 * handle for the timer registration, and the second
-	 * is the argument that was passed when registering the
-	 * timer.
-	 */
-	virtual void OnTimer( const timerID& , void* ) = 0 ;
-
-	/**
-	 * This method is invoked when the server removes a
-	 * timed event without being requested by the TimerHandler.
-	 * This can happen when the TimerHandler is being destroyed,
-	 * but has not removed all of its timers yet.
-	 */
-	virtual void OnTimerDestroy( timerID, void * ) {}
-
-} ;
+    /**
+     * This method is invoked when the server removes a
+     * timed event without being requested by the TimerHandler.
+     * This can happen when the TimerHandler is being destroyed,
+     * but has not removed all of its timers yet.
+     */
+    virtual void OnTimerDestroy(timerID, void*) {}
+};
 
 /**
  * This macro is meant to assist in creating new subclasses of
  * the TimerHandler class.
  */
-#define SUBCLASS_TIMERHANDLER(className) \
-class className##Timer : public TimerHandler \
-{ \
-public: \
-className##Timer() {} \
-virtual ~className##Timer() {} \
-virtual void OnTimer( timerID, void* ) ; \
-} ;
+#define SUBCLASS_TIMERHANDLER(className)                                                           \
+    class className##Timer : public TimerHandler {                                                 \
+      public:                                                                                      \
+        className##Timer() {}                                                                      \
+        virtual ~className##Timer() {}                                                             \
+        virtual void OnTimer(timerID, void*);                                                      \
+    };
 
 } // namespace gnuworld
 

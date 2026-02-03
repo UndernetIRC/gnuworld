@@ -20,88 +20,66 @@
  * $Id: scanner.cc,v 1.9 2004/05/25 14:18:13 jeekay Exp $
  */
 
-#include	<iostream>
+#include <iostream>
 
-#include	"client.h"
-#include	"scanner.h"
-#include	"server.h"
-#include	"EConfig.h"
-#include	"ELog.h"
-#include	"iClient.h"
+#include "client.h"
+#include "scanner.h"
+#include "server.h"
+#include "EConfig.h"
+#include "ELog.h"
+#include "iClient.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 /*
  *  Exported function used by moduleLoader to gain an
  *  instance of this module.
  */
-extern "C"
-{
-  xClient* _gnuwinit(const string& args)
-  { 
-    return new scanner( args );
-  }
-} 
- 
+extern "C" {
+xClient* _gnuwinit(const string& args) { return new scanner(args); }
+}
+
 /**
  * This constructor calls the base class constructor.  The xClient
  * constructor will open the configuration file given and retrieve
  * basic client info (nick/user/host/etc).
  * Any additional processing must be done here.
  */
-scanner::scanner( const string& configFileName )
- : xClient( configFileName )
-{}
+scanner::scanner(const string& configFileName) : xClient(configFileName) {}
 
-scanner::~scanner()
-{
-/* No heap space allocated */
+scanner::~scanner() { /* No heap space allocated */ }
+
+void scanner::OnAttach() {
+    xClient::OnAttach();
+
+    MyUplink->RegisterEvent(EVT_NICK, this);
 }
 
-void scanner::OnAttach()
-{
-xClient::OnAttach() ;
-
-MyUplink->RegisterEvent( EVT_NICK, this ) ;
-}
-
-void scanner::OnPrivateMessage( iClient* theClient,
-	const string&, bool )
-{
-Notice( theClient, "Howdy :)" ) ;
+void scanner::OnPrivateMessage(iClient* theClient, const string&, bool) {
+    Notice(theClient, "Howdy :)");
 }
 
 // Burst any channels.
-void scanner::BurstChannels()
-{
-xClient::BurstChannels() ;
+void scanner::BurstChannels() {
+    xClient::BurstChannels();
 
-Join( "#some_oper_channel" ) ;
+    Join("#some_oper_channel");
 }
 
-void scanner::OnEvent( const eventType& whichEvent,
-	void* arg1,
-	void* arg2,
-	void* arg3,
-	void* arg4 )
-{
-switch( whichEvent )
-	{
-	case EVT_NICK:
-		handleNewClient( static_cast< iClient* >( arg1 ) ) ;
-		break ;
-	case EVT_BURST_CMPLT:
-	case EVT_BURST_ACK:
-		// Delivered to all clients
-		break ;
-	default:
-		elog	<< "scanner::OnEvent> Received unknown event: "
-			<< whichEvent
-			<< std::endl ;
-		break ;
-	}
-xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
+void scanner::OnEvent(const eventType& whichEvent, void* arg1, void* arg2, void* arg3, void* arg4) {
+    switch (whichEvent) {
+    case EVT_NICK:
+        handleNewClient(static_cast<iClient*>(arg1));
+        break;
+    case EVT_BURST_CMPLT:
+    case EVT_BURST_ACK:
+        // Delivered to all clients
+        break;
+    default:
+        elog << "scanner::OnEvent> Received unknown event: " << whichEvent << std::endl;
+        break;
+    }
+    xClient::OnEvent(whichEvent, arg1, arg2, arg3, arg4);
 }
 
 /**
@@ -109,10 +87,8 @@ xClient::OnEvent( whichEvent, arg1, arg2, arg3, arg4 ) ;
  * db thread queue.  The db thread will then check the cache for existing
  * entries, and place a reply into the reply queue.
  */
-void scanner::handleNewClient( iClient* /* newClient */ )
-{
-// put into db processing queue
-
+void scanner::handleNewClient(iClient* /* newClient */) {
+    // put into db processing queue
 }
 
 /**
@@ -120,14 +96,12 @@ void scanner::handleNewClient( iClient* /* newClient */ )
  * address and IP of the given connection :)
  * logMsg can be empty, in which case, use the default string.
  */
-void scanner::RejectClient( Connection* /* cPtr */,
-	const string& /* logMsg */ )
-{
-// gline IP
-// gline host
-// kill clients for fun? :)
+void scanner::RejectClient(Connection* /* cPtr */, const string& /* logMsg */) {
+    // gline IP
+    // gline host
+    // kill clients for fun? :)
 
-// place ip/host into rejected queue for db thread to update db
+    // place ip/host into rejected queue for db thread to update db
 }
 
 } // namespace gnuworld

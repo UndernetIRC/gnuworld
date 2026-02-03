@@ -22,35 +22,34 @@
 #ifndef __CONSTANTS_H_
 #define __CONSTANTS_H_
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace uworld
-{
+namespace uworld {
 
-namespace channel
-{
+namespace channel {
 
 const unsigned int MaxName = 300;
 
 }
 
-namespace server
-{
+namespace server {
 const unsigned int MaxName = 63;
-static const char Query[] = "SELECT name,lastuplink,lastconnected,"
-	"splitedon,lastnumeric,splitreason,version,addedon,lastupdated,reportmissing"
-	" FROM servers ";
-}
+static const char Query[] =
+    "SELECT name,lastuplink,lastconnected,"
+    "splitedon,lastnumeric,splitreason,version,addedon,lastupdated,reportmissing"
+    " FROM servers ";
+} // namespace server
 
-namespace User
-{
+namespace User {
 const unsigned int MaxName = 32;
-static const char Query[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers";
-}
-namespace gline
-{
-const unsigned int GLINE_OK =0x01;
+static const char Query[] =
+    "SELECT "
+    "user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,"
+    "isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_"
+    "Reason,notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers";
+} // namespace User
+namespace gline {
+const unsigned int GLINE_OK = 0x01;
 const unsigned int FORCE_NEEDED_HOST = 0x02;
 const unsigned int FORCE_NEEDED_TIME = 0x04;
 const unsigned int FU_NEEDED_USERS = 0x08;
@@ -66,51 +65,47 @@ const unsigned int BAD_CIDRMASK = 0x1000;
 const unsigned int BAD_CIDROVERRIDE = 0x2000;
 const unsigned int HUH_IS_EXCEPTION = 0x4000;
 const unsigned int HUH_IS_IP_OF_OPER = 0x8000;
-const unsigned int MGLINE_TIME = 3*24*3600;
+const unsigned int MGLINE_TIME = 3 * 24 * 3600;
 const unsigned int MGLINE_WILD_NOID_TIME = 7200;
-const unsigned int MGLINE_WILD_TIME = 24*3600;
+const unsigned int MGLINE_WILD_TIME = 24 * 3600;
 const unsigned int MFGLINE_USERS = 255;
-const unsigned int MFGLINE_TIME = 14*3600*24;
-const unsigned int PERM_TIME = 730*3600*24;
-const unsigned int MFU_TIME = 100*3600*24;
-const unsigned int NOLOGIN_TIME = 3600;	
+const unsigned int MFGLINE_TIME = 14 * 3600 * 24;
+const unsigned int PERM_TIME = 730 * 3600 * 24;
+const unsigned int MFU_TIME = 100 * 3600 * 24;
+const unsigned int NOLOGIN_TIME = 3600;
 const unsigned int MAX_REASON_LENGTH = 255;
-}
+} // namespace gline
 
-namespace flood
-{
+namespace flood {
 const unsigned int MESSAGE_POINTS = 4;
 const unsigned int CTCP_POINTS = 5;
 const unsigned int RESET_TIME = 5;
 const unsigned int FLOOD_POINTS = 20;
-const int IGNORE_TIME = 15*60;
-}
+const int IGNORE_TIME = 15 * 60;
+} // namespace flood
 
-namespace password
-{
+namespace password {
 const unsigned int MIN_SIZE = 5;
 const unsigned int TOO_SHORT = 1;
 const unsigned int LIKE_UNAME = 2;
 const unsigned int PASS_OK = 3;
-}
+} // namespace password
 
-namespace badChannels
-{
+namespace badChannels {
 static const char Query[] = "SELECT Name,Reason,AddedBy FROM BadChannels";
 }
 
-namespace scan
-{
+namespace scan {
 static const unsigned int MAX_SHOW = 15;
 }
 
-namespace exceptions
-{
-static const char Query[] = "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions WHERE lower(Host)='";
+namespace exceptions {
+static const char Query[] =
+    "SELECT Host,Connections,AddedBy,AddedOn,Reason FROM Exceptions WHERE lower(Host)='";
 const unsigned int MAX_REASON = 449;
-}
+} // namespace exceptions
 
-}
-}
+} // namespace uworld
+} // namespace gnuworld
 
 #endif

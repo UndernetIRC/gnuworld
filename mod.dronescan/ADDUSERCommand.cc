@@ -30,72 +30,66 @@ namespace gnuworld {
 
 namespace ds {
 
-void ADDUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
-{
-	if(theUser->getAccess() < level::adduser) return ;
+void ADDUSERCommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser) {
+    if (theUser->getAccess() < level::adduser)
+        return;
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	/* Usage:
-	 *  ADDUSER <username> <level>
-	 */
+    /* Usage:
+     *  ADDUSER <username> <level>
+     */
 
-	if(st.size() != 3) {
-		Usage(theClient);
-		return ;
-	}
+    if (st.size() != 3) {
+        Usage(theClient);
+        return;
+    }
 
-	/* Conditions:
-	 *  i) The user must not already exist
-	 * ii) A user cannot add a user with >= their own access
-	 */
+    /* Conditions:
+     *  i) The user must not already exist
+     * ii) A user cannot add a user with >= their own access
+     */
 
-	/* Check if the user already exists */
-	string newUser = st[1];
+    /* Check if the user already exists */
+    string newUser = st[1];
 
-	sqlUser *targetUser = bot->getSqlUser(newUser);
-	if(targetUser) {
-		bot->Reply(theClient, "The user %s has already been added.",
-			targetUser->getUserName().c_str()
-			);
-		return ;
-	}
+    sqlUser* targetUser = bot->getSqlUser(newUser);
+    if (targetUser) {
+        bot->Reply(theClient, "The user %s has already been added.",
+                   targetUser->getUserName().c_str());
+        return;
+    }
 
-	/* Check the new level is not >= the user adding them */
-	unsigned int newAccess = atoi(st[2].c_str());
-	if(newAccess <= 0 || newAccess >= theUser->getAccess()) {
-		bot->Reply(theClient, "Please choose a sensible access level.");
-		return ;
-	}
+    /* Check the new level is not >= the user adding them */
+    unsigned int newAccess = atoi(st[2].c_str());
+    if (newAccess <= 0 || newAccess >= theUser->getAccess()) {
+        bot->Reply(theClient, "Please choose a sensible access level.");
+        return;
+    }
 
-	/* User doesn't exist, access level is sane. */
-	/* NB: targetUser here is empty because of the earlier check */
+    /* User doesn't exist, access level is sane. */
+    /* NB: targetUser here is empty because of the earlier check */
 
-	targetUser = new sqlUser(bot->getSqlDb());
+    targetUser = new sqlUser(bot->getSqlDb());
 
-	targetUser->setUserName(newUser);
-	targetUser->setCreated(::time(0));
-	targetUser->setLastSeen(0);
-	targetUser->setLastUpdatedBy(theClient->getRealNickUserHost());
-	targetUser->setLastUpdated(::time(0));
-	targetUser->setFlags(0);
-	targetUser->setAccess(newAccess);
+    targetUser->setUserName(newUser);
+    targetUser->setCreated(::time(0));
+    targetUser->setLastSeen(0);
+    targetUser->setLastUpdatedBy(theClient->getRealNickUserHost());
+    targetUser->setLastUpdated(::time(0));
+    targetUser->setFlags(0);
+    targetUser->setAccess(newAccess);
 
-	if(targetUser->insert()) {
-		bot->Reply(theClient, "User %s successfully added.",
-			newUser.c_str()
-			);
-	} else {
-		bot->Reply(theClient, "An error occured whilst adding %s.",
-			newUser.c_str()
-			);
-	}
+    if (targetUser->insert()) {
+        bot->Reply(theClient, "User %s successfully added.", newUser.c_str());
+    } else {
+        bot->Reply(theClient, "An error occured whilst adding %s.", newUser.c_str());
+    }
 
-	/* Flush the cache */
-	bot->preloadUserCache();
+    /* Flush the cache */
+    bot->preloadUserCache();
 
-	return ;
-
+    return;
 
 } // ADDUSERCommand::Exec(iClient*, const string&, const sqlUser*)
 

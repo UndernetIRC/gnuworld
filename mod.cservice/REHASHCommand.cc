@@ -19,97 +19,85 @@
  * $Id: REHASHCommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include	<string>
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"levels.h"
-#include	"responses.h"
+#include <string>
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "levels.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-bool REHASHCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool REHASHCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if (!theUser) return false;
-
-int level = bot->getAdminAccessLevel(theUser);
-if (level < level::rehash_admin)
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::insuf_access,
-			string("You have insufficient access to perform that command.")));
-	return false;
-}
-
-string option = string_upper(st[1]);
-
-if (option == "MOTD")
-	{
-                int lastupdate = bot->rehashMOTD();
-                if (lastupdate > 0) {
-                        bot->Notice(theClient, "Done. Rehashed the MOTD, last updated %s ago.",
-                                prettyDuration(lastupdate).c_str(), lastupdate);
-			return true;
-                } else {
-                        bot->Notice(theClient, "Couldn't update the MOTD.");
-			return false;
-                }
-	}
-
-if (option == "HELP")
-	{
-		bot->helpTable.clear();
-		bot->loadHelpTable();
-		bot->Notice(theClient, "Done. %i entries in help table.",
-			bot->helpTable.size());
-		return true;
-	}
-if (option == "TRANSLATIONS")
-	{
-		bot->languageTable.clear();
-		bot->translationTable.clear();
-		bot->loadTranslationTable();
-		bot->Notice(theClient, "Done. %i entries in language table.",
-			bot->translationTable.size());
-		return true;
-	}
-/* Options below require a higher level to rehash */
-if (level < level::rehash_coder)
-{
-        bot->Notice(theClient,
-                bot->getResponse(theUser,
-                        language::insuf_access,
-                        string("You have insufficient access to perform that command.")));
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser)
         return false;
-}
 
-if (option == "CONFIG")
-	{
-		bot->rehashConfigData();
-		bot->Notice(theClient, "Done. %zu entries in config table.",
-			bot->getConfigData_size());
-		// TODO: Free up the memory allocated in building this table ;)
-	}
+    int level = bot->getAdminAccessLevel(theUser);
+    if (level < level::rehash_admin) {
+        bot->Notice(
+            theClient,
+            bot->getResponse(theUser, language::insuf_access,
+                             string("You have insufficient access to perform that command.")));
+        return false;
+    }
 
-if (option == "VARIABLES")
-{
-	bot->rehashConfigVariables();
-	bot->Notice(theClient, "Done. Red %zu configuration variables.",
-		bot->getConfigVariables_size());
-}
+    string option = string_upper(st[1]);
 
-return true ;
+    if (option == "MOTD") {
+        int lastupdate = bot->rehashMOTD();
+        if (lastupdate > 0) {
+            bot->Notice(theClient, "Done. Rehashed the MOTD, last updated %s ago.",
+                        prettyDuration(lastupdate).c_str(), lastupdate);
+            return true;
+        } else {
+            bot->Notice(theClient, "Couldn't update the MOTD.");
+            return false;
+        }
+    }
+
+    if (option == "HELP") {
+        bot->helpTable.clear();
+        bot->loadHelpTable();
+        bot->Notice(theClient, "Done. %i entries in help table.", bot->helpTable.size());
+        return true;
+    }
+    if (option == "TRANSLATIONS") {
+        bot->languageTable.clear();
+        bot->translationTable.clear();
+        bot->loadTranslationTable();
+        bot->Notice(theClient, "Done. %i entries in language table.", bot->translationTable.size());
+        return true;
+    }
+    /* Options below require a higher level to rehash */
+    if (level < level::rehash_coder) {
+        bot->Notice(
+            theClient,
+            bot->getResponse(theUser, language::insuf_access,
+                             string("You have insufficient access to perform that command.")));
+        return false;
+    }
+
+    if (option == "CONFIG") {
+        bot->rehashConfigData();
+        bot->Notice(theClient, "Done. %zu entries in config table.", bot->getConfigData_size());
+        // TODO: Free up the memory allocated in building this table ;)
+    }
+
+    if (option == "VARIABLES") {
+        bot->rehashConfigVariables();
+        bot->Notice(theClient, "Done. Red %zu configuration variables.",
+                    bot->getConfigVariables_size());
+    }
+
+    return true;
 }
 
 } // namespace gnuworld.

@@ -24,46 +24,38 @@ namespace gnuworld {
 
 namespace ds {
 
+void jfChannel::addJoin(iClient* theClient) {
+    std::string clientIp = xIP(theClient->getIP()).GetNumericIP();
+    jfClientData& jfClient = joinPartMap[clientIp];
+    jfClient.numOfJoins++;
+    std::list<std::string>::iterator begin = jfClient.numerics.begin();
+    std::list<std::string>::iterator end = jfClient.numerics.end();
 
-void jfChannel::addJoin(iClient* theClient)
-{
-	std::string clientIp = xIP(theClient->getIP()).GetNumericIP();
-	jfClientData& jfClient = joinPartMap[clientIp];
-	jfClient.numOfJoins++;
-	std::list<std::string>::iterator begin = jfClient.numerics.begin();
-	std::list<std::string>::iterator end = jfClient.numerics.end();
+    if (theClient->isOper()) {
+        jfClient.seenOper = true;
+    }
+    if (theClient->getMode(iClient::MODE_REGISTERED)) {
+        jfClient.seenLoggedInUser = true;
+        jfClient.userNames.push_back(std::pair<std::string, std::string>(theClient->getCharYYXXX(),
+                                                                         theClient->getAccount()));
+    }
 
-	if(theClient->isOper())
-		{
-		jfClient.seenOper = true;
-		}
-	if(theClient->getMode(iClient::MODE_REGISTERED))
-		{
-		jfClient.seenLoggedInUser = true;
-		jfClient.userNames.push_back(std::pair<std::string,std::string>(theClient->getCharYYXXX(),
-			theClient->getAccount()));
-		}
+    bool found = false;
+    for (std::list<std::string>::iterator it = begin; it != end && !found; ++it) {
+        if (*it == theClient->getCharYYXXX()) {
+            found = true;
+        }
+    }
 
-	bool found = false;
-	for(std::list<std::string>::iterator it=begin;it!=end && !found;++it) {
-		if(*it == theClient->getCharYYXXX()) {
-			found = true;
-		}
-	}
-
-	if(!found) {
-		jfClient.numerics.push_back(theClient->getCharYYXXX());
-	}
+    if (!found) {
+        jfClient.numerics.push_back(theClient->getCharYYXXX());
+    }
 }
-	
-void jfChannel::addPart(iClient* theClient)
-{
-joinPartMap[xIP(theClient->getIP()).GetNumericIP()].numOfParts++;
+
+void jfChannel::addPart(iClient* theClient) {
+    joinPartMap[xIP(theClient->getIP()).GetNumericIP()].numOfParts++;
 }
-	
-	
 
 } // namespace ds
 
 } // namespace gnuworld
-

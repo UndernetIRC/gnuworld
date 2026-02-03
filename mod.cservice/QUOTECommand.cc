@@ -19,45 +19,40 @@
  * $Id: QUOTECommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include	<string>
-#include	"cservice.h"
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"levels.h"
-#include	"responses.h"
+#include <string>
+#include "cservice.h"
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "levels.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-bool QUOTECommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 1 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool QUOTECommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 1) {
+        Usage(theClient);
+        return true;
+    }
 
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if (!theUser)
-	{
-	return false;
- 	}
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
+        return false;
+    }
 
-int admLevel = bot->getAdminAccessLevel(theUser);
-if (admLevel < level::quote)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::insuf_access,
-			string("Sorry, you have insufficient access to perform that command.")));
-	return false;
-	}
+    int admLevel = bot->getAdminAccessLevel(theUser);
+    if (admLevel < level::quote) {
+        bot->Notice(theClient,
+                    bot->getResponse(
+                        theUser, language::insuf_access,
+                        string("Sorry, you have insufficient access to perform that command.")));
+        return false;
+    }
 
-bot->Write( st.assemble(1) );
+    bot->Write(st.assemble(1));
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld.

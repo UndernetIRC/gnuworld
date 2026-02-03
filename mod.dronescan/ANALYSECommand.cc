@@ -35,31 +35,27 @@ namespace gnuworld {
 
 namespace ds {
 
-void ANALYSECommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
-{
-	if(theUser->getAccess() < level::analyse) return ;
+void ANALYSECommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser) {
+    if (theUser->getAccess() < level::analyse)
+        return;
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	/* ANALYSE <#channel>
-	 */
-	if(st.size() != 2) {
-		Usage(theClient);
-		return ;
-	}
+    /* ANALYSE <#channel>
+     */
+    if (st.size() != 2) {
+        Usage(theClient);
+        return;
+    }
 
-	Channel *theChannel = Network->findChannel(st[1]);
+    Channel* theChannel = Network->findChannel(st[1]);
 
-	if(!theChannel) {
-		bot->Reply(theClient, "Unable to find channel: %s",
-			st.assemble(1).c_str()
-			);
-		return ;
-	}
+    if (!theChannel) {
+        bot->Reply(theClient, "Unable to find channel: %s", st.assemble(1).c_str());
+        return;
+    }
 
-
-
-	return ;
+    return;
 } // ANALYSECommand::Exec(iClient*, const string&)
 
 } // namespace ds

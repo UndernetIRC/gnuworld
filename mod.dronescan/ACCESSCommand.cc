@@ -35,44 +35,37 @@ namespace gnuworld {
 
 namespace ds {
 
-void ACCESSCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
-{
-	if(theUser->getAccess() < level::access) return ;
+void ACCESSCommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser) {
+    if (theUser->getAccess() < level::access)
+        return;
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	/* Usage:
-	 *  ACCESS
-	 *  ACCESS <username>
-	 */
+    /* Usage:
+     *  ACCESS
+     *  ACCESS <username>
+     */
 
-	const sqlUser *targetUser = theUser;
+    const sqlUser* targetUser = theUser;
 
-	if(st.size() == 2) {
-		targetUser = bot->getSqlUser(st[1]);
-		if(!targetUser) {
-			bot->Reply(theClient, "No such user %s",
-				st[1].c_str()
-				);
-			return ;
-		}
-	}
+    if (st.size() == 2) {
+        targetUser = bot->getSqlUser(st[1]);
+        if (!targetUser) {
+            bot->Reply(theClient, "No such user %s", st[1].c_str());
+            return;
+        }
+    }
 
-	/* Give the client information about the targetUser */
-	bot->Reply(theClient, "Username : %-10s Access: %4u",
-		targetUser->getUserName().c_str(),
-		targetUser->getAccess()
-		);
-	bot->Reply(theClient, "Last Seen: %s",
-		prettyTime(targetUser->getLastSeen()).c_str()
-		);
+    /* Give the client information about the targetUser */
+    bot->Reply(theClient, "Username : %-10s Access: %4u", targetUser->getUserName().c_str(),
+               targetUser->getAccess());
+    bot->Reply(theClient, "Last Seen: %s", prettyTime(targetUser->getLastSeen()).c_str());
 
-	bot->Reply(theClient, "Last Updated: %s (by %s)",
-		prettyTime(targetUser->getLastUpdated()).c_str(),
-		targetUser->getLastUpdatedBy().c_str()
-		);
+    bot->Reply(theClient, "Last Updated: %s (by %s)",
+               prettyTime(targetUser->getLastUpdated()).c_str(),
+               targetUser->getLastUpdatedBy().c_str());
 
-	return ;
+    return;
 } // ACCESSCommand::Exec(iClient*, const string&)
 
 } // namespace ds

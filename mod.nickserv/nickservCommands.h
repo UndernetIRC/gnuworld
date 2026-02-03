@@ -20,7 +20,7 @@
 #ifndef NICKSERVCOMMANDS_H
 #define NICKSERVCOMMANDS_H
 
-#include	<string>
+#include <string>
 
 /**
  * All this code is stolen straight from mod.cservice, which possibly had
@@ -28,77 +28,65 @@
  * ripper knows how any of this works.
  */
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 class iClient;
 class xServer;
 
-namespace ns
-{
+namespace ns {
 
 class nickserv;
 
 class Command {
   public:
-    Command(nickserv* _bot,
-	const std::string& _commName,
-	const std::string& _help) :
-      bot(_bot), server(0), commName(_commName), help(_help)
-      {}
+    Command(nickserv* _bot, const std::string& _commName, const std::string& _help)
+        : bot(_bot), server(0), commName(_commName), help(_help) {}
 
     virtual ~Command() {}
 
     virtual bool Exec(iClient*, const std::string&) = 0;
 
-    void setServer(xServer* _server)
-      { server = _server; }
+    void setServer(xServer* _server) { server = _server; }
 
-    virtual std::string getInfo() const
-      { return commName + ' ' + help; }
+    virtual std::string getInfo() const { return commName + ' ' + help; }
 
     virtual void Usage(iClient*);
 
-    inline const std::string& getName() const
-      { return commName; }
+    inline const std::string& getName() const { return commName; }
 
-    inline const std::string& getHelp() const
-      { return help; }
+    inline const std::string& getHelp() const { return help; }
 
   protected:
     nickserv* bot;
-    xServer*  server;
-    std::string    commName;
-    std::string    help;
+    xServer* server;
+    std::string commName;
+    std::string help;
 }; // class Command
 
 /* Big nasty #define time! */
 
-#define DECLARE_COMMAND(commName) \
-class commName##Command : public Command \
-{ \
-  public: \
-    commName##Command(nickserv* _bot, \
-      const std::string& _commName, \
-      const std::string& _help) : \
-        Command(_bot, _commName, _help) {} \
-    virtual ~commName##Command() {} \
-    virtual bool Exec(iClient*, const std::string&); \
-};
+#define DECLARE_COMMAND(commName)                                                                  \
+    class commName##Command : public Command {                                                     \
+      public:                                                                                      \
+        commName##Command(nickserv* _bot, const std::string& _commName, const std::string& _help)  \
+            : Command(_bot, _commName, _help) {}                                                   \
+        virtual ~commName##Command() {}                                                            \
+        virtual bool Exec(iClient*, const std::string&);                                           \
+    };
 
 /* Level 0 Commands */
-DECLARE_COMMAND( RECOVER )
-DECLARE_COMMAND( REGISTER )
-DECLARE_COMMAND( RELEASE )
-DECLARE_COMMAND( SET )
-DECLARE_COMMAND( WHOAMI )
+DECLARE_COMMAND(RECOVER)
+DECLARE_COMMAND(REGISTER)
+DECLARE_COMMAND(RELEASE)
+DECLARE_COMMAND(SET)
+DECLARE_COMMAND(WHOAMI)
 
 /* Admin commands */
-DECLARE_COMMAND( INFO )
-DECLARE_COMMAND( INVITE )
-DECLARE_COMMAND( MODUSER )
-DECLARE_COMMAND( SHUTDOWN )
-DECLARE_COMMAND( STATS )
+DECLARE_COMMAND(INFO)
+DECLARE_COMMAND(INVITE)
+DECLARE_COMMAND(MODUSER)
+DECLARE_COMMAND(SHUTDOWN)
+DECLARE_COMMAND(STATS)
 
 } // namespace ns
 

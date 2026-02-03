@@ -25,223 +25,199 @@
  *
  * $Id: UNSUSPENDCommand.cc,v 1.23 2010/04/10 18:56:06 danielaustin Exp $
  */
-#include	<iostream>
-#include	<string>
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"Network.h"
-#include	"levels.h"
-#include	"responses.h"
+#include <iostream>
+#include <string>
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "Network.h"
+#include "levels.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 using namespace level;
 
-bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
+bool UNSUSPENDCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-// Is the user authorized?
+    // Is the user authorized?
 
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if(!theUser)
-	{
-	bot->Notice(theClient,
-	bot->getResponse(theUser,
-		language::no_longer_auth,
-		string("Sorry, you are not authorised with me.")));
-	return false;
-	}
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::no_longer_auth,
+                                                string("Sorry, you are not authorised with me.")));
+        return false;
+    }
 
-/*
- * Trying to unsuspend a user, or a channel?
- * If there is no #, check this person's admin access.
- * If it passes, we can unsuspend a whole user account.
- * (Level 600)
- */
+    /*
+     * Trying to unsuspend a user, or a channel?
+     * If there is no #, check this person's admin access.
+     * If it passes, we can unsuspend a whole user account.
+     * (Level 600)
+     */
 
-if ((st[1][0] != '#') && (st[1][0] != '*'))
-{
-	// Got enough admin access?
-	int level = bot->getAdminAccessLevel(theUser);
-	if (level < level::globalsuspend)
-	{
-		Usage(theClient);
-		return true;
-	}
+    if ((st[1][0] != '#') && (st[1][0] != '*')) {
+        // Got enough admin access?
+        int level = bot->getAdminAccessLevel(theUser);
+        if (level < level::globalsuspend) {
+            Usage(theClient);
+            return true;
+        }
 
-	// Does this user account even exist?
-	sqlUser* targetUser = bot->getUserRecord(st[1]);
-	if (!targetUser)
-		{
-		bot->Notice(theClient,
-			bot->getResponse(theUser, language::not_registered,
-				string("I don't know who %s is")).c_str(),
-		    	st[1].c_str());
-		return true;
-		}
+        // Does this user account even exist?
+        sqlUser* targetUser = bot->getUserRecord(st[1]);
+        if (!targetUser) {
+            bot->Notice(theClient,
+                        bot->getResponse(theUser, language::not_registered,
+                                         string("I don't know who %s is"))
+                            .c_str(),
+                        st[1].c_str());
+            return true;
+        }
 
-	if (!targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-	{
-		bot->Notice(theClient, "%s isn't suspended.", targetUser->getUserName().c_str());
-		return true;
-	}
+        if (!targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND)) {
+            bot->Notice(theClient, "%s isn't suspended.", targetUser->getUserName().c_str());
+            return true;
+        }
 
-	// Unsuspend them.
-	targetUser->removeFlag(sqlUser::F_GLOBAL_SUSPEND);
-	targetUser->commit(theClient);
-	bot->sendAccountFlags(targetUser);
-	bot->Notice(theClient, "%s has been unsuspended.",
-		targetUser->getUserName().c_str());
+        // Unsuspend them.
+        targetUser->removeFlag(sqlUser::F_GLOBAL_SUSPEND);
+        targetUser->commit(theClient);
+        bot->sendAccountFlags(targetUser);
+        bot->Notice(theClient, "%s has been unsuspended.", targetUser->getUserName().c_str());
 
-	bot->updateUserLevels(targetUser);
-	bot->NoteAllAuthedClients(targetUser,"Your user account's global suspension has been cancelled.");
+        bot->updateUserLevels(targetUser);
+        bot->NoteAllAuthedClients(targetUser,
+                                  "Your user account's global suspension has been cancelled.");
 
-	targetUser->writeEvent(sqlUser::EV_UNSUSPEND, theUser, "");
+        targetUser->writeEvent(sqlUser::EV_UNSUSPEND, theUser, "");
 
-	bot->logAdminMessage("%s (%s) has unsuspended %s's user account.",
-	theClient->getNickName().c_str(), theUser->getUserName().c_str(),
-	targetUser->getUserName().c_str());
+        bot->logAdminMessage("%s (%s) has unsuspended %s's user account.",
+                             theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+                             targetUser->getUserName().c_str());
 
-	return true;
-}
+        return true;
+    }
 
-if( st.size() < 3 )
-	{
-	Usage(theClient);
-	return true;
-	}
+    if (st.size() < 3) {
+        Usage(theClient);
+        return true;
+    }
 
+    // Is the channel registered?
 
-// Is the channel registered?
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->Notice(theClient,
+                    bot->getResponse(theUser, language::chan_not_reg,
+                                     string("Sorry, %s isn't registered with me."))
+                        .c_str(),
+                    st[1].c_str());
+        return false;
+    }
 
-if(!theChan)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::chan_not_reg,
-			string("Sorry, %s isn't registered with me.")).c_str(),
-		st[1].c_str());
-	return false;
-	}
+    // Check level.
+    int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+    if ((level < level::unsuspend) || ((st[1] == "*") && (level < adminlevel::unsuspend))) {
+        bot->Notice(theClient,
+                    bot->getResponse(
+                        theUser, language::insuf_access,
+                        string("Sorry, you have insufficient access to perform that command.")));
+        return false;
+    }
 
-// Check level.
-int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-if ((level < level::unsuspend) || (( st[1] == "*" ) && (level < adminlevel::unsuspend)))
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::insuf_access,
-			string("Sorry, you have insufficient access to perform that command.")));
-	return false;
-	}
+    // Check whether the user is in the access list.
+    sqlUser* Target = bot->getUserRecord(st[2]);
+    if (!Target) {
+        bot->Notice(theClient, "I don't know who %s is", st[2].c_str());
+        return true;
+    }
 
-// Check whether the user is in the access list.
-sqlUser* Target = bot->getUserRecord(st[2]);
-if(!Target)
-	{
-	bot->Notice(theClient, "I don't know who %s is",
-    	st[2].c_str());
-	return true;
-	}
+    sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
+    if (!aLevel) {
+        bot->Notice(
+            theClient,
+            bot->getResponse(theUser, language::not_registered, string("I don't know who %s is"))
+                .c_str(),
+            Target->getUserName().c_str(), theChan->getName().c_str());
+        return true;
+    }
 
-sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
-if(!aLevel)
-	{
-	bot->Notice(theClient,
-	bot->getResponse(theUser,
-		language::not_registered,
-		string("I don't know who %s is")).c_str(),
-    	Target->getUserName().c_str(), theChan->getName().c_str());
-	return true;
-	}
+    if (aLevel->getSuspendExpire() == 0) {
+        bot->Notice(
+            theClient,
+            bot->getResponse(theUser, language::isnt_suspended, string("%s isn't suspended on %s"))
+                .c_str(),
+            Target->getUserName().c_str(), theChan->getName().c_str());
+        return false;
+    }
 
-if (aLevel->getSuspendExpire() == 0)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::isnt_suspended,
-			string("%s isn't suspended on %s")).c_str(),
-		Target->getUserName().c_str(), theChan->getName().c_str());
-	return false;
-	}
+    /*
+     *  Finally, check we have access to perform the unsuspend.
+     */
 
-/*
- *  Finally, check we have access to perform the unsuspend.
- */
+    if ((aLevel->getAccess()) >= level) {
+        bot->Notice(theClient,
+                    "Cannot unsuspend a user with equal or higher access than your own.");
+        return false;
+    }
 
-if ((aLevel->getAccess()) >= level)
-	{
-	bot->Notice(theClient,
-		"Cannot unsuspend a user with equal or higher access than your own.");
-	return false;
-	}
+    /*
+     * Was this suspension set with a higher suspend level?
+     */
 
-/*
- * Was this suspension set with a higher suspend level?
- */
+    if (aLevel->getSuspendLevel() > level) {
+        bot->Notice(
+            theClient,
+            "Cannot unsuspend a user that was suspended at a higher level than your own access.");
+        return false;
+    }
+    string reason = "No reason supplied";
+    if (st.size() >= 4) {
+        reason = st.assemble(3);
+        if ((reason.size() < 2) || (reason.size() > 300)) {
+            bot->Notice(theClient, bot->getResponse(theUser, language::reason_must).c_str(), 2,
+                        300);
+            return false;
+        }
+    }
+    aLevel->setSuspendExpire(0);
+    aLevel->setSuspendBy(string());
+    aLevel->setLastModif(bot->currentTime());
+    aLevel->setLastModifBy(
+        string("(" + theUser->getUserName() + ") " + theClient->getNickUserHost()));
+    aLevel->setSuspendReason(string());
+    if (!aLevel->commit()) {
+        bot->Notice(theClient, "Error updating channel status.");
+        LOG(ERROR, "Failed to commit sqlLevel record");
+        return false;
+    }
 
-if (aLevel->getSuspendLevel() > level)
-{
-	bot->Notice(theClient,
-		"Cannot unsuspend a user that was suspended at a higher level than your own access.");
-	return false;
-}
-string reason = "No reason supplied";
-if (st.size() >= 4)
-{
-	reason = st.assemble(3);
-	if ((reason.size() < 2) || (reason.size() > 300))
-	{
-		bot->Notice(theClient, bot->getResponse(theUser,language::reason_must).c_str(),2,300);
-		return false;
-	}
-}
-aLevel->setSuspendExpire(0);
-aLevel->setSuspendBy(string());
-aLevel->setLastModif(bot->currentTime());
-aLevel->setLastModifBy( string( "("
-	+ theUser->getUserName()
-	+ ") "
-	+ theClient->getNickUserHost() ) );
-aLevel->setSuspendReason(string());
-if( !aLevel->commit() )
-	{
-	bot->Notice( theClient,
-		"Error updating channel status." ) ;
-	LOG( ERROR, "Failed to commit sqlLevel record" ) ;
-	return false ;
-	}
+    bot->Notice(theClient,
+                bot->getResponse(theUser, language::susp_cancelled,
+                                 string("SUSPENSION for %s is cancelled"))
+                    .c_str(),
+                Target->getUserName().c_str());
+    if (Target != theUser) {
+        bot->NoteAllAuthedClients(Target, bot->getResponse(Target, language::acc_unsusp).c_str(),
+                                  theChan->getName().c_str());
+        // Announce the manager about the new access change
+        if (level < 500) {
+            string theMessage = TokenStringsParams(
+                "%s unsuspended %s's access on channel %s", theUser->getUserName().c_str(),
+                Target->getUserName().c_str(), theChan->getName().c_str());
+            bot->NoteChannelManager(theChan, theMessage.c_str());
+        }
+    }
 
-bot->Notice(theClient,
-	bot->getResponse(theUser,
-		language::susp_cancelled,
-		string("SUSPENSION for %s is cancelled")).c_str(),
-	Target->getUserName().c_str());
-if (Target != theUser)
-{
-	bot->NoteAllAuthedClients(Target, bot->getResponse(Target,language::acc_unsusp).c_str(), theChan->getName().c_str());
-	// Announce the manager about the new access change
-	if (level < 500)
-	{
-		string theMessage = TokenStringsParams("%s unsuspended %s's access on channel %s",
-				theUser->getUserName().c_str(), Target->getUserName().c_str(), theChan->getName().c_str());
-		bot->NoteChannelManager(theChan, theMessage.c_str());
-	}
-}
-
-return true;
+    return true;
 }
 
 } // namespace gnuworld.
-

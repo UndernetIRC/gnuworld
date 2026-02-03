@@ -20,87 +20,69 @@
  * $Id: INVITECommand.cc,v 1.21 2006/09/26 17:35:58 kewlio Exp $
  */
 
-#include	<string>
-#include	<iomanip>
+#include <string>
+#include <iomanip>
 
-#include	<cstdlib>
+#include <cstdlib>
 
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Constants.h"
-#include	"Network.h"
-#include	"gnuworld_config.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Constants.h"
+#include "Network.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool TOPICCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
+bool TOPICCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-if( st.size() < 2 )
-	{
-	// send help
-	Usage( theClient ) ;
-	return false ;
-	}
-if(st[1].size() > channel::MaxName)
-	{
-	bot->Notice(theClient,"Channel name can't be more than %d characters",
-		channel::MaxName);
-	return false;
-	}
-bot->MsgChanLog("TOPIC %s\n",st.assemble(1).c_str());
+    if (st.size() < 2) {
+        // send help
+        Usage(theClient);
+        return false;
+    }
+    if (st[1].size() > channel::MaxName) {
+        bot->Notice(theClient, "Channel name can't be more than %d characters", channel::MaxName);
+        return false;
+    }
+    bot->MsgChanLog("TOPIC %s\n", st.assemble(1).c_str());
 
-//If the channel doesnt begin with # add it
-string chanName = st[ 1 ] ;
-if( chanName[ 0 ] != '#' )
-	{
-	chanName.insert( chanName.begin(), '#' ) ;
-	}
+    // If the channel doesnt begin with # add it
+    string chanName = st[1];
+    if (chanName[0] != '#') {
+        chanName.insert(chanName.begin(), '#');
+    }
 
-string topic;
-if (st.size() == 2)
-	topic = "";
-else
-	topic = "(" + theClient->getNickName() + ") " + st.assemble(2);
+    string topic;
+    if (st.size() == 2)
+        topic = "";
+    else
+        topic = "(" + theClient->getNickName() + ") " + st.assemble(2);
 
-if ( topic.size() > MAX_TOPIC_LENGTH )
-	{
-	bot->Notice(theClient, "Topic cannot exceed %d characters", MAX_TOPIC_LENGTH);
-	return true;
-	}
+    if (topic.size() > MAX_TOPIC_LENGTH) {
+        bot->Notice(theClient, "Topic cannot exceed %d characters", MAX_TOPIC_LENGTH);
+        return true;
+    }
 
+    Channel* theChan = Network->findChannel(st[1]);
+    if (theChan == NULL) {
+        bot->Notice(theClient, "Channel '%s' does not exist!", st[1].c_str());
+        return true;
+    }
 
-Channel* theChan = Network->findChannel(st[1]);
-if (theChan == NULL)
-	{
-	bot->Notice(theClient, "Channel '%s' does not exist!", st[1].c_str());
-	return true;
-	}
+    stringstream s;
+    s << bot->getCharYY() << " T " << theChan->getName() << " :" << topic << ends;
 
+    bot->Write(s);
 
-stringstream s;
-s	<< bot->getCharYY()
-	<< " T "
-	<< theChan->getName()
-	<< " :"
-	<< topic
-	<< ends;
-
-bot->Write( s );
-
-return true ;
+    return true;
 }
 
-}
+} // namespace uworld
 
-}
-
-
+} // namespace gnuworld

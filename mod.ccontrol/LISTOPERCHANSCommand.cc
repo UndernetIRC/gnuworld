@@ -20,53 +20,45 @@
  * $Id: LISTOPERCHANSCommand.cc,v 1.9 2005/01/12 03:50:29 dan_karrels Exp $
  */
 
-#include	<string>
-#include	<cstdlib>
-#include	<iomanip>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <cstdlib>
+#include <iomanip>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
 // listoperchans
-bool LISTOPERCHANSCommand::Exec( iClient* theClient, const string& )
-{
+bool LISTOPERCHANSCommand::Exec(iClient* theClient, const string&) {
 
-bot->Notice( theClient, "There are currently %d IRCoperator only channels",
-	bot->operChan_size() ) ;
+    bot->Notice(theClient, "There are currently %d IRCoperator only channels",
+                bot->operChan_size());
 
-if( bot->operChan_empty() )
-	{
-	return true ;
-	}
+    if (bot->operChan_empty()) {
+        return true;
+    }
 
-string chanList = "" ;
-ccontrol::const_operChanIterator ptr = bot->operChan_begin() ;
+    string chanList = "";
+    ccontrol::const_operChanIterator ptr = bot->operChan_begin();
 
-while( ptr != bot->operChan_end() )
-	{
-	if( !chanList.empty() )
-		{
-		chanList += ", " ;
-		chanList += *ptr ;
-		}
-	else
-		{
-		chanList = *ptr ;
-		}
-	++ptr ;
-	}
+    while (ptr != bot->operChan_end()) {
+        if (!chanList.empty()) {
+            chanList += ", ";
+            chanList += *ptr;
+        } else {
+            chanList = *ptr;
+        }
+        ++ptr;
+    }
 
-bot->Notice( theClient, chanList ) ;
-return true ;
+    bot->Notice(theClient, chanList);
+    return true;
 }
-}
-}
+} // namespace uworld
+} // namespace gnuworld

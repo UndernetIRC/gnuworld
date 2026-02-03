@@ -21,63 +21,48 @@
  * $Id: ConnectionHandler.cc,v 1.3 2003/08/05 01:59:14 dan_karrels Exp $
  */
 
-#include	<string>
-#include	<iostream>
+#include <string>
+#include <iostream>
 
-#include	"ConnectionHandler.h"
-#include	"Connection.h"
+#include "ConnectionHandler.h"
+#include "Connection.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::cout ;
-using std::endl ;
+using std::cout;
+using std::endl;
+using std::string;
 
 /**
  * These methods are empty.
  * Simply output a little debugging message if uncommented.
  */
 
-ConnectionHandler::ConnectionHandler()
-{}
+ConnectionHandler::ConnectionHandler() {}
 
-ConnectionHandler::~ConnectionHandler()
-{}
+ConnectionHandler::~ConnectionHandler() {}
 
-void ConnectionHandler::OnConnect( Connection* cPtr )
-{
-cout	<< "ConnectionHandler::OnConnect> "
-	<< *cPtr
-	<< endl ;
+void ConnectionHandler::OnConnect(Connection* cPtr) {
+    cout << "ConnectionHandler::OnConnect> " << *cPtr << endl;
 }
 
-void ConnectionHandler::OnConnectFail( Connection* cPtr )
-{
-cout	<< "ConnectionHandler::OnConnectFail> "
-	<< *cPtr
-	<< endl ;
+void ConnectionHandler::OnConnectFail(Connection* cPtr) {
+    cout << "ConnectionHandler::OnConnectFail> " << *cPtr << endl;
 }
 
-void ConnectionHandler::OnRead( Connection*, const string& )
-{
-//cout	<< "ConnectionHandler::OnRead> "
-//	<< *cPtr
-//	<< ", line: "
-//	<< line
-//	<< endl ;
+void ConnectionHandler::OnRead(Connection*, const string&) {
+    // cout	<< "ConnectionHandler::OnRead> "
+    //	<< *cPtr
+    //	<< ", line: "
+    //	<< line
+    //	<< endl ;
 }
 
-void ConnectionHandler::OnDisconnect( Connection* cPtr )
-{
-cout	<< "ConnectionHandler::OnDisconnect> "
-	<< *cPtr
-	<< endl ;
+void ConnectionHandler::OnDisconnect(Connection* cPtr) {
+    cout << "ConnectionHandler::OnDisconnect> " << *cPtr << endl;
 }
 
 /* This method is now overridden by xServer's onTimeout() method */
-void ConnectionHandler::OnTimeout( Connection * )
-{
-}
+void ConnectionHandler::OnTimeout(Connection*) {}
 
 } // namespace gnuworld

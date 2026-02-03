@@ -20,7 +20,7 @@
 #ifndef CF_CHANFIX_COMMANDS_H
 #define CF_CHANFIX_COMMANDS_H
 
-#include	<string>
+#include <string>
 
 namespace gnuworld {
 
@@ -31,44 +31,37 @@ namespace chanfix {
 class chanfix;
 
 class Command {
-public:
-	Command( chanfix *_bot,
-		const std::string& _commandName,
-		const std::string& _help ) :
-		bot(_bot), commandName(_commandName), help(_help)
-		{ }
+  public:
+    Command(chanfix* _bot, const std::string& _commandName, const std::string& _help)
+        : bot(_bot), commandName(_commandName), help(_help) {}
 
-	virtual ~Command() { }
+    virtual ~Command() {}
 
-	virtual void Exec(const iClient*, const std::string&) = 0;
+    virtual void Exec(const iClient*, const std::string&) = 0;
 
-	const std::string& getName() const
-		{ return commandName; }
+    const std::string& getName() const { return commandName; }
 
-	const std::string& getHelp() const
-		{ return help; }
+    const std::string& getHelp() const { return help; }
 
-	virtual void Usage(const iClient*);
+    virtual void Usage(const iClient*);
 
-protected:
-	chanfix	*bot;
-	std::string	commandName;
-	std::string	help;
+  protected:
+    chanfix* bot;
+    std::string commandName;
+    std::string help;
 }; // class Command
 
-#define DECLARE_COMMAND(commandName) \
-class commandName##Command : public Command \
-{ \
-  public: \
-    commandName##Command(chanfix* _bot, \
-      const std::string& _commandName, \
-      const std::string& _help) : \
-        Command(_bot, _commandName, _help) {} \
-    virtual ~commandName##Command() {} \
-    virtual void Exec(const iClient*, const std::string&); \
-};
+#define DECLARE_COMMAND(commandName)                                                               \
+    class commandName##Command : public Command {                                                  \
+      public:                                                                                      \
+        commandName##Command(chanfix* _bot, const std::string& _commandName,                       \
+                             const std::string& _help)                                             \
+            : Command(_bot, _commandName, _help) {}                                                \
+        virtual ~commandName##Command() {}                                                         \
+        virtual void Exec(const iClient*, const std::string&);                                     \
+    };
 
-DECLARE_COMMAND( CHECK )
+DECLARE_COMMAND(CHECK)
 
 } // namespace chanfix
 

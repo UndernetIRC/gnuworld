@@ -19,56 +19,42 @@
  * $Id: clientExample.cc,v 1.7 2004/05/25 14:17:58 jeekay Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"client.h"
-#include	"clientExample.h"
-#include	"server.h"
-#include	"EConfig.h"
+#include "client.h"
+#include "clientExample.h"
+#include "server.h"
+#include "EConfig.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 /*
  *  Exported function used by moduleLoader to gain an
  *  instance of this module.
  */
 
-extern "C"
-{
-  xClient* _gnuwinit(const std::string& args)
-  { 
-    return new clientExample( args );
-  }
+extern "C" {
+xClient* _gnuwinit(const std::string& args) { return new clientExample(args); }
+}
 
-} 
- 
 /**
  * This constructor calls the base class constructor.  The xClient
  * constructor will open the configuration file given and retrieve
  * basic client info (nick/user/host/etc).
  * Any additional processing must be done here.
  */
-clientExample::clientExample( const std::string& configFileName )
- : xClient( configFileName )
-{}
+clientExample::clientExample(const std::string& configFileName) : xClient(configFileName) {}
 
-clientExample::~clientExample()
-{
-/* No heap space allocated */
-}
+clientExample::~clientExample() { /* No heap space allocated */ }
 
-void clientExample::OnPrivateMessage( iClient* theClient,
-	const std::string&, bool )
-{
-Notice( theClient, "Howdy :)" ) ;
+void clientExample::OnPrivateMessage(iClient* theClient, const std::string&, bool) {
+    Notice(theClient, "Howdy :)");
 }
 
 // Burst any channels.
-void clientExample::BurstChannels()
-{
-xClient::BurstChannels() ;
-Join( "#some_oper_channel" ) ;
+void clientExample::BurstChannels() {
+    xClient::BurstChannels();
+    Join("#some_oper_channel");
 }
 
 } // namespace gnuworld

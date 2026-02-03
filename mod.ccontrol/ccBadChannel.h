@@ -18,72 +18,59 @@
  *
  * $Id: ccBadChannel.h,v 1.3 2007/08/28 16:10:03 dan_karrels Exp $
  */
- 
+
 #ifndef __CCBADCHANNEL_H_
 #define __CCBADCHANNEL_H_
 
-#include	<string>
+#include <string>
 
-#include	"dbHandle.h"
+#include "dbHandle.h"
 
 using namespace std;
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace uworld
-{
+namespace uworld {
 
-class ccBadChannel
-{
-public:
-	ccBadChannel() {}
-	
-	ccBadChannel(dbHandle* , unsigned int);
-	
-	ccBadChannel(const string& _Name, const string& _Reason , 
-		     const string& _AddedBy) : Name(_Name),
-		     Reason(_Reason),AddedBy(_AddedBy) {};
-	
-	~ccBadChannel(){}
-	
-	bool Update(dbHandle*);
-	
-	bool Insert(dbHandle*);
-	
-	bool Delete(dbHandle*);
-	
-	const string& getName() const
-	{ return Name; }
-	
-	const string& getReason() const
-	{ return Reason; }
+class ccBadChannel {
+  public:
+    ccBadChannel() {}
 
-	const string& getAddedBy() const
-	{ return AddedBy; }
-	
-	void setName(const string& _Name)
-	{ Name = _Name; }
-	
-	void setReason(const string& _Reason)
-	{ Reason = _Reason; }
-	
-	void setAddedBy(const string& _AddedBy)
-	{ AddedBy = _AddedBy; }
-	
-private:
-	
-	string Name;
-	
-	string Reason;
-	
-	string AddedBy;
-	
-	
-};	
+    ccBadChannel(dbHandle*, unsigned int);
 
-}
+    ccBadChannel(const string& _Name, const string& _Reason, const string& _AddedBy)
+        : Name(_Name), Reason(_Reason), AddedBy(_AddedBy) {};
 
-}
+    ~ccBadChannel() {}
 
-#endif 
+    bool Update(dbHandle*);
+
+    bool Insert(dbHandle*);
+
+    bool Delete(dbHandle*);
+
+    const string& getName() const { return Name; }
+
+    const string& getReason() const { return Reason; }
+
+    const string& getAddedBy() const { return AddedBy; }
+
+    void setName(const string& _Name) { Name = _Name; }
+
+    void setReason(const string& _Reason) { Reason = _Reason; }
+
+    void setAddedBy(const string& _AddedBy) { AddedBy = _AddedBy; }
+
+  private:
+    string Name;
+
+    string Reason;
+
+    string AddedBy;
+};
+
+} // namespace uworld
+
+} // namespace gnuworld
+
+#endif

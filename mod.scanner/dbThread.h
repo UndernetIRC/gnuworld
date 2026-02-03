@@ -23,21 +23,18 @@
 #ifndef __DBTHREAD_H
 #define __DBTHREAD_H "$Id: dbThread.h,v 1.1 2002/08/08 21:31:45 dan_karrels Exp $"
 
-#include	"gThread.h"
+#include "gThread.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-class dbThread : public gThread
-{
+class dbThread : public gThread {
 
-public:
-	dbThread() ;
-	virtual ~dbThread() ;
+  public:
+    dbThread();
+    virtual ~dbThread();
 
-	virtual void		Exec() ;
-
-} ;
+    virtual void Exec();
+};
 
 } // namespace gnuworld
 

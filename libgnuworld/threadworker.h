@@ -28,43 +28,39 @@
 #include <atomic>
 #include <functional>
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 class ThreadWorker {
-private:
-  std::queue< std::function< void() > > jobs ;
-  mutable std::mutex mutex ;
-  std::condition_variable cv ;
-  std::thread worker ;
-  bool stop ;
+  private:
+    std::queue<std::function<void()>> jobs;
+    mutable std::mutex mutex;
+    std::condition_variable cv;
+    std::thread worker;
+    bool stop;
 
-  void run() ;
+    void run();
 
-public:
-  ThreadWorker() ;
-  ~ThreadWorker() ;
+  public:
+    ThreadWorker();
+    ~ThreadWorker();
 
-  template< typename Callable >
-  void submitJob( Callable&& task ) {
-    {
-      std::lock_guard< std::mutex > lock( mutex ) ;
-      jobs.emplace( std::forward< Callable >( task ) ) ;
-    }
-    cv.notify_one() ;
-  }
-
-  bool hasPendingJobs() const
-    {
-    std::lock_guard< std::mutex > lock( mutex ) ;
-    return !jobs.empty() ;
+    template <typename Callable> void submitJob(Callable&& task) {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            jobs.emplace(std::forward<Callable>(task));
+        }
+        cv.notify_one();
     }
 
-  size_t getPendingJobCount() const
-    {
-    std::lock_guard< std::mutex > lock( mutex ) ;
-    return jobs.size() ;
+    bool hasPendingJobs() const {
+        std::lock_guard<std::mutex> lock(mutex);
+        return !jobs.empty();
     }
-} ;
+
+    size_t getPendingJobCount() const {
+        std::lock_guard<std::mutex> lock(mutex);
+        return jobs.size();
+    }
+};
 
 } // namespace gnuworld

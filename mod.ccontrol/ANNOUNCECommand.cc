@@ -20,40 +20,35 @@
  * $Id: ANNOUNCECommand.cc,v 1.2 2009/06/13 06:43:34 hidden1 Exp $
  */
 
-#include	<string>
-#include        <iomanip>
+#include <string>
+#include <iomanip>
 
-#include	<cstdlib>
+#include <cstdlib>
 
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include 	"Constants.h"
-#include	"gnuworld_config.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool ANNOUNCECommand::Exec( iClient* theClient, const string& Message )
-{	 
-StringTokenizer st( Message ) ;
-bot->MsgChanLog("ANNOUNCE %s\n",st.assemble(1).c_str());
-	
-if(st.size() < 2) 
-	{
-	Usage(theClient);
-	return true;
-	}
+bool ANNOUNCECommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    bot->MsgChanLog("ANNOUNCE %s\n", st.assemble(1).c_str());
 
-bot->announce(theClient, st.assemble(1));
-return true;
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
+
+    bot->announce(theClient, st.assemble(1));
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld
-

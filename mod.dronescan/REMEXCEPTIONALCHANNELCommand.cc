@@ -33,40 +33,37 @@ namespace gnuworld {
 
 namespace ds {
 
-void REMEXCEPTIONALCHANNELCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
-{
-	if(theUser->getAccess() < level::remExceptionalChannel) return ;
+void REMEXCEPTIONALCHANNELCommand::Exec(const iClient* theClient, const string& Message,
+                                        const sqlUser* theUser) {
+    if (theUser->getAccess() < level::remExceptionalChannel)
+        return;
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	/* Usage:
-	 *  REMEXCEPTIONALCHANNEL <channel name>
-	 */
-	if( st.size() != 2 )
-	{
-		Usage(theClient);
-		return;
-	}
-	if( st[1][0] != '#' )
-	{
-		bot->Reply(theClient, "Channel name must start with #");
-		return;
-	}
-	if(!bot->isExceptionalChannel(st[1]))
-	{
-		bot->Reply(theClient, "Channel %s isn't an exceptionalChannel",st[1].c_str());
-		return;
-	}
-	if(!bot->remExceptionalChannel(st[1]))
-	{
-		bot->Reply(theClient, "Failed to remove %s from the exceptional channels list",
-			st[1].c_str());
-	} else {
-		bot->Reply(theClient, "Successfully removed %s from the exceptional channels list",
-			st[1].c_str());
-	}
+    /* Usage:
+     *  REMEXCEPTIONALCHANNEL <channel name>
+     */
+    if (st.size() != 2) {
+        Usage(theClient);
+        return;
+    }
+    if (st[1][0] != '#') {
+        bot->Reply(theClient, "Channel name must start with #");
+        return;
+    }
+    if (!bot->isExceptionalChannel(st[1])) {
+        bot->Reply(theClient, "Channel %s isn't an exceptionalChannel", st[1].c_str());
+        return;
+    }
+    if (!bot->remExceptionalChannel(st[1])) {
+        bot->Reply(theClient, "Failed to remove %s from the exceptional channels list",
+                   st[1].c_str());
+    } else {
+        bot->Reply(theClient, "Successfully removed %s from the exceptional channels list",
+                   st[1].c_str());
+    }
 
-	return ;
+    return;
 } // REMEXCEPTIONALCHANNELCommand::Exec(iClient*, const string&)
 
 } // namespace ds

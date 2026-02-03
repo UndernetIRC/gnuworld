@@ -19,48 +19,39 @@
  * $Id: match.cc,v 1.4 2004/05/18 16:51:05 dan_karrels Exp $
  */
 
-#include	<iostream>
-#include	<string>
+#include <iostream>
+#include <string>
 
-#include	"ELog.h"
-#include	"match.h"
+#include "ELog.h"
+#include "match.h"
 
-using namespace std ;
-using namespace gnuworld ;
+using namespace std;
+using namespace gnuworld;
 
-void getInput( string& s1, string& s2 )
-{
-cout	<< "Please input two strings to match: " ;
-cout.flush() ;
+void getInput(string& s1, string& s2) {
+    cout << "Please input two strings to match: ";
+    cout.flush();
 
-cin	>> s1 >> s2 ;
+    cin >> s1 >> s2;
 }
 
-int main()
-{
-string s1 ;
-string s2 ;
+int main() {
+    string s1;
+    string s2;
 
-getInput( s1, s2 ) ;
+    getInput(s1, s2);
 
-cout	<< "Matching "
-	<< s1
-	<< " and "
-	<< s2
-	<< ": " ;
+    cout << "Matching " << s1 << " and " << s2 << ": ";
 
-int result = match( s1, s2 ) ;
+    int result = match(s1, s2);
 
-if( 0 == result )
-	{
-	cout	<< "Match" ;
-	}
-else
-	{
-	cout	<< "No Match" ;
-	}
+    if (0 == result) {
+        cout << "Match";
+    } else {
+        cout << "No Match";
+    }
 
-cout	<< endl ;
+    cout << endl;
 
-return 0 ;
+    return 0;
 }

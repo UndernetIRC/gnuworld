@@ -30,61 +30,60 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void ALERTCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void ALERTCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-if (st[1][0] != '#') {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::invalid_channel_name,
-                              std::string("%s is an invalid channel name.")).c_str(),
-                                          st[1].c_str());
-  return;
-}
+    if (st[1][0] != '#') {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::invalid_channel_name,
+                                     std::string("%s is an invalid channel name."))
+                        .c_str(),
+                    st[1].c_str());
+        return;
+    }
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan) theChan = bot->newChannelRecord(st[1]);
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan)
+        theChan = bot->newChannelRecord(st[1]);
 
-if (theChan->getFlag(sqlChannel::F_ALERT)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::alert_already_set,
-                              std::string("The channel %s already has the ALERT flag.")).c_str(),
-                                          theChan->getChannel().c_str());
-  return;
-}
+    if (theChan->getFlag(sqlChannel::F_ALERT)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::alert_already_set,
+                                     std::string("The channel %s already has the ALERT flag."))
+                        .c_str(),
+                    theChan->getChannel().c_str());
+        return;
+    }
 
-theChan->setFlag(sqlChannel::F_ALERT);
+    theChan->setFlag(sqlChannel::F_ALERT);
 
-if (!theChan->useSQL())
-  theChan->Insert(bot->getLocalDBHandle());
-else
-  theChan->commit(bot->getLocalDBHandle());
+    if (!theChan->useSQL())
+        theChan->Insert(bot->getLocalDBHandle());
+    else
+        theChan->commit(bot->getLocalDBHandle());
 
-/* Add note to the channel about this command */
-theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_ALERT, theClient, (st.size() > 2) ? st.assemble(2) : "");
+    /* Add note to the channel about this command */
+    theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_ALERT, theClient,
+                     (st.size() > 2) ? st.assemble(2) : "");
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::alert_flag_added,
-                            std::string("ALERT flag added to channel %s")).c_str(),
-                                        theChan->getChannel().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::alert_flag_added,
+                                 std::string("ALERT flag added to channel %s"))
+                    .c_str(),
+                theChan->getChannel().c_str());
 
-/* Log command */
-bot->logAdminMessage("%s (%s) ALERT %s",
-		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
-		     theClient->getRealNickUserHost().c_str(),
-		     theChan->getChannel().c_str());
+    /* Log command */
+    bot->logAdminMessage("%s (%s) ALERT %s",
+                         theUser ? theUser->getUserName().c_str()
+                                 : theClient->getNickName().c_str(),
+                         theClient->getRealNickUserHost().c_str(), theChan->getChannel().c_str());
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
+    return;
 }
 } // namespace cf
 } // namespace gnuworld

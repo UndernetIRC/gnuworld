@@ -20,96 +20,84 @@
  * $Id: REMSERVERCommand.cc,v 1.14 2007/08/28 16:10:03 dan_karrels Exp $
  */
 
-#include	<string>
-#include	<iomanip>
-#include	<sstream>
-#include	<iostream>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Network.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
-#include	"dbHandle.h"
+#include <string>
+#include <iomanip>
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Network.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
+#include "dbHandle.h"
 
-namespace gnuworld
-{
-using std::endl ;
-using std::ends ;
-using std::stringstream ;
-using std::string ;
+namespace gnuworld {
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
 
-namespace uworld
-{
+namespace uworld {
 
-bool REMSERVERCommand::Exec( iClient* theClient, const string& Message )
-{
+bool REMSERVERCommand::Exec(iClient* theClient, const string& Message) {
 
-StringTokenizer st( Message ) ;
+    StringTokenizer st(Message);
 
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
-if(st[1].size() > server::MaxName)
-	{
-	bot->Notice(theClient,"Server name can't be longer than %d characters",
-		    server::MaxName);
-	return false;
-	}
-
-ccServer* tmpServer = bot->getServer(st[1]);
-if(!tmpServer)
-	{
-	bot->Notice(theClient, "Server %s is not in my database!\n",st [ 1 ].c_str());
-	return false;
-	}	
-
-bot->MsgChanLog("REMSERVER %s\n",st.assemble(1).c_str());
-
-stringstream theQuery;  
-theQuery        << User::Query
-                << " Where lower(server) = '"
- 		<< string_lower(tmpServer->getName()) << "'"
-		<< ends;
-
-
-elog << theQuery.str().c_str() << endl;
-
-if( !bot->SQLDb->Exec( theQuery.str(), true ) )
-//if(PGRES_TUPLES_OK != status)
-        {
-	bot->Notice(theClient,"Database error, unable to remove the server.");	
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
+    if (st[1].size() > server::MaxName) {
+        bot->Notice(theClient, "Server name can't be longer than %d characters", server::MaxName);
         return false;
-        }
+    }
 
-if(bot->SQLDb->Tuples() > 0)
-	{
-	bot->Notice(theClient,"There are %d users added to that server, please remove them first",
-			bot->SQLDb->Tuples());
-	return false;
-	}
+    ccServer* tmpServer = bot->getServer(st[1]);
+    if (!tmpServer) {
+        bot->Notice(theClient, "Server %s is not in my database!\n", st[1].c_str());
+        return false;
+    }
 
-bot->MsgChanLog("Removing server '%s' from the database at the request of %s\n",
-		tmpServer->getName().c_str(),theClient->getNickName().c_str());
+    bot->MsgChanLog("REMSERVER %s\n", st.assemble(1).c_str());
 
-//NewServer->setName(SName);
-if(tmpServer->Delete())
-	{
-	bot->Notice(theClient,"Server \002%s\002 has been successfully removed\n",tmpServer->getName().c_str());
-	bot->remServer(tmpServer);
-	delete tmpServer;
-	return true;
-	}
-else
-	{
-	bot->Notice(theClient,"Database error while removing server \002%s\002\n",tmpServer->getName().c_str());
-	return false;
-	}
-return true;
+    stringstream theQuery;
+    theQuery << User::Query << " Where lower(server) = '" << string_lower(tmpServer->getName())
+             << "'" << ends;
+
+    elog << theQuery.str().c_str() << endl;
+
+    if (!bot->SQLDb->Exec(theQuery.str(), true))
+    // if(PGRES_TUPLES_OK != status)
+    {
+        bot->Notice(theClient, "Database error, unable to remove the server.");
+        return false;
+    }
+
+    if (bot->SQLDb->Tuples() > 0) {
+        bot->Notice(theClient, "There are %d users added to that server, please remove them first",
+                    bot->SQLDb->Tuples());
+        return false;
+    }
+
+    bot->MsgChanLog("Removing server '%s' from the database at the request of %s\n",
+                    tmpServer->getName().c_str(), theClient->getNickName().c_str());
+
+    // NewServer->setName(SName);
+    if (tmpServer->Delete()) {
+        bot->Notice(theClient, "Server \002%s\002 has been successfully removed\n",
+                    tmpServer->getName().c_str());
+        bot->remServer(tmpServer);
+        delete tmpServer;
+        return true;
+    } else {
+        bot->Notice(theClient, "Database error while removing server \002%s\002\n",
+                    tmpServer->getName().c_str());
+        return false;
+    }
+    return true;
 }
 
-}
-}
+} // namespace uworld
+} // namespace gnuworld

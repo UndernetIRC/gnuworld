@@ -30,121 +30,119 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void DELNOTECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void DELNOTECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_entry_in_db,
-                              std::string("There is no entry in the database for %s.")).c_str(),
-                                          st[1].c_str());
-  return;
-}
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::no_entry_in_db,
+                                     std::string("There is no entry in the database for %s."))
+                        .c_str(),
+                    st[1].c_str());
+        return;
+    }
 
-if (!theChan->useSQL() || (theChan->countNotes(bot->getLocalDBHandle(),0) <= 0)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::chan_has_no_notes,
-                              std::string("The channel %s does not have any notes.")).c_str(),
-                                          theChan->getChannel().c_str());
-  return;
-}
+    if (!theChan->useSQL() || (theChan->countNotes(bot->getLocalDBHandle(), 0) <= 0)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::chan_has_no_notes,
+                                     std::string("The channel %s does not have any notes."))
+                        .c_str(),
+                    theChan->getChannel().c_str());
+        return;
+    }
 
-unsigned int messageId = atoi(st[2].c_str());
+    unsigned int messageId = atoi(st[2].c_str());
 
-/* Get a connection instance to our backend */
-dbHandle* cacheCon = bot->getLocalDBHandle();
+    /* Get a connection instance to our backend */
+    dbHandle* cacheCon = bot->getLocalDBHandle();
 
-/* Retrieve the note */
-std::stringstream noteCheckQuery;
-noteCheckQuery	<< "SELECT channelID, user_name, event "
-		<< "FROM notes "
-		<< "WHERE id = "
-		<< messageId
-		;
+    /* Retrieve the note */
+    std::stringstream noteCheckQuery;
+    noteCheckQuery << "SELECT channelID, user_name, event "
+                   << "FROM notes "
+                   << "WHERE id = " << messageId;
 
-if (!cacheCon->Exec(noteCheckQuery.str(),true)) {
-  elog	<< "DELNOTECommand> SQL Error: "
-	<< cacheCon->ErrorMessage()
-	<< std::endl ;
+    if (!cacheCon->Exec(noteCheckQuery.str(), true)) {
+        elog << "DELNOTECommand> SQL Error: " << cacheCon->ErrorMessage() << std::endl;
 
-  bot->SendTo(theClient,
-		bot->getResponse(theUser,
-				language::error_checking_noteid,
-				std::string("An unknown error occured while checking the note id.")).c_str());
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::error_checking_noteid,
+                             std::string("An unknown error occured while checking the note id."))
+                .c_str());
 
-  /* Dispose of our connection instance */
-  //bot->theManager->removeConnection(cacheCon);
+        /* Dispose of our connection instance */
+        // bot->theManager->removeConnection(cacheCon);
 
-  return;
-}
+        return;
+    }
 
-if (cacheCon->Tuples() != 1) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_note_with_id,
-                              std::string("There is no such note with that note_id.")).c_str());
-  return;
-}
+    if (cacheCon->Tuples() != 1) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::no_note_with_id,
+                                     std::string("There is no such note with that note_id."))
+                        .c_str());
+        return;
+    }
 
-unsigned int channelID = atoi(cacheCon->GetValue(0,0));
-std::string user_name = cacheCon->GetValue(0,1);
-unsigned short eventType = atoi(cacheCon->GetValue(0,2));
+    unsigned int channelID = atoi(cacheCon->GetValue(0, 0));
+    std::string user_name = cacheCon->GetValue(0, 1);
+    unsigned short eventType = atoi(cacheCon->GetValue(0, 2));
 
-/* Dispose of our connection instance */
-//bot->theManager->removeConnection(cacheCon);
+    /* Dispose of our connection instance */
+    // bot->theManager->removeConnection(cacheCon);
 
-if (channelID != theChan->getID()) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_note_id_for_chan,
-                              std::string("No such note #%d for channel %s.")).c_str(),
-                                          messageId, theChan->getChannel().c_str());
-  return;
-}
+    if (channelID != theChan->getID()) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::no_note_id_for_chan,
+                                     std::string("No such note #%d for channel %s."))
+                        .c_str(),
+                    messageId, theChan->getChannel().c_str());
+        return;
+    }
 
-if (string_lower(user_name) != string_lower(theUser->getUserName()) && !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::note_not_added_by_you,
-                              std::string("Note #%d for channel %s was not added by you. You can only delete notes that you added.")).c_str(),
-                                          messageId, theChan->getChannel().c_str());
-  return;
-}
+    if (string_lower(user_name) != string_lower(theUser->getUserName()) &&
+        !theUser->getFlag(sqlcfUser::F_USERMANAGER)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::note_not_added_by_you,
+                                     std::string("Note #%d for channel %s was not added by you. "
+                                                 "You can only delete notes that you added."))
+                        .c_str(),
+                    messageId, theChan->getChannel().c_str());
+        return;
+    }
 
-if (eventType != sqlChannel::EV_NOTE && !theUser->getFlag(sqlcfUser::F_OWNER)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::note_not_manually_added,
-                              std::string("Note #%d for channel %s is not a manually added note. You can only delete notes that were manually added.")).c_str(),
-                                          messageId, theChan->getChannel().c_str());
-  return;
-}
+    if (eventType != sqlChannel::EV_NOTE && !theUser->getFlag(sqlcfUser::F_OWNER)) {
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::note_not_manually_added,
+                             std::string("Note #%d for channel %s is not a manually added note. "
+                                         "You can only delete notes that were manually added."))
+                .c_str(),
+            messageId, theChan->getChannel().c_str());
+        return;
+    }
 
-theChan->deleteNote(bot->getLocalDBHandle(),messageId);
+    theChan->deleteNote(bot->getLocalDBHandle(), messageId);
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::note_deleted,
-                            std::string("Note #%d for channel %s deleted.")).c_str(),
-                                        messageId, theChan->getChannel().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::note_deleted,
+                                 std::string("Note #%d for channel %s deleted."))
+                    .c_str(),
+                messageId, theChan->getChannel().c_str());
 
-bot->logAdminMessage("%s (%s) DELNOTE %s %d",
-		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
-		     theClient->getRealNickUserHost().c_str(),
-		     theChan->getChannel().c_str(), messageId);
+    bot->logAdminMessage(
+        "%s (%s) DELNOTE %s %d",
+        theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
+        theClient->getRealNickUserHost().c_str(), theChan->getChannel().c_str(), messageId);
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
+    return;
 }
 
 } // namespace cf

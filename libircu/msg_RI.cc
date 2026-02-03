@@ -18,26 +18,25 @@
  * USA.
  */
 
-#include	<sys/types.h>
-#include	<sys/time.h>
+#include <sys/types.h>
+#include <sys/time.h>
 
-#include	<iostream>
-#include	<sstream>
+#include <iostream>
+#include <sstream>
 
-#include	"server.h"
-#include	"iServer.h"
-#include	"iClient.h"
-#include	"events.h"
-#include	"Network.h"
-#include	"ELog.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
+#include "server.h"
+#include "iServer.h"
+#include "iClient.h"
+#include "events.h"
+#include "Network.h"
+#include "ELog.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::endl ;
-using std::stringstream ;
+using std::endl;
+using std::stringstream;
 
 CREATE_HANDLER(msg_RI)
 
@@ -55,55 +54,40 @@ CREATE_HANDLER(msg_RI)
  * params: AB Az ABAAA 1085753348 87482 <No client start time>
  */
 
-bool msg_RI::Execute( const xParameters& params )
-{
+bool msg_RI::Execute(const xParameters& params) {
 
-//return true;
+    // return true;
 
-if( params.size() < 5 ) {
-	elog	<< "msg_RI> Invalid number of arguments."
-		<< endl;
-	return false;
-}
+    if (params.size() < 5) {
+        elog << "msg_RI> Invalid number of arguments." << endl;
+        return false;
+    }
 
-if( params[1] != theServer->getCharYY() ) {
-	elog	<< "msg_RI> Got RPING destined for someone else."
-		<< endl;
-	return false;
-}
+    if (params[1] != theServer->getCharYY()) {
+        elog << "msg_RI> Got RPING destined for someone else." << endl;
+        return false;
+    }
 
-iServer *remoteServer = Network->findServer(params[0]);
-iClient *remoteClient = Network->findClient(params[2]);
+    iServer* remoteServer = Network->findServer(params[0]);
+    iClient* remoteClient = Network->findClient(params[2]);
 
-if( !remoteServer || !remoteClient ) {
-	elog	<< "msg_RI> Got RPING from non-existant client/server."
-		<< endl;
-	return false;
-}
+    if (!remoteServer || !remoteClient) {
+        elog << "msg_RI> Got RPING from non-existant client/server." << endl;
+        return false;
+    }
 
-/* Construct our reply */
-stringstream reply;
-reply	<< theServer->getCharYY()
-	<< " RO "
-	<< remoteServer->getName()
-	<< " "
-	<< remoteClient->getCharYYXXX()
-	<< " "
-	<< params[3]
-	<< " "
-	<< params[4]
-	;
+    /* Construct our reply */
+    stringstream reply;
+    reply << theServer->getCharYY() << " RO " << remoteServer->getName() << " "
+          << remoteClient->getCharYYXXX() << " " << params[3] << " " << params[4];
 
-if( params.size() > 5 ) {
-	reply	<< " :"
-		<< params.assemble(5)
-		;
-}
+    if (params.size() > 5) {
+        reply << " :" << params.assemble(5);
+    }
 
-theServer->Write(reply);
+    theServer->Write(reply);
 
-return true;
-
+    return true;
 }
 
 } // namespace gnuworld

@@ -26,71 +26,66 @@
 #ifndef __IP_H
 #define __IP_H "$Id: ip.h,v 1.7 2004/01/07 03:08:29 dan_karrels Exp $"
 
-#include	<string>
-#include	"Numeric.h"
+#include <string>
+#include "Numeric.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 /**
  * A utility class that is used to retrieve information about
  * IP addresses.
  */
-class xIP
-{
+class xIP {
 
-public:
+  public:
+    /**
+     * Construct an xIP instance given an address in std::string
+     * format.
+     */
+    xIP(const std::string& IP, bool Base64 = false);
 
-	/**
-	 * Construct an xIP instance given an address in std::string
-	 * format.
-	 */
-	xIP( const std::string& IP, bool Base64 = false ) ;
+    /**
+     * Construct an xIP instance given an IP in irc_in_addr struct format.
+     */
+    xIP(const irc_in_addr& IP);
 
-	/**
- 	 * Construct an xIP instance given an IP in irc_in_addr struct format.
-	 */
-	xIP( const irc_in_addr& IP ) ;
+    /**
+     * Copy constructor.
+     */
+    xIP(const xIP& IP);
 
-	/**
-	 * Copy constructor.
-	 */
-	xIP( const xIP& IP ) ;
+    /**
+     * Destruct this xIP instance.  No heap space is allocated.
+     */
+    ~xIP() {}
 
-	/**
-	 * Destruct this xIP instance.  No heap space is allocated.
-	 */
-	~xIP() {}
+    /**
+     * Retrieve the IP in xxx.xxx.xxx.xxx/xx:xx::xx:xx character array format.
+     */
+    std::string GetNumericIP(bool fixedToCIDR64 = false) const;
 
-	/**
-	 * Retrieve the IP in xxx.xxx.xxx.xxx/xx:xx::xx:xx character array format.
-	 */
-	std::string	GetNumericIP(bool fixedToCIDR64 = false) const ;
+    /**
+     * Retrieve the IP as an irc_in_addr struct.
+     */
+    const irc_in_addr& GetLongIP() const;
 
-	/**
-	 * Retrieve the IP as an irc_in_addr struct.
-	 */
-	const irc_in_addr& GetLongIP() const ;
+    /**
+     * Return a character array representation of the base 64
+     * IP.
+     */
+    std::string GetBase64IP() const;
 
-	/**
-	 * Return a character array representation of the base 64
-	 * IP.
-	 */
-	std::string	GetBase64IP() const ;
+    /**
+     * Get the 32 bit integer representation of a current IPv4 address.
+     */
+    unsigned int getIP32() const;
 
-	/**
-	 * Get the 32 bit integer representation of a current IPv4 address.
-	 */
-	unsigned int getIP32() const;
-
-protected:
-
-	/**
-	 * The IP number itself.
-	 */
-	irc_in_addr	IP;
-
-} ;
+  protected:
+    /**
+     * The IP number itself.
+     */
+    irc_in_addr IP;
+};
 
 } // namespace gnuworld
 

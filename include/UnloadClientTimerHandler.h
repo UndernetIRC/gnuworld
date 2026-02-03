@@ -21,61 +21,52 @@
  */
 
 #ifndef __UNLOADCLIENTTIMERHANDLER_H
-#define __UNLOADCLIENTTIMERHANDLER_H "$Id: UnloadClientTimerHandler.h,v 1.7 2004/05/19 19:46:33 jeekay Exp $"
+#define __UNLOADCLIENTTIMERHANDLER_H                                                               \
+    "$Id: UnloadClientTimerHandler.h,v 1.7 2004/05/19 19:46:33 jeekay Exp $"
 
-#include	<string>
+#include <string>
 
-#include	"ServerTimerHandlers.h"
+#include "ServerTimerHandlers.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-class xServer ;
+class xServer;
 
 /**
  * This class is responsible for unloading an xClient at a particular time.
  * This delayed unload allows the xClient to finish cleanup work as
  * requested by the server event system.
  */
-class UnloadClientTimerHandler : public ServerTimerHandler
-{
+class UnloadClientTimerHandler : public ServerTimerHandler {
 
-protected:
+  protected:
+    /// The xClient module name
+    std::string moduleName;
 
-	/// The xClient module name
-	std::string	moduleName ;
+    /// The reason for the unload, will be delivered to the xClient
+    std::string reason;
 
-	/// The reason for the unload, will be delivered to the xClient
-	std::string	reason ;
+  public:
+    /**
+     * The constructor receives the follow arguments:
+     * - A pointer to the global xServer instance
+     * - The xClient module name
+     * - The reason for unloading the client.
+     */
+    UnloadClientTimerHandler(xServer* theServer, const std::string& _moduleName,
+                             const std::string& _reason)
+        : ServerTimerHandler(theServer, 0), moduleName(_moduleName), reason(_reason) {}
 
-public:
+    /**
+     * Destructor, not much to talk about here.
+     */
+    virtual ~UnloadClientTimerHandler() {}
 
-	/**
-	 * The constructor receives the follow arguments:
-	 * - A pointer to the global xServer instance
-	 * - The xClient module name
-	 * - The reason for unloading the client.
-	 */
-	UnloadClientTimerHandler( xServer* theServer,
-		const std::string& _moduleName,
-		const std::string& _reason )
-	: ServerTimerHandler( theServer, 0),
-	  moduleName( _moduleName ),
-	  reason( _reason )
-	{}
-
-	/**
-	 * Destructor, not much to talk about here.
-	 */
-	virtual ~UnloadClientTimerHandler()
-	{}
-
-	/**
-	 * The method that is called when it's time to unload the client.
-	 */
-	virtual	void	OnTimer( const timerID& , void* ) ;
-
-} ;
+    /**
+     * The method that is called when it's time to unload the client.
+     */
+    virtual void OnTimer(const timerID&, void*);
+};
 
 } // namespace gnuworld
 

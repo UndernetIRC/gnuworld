@@ -22,549 +22,527 @@
 #ifndef __CHANFIX_H
 #define __CHANFIX_H "$Id: chanfix.h,v 1.10 2010/03/04 04:24:12 hidden1 Exp $"
 
-#include	<string>
-#include	<vector>
-#include	<map>
-#include	<list>
-#include	<sstream>
+#include <string>
+#include <vector>
+#include <map>
+#include <list>
+#include <sstream>
 
-#include	"client.h"
-#include	"EConfig.h"
-#include	"ELog.h"
-#include	"Timer.h"
-#include	"misc.h"
+#include "client.h"
+#include "EConfig.h"
+#include "ELog.h"
+#include "Timer.h"
+#include "misc.h"
 
-#include	"chanfixCommands.h"
-#include	"chanfix_config.h"
-#include	"sqlChannel.h"
+#include "chanfixCommands.h"
+#include "chanfix_config.h"
+#include "sqlChannel.h"
 
 /* This must be declared before sqlChanOp.h is #include'd */
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 extern short currentDay;
 }
-}
+} // namespace gnuworld
 
-#include	"sqlChanOp.h"
-#include	"sqlManager.h"
-#include	"sqlcfUser.h"
+#include "sqlChanOp.h"
+#include "sqlManager.h"
+#include "sqlcfUser.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 class Timer;
 
-namespace cf
-{
+namespace cf {
 
 class chanfix : public xClient {
 
-public:
+  public:
+    /**
+     * Current network state.
+     */
+    enum STATE { BURST, RUN, SPLIT, INIT };
 
-	/**
-	 * Current network state.
-	 */
-	enum STATE {
-		BURST,
-		RUN,
-		SPLIT,
-		INIT
-	};
+    /**
+     * Constructor receives a configuration file name.
+     */
+    chanfix(const std::string&);
 
-	/**
-	 * Constructor receives a configuration file name.
-	 */
-	chanfix( const std::string& ) ;
+    /**
+     * Destructor does normal stuff.
+     */
+    virtual ~chanfix();
 
-	/**
-	 * Destructor does normal stuff.
-	 */
-	virtual ~chanfix() ;
+    virtual void OnTimer(const gnuworld::xServer::timerID&, void*);
 
-	virtual void OnTimer(const gnuworld::xServer::timerID&, void*) ;
+    /**
+     * This method is called when a network client sends
+     * a private message (PRIVMSG or NOTICE) to this xClient.
+     * The first argument is a pointer to the source client,
+     * and the second argument is the actual message (minus
+     * all of the server command stuff).
+     */
+    virtual void OnPrivateMessage(iClient*, const std::string&, bool secure = false);
 
-	/**
-	 * This method is called when a network client sends
-	 * a private message (PRIVMSG or NOTICE) to this xClient.
-	 * The first argument is a pointer to the source client,
-	 * and the second argument is the actual message (minus
-	 * all of the server command stuff).
-	 */
-	virtual void OnPrivateMessage( iClient*, const std::string&,
-		bool secure = false ) ;
+    /**
+     * This method is called by the server when a server connection
+     * is established.  The purpose of this method is to inform
+     * the xServer of the channels this client wishes to burst.
+     */
+    virtual void BurstChannels();
 
-	/**
-	 * This method is called by the server when a server connection
-	 * is established.  The purpose of this method is to inform
-	 * the xServer of the channels this client wishes to burst.
-	 */
-	virtual void BurstChannels() ;
+    /**
+     * This method is invoked when the server has been requested
+     * to shutdown.  If currently connected to the network, this
+     * method gives xClient's a chance to gracefully QUIT from
+     * the network, or whatever other processing is useful.
+     * To force data to be written before final shutdown (again,
+     * if connected), set xServer::FlushData().
+     * Timers will be executed after this method is invoked, once,
+     * depending upon target time of course :)
+     */
+    virtual void OnShutdown(const std::string& reason);
 
-	/**
-	 * This method is invoked when the server has been requested
-	 * to shutdown.  If currently connected to the network, this
-	 * method gives xClient's a chance to gracefully QUIT from
-	 * the network, or whatever other processing is useful.
-	 * To force data to be written before final shutdown (again,
-	 * if connected), set xServer::FlushData().
-	 * Timers will be executed after this method is invoked, once,
-	 * depending upon target time of course :)
-	 */
-	virtual void OnShutdown( const std::string& reason ) ;
+    /**
+     * This method is invoked when this module is first loaded.
+     * This is a good place to setup timers, connect to DB, etc.
+     * At this point, the server may not yet be connected to the
+     * network, so please do not issue join/nick requests.
+     */
+    virtual void OnAttach();
 
-	/**
-	 * This method is invoked when this module is first loaded.
-	 * This is a good place to setup timers, connect to DB, etc.
-	 * At this point, the server may not yet be connected to the
-	 * network, so please do not issue join/nick requests.
-	 */
-	virtual void OnAttach() ;
+    /**
+     * This method is called when this module is being unloaded from
+     * the server.  This is a good place to cleanup, including
+     * deallocating timers, closing connections, closing log files,
+     * and deallocating private data stored in iClients.
+     */
+    virtual void OnDetach(const std::string& = std::string("Shutting down"));
 
-	/**
-	 * This method is called when this module is being unloaded from
-	 * the server.  This is a good place to cleanup, including
-	 * deallocating timers, closing connections, closing log files,
-	 * and deallocating private data stored in iClients.
-	 */
-	virtual void OnDetach( const std::string& =
-			std::string( "Shutting down" ) ) ;
+    /**
+     * This method is called when the server connects to the network.
+     * Note that if this module is attached while already connected
+     * to a network, this method is still invoked.
+     */
+    virtual void OnConnect();
 
-	/**
-	 * This method is called when the server connects to the network.
-	 * Note that if this module is attached while already connected
-	 * to a network, this method is still invoked.
-	 */
-	virtual void OnConnect() ;
+    /**
+     * This method is invoked when the server disconnects from
+     * its uplink.
+     */
+    virtual void OnDisconnect();
 
-	/**
-	 * This method is invoked when the server disconnects from
-	 * its uplink.
-	 */
-	virtual void OnDisconnect() ;
+    /**
+     * This method will register a given command handler, removing
+     * (and deallocating) the existing handler for this command,
+     * should one exist.
+     */
+    virtual bool RegisterCommand(Command*);
 
-	/**
-	 * This method will register a given command handler, removing
-	 * (and deallocating) the existing handler for this command,
-	 * should one exist.
-	 */
-	virtual bool RegisterCommand( Command* ) ;
+    /**
+     * This method will unregister the command handler for the command
+     * of the given command name, deallocating the object from the
+     * heap as well.
+     */
+    virtual bool UnRegisterCommand(const std::string&);
 
-	/**
-	 * This method will unregister the command handler for the command
-	 * of the given command name, deallocating the object from the
-	 * heap as well.
-	 */
-	virtual bool UnRegisterCommand( const std::string& ) ;
+    /**
+     * This method is invoked each time a channel event occurs
+     * for one of the channels for which this client has registered
+     * to receive channel events.
+     */
+    virtual void OnChannelEvent(const channelEventType&, Channel*, void* data1 = 0, void* data2 = 0,
+                                void* data3 = 0, void* data4 = 0);
 
-	/**
-	 * This method is invoked each time a channel event occurs
-	 * for one of the channels for which this client has registered
-	 * to receive channel events.
-	 */
-	virtual void	OnChannelEvent( const channelEventType&, Channel*,
-		void* data1 = 0, void* data2 = 0,
-		void* data3 = 0, void* data4 = 0 ) ;
+    /**
+     * This method is invoked when a user sets or removes
+     * one or more channel mode (o).  Keep in mind that the
+     * source ChannelUser may be NULL if a server is
+     * setting the mode.
+     */
+    virtual void OnChannelModeO(Channel*, ChannelUser*, const xServer::opVectorType&);
 
-	/**
-	 * This method is invoked when a user sets or removes
-	 * one or more channel mode (o).  Keep in mind that the
-	 * source ChannelUser may be NULL if a server is
-	 * setting the mode.
-	 */
-	virtual void OnChannelModeO( Channel*, ChannelUser*,
-			const xServer::opVectorType& ) ;
+    /**
+     * This method is invoked each time a network event occurs.
+     */
+    virtual void OnEvent(const eventType& theEvent, void* data1 = 0, void* data2 = 0,
+                         void* data3 = 0, void* data4 = 0);
 
-	/**
-	 * This method is invoked each time a network event occurs.
-	 */
-	virtual void	OnEvent( const eventType& theEvent,
-		void* data1 = 0, void* data2 = 0,
-		void* data3 = 0, void* data4 = 0 ) ;
+    virtual void OnCTCP(iClient*, const std::string&, const std::string&, bool);
 
-	virtual void OnCTCP( iClient*, const std::string&, const std::string&, bool ) ;
+    virtual void OnSignal(int sig);
 
-	virtual void OnSignal( int sig ) ;
+    /**
+     * Our functions.
+     */
 
-	/**
-	 * Our functions.
-	 */
+    void readConfigFile(const std::string&);
 
-	void readConfigFile(const std::string&);
+    sqlChanOp* newChanOp(const std::string&, const std::string&);
+    sqlChanOp* newChanOp(Channel*, iClient*);
 
-	sqlChanOp* newChanOp(const std::string&, const std::string&);
-	sqlChanOp* newChanOp(Channel*, iClient*);
+    sqlChanOp* findChanOp(const std::string&, const std::string&);
+    sqlChanOp* findChanOp(Channel*, iClient*);
 
-	sqlChanOp* findChanOp(const std::string&, const std::string&);
-	sqlChanOp* findChanOp(Channel*, iClient*);
+    dbHandle* getLocalDBHandle() { return localDBHandle; }
 
-	dbHandle* getLocalDBHandle() { return localDBHandle; }
+    size_t countMyOps(const std::string&);
+    size_t countMyOps(Channel*);
 
-	size_t countMyOps(const std::string&);
-	size_t countMyOps(Channel*);
+    sqlcfUser* isAuthed(const std::string);
 
-	sqlcfUser* isAuthed(const std::string);
+    void precacheChanOps();
+    void precacheChannels();
+    void precacheUsers();
 
-	void precacheChanOps();
-	void precacheChannels();
-	void precacheUsers();
+    void printResourceStats();
 
-	void printResourceStats();
+    void changeState(STATE);
 
-	void changeState(STATE);
+    time_t currentTime() { return ::time(0); }
 
-	time_t currentTime() { return ::time(0); }
-	
-	time_t getSecsTilMidnight() { return 86400 - (currentTime() % 86400); }
+    time_t getSecsTilMidnight() { return 86400 - (currentTime() % 86400); }
 
-	size_t countAutoFixes() { return autoFixQ.size(); }
-	size_t countManFixes() { return manFixQ.size(); }
+    size_t countAutoFixes() { return autoFixQ.size(); }
+    size_t countManFixes() { return manFixQ.size(); }
 
-	void updatePoints();
-	void giveAllOpsPoints();
+    void updatePoints();
+    void giveAllOpsPoints();
 
-	void givePoints(Channel*, iClient*);
-	void gotOpped(Channel*, iClient*);
+    void givePoints(Channel*, iClient*);
+    void gotOpped(Channel*, iClient*);
 
-	bool hasIdent(iClient*);
+    bool hasIdent(iClient*);
 
-	void JoinChan(Channel* theChan);
-	void PartChan(Channel* theChan);
+    void JoinChan(Channel* theChan);
+    void PartChan(Channel* theChan);
 
-	void checkNetwork();
-	void checkChannelServiceLink(iServer*, const eventType&);
-	void findChannelService();
-	int getLastFix(sqlChannel*);
+    void checkNetwork();
+    void checkChannelServiceLink(iServer*, const eventType&);
+    void findChannelService();
+    int getLastFix(sqlChannel*);
 
-	void insertop(sqlChanOp*, sqlChannel*);
-	bool findop(sqlChanOp*, sqlChannel*);
-	void removechan(sqlChannel*);
+    void insertop(sqlChanOp*, sqlChannel*);
+    bool findop(sqlChanOp*, sqlChannel*);
+    void removechan(sqlChannel*);
 
-	bool simFix(sqlChannel*, bool, time_t, iClient*, sqlcfUser*);
-	bool simulateFix(sqlChannel*, bool, iClient*, sqlcfUser*);
+    bool simFix(sqlChannel*, bool, time_t, iClient*, sqlcfUser*);
+    bool simulateFix(sqlChannel*, bool, iClient*, sqlcfUser*);
 
-	bool shouldCJoin(sqlChannel*, bool);
+    bool shouldCJoin(sqlChannel*, bool);
 
-	void autoFix();
-	void manualFix(Channel*);
+    void autoFix();
+    void manualFix(Channel*);
 
-	bool logLastComMessage(iClient*, const std::string&);
-	bool msgTopOps(Channel*);
+    bool logLastComMessage(iClient*, const std::string&);
+    bool msgTopOps(Channel*);
 
-	bool fixChan(sqlChannel*, bool);
-	void stopFixingChan(Channel*, bool);
+    bool fixChan(sqlChannel*, bool);
+    void stopFixingChan(Channel*, bool);
 
-	bool accountIsOnChan(const std::string&, const std::string&);
+    bool accountIsOnChan(const std::string&, const std::string&);
 
-	sqlChannel* getChannelRecord(const std::string&);
-	sqlChannel* getChannelRecord(Channel*);
+    sqlChannel* getChannelRecord(const std::string&);
+    sqlChannel* getChannelRecord(Channel*);
 
-	sqlChannel* newChannelRecord(const std::string&);
-	sqlChannel* newChannelRecord(Channel*);
+    sqlChannel* newChannelRecord(const std::string&);
+    sqlChannel* newChannelRecord(Channel*);
 
-	bool deleteChannelRecord(sqlChannel*);
+    bool deleteChannelRecord(sqlChannel*);
 
-	static size_t countChanOps(const Channel*);
+    static size_t countChanOps(const Channel*);
 
-	bool needsModesRemoved(Channel*);
+    bool needsModesRemoved(Channel*);
 
-	bool canScoreChan(Channel*);
+    bool canScoreChan(Channel*);
 
-	void startTimers();
+    void startTimers();
 
-	void processQueue();
-	
-	void rotateDB();
-	
-	void expireTempBlocks();
+    void processQueue();
 
-	void prepareUpdate(bool);
-	void updateDB();
+    void rotateDB();
+
+    void expireTempBlocks();
+
+    void prepareUpdate(bool);
+    void updateDB();
 #ifdef ENABLE_NEWSCORES
-	int getNewScore(sqlChanOp*, time_t);
+    int getNewScore(sqlChanOp*, time_t);
 #endif
 
-	bool isBeingFixed(Channel*);
-	bool isBeingAutoFixed(Channel*);
-	bool isBeingChanFixed(Channel*);
+    bool isBeingFixed(Channel*);
+    bool isBeingAutoFixed(Channel*);
+    bool isBeingChanFixed(Channel*);
 
-	bool isTempBlocked(const std::string&);
+    bool isTempBlocked(const std::string&);
 
-	bool removeFromAutoQ(Channel*);
-	bool removeFromManQ(Channel*);
+    bool removeFromAutoQ(Channel*);
+    bool removeFromManQ(Channel*);
 
-	char getFlagChar(const sqlcfUser::flagType&);
-	const std::string getFlagsString(const sqlcfUser::flagType&);
-	sqlcfUser::flagType getFlagType(const char);
+    char getFlagChar(const sqlcfUser::flagType&);
+    const std::string getFlagsString(const sqlcfUser::flagType&);
+    sqlcfUser::flagType getFlagType(const char);
 
-	const std::string getEventName(const int);
+    const std::string getEventName(const int);
 
-	const std::string getHostList( sqlcfUser* );
-	
-	const std::string getChanNickName(const std::string&, const std::string&);
+    const std::string getHostList(sqlcfUser*);
 
-	char *convertToAscTime(time_t);
+    const std::string getChanNickName(const std::string&, const std::string&);
 
-	/* Server notices */
-	bool serverNotice( Channel*, const char*, ... );
-	bool serverNotice( Channel*, const std::string& );
+    char* convertToAscTime(time_t);
 
-	/* XREPLY support */
-	bool doXROplist(iServer*, const string&, const string&);
-	bool doXResponse(iServer*, const string&, const string&);
+    /* Server notices */
+    bool serverNotice(Channel*, const char*, ...);
+    bool serverNotice(Channel*, const std::string&);
 
-	/*
-	 * Send private messages or notices to authenticated users
-	 * By default, send notices
-	 */
-	void SendTo( iClient*, const char*, ... );
-	void SendTo( iClient*, const std::string& );
+    /* XREPLY support */
+    bool doXROplist(iServer*, const string&, const string&);
+    bool doXResponse(iServer*, const string&, const string&);
 
-	void SendFmtTo(iClient*, const std::string&);
+    /*
+     * Send private messages or notices to authenticated users
+     * By default, send notices
+     */
+    void SendTo(iClient*, const char*, ...);
+    void SendTo(iClient*, const std::string&);
 
-	/* Admin message logs */
-	bool logAdminMessage(const char*, ... );
-	bool logDebugMessage(const char*, ... );
+    void SendFmtTo(iClient*, const std::string&);
 
-	void doSqlError(const std::string&, const std::string&);
-	
-	/**
-	 * Our sqlManager instance for DB communication
-	 */
-	sqlManager* theManager;
+    /* Admin message logs */
+    bool logAdminMessage(const char*, ...);
+    bool logDebugMessage(const char*, ...);
 
-	/**
-	 * Commands map
-	 */
-	typedef std::map <std::string, Command*, noCaseCompare> commandMapType;
-	commandMapType commandMap;
+    void doSqlError(const std::string&, const std::string&);
 
-	/**
-	 * ChannelOp map
-	 */
-	// map contents: channel string (account string, sqlChanOp object)
-	typedef std::map <std::string, std::map <std::string, sqlChanOp*, noCaseCompare>, noCaseCompare> sqlChanOpsType;
-	sqlChanOpsType		sqlChanOps;
+    /**
+     * Our sqlManager instance for DB communication
+     */
+    sqlManager* theManager;
 
-	typedef std::map <std::string, sqlChannel*, noCaseCompare> sqlChannelCacheType;
-	sqlChannelCacheType	sqlChanCache;
+    /**
+     * Commands map
+     */
+    typedef std::map<std::string, Command*, noCaseCompare> commandMapType;
+    commandMapType commandMap;
 
-	typedef std::set <std::string> clientOpsType;
-	clientOpsType*		findMyOps(iClient*);
-	void 			lostOp(const std::string&, iClient*, clientOpsType*);
+    /**
+     * ChannelOp map
+     */
+    // map contents: channel string (account string, sqlChanOp object)
+    typedef std::map<std::string, std::map<std::string, sqlChanOp*, noCaseCompare>, noCaseCompare>
+        sqlChanOpsType;
+    sqlChanOpsType sqlChanOps;
 
-	typedef std::list <sqlChanOp*> chanOpsType;
-	chanOpsType		getMyOps(Channel*);
-	chanOpsType		getMyOps(const std::string&);
-	chanOpsType     getMyOps(const std::string&, bool);
-	
-	typedef std::map <std::string, time_t, noCaseCompare> tempBlockType;
-	tempBlockType		tempBlockList;
-	
-	typedef struct {
-	    std::string account;
-	    std::string channel;
-	} simOppedStruct;
+    typedef std::map<std::string, sqlChannel*, noCaseCompare> sqlChannelCacheType;
+    sqlChannelCacheType sqlChanCache;
 
-	typedef std::multimap<std::string, simOppedStruct> SimMapType;
-	SimMapType		simMap;
+    typedef std::set<std::string> clientOpsType;
+    clientOpsType* findMyOps(iClient*);
+    void lostOp(const std::string&, iClient*, clientOpsType*);
 
-	/**
-	 * The snapshot map for updating the SQL database
-	 */
-	typedef struct {
-	    std::string	account;
-	    std::string	lastSeenAs;
-	    time_t	firstOpped;
-	    time_t	lastOpped;
-	    short	day[DAYSAMPLES];
-	} snapShotStruct;
+    typedef std::list<sqlChanOp*> chanOpsType;
+    chanOpsType getMyOps(Channel*);
+    chanOpsType getMyOps(const std::string&);
+    chanOpsType getMyOps(const std::string&, bool);
 
-	typedef std::multimap<std::string, snapShotStruct> DBMapType;
-	DBMapType		snapShot;
+    typedef std::map<std::string, time_t, noCaseCompare> tempBlockType;
+    tempBlockType tempBlockList;
 
-	/**
-	 * The db clients map
-	 */
-	typedef std::map <std::string, sqlcfUser*, noCaseCompare> usersMapType;
+    typedef struct {
+        std::string account;
+        std::string channel;
+    } simOppedStruct;
 
-	/**
-	 * Holds the authenticated user list
-	 */
-	usersMapType		usersMap;
-	
-	typedef usersMapType::iterator	usersIterator;
+    typedef std::multimap<std::string, simOppedStruct> SimMapType;
+    SimMapType simMap;
 
-	usersIterator		usersMap_begin()
-		{ return usersMap.begin(); }
+    /**
+     * The snapshot map for updating the SQL database
+     */
+    typedef struct {
+        std::string account;
+        std::string lastSeenAs;
+        time_t firstOpped;
+        time_t lastOpped;
+        short day[DAYSAMPLES];
+    } snapShotStruct;
 
-	usersIterator		usersMap_end()
-		{ return usersMap.end(); }
+    typedef std::multimap<std::string, snapShotStruct> DBMapType;
+    DBMapType snapShot;
 
-	/**
-	 * Channels that chanfix should join
-	 */
-	typedef std::vector <std::string> joinChansType;
-	joinChansType	chansToJoin;
+    /**
+     * The db clients map
+     */
+    typedef std::map<std::string, sqlcfUser*, noCaseCompare> usersMapType;
 
-	/**
-	 * Queues to process.
-	 */
-	typedef std::map <std::string, time_t, noCaseCompare> fixQueueType;
-	fixQueueType	autoFixQ;
-	fixQueueType	manFixQ;
+    /**
+     * Holds the authenticated user list
+     */
+    usersMapType usersMap;
 
-	typedef std::vector< iClient* > acctListType; //For reopping all logged in users to an acct.
-	acctListType	findAccount(Channel*, const std::string&);
+    typedef usersMapType::iterator usersIterator;
 
-	typedef std::map < std::pair <int, std::string>, std::string > helpTableType;
-	helpTableType	helpTable;
+    usersIterator usersMap_begin() { return usersMap.begin(); }
 
-	void loadHelpTable();
-	const std::string getHelpMessage(sqlcfUser*, std::string);
+    usersIterator usersMap_end() { return usersMap.end(); }
 
-	typedef std::map < std::string, std::pair <int, std::string> > languageTableType;
-	languageTableType	languageTable;
+    /**
+     * Channels that chanfix should join
+     */
+    typedef std::vector<std::string> joinChansType;
+    joinChansType chansToJoin;
 
-	typedef std::map < std::pair <int, int>, std::string > translationTableType ;
-	translationTableType	translationTable;
-	
-	typedef std::map < std::string, std::list< iClient* >, noCaseCompare > authMapType;
-	authMapType	authMap;
+    /**
+     * Queues to process.
+     */
+    typedef std::map<std::string, time_t, noCaseCompare> fixQueueType;
+    fixQueueType autoFixQ;
+    fixQueueType manFixQ;
 
-	void loadTranslationTable();
+    typedef std::vector<iClient*> acctListType; // For reopping all logged in users to an acct.
+    acctListType findAccount(Channel*, const std::string&);
 
-	const std::string getResponse(sqlcfUser*, int, std::string = std::string());
+    typedef std::map<std::pair<int, std::string>, std::string> helpTableType;
+    helpTableType helpTable;
 
-	/**
-	 * Configuration variables
-	 */
-	std::string	consoleChan;
-	std::string	consoleChanModes;
-	bool		sendConsoleNotices;
-	std::string	joinChanModes;
-	bool		enableAutoFix;
-	bool		enableChanFix;
-	bool		enableChannelBlocking;
-	bool		joinChannels;
-	bool		autoFixNotice;
-	bool		manualFixNotice;
-	bool		stopAutoFixOnOp;
-	bool		stopChanFixOnOp;
-	bool		allowTopOpFix;
-	int		topOpPercent;
-	int		minFixScore;
-	int		minCanFixScore;
-	int		minRequestOpTime;
-	unsigned int	version;
-	bool		useBurstToFix;
-	unsigned int	nextFix;
-	unsigned int	numServers;
-	unsigned int	minServersPresent;
-	std::string	chanServName;
-	unsigned int	numTopScores;
-	unsigned int	minClients;
-	bool		clientNeedsIdent;
-	unsigned int	connectCheckFreq;
-	std::string	adminLogFile;
-	std::string	debugLogFile;
-	std::string	sqlHost;
-	std::string	sqlPort;
-	std::string	sqlcfUsername;
-	std::string	sqlPass;
-	std::string	sqlDB;
+    void loadHelpTable();
+    const std::string getHelpMessage(sqlcfUser*, std::string);
 
-protected:
-	/**
-	 * Configuration file.
-	 */
-	EConfig*	chanfixConfig;
+    typedef std::map<std::string, std::pair<int, std::string>> languageTableType;
+    languageTableType languageTable;
 
-	/**
-	 * State variable
-	 */
-	STATE		currentState;
+    typedef std::map<std::pair<int, int>, std::string> translationTableType;
+    translationTableType translationTable;
 
-	/**
-	 * Channel service currently linked variable
-	 */
-	bool		chanServLinked;
+    typedef std::map<std::string, std::list<iClient*>, noCaseCompare> authMapType;
+    authMapType authMap;
 
-	/**
-	 * Update status variable
-	 */
-	bool		updateInProgress;
+    void loadTranslationTable();
 
-	/**
-	 * Timer declarations
-	 */
-	xServer::timerID tidCheckDB;
-	xServer::timerID tidAutoFix;
-	xServer::timerID tidFixQ;
-	xServer::timerID tidGivePoints;
-	xServer::timerID tidRotateDB;
-	xServer::timerID tidUpdateDB;
-	xServer::timerID tidTempBlocks;
+    const std::string getResponse(sqlcfUser*, int, std::string = std::string());
 
-	/**
-	 * Internal timer
-	 */
-	Timer *theTimer;
+    /**
+     * Configuration variables
+     */
+    std::string consoleChan;
+    std::string consoleChanModes;
+    bool sendConsoleNotices;
+    std::string joinChanModes;
+    bool enableAutoFix;
+    bool enableChanFix;
+    bool enableChannelBlocking;
+    bool joinChannels;
+    bool autoFixNotice;
+    bool manualFixNotice;
+    bool stopAutoFixOnOp;
+    bool stopChanFixOnOp;
+    bool allowTopOpFix;
+    int topOpPercent;
+    int minFixScore;
+    int minCanFixScore;
+    int minRequestOpTime;
+    unsigned int version;
+    bool useBurstToFix;
+    unsigned int nextFix;
+    unsigned int numServers;
+    unsigned int minServersPresent;
+    std::string chanServName;
+    unsigned int numTopScores;
+    unsigned int minClients;
+    bool clientNeedsIdent;
+    unsigned int connectCheckFreq;
+    std::string adminLogFile;
+    std::string debugLogFile;
+    std::string sqlHost;
+    std::string sqlPort;
+    std::string sqlcfUsername;
+    std::string sqlPass;
+    std::string sqlDB;
 
-	/**
-	 * Log-to-file streams
-	 */
-	std::ofstream	adminLog;
-	std::ofstream	debugLog;
+  protected:
+    /**
+     * Configuration file.
+     */
+    EConfig* chanfixConfig;
 
-	/**
-	 * DB Handle
-	 */
-	dbHandle*	localDBHandle;
+    /**
+     * State variable
+     */
+    STATE currentState;
 
+    /**
+     * Channel service currently linked variable
+     */
+    bool chanServLinked;
 
-public:
+    /**
+     * Update status variable
+     */
+    bool updateInProgress;
 
-	/*
-	 *  Methods to get data attributes.
-	 */
-	bool doAutoFix() { return enableAutoFix; }
-	bool doChanFix() { return enableChanFix; }
-	bool doChanBlocking() { return enableChannelBlocking; }
-	bool doJoinChannels() { return joinChannels; }
-	bool doAutoFixNotice() { return autoFixNotice; }
-	bool doManualFixNotice() { return manualFixNotice; }
-	STATE getState() { return currentState; }
-	bool isChanServLinked() { return chanServLinked; }
-	bool isUpdateRunning() { return updateInProgress; }
-	bool isAllowingTopFix() { return allowTopOpFix; }
-	unsigned int getTopOpPercent() { return topOpPercent; }
-	unsigned int getMinFixScore() { return minFixScore; }
-	unsigned int getMinCanFixScore() { return minCanFixScore; }
-	unsigned int getMinRequestOpTime() { return minRequestOpTime; }
-	unsigned int getNumServers() { return numServers; }
-	unsigned int getMinServersPresent() { return minServersPresent; }
-	unsigned int getNumTopScores() { return numTopScores; }
-	unsigned int getMinClients() { return minClients; }
-	unsigned int getNextFix() { return nextFix; }
-	short getCurrentDay() { return currentDay; }
+    /**
+     * Timer declarations
+     */
+    xServer::timerID tidCheckDB;
+    xServer::timerID tidAutoFix;
+    xServer::timerID tidFixQ;
+    xServer::timerID tidGivePoints;
+    xServer::timerID tidRotateDB;
+    xServer::timerID tidUpdateDB;
+    xServer::timerID tidTempBlocks;
 
-	/*
-	 *  Methods to set data attributes.
-	 */
-	inline void	setNextFix(int _nextFix)
-		{ nextFix = _nextFix; }
-	inline void	setNumServers(int _numServers)
-		{ numServers = _numServers; }
-	inline void	setDoAutoFix(bool _enableAutoFix)
-		{ enableAutoFix = _enableAutoFix; }
-	inline void	setDoChanFix(bool _enableChanFix)
-		{ enableChanFix = _enableChanFix; }
-	inline void	setDoChanBlocking(bool _enableChannelBlocking)
-		{ enableChannelBlocking = _enableChannelBlocking; }
-	inline void	setCurrentDay()
-		{ currentDay = currentTime() / 86400 % DAYSAMPLES; }
+    /**
+     * Internal timer
+     */
+    Timer* theTimer;
+
+    /**
+     * Log-to-file streams
+     */
+    std::ofstream adminLog;
+    std::ofstream debugLog;
+
+    /**
+     * DB Handle
+     */
+    dbHandle* localDBHandle;
+
+  public:
+    /*
+     *  Methods to get data attributes.
+     */
+    bool doAutoFix() { return enableAutoFix; }
+    bool doChanFix() { return enableChanFix; }
+    bool doChanBlocking() { return enableChannelBlocking; }
+    bool doJoinChannels() { return joinChannels; }
+    bool doAutoFixNotice() { return autoFixNotice; }
+    bool doManualFixNotice() { return manualFixNotice; }
+    STATE getState() { return currentState; }
+    bool isChanServLinked() { return chanServLinked; }
+    bool isUpdateRunning() { return updateInProgress; }
+    bool isAllowingTopFix() { return allowTopOpFix; }
+    unsigned int getTopOpPercent() { return topOpPercent; }
+    unsigned int getMinFixScore() { return minFixScore; }
+    unsigned int getMinCanFixScore() { return minCanFixScore; }
+    unsigned int getMinRequestOpTime() { return minRequestOpTime; }
+    unsigned int getNumServers() { return numServers; }
+    unsigned int getMinServersPresent() { return minServersPresent; }
+    unsigned int getNumTopScores() { return numTopScores; }
+    unsigned int getMinClients() { return minClients; }
+    unsigned int getNextFix() { return nextFix; }
+    short getCurrentDay() { return currentDay; }
+
+    /*
+     *  Methods to set data attributes.
+     */
+    inline void setNextFix(int _nextFix) { nextFix = _nextFix; }
+    inline void setNumServers(int _numServers) { numServers = _numServers; }
+    inline void setDoAutoFix(bool _enableAutoFix) { enableAutoFix = _enableAutoFix; }
+    inline void setDoChanFix(bool _enableChanFix) { enableChanFix = _enableChanFix; }
+    inline void setDoChanBlocking(bool _enableChannelBlocking) {
+        enableChannelBlocking = _enableChannelBlocking;
+    }
+    inline void setCurrentDay() { currentDay = currentTime() / 86400 % DAYSAMPLES; }
 
 }; // class chanfix
 

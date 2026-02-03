@@ -23,21 +23,13 @@
 #include "gnuworld_config.h"
 #include "netData.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
-netData::netData() :
-  authedUser(0),
-  warned(0)
-{
-}
+netData::netData() : authedUser(0), warned(0) {}
 
-netData::~netData()
-{
-}
+netData::~netData() {}
 
 } // namespace ns
 

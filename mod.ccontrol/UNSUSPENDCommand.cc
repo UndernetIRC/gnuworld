@@ -19,101 +19,86 @@
  *
  * $Id: UNSUSPENDCommand.cc,v 1.14 2006/09/26 17:36:01 kewlio Exp $
  */
-#include	<string>
-#include	<iomanip>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool UNSUSPENDCommand::Exec( iClient* theClient, const string& Message)
-{
-StringTokenizer st( Message ) ;
-	
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool UNSUSPENDCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-//Fetch the user record from the database	
-//ccUser *tmpUser = bot->GetUser(st[1]);
-ccUser* tmpUser = bot->GetOper(st[1]);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-if(!tmpUser)
-	{
-	bot->Notice(theClient,"%s isn't on my access list",st[1].c_str());
-	return false;
-	}
-	
-ccUser* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
-if(!tmpAuth)
-	{ //we should never get here
-	return false;
-	}
-bot->MsgChanLog("UNSUSPEND %s\n",st.assemble(1).c_str());
+    // Fetch the user record from the database
+    // ccUser *tmpUser = bot->GetUser(st[1]);
+    ccUser* tmpUser = bot->GetOper(st[1]);
 
-unsigned int AdFlag = tmpAuth->getType(); //Get the admin flag
-unsigned int OpFlag = tmpUser->getType(); //Get the oper flag
-bool Admin = AdFlag < operLevel::SMTLEVEL;
+    if (!tmpUser) {
+        bot->Notice(theClient, "%s isn't on my access list", st[1].c_str());
+        return false;
+    }
 
-if((Admin) && (AdFlag <= OpFlag))
-	{
-	bot->Notice(theClient,"You can't unsuspend a user who has a higher or equal "
-		"access level than you.");
-	return false;
-	}
-else if(AdFlag < OpFlag)
-	{
-	bot->Notice(theClient,"You can't unsuspend a user who has a higher level "
-		"than you.");
-	return false;
-	}
-/*if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
-	{
-	bot->Notice(theClient,"You can only unsuspend a user that is associated with "
-		"the same server as you");
-	return false;
-	}
-*/
-if(tmpUser->getSuspendLevel() > AdFlag)
-	{
-	bot->Notice(theClient,"The suspend level is set to a higher level than yours");
-	return false;
-	}
-	
-if(!(bot->isSuspended(tmpUser)))
-	{
-	bot->Notice(theClient,"%s is not suspended",st[1].c_str());
-	return false;
-	}
+    ccUser* tmpAuth = bot->IsAuth(theClient->getCharYYXXX());
+    if (!tmpAuth) { // we should never get here
+        return false;
+    }
+    bot->MsgChanLog("UNSUSPEND %s\n", st.assemble(1).c_str());
 
-//Remove the suspention and update the database	
-tmpUser->setSuspendExpires(0);
-tmpUser->setIsSuspended(false);
-tmpUser->setSuspendedBy("");
-tmpUser->setSuspendReason("");
-tmpUser->setSuspendLevel(0);	
-if(tmpUser->Update())
-	{
-	bot->Notice(theClient,"%s has been unsuspended",st[1].c_str());
-	return true;
-	}
-else
-	{
-	bot->Notice(theClient,"Error while unsuspending %s",st[1].c_str());
-	return false;
-	}
+    unsigned int AdFlag = tmpAuth->getType(); // Get the admin flag
+    unsigned int OpFlag = tmpUser->getType(); // Get the oper flag
+    bool Admin = AdFlag < operLevel::SMTLEVEL;
 
+    if ((Admin) && (AdFlag <= OpFlag)) {
+        bot->Notice(theClient, "You can't unsuspend a user who has a higher or equal "
+                               "access level than you.");
+        return false;
+    } else if (AdFlag < OpFlag) {
+        bot->Notice(theClient, "You can't unsuspend a user who has a higher level "
+                               "than you.");
+        return false;
+    }
+    /*if((Admin) && (strcasecmp(tmpAuth->getServer().c_str(),tmpUser->getServer().c_str())))
+            {
+            bot->Notice(theClient,"You can only unsuspend a user that is associated with "
+                    "the same server as you");
+            return false;
+            }
+    */
+    if (tmpUser->getSuspendLevel() > AdFlag) {
+        bot->Notice(theClient, "The suspend level is set to a higher level than yours");
+        return false;
+    }
+
+    if (!(bot->isSuspended(tmpUser))) {
+        bot->Notice(theClient, "%s is not suspended", st[1].c_str());
+        return false;
+    }
+
+    // Remove the suspention and update the database
+    tmpUser->setSuspendExpires(0);
+    tmpUser->setIsSuspended(false);
+    tmpUser->setSuspendedBy("");
+    tmpUser->setSuspendReason("");
+    tmpUser->setSuspendLevel(0);
+    if (tmpUser->Update()) {
+        bot->Notice(theClient, "%s has been unsuspended", st[1].c_str());
+        return true;
+    } else {
+        bot->Notice(theClient, "Error while unsuspending %s", st[1].c_str());
+        return false;
+    }
 }
 
-}
-}
+} // namespace uworld
+} // namespace gnuworld

@@ -1,7 +1,7 @@
 /**
  * ccUser.cc
- * Storage class for accessing user information 
- * 
+ * Storage class for accessing user information
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,433 +19,325 @@
  *
  * $Id: ccUser.cc,v 1.22 2009/07/26 18:30:38 mrbean_ Exp $
  */
- 
-#include	<sstream>
-#include	<string>
 
-#include	<cstring>
+#include <sstream>
+#include <string>
 
-#include	"dbHandle.h"
-#include	"ELog.h"
-#include	"misc.h"
-#include	"ccUser.h"
-#include	"commLevels.h"
-#include	"ccontrol.h"
-#include	"gnuworld_config.h"
+#include <cstring>
 
-namespace gnuworld
-{
-using std::string ;
-using std::endl ;
-using std::stringstream ;
-using std::ends ;
+#include "dbHandle.h"
+#include "ELog.h"
+#include "misc.h"
+#include "ccUser.h"
+#include "commLevels.h"
+#include "ccontrol.h"
+#include "gnuworld_config.h"
 
-namespace uworld
-{
+namespace gnuworld {
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
+
+namespace uworld {
 
 unsigned int ccUser::numAllocated = 0;
 
 ccUser::ccUser(dbHandle* _SQLDb)
- : Id( 0 ),
-   Server( "" ),
-   IsSuspended(0),
-   SuspendExpires(0),
-   SuspendLevel(0),
-   SuspendReason(""),
-   Access( 0 ),
-   SAccess( 0 ),
-   Flags( 0 ),
-   IsUhs(0),
-   IsOper(0),
-   IsAdmin(0),
-   IsSmt(0),
-   IsCoder(0),
-   GetLogs(0),
-   GetLag(0),
-   Sso(0),
-   Ssooo(0),
-   AutoOp(0),
-   NeedOp(0),
-   Notice(0),
-   SQLDb( _SQLDb ),
-   LastAuthTS(0),
-   PassChangeTS(0)
-{
-++numAllocated;
+    : Id(0), Server(""), IsSuspended(0), SuspendExpires(0), SuspendLevel(0), SuspendReason(""),
+      Access(0), SAccess(0), Flags(0), IsUhs(0), IsOper(0), IsAdmin(0), IsSmt(0), IsCoder(0),
+      GetLogs(0), GetLag(0), Sso(0), Ssooo(0), AutoOp(0), NeedOp(0), Notice(0), SQLDb(_SQLDb),
+      LastAuthTS(0), PassChangeTS(0) {
+    ++numAllocated;
 }
 
-ccUser::~ccUser()
-{
---numAllocated;
-}
+ccUser::~ccUser() { --numAllocated; }
 
-bool ccUser::loadData(const string& Name)
-{
-if(!dbConnected)
-	{
-	return false;
-	}
+bool ccUser::loadData(const string& Name) {
+    if (!dbConnected) {
+        return false;
+    }
 
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE lower(user_name) = '";
+    static const char Main[] =
+        "SELECT "
+        "user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,"
+        "isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_"
+        "Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE "
+        "lower(user_name) = '";
 
-if(!dbConnected)
-	{
-	return false;
-	}
+    if (!dbConnected) {
+        return false;
+    }
 
-stringstream theQuery;
-theQuery	<< Main
-		<< escapeSQLChars(string_lower(Name))
-		<< "'"
-		<< ends;
+    stringstream theQuery;
+    theQuery << Main << escapeSQLChars(string_lower(Name)) << "'" << ends;
 
-elog	<< "ccUser::loadData> "
-	<< theQuery.str().c_str()
-	<< endl;
+    elog << "ccUser::loadData> " << theQuery.str().c_str() << endl;
 
-if( SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
-//if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
-	{
+    if (SQLDb->Exec(theQuery, true) && (SQLDb->Tuples() > 0))
+    // if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
+    {
         GetParm();
-	return true;
-	}
+        return true;
+    }
 
-return false;
+    return false;
 }
 
-bool ccUser::loadData( const unsigned int Id)
-{
+bool ccUser::loadData(const unsigned int Id) {
 
-if(!dbConnected)
-	{
-	return false;
-	}
+    if (!dbConnected) {
+        return false;
+    }
 
-static const char Main[] = "SELECT user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE user_id = ";
-stringstream theQuery;
+    static const char Main[] =
+        "SELECT "
+        "user_id,user_name,password,access,saccess,flags,suspend_expires,suspended_by,server,"
+        "isSuspended,IsUhs,IsOper,IsAdmin,IsSmt,IsCoder,GetLogs,NeedOp,Email,Suspend_Level,Suspend_"
+        "Reason,Notice,GetLag,LastPassChangeTS,Sso,Ssooo,AutoOp,Account,AccountTS FROM opers WHERE "
+        "user_id = ";
+    stringstream theQuery;
 
-if(!dbConnected)
-	{
-	return false;
-	}
+    if (!dbConnected) {
+        return false;
+    }
 
-theQuery	<< Main
-		<< Id
-		<< ';'
-		<< ends;
+    theQuery << Main << Id << ';' << ends;
 
-elog	<< "ccontrol::loadData> "
-	<< theQuery.str().c_str()
-	<< endl;
+    elog << "ccontrol::loadData> " << theQuery.str().c_str() << endl;
 
-if( SQLDb->Exec( theQuery, true ) && (SQLDb->Tuples() > 0) )
-//if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
-	{
-	GetParm();
-	return true;
-	}
+    if (SQLDb->Exec(theQuery, true) && (SQLDb->Tuples() > 0))
+    // if( (PGRES_TUPLES_OK == status) && (SQLDb->Tuples() > 0) )
+    {
+        GetParm();
+        return true;
+    }
 
-return false;
+    return false;
 }
 
-void ccUser::GetParm()
-{
-Id = atoi(SQLDb->GetValue(0, 0).c_str());
-UserName = SQLDb->GetValue(0, 1);
-Password = SQLDb->GetValue(0, 2);
-Access = atol(SQLDb->GetValue(0, 3).c_str());
-SAccess = atol(SQLDb->GetValue(0, 4).c_str());
-Flags = atoi(SQLDb->GetValue(0, 5).c_str());
-SuspendExpires = atoi(SQLDb->GetValue(0,6).c_str());
-SuspendedBy = SQLDb->GetValue(0,7);
-Server = SQLDb->GetValue(0,8);
-IsSuspended = (!strcasecmp(SQLDb->GetValue(0,9),"t") ? 1 : 0 );
-IsUhs = (!strcasecmp(SQLDb->GetValue(0,10),"t") ? 1 : 0 );
-IsOper = (!strcasecmp(SQLDb->GetValue(0,11),"t") ? 1 : 0 );
-IsAdmin = (!strcasecmp(SQLDb->GetValue(0,12),"t") ? 1 : 0 );
-IsSmt = (!strcasecmp(SQLDb->GetValue(0,13),"t") ? 1 : 0 );
-IsCoder = (!strcasecmp(SQLDb->GetValue(0,14),"t") ? 1 : 0 );
-GetLogs = (!strcasecmp(SQLDb->GetValue(0,15),"t") ? 1 : 0 );
-NeedOp = (!strcasecmp(SQLDb->GetValue(0,16),"t") ? 1 : 0 );
-Email = SQLDb->GetValue(0,17);
-SuspendLevel = atoi(SQLDb->GetValue(0,18).c_str());
-SuspendReason = SQLDb->GetValue(0,19);
-Notice = (!strcasecmp(SQLDb->GetValue(0,20),"t") ? 1 : 0 );
-GetLag = (!strcasecmp(SQLDb->GetValue(0,21),"t") ? 1 : 0 );
-PassChangeTS = atoi(SQLDb->GetValue(0,22).c_str());
-Sso = (!strcasecmp(SQLDb->GetValue(0,23),"t") ? 1 : 0 );
-Ssooo = (!strcasecmp(SQLDb->GetValue(0,24),"t") ? 1 : 0 );
-AutoOp = (!strcasecmp(SQLDb->GetValue(0,25),"t") ? 1 : 0 );
-Account = SQLDb->GetValue(0,26);
-AccountTS = atoi(SQLDb->GetValue(0,27).c_str());
+void ccUser::GetParm() {
+    Id = atoi(SQLDb->GetValue(0, 0).c_str());
+    UserName = SQLDb->GetValue(0, 1);
+    Password = SQLDb->GetValue(0, 2);
+    Access = atol(SQLDb->GetValue(0, 3).c_str());
+    SAccess = atol(SQLDb->GetValue(0, 4).c_str());
+    Flags = atoi(SQLDb->GetValue(0, 5).c_str());
+    SuspendExpires = atoi(SQLDb->GetValue(0, 6).c_str());
+    SuspendedBy = SQLDb->GetValue(0, 7);
+    Server = SQLDb->GetValue(0, 8);
+    IsSuspended = (!strcasecmp(SQLDb->GetValue(0, 9), "t") ? 1 : 0);
+    IsUhs = (!strcasecmp(SQLDb->GetValue(0, 10), "t") ? 1 : 0);
+    IsOper = (!strcasecmp(SQLDb->GetValue(0, 11), "t") ? 1 : 0);
+    IsAdmin = (!strcasecmp(SQLDb->GetValue(0, 12), "t") ? 1 : 0);
+    IsSmt = (!strcasecmp(SQLDb->GetValue(0, 13), "t") ? 1 : 0);
+    IsCoder = (!strcasecmp(SQLDb->GetValue(0, 14), "t") ? 1 : 0);
+    GetLogs = (!strcasecmp(SQLDb->GetValue(0, 15), "t") ? 1 : 0);
+    NeedOp = (!strcasecmp(SQLDb->GetValue(0, 16), "t") ? 1 : 0);
+    Email = SQLDb->GetValue(0, 17);
+    SuspendLevel = atoi(SQLDb->GetValue(0, 18).c_str());
+    SuspendReason = SQLDb->GetValue(0, 19);
+    Notice = (!strcasecmp(SQLDb->GetValue(0, 20), "t") ? 1 : 0);
+    GetLag = (!strcasecmp(SQLDb->GetValue(0, 21), "t") ? 1 : 0);
+    PassChangeTS = atoi(SQLDb->GetValue(0, 22).c_str());
+    Sso = (!strcasecmp(SQLDb->GetValue(0, 23), "t") ? 1 : 0);
+    Ssooo = (!strcasecmp(SQLDb->GetValue(0, 24), "t") ? 1 : 0);
+    AutoOp = (!strcasecmp(SQLDb->GetValue(0, 25), "t") ? 1 : 0);
+    Account = SQLDb->GetValue(0, 26);
+    AccountTS = atoi(SQLDb->GetValue(0, 27).c_str());
 }
 
-bool ccUser::Update()
-{
-static const char *Main = "UPDATE opers SET password = '";
+bool ccUser::Update() {
+    static const char* Main = "UPDATE opers SET password = '";
 
-if(!dbConnected)
-	{
-	return false;
-	}
+    if (!dbConnected) {
+        return false;
+    }
 
-stringstream theQuery;
-theQuery	<< Main
-		<< escapeSQLChars(Password)
-		<< "', Access = "
-		<< Access
-		<< ", SAccess = "
-		<< SAccess
-		<< ", last_updated_by = '"
-		<< escapeSQLChars(last_updated_by)
-		<< "',last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,flags = "
-		<< Flags
-		<<  ",suspend_expires = "
-		<< SuspendExpires
-		<< " ,suspended_by = '"
-		<< escapeSQLChars(SuspendedBy)
-		<< "' ,suspend_level = "
-		<< SuspendLevel
-		<< ", suspend_reason = '"
-		<< escapeSQLChars(SuspendReason)
-		<< "' ,server = '"
-		<< escapeSQLChars(Server)
-		<< "' ,isSuspended = "
-		<< (IsSuspended ? "'t'" : "'n'")
-		<< ",isUhs = "
-		<< (IsUhs ? "'t'" : "'n'")
-		<< ",isOper = "
-		<< (IsOper ? "'t'" : "'n'")
-		<< ",isAdmin = "
-		<< (IsAdmin ? "'t'" : "'n'")
-		<< ",isSmt = "
-		<< (IsSmt ? "'t'" : "'n'")
-		<< ",isCoder = "
-		<< (IsCoder ? "'t'" : "'n'")
-		<< ",GetLogs = "
-		<< (GetLogs ? "'t'" : "'n'")
-		<< ",GetLag = "
-		<< (GetLag ? "'t'" : "'n'")
-		<< ",Sso = "
-		<< (Sso ? "'t'" : "'n'")
-		<< ",Ssooo = "
-		<< (Ssooo ? "'t'" : "'n'")
-		<< ",AutoOp = "
-		<< (AutoOp ? "'t'" : "'n'")
-		<< ",LastPassChangeTS = "
-		<< PassChangeTS
-		<< ",AccountTS = "
-		<< AccountTS
-		<< ",NeedOp = "
-		<< (NeedOp ? "'t'" : "'n'")
-		<< ", Email = '"
-		<<  escapeSQLChars(Email)
-		<< "', Account = '"
-		<<  escapeSQLChars(Account)
-		<< "',Notice = "
-		<< (Notice ? "'t'" : "'n'")
-		<< " WHERE lower(user_name) = '" 
-		<< escapeSQLChars( string_lower(UserName)) << "'"
-		<<  ends;
+    stringstream theQuery;
+    theQuery << Main << escapeSQLChars(Password) << "', Access = " << Access
+             << ", SAccess = " << SAccess << ", last_updated_by = '"
+             << escapeSQLChars(last_updated_by)
+             << "',last_updated = date_part('epoch', CURRENT_TIMESTAMP)::int,flags = " << Flags
+             << ",suspend_expires = " << SuspendExpires << " ,suspended_by = '"
+             << escapeSQLChars(SuspendedBy) << "' ,suspend_level = " << SuspendLevel
+             << ", suspend_reason = '" << escapeSQLChars(SuspendReason) << "' ,server = '"
+             << escapeSQLChars(Server) << "' ,isSuspended = " << (IsSuspended ? "'t'" : "'n'")
+             << ",isUhs = " << (IsUhs ? "'t'" : "'n'") << ",isOper = " << (IsOper ? "'t'" : "'n'")
+             << ",isAdmin = " << (IsAdmin ? "'t'" : "'n'") << ",isSmt = " << (IsSmt ? "'t'" : "'n'")
+             << ",isCoder = " << (IsCoder ? "'t'" : "'n'")
+             << ",GetLogs = " << (GetLogs ? "'t'" : "'n'")
+             << ",GetLag = " << (GetLag ? "'t'" : "'n'") << ",Sso = " << (Sso ? "'t'" : "'n'")
+             << ",Ssooo = " << (Ssooo ? "'t'" : "'n'") << ",AutoOp = " << (AutoOp ? "'t'" : "'n'")
+             << ",LastPassChangeTS = " << PassChangeTS << ",AccountTS = " << AccountTS
+             << ",NeedOp = " << (NeedOp ? "'t'" : "'n'") << ", Email = '" << escapeSQLChars(Email)
+             << "', Account = '" << escapeSQLChars(Account)
+             << "',Notice = " << (Notice ? "'t'" : "'n'") << " WHERE lower(user_name) = '"
+             << escapeSQLChars(string_lower(UserName)) << "'" << ends;
 
-elog	<< "ccontrol::UpdateOper> "
-	<< theQuery.str().c_str()
-	<< endl; 
+    elog << "ccontrol::UpdateOper> " << theQuery.str().c_str() << endl;
 
-if( SQLDb->Exec( theQuery ) )
-//if( PGRES_COMMAND_OK == status ) 
-	{
-	return true;
-	}
-else
-	{
-	elog	<< "ccontrol::UpdateOper> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
+    if (SQLDb->Exec(theQuery))
+    // if( PGRES_COMMAND_OK == status )
+    {
+        return true;
+    } else {
+        elog << "ccontrol::UpdateOper> SQL Failure: " << SQLDb->ErrorMessage() << endl;
+        return false;
+    }
 }
 
-void ccUser::setUhs()
-{
-IsUhs = true;
-IsOper = IsAdmin = IsSmt = IsCoder = false;
+void ccUser::setUhs() {
+    IsUhs = true;
+    IsOper = IsAdmin = IsSmt = IsCoder = false;
 }
 
-void ccUser::setOper()
-{
-IsOper = true;
-IsUhs = IsAdmin = IsSmt = IsCoder = false;
+void ccUser::setOper() {
+    IsOper = true;
+    IsUhs = IsAdmin = IsSmt = IsCoder = false;
 }
 
-void ccUser::setAdmin()
-{
-IsAdmin = true;
-IsOper = IsUhs = IsSmt = IsCoder = false;
+void ccUser::setAdmin() {
+    IsAdmin = true;
+    IsOper = IsUhs = IsSmt = IsCoder = false;
 }
 
-void ccUser::setSmt()
-{
-IsSmt = true;
-IsOper = IsAdmin = IsUhs = IsCoder = false;
+void ccUser::setSmt() {
+    IsSmt = true;
+    IsOper = IsAdmin = IsUhs = IsCoder = false;
 }
 
-void ccUser::setCoder()
-{
-IsCoder = true;
-IsOper = IsAdmin = IsSmt = IsUhs = false;
+void ccUser::setCoder() {
+    IsCoder = true;
+    IsOper = IsAdmin = IsSmt = IsUhs = false;
 }
 
-void ccUser::addClient(iClient* Client)
-{
-vector<iClient*>::iterator Itr;
-for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
-	{
-	if (*Itr == Client)
-		return;
-	}
-Clients.push_back(Client);
+void ccUser::addClient(iClient* Client) {
+    vector<iClient*>::iterator Itr;
+    for (Itr = Clients.begin(); Itr != Clients.end(); Itr++) {
+        if (*Itr == Client)
+            return;
+    }
+    Clients.push_back(Client);
 }
 
-void ccUser::remClient(iClient* Client)
-{
-vector<iClient*>::iterator Itr;
-for (Itr = Clients.begin(); Itr != Clients.end(); Itr++)
-	{
-	iClient* tClient = *Itr;
-	if (tClient == Client)
-		{
-		Clients.erase(Itr);
-		return;
-		}
-	}
+void ccUser::remClient(iClient* Client) {
+    vector<iClient*>::iterator Itr;
+    for (Itr = Clients.begin(); Itr != Clients.end(); Itr++) {
+        iClient* tClient = *Itr;
+        if (tClient == Client) {
+            Clients.erase(Itr);
+            return;
+        }
+    }
 }
 
-unsigned int ccUser::getType()
-{
-return (operLevel::UHSLEVEL * IsUhs + operLevel::OPERLEVEL * IsOper 
-	+ operLevel::ADMINLEVEL * IsAdmin + operLevel::SMTLEVEL * IsSmt 
-	+ operLevel::CODERLEVEL * IsCoder);
-}	
-	
-void ccUser::setType(unsigned int Type)
-{
-switch (Type)
-	{
-	case operLevel::UHSLEVEL:
-		IsUhs = true;
-		IsOper = false;
-		IsAdmin = false;
-		IsSmt = false;
-		IsCoder = false;
-		break;
-	case operLevel::OPERLEVEL:
-		IsUhs = false;
-		IsOper = true;
-		IsAdmin = false;
-		IsSmt = false;
-		IsCoder = false;
-		break;
-	case operLevel::ADMINLEVEL:
-		IsUhs = false;
-		IsOper = false;
-		IsAdmin = true;
-		IsSmt = false;
-		IsCoder = false;
-		break;
-	case operLevel::SMTLEVEL:
-		IsUhs = false;
-		IsOper = false;
-		IsAdmin = false;
-		IsSmt = true;
-		IsCoder = false;
-		break;
-	case operLevel::CODERLEVEL:
-		IsUhs = false;
-		IsOper = false;
-		IsAdmin = false;
-		IsSmt = false;
-		IsCoder = true;
-	default:;
-	}
+unsigned int ccUser::getType() {
+    return (operLevel::UHSLEVEL * IsUhs + operLevel::OPERLEVEL * IsOper +
+            operLevel::ADMINLEVEL * IsAdmin + operLevel::SMTLEVEL * IsSmt +
+            operLevel::CODERLEVEL * IsCoder);
 }
 
-bool ccUser::gotAccess(Command* Comm)
-{
-if(Comm->getSecondAccess())
-	{
-	return ((SAccess & Comm->getFlags()) != 0 ? true : false);
-	}
-else
-	{
-	return ((Access & Comm->getFlags()) != 0 ? true : false);	
-	}
-return false;
+void ccUser::setType(unsigned int Type) {
+    switch (Type) {
+    case operLevel::UHSLEVEL:
+        IsUhs = true;
+        IsOper = false;
+        IsAdmin = false;
+        IsSmt = false;
+        IsCoder = false;
+        break;
+    case operLevel::OPERLEVEL:
+        IsUhs = false;
+        IsOper = true;
+        IsAdmin = false;
+        IsSmt = false;
+        IsCoder = false;
+        break;
+    case operLevel::ADMINLEVEL:
+        IsUhs = false;
+        IsOper = false;
+        IsAdmin = true;
+        IsSmt = false;
+        IsCoder = false;
+        break;
+    case operLevel::SMTLEVEL:
+        IsUhs = false;
+        IsOper = false;
+        IsAdmin = false;
+        IsSmt = true;
+        IsCoder = false;
+        break;
+    case operLevel::CODERLEVEL:
+        IsUhs = false;
+        IsOper = false;
+        IsAdmin = false;
+        IsSmt = false;
+        IsCoder = true;
+    default:;
+    }
 }
 
-void ccUser::addCommand(Command* Comm)
-{
-if(Comm->getSecondAccess())
-	SAccess |= Comm->getFlags();
-else
-	Access |= Comm->getFlags();
-}
-		
-void ccUser::removeCommand(Command* Comm)
-{
-if(Comm->getSecondAccess())
-	SAccess &= ~Comm->getFlags();
-else
-	Access &= ~Comm->getFlags();
+bool ccUser::gotAccess(Command* Comm) {
+    if (Comm->getSecondAccess()) {
+        return ((SAccess & Comm->getFlags()) != 0 ? true : false);
+    } else {
+        return ((Access & Comm->getFlags()) != 0 ? true : false);
+    }
+    return false;
 }
 
-void ccUser::updateAccessFromFlags()
-{
-if(IsOper)
-	{
-	Access = commandLevel::OPER;
-	SAccess = commandLevel::SOPER;
-	}
-else if(IsAdmin)
-	{
-	Access = commandLevel::ADMIN;
-	SAccess = commandLevel::SADMIN;
-	}
-else if(IsSmt)
-	{
-	Access = commandLevel::SMT;
-	SAccess = commandLevel::SSMT;
-	}
-else if(IsCoder)
-	{
-	Access = commandLevel::CODER;
-	SAccess = commandLevel::SCODER;
-	}
+void ccUser::addCommand(Command* Comm) {
+    if (Comm->getSecondAccess())
+        SAccess |= Comm->getFlags();
+    else
+        Access |= Comm->getFlags();
 }
 
-void ccUser::updateAccess(unsigned int Type)
-{
-switch(Type)
-	{
-	case operLevel::OPERLEVEL:
-		Access = commandLevel::OPER;
-		SAccess = commandLevel::SOPER;
-		break;
-	case operLevel::ADMINLEVEL:
-		Access = commandLevel::ADMIN;
-		SAccess = commandLevel::SADMIN;
-		break;
-	case operLevel::SMTLEVEL:
-		Access = commandLevel::SMT;
-		SAccess = commandLevel::SSMT;
-		break;
-	case operLevel::CODERLEVEL:
-		Access = commandLevel::CODER;
-		SAccess = commandLevel::SCODER;
-		break;
-	}
+void ccUser::removeCommand(Command* Comm) {
+    if (Comm->getSecondAccess())
+        SAccess &= ~Comm->getFlags();
+    else
+        Access &= ~Comm->getFlags();
 }
 
+void ccUser::updateAccessFromFlags() {
+    if (IsOper) {
+        Access = commandLevel::OPER;
+        SAccess = commandLevel::SOPER;
+    } else if (IsAdmin) {
+        Access = commandLevel::ADMIN;
+        SAccess = commandLevel::SADMIN;
+    } else if (IsSmt) {
+        Access = commandLevel::SMT;
+        SAccess = commandLevel::SSMT;
+    } else if (IsCoder) {
+        Access = commandLevel::CODER;
+        SAccess = commandLevel::SCODER;
+    }
 }
-	
+
+void ccUser::updateAccess(unsigned int Type) {
+    switch (Type) {
+    case operLevel::OPERLEVEL:
+        Access = commandLevel::OPER;
+        SAccess = commandLevel::SOPER;
+        break;
+    case operLevel::ADMINLEVEL:
+        Access = commandLevel::ADMIN;
+        SAccess = commandLevel::SADMIN;
+        break;
+    case operLevel::SMTLEVEL:
+        Access = commandLevel::SMT;
+        SAccess = commandLevel::SSMT;
+        break;
+    case operLevel::CODERLEVEL:
+        Access = commandLevel::CODER;
+        SAccess = commandLevel::SCODER;
+        break;
+    }
+}
+
+} // namespace uworld
+
 } //  namespace gnuworld

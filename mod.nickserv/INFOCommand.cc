@@ -30,37 +30,36 @@ namespace gnuworld {
 
 namespace ns {
 
-bool INFOCommand::Exec(iClient* theClient, const string& Message)
-{
-bot->theStats->incStat("NS.CMD.INFO");
+bool INFOCommand::Exec(iClient* theClient, const string& Message) {
+    bot->theStats->incStat("NS.CMD.INFO");
 
-sqlUser* theUser = bot->isAuthed(theClient);
+    sqlUser* theUser = bot->isAuthed(theClient);
 
-if(!theUser || (theUser->getLevel() < level::admin::info)) {
-  bot->Notice(theClient, responses::noAccess);
-  return true;
-}
+    if (!theUser || (theUser->getLevel() < level::admin::info)) {
+        bot->Notice(theClient, responses::noAccess);
+        return true;
+    }
 
-StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-// INFO nick
-if(st.size() != 2) {
-  Usage(theClient);
-  return true;
-}
+    // INFO nick
+    if (st.size() != 2) {
+        Usage(theClient);
+        return true;
+    }
 
-sqlUser* targetUser = bot->isRegistered(st[1]);
+    sqlUser* targetUser = bot->isRegistered(st[1]);
 
-if(!targetUser) {
-  bot->Notice(theClient, responses::noSuchUser);
-  return true;
-}
+    if (!targetUser) {
+        bot->Notice(theClient, responses::noSuchUser);
+        return true;
+    }
 
-bot->Notice(theClient, "Nick: %s", targetUser->getName().c_str());
-bot->Notice(theClient, "Level: %u; Flags: %u; LogMask: %u",
-  targetUser->getLevel(), targetUser->getFlags(), targetUser->getLogMask());
+    bot->Notice(theClient, "Nick: %s", targetUser->getName().c_str());
+    bot->Notice(theClient, "Level: %u; Flags: %u; LogMask: %u", targetUser->getLevel(),
+                targetUser->getFlags(), targetUser->getLogMask());
 
-return true;
+    return true;
 }
 
 } // namespace ns

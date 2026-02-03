@@ -31,99 +31,82 @@ namespace gnuworld {
 namespace ds {
 
 class jfChannel {
-public:
-	
-	typedef std::map<std::string,jfClientData> joinPartMapType;
-	typedef joinPartMapType::const_iterator joinPartMapIterator;
-	typedef std::vector<std::string> jClientsVectorType;
-	typedef jClientsVectorType::const_iterator jClientsVectorIterator;
-		
-	/**
-	 * Constructor to set up initial state.
-	 *
-	 * @param _name		the name of the active channel
-	 * @param _lastjoin	the time of the last join to this channel
-	 */
-	inline jfChannel( const std::string& _name ) :
-		name(_name) 
-		{ numOfJoins = 0; 
-		  numOfParts = 0; } ;
+  public:
+    typedef std::map<std::string, jfClientData> joinPartMapType;
+    typedef joinPartMapType::const_iterator joinPartMapIterator;
+    typedef std::vector<std::string> jClientsVectorType;
+    typedef jClientsVectorType::const_iterator jClientsVectorIterator;
 
-	/** Empty destructor as we allocate no memory. */
-	inline ~jfChannel() { } ;
+    /**
+     * Constructor to set up initial state.
+     *
+     * @param _name		the name of the active channel
+     * @param _lastjoin	the time of the last join to this channel
+     */
+    inline jfChannel(const std::string& _name) : name(_name) {
+        numOfJoins = 0;
+        numOfParts = 0;
+    };
 
-	/************************
-	 ** A C C E S S O  R S **
-	 ************************/
+    /** Empty destructor as we allocate no memory. */
+    inline ~jfChannel() {};
 
-	inline const std::string& getName() const
-		{ return name; }
-	
-	inline bool getJoinFlooded() const
-		{ return joinFlooded; }
+    /************************
+     ** A C C E S S O  R S **
+     ************************/
 
-	inline unsigned int getNumOfJoins() const
-		{ return numOfJoins; }
-		
-	inline unsigned int getNumOfParts() const
-		{ return numOfParts; }
+    inline const std::string& getName() const { return name; }
 
-	inline const joinPartMapIterator joinPartBegin() const
-		{ return joinPartMap.begin(); }
-	
-	inline const joinPartMapIterator joinPartEnd() const
-		{ return joinPartMap.end(); }
+    inline bool getJoinFlooded() const { return joinFlooded; }
 
-	inline const jClientsVectorIterator jClientsBegin() const
-		{ return jClients.begin(); }
+    inline unsigned int getNumOfJoins() const { return numOfJoins; }
 
-	inline const jClientsVectorIterator jClientsEnd() const
-		{ return jClients.end(); }
+    inline unsigned int getNumOfParts() const { return numOfParts; }
 
-	/*********************
-	 ** M U T A T O R S **
-	 *********************/
-	
-	inline unsigned int advanceChannelJoin(iClient* tmpClient)
-		{
-		jClients.push_back(std::string(tmpClient->getCharYYXXX()));
-		return ++numOfJoins;
-		}
-	
-	inline void resetJoinCount()
-		{ numOfJoins = 0; }
-	
-	inline unsigned int advanceChannelParts()
-		{ return ++numOfParts; }
-	
-	inline void resetPartCount()
-		{ numOfParts = 0; }
-				 
-	inline void setJoinFlooded( bool _joinFlooded )
-		{ joinFlooded = _joinFlooded; }
+    inline const joinPartMapIterator joinPartBegin() const { return joinPartMap.begin(); }
 
-	inline void setPartFlooded( bool _partFlooded )
-		{ partFlooded = _partFlooded; }
-	
-	inline void setLastJoinFlood( time_t _lastJoinFlood)
-		{ lastJoinFlood = _lastJoinFlood; }
-	
-	inline time_t getLastJoinFlood() const
-		{ return lastJoinFlood; }
-		
-	void addJoin(iClient*);
-	
-	void addPart(iClient*);
-	
-protected:
-	std::string	name;
-	unsigned int	numOfJoins;
-	unsigned int 	numOfParts;
-	bool		joinFlooded;
-	bool		partFlooded;
-	joinPartMapType joinPartMap;
-	time_t lastJoinFlood;
-	jClientsVectorType jClients;
+    inline const joinPartMapIterator joinPartEnd() const { return joinPartMap.end(); }
+
+    inline const jClientsVectorIterator jClientsBegin() const { return jClients.begin(); }
+
+    inline const jClientsVectorIterator jClientsEnd() const { return jClients.end(); }
+
+    /*********************
+     ** M U T A T O R S **
+     *********************/
+
+    inline unsigned int advanceChannelJoin(iClient* tmpClient) {
+        jClients.push_back(std::string(tmpClient->getCharYYXXX()));
+        return ++numOfJoins;
+    }
+
+    inline void resetJoinCount() { numOfJoins = 0; }
+
+    inline unsigned int advanceChannelParts() { return ++numOfParts; }
+
+    inline void resetPartCount() { numOfParts = 0; }
+
+    inline void setJoinFlooded(bool _joinFlooded) { joinFlooded = _joinFlooded; }
+
+    inline void setPartFlooded(bool _partFlooded) { partFlooded = _partFlooded; }
+
+    inline void setLastJoinFlood(time_t _lastJoinFlood) { lastJoinFlood = _lastJoinFlood; }
+
+    inline time_t getLastJoinFlood() const { return lastJoinFlood; }
+
+    void addJoin(iClient*);
+
+    void addPart(iClient*);
+
+  protected:
+    std::string name;
+    unsigned int numOfJoins;
+    unsigned int numOfParts;
+    bool joinFlooded;
+    bool partFlooded;
+    joinPartMapType joinPartMap;
+    time_t lastJoinFlood;
+    jClientsVectorType jClients;
 
 }; // class jfChannel
 

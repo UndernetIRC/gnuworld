@@ -25,143 +25,132 @@
  * $Id: SCANUNAMECommand.cc,v 1.9 2007/08/28 16:10:11 dan_karrels Exp $
  */
 
+#include <string>
+#include <sstream>
 
-#include        <string>
-#include        <sstream>
+#include "StringTokenizer.h"
+#include "cservice.h"
+#include "levels.h"
+#include "responses.h"
+#include "dbHandle.h"
 
-#include        "StringTokenizer.h"
-#include        "cservice.h"
-#include        "levels.h"
-#include        "responses.h"
-#include        "dbHandle.h"
+namespace gnuworld {
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
 
-namespace gnuworld
-{
-using std::string ;
-using std::endl ;
-using std::ends ;
-using std::stringstream ;
-
-bool SCANUNAMECommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-        {
+bool SCANUNAMECommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
         Usage(theClient);
         return true;
-        }
+    }
 
-bool showAll = false;
+    bool showAll = false;
 
-if(st.size() > 2)
-	if(!strcasecmp(st[2],"-all"))
-		showAll = true;
+    if (st.size() > 2)
+        if (!strcasecmp(st[2], "-all"))
+            showAll = true;
 
-/*
- *  Fetch the sqlUser record attached to this client. If there isn't one,
- *  they aren't logged in - tell them they should be.
- */
+    /*
+     *  Fetch the sqlUser record attached to this client. If there isn't one,
+     *  they aren't logged in - tell them they should be.
+     */
 
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if (!theUser)
-        {
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
         return false;
-        }
+    }
 
-/*
- *  Check the user has sufficient access for this command..
- */
+    /*
+     *  Check the user has sufficient access for this command..
+     */
 
-int level = bot->getAdminAccessLevel(theUser);
-if (level < level::scanuname)
-        {
-        bot->Notice(theClient,
-                bot->getResponse(theUser,
-                        language::insuf_access,
-                        string("You have insufficient access to perform that command")));
+    int level = bot->getAdminAccessLevel(theUser);
+    if (level < level::scanuname) {
+        bot->Notice(theClient, bot->getResponse(
+                                   theUser, language::insuf_access,
+                                   string("You have insufficient access to perform that command")));
         return false;
-        }
+    }
 
-string uname = string_lower(st[1]);
+    string uname = string_lower(st[1]);
 
-stringstream scanunameQuery;
-scanunameQuery << "SELECT user_name, signup_ip FROM users WHERE "
-                << "lower(user_name) LIKE '" << escapeSQLChars(searchSQL(uname)) << "' LIMIT 50"
-                << ends;
+    stringstream scanunameQuery;
+    scanunameQuery << "SELECT user_name, signup_ip FROM users WHERE "
+                   << "lower(user_name) LIKE '" << escapeSQLChars(searchSQL(uname)) << "' LIMIT 50"
+                   << ends;
 
-if( !bot->SQLDb->Exec( scanunameQuery, true ) )
-        {
-		LOGSQL_ERROR( bot->SQLDb ) ;
-        return false ;
-        }
+    if (!bot->SQLDb->Exec(scanunameQuery, true)) {
+        LOGSQL_ERROR(bot->SQLDb);
+        return false;
+    }
 
-bot->Notice(theClient,"Found %i matches", bot->SQLDb->Tuples());
+    bot->Notice(theClient, "Found %i matches", bot->SQLDb->Tuples());
 
-if( bot->SQLDb->Tuples() >= 50 )
-	{
-	bot->Notice(theClient, "More than 50 matches were found, please visit the website.");
-	return false;
-	}
+    if (bot->SQLDb->Tuples() >= 50) {
+        bot->Notice(theClient, "More than 50 matches were found, please visit the website.");
+        return false;
+    }
 
-if((bot->SQLDb->Tuples() > 15) && (!showAll))
-	{
-	bot->Notice(theClient, "More than 15 matches were found without the use of -all, please visit the website.");
-	return false;
-	}
+    if ((bot->SQLDb->Tuples() > 15) && (!showAll)) {
+        bot->Notice(
+            theClient,
+            "More than 15 matches were found without the use of -all, please visit the website.");
+        return false;
+    }
 
-/* use this to store the SQL result set (querying later would overwrite the results */
-typedef std::map< std::string, std::string > scanResultsType;
-scanResultsType scanResults;
+    /* use this to store the SQL result set (querying later would overwrite the results */
+    typedef std::map<std::string, std::string> scanResultsType;
+    scanResultsType scanResults;
 
-/* store the results in the map defined above */
-for (unsigned int i = 0; i < bot->SQLDb->Tuples(); i++)
-{
+    /* store the results in the map defined above */
+    for (unsigned int i = 0; i < bot->SQLDb->Tuples(); i++) {
         string username = bot->SQLDb->GetValue(i, 0);
         string signupip = bot->SQLDb->GetValue(i, 1);
 
-	scanResults.insert( std::make_pair(username, signupip));
+        scanResults.insert(std::make_pair(username, signupip));
+    }
+
+    /* use this for each user record (below) */
+    unsigned short tmpadminLevel;
+
+    /* iterate through the results, fetching user records for each */
+    for (scanResultsType::const_iterator Itr = scanResults.begin(); Itr != scanResults.end();
+         ++Itr) {
+        string username = Itr->first;
+        string signupip = Itr->second;
+
+        /* check each user's access for purposes of IP hiding ONLY */
+        sqlUser* tmpUser = bot->getUserRecord(username);
+        if (tmpUser) {
+            /* found user, fetch admin access level */
+            sqlChannel* adminChan = bot->getChannelRecord("*");
+            if (!adminChan) {
+                /* cant find admin channel, assume no access */
+                tmpadminLevel = 0;
+            } else {
+                /* found admin channel, try to get the level record */
+                sqlLevel* adminLev = bot->getLevelRecord(tmpUser, adminChan);
+                if (!adminLev) {
+                    /* no level record, assume no access */
+                    tmpadminLevel = 0;
+                } else {
+                    /* found level record, set it */
+                    tmpadminLevel = adminLev->getAccess();
+                }
+            }
+            bot->Notice(theClient, "Username: %s -- Signup ip: %s", username.c_str(),
+                        ((tmpadminLevel > 0 || tmpUser->getFlag(sqlUser::F_OPER)) && level < 800)
+                            ? "Not Available"
+                            : signupip.c_str());
+        }
+    }
+
+    /* clean up */
+    scanResults.clear();
+
+    return true;
 }
-
-/* use this for each user record (below) */
-unsigned short tmpadminLevel;
-
-/* iterate through the results, fetching user records for each */
-for (scanResultsType::const_iterator Itr = scanResults.begin();
-	Itr != scanResults.end(); ++Itr)
-{
-	string username = Itr->first;
-	string signupip = Itr->second;
-
-	/* check each user's access for purposes of IP hiding ONLY */
-	sqlUser* tmpUser = bot->getUserRecord(username);
-	if (tmpUser)
-	{
-		/* found user, fetch admin access level */
-		sqlChannel* adminChan = bot->getChannelRecord("*");
-		if (!adminChan)
-		{
-			/* cant find admin channel, assume no access */
-			tmpadminLevel = 0;
-		} else {
-			/* found admin channel, try to get the level record */
-			sqlLevel* adminLev = bot->getLevelRecord(tmpUser, adminChan);
-			if (!adminLev)
-			{
-				/* no level record, assume no access */
-				tmpadminLevel = 0;
-			} else {
-				/* found level record, set it */
-				tmpadminLevel = adminLev->getAccess();
-			}
-		}
-		bot->Notice(theClient, "Username: %s -- Signup ip: %s", username.c_str(),
-			((tmpadminLevel>0 || tmpUser->getFlag(sqlUser::F_OPER)) && level<800)?"Not Available":signupip.c_str());
-	}
-}
-
-/* clean up */
-scanResults.clear();
-
-return true;
-}
-}
+} // namespace gnuworld

@@ -31,148 +31,151 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void SIMULATECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void SIMULATECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-bool autof = false;
+    bool autof = false;
 
-if (st.size() > 2) {
-  unsigned int pos = 2;
-  while(pos < st.size()) {
-    if (!strcasecmp(st[pos],"AUTO"))
-      autof = true;
+    if (st.size() > 2) {
+        unsigned int pos = 2;
+        while (pos < st.size()) {
+            if (!strcasecmp(st[pos], "AUTO"))
+                autof = true;
 
-    if (!strcasecmp(st[pos],"MANUAL"))
-      autof = false;
+            if (!strcasecmp(st[pos], "MANUAL"))
+                autof = false;
 
-    pos++;
-  }
-}
+            pos++;
+        }
+    }
 
-/* If not enough servers are currently linked, bail out. */
-if (bot->getState() != chanfix::RUN) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::not_enough_servers,
-                              std::string("Sorry, chanfix is currently disabled because not enough servers are linked.")).c_str());
-  return;
-}
+    /* If not enough servers are currently linked, bail out. */
+    if (bot->getState() != chanfix::RUN) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::not_enough_servers,
+                                     std::string("Sorry, chanfix is currently disabled because not "
+                                                 "enough servers are linked."))
+                        .c_str());
+        return;
+    }
 
-Channel* netChan = Network->findChannel(st[1]);
-if (!netChan) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_such_channel,
-                              std::string("No such channel %s.")).c_str(), st[1].c_str());
-  return;
-}
+    Channel* netChan = Network->findChannel(st[1]);
+    if (!netChan) {
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::no_such_channel, std::string("No such channel %s."))
+                .c_str(),
+            st[1].c_str());
+        return;
+    }
 
-if (!bot->canScoreChan(netChan) || netChan->getMode(Channel::MODE_REG)) {
-  bot->SendTo(theClient,
-	      bot->getResponse(theUser,
-			       language::registered_channel,
-			       std::string("%s is a registered channel.")).c_str(),
-			       netChan->getName().c_str());
-  return;
-}
+    if (!bot->canScoreChan(netChan) || netChan->getMode(Channel::MODE_REG)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::registered_channel,
+                                     std::string("%s is a registered channel."))
+                        .c_str(),
+                    netChan->getName().c_str());
+        return;
+    }
 
-chanfix::chanOpsType myOps = bot->getMyOps(netChan);
-if (myOps.empty()) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_scores_for_chan,
-                              std::string("There are no scores in the database for %s.")).c_str(),
-                                          netChan->getName().c_str());
-  return;
-}
+    chanfix::chanOpsType myOps = bot->getMyOps(netChan);
+    if (myOps.empty()) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::no_scores_for_chan,
+                                     std::string("There are no scores in the database for %s."))
+                        .c_str(),
+                    netChan->getName().c_str());
+        return;
+    }
 
-if (bot->isBeingChanFixed(netChan)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::already_being_man_fixed,
-                              std::string("The channel %s is already being manually fixed.")).c_str(),
-                                          netChan->getName().c_str());
-  return;
-}
+    if (bot->isBeingChanFixed(netChan)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::already_being_man_fixed,
+                                     std::string("The channel %s is already being manually fixed."))
+                        .c_str(),
+                    netChan->getName().c_str());
+        return;
+    }
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan) theChan = bot->newChannelRecord(st[1]);
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan)
+        theChan = bot->newChannelRecord(st[1]);
 
-if (myOps.begin() != myOps.end())
-  theChan->setMaxScore((*myOps.begin())->getPoints());
+    if (myOps.begin() != myOps.end())
+        theChan->setMaxScore((*myOps.begin())->getPoints());
 
-if (theChan->getMaxScore() <= 
-    static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE)) 
-{
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::highscore_channel,
-                              std::string("The highscore in channel %s is %d which is lower than the minimum score required (%.2f * %d = %d).")).c_str(),
-                                          theChan->getChannel().c_str(), theChan->getMaxScore(),
-                                          FIX_MIN_ABS_SCORE_END, MAX_SCORE,
-                                          static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) 
-                                          * MAX_SCORE));
-  return;
-}
+    if (theChan->getMaxScore() <=
+        static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE)) {
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::highscore_channel,
+                             std::string("The highscore in channel %s is %d which is lower than "
+                                         "the minimum score required (%.2f * %d = %d)."))
+                .c_str(),
+            theChan->getChannel().c_str(), theChan->getMaxScore(), FIX_MIN_ABS_SCORE_END, MAX_SCORE,
+            static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
+        return;
+    }
 
-if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_blocked,
-                              std::string("The channel %s is BLOCKED.")).c_str(),
-                                          theChan->getChannel().c_str());
-  return;
-}
+    if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::channel_blocked,
+                                     std::string("The channel %s is BLOCKED."))
+                        .c_str(),
+                    theChan->getChannel().c_str());
+        return;
+    }
 
-if (bot->isTempBlocked(theChan->getChannel())) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_temp_blocked,
-                              std::string("The channel %s is TEMPBLOCKED.")).c_str(),
-                                          theChan->getChannel().c_str());
-  return;
-}
+    if (bot->isTempBlocked(theChan->getChannel())) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::channel_temp_blocked,
+                                     std::string("The channel %s is TEMPBLOCKED."))
+                        .c_str(),
+                    theChan->getChannel().c_str());
+        return;
+    }
 
-if (!theChan->useSQL())
-  theChan->Insert(bot->getLocalDBHandle());
+    if (!theChan->useSQL())
+        theChan->Insert(bot->getLocalDBHandle());
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::manual_simulate_starting,
-                            std::string("Simulate for %s (%s) starting at next fixing round (Current C time %s).")).c_str(),
-                                        netChan->getName().c_str(), ((autof == true) ? "AUTO" : "MANUAL"), 
-                                        prettyTime(bot->currentTime()).c_str());
+    bot->SendTo(
+        theClient,
+        bot->getResponse(
+               theUser, language::manual_simulate_starting,
+               std::string(
+                   "Simulate for %s (%s) starting at next fixing round (Current C time %s)."))
+            .c_str(),
+        netChan->getName().c_str(), ((autof == true) ? "AUTO" : "MANUAL"),
+        prettyTime(bot->currentTime()).c_str());
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::manual_simulate_estimate,
-                            std::string("NOTE: This is only an estimate, if ops with points join or part it could affect who gets opped.")).c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::manual_simulate_estimate,
+                                 std::string("NOTE: This is only an estimate, if ops with points "
+                                             "join or part it could affect who gets opped."))
+                    .c_str());
 
-sqlChannel* sqlChan = bot->getChannelRecord(st[1]);
-bot->simulateFix(sqlChan, autof, theClient, theUser);
+    sqlChannel* sqlChan = bot->getChannelRecord(st[1]);
+    bot->simulateFix(sqlChan, autof, theClient, theUser);
 
-theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_SIMULATE, theClient, (autof) ? "[auto]" : "[manual]");
+    theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_SIMULATE, theClient,
+                     (autof) ? "[auto]" : "[manual]");
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::manual_simulate_complete,
-                            std::string("Simulate complete for %s")).c_str(),
-                                        netChan->getName().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::manual_simulate_complete,
+                                 std::string("Simulate complete for %s"))
+                    .c_str(),
+                netChan->getName().c_str());
 
-bot->logAdminMessage("%s (%s) SIMULATE %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     netChan->getName().c_str());
+    bot->logAdminMessage("%s (%s) SIMULATE %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), netChan->getName().c_str());
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
+    return;
 }
 
 } // namespace cf

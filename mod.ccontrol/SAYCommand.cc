@@ -20,91 +20,64 @@
  * $Id: SAYCommand.cc,v 1.8 2006/09/26 17:36:01 kewlio Exp $
  */
 
-#include	<string>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Network.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Network.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool SAYCommand::Exec( iClient* theClient, const string& Message)
-{	 
+bool SAYCommand::Exec(iClient* theClient, const string& Message) {
 
-StringTokenizer st( Message ) ;
-string Numeric;
-string Target;
-if(st.size() < 4)
-	{
-	Usage(theClient);
-	return true;
-	}
+    StringTokenizer st(Message);
+    string Numeric;
+    string Target;
+    if (st.size() < 4) {
+        Usage(theClient);
+        return true;
+    }
 
-bot->MsgChanLog("%s\n",st.assemble(0).c_str());
-if(!strcasecmp(st[1].c_str(),"-s"))
-	{
-	Numeric = bot->getUplink()->getCharYY();
-	}
-else if(!strcasecmp(st[1].c_str(),"-b"))
-	{
-	Numeric = bot->getCharYYXXX();
-	}
-else
-	{
-	bot->Notice(theClient,"First argument must be -s for server, or -b for bot");
-	return true;
-	}
+    bot->MsgChanLog("%s\n", st.assemble(0).c_str());
+    if (!strcasecmp(st[1].c_str(), "-s")) {
+        Numeric = bot->getUplink()->getCharYY();
+    } else if (!strcasecmp(st[1].c_str(), "-b")) {
+        Numeric = bot->getCharYYXXX();
+    } else {
+        bot->Notice(theClient, "First argument must be -s for server, or -b for bot");
+        return true;
+    }
 
-if(!strcasecmp(st[2].substr(0,1),"#"))
-	{
-	if(!Network->findChannel(st[2]))
-		{
-		bot->Notice(theClient,"Sorry, but i can't find channel %s",
-			    st[2].c_str());
-		return true;
-		}
-	else
-		{
-		Target = st[2];
-		}
-	}
-else	
-	{
-	iClient* tClient = Network->findNick(st[2]);
-	if(!tClient)
-		{
-		bot->Notice(theClient,"Sorry, but i can't find nick: %s",
-			    st[2].c_str());
-		return true;
-		}
-	else
-		{
-		Target = tClient->getCharYYXXX();
-		}
-	}
+    if (!strcasecmp(st[2].substr(0, 1), "#")) {
+        if (!Network->findChannel(st[2])) {
+            bot->Notice(theClient, "Sorry, but i can't find channel %s", st[2].c_str());
+            return true;
+        } else {
+            Target = st[2];
+        }
+    } else {
+        iClient* tClient = Network->findNick(st[2]);
+        if (!tClient) {
+            bot->Notice(theClient, "Sorry, but i can't find nick: %s", st[2].c_str());
+            return true;
+        } else {
+            Target = tClient->getCharYYXXX();
+        }
+    }
 
-if (!match("SAY",st[0]))
-{
-	bot->Write("%s P %s :%s",
-		Numeric.c_str(),
-		Target.c_str(),
-		st.assemble(3).c_str());
-} else {
-	bot->Write("%s P %s :%cACTION %s%c",
-		Numeric.c_str(),
-		Target.c_str(),
-		1, st.assemble(3).c_str(), 1);
-}
-return true ;
+    if (!match("SAY", st[0])) {
+        bot->Write("%s P %s :%s", Numeric.c_str(), Target.c_str(), st.assemble(3).c_str());
+    } else {
+        bot->Write("%s P %s :%cACTION %s%c", Numeric.c_str(), Target.c_str(), 1,
+                   st.assemble(3).c_str(), 1);
+    }
+    return true;
 }
 
-}
-}
-
+} // namespace uworld
+} // namespace gnuworld

@@ -23,61 +23,61 @@
  *
  * $Id: DEBUGCommand.cc,v 1.4 2006/12/09 00:29:18 buzlip01 Exp $
  */
-#include	<string>
-#include	"gnuworld_config.h"
-#include	"StringTokenizer.h"
-#include	"chanfix.h"
-#include	"responses.h"
+#include <string>
+#include "gnuworld_config.h"
+#include "StringTokenizer.h"
+#include "chanfix.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void DEBUGCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
+void DEBUGCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
 #ifndef CHANFIX_DEBUG
-return;
+    return;
 #endif
 
-StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-std::string option = string_upper(st[1]);
+    std::string option = string_upper(st[1]);
 
-if (option == "ROTATE") {
-  bot->logDebugMessage("%s (%s) ordered a manual DB rotation.",
-		       theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
-		       theClient->getRealNickUserHost().c_str());
-  bot->rotateDB();
-  return;
-}
+    if (option == "ROTATE") {
+        bot->logDebugMessage("%s (%s) ordered a manual DB rotation.",
+                             theUser ? theUser->getUserName().c_str()
+                                     : theClient->getNickName().c_str(),
+                             theClient->getRealNickUserHost().c_str());
+        bot->rotateDB();
+        return;
+    }
 
-if (option == "UPDATE") {
-  if (bot->isUpdateRunning()) {
-    bot->SendTo(theClient,
-		bot->getResponse(theUser,
-				language::update_in_progress,
-                        	std::string("This command cannot proceed while an update is in progress. Please try again later.")).c_str());
-    return;
-  }
+    if (option == "UPDATE") {
+        if (bot->isUpdateRunning()) {
+            bot->SendTo(theClient,
+                        bot->getResponse(theUser, language::update_in_progress,
+                                         std::string("This command cannot proceed while an update "
+                                                     "is in progress. Please try again later."))
+                            .c_str());
+            return;
+        }
 
-  if ((st.size() > 2) && string_upper(st[2]) == "THREADED") {
-    bot->logDebugMessage("%s (%s) ordered a manual DB update (threaded).",
-			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
-			 theClient->getRealNickUserHost().c_str());
-    bot->prepareUpdate(true);
-    return;
-  } else {
-    bot->logDebugMessage("%s (%s) ordered a manual DB update.",
-			 theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
-			 theClient->getRealNickUserHost().c_str());
-    bot->prepareUpdate(false);
-    return;
-  }
-}
+        if ((st.size() > 2) && string_upper(st[2]) == "THREADED") {
+            bot->logDebugMessage("%s (%s) ordered a manual DB update (threaded).",
+                                 theUser ? theUser->getUserName().c_str()
+                                         : theClient->getNickName().c_str(),
+                                 theClient->getRealNickUserHost().c_str());
+            bot->prepareUpdate(true);
+            return;
+        } else {
+            bot->logDebugMessage("%s (%s) ordered a manual DB update.",
+                                 theUser ? theUser->getUserName().c_str()
+                                         : theClient->getNickName().c_str(),
+                                 theClient->getRealNickUserHost().c_str());
+            bot->prepareUpdate(false);
+            return;
+        }
+    }
 
-bot->logLastComMessage(theClient, Message);
-
+    bot->logLastComMessage(theClient, Message);
 }
 
 } // namespace cf

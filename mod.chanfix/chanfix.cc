@@ -33,43 +33,36 @@ namespace chanfix {
 using std::string;
 
 extern "C" {
-	xClient* _gnuwinit(const string& args) {
-		return new chanfix( args ) ;
-	}
+xClient* _gnuwinit(const string& args) { return new chanfix(args); }
 }
 
 /** Constructor taking the configuration file as an argument. */
-chanfix::chanfix( const string& configFileName )
-	: xClient( configFileName )
-{
-/* Get our config */
-EConfig *config = new EConfig(configFileName);
-assert( config != 0 );
+chanfix::chanfix(const string& configFileName) : xClient(configFileName) {
+    /* Get our config */
+    EConfig* config = new EConfig(configFileName);
+    assert(config != 0);
 
-/* Initialise our config variables */
-confConsoleChannel = config->Require("consoleChannel")->second;
-confConsoleModes = config->Require("consoleModes")->second;
+    /* Initialise our config variables */
+    confConsoleChannel = config->Require("consoleChannel")->second;
+    confConsoleModes = config->Require("consoleModes")->second;
 
-//confLogLevel = atoi(config->Require("logLevel")->second.c_str());
-confLogLevel = 255;
+    // confLogLevel = atoi(config->Require("logLevel")->second.c_str());
+    confLogLevel = 255;
 
-confPointsAuth = atoi(config->Require("pointsAuth")->second.c_str());
-confMaxPoints = atoi(config->Require("maxPoints")->second.c_str());
-confPeriod = atoi(config->Require("period")->second.c_str());
-confStartDelay = atoi(config->Require("startDelay")->second.c_str());
+    confPointsAuth = atoi(config->Require("pointsAuth")->second.c_str());
+    confMaxPoints = atoi(config->Require("maxPoints")->second.c_str());
+    confPeriod = atoi(config->Require("period")->second.c_str());
+    confStartDelay = atoi(config->Require("startDelay")->second.c_str());
 
-/* Register our commands */
-RegisterCommand(new CHECKCommand(this, "CHECK", "<#channel>"));
+    /* Register our commands */
+    RegisterCommand(new CHECKCommand(this, "CHECK", "<#channel>"));
 }
 
 /** Destructor doing nothing as we have no heap. */
-chanfix::~chanfix()
-{
-for( mapChannels::iterator itr = channels.begin() ;
-     itr != channels.end() ;
-     ++itr ) {
-	delete itr->second;
-}
+chanfix::~chanfix() {
+    for (mapChannels::iterator itr = channels.begin(); itr != channels.end(); ++itr) {
+        delete itr->second;
+    }
 }
 
 } // namespace chanfix

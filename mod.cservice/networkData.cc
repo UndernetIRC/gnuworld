@@ -1,6 +1,6 @@
 /**
  * networkData.cc
- * 
+ *
  * This class is used for storing/modifying "Runtime" specific data
  * applicable to a active iClient on the network.
  *
@@ -24,34 +24,25 @@
  *
  * $Id: networkData.cc,v 1.9 2005/12/27 13:27:59 kewlio Exp $
  */
- 
-#include	<sstream>
-#include	<string> 
 
-#include	<cstring> 
+#include <sstream>
+#include <string>
 
-#include	"ELog.h"
-#include	"misc.h"
-#include	"networkData.h" 
+#include <cstring>
 
-namespace gnuworld
-{
+#include "ELog.h"
+#include "misc.h"
+#include "networkData.h"
 
-using std::string ;
-using std::endl ;
- 
+namespace gnuworld {
+
+using std::endl;
+using std::string;
+
 networkData::networkData()
- : messageTime( 0 ),
-   outputCount( 0 ),
-   flood_points( 0 ),
-   currentUser( 0 ), 
-   ignored( false ),
-   ipr_ts( 0 ),
-   failed_logins( 0 )
-{
-}
- 
-networkData::~networkData()
-{}
- 
+    : messageTime(0), outputCount(0), flood_points(0), currentUser(0), ignored(false), ipr_ts(0),
+      failed_logins(0) {}
+
+networkData::~networkData() {}
+
 } // Namespace gnuworld.

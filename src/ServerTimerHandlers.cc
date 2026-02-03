@@ -19,36 +19,33 @@
  *
  * $Id: ServerTimerHandlers.cc,v 1.11 2005/01/12 03:50:38 dan_karrels Exp $
  */
-#include	<string>
-#include	<ctime>
-#include	"ServerTimerHandlers.h"
-#include	"server.h"
-#include	"ELog.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <ctime>
+#include "ServerTimerHandlers.h"
+#include "server.h"
+#include "ELog.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-void GlineUpdateTimer::OnTimer( const timerID& , void* )
-{
-// Remove any expired glines
-theServer->updateGlines() ;
+void GlineUpdateTimer::OnTimer(const timerID&, void*) {
+    // Remove any expired glines
+    theServer->updateGlines();
 
-// Re-register this timer
-theServer->RegisterTimer( ::time( 0 ) + updateInterval, this, 0 ) ;
+    // Re-register this timer
+    theServer->RegisterTimer(::time(0) + updateInterval, this, 0);
 }
 
-void PINGTimer::OnTimer( const timerID& , void* )
-{
-string writeMe( theServer->getCharYY() ) ;
-writeMe += " G :I am the King, bow before me!\n" ;
+void PINGTimer::OnTimer(const timerID&, void*) {
+    string writeMe(theServer->getCharYY());
+    writeMe += " G :I am the King, bow before me!\n";
 
-theServer->RegisterTimer( ::time( 0 ) + updateInterval, this, 0 ) ;
+    theServer->RegisterTimer(::time(0) + updateInterval, this, 0);
 
-// Write to the network, even during bursting
-theServer->WriteDuringBurst( writeMe ) ;
+    // Write to the network, even during bursting
+    theServer->WriteDuringBurst(writeMe);
 }
 
 } // namespace gnuworld

@@ -20,60 +20,49 @@
  * $Id: msg_W.cc,v 1.5 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
-#include	<iostream>
+#include <iostream>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"xparameters.h"
-#include	"ELog.h"
-#include	"Network.h"
-#include	"iClient.h"
-#include	"client.h"
-#include	"ServerCommandHandler.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "xparameters.h"
+#include "ELog.h"
+#include "Network.h"
+#include "iClient.h"
+#include "client.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::endl ;
+using std::endl;
 
 CREATE_HANDLER(msg_W)
 
 // ABAG7 W Az :Gte-
-bool msg_W::Execute( const xParameters& Param )
-{
-if( Param.size() != 3 )
-	{
-	elog	<< "msg_W> Invalid number of parameters"
-		<< endl ;
-	return false ;
-	}
+bool msg_W::Execute(const xParameters& Param) {
+    if (Param.size() != 3) {
+        elog << "msg_W> Invalid number of parameters" << endl;
+        return false;
+    }
 
-iClient* sourceClient = Network->findClient( Param[ 0 ] ) ;
-if( NULL == sourceClient )
-	{
-	elog	<< "msg_W> Unable to find source client: "
-		<< Param[ 0 ]
-		<< endl ;
-	return false ;
-	}
+    iClient* sourceClient = Network->findClient(Param[0]);
+    if (NULL == sourceClient) {
+        elog << "msg_W> Unable to find source client: " << Param[0] << endl;
+        return false;
+    }
 
-iClient* targetClient = Network->findNick( Param[ 2 ] ) ;
-if( NULL == targetClient )
-	{
-	elog	<< "msg_W> Unable to find target client: "
-		<< Param[ 2 ]
-		<< endl ;
-	return false ;
-	}
+    iClient* targetClient = Network->findNick(Param[2]);
+    if (NULL == targetClient) {
+        elog << "msg_W> Unable to find target client: " << Param[2] << endl;
+        return false;
+    }
 
-// WHOIS must be delivered to all xclients
-xNetwork::localClientIterator ptr = Network->localClient_begin() ;
-for( ; ptr != Network->localClient_end() ; ++ptr )
-	{
-	ptr->second->OnWhois( sourceClient, targetClient ) ;
-	}
+    // WHOIS must be delivered to all xclients
+    xNetwork::localClientIterator ptr = Network->localClient_begin();
+    for (; ptr != Network->localClient_end(); ++ptr) {
+        ptr->second->OnWhois(sourceClient, targetClient);
+    }
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld

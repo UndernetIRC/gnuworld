@@ -30,68 +30,63 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void UNBLOCKCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void UNBLOCKCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-/* Check if channel blocking has been disabled in the config. */
-if (!bot->doChanBlocking()) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_blocking_disabled,
-                              std::string("Channel blocking is disabled.")).c_str());
-  return;
-}
-	
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_entry_in_db,
-                              std::string("There is no entry in the database for %s.")).c_str(),
-                                          st[1].c_str());
-  return;
-}
+    /* Check if channel blocking has been disabled in the config. */
+    if (!bot->doChanBlocking()) {
+        bot->SendTo(theClient, bot->getResponse(theUser, language::channel_blocking_disabled,
+                                                std::string("Channel blocking is disabled."))
+                                   .c_str());
+        return;
+    }
 
-if (!theChan->getFlag(sqlChannel::F_BLOCKED)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_not_blocked,
-                              std::string("The channel %s is not blocked.")).c_str(),
-                                          theChan->getChannel().c_str());
-  return;
-}
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::no_entry_in_db,
+                                     std::string("There is no entry in the database for %s."))
+                        .c_str(),
+                    st[1].c_str());
+        return;
+    }
 
-theChan->removeFlag(sqlChannel::F_BLOCKED);
+    if (!theChan->getFlag(sqlChannel::F_BLOCKED)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::channel_not_blocked,
+                                     std::string("The channel %s is not blocked."))
+                        .c_str(),
+                    theChan->getChannel().c_str());
+        return;
+    }
 
-if (!theChan->useSQL())
-  theChan->Insert(bot->getLocalDBHandle());
-else
-  theChan->commit(bot->getLocalDBHandle());
+    theChan->removeFlag(sqlChannel::F_BLOCKED);
 
-/* Add note to the channel about this command */
-theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_UNBLOCK, theClient, "");
+    if (!theChan->useSQL())
+        theChan->Insert(bot->getLocalDBHandle());
+    else
+        theChan->commit(bot->getLocalDBHandle());
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::channel_unblocked,
-                            std::string("Channel %s has been unblocked.")).c_str(),
-                                        theChan->getChannel().c_str());
+    /* Add note to the channel about this command */
+    theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_UNBLOCK, theClient, "");
 
-/* Log command */
-bot->logAdminMessage("%s (%s) UNBLOCK %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     theChan->getChannel().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::channel_unblocked,
+                                 std::string("Channel %s has been unblocked."))
+                    .c_str(),
+                theChan->getChannel().c_str());
 
-bot->logLastComMessage(theClient, Message);
+    /* Log command */
+    bot->logAdminMessage("%s (%s) UNBLOCK %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), theChan->getChannel().c_str());
 
-return;
+    bot->logLastComMessage(theClient, Message);
+
+    return;
 }
 } // namespace cf
 } // namespace gnuworld

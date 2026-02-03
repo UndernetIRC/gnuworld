@@ -26,95 +26,84 @@
  * $Id: OPERPARTCommand.cc,v 1.15 2008/04/16 20:34:39 danielaustin Exp $
  */
 
-#include	<string>
-#include	<sstream>
-#include	<iostream>
+#include <string>
+#include <sstream>
+#include <iostream>
 
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"levels.h"
-#include	"responses.h"
-#include	"Network.h"
-#include	"cservice_config.h"
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "levels.h"
+#include "responses.h"
+#include "Network.h"
+#include "cservice_config.h"
 
-namespace gnuworld
-{
-using std::endl ;
-using std::ends ;
-using std::string ;
-using std::stringstream ;
+namespace gnuworld {
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
 
-bool OPERPARTCommand::Exec( [[maybe_unused]] iClient* theClient, [[maybe_unused]] const string& Message )
-{
+bool OPERPARTCommand::Exec([[maybe_unused]] iClient* theClient,
+                           [[maybe_unused]] const string& Message) {
 #ifdef USE_OPERPARTJOIN
 
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-/*
- *  Check if the user is an oper.
- */
+    /*
+     *  Check if the user is an oper.
+     */
 
-// cservice::getResponse() will properly handle a NULL
-// sqlUser
-sqlUser* theUser = bot->isAuthed(theClient, false);
+    // cservice::getResponse() will properly handle a NULL
+    // sqlUser
+    sqlUser* theUser = bot->isAuthed(theClient, false);
 
-if(!theClient->isOper())
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::ircops_only_cmd,
-		"This command is reserved to IRC Operators"));
-	return true;
-	}
+    if (!theClient->isOper()) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::ircops_only_cmd,
+                                                "This command is reserved to IRC Operators"));
+        return true;
+    }
 
-/*
- *  Check the channel is actually registered.
- */
+    /*
+     *  Check the channel is actually registered.
+     */
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_not_reg).c_str(),
-		st[1].c_str());
-	return false;
-	}
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
+                    st[1].c_str());
+        return false;
+    }
 
-/* Check the bot is in the channel. */
+    /* Check the bot is in the channel. */
 
-if (!theChan->getInChan())
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::i_am_not_on_chan,
-			string("I'm not in that channel!")));
-	return false;
-	}
+    if (!theChan->getInChan()) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::i_am_not_on_chan,
+                                                string("I'm not in that channel!")));
+        return false;
+    }
 
-bot->writeChannelLog(theChan, theClient, sqlChannel::EV_OPERPART, "");
+    bot->writeChannelLog(theChan, theClient, sqlChannel::EV_OPERPART, "");
 
-// Tell the world.
+    // Tell the world.
 
-bot->Wallops( "An IRC Operator is asking me to leave channel %s",
-	theChan->getName().c_str() ) ;
+    bot->Wallops("An IRC Operator is asking me to leave channel %s", theChan->getName().c_str());
 
-bot->logAdminMessage("%s is asking me to leave channel %s",
-		theClient->getNickUserHost().c_str(),
-		theChan->getName().c_str());
+    bot->logAdminMessage("%s is asking me to leave channel %s",
+                         theClient->getNickUserHost().c_str(), theChan->getName().c_str());
 
-theChan->setInChan(false);
-bot->decrementJoinCount();
+    theChan->setInChan(false);
+    bot->decrementJoinCount();
 
-bot->Part(theChan->getName(), "At the request of an IRC Operator");
+    bot->Part(theChan->getName(), "At the request of an IRC Operator");
 
 #endif // USE_OPERPARTJOIN
 
-return true;
-
+    return true;
 }
 
 } // namespace gnuworld.

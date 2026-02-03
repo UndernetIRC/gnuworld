@@ -20,8 +20,8 @@
 #ifndef CF_CFCHANNEL_H
 #define CF_CFCHANNEL_H "$Id: cfChannel.h,v 1.6 2007/08/28 16:10:08 dan_karrels Exp $"
 
-#include	<string>
-#include	<map>
+#include <string>
+#include <map>
 
 namespace gnuworld {
 
@@ -30,24 +30,22 @@ namespace chanfix {
 class cfChannelUser;
 
 class cfChannel {
-public:
-	cfChannel(const std::string&);
-	virtual ~cfChannel();
+  public:
+    cfChannel(const std::string&);
+    virtual ~cfChannel();
 
-	/** Return a given user - add a new one if one is not present. */
-	cfChannelUser* getUser(const std::string&);
+    /** Return a given user - add a new one if one is not present. */
+    cfChannelUser* getUser(const std::string&);
 
-	/** Return the beginning of the users map. */
-	typedef std::map< std::string , cfChannelUser* > mapUsers;
-	typedef mapUsers::const_iterator mapUsersConstIterator;
-	inline mapUsersConstIterator getUsersBegin()
-		{ return users.begin(); }
-	inline mapUsersConstIterator getUsersEnd()
-		{ return users.end(); }
+    /** Return the beginning of the users map. */
+    typedef std::map<std::string, cfChannelUser*> mapUsers;
+    typedef mapUsers::const_iterator mapUsersConstIterator;
+    inline mapUsersConstIterator getUsersBegin() { return users.begin(); }
+    inline mapUsersConstIterator getUsersEnd() { return users.end(); }
 
-protected:
-	std::string name;
-	mapUsers users;
+  protected:
+    std::string name;
+    mapUsers users;
 }; // class cfChannel
 
 } // namespace chanfix

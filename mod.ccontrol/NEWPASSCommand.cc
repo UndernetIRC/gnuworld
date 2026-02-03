@@ -20,75 +20,63 @@
  * $Id: NEWPASSCommand.cc,v 1.24 2009/07/25 18:12:34 hidden1 Exp $
  */
 
-#include	<string>
-#include	<iomanip>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Network.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Network.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool NEWPASSCommand::Exec( iClient* theClient, const string& Message)
-{
-StringTokenizer st( Message ) ;
-	
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool NEWPASSCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-//Fetch the user authentication entry
-ccUser *theUser = bot->IsAuth(theClient);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-if(!theUser)
-	{
-        bot->Notice(theClient,"You have to be logged in to use this command");
-	return false;
-	}
-unsigned int passRet = bot->checkPassword(st[1],theUser);
-switch(passRet)
-	{
-	case password::TOO_SHORT:
-		bot->Notice(theClient,"Password must be at least %d characters",
-			password::MIN_SIZE);
-		break;
-	case password::LIKE_UNAME:
-		bot->Notice(theClient,"Password can't be similar to your username");
-		break;
-	case password::PASS_OK:
-		{		
-		theUser->setPassword(bot->CryptPass(st[1]));
-		theUser->setPassChangeTS(::time(0));
-		if(theUser->Update())
-			{
-			bot->Notice(theClient,"Password changed!");
-        		bot->MsgChanLog("(%s) - %s: Changed Password\n",
-				theUser->getUserName().c_str(),
-                        	theClient->getRealNickUserHost().c_str());
-			return true;
-			}
-		else
-			{
-			bot->Notice(theClient,"Error while changing password");
-        		bot->MsgChanLog("Error while changing password for (%s) - %s\n",
-				theUser->getUserName().c_str(),
-                        	theClient->getRealNickUserHost().c_str(),st.assemble(1).c_str());
-			return true;
-			}
-		}
-	}
-return true;	
-}	
+    // Fetch the user authentication entry
+    ccUser* theUser = bot->IsAuth(theClient);
 
+    if (!theUser) {
+        bot->Notice(theClient, "You have to be logged in to use this command");
+        return false;
+    }
+    unsigned int passRet = bot->checkPassword(st[1], theUser);
+    switch (passRet) {
+    case password::TOO_SHORT:
+        bot->Notice(theClient, "Password must be at least %d characters", password::MIN_SIZE);
+        break;
+    case password::LIKE_UNAME:
+        bot->Notice(theClient, "Password can't be similar to your username");
+        break;
+    case password::PASS_OK: {
+        theUser->setPassword(bot->CryptPass(st[1]));
+        theUser->setPassChangeTS(::time(0));
+        if (theUser->Update()) {
+            bot->Notice(theClient, "Password changed!");
+            bot->MsgChanLog("(%s) - %s: Changed Password\n", theUser->getUserName().c_str(),
+                            theClient->getRealNickUserHost().c_str());
+            return true;
+        } else {
+            bot->Notice(theClient, "Error while changing password");
+            bot->MsgChanLog("Error while changing password for (%s) - %s\n",
+                            theUser->getUserName().c_str(),
+                            theClient->getRealNickUserHost().c_str(), st.assemble(1).c_str());
+            return true;
+        }
+    }
+    }
+    return true;
 }
-}
+
+} // namespace uworld
+} // namespace gnuworld

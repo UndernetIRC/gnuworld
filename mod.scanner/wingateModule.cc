@@ -1,6 +1,6 @@
 /**
  * winGateModule.cc
- * Copyright (C) 2002 Daniel Karrels (dan@karrels.com)  
+ * Copyright (C) 2002 Daniel Karrels (dan@karrels.com)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,20 +20,19 @@
  * $Id: wingateModule.cc,v 1.2 2003/06/28 01:21:21 dan_karrels Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"server.h"
-#include	"client.h"
-#include	"ConnectionManager.h"
-#include	"ConnectionHandler.h"
-#include	"Connection.h"
-#include	"ScannerModule.h"
-#include	"scanner.h"
+#include "server.h"
+#include "client.h"
+#include "ConnectionManager.h"
+#include "ConnectionHandler.h"
+#include "Connection.h"
+#include "ScannerModule.h"
+#include "scanner.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
 /**
  * Wingate looking for:
@@ -41,55 +40,43 @@ using std::string ;
  * "Too m"(any connections)
  */
 
-class wingateModule : public ScannerModule
-{
+class wingateModule : public ScannerModule {
 
-public:
-	wingateModule( ConnectionManager* cm, scanner* theScanner ) ;
-	virtual ~wingateModule() ;
+  public:
+    wingateModule(ConnectionManager* cm, scanner* theScanner);
+    virtual ~wingateModule();
 
-	virtual void	CheckIP( const string& ip ) ;
+    virtual void CheckIP(const string& ip);
 
-	virtual void	OnConnect( Connection* ) ;
-	virtual void	OnConnectFail( Connection* ) ;
-	virtual void	OnRead( Connection*, const string& ) ;
+    virtual void OnConnect(Connection*);
+    virtual void OnConnectFail(Connection*);
+    virtual void OnRead(Connection*, const string&);
+};
 
-} ;
+wingateModule::wingateModule(ConnectionManager* cm, scanner* theScanner)
+    : ScannerModule(cm, theScanner) {}
 
-wingateModule::wingateModule( ConnectionManager* cm,
-	scanner* theScanner )
-: ScannerModule( cm, theScanner )
-{}
+wingateModule::~wingateModule() {}
 
-wingateModule::~wingateModule()
-{}
+void wingateModule::CheckIP(const string& ip) { cm->Connect(this, ip, 23, false); }
 
-void wingateModule::CheckIP( const string& ip )
-{
-cm->Connect( this, ip, 23, false ) ;
+void wingateModule::OnConnect(Connection*) {
+    // Nothing to do, wait for input
 }
 
-void wingateModule::OnConnect( Connection* )
-{
-// Nothing to do, wait for input
+void wingateModule::OnConnectFail(Connection*) {
+    // Client ok
+    // No need to call CM::Disconnect(), it's already disconnected :)
 }
 
-void wingateModule::OnConnectFail( Connection* )
-{
-// Client ok
-// No need to call CM::Disconnect(), it's already disconnected :)
-}
+void wingateModule::OnRead(Connection* cPtr, const string& line) {
+    if (line == "Wingate>") {
+        // Open proxy
+        theScanner->RejectClient(cPtr);
+    }
 
-void wingateModule::OnRead( Connection* cPtr, const string& line )
-{
-if( line == "Wingate>" )
-	{
-	// Open proxy
-	theScanner->RejectClient( cPtr ) ;
-	}
-
-// Do nothing if the client is ok
-cm->Disconnect( this, cPtr ) ;
+    // Do nothing if the client is ok
+    cm->Disconnect(this, cPtr);
 }
 
 } // namespace gnuworld
