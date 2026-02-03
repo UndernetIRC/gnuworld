@@ -19,8 +19,8 @@
  * Checks the range of the entropy of a given channel.
  */
 
-#include	<string>
-#include	<sstream>
+#include <string>
+#include <sstream>
 
 #include "gnuworld_config.h"
 #include "dronescan.h"
@@ -30,52 +30,44 @@ namespace gnuworld {
 
 namespace ds {
 
-bool RANGETest::isNormal( const Channel *theChannel )
-{
-	double maxEntropy, minEntropy;
-	maxEntropy = minEntropy = 0;
+bool RANGETest::isNormal(const Channel* theChannel) {
+    double maxEntropy, minEntropy;
+    maxEntropy = minEntropy = 0;
 
-	Channel::const_userIterator chanItr = theChannel->userList_begin();
+    Channel::const_userIterator chanItr = theChannel->userList_begin();
 
-	for ( ; chanItr != theChannel->userList_end() ; ++chanItr )
-	{
-		iClient *targetClient = chanItr->second->getClient();
+    for (; chanItr != theChannel->userList_end(); ++chanItr) {
+        iClient* targetClient = chanItr->second->getClient();
 
-		double userEntropy = bot->calculateEntropy(targetClient);
+        double userEntropy = bot->calculateEntropy(targetClient);
 
-		if (userEntropy < minEntropy || minEntropy == 0) minEntropy = userEntropy;
-		if (userEntropy > maxEntropy) maxEntropy = userEntropy;
-	}
+        if (userEntropy < minEntropy || minEntropy == 0)
+            minEntropy = userEntropy;
+        if (userEntropy > maxEntropy)
+            maxEntropy = userEntropy;
+    }
 
-	if((maxEntropy - minEntropy) > channelRange)
-		return true;
-	else
-		return false;
+    if ((maxEntropy - minEntropy) > channelRange)
+        return true;
+    else
+        return false;
 }
 
+bool RANGETest::setVariable(const std::string& var, const std::string& value) {
+    if ("CHANNELRANGE" != var)
+        return false;
 
-bool RANGETest::setVariable( const std::string& var,
-	const std::string& value )
-{
-	if("CHANNELRANGE" != var) return false;
+    channelRange = atoi(value.c_str());
 
-	channelRange = atoi(value.c_str());
-
-	return true;
+    return true;
 }
 
+const std::string RANGETest::getVariable() const { return "channelRange"; }
 
-const std::string RANGETest::getVariable() const
-{
-	return "channelRange";
-}
-
-
-const std::string RANGETest::getStatus() const
-{
-	std::stringstream status;
-	status << "channelRange: " << channelRange;
-	return status.str();
+const std::string RANGETest::getStatus() const {
+    std::stringstream status;
+    status << "channelRange: " << channelRange;
+    return status.str();
 }
 
 } // namespace ds

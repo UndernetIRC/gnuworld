@@ -20,29 +20,28 @@
  * $Id: FORCECHANGLINECommand.cc,v 1.5 2009/06/06 07:53:34 hidden1 Exp $
  */
 
-#include	<string>
-#include        <iomanip>
-#include	<map>
+#include <string>
+#include <iomanip>
+#include <map>
 
-#include	<cstdlib>
+#include <cstdlib>
 
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Network.h"
-#include	"misc.h"
-#include	"Gline.h"
-#include	"ip.h"
-#include	"ELog.h"
-#include	"Gline.h"
-//#include	"gline.h"
-#include 	"time.h"
-#include	"ccUser.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Network.h"
+#include "misc.h"
+#include "Gline.h"
+#include "ip.h"
+#include "ELog.h"
+#include "Gline.h"
+// #include	"gline.h"
+#include "time.h"
+#include "ccUser.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 using std::string;
 
@@ -51,92 +50,86 @@ using std::string;
 // Output: C GL * +*@lamer.net 3600 :Banned (*@lamer) ...
 //
 
-namespace uworld
-{
+namespace uworld {
 
-bool FORCECHANGLINECommand::Exec( iClient* theClient, const string& Message )
-{
-	const int MAX_CHANGLINE_LENGTH = 24*3600;
-	StringTokenizer st(Message);
-	unsigned int ResStart = 2;
-	int uParam = 0; // if the -u paramter is used in the command, it will only gline unidented connections
+bool FORCECHANGLINECommand::Exec(iClient* theClient, const string& Message) {
+    const int MAX_CHANGLINE_LENGTH = 24 * 3600;
+    StringTokenizer st(Message);
+    unsigned int ResStart = 2;
+    int uParam =
+        0; // if the -u paramter is used in the command, it will only gline unidented connections
 
-	if (st.size() < 4)
-	{
-		Usage(theClient);
-		return true;
-	}
+    if (st.size() < 4) {
+        Usage(theClient);
+        return true;
+    }
 
-	if (st[1] == "-u") {
-		if (st.size() < 5) {
-			Usage(theClient);
-			return true;
-		}
-        uParam = 1;	
-	}
+    if (st[1] == "-u") {
+        if (st.size() < 5) {
+            Usage(theClient);
+            return true;
+        }
+        uParam = 1;
+    }
 
-	StringTokenizer::size_type pos = 1;
-	time_t gLength = bot->getDefaultGlineLength();
-	ccUser* tmpUser = bot->IsAuth(theClient);
+    StringTokenizer::size_type pos = 1;
+    time_t gLength = bot->getDefaultGlineLength();
+    ccUser* tmpUser = bot->IsAuth(theClient);
 
-	/* log use of the command */
-	bot->MsgChanLog("FORCECHANGLINE %s\n",st.assemble(1).c_str());
+    /* log use of the command */
+    bot->MsgChanLog("FORCECHANGLINE %s\n", st.assemble(1).c_str());
 
-	/* make sure they're trying a channel gline! */
-	if (st[pos+uParam].substr(0,1) != "#")
-	{
-		bot->Notice(theClient,"Umm... this is CHANGLINE, not GLINE - Try "
-			"glining a channel maybe?");
-		return true;
-	}
-	if (IsTimeSpec(st[2+uParam]))
-	{
-		gLength = extractTime( st[2+uParam], 1 );
-	} else {
-		gLength = bot->getDefaultGlineLength();
-		ResStart = 1;
-	}
-	if (gLength > MAX_CHANGLINE_LENGTH)
-	{
-		bot->Notice(theClient,"FORCECHANGLINE is limited for maximum %d seconds, "
-			"please use the CHANGLINE command instead",MAX_CHANGLINE_LENGTH);
-		return false;
-	}
-	string nickUserHost = theClient->getRealNickUserHost();
+    /* make sure they're trying a channel gline! */
+    if (st[pos + uParam].substr(0, 1) != "#") {
+        bot->Notice(theClient, "Umm... this is CHANGLINE, not GLINE - Try "
+                               "glining a channel maybe?");
+        return true;
+    }
+    if (IsTimeSpec(st[2 + uParam])) {
+        gLength = extractTime(st[2 + uParam], 1);
+    } else {
+        gLength = bot->getDefaultGlineLength();
+        ResStart = 1;
+    }
+    if (gLength > MAX_CHANGLINE_LENGTH) {
+        bot->Notice(theClient,
+                    "FORCECHANGLINE is limited for maximum %d seconds, "
+                    "please use the CHANGLINE command instead",
+                    MAX_CHANGLINE_LENGTH);
+        return false;
+    }
+    string nickUserHost = theClient->getRealNickUserHost();
 
-	if (!tmpUser)
-	{
-		bot->Notice(theClient,"You must login to issue this channel gline!");
-		return false;
-	}
+    if (!tmpUser) {
+        bot->Notice(theClient, "You must login to issue this channel gline!");
+        return false;
+    }
 
-	if (st[1+uParam].size() > channel::MaxName)
-	{
-		bot->Notice(theClient,"Channel name can't be more than %d "
-			"characters", channel::MaxName);
-		return false;
-	}
-	if(bot->isBadChannel(st[1+uParam]) != NULL)
-		{
-		bot->Notice(theClient,"You cant gline a nomode channel");
-		return false;
-		}
-	Channel* theChan = Network->findChannel(st[1+uParam]);
-	if (NULL == theChan)
-	{
-		bot->Notice(theClient, "Unable to find channel %s",
-			st[1+uParam].c_str());
-		return true;
-	}
+    if (st[1 + uParam].size() > channel::MaxName) {
+        bot->Notice(theClient,
+                    "Channel name can't be more than %d "
+                    "characters",
+                    channel::MaxName);
+        return false;
+    }
+    if (bot->isBadChannel(st[1 + uParam]) != NULL) {
+        bot->Notice(theClient, "You cant gline a nomode channel");
+        return false;
+    }
+    Channel* theChan = Network->findChannel(st[1 + uParam]);
+    if (NULL == theChan) {
+        bot->Notice(theClient, "Unable to find channel %s", st[1 + uParam].c_str());
+        return true;
+    }
 
-	StringTokenizer reason(st.assemble(pos + ResStart + uParam), '|');
+    StringTokenizer reason(st.assemble(pos + ResStart + uParam), '|');
 
-	if(!bot->glineChannelUsers(theClient, theChan, reason[0], gLength, nickUserHost,true,uParam))
-		{
-		bot->Notice(theClient, "You cant gline a channel which has an oper in it");
-		}
-	return true;
+    if (!bot->glineChannelUsers(theClient, theChan, reason[0], gLength, nickUserHost, true,
+                                uParam)) {
+        bot->Notice(theClient, "You cant gline a channel which has an oper in it");
+    }
+    return true;
 }
 
-}
-}
+} // namespace uworld
+} // namespace gnuworld

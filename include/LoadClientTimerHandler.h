@@ -21,16 +21,16 @@
  */
 
 #ifndef __LOADCLIENTTIMERHANDLER_H
-#define __LOADCLIENTTIMERHANDLER_H "$Id: LoadClientTimerHandler.h,v 1.6 2004/05/19 19:46:33 jeekay Exp $"
+#define __LOADCLIENTTIMERHANDLER_H                                                                 \
+    "$Id: LoadClientTimerHandler.h,v 1.6 2004/05/19 19:46:33 jeekay Exp $"
 
-#include	<string>
+#include <string>
 
-#include	"ServerTimerHandlers.h"
+#include "ServerTimerHandlers.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-class xServer ;
+class xServer;
 
 /**
  * The purpose of this class is to load xClient's at a particular time,
@@ -38,46 +38,38 @@ class xServer ;
  * event system to give the xClient time to unload before reloading a
  * new instance.
  */
-class LoadClientTimerHandler : public ServerTimerHandler
-{
+class LoadClientTimerHandler : public ServerTimerHandler {
 
-protected:
+  protected:
+    /// The name of the module to be loaded
+    std::string moduleName;
 
-	/// The name of the module to be loaded
-	std::string	moduleName ;
+    /// The configuration file name to pass to the client constructor
+    std::string configFileName;
 
-	/// The configuration file name to pass to the client constructor
-	std::string	configFileName ;
+  public:
+    /**
+     * Constructor receives:
+     * - The xServer instance for the system
+     * - The xClient's module name
+     * - The configuration file name for the xClient.
+     */
+    LoadClientTimerHandler(xServer* theServer, const std::string& _moduleName,
+                           const std::string& _configFileName)
+        : ServerTimerHandler(theServer, 0), moduleName(_moduleName),
+          configFileName(_configFileName) {}
 
-public:
+    /**
+     * Default destructor, nothing to do here atm.
+     */
+    virtual ~LoadClientTimerHandler() {}
 
-	/**
-	 * Constructor receives:
-	 * - The xServer instance for the system
-	 * - The xClient's module name
-	 * - The configuration file name for the xClient.
-	 */
-	LoadClientTimerHandler( xServer* theServer,
-		 const std::string& _moduleName,
-		 const std::string& _configFileName )
-	: ServerTimerHandler( theServer, 0),
-	  moduleName( _moduleName ),
-	  configFileName( _configFileName )
-	{}
-
-	/**
-	 * Default destructor, nothing to do here atm.
-	 */
-	virtual ~LoadClientTimerHandler()
-	{}
-
-	/**
-	 * The method that is called by the server when this handler's
-	 * time to perform has arrived.
-	 */
-	virtual	void	OnTimer( const timerID& , void* ) ;
-
-} ;
+    /**
+     * The method that is called by the server when this handler's
+     * time to perform has arrived.
+     */
+    virtual void OnTimer(const timerID&, void*);
+};
 
 } // namespace gnuworld
 

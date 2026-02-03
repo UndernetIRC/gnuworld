@@ -20,47 +20,41 @@
  * $Id: DEAUTHCommand.cc,v 1.14 2006/09/26 17:35:58 kewlio Exp $
  */
 
-#include	<string>
-#include	<cstdlib>
-#include	<iomanip>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <cstdlib>
+#include <iomanip>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool DEAUTHCommand::Exec( iClient* theClient, const string& )
-{
-//Fetch the user authenticate entry
-ccUser* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
-if (!tmpUser) 
-	{
-	bot->Notice(theClient,"You are not currently authenticated");
-	return false;
-	}
-if(bot->deAuthUser(tmpUser, theClient))
-	{
-	bot->Notice(theClient,"DeAuthentication successfull");
-	bot->MsgChanLog("(%s) - %s : Deauthenticated\n",tmpUser->getUserName().c_str()
-			,theClient->getRealNickUserHost().c_str());
-	/* forget their details to stop them getting auto-authenticated after netsplit */
-	tmpUser->setLastAuthTS(1);		/* if uninitialised, this would be 0 - so 1 should be a safe figure! */
-	tmpUser->setLastAuthNumeric("");
-	return true;
-	}
-else
-	{
-	bot->Notice(theClient,"DeAuthentication failed");
-	return false;
-	}
-}	
-
+bool DEAUTHCommand::Exec(iClient* theClient, const string&) {
+    // Fetch the user authenticate entry
+    ccUser* tmpUser = bot->IsAuth(theClient->getCharYYXXX());
+    if (!tmpUser) {
+        bot->Notice(theClient, "You are not currently authenticated");
+        return false;
+    }
+    if (bot->deAuthUser(tmpUser, theClient)) {
+        bot->Notice(theClient, "DeAuthentication successfull");
+        bot->MsgChanLog("(%s) - %s : Deauthenticated\n", tmpUser->getUserName().c_str(),
+                        theClient->getRealNickUserHost().c_str());
+        /* forget their details to stop them getting auto-authenticated after netsplit */
+        tmpUser->setLastAuthTS(
+            1); /* if uninitialised, this would be 0 - so 1 should be a safe figure! */
+        tmpUser->setLastAuthNumeric("");
+        return true;
+    } else {
+        bot->Notice(theClient, "DeAuthentication failed");
+        return false;
+    }
 }
-}
+
+} // namespace uworld
+} // namespace gnuworld

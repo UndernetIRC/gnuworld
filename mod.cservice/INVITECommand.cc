@@ -26,102 +26,96 @@
  * $Id: INVITECommand.cc,v 1.7 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
+#include <string>
 
-#include	<string>
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "levels.h"
+#include "responses.h"
+#include "Network.h"
 
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"levels.h"
-#include	"responses.h"
-#include	"Network.h"
-
-namespace gnuworld
-{
+namespace gnuworld {
 
 using namespace gnuworld;
 
-bool INVITECommand::Exec( iClient* theClient, const string& Message )
-{
-	StringTokenizer st( Message ) ;
-	if( st.size() < 2 )
-	{
-		Usage(theClient);
-		return true;
-	}
+bool INVITECommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-	/*
-	 *  Fetch the sqlUser record attached to this client. If there isn't one,
-	 *  they aren't logged in - tell them they should be.
-	 */
+    /*
+     *  Fetch the sqlUser record attached to this client. If there isn't one,
+     *  they aren't logged in - tell them they should be.
+     */
 
-	sqlUser* theUser = bot->isAuthed(theClient, true);
-	if (!theUser) {
-		return false;
-	}
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
+        return false;
+    }
 
-	/*
-	 *  Check the channel is actually registered.
-	 */
+    /*
+     *  Check the channel is actually registered.
+     */
 
-	char delim = 0;
-	string source;
-	int i = 1;
-	string::size_type pos = st[1].find_first_of(',');
-	/* Found a comma? */
-	if (string::npos != pos) {
-		/* We'll do a comma seperated search then. */
-		source = st.assemble(1);
-		delim = ',';
-		i = 0;
-	} else {
-		source = Message;
-		delim = ' ';
-	}
-	StringTokenizer st2(source, delim);
-	int max_channels = st2.size() < 10 ? st2.size() : 10;
-	for(; i < max_channels;++i) {
-		sqlChannel* theChan = bot->getChannelRecord(st2[i]);
-		if (!theChan) {
-			bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
-				st2[i].c_str());
-			continue;
-		}
+    char delim = 0;
+    string source;
+    int i = 1;
+    string::size_type pos = st[1].find_first_of(',');
+    /* Found a comma? */
+    if (string::npos != pos) {
+        /* We'll do a comma seperated search then. */
+        source = st.assemble(1);
+        delim = ',';
+        i = 0;
+    } else {
+        source = Message;
+        delim = ' ';
+    }
+    StringTokenizer st2(source, delim);
+    int max_channels = st2.size() < 10 ? st2.size() : 10;
+    for (; i < max_channels; ++i) {
+        sqlChannel* theChan = bot->getChannelRecord(st2[i]);
+        if (!theChan) {
+            bot->Notice(theClient, bot->getResponse(theUser, language::chan_not_reg).c_str(),
+                        st2[i].c_str());
+            continue;
+        }
 
-		/* Check the bot is in the channel. */
+        /* Check the bot is in the channel. */
 
-		if (!theChan->getInChan()) {
-			bot->Notice(theClient,
-				bot->getResponse(theUser,
-					language::i_am_not_on_chan,
-					string("I'm not in that channel!")));
-			continue;
-		}
+        if (!theChan->getInChan()) {
+            bot->Notice(theClient, bot->getResponse(theUser, language::i_am_not_on_chan,
+                                                    string("I'm not in that channel!")));
+            continue;
+        }
 
-		/*
-		 *  Check the user has sufficient access on this channel.
-		 */
+        /*
+         *  Check the user has sufficient access on this channel.
+         */
 
-		int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-		if (level < level::invite)
-		{
-			bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
-			continue;
-		}
+        int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+        if (level < level::invite) {
+            bot->Notice(theClient, bot->getResponse(theUser, language::insuf_access).c_str());
+            continue;
+        }
 
-		sqlBan* tmpBan = bot->isBannedOnChan(theChan, theClient);
-		if (tmpBan && tmpBan->getLevel() >= 75) {
-			bot->Notice(theClient,"Can't invite you to channel %s, you are banned",theChan->getName().c_str());
-			continue;
-		}
-		
-		/*
-		 *  No parameters, Just invite them to the channel.
-		 */
+        sqlBan* tmpBan = bot->isBannedOnChan(theChan, theClient);
+        if (tmpBan && tmpBan->getLevel() >= 75) {
+            bot->Notice(theClient, "Can't invite you to channel %s, you are banned",
+                        theChan->getName().c_str());
+            continue;
+        }
 
-		bot->Invite(theClient, theChan->getName());
-	}
-	return true;
+        /*
+         *  No parameters, Just invite them to the channel.
+         */
+
+        bot->Invite(theClient, theChan->getName());
+    }
+    return true;
 }
 
 } // namespace gnuworld.

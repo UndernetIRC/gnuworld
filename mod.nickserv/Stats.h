@@ -25,8 +25,8 @@
 
 namespace gnuworld {
 
-using std::map ;
-using std::string ;
+using std::map;
+using std::string;
 
 class Stats {
   public:
@@ -40,8 +40,7 @@ class Stats {
      ** T Y P E D E F S **
      *********************/
 
-    typedef map< string, int > statsMapType;
-
+    typedef map<string, int> statsMapType;
 
     /*******************************
      ** S T A T S   C O N T R O L **
@@ -54,12 +53,10 @@ class Stats {
     unsigned int getStat(const string&);
 
     /** Accessor for statsMap.begin() */
-    inline const statsMapType::const_iterator getStatsMapBegin() const
-      { return statsMap.begin(); }
+    inline const statsMapType::const_iterator getStatsMapBegin() const { return statsMap.begin(); }
 
     /** Accessor for statsMap.end() */
-    inline const statsMapType::const_iterator getStatsMapEnd() const
-      { return statsMap.end(); }
+    inline const statsMapType::const_iterator getStatsMapEnd() const { return statsMap.end(); }
 
   protected:
     /**

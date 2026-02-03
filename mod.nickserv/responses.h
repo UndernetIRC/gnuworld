@@ -29,9 +29,9 @@ namespace ns {
 
 namespace responses {
 
-  const string noAccess("Sorry, you do not have access to this command.");
+const string noAccess("Sorry, you do not have access to this command.");
 
-  const string noSuchUser("Sorry, that user name does not exist.");
+const string noSuchUser("Sorry, that user name does not exist.");
 
 } // namespace responses
 

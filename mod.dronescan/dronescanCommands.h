@@ -20,7 +20,7 @@
 #ifndef DRONESCANCOMMANDS_H
 #define DRONESCANCOMMANDS_H
 
-#include	<string>
+#include <string>
 
 namespace gnuworld {
 
@@ -30,70 +30,61 @@ class dronescan;
 class sqlUser;
 
 class Command {
-public:
-	Command( dronescan* _bot, const std::string& _commandName,
-		const std::string& _help ) :
-		bot(_bot), server(0), commandName(_commandName), help(_help)
-		{ }
+  public:
+    Command(dronescan* _bot, const std::string& _commandName, const std::string& _help)
+        : bot(_bot), server(0), commandName(_commandName), help(_help) {}
 
-	virtual ~Command() { }
+    virtual ~Command() {}
 
-	virtual void Exec(const iClient*, const std::string&,
-			const sqlUser*) = 0;
+    virtual void Exec(const iClient*, const std::string&, const sqlUser*) = 0;
 
-	void setServer(xServer *_server)
-		{ server = _server; }
+    void setServer(xServer* _server) { server = _server; }
 
-	virtual inline std::string getInfo() const
-		{ return commandName + ' ' + help; }
+    virtual inline std::string getInfo() const { return commandName + ' ' + help; }
 
-	virtual void Usage(const iClient*);
+    virtual void Usage(const iClient*);
 
-	inline const std::string& getName() const
-		{ return commandName; }
+    inline const std::string& getName() const { return commandName; }
 
-	inline const std::string& getHelp() const
-		{ return help; }
+    inline const std::string& getHelp() const { return help; }
 
-protected:
-	dronescan	*bot;
-	xServer		*server;
-	std::string	commandName;
-	std::string	help;
+  protected:
+    dronescan* bot;
+    xServer* server;
+    std::string commandName;
+    std::string help;
 
 }; // class Command
 
 /* Mmmmm we like big convoluted defines! */
-#define DECLARE_COMMAND(commandName) \
-class commandName##Command : public Command \
-{ \
-  public: \
-    commandName##Command(dronescan* _bot, \
-      const std::string& _commandName, \
-      const std::string& _help) : \
-        Command(_bot, _commandName, _help) {} \
-    virtual ~commandName##Command() {} \
-    virtual void Exec(const iClient*, const std::string&, const sqlUser*); \
-};
+#define DECLARE_COMMAND(commandName)                                                               \
+    class commandName##Command : public Command {                                                  \
+      public:                                                                                      \
+        commandName##Command(dronescan* _bot, const std::string& _commandName,                     \
+                             const std::string& _help)                                             \
+            : Command(_bot, _commandName, _help) {}                                                \
+        virtual ~commandName##Command() {}                                                         \
+        virtual void Exec(const iClient*, const std::string&, const sqlUser*);                     \
+    };
 
 /* Admin commands */
-DECLARE_COMMAND( ACCESS )
-DECLARE_COMMAND( CHECK )
-DECLARE_COMMAND( FAKE )
-DECLARE_COMMAND( LIST )
-DECLARE_COMMAND( STATUS )
+DECLARE_COMMAND(ACCESS)
+DECLARE_COMMAND(CHECK)
+DECLARE_COMMAND(FAKE)
+DECLARE_COMMAND(LIST)
+DECLARE_COMMAND(STATUS)
 
 /* Maintainence commands */
-DECLARE_COMMAND( ADDUSER )
-DECLARE_COMMAND( MODUSER )
-DECLARE_COMMAND( REMUSER )
-DECLARE_COMMAND( ADDEXCEPTIONALCHANNEL )
-DECLARE_COMMAND( REMEXCEPTIONALCHANNEL )
-DECLARE_COMMAND( RELOAD )
+DECLARE_COMMAND(ADDUSER)
+DECLARE_COMMAND(MODUSER)
+DECLARE_COMMAND(REMUSER)
+DECLARE_COMMAND(ADDEXCEPTIONALCHANNEL)
+DECLARE_COMMAND(REMEXCEPTIONALCHANNEL)
+DECLARE_COMMAND(RELOAD)
 
 /* Coder commands */
-DECLARE_COMMAND( ANALYSE )
-DECLARE_COMMAND( QUOTE )
+DECLARE_COMMAND(ANALYSE)
+DECLARE_COMMAND(QUOTE)
 
 } // namespace ds
 

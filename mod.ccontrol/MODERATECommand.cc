@@ -20,68 +20,59 @@
  * $Id: MODERATECommand.cc,v 1.16 2006/09/26 17:35:59 kewlio Exp $
  */
 
-#include	<string>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Network.h"
-#include	"Constants.h"
-#include	"ccBadChannel.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Network.h"
+#include "Constants.h"
+#include "ccBadChannel.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool MODERATECommand::Exec( iClient* theClient, const string& Message )
-{
+bool MODERATECommand::Exec(iClient* theClient, const string& Message) {
 
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-if(st[1].size() > channel::MaxName)
-	{
-	bot->Notice(theClient,"Channel name can't be more than %d characters",
-		channel::MaxName);
-	return false;
-	}
-Channel* theChan = Network->findChannel( st[ 1 ] ) ;
-if( NULL == theChan )
-	{
-	bot->Notice( theClient, "Unable to find channel %s\n",
-		st[ 1 ].c_str() ) ;
-	return true ;
-	}
-bot->MsgChanLog("MODERATE %s\n",st.assemble(1).c_str());
-
-ccBadChannel* Chan = bot->isBadChannel(st[1]);
-if(Chan)
-        {
-        bot->Notice(theClient,"Sorry, but you can't change modes in "
-                             "this channel because: %s",
-                             Chan->getReason().c_str());
+    if (st[1].size() > channel::MaxName) {
+        bot->Notice(theClient, "Channel name can't be more than %d characters", channel::MaxName);
         return false;
-        }
+    }
+    Channel* theChan = Network->findChannel(st[1]);
+    if (NULL == theChan) {
+        bot->Notice(theClient, "Unable to find channel %s\n", st[1].c_str());
+        return true;
+    }
+    bot->MsgChanLog("MODERATE %s\n", st.assemble(1).c_str());
 
-if(theChan->getMode(Channel::MODE_M))
-	{
-	bot->Notice( theClient,"Channel %s is already moderated",st[ 1 ].c_str());
-	return false;
-	}
+    ccBadChannel* Chan = bot->isBadChannel(st[1]);
+    if (Chan) {
+        bot->Notice(theClient,
+                    "Sorry, but you can't change modes in "
+                    "this channel because: %s",
+                    Chan->getReason().c_str());
+        return false;
+    }
 
-//theChan->setMode(Channel::MODE_M);
-bot->Mode( theChan, "+m", string(), true );
-return true;
+    if (theChan->getMode(Channel::MODE_M)) {
+        bot->Notice(theClient, "Channel %s is already moderated", st[1].c_str());
+        return false;
+    }
+
+    // theChan->setMode(Channel::MODE_M);
+    bot->Mode(theChan, "+m", string(), true);
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld

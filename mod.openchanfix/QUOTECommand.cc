@@ -23,43 +23,38 @@
  *
  * $Id: QUOTECommand.cc,v 1.4 2006/12/09 00:29:19 buzlip01 Exp $
  */
-#include	<string>
-#include	"gnuworld_config.h"
-#include	"StringTokenizer.h"
-#include	"chanfix.h"
-#include	"responses.h"
+#include <string>
+#include "gnuworld_config.h"
+#include "StringTokenizer.h"
+#include "chanfix.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void QUOTECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
+void QUOTECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
 #ifndef ENABLE_QUOTE
-return;
+    return;
 #endif
 
-if (!theUser->getNeedOper()) {
-  bot->SendTo(theClient,
-	bot->getResponse(theUser,
-			 language::unknown_command,
-			 std::string("Unknown command.")).c_str());
-  return;
-}
+    if (!theUser->getNeedOper()) {
+        bot->SendTo(theClient, bot->getResponse(theUser, language::unknown_command,
+                                                std::string("Unknown command."))
+                                   .c_str());
+        return;
+    }
 
-StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-bot->Write( st.assemble(1) );
+    bot->Write(st.assemble(1));
 
-bot->logAdminMessage("%s (%s) QUOTE %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     st.assemble(1).c_str());
+    bot->logAdminMessage("%s (%s) QUOTE %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), st.assemble(1).c_str());
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
+    return;
 }
 
 } // namespace cf

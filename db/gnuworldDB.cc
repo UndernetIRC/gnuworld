@@ -21,36 +21,22 @@
  * $Id: gnuworldDB.cc,v 1.5 2008/01/02 23:32:17 kewlio Exp $
  */
 
-#include	<string>
-#include	"gnuworldDB.h"
+#include <string>
+#include "gnuworldDB.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-gnuworldDB::gnuworldDB( )
-{
-	/* dummy to prevent issues with pedantic compilers */
+gnuworldDB::gnuworldDB() { /* dummy to prevent issues with pedantic compilers */ }
+
+gnuworldDB::gnuworldDB(const string& _dbHost, const unsigned short int _dbPort,
+                       const string& _dbName, const string& _userName, const string& _password)
+    : dbHost(_dbHost), dbPort(_dbPort), dbName(_dbName), userName(_userName), password(_password) {}
+
+gnuworldDB::gnuworldDB(const string& /* connectInfo */) {
+    // TODO
 }
 
-gnuworldDB::gnuworldDB( const string& _dbHost,
-	const unsigned short int _dbPort,
-	const string& _dbName,
-	const string& _userName,
-	const string& _password )
- : dbHost( _dbHost ),
-	dbPort( _dbPort ),
-	dbName( _dbName ),
-	userName( _userName ),
-	password( _password )
-{}
-
-gnuworldDB::gnuworldDB( const string& /* connectInfo */ )
-{
-// TODO
-}
-
-gnuworldDB::~gnuworldDB()
-{}
+gnuworldDB::~gnuworldDB() {}
 
 } // namespace gnuworld

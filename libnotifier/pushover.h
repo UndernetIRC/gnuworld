@@ -26,82 +26,66 @@
 #include "gnuworld_config.h"
 #include "notifier.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-typedef std::vector< std::string > pushoverKeysType ;
+typedef std::vector<std::string> pushoverKeysType;
 #ifdef USE_THREAD
-class ThreadWorker ;
+class ThreadWorker;
 #endif
 
-class PushoverClient : public notifier
-{
+class PushoverClient : public notifier {
 
-public:
-  PushoverClient( xClient*, std::string, pushoverKeysType
+  public:
+    PushoverClient(xClient*, std::string, pushoverKeysType
 #ifdef USE_THREAD
-                , ThreadWorker*
+                   ,
+                   ThreadWorker*
 #endif
-                ) ;
+    );
 
-  virtual ~PushoverClient() = default ;
+    virtual ~PushoverClient() = default;
 
-  void setUserKeys( const pushoverKeysType& newUsers )
-      { userKeys = newUsers ; }
+    void setUserKeys(const pushoverKeysType& newUsers) { userKeys = newUsers; }
 
-  void setToken( const std::string& newToken )
-      { apiToken = newToken ; }
+    void setToken(const std::string& newToken) { apiToken = newToken; }
 
-  [[nodiscard]] size_t getSuccessful() const override
-      { return statSuccessful ; }
+    [[nodiscard]] size_t getSuccessful() const override { return statSuccessful; }
 
-  [[nodiscard]] size_t getErrors() const override
-      { return statErrors ; }
+    [[nodiscard]] size_t getErrors() const override { return statErrors; }
 
-  [[nodiscard]] size_t userKeys_size() const
-      { return userKeys.size() ; }
+    [[nodiscard]] size_t userKeys_size() const { return userKeys.size(); }
 
-  bool sendMessage( int level, const std::string message ) override ;
+    bool sendMessage(int level, const std::string message) override;
 
-  bool sendMessage( const std::string title,
-                    const std::string message ) ;
+    bool sendMessage(const std::string title, const std::string message);
 
-  bool sendMessage( const std::string title,
-                    const std::string message,
-                    int priority,
-                    int retry = 60,
-                    int expire = 3600 ) ;
+    bool sendMessage(const std::string title, const std::string message, int priority,
+                     int retry = 60, int expire = 3600);
 
-private:
-  xClient*          bot ;
-  std::string       apiToken ;
-  pushoverKeysType  userKeys ;
-  size_t            statSuccessful = 0 ;
-  size_t            statErrors = 0 ;
+  private:
+    xClient* bot;
+    std::string apiToken;
+    pushoverKeysType userKeys;
+    size_t statSuccessful = 0;
+    size_t statErrors = 0;
 
 #ifdef USE_THREAD
-  ThreadWorker*     threadWorker = nullptr ;
+    ThreadWorker* threadWorker = nullptr;
 #endif
 
 #ifdef HAVE_LIBCURL
-  void initialise_curl() ;
+    void initialise_curl();
 #endif
 
-  std::string truncate( const std::string input, std::size_t maxLength ) const
-      { return input.size() <= maxLength ? input : input.substr( 0, maxLength - 3 ) + "..." ; }
+    std::string truncate(const std::string input, std::size_t maxLength) const {
+        return input.size() <= maxLength ? input : input.substr(0, maxLength - 3) + "...";
+    }
 
-  bool processMessage( const std::string title,
-                       const std::string message,
-                       int priority,
-                       int retry,
-                       int expire ) ;
+    bool processMessage(const std::string title, const std::string message, int priority, int retry,
+                        int expire);
 
-  bool sendToUser( const std::string user,
-                   const std::string title,
-                   const std::string message,
-                   int priority,
-                   int retry,
-                   int expire ) ;
-} ;
+    bool sendToUser(const std::string user, const std::string title, const std::string message,
+                    int priority, int retry, int expire);
+};
 
 } // namespace gnuworld

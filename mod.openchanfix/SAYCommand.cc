@@ -24,45 +24,38 @@
  * $Id: SAYCommand.cc,v 1.1 2006/12/09 00:29:19 buzlip01 Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"gnuworld_config.h"
-#include	"StringTokenizer.h"
+#include "gnuworld_config.h"
+#include "StringTokenizer.h"
 
-#include	"chanfix.h"
-#include	"responses.h"
-#include	"Network.h"
+#include "chanfix.h"
+#include "responses.h"
+#include "Network.h"
 
+namespace gnuworld {
+namespace cf {
 
-namespace gnuworld
-{
-namespace cf
-{
+void SAYCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-void SAYCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+    std::string option = st[1];
+    std::string value = st.assemble(2);
 
-std::string option = st[1];
-std::string value = st.assemble(2);
+    bot->logAdminMessage("%s (%s) SAY %s %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), option.c_str(), value.c_str());
 
-bot->logAdminMessage("%s (%s) SAY %s %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     option.c_str(), value.c_str());
+    bot->logLastComMessage(theClient, Message);
 
-bot->logLastComMessage(theClient, Message);
+    Channel* thisChan = Network->findChannel(option);
 
-Channel* thisChan = Network->findChannel(option);
+    if (!thisChan)
+        bot->SendTo(theClient, "The channel %s does not exist on the network.", option.c_str());
+    else
+        bot->Message(thisChan, value);
 
-if (!thisChan)
-	bot->SendTo(theClient,
-		"The channel %s does not exist on the network.",
-		option.c_str());
-else
-	bot->Message(thisChan,value);
-
-return;
+    return;
 }
 
 } // namespace cf

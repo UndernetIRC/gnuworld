@@ -20,83 +20,71 @@
  * $Id: HELPCommand.cc,v 1.23 2006/09/26 17:35:58 kewlio Exp $
  */
 
-#include	<string>
-#include	<iomanip>
+#include <string>
+#include <iomanip>
 
-#include	<cstdlib>
+#include <cstdlib>
 
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"commLevels.h"
-#include	"gnuworld_config.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "commLevels.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-
+using std::string;
 
 // help [command]
-namespace uworld
-{
+namespace uworld {
 
-bool HELPCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
+bool HELPCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-ccUser *tmpAuth = bot->IsAuth(theClient);
-//if(!tmpAuth)
-//	return false;
-string banner = "--- Help Menu for " ;
-banner += bot->getNickName() + " --- (Showing commands which are available for you)" ;
+    ccUser* tmpAuth = bot->IsAuth(theClient);
+    // if(!tmpAuth)
+    //	return false;
+    string banner = "--- Help Menu for ";
+    banner += bot->getNickName() + " --- (Showing commands which are available for you)";
 
-bot->Notice( theClient, "%s", banner.c_str() ) ;
+    bot->Notice(theClient, "%s", banner.c_str());
 
-int ComLevel;
-// Check if the user didnt supply a command 
-if( 1 == st.size() )
-	{
-	// Spit out all commands
-	string Show;
-	for( ccontrol::constCommandIterator ptr = bot->command_begin() ;
-		ptr != bot->command_end() ; ++ptr )
-		{
-		ComLevel = ptr->second->getFlags();
-		//ComLevel &= ~flg_NOLOG; 
-		if((ComLevel & commandLevel::flg_NOLOGIN) || ((tmpAuth) && (tmpAuth->gotAccess(ptr->second))) )
-			{
-			Show += (ptr->second->getName() + " ");
-			if(Show.size() > 80)
-				{
-				bot->Notice( theClient, "%s", Show.c_str()) ;
-				Show.assign("");
-				}
-			}
-		}
-	if(!Show.empty())
-		bot->Notice( theClient, "%s", Show.c_str()) ;
-	bot->Notice(theClient,"End of command list");
-	}
-else //Supplied a command, show only the help for that command (if it exists)
-	{
-	ccontrol::constCommandIterator ptr =
-		bot->findCommand( string_upper( st[ 1 ] ) ) ;
-	if( ptr == bot->command_end() )
-		{
-		bot->Notice( theClient, "Command not found" ) ;
-		}
-	else
-		{
-			if (st.size()==2)
-				bot->GetHelp(theClient,st[1],static_cast<std::string>(""));
-			else
-				bot->GetHelp(theClient,st[1],st[2]);
-		}
-	}
+    int ComLevel;
+    // Check if the user didnt supply a command
+    if (1 == st.size()) {
+        // Spit out all commands
+        string Show;
+        for (ccontrol::constCommandIterator ptr = bot->command_begin(); ptr != bot->command_end();
+             ++ptr) {
+            ComLevel = ptr->second->getFlags();
+            // ComLevel &= ~flg_NOLOG;
+            if ((ComLevel & commandLevel::flg_NOLOGIN) ||
+                ((tmpAuth) && (tmpAuth->gotAccess(ptr->second)))) {
+                Show += (ptr->second->getName() + " ");
+                if (Show.size() > 80) {
+                    bot->Notice(theClient, "%s", Show.c_str());
+                    Show.assign("");
+                }
+            }
+        }
+        if (!Show.empty())
+            bot->Notice(theClient, "%s", Show.c_str());
+        bot->Notice(theClient, "End of command list");
+    } else // Supplied a command, show only the help for that command (if it exists)
+    {
+        ccontrol::constCommandIterator ptr = bot->findCommand(string_upper(st[1]));
+        if (ptr == bot->command_end()) {
+            bot->Notice(theClient, "Command not found");
+        } else {
+            if (st.size() == 2)
+                bot->GetHelp(theClient, st[1], static_cast<std::string>(""));
+            else
+                bot->GetHelp(theClient, st[1], st[2]);
+        }
+    }
 
-return true ;
+    return true;
 }
 
-}
-}
+} // namespace uworld
+} // namespace gnuworld

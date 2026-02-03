@@ -23,581 +23,491 @@
 #ifndef __SQLCHANNEL_H
 #define __SQLCHANNEL_H "$Id: sqlChannel.h,v 1.47 2007/08/28 16:10:12 dan_karrels Exp $"
 
-#include	<string>
-#include	<map>
-#include	<vector>
-#include	<utility>
-#include	<list>
+#include <string>
+#include <map>
+#include <vector>
+#include <utility>
+#include <list>
 
-#include	<ctime>
+#include <ctime>
 
-#include	"dbHandle.h"
-#include	"server.h"
-#include	"sqlBan.h"
+#include "dbHandle.h"
+#include "server.h"
+#include "sqlBan.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::map ;
-using std::vector ;
+using std::map;
+using std::string;
+using std::vector;
 
 //	< Message < time, count > >
-typedef std::map < string, std::pair < time_t, unsigned int > > floodMessageType;
+typedef std::map<string, std::pair<time_t, unsigned int>> floodMessageType;
 
-class chanFloodType
-{
-private:
-	time_t last_time;
-	string last_message;
-	unsigned int msgCount;
-	unsigned int noticeCount;
-	unsigned int ctcpCount;
-	time_t now;
+class chanFloodType {
+  private:
+    time_t last_time;
+    string last_message;
+    unsigned int msgCount;
+    unsigned int noticeCount;
+    unsigned int ctcpCount;
+    time_t now;
 
-public:
+  public:
+    unsigned int repCount;
 
-	unsigned int repCount;
+    floodMessageType messageFloodMap;
+    floodMessageType noticeFloodMap;
+    floodMessageType ctcpFloodMap;
 
-	floodMessageType messageFloodMap;
-	floodMessageType noticeFloodMap;
-	floodMessageType ctcpFloodMap;
+    void setCurrentTime(const time_t&);
 
-	void setCurrentTime(const time_t&);
+    void calcTotalMessageCount(const string&);
+    void calcTotalNoticeCount(const string&);
+    void calcTotalCTCPCount(const string&);
 
-	void calcTotalMessageCount(const string&);
-	void calcTotalNoticeCount(const string&);
-	void calcTotalCTCPCount(const string&);
+    inline const time_t& getLastTime() { return last_time; }
 
-	inline const time_t& getLastTime()
-		{ return last_time; }
+    inline void setLastTime(const time_t& _last_time) { last_time = _last_time; }
 
-	inline void setLastTime(const time_t& _last_time)
-		{ last_time = _last_time; }
+    inline const string& getLastMessage() { return last_message; }
 
-	inline const string& getLastMessage()
-		{ return last_message; }
+    inline void setLastMessage(const string& _last_message) { last_message = _last_message; }
 
-	inline void setLastMessage(const string& _last_message)
-		{ last_message = _last_message; }
+    inline const unsigned int& getRepCount() { return repCount; }
 
-	inline const unsigned int& getRepCount()
-		{ return repCount; }
+    inline void setRepCount(const unsigned int& _repCount) { repCount = _repCount; }
 
-	inline void setRepCount(const unsigned int& _repCount)
-		{ repCount = _repCount; }
+    inline const unsigned int& getTotalMessageCount() { return msgCount; }
 
-	inline const unsigned int& getTotalMessageCount()
-		{ return msgCount; }
+    inline void setTotalMessageCount(const unsigned int& _msgCount) { msgCount = _msgCount; }
 
-	inline void setTotalMessageCount(const unsigned int& _msgCount)
-		{ msgCount = _msgCount; }
+    inline const unsigned int& getTotalNoticeCount() { return noticeCount; }
 
-	inline const unsigned int& getTotalNoticeCount()
-		{ return noticeCount; }
+    inline void setTotalNoticeCount(const unsigned int& _noticeCount) {
+        noticeCount = _noticeCount;
+    }
 
-	inline void setTotalNoticeCount(const unsigned int& _noticeCount)
-		{ noticeCount = _noticeCount; }
+    inline const unsigned int& getTotalCTCPCount() { return ctcpCount; }
 
-	inline const unsigned int& getTotalCTCPCount()
-		{ return ctcpCount; }
+    inline void setTotalCTCPCount(const unsigned int& _ctcpCount) { ctcpCount = _ctcpCount; }
 
-	inline void setTotalCTCPCount(const unsigned int& _ctcpCount)
-		{ ctcpCount = _ctcpCount; }
-
-	chanFloodType();
-	virtual ~chanFloodType();
+    chanFloodType();
+    virtual ~chanFloodType();
 };
 
-class sqlChannel
-{
-
-public:
-	sqlChannel(cservice*) ;
-	virtual ~sqlChannel() ;
-
-	typedef unsigned int	flagType ;
-
-	static const flagType	F_NOPURGE;
-	static const flagType	F_SPECIAL;
-	static const flagType	F_NOREG;
-	static const flagType	F_NEVREG;
-	static const flagType	F_SUSPEND;
-	static const flagType	F_TEMP;
-	static const flagType	F_CAUTION;
-	static const flagType	F_VACATION;
-	static const flagType	F_LOCKED;
-
-	static const flagType	F_ALWAYSOP;
-	static const flagType	F_STRICTOP;
-	static const flagType	F_NOOP;
-	static const flagType	F_AUTOTOPIC;
-	static const flagType	F_OPONLY; 	// Deprecated.
-	static const flagType	F_AUTOJOIN;
-	static const flagType	F_FLOATLIM;
-	static const flagType	F_MIA;		// MIA review tag
-	static const flagType	F_JOINLIM;
-	static const flagType	F_NOFORCE; // Reserved for use by Planetarion.
-	static const flagType	F_NOVOICE;
-	static const flagType	F_NOTAKE;
-	static const flagType	F_FLOODPRO;
-	static const flagType	F_FLOODPROGLINE;
-	static const flagType	F_OPLOG;
-
-	/*
-	 *   Channel 'Event' Flags, used in the channelog table.
-	 *   These flags are used to filter channel log records.
-	 *   in reports.
-	 */
-
-	static const int	EV_MISC;
-	static const int	EV_JOIN;
-	static const int	EV_PART;
-	static const int	EV_OPERJOIN;
-	static const int	EV_OPERPART;
-	static const int	EV_FORCE;
-	static const int	EV_REGISTER;
-	static const int	EV_PURGE;
-
-	/* Manually added Comment */
-	static const int	EV_COMMENT;
-	static const int	EV_REMOVEALL;
-	static const int	EV_IDLE;
-
-	/* other events */
-	static const int	EV_MGRCHANGE;
-	static const int	EV_ADMREJECT;
-	static const int	EV_WITHDRAW;
-	static const int	EV_NEWAPP;
-	static const int	EV_NONSUPPORT;
-	static const int	EV_ADMREVIEW;
-	static const int	EV_CLRREVIEW;
-	static const int	EV_SUSPEND;
-	static const int	EV_UNSUSPEND;
-
-	enum FloodType {
-		FLOOD_MSG,
-		FLOOD_NOTICE,
-		FLOOD_CTCP
-	};
-
-	enum FloodProLevel {
-		FLOODPRO_NONE,
-		FLOODPRO_KICK,	//=WARNING
-		FLOODPRO_BAN,
-		FLOODPRO_GLINE
-	};
-
-	/*
-	 *  Methods to get data atrributes.
-	 */
-
-	inline const unsigned int&	getID() const
-		{ return id ; }
-
-	inline const string&		getName() const
-		{ return name ; }
+class sqlChannel {
+
+  public:
+    sqlChannel(cservice*);
+    virtual ~sqlChannel();
+
+    typedef unsigned int flagType;
+
+    static const flagType F_NOPURGE;
+    static const flagType F_SPECIAL;
+    static const flagType F_NOREG;
+    static const flagType F_NEVREG;
+    static const flagType F_SUSPEND;
+    static const flagType F_TEMP;
+    static const flagType F_CAUTION;
+    static const flagType F_VACATION;
+    static const flagType F_LOCKED;
 
-	inline const flagType&		getFlags() const
-		{ return flags ; }
+    static const flagType F_ALWAYSOP;
+    static const flagType F_STRICTOP;
+    static const flagType F_NOOP;
+    static const flagType F_AUTOTOPIC;
+    static const flagType F_OPONLY; // Deprecated.
+    static const flagType F_AUTOJOIN;
+    static const flagType F_FLOATLIM;
+    static const flagType F_MIA; // MIA review tag
+    static const flagType F_JOINLIM;
+    static const flagType F_NOFORCE; // Reserved for use by Planetarion.
+    static const flagType F_NOVOICE;
+    static const flagType F_NOTAKE;
+    static const flagType F_FLOODPRO;
+    static const flagType F_FLOODPROGLINE;
+    static const flagType F_OPLOG;
 
-	inline bool  getFlag( const flagType& whichFlag ) const
-		{ return (flags & whichFlag) ; }
+    /*
+     *   Channel 'Event' Flags, used in the channelog table.
+     *   These flags are used to filter channel log records.
+     *   in reports.
+     */
 
-	inline const unsigned short int& getMassDeopPro() const
-		{ return mass_deop_pro ; }
+    static const int EV_MISC;
+    static const int EV_JOIN;
+    static const int EV_PART;
+    static const int EV_OPERJOIN;
+    static const int EV_OPERPART;
+    static const int EV_FORCE;
+    static const int EV_REGISTER;
+    static const int EV_PURGE;
 
-	inline const unsigned int& getFloodPro() const
-		{ return flood_pro ; }
+    /* Manually added Comment */
+    static const int EV_COMMENT;
+    static const int EV_REMOVEALL;
+    static const int EV_IDLE;
 
-	inline const unsigned short& getFloodMsg() const
-		{ return msg_period ; }
+    /* other events */
+    static const int EV_MGRCHANGE;
+    static const int EV_ADMREJECT;
+    static const int EV_WITHDRAW;
+    static const int EV_NEWAPP;
+    static const int EV_NONSUPPORT;
+    static const int EV_ADMREVIEW;
+    static const int EV_CLRREVIEW;
+    static const int EV_SUSPEND;
+    static const int EV_UNSUSPEND;
 
-	inline const unsigned short int& getFloodNotice() const
-		{ return notice_period ; }
+    enum FloodType { FLOOD_MSG, FLOOD_NOTICE, FLOOD_CTCP };
 
-	inline const unsigned short int& getFloodCTCP() const
-		{ return ctcp_period ; }
+    enum FloodProLevel {
+        FLOODPRO_NONE,
+        FLOODPRO_KICK, //=WARNING
+        FLOODPRO_BAN,
+        FLOODPRO_GLINE
+    };
 
-	inline const unsigned short int& getFloodPeriod() const
-		{ return flood_period ; }
+    /*
+     *  Methods to get data atrributes.
+     */
 
-    inline const unsigned short int& getRepeatCount() const
-		{ return repeat_count ; }
+    inline const unsigned int& getID() const { return id; }
 
-    inline const FloodProLevel& getFloodproLevel() const
-		{ return floodlevel; }
+    inline const string& getName() const { return name; }
 
-    inline const FloodProLevel& getManualFloodproLevel() const
-		{ return man_floodlevel; }
+    inline const flagType& getFlags() const { return flags; }
 
-	inline const time_t& 		getLastFloodTime() const
-		{ return last_flood; }
+    inline bool getFlag(const flagType& whichFlag) const { return (flags & whichFlag); }
 
-	inline const string&		getURL() const
-		{ return url ; }
+    inline const unsigned short int& getMassDeopPro() const { return mass_deop_pro; }
 
-	inline const string&		getDescription() const
-		{ return description ; }
+    inline const unsigned int& getFloodPro() const { return flood_pro; }
 
-	inline const string&		getComment() const
-		{ return comment ; }
+    inline const unsigned short& getFloodMsg() const { return msg_period; }
 
-	inline const string&		getKeywords() const
-		{ return keywords ; }
+    inline const unsigned short int& getFloodNotice() const { return notice_period; }
 
-	inline const string&		getWelcome() const
-		{ return welcome ; }
+    inline const unsigned short int& getFloodCTCP() const { return ctcp_period; }
 
-	inline const time_t&		getRegisteredTS() const
-		{ return registered_ts ; }
+    inline const unsigned short int& getFloodPeriod() const { return flood_period; }
 
-	inline const time_t&		getChannelTS() const
-		{ return channel_ts ; }
+    inline const unsigned short int& getRepeatCount() const { return repeat_count; }
 
-	inline const string&		getChannelMode() const
-		{ return channel_mode ; }
+    inline const FloodProLevel& getFloodproLevel() const { return floodlevel; }
 
-	inline const unsigned short int& getUserFlags() const
-		{ return userflags ; }
+    inline const FloodProLevel& getManualFloodproLevel() const { return man_floodlevel; }
 
-	inline const time_t&		getLastUpdated() const
-		{ return last_updated ; }
+    inline const time_t& getLastFloodTime() const { return last_flood; }
 
-	inline const bool& 			getInChan() const
-		{ return inChan; }
+    inline const string& getURL() const { return url; }
 
-	inline const time_t&		getLastTopic() const
-		{ return last_topic ; }
+    inline const string& getDescription() const { return description; }
 
-	inline const time_t&		getLastLimitCheck() const
-		{ return last_limit_check ; }
+    inline const string& getComment() const { return comment; }
 
-	inline const time_t&		getLastUsed() const
-		{ return last_used ; }
+    inline const string& getKeywords() const { return keywords; }
 
-	inline const unsigned int& getLimitOffset() const
-		{ return limit_offset ; }
+    inline const string& getWelcome() const { return welcome; }
 
-	inline const time_t&	getLimitPeriod() const
-		{ return limit_period ; }
+    inline const time_t& getRegisteredTS() const { return registered_ts; }
 
-	inline const unsigned int& getLimitGrace() const
-		{ return limit_grace ; }
+    inline const time_t& getChannelTS() const { return channel_ts; }
 
-	inline const unsigned int& getLimitMax() const
-		{ return limit_max ; }
+    inline const string& getChannelMode() const { return channel_mode; }
 
-	inline const unsigned int& getLimitJoinMax() const
-		{ return limit_joinmax ; }
+    inline const unsigned short int& getUserFlags() const { return userflags; }
 
-	inline const unsigned int& getLimitJoinSecs() const
-		{ return limit_joinsecs ; }
+    inline const time_t& getLastUpdated() const { return last_updated; }
 
-	inline const unsigned int& getLimitJoinPeriod() const
-		{ return limit_joinperiod; }
+    inline const bool& getInChan() const { return inChan; }
 
-	std::string getLimitJoinMode()
-		{ return limit_joinmode ; }
+    inline const time_t& getLastTopic() const { return last_topic; }
 
-	std::string getLimitJoinModeSet()
-		{ return limit_joinmodeset ; }
+    inline const time_t& getLastLimitCheck() const { return last_limit_check; }
 
-	inline unsigned int& getLimitJoinCount()
-		{ return limit_joincount ; }
+    inline const time_t& getLastUsed() const { return last_used; }
 
-	inline time_t& getLimitJoinTime()
-		{ return limit_joinlast ; }
+    inline const unsigned int& getLimitOffset() const { return limit_offset; }
 
-	inline time_t& getLimitJoinTimeExpire()
-		{ return limit_jointimerexpire ; }
+    inline const time_t& getLimitPeriod() const { return limit_period; }
 
-	inline const bool& getLimitJoinActive()
-		{ return limit_joinactive ; }
+    inline const unsigned int& getLimitGrace() const { return limit_grace; }
 
-	inline const xServer::timerID& getLimitJoinTimer()
-		{ return limit_jointimerID ; }
+    inline const unsigned int& getLimitMax() const { return limit_max; }
 
-	inline const unsigned int& getMaxBans() const
-		{ return max_bans ; }
+    inline const unsigned int& getLimitJoinMax() const { return limit_joinmax; }
 
-	inline const unsigned int& getNoTake() const
-		{ return no_take ; }
+    inline const unsigned int& getLimitJoinSecs() const { return limit_joinsecs; }
 
-	unsigned int getTotalMessageCount(const string& );
+    inline const unsigned int& getLimitJoinPeriod() const { return limit_joinperiod; }
 
-	unsigned int getTotalNoticeCount(const string&);
+    std::string getLimitJoinMode() { return limit_joinmode; }
 
-	unsigned int getTotalCTCPCount(const string&);
+    std::string getLimitJoinModeSet() { return limit_joinmodeset; }
 
-	std::string getLimitJoinMode() const
-		{ return limit_joinmode; }
+    inline unsigned int& getLimitJoinCount() { return limit_joincount; }
 
-	/**
-	 * Load channel data from the backend using the channel name as
-	 * a key.
-	 */
-	bool loadData( const string& );
+    inline time_t& getLimitJoinTime() { return limit_joinlast; }
 
-	/**
-	 * Load channel data from the backend using the channel_id as a
-	 * key.
-	 */
-	bool loadData( int );
+    inline time_t& getLimitJoinTimeExpire() { return limit_jointimerexpire; }
 
-	/*
-	 *  Methods to set data atrributes.
-	 */
+    inline const bool& getLimitJoinActive() { return limit_joinactive; }
 
-	// 'ID' is a primary key and cannot be altered.
+    inline const xServer::timerID& getLimitJoinTimer() { return limit_jointimerID; }
 
-	inline void setID( const unsigned int& _id )
-		{ id = _id; }
+    inline const unsigned int& getMaxBans() const { return max_bans; }
 
-	inline void setName( const string& _name )
-		{ name = _name; }
+    inline const unsigned int& getNoTake() const { return no_take; }
 
-	inline void setFlag( const flagType& whichFlag )
-		{ flags |= whichFlag; }
+    unsigned int getTotalMessageCount(const string&);
 
-	inline void removeFlag( const flagType& whichFlag )
-		{ flags &= ~whichFlag; }
+    unsigned int getTotalNoticeCount(const string&);
 
-	inline void clearFlags()
-		{ flags = 0; }
+    unsigned int getTotalCTCPCount(const string&);
 
-	inline void setMassDeopPro( const unsigned short int& _mass_deop_pro )
-		{ mass_deop_pro = _mass_deop_pro; }
+    std::string getLimitJoinMode() const { return limit_joinmode; }
 
-	inline void setFloodPro( const unsigned int& _flood_pro )
-		{ flood_pro = _flood_pro; }
+    /**
+     * Load channel data from the backend using the channel name as
+     * a key.
+     */
+    bool loadData(const string&);
 
-	inline void setFloodproLevel( const FloodProLevel& _floodlevel )
-		{ floodlevel = _floodlevel; }
+    /**
+     * Load channel data from the backend using the channel_id as a
+     * key.
+     */
+    bool loadData(int);
 
-	inline void setManualFloodproLevel( const FloodProLevel& _man_floodlevel )
-		{ man_floodlevel = _man_floodlevel; }
+    /*
+     *  Methods to set data atrributes.
+     */
 
-	inline void incFloodPro()
-	{
-		if (floodlevel == FLOODPRO_NONE)
-			floodlevel = FLOODPRO_KICK;
-		else if (floodlevel == FLOODPRO_KICK)
-			floodlevel = FLOODPRO_BAN;
+    // 'ID' is a primary key and cannot be altered.
+
+    inline void setID(const unsigned int& _id) { id = _id; }
+
+    inline void setName(const string& _name) { name = _name; }
+
+    inline void setFlag(const flagType& whichFlag) { flags |= whichFlag; }
+
+    inline void removeFlag(const flagType& whichFlag) { flags &= ~whichFlag; }
+
+    inline void clearFlags() { flags = 0; }
+
+    inline void setMassDeopPro(const unsigned short int& _mass_deop_pro) {
+        mass_deop_pro = _mass_deop_pro;
+    }
+
+    inline void setFloodPro(const unsigned int& _flood_pro) { flood_pro = _flood_pro; }
+
+    inline void setFloodproLevel(const FloodProLevel& _floodlevel) { floodlevel = _floodlevel; }
+
+    inline void setManualFloodproLevel(const FloodProLevel& _man_floodlevel) {
+        man_floodlevel = _man_floodlevel;
+    }
+
+    inline void incFloodPro() {
+        if (floodlevel == FLOODPRO_NONE)
+            floodlevel = FLOODPRO_KICK;
+        else if (floodlevel == FLOODPRO_KICK)
+            floodlevel = FLOODPRO_BAN;
 #ifdef GLINE_ON_FLOODPRO
-		else if ((floodlevel == FLOODPRO_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
-			floodlevel = FLOODPRO_GLINE;
+        else if ((floodlevel == FLOODPRO_BAN) && (getFlag(sqlChannel::F_FLOODPROGLINE)))
+            floodlevel = FLOODPRO_GLINE;
 #endif
-	}
+    }
 
-	inline void decFloodPro()
-	{
-		if (floodlevel == FLOODPRO_GLINE)
-			floodlevel = FLOODPRO_BAN;
-		else if (floodlevel == FLOODPRO_BAN)
-			floodlevel = FLOODPRO_KICK;
-		else if (floodlevel == FLOODPRO_KICK)
-			floodlevel = FLOODPRO_NONE;
-	}
+    inline void decFloodPro() {
+        if (floodlevel == FLOODPRO_GLINE)
+            floodlevel = FLOODPRO_BAN;
+        else if (floodlevel == FLOODPRO_BAN)
+            floodlevel = FLOODPRO_KICK;
+        else if (floodlevel == FLOODPRO_KICK)
+            floodlevel = FLOODPRO_NONE;
+    }
 
-	// When an unidented client joins the channel, call this and this increments
-	inline void addLimitJoinCount()
-		{ limit_joincount++; }
+    // When an unidented client joins the channel, call this and this increments
+    inline void addLimitJoinCount() { limit_joincount++; }
 
-	// When did we start a new unidented client session
-	inline void setLastFloodTime( const time_t& _last_flood )
-		{ last_flood = _last_flood; }
+    // When did we start a new unidented client session
+    inline void setLastFloodTime(const time_t& _last_flood) { last_flood = _last_flood; }
 
-	inline void setURL( const string& _url )
-		{ url = _url; }
+    inline void setURL(const string& _url) { url = _url; }
 
-	inline void setDescription( const string& _description )
-		{ description = _description; }
+    inline void setDescription(const string& _description) { description = _description; }
 
-	inline void setComment( const string& _comment )
-		{ comment = _comment; }
+    inline void setComment(const string& _comment) { comment = _comment; }
 
-	inline void setKeywords( const string& _keywords )
-		{ keywords = _keywords; }
+    inline void setKeywords(const string& _keywords) { keywords = _keywords; }
 
-	inline void setWelcome(const string& _welcome)
-		{ welcome = _welcome; }
+    inline void setWelcome(const string& _welcome) { welcome = _welcome; }
 
-	inline void setRegisteredTS( const time_t& _registered_ts )
-		{ registered_ts = _registered_ts; }
+    inline void setRegisteredTS(const time_t& _registered_ts) { registered_ts = _registered_ts; }
 
-	inline void setChannelTS( const time_t& _channel_ts )
-		{ channel_ts = _channel_ts; }
+    inline void setChannelTS(const time_t& _channel_ts) { channel_ts = _channel_ts; }
 
-	inline void setChannelMode( const string& _channel_mode )
-		{ channel_mode = _channel_mode; }
+    inline void setChannelMode(const string& _channel_mode) { channel_mode = _channel_mode; }
 
-	inline void setUserFlags( const unsigned short int& _userflags )
-		{ userflags = _userflags; }
+    inline void setUserFlags(const unsigned short int& _userflags) { userflags = _userflags; }
 
-	inline void setInChan( const bool& _inChan )
-		{ inChan = _inChan; }
+    inline void setInChan(const bool& _inChan) { inChan = _inChan; }
 
-	inline void setLastTopic( const time_t& _last_topic )
-		{ last_topic = _last_topic; }
+    inline void setLastTopic(const time_t& _last_topic) { last_topic = _last_topic; }
 
-	inline void setLastLimitCheck( const time_t& _last_limit_check )
-		{ last_limit_check = _last_limit_check; }
+    inline void setLastLimitCheck(const time_t& _last_limit_check) {
+        last_limit_check = _last_limit_check;
+    }
 
-	inline void setLastUsed( const time_t& _last_used )
-		{ last_used = _last_used; }
+    inline void setLastUsed(const time_t& _last_used) { last_used = _last_used; }
 
-	inline void setLimitOffset( const unsigned int& _limit_offset )
-		{ limit_offset = _limit_offset; }
+    inline void setLimitOffset(const unsigned int& _limit_offset) { limit_offset = _limit_offset; }
 
-	inline void setLimitPeriod( const time_t& _limit_period )
-		{ limit_period = _limit_period; }
+    inline void setLimitPeriod(const time_t& _limit_period) { limit_period = _limit_period; }
 
-	inline void setLimitGrace( const unsigned int& _limit_grace )
-		{ limit_grace = _limit_grace; }
+    inline void setLimitGrace(const unsigned int& _limit_grace) { limit_grace = _limit_grace; }
 
-	inline void setLimitMax( const unsigned int& _limit_max )
-		{ limit_max = _limit_max; }
+    inline void setLimitMax(const unsigned int& _limit_max) { limit_max = _limit_max; }
 
-	inline void setLimitJoinMax( const unsigned int& _limit_joinmax )
-		{ limit_joinmax = _limit_joinmax; }
+    inline void setLimitJoinMax(const unsigned int& _limit_joinmax) {
+        limit_joinmax = _limit_joinmax;
+    }
 
-	inline void setLimitJoinSecs( const unsigned int& _limit_joinsecs )
-		{ limit_joinsecs = _limit_joinsecs; }
+    inline void setLimitJoinSecs(const unsigned int& _limit_joinsecs) {
+        limit_joinsecs = _limit_joinsecs;
+    }
 
-	inline void setLimitJoinMode( const string& _limit_mode )
-		{ limit_joinmode = _limit_mode; }
+    inline void setLimitJoinMode(const string& _limit_mode) { limit_joinmode = _limit_mode; }
 
-	inline void setLimitJoinModeSet( const string& _limit_mode )
-		{ limit_joinmodeset = _limit_mode; }
+    inline void setLimitJoinModeSet(const string& _limit_mode) { limit_joinmodeset = _limit_mode; }
 
-	inline void setLimitJoinPeriod( const unsigned int& _limit_joinperiod )
-		{ limit_joinperiod = _limit_joinperiod; }
+    inline void setLimitJoinPeriod(const unsigned int& _limit_joinperiod) {
+        limit_joinperiod = _limit_joinperiod;
+    }
 
-	inline void setLimitJoinTime( const time_t& _last_time )
-		{ limit_joinlast = _last_time; }
+    inline void setLimitJoinTime(const time_t& _last_time) { limit_joinlast = _last_time; }
 
-	inline void setLimitJoinTimeExpire( const time_t& _expire_time )
-		{ limit_jointimerexpire = _expire_time; }
+    inline void setLimitJoinTimeExpire(const time_t& _expire_time) {
+        limit_jointimerexpire = _expire_time;
+    }
 
-	inline void setLimitJoinCount( const unsigned int& _limit_count )
-		{ limit_joincount = _limit_count; }
+    inline void setLimitJoinCount(const unsigned int& _limit_count) {
+        limit_joincount = _limit_count;
+    }
 
-	inline void setLimitJoinActive( const bool& _is_active )
-		{ limit_joinactive = _is_active; }
+    inline void setLimitJoinActive(const bool& _is_active) { limit_joinactive = _is_active; }
 
-	inline void setLimitJoinTimer( const xServer::timerID& _timer )
-		{ limit_jointimerID = _timer; }
+    inline void setLimitJoinTimer(const xServer::timerID& _timer) { limit_jointimerID = _timer; }
 
-	inline void setMaxBans( const unsigned int& _max_bans )
-		{ max_bans = _max_bans; }
+    inline void setMaxBans(const unsigned int& _max_bans) { max_bans = _max_bans; }
 
-	inline void setNoTake( const unsigned int& _no_take )
-		{ no_take = _no_take; }
+    inline void setNoTake(const unsigned int& _no_take) { no_take = _no_take; }
 
-	inline void setCurrentTime(const time_t& _now )
-		{ now = _now; }
+    inline void setCurrentTime(const time_t& _now) { now = _now; }
 
-	/**
-	 * Method to perform a SQL 'UPDATE' and commit changes to this
-	 * object back to the database.
-	 */
-	bool commit();
-	bool insertRecord();
-	void setAllMembers(int);
+    /**
+     * Method to perform a SQL 'UPDATE' and commit changes to this
+     * object back to the database.
+     */
+    bool commit();
+    bool insertRecord();
+    void setAllMembers(int);
 
-	void setAllFlood();
-	void setFloodMsg(const unsigned short& );
-	void setFloodNotice(const unsigned short& );
-	void setFloodCTCP(const unsigned short& );
-	void setFloodPeriod(const unsigned short& );
-    void setRepeatCount(const unsigned short& );
+    void setAllFlood();
+    void setFloodMsg(const unsigned short&);
+    void setFloodNotice(const unsigned short&);
+    void setFloodCTCP(const unsigned short&);
+    void setFloodPeriod(const unsigned short&);
+    void setRepeatCount(const unsigned short&);
     void setDefaultFloodproValues();
 
     // < total_count, Mask_list >
-	typedef std::pair < unsigned int, std::list < string > > repeatMaskMapType;
+    typedef std::pair<unsigned int, std::list<string>> repeatMaskMapType;
 
-	static string getFloodLevelName(const FloodProLevel& );
+    static string getFloodLevelName(const FloodProLevel&);
     repeatMaskMapType getRepeatMessageCount(const string&, string Mask = string());
-	time_t getMaskLastTime(const string& );
-	//void setMaskLastTime(const string&,);
-	void RemoveFlooderMask(const string&);
-	void handleNewMessage(const FloodType&, const string&, const string&);
-	void calcTotalMessageCount(const string&);
-	void calcTotalNoticeCount(const string&);
-	void calcTotalCTCPCount(const string&);
-	void ExpireMessagesForChannel(sqlChannel*);
+    time_t getMaskLastTime(const string&);
+    // void setMaskLastTime(const string&,);
+    void RemoveFlooderMask(const string&);
+    void handleNewMessage(const FloodType&, const string&, const string&);
+    void calcTotalMessageCount(const string&);
+    void calcTotalNoticeCount(const string&);
+    void calcTotalCTCPCount(const string&);
+    void ExpireMessagesForChannel(sqlChannel*);
 
-public:
-	/*
-	 * Map with key user-id, contents level and username for
-	 * easy access
-	 * Stores UID's of admin users with forced accessse
-	 * on this channel
-	 */
+  public:
+    /*
+     * Map with key user-id, contents level and username for
+     * easy access
+     * Stores UID's of admin users with forced accessse
+     * on this channel
+     */
 
-	typedef std::map< unsigned int, std::pair < unsigned short, string > > forceMapType ;
-	forceMapType forceMap;
+    typedef std::map<unsigned int, std::pair<unsigned short, string>> forceMapType;
+    forceMapType forceMap;
 
-	typedef std::map < int,sqlBan*> sqlBanMapType;
-	sqlBanMapType banList;
+    typedef std::map<int, sqlBan*> sqlBanMapType;
+    sqlBanMapType banList;
 
-	// < repeater_Mask, flooder_struct >
-	typedef std::map < string, chanFloodType* > chanFloodMapType;
-	chanFloodMapType chanFloodMap;
+    // < repeater_Mask, flooder_struct >
+    typedef std::map<string, chanFloodType*> chanFloodMapType;
+    chanFloodMapType chanFloodMap;
 
-protected:
+  protected:
+    unsigned int id;
+    string name;
+    flagType flags;
+    unsigned short mass_deop_pro;
+    unsigned int flood_pro;
+    unsigned short msg_period;
+    unsigned short notice_period;
+    unsigned short ctcp_period;
+    unsigned short flood_period;
+    unsigned short repeat_count;
+    FloodProLevel floodlevel;
+    FloodProLevel man_floodlevel; // the variable to keep track which floodpro level was set
+                                  // manually
+    string url;
+    string description;
+    string comment;
+    string keywords;
+    string welcome;
+    time_t registered_ts;
+    time_t channel_ts;
+    string channel_mode;
+    unsigned short userflags;
+    time_t last_updated;
+    time_t last_topic;
+    bool inChan;
+    time_t last_used;
+    unsigned int limit_offset;
+    time_t limit_period;
+    time_t last_limit_check;
+    time_t last_flood; // last time when an floodpro measure was taken (kick/ban/gline)
+    time_t limit_joinlast =
+        0; // first time (in current joinlimit session) unidented user was seen joining
+    time_t limit_jointimerexpire;     // time for scheduled expire
+    unsigned int limit_joincount = 0; // how many unidented joins have we have in this session
+    unsigned int limit_grace;
+    unsigned int limit_max;
+    unsigned int limit_joinmax;         // Number of unidented joins in joinsecs period
+    unsigned int limit_joinsecs;        // Number of seconds period to monitor unidented joins
+    std::string limit_joinmode;         // Mode to set when triggerin a joinlimit event
+    std::string limit_joinmodeset;      // Current mode set when last triggered
+    unsigned int limit_joinperiod;      // The period before unsetting modes again
+    xServer::timerID limit_jointimerID; // ID of the current running timer
+    bool limit_joinactive = false;      // State of the joinlimit active
+    unsigned int max_bans;
+    unsigned int no_take;
+    time_t now;
 
-	unsigned int	id ;
-	string		name ;
-	flagType	flags ;
-	unsigned short	mass_deop_pro ;
-	unsigned int	flood_pro ;
-	unsigned short	msg_period;
-	unsigned short	notice_period;
-	unsigned short	ctcp_period;
-	unsigned short	flood_period;
-  unsigned short	repeat_count;
-  FloodProLevel		floodlevel;
-  FloodProLevel		man_floodlevel; //the variable to keep track which floodpro level was set manually
-	string		url ;
-	string		description ;
-	string		comment ;
-	string		keywords  ;
-	string		welcome ;
-	time_t		registered_ts ;
-	time_t		channel_ts ;
-	string		channel_mode ;
-	unsigned short	userflags ;
-	time_t		last_updated ;
-	time_t		last_topic ;
-	bool		inChan;
-	time_t		last_used;
-	unsigned int limit_offset;
-	time_t limit_period;
-	time_t last_limit_check;
-	time_t last_flood;	//last time when an floodpro measure was taken (kick/ban/gline)
-	time_t limit_joinlast = 0; //first time (in current joinlimit session) unidented user was seen joining
-	time_t limit_jointimerexpire; // time for scheduled expire
-	unsigned int limit_joincount = 0; // how many unidented joins have we have in this session
-	unsigned int limit_grace;
-	unsigned int limit_max;
-	unsigned int limit_joinmax; // Number of unidented joins in joinsecs period
-	unsigned int limit_joinsecs; // Number of seconds period to monitor unidented joins
-	std::string  limit_joinmode; // Mode to set when triggerin a joinlimit event
-	std::string  limit_joinmodeset; // Current mode set when last triggered
-	unsigned int limit_joinperiod; // The period before unsetting modes again
-	xServer::timerID limit_jointimerID; // ID of the current running timer
-	bool limit_joinactive = false; // State of the joinlimit active
-	unsigned int max_bans;
-	unsigned int no_take;
-	time_t		now;
+    Logger* logger;
+    dbHandle* SQLDb;
+};
 
-	Logger*		logger;
-	dbHandle*	SQLDb;
-
- } ;
-
-}
+} // namespace gnuworld
 
 #endif // __SQLCHANNEL_H

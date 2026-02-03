@@ -22,104 +22,84 @@
 #ifndef __CCGLINE_H
 #define __CCGLINE_H "$Id: ccGline.h,v 1.15 2007/08/28 16:10:07 dan_karrels Exp $"
 
-#include	<string>
-#include	<list>
+#include <string>
+#include <list>
 
-#include	<ctime>
+#include <ctime>
 
-#include	"dbHandle.h"
+#include "dbHandle.h"
 
-namespace gnuworld
-{ 
+namespace gnuworld {
 
-using std::string ;
-using std::list ;
-namespace uworld
-{
+using std::list;
+using std::string;
+namespace uworld {
 
-class ccGline
-{
-public:
+class ccGline {
+  public:
+    ccGline(dbHandle*);
 
-	ccGline(dbHandle*);
-	
-	virtual ~ccGline();
-	//Mehods for getting info
-	
-	inline const string& 	getId() const
-		{ return Id; }
+    virtual ~ccGline();
+    // Mehods for getting info
 
-	inline const string& 	getHost() const
-		{ return Host; }
-	
-	inline const string& 	getAddedBy() const
-		{ return AddedBy; }
-    
-	inline const time_t&	getAddedOn() const
-		{ return AddedOn; }
-	    
-	inline const time_t&	getExpires() const
-		{ return Expires; }
+    inline const string& getId() const { return Id; }
 
-	inline const time_t&	getLastUpdated() const
-		{ return LastUpdated; }
+    inline const string& getHost() const { return Host; }
 
-	inline const string&	getReason() const
-		{ return Reason; }
+    inline const string& getAddedBy() const { return AddedBy; }
 
-	
-	//Methods for setting info
-	
-	inline void 		setId( const string& _Id ) 
-		{ Id = _Id; }
+    inline const time_t& getAddedOn() const { return AddedOn; }
 
-	inline void 		setHost( const string& _Host ) 
-		{ Host = _Host; }
-	
-	inline void 		setAddedBy( const string& _AddedBy ) 
-		{ AddedBy = _AddedBy; }
-    
-	inline void		setAddedOn( const time_t& _AddedOn ) 
-		{ AddedOn = _AddedOn; }
-	    
-	inline void		setExpires( const time_t& _Expires ) 
-		{ Expires = _Expires; }
+    inline const time_t& getExpires() const { return Expires; }
 
-	inline void		setLastUpdated( const time_t& _LastUpdated ) 
-		{ LastUpdated = _LastUpdated; }
+    inline const time_t& getLastUpdated() const { return LastUpdated; }
 
-	inline void 		setReason( const string& _Reason ) 
-		{ Reason = _Reason; }
-	    
-	inline void 		setSqldb(dbHandle* _SQLDb)
-		{ SQLDb = _SQLDb; } 
-		
-	//Methods for updating 
+    inline const string& getReason() const { return Reason; }
 
-	bool Insert();
-	
-	bool Update();
-	
-	bool loadData( int );
+    // Methods for setting info
 
-	bool loadData( const string & );
-	
-	bool Delete();
-	
-	static unsigned int numAllocated;
-	
-protected:
-	string Id;
-	string Host;
-	string AddedBy;
-	time_t AddedOn;
-	time_t Expires;
-	time_t LastUpdated;
-	string Reason;
-	dbHandle* SQLDb;
-	
+    inline void setId(const string& _Id) { Id = _Id; }
+
+    inline void setHost(const string& _Host) { Host = _Host; }
+
+    inline void setAddedBy(const string& _AddedBy) { AddedBy = _AddedBy; }
+
+    inline void setAddedOn(const time_t& _AddedOn) { AddedOn = _AddedOn; }
+
+    inline void setExpires(const time_t& _Expires) { Expires = _Expires; }
+
+    inline void setLastUpdated(const time_t& _LastUpdated) { LastUpdated = _LastUpdated; }
+
+    inline void setReason(const string& _Reason) { Reason = _Reason; }
+
+    inline void setSqldb(dbHandle* _SQLDb) { SQLDb = _SQLDb; }
+
+    // Methods for updating
+
+    bool Insert();
+
+    bool Update();
+
+    bool loadData(int);
+
+    bool loadData(const string&);
+
+    bool Delete();
+
+    static unsigned int numAllocated;
+
+  protected:
+    string Id;
+    string Host;
+    string AddedBy;
+    time_t AddedOn;
+    time_t Expires;
+    time_t LastUpdated;
+    string Reason;
+    dbHandle* SQLDb;
+
 }; // class ccGline
-}
+} // namespace uworld
 } // namespace gnuworld
 
 #endif // __CCGLINE_H

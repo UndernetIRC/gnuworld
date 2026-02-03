@@ -28,82 +28,75 @@ namespace gnuworld {
 
 namespace chanfix {
 
-void chanfix::OnAttach()
-{
-	xClient::OnAttach();
+void chanfix::OnAttach() {
+    xClient::OnAttach();
 
-	/* Lastly, kick off any timers we might need */
-	time_t next;
+    /* Lastly, kick off any timers we might need */
+    time_t next;
 
-	next = ::time(0) + confStartDelay;
-	timerCount = MyUplink->RegisterTimer(next, this, 0);
+    next = ::time(0) + confStartDelay;
+    timerCount = MyUplink->RegisterTimer(next, this, 0);
 }
 
+void chanfix::BurstChannels() {
+    xClient::BurstChannels();
 
-void chanfix::BurstChannels()
-{
-	xClient::BurstChannels();
-
-	MyUplink->JoinChannel(this, confConsoleChannel, confConsoleModes);
+    MyUplink->JoinChannel(this, confConsoleChannel, confConsoleModes);
 }
 
+void chanfix::OnCTCP(iClient* theClient, const std::string& CTCP, const std::string& Message,
+                     bool) {
+    StringTokenizer st(CTCP);
 
-void chanfix::OnCTCP( iClient *theClient, const std::string& CTCP,
-	const std::string& Message, bool )
-{
-	StringTokenizer st(CTCP);
+    if (st.empty())
+        return;
 
-	if(st.empty()) return;
+    std::string Command = string_upper(st[0]);
 
-	std::string Command = string_upper(st[0]);
-
-	if("DCC" == Command) {
-		DoCTCP(theClient, CTCP, "REJECT");
-	} else if("PING" == Command) {
-		DoCTCP(theClient, CTCP, Message);
-	} else if("VERSION" == Command) {
-		DoCTCP(theClient, CTCP, "GNUWorld ChanFix v0.0.1");
-	}
+    if ("DCC" == Command) {
+        DoCTCP(theClient, CTCP, "REJECT");
+    } else if ("PING" == Command) {
+        DoCTCP(theClient, CTCP, Message);
+    } else if ("VERSION" == Command) {
+        DoCTCP(theClient, CTCP, "GNUWorld ChanFix v0.0.1");
+    }
 }
 
+void chanfix::OnPrivateMessage(iClient* theClient, const std::string& Message, bool) {
+    /* Only speak to opers */
+    if (!theClient->isOper())
+        return;
 
-void chanfix::OnPrivateMessage( iClient *theClient,
-	const std::string& Message, bool)
-{
-	/* Only speak to opers */
-	if( ! theClient->isOper() ) return;
+    StringTokenizer st(Message);
 
-	StringTokenizer st(Message);
+    if (st.empty())
+        return;
 
-	if( st.empty() ) return;
+    std::string Command = string_upper(st[0]);
+    commandMapType::iterator commandHandler = commandMap.find(Command);
 
-	std::string Command = string_upper(st[0]);
-	commandMapType::iterator commandHandler = commandMap.find(Command);
+    if (commandHandler == commandMap.end()) {
+        Notice(theClient, "Invalid command: %s", Command.c_str());
+        return;
+    }
 
-	if( commandHandler == commandMap.end() ) {
-		Notice(theClient, "Invalid command: %s", Command.c_str());
-		return;
-	}
-
-	commandHandler->second->Exec(theClient, Message);
+    commandHandler->second->Exec(theClient, Message);
 }
 
+void chanfix::OnTimer(const TimerHandler::timerID& theTimer, void* _data) {
+    xClient::OnTimer(theTimer, _data);
 
-void chanfix::OnTimer( const TimerHandler::timerID& theTimer , void* _data )
-{
-	xClient::OnTimer( theTimer , _data );
+    time_t next = ::time(0);
 
-	time_t next = ::time(0);
+    if (theTimer == timerCount) {
+        doCountUpdate();
 
-	if( theTimer == timerCount ) {
-		doCountUpdate();
+        next += confPeriod;
 
-		next += confPeriod;
-
-		timerCount = MyUplink->RegisterTimer(next, this, 0);
-	} else {
-		assert(0);
-	}
+        timerCount = MyUplink->RegisterTimer(next, this, 0);
+    } else {
+        assert(0);
+    }
 }
 
 } // namespace chanfix

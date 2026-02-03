@@ -25,322 +25,281 @@
 #ifndef __ISERVER_H
 #define __ISERVER_H "$Id: iServer.h,v 1.15 2006/12/22 06:41:41 kewlio Exp $"
 
-#include	<iostream>
-#include	<string>
+#include <iostream>
+#include <string>
 
-#include	<ctime>
+#include <ctime>
 
-#include	"ELog.h"
-#include	"NetworkTarget.h"
+#include "ELog.h"
+#include "NetworkTarget.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-class xServer ;
-class xNetwork ;
+class xServer;
+class xNetwork;
 
 /**
  * This class represents a network server.
  */
-class iServer : public NetworkTarget
-{
-	/**
-	 * Allow xServer to directly manipulate the
-	 * internal state of this iServer.
-	 */
-	friend class xServer ;
+class iServer : public NetworkTarget {
+    /**
+     * Allow xServer to directly manipulate the
+     * internal state of this iServer.
+     */
+    friend class xServer;
 
-	/**
-	 * xNetwork needs access to setIntYY().
-	 */
-	friend class xNetwork ;
+    /**
+     * xNetwork needs access to setIntYY().
+     */
+    friend class xNetwork;
 
-public:
+  public:
+    /// Type used to hold flags
+    typedef unsigned int flagType;
 
-	/// Type used to hold flags
-	typedef unsigned int	flagType ;
+    /**
+     * Flags that iServers may have.
+     */
+    /* Set if this iServer is juped, false otherwise */
+    static const flagType FLAG_JUPE;
+    /* Set if this iServer is a hub (+h) */
+    static const flagType FLAG_HUB;
+    /* Set if this iServer is a service (+s) */
+    static const flagType FLAG_SERVICE;
+    /* Set if this iServer is IPv6-compatible (+6) */
+    static const flagType FLAG_IPV6;
 
-	/**
-	 * Flags that iServers may have.
-	 */
-	/* Set if this iServer is juped, false otherwise */
-	static const flagType	FLAG_JUPE ;
-	/* Set if this iServer is a hub (+h) */
-	static const flagType	FLAG_HUB ;
-	/* Set if this iServer is a service (+s) */
-	static const flagType	FLAG_SERVICE ;
-	/* Set if this iServer is IPv6-compatible (+6) */
-	static const flagType	FLAG_IPV6 ;
+    /**
+     * Construct an iServer given its vital state variables
+     * as parameters.
+     */
+    iServer(const unsigned int& _uplink, const std::string& _yyxxx, const std::string& _name,
+            const time_t& _connectTime, const std::string& description = std::string());
 
-	/**
-	 * Construct an iServer given its vital state variables
-	 * as parameters.
-	 */
-	iServer( const unsigned int& _uplink,
-		const std::string& _yyxxx,
-		const std::string& _name,
-		const time_t& _connectTime,
-		const std::string& description = std::string() ) ;
+    /**
+     * Destruct this iServer instance.
+     */
+    virtual ~iServer();
 
-	/**
-	 * Destruct this iServer instance.
-	 */
-	virtual ~iServer() ;
+    /* Accessor methods */
 
-	/* Accessor methods */
+    /**
+     * Return the iServer's flags.
+     */
+    inline const flagType& getFlags() const { return flags; }
 
-	/**
-	 * Return the iServer's flags.
-	 */
-	inline const flagType& getFlags() const
-		{ return flags ; }
+    /**
+     * Return true if a particular flag is set, false otherwise.
+     */
+    inline bool getFlag(const flagType& whichFlag) const {
+        return ((flags & whichFlag) == whichFlag);
+    }
 
-	/**
-	 * Return true if a particular flag is set, false otherwise.
-	 */
-	inline bool getFlag( const flagType& whichFlag ) const
-		{ return ((flags & whichFlag) == whichFlag) ; }
+    /**
+     * Set a particular flags.
+     */
+    inline void setFlag(const flagType& whichFlag) { flags |= whichFlag; }
 
-	/**
-	 * Set a particular flags.
-	 */
-	inline void setFlag( const flagType& whichFlag )
-		{ flags |= whichFlag ; }
+    /**
+     * Remove a particular flag.
+     */
+    inline void removeFlag(const flagType& whichFlag) { flags &= ~whichFlag; }
 
-	/**
-	 * Remove a particular flag.
-	 */
-	inline void removeFlag( const flagType& whichFlag )
-		{ flags &= ~whichFlag ; }
+    /**
+     * Return true if this server is a jupe.
+     */
+    inline bool isJupe() const { return getFlag(FLAG_JUPE); }
 
-	/**
-	 * Return true if this server is a jupe.
-	 */
-	inline bool isJupe() const
-		{ return getFlag( FLAG_JUPE ) ; }
+    /**
+     * Set this iServer as a juped server.
+     */
+    inline void setJupe() { setFlag(FLAG_JUPE); }
 
-	/**
-	 * Set this iServer as a juped server.
-	 */
-	inline void setJupe()
-		{ setFlag( FLAG_JUPE ) ; }
+    /**
+     * Return true if this server is a hub.
+     */
+    inline bool isHub() const { return getFlag(FLAG_HUB); }
 
-	/**
-	 * Return true if this server is a hub.
-	 */
-	inline bool isHub() const
-		{ return getFlag( FLAG_HUB ) ; }
+    /**
+     * Set this iServer as a hub.
+     */
+    inline void setHub() { setFlag(FLAG_HUB); }
 
-	/**
-	 * Set this iServer as a hub.
-	 */
-	inline void setHub()
-		{ setFlag( FLAG_HUB ) ; }
+    /**
+     * Return true if this server is a service
+     */
+    inline bool isService() const { return getFlag(FLAG_SERVICE); }
 
-	/**
-	 * Return true if this server is a service
-	 */
-	inline bool isService() const
-		{ return getFlag( FLAG_SERVICE ) ; }
+    /**
+     * Set this iServer as a service.
+     */
+    inline void setService() { setFlag(FLAG_SERVICE); }
 
-	/**
-	 * Set this iServer as a service.
-	 */
-	inline void setService()
-		{ setFlag( FLAG_SERVICE ) ; }
+    /**
+     * Return true if this server is IPv6-compatible
+     */
+    inline bool isIPv6() const { return getFlag(FLAG_IPV6); }
 
-	/**
-	 * Return true if this server is IPv6-compatible
-	 */
-	inline bool isIPv6() const
-		{ return getFlag( FLAG_IPV6 ) ; }
+    /**
+     * Set this iServer as IPv6-compatible
+     */
+    inline void setIPv6() { setFlag(FLAG_IPV6); }
 
-	/**
-	 * Set this iServer as IPv6-compatible
-	 */
-	inline void setIPv6()
-		{ setFlag( FLAG_IPV6 ) ; }
+    /**
+     * Return the server numeric of this server's uplink.
+     */
+    inline const unsigned int& getUplinkIntYY() const { return uplinkIntYY; }
 
-	/**
-	 * Return the server numeric of this server's uplink.
-	 */
-	inline const unsigned int& getUplinkIntYY() const
-		{ return uplinkIntYY ; }
+    /**
+     * Return the name of this server.
+     */
+    inline const std::string& getName() const { return name; }
 
-	/**
-	 * Return the name of this server.
-	 */
-	inline const std::string& getName() const
-		{ return name ; }
+    /**
+     * Return the time at which this server connected to the network.
+     */
+    inline const time_t& getConnectTime() const { return connectTime; }
 
-	/**
-	 * Return the time at which this server connected to the network.
-	 */
-	inline const time_t& getConnectTime() const
-		{ return connectTime ; }
+    /**
+     * Return the time at which this server started.
+     */
+    inline const time_t& getStartTime() const { return startTime; }
 
-	/**
-	 * Return the time at which this server started.
-	 */
-	inline const time_t& getStartTime() const
-		{ return startTime ; }
+    /**
+     * Return the lag of this server (in seconds).
+     */
+    inline const time_t& getLag() const { return lag; }
 
-	/**
-	 * Return the lag of this server (in seconds).
-	 */
-	inline const time_t& getLag() const
-		{ return lag ; }
+    /**
+     * Set the lag value and update lastLagTS to current TS.
+     */
+    inline void setLag(const time_t& _lag) {
+        lag = _lag;
+        lastLagTS = ::time(0);
+    }
 
-	/**
-	 * Set the lag value and update lastLagTS to current TS.
-	 */
-	inline void setLag( const time_t& _lag )
-		{
-		lag = _lag ;
-		lastLagTS = ::time(0) ;
-		}
+    /**
+     * Return the TS of the last lag update
+     */
+    inline const time_t& getLastLagTS() const { return lastLagTS; }
 
-	/**
-	 * Return the TS of the last lag update
-	 */
-	inline const time_t& getLastLagTS() const
-		{ return lastLagTS ; }
+    /**
+     * Return the description of this server.
+     */
+    inline const std::string& getDescription() const { return description; }
 
-	/**
-	 * Return the description of this server.
-	 */
-	inline const std::string& getDescription() const
-		{ return description ; }
+    /**
+     * Return true if no BURST state exists, false otherwise.
+     */
+    virtual bool isBursting() const { return bursting; }
 
-	/**
-	 * Return true if no BURST state exists, false otherwise.
-	 */
-	virtual bool isBursting() const
-		{ return bursting ; }
+    /**
+     * This method is used by xServer to signify that this
+     * iServer is now in the bursting state.
+     */
+    virtual void startBursting() { bursting = true; }
 
-	/**
-	 * This method is used by xServer to signify that this
-	 * iServer is now in the bursting state.
-	 */
-	virtual void	startBursting()
-		{ bursting = true ; }
+    /**
+     * This method is called by xServer to signify that this
+     * iServer has completed bursting.
+     */
+    virtual void stopBursting() { bursting = false; }
 
-	/**
-	 * This method is called by xServer to signify that this
-	 * iServer has completed bursting.
-	 */
-	virtual void	stopBursting()
-		{ bursting = false ; }
+    /**
+     * Permit setting an arbitrary value to the bursting
+     * variable.
+     */
+    virtual void setBursting(bool newVal) { bursting = newVal; }
 
-	/**
-	 * Permit setting an arbitrary value to the bursting
-	 * variable.
-	 */
-	virtual void	setBursting( bool newVal )
-		{ bursting = newVal ; }
+    /**
+     * This method is called by class xServer once the uplink
+     * of the xServer is known.  This method is only called
+     * for the single instance of the iServer for the core
+     * xServer.
+     */
+    virtual void setUplinkIntYY(const unsigned int& newYY) { uplinkIntYY = newYY; }
 
-	/**
-	 * This method is called by class xServer once the uplink
-	 * of the xServer is known.  This method is only called
-	 * for the single instance of the iServer for the core
-	 * xServer.
-	 */
-	virtual void	setUplinkIntYY( const unsigned int& newYY )
-		{ uplinkIntYY = newYY ; }
+    /**
+     * Nice debugging method for outputting the iServer's
+     * information to an ELog stream.
+     */
+    friend ELog& operator<<(ELog& out, const iServer& serv) {
+        out << "Name: " << serv.getName() << ' ' << "intYY: " << serv.getIntYY() << ' '
+            << "uplinkIntYY: " << serv.getUplinkIntYY() << ' ' << "charYY: " << serv.getCharYY();
+        return out;
+    }
 
-	/**
-	 * Nice debugging method for outputting the iServer's
-	 * information to an ELog stream.
-	 */
-	friend ELog& operator<<( ELog& out,
-		const iServer& serv )
-		{
-		out     << "Name: " << serv.getName() << ' '
-			<< "intYY: " << serv.getIntYY() << ' '
-			<< "uplinkIntYY: "
-			<< serv.getUplinkIntYY() << ' '
-			<< "charYY: " << serv.getCharYY() ;
-		return out ;
-		}
+    /**
+     * Nice debugging method for outputting the iServer's
+     * information to a standard c++ output stream.
+     */
+    friend std::ostream& operator<<(std::ostream& out, const iServer& serv) {
+        out << "Name: " << serv.getName() << ' ' << "intYY: " << serv.getIntYY() << ' '
+            << "uplinkIntYY: " << serv.getUplinkIntYY() << ' ' << "charYY: " << serv.getCharYY();
+        return out;
+    }
 
-	/**
-	 * Nice debugging method for outputting the iServer's
-	 * information to a standard c++ output stream.
-	 */
-	friend std::ostream& operator<<( std::ostream& out,
-		const iServer& serv )
-		{
-		out     << "Name: " << serv.getName() << ' '
-			<< "intYY: " << serv.getIntYY() << ' '
-			<< "uplinkIntYY: "
-			<< serv.getUplinkIntYY() << ' '
-			<< "charYY: " << serv.getCharYY() ;
-		return out ;
-		}
+    /* Mutator methods */
 
-	/* Mutator methods */
+    /**
+     * Interpret a server's flags.
+     */
+    void setFlags(const std::string&);
 
-	/**
-	 * Interpret a server's flags.
-	 */
-	void setFlags( const std::string& ) ;
+  protected:
+    /**
+     * Allow friends to modify the iServer's description.  This
+     * is used in the case of adding this server as a juped
+     * server.
+     */
+    inline void setDescription(const std::string& newDescription) { description = newDescription; }
 
-protected:
+    /**
+     * Integer numeric of this server's uplink.
+     */
+    unsigned int uplinkIntYY;
 
-	/**
-	 * Allow friends to modify the iServer's description.  This
-	 * is used in the case of adding this server as a juped
-	 * server.
-	 */
-	inline void	setDescription( const std::string& newDescription )
-		{ description = newDescription ; }
+    /**
+     * Name of this server.
+     */
+    std::string name;
 
-	/**
-	 * Integer numeric of this server's uplink.
-	 */
-	unsigned int	uplinkIntYY ;
+    /**
+     * The time at which this server joined the network.
+     */
+    time_t connectTime;
 
-	/**
-	 * Name of this server.
-	 */
-	std::string	name ;
+    /**
+     * The time at which this server was started.
+     */
+    time_t startTime;
 
-	/**
-	 * The time at which this server joined the network.
-	 */
-	time_t		connectTime ;
+    /**
+     * The server's description field.
+     */
+    std::string description;
 
-	/**
-	 * The time at which this server was started.
-	 */
-	time_t		startTime ;
+    /**
+     * This variable is true when this server is bursting.
+     */
+    bool bursting;
 
-	/**
-	 * The server's description field.
-	 */
-	std::string	description ;
+    /**
+     * This server's flags.
+     */
+    flagType flags;
 
-	/**
-	 * This variable is true when this server is bursting.
-	 */
-	bool		bursting ;
+    /**
+     * This server's lag time (in seconds), based on the last nick change
+     * or new client connection from this server.
+     */
+    time_t lag;
 
-	/**
-	 * This server's flags.
-	 */
-	flagType	flags ;
-
-	/**
-	 * This server's lag time (in seconds), based on the last nick change
-	 * or new client connection from this server.
-	 */
-	time_t		lag ;
-
-	/**
-	 * Timestamp of last update of the lag value for this server
-	 */
-	time_t		lastLagTS ;
-} ;
+    /**
+     * Timestamp of last update of the lag value for this server
+     */
+    time_t lastLagTS;
+};
 
 } // namespace gnuworld
 

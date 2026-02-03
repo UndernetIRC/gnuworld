@@ -26,47 +26,44 @@
 #include "nickserv.h"
 #include "responses.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
 using std::string;
 
-bool INVITECommand::Exec(iClient* theClient, const string& )
-{
-bot->theStats->incStat("NS.CMD.INVITE");
+bool INVITECommand::Exec(iClient* theClient, const string&) {
+    bot->theStats->incStat("NS.CMD.INVITE");
 
-sqlUser* theUser = bot->isAuthed(theClient);
+    sqlUser* theUser = bot->isAuthed(theClient);
 
-if(!theUser || (theUser->getLevel() < level::admin::invite)) {
-  bot->Notice(theClient, responses::noAccess);
-  return true;
-}
+    if (!theUser || (theUser->getLevel() < level::admin::invite)) {
+        bot->Notice(theClient, responses::noAccess);
+        return true;
+    }
 
-Channel* theChannel = Network->findChannel(bot->getConsoleChannel());
+    Channel* theChannel = Network->findChannel(bot->getConsoleChannel());
 
-if(!theChannel) {
-  bot->Notice(theClient, "Could not find the console channel on the network.");
-  return true;
-}
+    if (!theChannel) {
+        bot->Notice(theClient, "Could not find the console channel on the network.");
+        return true;
+    }
 
-ChannelUser* theBot = theChannel->findUser(bot->getInstance());
-if(!theBot) {
-  bot->Notice(theClient, "I am not in the console channel.");
-  return true;
-}
+    ChannelUser* theBot = theChannel->findUser(bot->getInstance());
+    if (!theBot) {
+        bot->Notice(theClient, "I am not in the console channel.");
+        return true;
+    }
 
-ChannelUser* theChannelUser = theChannel->findUser(theClient);
-if(theChannelUser) {
-  bot->Notice(theClient, "You are already in the console channel!");
-  return true;
-}
+    ChannelUser* theChannelUser = theChannel->findUser(theClient);
+    if (theChannelUser) {
+        bot->Notice(theClient, "You are already in the console channel!");
+        return true;
+    }
 
-bot->Invite(theClient, theChannel);
+    bot->Invite(theClient, theChannel);
 
-return true;
+    return true;
 } // INVITECommand
 
 } // namespace ns

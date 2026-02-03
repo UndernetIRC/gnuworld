@@ -21,72 +21,61 @@
  * $Id: sqlChanOp.cc,v 1.6 2010/03/04 04:24:12 hidden1 Exp $
  */
 
-#include	<sstream>
-#include	<string>
+#include <sstream>
+#include <string>
 
-#include	"dbHandle.h"
+#include "dbHandle.h"
 
-#include	"ELog.h"
-#include	"misc.h"
+#include "ELog.h"
+#include "misc.h"
 
-#include	"chanfix.h"
-#include	"sqlChanOp.h"
+#include "chanfix.h"
+#include "sqlChanOp.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace cf
-{
+namespace cf {
 
-sqlChanOp::sqlChanOp(sqlManager* _myManager) :
-  channel(""),
-  account(""),
-  nickUserHost(""),
-  points(0),
-  ts_firstopped(0),
-  ts_lastopped(0),
-  day()
-{
-  myManager = _myManager;
-  OldestOp = false;
-}
-	
-void sqlChanOp::setAllMembers(dbHandle* theDB, int row)
-{
-  channel = theDB->GetValue(row, 0);
-  account = theDB->GetValue(row, 1);
-  nickUserHost = theDB->GetValue(row, 2);
-  ts_firstopped = atoi(theDB->GetValue(row, 3));
-  ts_lastopped = atoi(theDB->GetValue(row, 4));
-  day[0] = atoi(theDB->GetValue(row, 5));
-  day[1] = atoi(theDB->GetValue(row, 6));
-  day[2] = atoi(theDB->GetValue(row, 7));
-  day[3] = atoi(theDB->GetValue(row, 8));
-  day[4] = atoi(theDB->GetValue(row, 9));
-  day[5] = atoi(theDB->GetValue(row, 10));
-  day[6] = atoi(theDB->GetValue(row, 11));
-  day[7] = atoi(theDB->GetValue(row, 12));
-  day[8] = atoi(theDB->GetValue(row, 13));
-  day[9] = atoi(theDB->GetValue(row, 14));
-  day[10] = atoi(theDB->GetValue(row, 15));
-  day[11] = atoi(theDB->GetValue(row, 16));
-  day[12] = atoi(theDB->GetValue(row, 17));
-  day[13] = atoi(theDB->GetValue(row, 18));
-  calcTotalPoints();
+sqlChanOp::sqlChanOp(sqlManager* _myManager)
+    : channel(""), account(""), nickUserHost(""), points(0), ts_firstopped(0), ts_lastopped(0),
+      day() {
+    myManager = _myManager;
+    OldestOp = false;
 }
 
-void sqlChanOp::calcTotalPoints()
-{
-  int i;
-  points = 0;
-  for (i = 0; i < DAYSAMPLES; i++) {
-    points += day[i];
-  }
+void sqlChanOp::setAllMembers(dbHandle* theDB, int row) {
+    channel = theDB->GetValue(row, 0);
+    account = theDB->GetValue(row, 1);
+    nickUserHost = theDB->GetValue(row, 2);
+    ts_firstopped = atoi(theDB->GetValue(row, 3));
+    ts_lastopped = atoi(theDB->GetValue(row, 4));
+    day[0] = atoi(theDB->GetValue(row, 5));
+    day[1] = atoi(theDB->GetValue(row, 6));
+    day[2] = atoi(theDB->GetValue(row, 7));
+    day[3] = atoi(theDB->GetValue(row, 8));
+    day[4] = atoi(theDB->GetValue(row, 9));
+    day[5] = atoi(theDB->GetValue(row, 10));
+    day[6] = atoi(theDB->GetValue(row, 11));
+    day[7] = atoi(theDB->GetValue(row, 12));
+    day[8] = atoi(theDB->GetValue(row, 13));
+    day[9] = atoi(theDB->GetValue(row, 14));
+    day[10] = atoi(theDB->GetValue(row, 15));
+    day[11] = atoi(theDB->GetValue(row, 16));
+    day[12] = atoi(theDB->GetValue(row, 17));
+    day[13] = atoi(theDB->GetValue(row, 18));
+    calcTotalPoints();
 }
 
-sqlChanOp::~sqlChanOp()
-{
-// No heap space allocated
+void sqlChanOp::calcTotalPoints() {
+    int i;
+    points = 0;
+    for (i = 0; i < DAYSAMPLES; i++) {
+        points += day[i];
+    }
+}
+
+sqlChanOp::~sqlChanOp() {
+    // No heap space allocated
 }
 
 } // namespace cf

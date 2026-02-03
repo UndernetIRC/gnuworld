@@ -20,18 +20,17 @@
  * $Id: msg_V.cc,v 1.7 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
-#include	<sstream>
+#include <sstream>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"ServerCommandHandler.h"
-#include	"xparameters.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "ServerCommandHandler.h"
+#include "xparameters.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::endl ;
-using std::stringstream ;
+using std::endl;
+using std::stringstream;
 
 CREATE_HANDLER(msg_V)
 
@@ -46,49 +45,41 @@ CREATE_HANDLER(msg_V)
  * As always, the token itself is missing from our xParameters
  */
 
-bool msg_V::Execute( const xParameters& Param )
-{
-/* We should have exactly two parameters - source and destination */
-if( Param.size() != 2)
-	{
-	elog	<< "msg_V> Invalid number of parameters received."
-		<< endl;
-	return false;
-	}
+bool msg_V::Execute(const xParameters& Param) {
+    /* We should have exactly two parameters - source and destination */
+    if (Param.size() != 2) {
+        elog << "msg_V> Invalid number of parameters received." << endl;
+        return false;
+    }
 
-/* The destination numeric should always match us exactly */
-if(strncmp(Param[1], theServer->getCharYY().c_str(), 2) != 0)
-	{
-	elog	<< "msg_V> Target server is not me!"
-		<< endl;
-	return false;
-	}
+    /* The destination numeric should always match us exactly */
+    if (strncmp(Param[1], theServer->getCharYY().c_str(), 2) != 0) {
+        elog << "msg_V> Target server is not me!" << endl;
+        return false;
+    }
 
-/* 
- * Should we check if the client exists here?
- * If the version request got to us, presumably it has to exist
- * on the network, even if we don't know about it.
- */
+    /*
+     * Should we check if the client exists here?
+     * If the version request got to us, presumably it has to exist
+     * on the network, even if we don't know about it.
+     */
 
-/*
- * Reply looks like:
- *  A8 351 AyAAA u2.10.11.01. devlink.netgamers.org :B27AeEFfIKMpSU
- *
- * A8    - Answering server
- * 351   - Numeric for version reply
- * AyAAA - Target (requester)
- * 'the rest' - Reply.
- */
-stringstream versionReply;
-versionReply << theServer->getCharYY()
-             << " 351 "
-             << Param[0]
-             << " :" __DATE__ " " __TIME__
-             << " GNUworld Services Core" ;
+    /*
+     * Reply looks like:
+     *  A8 351 AyAAA u2.10.11.01. devlink.netgamers.org :B27AeEFfIKMpSU
+     *
+     * A8    - Answering server
+     * 351   - Numeric for version reply
+     * AyAAA - Target (requester)
+     * 'the rest' - Reply.
+     */
+    stringstream versionReply;
+    versionReply << theServer->getCharYY() << " 351 " << Param[0] << " :" __DATE__ " " __TIME__
+                 << " GNUworld Services Core";
 
-theServer->Write(versionReply);
+    theServer->Write(versionReply);
 
-return true;
+    return true;
 
 } // bool msg_V::Execute()
 

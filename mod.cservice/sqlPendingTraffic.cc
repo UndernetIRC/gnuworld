@@ -18,82 +18,63 @@
  *
  * $Id: sqlPendingTraffic.cc,v 1.5 2007/08/28 16:10:12 dan_karrels Exp $
  */
- 
-#include	<sstream>
-#include	<string> 
-#include	<iostream>
 
-#include	<cstring> 
-#include	<ctime>
+#include <sstream>
+#include <string>
+#include <iostream>
 
-#include	"ELog.h"
-#include	"misc.h"
-#include	"sqlLevel.h"
-#include	"sqlUser.h"
-#include	"sqlChannel.h"
-#include	"constants.h"
-#include	"cservice_config.h"
-#include	"sqlPendingTraffic.h"
-#include	"cservice.h"
- 
-namespace gnuworld
-{
-using std::string ; 
-using std::endl ; 
-using std::ends ;
-using std::stringstream ;
+#include <cstring>
+#include <ctime>
+
+#include "ELog.h"
+#include "misc.h"
+#include "sqlLevel.h"
+#include "sqlUser.h"
+#include "sqlChannel.h"
+#include "constants.h"
+#include "cservice_config.h"
+#include "sqlPendingTraffic.h"
+#include "cservice.h"
+
+namespace gnuworld {
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
 
 sqlPendingTraffic::sqlPendingTraffic(cservice* _bot)
-:channel_id(0),
-ip_number(string()),
-join_count(0),
-logger(_bot->getLogger()),
-SQLDb(_bot->SQLDb)
-{ 
+    : channel_id(0), ip_number(string()), join_count(0), logger(_bot->getLogger()),
+      SQLDb(_bot->SQLDb) {}
+
+bool sqlPendingTraffic::insertRecord() {
+    string theip_number = ip_number;
+
+    stringstream queryString;
+    queryString << "INSERT INTO pending_traffic (channel_id, ip_number, join_count) VALUES ("
+                << channel_id << ", '" << theip_number << "', " << join_count << ")" << ends;
+
+    if (!SQLDb->Exec(queryString)) {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
+
+    return true;
 }
 
-bool sqlPendingTraffic::insertRecord()
-{ 
-string theip_number = ip_number;
- 
-stringstream queryString;
-queryString << "INSERT INTO pending_traffic (channel_id, ip_number, join_count) VALUES ("
-			<< channel_id << ", '"
-			<< theip_number << "', "
-			<< join_count << ")"
-			<< ends;
+bool sqlPendingTraffic::commit() {
+    string theip_number = ip_number;
 
-if( !SQLDb->Exec(queryString ) )
-	{
-	LOGSQL_ERROR( SQLDb ) ;
-	return false;
- 	} 
+    stringstream queryString;
+    queryString << "UPDATE pending_traffic SET "
+                << "join_count = " << join_count << " WHERE channel_id = " << channel_id
+                << " AND ip_number = '" << theip_number << "'" << ends;
 
-	return true;
+    if (!SQLDb->Exec(queryString)) {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
+
+    return true;
 }
 
-bool sqlPendingTraffic::commit()
-{
-	string theip_number = ip_number;
-	
-	stringstream queryString; 
-	queryString << "UPDATE pending_traffic SET "
-				<< "join_count = " 
-				<< join_count
-				<< " WHERE channel_id = "
-				<< channel_id
-				<< " AND ip_number = '"
-				<< theip_number
-				<< "'"
-				<< ends;
-	
-	if( !SQLDb->Exec(queryString ) )
-		{
-		LOGSQL_ERROR( SQLDb ) ;
-		return false;
-		}
-
-	return true;
-}
-
-}
+} // namespace gnuworld

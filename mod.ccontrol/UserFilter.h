@@ -30,45 +30,39 @@ namespace gnuworld {
 namespace uworld {
 
 class UserFilter {
-public:
-        virtual bool filter(ccUser*) = 0;
+  public:
+    virtual bool filter(ccUser*) = 0;
 };
 
-class UserFilterComposite : public UserFilter{
+class UserFilterComposite : public UserFilter {
 
-private:
-        vector<UserFilter*> filters;
-public:
-        void addFilter(UserFilter* filter) {
-                filters.push_back(filter);
-        }
+  private:
+    vector<UserFilter*> filters;
 
-        virtual bool filter(ccUser* user) {
-                for(unsigned int i=0; i < filters.size();++i) {
-                        if(!filters[i]->filter(user)) {
-                                return false;
-                        }
-                }
-                return true;
+  public:
+    void addFilter(UserFilter* filter) { filters.push_back(filter); }
+
+    virtual bool filter(ccUser* user) {
+        for (unsigned int i = 0; i < filters.size(); ++i) {
+            if (!filters[i]->filter(user)) {
+                return false;
+            }
         }
+        return true;
+    }
 };
 
 class ByLevelsUserFilter : public UserFilter {
-private:
-        unsigned int levels;
-public:
-        ByLevelsUserFilter() {
-                this->levels = 0;
-        }
+  private:
+    unsigned int levels;
 
-        void addLevel(unsigned int userLevel) {
-                levels |= (1 << userLevel);
-        }
+  public:
+    ByLevelsUserFilter() { this->levels = 0; }
 
-        virtual bool filter(ccUser* user) {
-                return (levels & (1 << user->getType())) > 0 ;
-        }
+    void addLevel(unsigned int userLevel) { levels |= (1 << userLevel); }
+
+    virtual bool filter(ccUser* user) { return (levels & (1 << user->getType())) > 0; }
 };
-}
-}
-#endif  /* USERFILTER_H */
+} // namespace uworld
+} // namespace gnuworld
+#endif /* USERFILTER_H */

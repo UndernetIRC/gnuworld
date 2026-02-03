@@ -19,43 +19,39 @@
  * banMatcher.cc, v2.0 2013.10.28 -- Seven
  */
 
-#include	"banMatcher.h"
-#include	"misc.h"
+#include "banMatcher.h"
+#include "misc.h"
 
-using std::string ;
+using std::string;
 
-namespace gnuworld
-{
-	bool banMatch(const string& banMask, const string& address)
-	{
-		/* If we don't have at least a user@hostip at both side
-		 * it means we don't match a ban
-		 */
-		if ((!isUserHost(banMask)) || (!isUserHost(address)))
-			return false;
+namespace gnuworld {
+bool banMatch(const string& banMask, const string& address) {
+    /* If we don't have at least a user@hostip at both side
+     * it means we don't match a ban
+     */
+    if ((!isUserHost(banMask)) || (!isUserHost(address)))
+        return false;
 
-		if (match(banMask, address))
-			return false;
+    if (match(banMask, address))
+        return false;
 
-		return true;
-	}
+    return true;
+}
 
-	bool banMatch(const string& banMask, const iClient* theClient)
-	{
-		if (!isUserHost(banMask))
-			return false;
+bool banMatch(const string& banMask, const iClient* theClient) {
+    if (!isUserHost(banMask))
+        return false;
 
-		if (!match(banMask, theClient))
-			return true;
+    if (!match(banMask, theClient))
+        return true;
 
-		string authmask = theClient->getNickName() + "!" + theClient->getUserName();
-		authmask += "@" + theClient->getAccount() + theClient->getHiddenHostSuffix();
-		if (theClient->isModeR() && !theClient->isModeX())
-		{
-			/* client is authed, check our constructed hidden host against them */
-			if (match(banMask, authmask) == 0)
-				return true;
-		}
-		return false;
-	}
-} //namespace gnuworld
+    string authmask = theClient->getNickName() + "!" + theClient->getUserName();
+    authmask += "@" + theClient->getAccount() + theClient->getHiddenHostSuffix();
+    if (theClient->isModeR() && !theClient->isModeX()) {
+        /* client is authed, check our constructed hidden host against them */
+        if (match(banMask, authmask) == 0)
+            return true;
+    }
+    return false;
+}
+} // namespace gnuworld

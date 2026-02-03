@@ -23,33 +23,29 @@
 #ifndef __SCANNERMODULE_H
 #define __SCANNERMODULE_H "$Id: ScannerModule.h,v 1.2 2002/08/08 21:44:00 dan_karrels Exp $"
 
-#include	<string>
+#include <string>
 
-#include	"ConnectionManager.h"
-#include	"ConnectionHandler.h"
+#include "ConnectionManager.h"
+#include "ConnectionHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
 // Forward declaration of class scanner to prevent circular dependencies
-class scanner ;
+class scanner;
 
-class ScannerModule : public ConnectionHandler
-{
-public:
-	ScannerModule( ConnectionManager* cm, scanner* theScanner ) ;
-	virtual ~ScannerModule() ;
+class ScannerModule : public ConnectionHandler {
+  public:
+    ScannerModule(ConnectionManager* cm, scanner* theScanner);
+    virtual ~ScannerModule();
 
-	virtual void	CheckIP( const string& ip ) = 0 ;
+    virtual void CheckIP(const string& ip) = 0;
 
-protected:
-
-	ConnectionManager*	cm ;
-	scanner*		theScanner ;
-
-} ;
+  protected:
+    ConnectionManager* cm;
+    scanner* theScanner;
+};
 
 } // namespace gnuworld
 

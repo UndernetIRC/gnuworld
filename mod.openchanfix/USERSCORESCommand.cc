@@ -32,58 +32,57 @@
 #include "sqlChanOp.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void USERSCORESCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void USERSCORESCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-sqlChanOp* curOp;
-std::string firstop;
-std::string lastop;
-bool foundOne = false;
+    sqlChanOp* curOp;
+    std::string firstop;
+    std::string lastop;
+    bool foundOne = false;
 
-for (chanfix::sqlChanOpsType::iterator ptr = bot->sqlChanOps.begin();
-     ptr != bot->sqlChanOps.end(); ptr++) {
-  chanfix::sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.find(st[1]);
+    for (chanfix::sqlChanOpsType::iterator ptr = bot->sqlChanOps.begin();
+         ptr != bot->sqlChanOps.end(); ptr++) {
+        chanfix::sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.find(st[1]);
 
-  if (chanOp != ptr->second.end()) {
-    if (!foundOne) {
-      // print header
-      foundOne = true;
-      bot->SendTo(theClient,
-		  bot->getResponse(theUser,
-				   language::userscores_header,
-				   std::string("Channel Score -- Time first opped / Time last opped")).c_str());
+        if (chanOp != ptr->second.end()) {
+            if (!foundOne) {
+                // print header
+                foundOne = true;
+                bot->SendTo(
+                    theClient,
+                    bot->getResponse(
+                           theUser, language::userscores_header,
+                           std::string("Channel Score -- Time first opped / Time last opped"))
+                        .c_str());
+            }
+
+            curOp = chanOp->second;
+            firstop = prettyTime(curOp->getTimeFirstOpped(), false);
+            lastop = prettyTime(curOp->getTimeLastOpped());
+            bot->SendTo(theClient, "%s %d -- %s / %s", ptr->first.c_str(),
+                        (curOp->getPoints() + curOp->getBonus()), firstop.c_str(), lastop.c_str());
+        }
     }
 
-    curOp = chanOp->second;
-    firstop = prettyTime(curOp->getTimeFirstOpped(), false);
-    lastop = prettyTime(curOp->getTimeLastOpped());
-    bot->SendTo(theClient, "%s %d -- %s / %s", ptr->first.c_str(),
-		(curOp->getPoints() + curOp->getBonus()), firstop.c_str(), lastop.c_str());
-  }
-}
+    if (!foundOne) {
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::userscores_noscore,
+                             std::string("Account %s doesn't have any scores in the database."))
+                .c_str(),
+            st[1].c_str());
+    }
 
-if (!foundOne) {
-  bot->SendTo(theClient,
-	      bot->getResponse(theUser,
-			       language::userscores_noscore,
-			       std::string("Account %s doesn't have any scores in the database.")).c_str(),
-					st[1].c_str());
-}
+    bot->logAdminMessage("%s (%s) USERSCORES %s",
+                         theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+                         theClient->getRealNickUserHost().c_str(), st[1].c_str());
 
-bot->logAdminMessage("%s (%s) USERSCORES %s",
-		     theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-		     theClient->getRealNickUserHost().c_str(),
-		     st[1].c_str());
+    bot->logLastComMessage(theClient, Message);
 
-bot->logLastComMessage(theClient, Message);
-
-return;
+    return;
 }
 
 } // namespace cf

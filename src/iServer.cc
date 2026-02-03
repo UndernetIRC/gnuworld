@@ -20,77 +20,59 @@
  * $Id: iServer.cc,v 1.11 2006/12/22 06:41:45 kewlio Exp $
  */
 
-#include	<string>
-#include	<ctime>
+#include <string>
+#include <ctime>
 
-#include	<cstring>
+#include <cstring>
 
-#include	"iServer.h"
-#include	"Numeric.h"
-#include	"gnuworld_config.h"
-#include	"NetworkTarget.h"
+#include "iServer.h"
+#include "Numeric.h"
+#include "gnuworld_config.h"
+#include "NetworkTarget.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-const iServer::flagType iServer::FLAG_JUPE	= 0x01 ;
-const iServer::flagType iServer::FLAG_HUB	= 0x02 ;
-const iServer::flagType iServer::FLAG_SERVICE	= 0x04 ;
-const iServer::flagType iServer::FLAG_IPV6	= 0x08 ;
+const iServer::flagType iServer::FLAG_JUPE = 0x01;
+const iServer::flagType iServer::FLAG_HUB = 0x02;
+const iServer::flagType iServer::FLAG_SERVICE = 0x04;
+const iServer::flagType iServer::FLAG_IPV6 = 0x08;
 
-iServer::iServer( const unsigned int& _uplink,
-	const string& _yyxxx,
-	const string& _name,
-	const time_t& _connectTime,
-	const string& _description )
-: NetworkTarget( _yyxxx ),
-	uplinkIntYY( _uplink ),
-	name( _name ),
-	connectTime( _connectTime ),
-	startTime( _connectTime ),
-	description( _description ),
-	bursting( false ),
-	flags( 0 ),
-	lag( 0 ),
-	lastLagTS( 0 )
-{}
+iServer::iServer(const unsigned int& _uplink, const string& _yyxxx, const string& _name,
+                 const time_t& _connectTime, const string& _description)
+    : NetworkTarget(_yyxxx), uplinkIntYY(_uplink), name(_name), connectTime(_connectTime),
+      startTime(_connectTime), description(_description), bursting(false), flags(0), lag(0),
+      lastLagTS(0) {}
 
-iServer::~iServer()
-{}
+iServer::~iServer() {}
 
 /**
  * Interpret a server's flags.
  *
  * @Param[in] newFlags String listing server's P10 flags.
  */
-void iServer::setFlags( const string& newFlags )
-{
-	for( string::size_type i = 0 ; i < newFlags.size() ; i++ )
-	{
-		switch( newFlags[ i ] )
-		{
-			case 'h':
-					setHub() ;
-					break ;
-			case 's':
-					setService() ;
-					break ;
-			case '6':
-					setIPv6() ;
-					break ;
-			case '+':	break ;
-			default:
-					// Unknown flag
-					elog	<< "iServer> Unknown server flag: "
-						<< newFlags[ i ]
-						<< ", in flags string: "
-						<< newFlags
-						<< std::endl ;
-					break ;
-		}
-	}
+void iServer::setFlags(const string& newFlags) {
+    for (string::size_type i = 0; i < newFlags.size(); i++) {
+        switch (newFlags[i]) {
+        case 'h':
+            setHub();
+            break;
+        case 's':
+            setService();
+            break;
+        case '6':
+            setIPv6();
+            break;
+        case '+':
+            break;
+        default:
+            // Unknown flag
+            elog << "iServer> Unknown server flag: " << newFlags[i]
+                 << ", in flags string: " << newFlags << std::endl;
+            break;
+        }
+    }
 }
 
 } // namespace gnuworld

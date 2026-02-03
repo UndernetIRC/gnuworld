@@ -20,111 +20,93 @@
  * $Id: CHANINFOCommand.cc,v 1.20 2007/11/05 10:04:23 kewlio Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"Network.h"
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Constants.h"
-#include	"ccontrol_generic.h"
-#include	"gnuworld_config.h"
+#include "Network.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Constants.h"
+#include "ccontrol_generic.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool CHANINFOCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
+bool CHANINFOCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-if(st[1].size() > channel::MaxName)
-	{
-	bot->Notice(theClient,"Channel name can't be more than %d characters",
-		channel::MaxName);
-	return false;
-	}
+    if (st[1].size() > channel::MaxName) {
+        bot->Notice(theClient, "Channel name can't be more than %d characters", channel::MaxName);
+        return false;
+    }
 
-ccUser* tmpAuth = bot->IsAuth(theClient);
-if (!tmpAuth)
-	return false;
-unsigned int OpFlag = tmpAuth->getType();
+    ccUser* tmpAuth = bot->IsAuth(theClient);
+    if (!tmpAuth)
+        return false;
+    unsigned int OpFlag = tmpAuth->getType();
 
-bot->MsgChanLog("CHANINFO %s\n",st[1].c_str());
-	    
-Channel* theChan = Network->findChannel( st[ 1 ] ) ;
-if( NULL == theChan )
-	{
-	bot->Notice( theClient, "Unable to find channel %s",
-		st[ 1 ].c_str() ) ;
-	return true ;
-	}
+    bot->MsgChanLog("CHANINFO %s\n", st[1].c_str());
 
-bot->Notice( theClient, "Channel %s is mode %s",
-	st[ 1 ].c_str(),
-	theChan->getModeString().c_str() ) ;
-bot->Notice( theClient, "Created at time: %d (%s ago)",
-	theChan->getCreationTime(), Ago(theChan->getCreationTime()));
+    Channel* theChan = Network->findChannel(st[1]);
+    if (NULL == theChan) {
+        bot->Notice(theClient, "Unable to find channel %s", st[1].c_str());
+        return true;
+    }
 
-/* iterate the channel user list to get statistics on each mode
-   and possibly a user list in future */
-int totalOps = 0; 
-int totalVoice = 0;
-string tmpMode;
+    bot->Notice(theClient, "Channel %s is mode %s", st[1].c_str(),
+                theChan->getModeString().c_str());
+    bot->Notice(theClient, "Created at time: %d (%s ago)", theChan->getCreationTime(),
+                Ago(theChan->getCreationTime()));
 
-for (Channel::userIterator userItr = theChan->userList_begin();
-	userItr != theChan->userList_end(); ++userItr)
-{
-	ChannelUser* theUser = userItr->second;
+    /* iterate the channel user list to get statistics on each mode
+       and possibly a user list in future */
+    int totalOps = 0;
+    int totalVoice = 0;
+    string tmpMode;
 
-	if (theUser->isModeO())
-		totalOps++;
-	if (theUser->isModeV())
-		totalVoice++;
-	if (OpFlag == operLevel::CODERLEVEL)
-	{
-		/* show full info to coders - make it format for easy viewing */
-		if (theUser->isModeO() && theUser->isModeV())
-			tmpMode = "+o+v: ";
-		else if (theUser->isModeO())
-			tmpMode = "+o:   ";
-		else if (theUser->isModeV())
-			tmpMode = "+v:   ";
-		else
-			tmpMode = "none: ";
-		bot->Notice(theClient, "%s%s!%s@%s",
-			tmpMode.c_str(),
-			theUser->getNickName().c_str(),
-			theUser->getUserName().c_str(),
-			theUser->getHostName().c_str());
-	}
-}
+    for (Channel::userIterator userItr = theChan->userList_begin();
+         userItr != theChan->userList_end(); ++userItr) {
+        ChannelUser* theUser = userItr->second;
 
-bot->Notice( theClient, "Number of channel users: %d (%d ops, %d voice)",
-	theChan->size(), totalOps, totalVoice);
+        if (theUser->isModeO())
+            totalOps++;
+        if (theUser->isModeV())
+            totalVoice++;
+        if (OpFlag == operLevel::CODERLEVEL) {
+            /* show full info to coders - make it format for easy viewing */
+            if (theUser->isModeO() && theUser->isModeV())
+                tmpMode = "+o+v: ";
+            else if (theUser->isModeO())
+                tmpMode = "+o:   ";
+            else if (theUser->isModeV())
+                tmpMode = "+v:   ";
+            else
+                tmpMode = "none: ";
+            bot->Notice(theClient, "%s%s!%s@%s", tmpMode.c_str(), theUser->getNickName().c_str(),
+                        theUser->getUserName().c_str(), theUser->getHostName().c_str());
+        }
+    }
+
+    bot->Notice(theClient, "Number of channel users: %d (%d ops, %d voice)", theChan->size(),
+                totalOps, totalVoice);
 
 #ifdef TOPIC_TRACK
-bot->Notice(theClient,"Topic: %s",
-	theChan->getTopic().c_str());
-if (theChan->getTopicTS() != 0)
-{
-	bot->Notice(theClient, "Topic set %s ago [%ld] by %s",
-		Ago(theChan->getTopicTS()),
-		theChan->getTopicTS(),
-		theChan->getTopicWhoSet().c_str());
-}
+    bot->Notice(theClient, "Topic: %s", theChan->getTopic().c_str());
+    if (theChan->getTopicTS() != 0) {
+        bot->Notice(theClient, "Topic set %s ago [%ld] by %s", Ago(theChan->getTopicTS()),
+                    theChan->getTopicTS(), theChan->getTopicWhoSet().c_str());
+    }
 #endif
-return true ;
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld

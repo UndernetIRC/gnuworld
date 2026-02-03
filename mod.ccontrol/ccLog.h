@@ -18,7 +18,7 @@
  *
  * $Id: ccLog.h,v 1.5 2003/06/28 01:21:19 dan_karrels Exp $
  */
- 
+
 #ifndef __CCLOG_H_
 #define __CCLOG_H_
 
@@ -28,48 +28,37 @@
 
 using namespace std;
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace uworld
-{
+namespace uworld {
 
-class ccLog
-{
+class ccLog {
 
-public:
-	ccLog() : Time(0) , User() , Host(), CommandName() , Desc() {}
-	
-	ccLog(time_t _Time, string _User, string _Host 
-	,string _CommName , string _Desc)
-	: Time(_Time), User(_User) , Host(_Host)
-	,CommandName(_CommName), Desc(_Desc)
-	{}
-	
-	ccLog(fstream& in)
-	{
-		Load(in);
-	}
-	
-	time_t Time;
-	
-	string User;
-	
-	string Host;
-	
-	string CommandName;
-	
-	string Desc;
-	
-	bool Save(fstream& out);
-	
-	bool Load(fstream& in);
+  public:
+    ccLog() : Time(0), User(), Host(), CommandName(), Desc() {}
 
-	
-};	
+    ccLog(time_t _Time, string _User, string _Host, string _CommName, string _Desc)
+        : Time(_Time), User(_User), Host(_Host), CommandName(_CommName), Desc(_Desc) {}
 
-}
+    ccLog(fstream& in) { Load(in); }
 
-}
+    time_t Time;
 
-#endif 
+    string User;
+
+    string Host;
+
+    string CommandName;
+
+    string Desc;
+
+    bool Save(fstream& out);
+
+    bool Load(fstream& in);
+};
+
+} // namespace uworld
+
+} // namespace gnuworld
+
+#endif

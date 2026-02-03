@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include	"dbHandle.h"
+#include "dbHandle.h"
 
 namespace gnuworld {
 
@@ -31,77 +31,64 @@ namespace ds {
 using std::string;
 
 class sqlUser {
-public:
-	sqlUser(dbHandle*);
-	virtual ~sqlUser();
+  public:
+    sqlUser(dbHandle*);
+    virtual ~sqlUser();
 
-	typedef unsigned int flagType;
-	static const flagType F_SUSPENDED;
+    typedef unsigned int flagType;
+    static const flagType F_SUSPENDED;
 
-	/* Accessors */
+    /* Accessors */
 
-	inline const string& getUserName() const
-		{ return user_name; }
+    inline const string& getUserName() const { return user_name; }
 
-	inline int getCreated() const
-		{ return created; }
+    inline int getCreated() const { return created; }
 
-	inline unsigned int getLastSeen() const
-		{ return last_seen; }
+    inline unsigned int getLastSeen() const { return last_seen; }
 
-	inline const string& getLastUpdatedBy() const
-		{ return last_updated_by; }
+    inline const string& getLastUpdatedBy() const { return last_updated_by; }
 
-	inline unsigned int getLastUpdated() const
-		{ return last_updated; }
+    inline unsigned int getLastUpdated() const { return last_updated; }
 
-	inline unsigned int getAccess() const
-		{ return access; }
+    inline unsigned int getAccess() const { return access; }
 
-	/* Mutators */
+    /* Mutators */
 
-	inline void setUserName(const string& _user_name)
-		{ user_name = _user_name; }
+    inline void setUserName(const string& _user_name) { user_name = _user_name; }
 
-	inline void setCreated(const unsigned int _created)
-		{ created = _created; }
+    inline void setCreated(const unsigned int _created) { created = _created; }
 
-	inline void setLastSeen(const unsigned int _last_seen)
-		{ last_seen = _last_seen; }
+    inline void setLastSeen(const unsigned int _last_seen) { last_seen = _last_seen; }
 
-	inline void setLastUpdatedBy(const string& _last_updated_by)
-		{ last_updated_by = _last_updated_by; }
+    inline void setLastUpdatedBy(const string& _last_updated_by) {
+        last_updated_by = _last_updated_by;
+    }
 
-	inline void setLastUpdated(const unsigned int _last_updated)
-		{ last_updated = _last_updated; }
+    inline void setLastUpdated(const unsigned int _last_updated) { last_updated = _last_updated; }
 
-	inline void setAccess(const unsigned int _access)
-		{ access = _access; }
+    inline void setAccess(const unsigned int _access) { access = _access; }
 
-	inline void setFlags(const flagType _flags)
-		{ flags = _flags; }
+    inline void setFlags(const flagType _flags) { flags = _flags; }
 
-	/* Convenience functions for flags */
-	inline bool isSuspended() const
-		{ return (flags & F_SUSPENDED); }
+    /* Convenience functions for flags */
+    inline bool isSuspended() const { return (flags & F_SUSPENDED); }
 
+    /* Methods to alter our SQL status */
+    void setAllMembers(int);
+    bool commit();
+    bool insert();
+    bool remove();
 
-	/* Methods to alter our SQL status */
-	void setAllMembers(int);
-	bool commit();
-	bool insert();
-	bool remove();
+  protected:
+    string user_name;
+    unsigned int created;
+    unsigned int last_seen;
+    string last_updated_by;
+    unsigned int last_updated;
+    unsigned int flags;
+    unsigned int access;
 
-protected:
-	string		user_name;
-	unsigned int	created;
-	unsigned int	last_seen;
-	string		last_updated_by;
-	unsigned int	last_updated;
-	unsigned int	flags;
-	unsigned int	access;
-
-	dbHandle*	SQLDb;
+    dbHandle* SQLDb;
 }; // class sqlUser
 
 } // namespace ds

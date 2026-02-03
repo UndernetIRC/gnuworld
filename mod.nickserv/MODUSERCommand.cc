@@ -27,77 +27,74 @@
 #include "responses.h"
 #include "sqlUser.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
 using std::string;
 
-bool MODUSERCommand::Exec(iClient* theClient, const string& Message)
-{
+bool MODUSERCommand::Exec(iClient* theClient, const string& Message) {
 
-bot->theStats->incStat("NS.CMD.MODUSER");
+    bot->theStats->incStat("NS.CMD.MODUSER");
 
-sqlUser* theUser = bot->isAuthed(theClient);
+    sqlUser* theUser = bot->isAuthed(theClient);
 
-if(!theUser || (theUser->getLevel() < level::admin::moduser)) {
-  bot->Notice(theClient, responses::noAccess);
-  return true;
-}
+    if (!theUser || (theUser->getLevel() < level::admin::moduser)) {
+        bot->Notice(theClient, responses::noAccess);
+        return true;
+    }
 
-// MODUSER user ACCESS level
-StringTokenizer st(Message);
+    // MODUSER user ACCESS level
+    StringTokenizer st(Message);
 
-if(st.size() != 4) {
-  Usage(theClient);
-  return true;
-}
+    if (st.size() != 4) {
+        Usage(theClient);
+        return true;
+    }
 
-sqlUser* targetUser = bot->isRegistered(st[1]);
-if(!targetUser) {
-  bot->Notice(theClient, responses::noSuchUser);
-  return true;
-}
+    sqlUser* targetUser = bot->isRegistered(st[1]);
+    if (!targetUser) {
+        bot->Notice(theClient, responses::noSuchUser);
+        return true;
+    }
 
-if(targetUser == theUser) {
-  bot->Notice(theClient, "Sorry, you may not modify your own access level.");
-  return true;
-}
+    if (targetUser == theUser) {
+        bot->Notice(theClient, "Sorry, you may not modify your own access level.");
+        return true;
+    }
 
-string attribute = string_upper(st[2]);
+    string attribute = string_upper(st[2]);
 
-if("ACCESS" == attribute) {
-  int newLevel = atoi(st[3].c_str());
+    if ("ACCESS" == attribute) {
+        int newLevel = atoi(st[3].c_str());
 
-  if(newLevel < 0 || newLevel > 999) {
-    bot->Notice(theClient, "Sorry, level must be between between 0 and 999, inclusive.");
+        if (newLevel < 0 || newLevel > 999) {
+            bot->Notice(theClient, "Sorry, level must be between between 0 and 999, inclusive.");
+            return true;
+        }
+
+        if (static_cast<unsigned int>(newLevel) >= theUser->getLevel()) {
+            bot->Notice(theClient, "You cannot raise another user's level above your own.");
+            return true;
+        }
+
+        if (targetUser->getLevel() >= theUser->getLevel()) {
+            bot->Notice(theClient, "You may not modify a user with a higher level than you.");
+            return true;
+        }
+
+        targetUser->setLevel(newLevel);
+        targetUser->commit();
+
+        bot->Notice(theClient, "Successfully set level of %s to %u", targetUser->getName().c_str(),
+                    newLevel);
+
+        return true;
+    }
+
+    bot->Notice(theClient, "Sorry, unknown attribute %s.", attribute.c_str());
+
     return true;
-  }
-
-  if(static_cast< unsigned int >( newLevel ) >= theUser->getLevel()) {
-    bot->Notice(theClient, "You cannot raise another user's level above your own.");
-    return true;
-  }
-
-  if(targetUser->getLevel() >= theUser->getLevel()) {
-    bot->Notice(theClient, "You may not modify a user with a higher level than you.");
-    return true;
-  }
-
-  targetUser->setLevel(newLevel);
-  targetUser->commit();
-
-  bot->Notice(theClient, "Successfully set level of %s to %u",
-              targetUser->getName().c_str(), newLevel);
-
-  return true;
-}
-
-bot->Notice(theClient, "Sorry, unknown attribute %s.", attribute.c_str());
-
-return true;
 } // MODUSERCommand
 
 } // namespace ns

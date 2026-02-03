@@ -24,52 +24,48 @@
  * $Id: SHUTDOWNCommand.cc,v 1.8 2005/01/08 23:33:42 dan_karrels Exp $
  */
 
-#include	<string>
-#include	"StringTokenizer.h"
-#include	"cservice.h"
-#include	"levels.h"
-#include	"responses.h"
+#include <string>
+#include "StringTokenizer.h"
+#include "cservice.h"
+#include "levels.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 using namespace level;
 
-bool SHUTDOWNCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool SHUTDOWNCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-/*
- *  Fetch the sqlUser record attached to this client. If there isn't one,
- *  they aren't logged in - tell them they should be.
- */
+    /*
+     *  Fetch the sqlUser record attached to this client. If there isn't one,
+     *  they aren't logged in - tell them they should be.
+     */
 
-sqlUser* theUser = bot->isAuthed(theClient, false);
-if (!theUser)
-	{
-	return false;
-	}
+    sqlUser* theUser = bot->isAuthed(theClient, false);
+    if (!theUser) {
+        return false;
+    }
 
-int admLevel = bot->getAdminAccessLevel(theUser);
-if (admLevel < level::shutdown)
-	{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::insuf_access,
-			string("Sorry, you have insufficient access to perform that command.")));
-	return false;
-	}
+    int admLevel = bot->getAdminAccessLevel(theUser);
+    if (admLevel < level::shutdown) {
+        bot->Notice(theClient,
+                    bot->getResponse(
+                        theUser, language::insuf_access,
+                        string("Sorry, you have insufficient access to perform that command.")));
+        return false;
+    }
 
-bot->logAdminMessage("%s issued the shutdown command! So long, and thanks for all the fish!", theClient->getNickName().c_str());
+    bot->logAdminMessage("%s issued the shutdown command! So long, and thanks for all the fish!",
+                         theClient->getNickName().c_str());
 
-server->Shutdown( st.assemble( 1 ) ) ;
+    server->Shutdown(st.assemble(1));
 
-return true;
+    return true;
 }
 
 } // namespace gnuworld.

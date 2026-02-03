@@ -8,114 +8,85 @@
 
 #include "constants.h"
 #include "sqlFakeClient.h"
-#include	"misc.h"
+#include "misc.h"
 
 namespace gnuworld {
 
 namespace ds {
 
-using std::string ;
 using std::endl;
+using std::string;
 using std::stringstream;
 
-const sqlFakeClient::flagType sqlFakeClient::F_ACTIVE	= 0x0001 ;
+const sqlFakeClient::flagType sqlFakeClient::F_ACTIVE = 0x0001;
 
-sqlFakeClient::sqlFakeClient(dbHandle *_SQLDb) :
-	id(0),
-	nickname(),
-	username(),
-	hostname(),
-	realname(),
-	createdBy_i(0),
-	createdBy_s(),
-	createdOn(::time(0)),
-	lastUpdated(::time(0)),
-	flags(0),
-	SQLDb(_SQLDb)
-{
+sqlFakeClient::sqlFakeClient(dbHandle* _SQLDb)
+    : id(0), nickname(), username(), hostname(), realname(), createdBy_i(0), createdBy_s(),
+      createdOn(::time(0)), lastUpdated(::time(0)), flags(0), SQLDb(_SQLDb) {}
+
+sqlFakeClient::~sqlFakeClient() {}
+
+string sqlFakeClient::getFlagsString() const {
+    /* If this grows, alter the field size in LISTCommand.cc */
+
+    stringstream theFlags;
+    if (flags & F_ACTIVE)
+        theFlags << "A";
+
+    return theFlags.str();
 }
 
-sqlFakeClient::~sqlFakeClient()
-{
+void sqlFakeClient::setAllMembers(int row) {
+    id = atoi(SQLDb->GetValue(row, 0));
+    nickname = SQLDb->GetValue(row, 1);
+    username = SQLDb->GetValue(row, 2);
+    hostname = SQLDb->GetValue(row, 3);
+    realname = SQLDb->GetValue(row, 4);
+    createdBy_s = SQLDb->GetValue(row, 5);
+    createdBy_i = atoi(SQLDb->GetValue(row, 6));
+    createdOn = atoi(SQLDb->GetValue(row, 7));
+    lastUpdated = atoi(SQLDb->GetValue(row, 8));
+    flags = atoi(SQLDb->GetValue(row, 9));
 }
 
-string sqlFakeClient::getFlagsString() const
-{
-/* If this grows, alter the field size in LISTCommand.cc */
+bool sqlFakeClient::insert() {
+    /* First insert a fake record */
+    stringstream fakeInsert;
+    fakeInsert << "INSERT INTO fakeclients VALUES ("
+               << "DEFAULT,"
+               << "'" << escapeSQLChars(nickname) << "', "
+               << "'" << escapeSQLChars(username) << "', "
+               << "'" << escapeSQLChars(hostname) << "', "
+               << "'" << escapeSQLChars(realname) << "', " << createdBy_i << ", "
+               << "date_part('epoch', CURRENT_TIMESTAMP)::int, "
+               << "date_part('epoch', CURRENT_TIMESTAMP)::int, 0"
+               << ")";
 
-stringstream theFlags;
-if(flags & F_ACTIVE)	theFlags << "A";
+    if (!SQLDb->Exec(fakeInsert)) {
+        return false;
+    }
 
-return theFlags.str();
+    /* Fake record now exists. Select the row and let setAllMembers do its thing.
+     * This is so we pull back the new ID from the database. */
+
+    stringstream selectFake;
+    selectFake << sql::fakeclients;
+
+    if (!SQLDb->Exec(selectFake, true))
+        // if( status != PGRES_TUPLES_OK )
+        return false;
+
+    setAllMembers(0);
+
+    return true;
 }
 
-void sqlFakeClient::setAllMembers(int row)
-{
-id   = atoi(SQLDb->GetValue(row, 0));
-nickname  = SQLDb->GetValue(row, 1);
-username  = SQLDb->GetValue(row, 2);
-hostname  = SQLDb->GetValue(row, 3);
-realname  = SQLDb->GetValue(row, 4);
-createdBy_s = SQLDb->GetValue(row, 5);
-createdBy_i = atoi(SQLDb->GetValue(row, 6));
-createdOn = atoi(SQLDb->GetValue(row, 7));
-lastUpdated = atoi(SQLDb->GetValue(row, 8));
-flags = atoi(SQLDb->GetValue(row, 9));
-}
+string sqlFakeClient::getNickUserHost() const {
+    stringstream theNickUserHost;
+    theNickUserHost << "(" << id << ") " << nickname << "!" << username << "@" << hostname << " ["
+                    << realname << "]";
 
-bool sqlFakeClient::insert()
-{
-/* First insert a fake record */
-stringstream fakeInsert;
-fakeInsert	<< "INSERT INTO fakeclients VALUES ("
-		<< "DEFAULT,"
-		<< "'" << escapeSQLChars(nickname) << "', "
-		<< "'" << escapeSQLChars(username) << "', "
-		<< "'" << escapeSQLChars(hostname) << "', "
-		<< "'" << escapeSQLChars(realname) << "', "
-		<< createdBy_i << ", "
-		<< "date_part('epoch', CURRENT_TIMESTAMP)::int, "
-		<< "date_part('epoch', CURRENT_TIMESTAMP)::int, 0"
-		<< ")"
-		;
-
-if(!SQLDb->Exec(fakeInsert)) {
-	return false;
-}
-
-/* Fake record now exists. Select the row and let setAllMembers do its thing.
- * This is so we pull back the new ID from the database. */
-
-stringstream selectFake;
-selectFake	<< sql::fakeclients;
-
-if( !SQLDb->Exec(selectFake, true ) )
-//if( status != PGRES_TUPLES_OK )
-	return false;
-
-setAllMembers(0);
-
-return true;
-
-}
-
-string sqlFakeClient::getNickUserHost() const
-{
-stringstream theNickUserHost;
-theNickUserHost	<< "("
-		<< id
-		<< ") "
-		<< nickname
-		<< "!"
-		<< username
-		<< "@"
-		<< hostname
-		<< " ["
-		<< realname
-		<< "]"
-		;
-
-return theNickUserHost.str();
+    return theNickUserHost.str();
 }
 
 } // namespace ds

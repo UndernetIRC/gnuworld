@@ -74,7 +74,7 @@
  */
 #undef ALLOW_HELLO
 
- /**
+/**
  * Define this if you want to enable the WELCOME feature.
  */
 #undef USE_WELCOME

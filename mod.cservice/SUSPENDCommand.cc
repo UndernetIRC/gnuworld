@@ -24,343 +24,322 @@
  *
  * $Id: SUSPENDCommand.cc,v 1.29 2010/04/10 18:56:06 danielaustin Exp $
  */
-#include	<iostream>
-#include	<string>
-#include	<ctime>
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include	"Network.h"
-#include	"levels.h"
-#include	"responses.h"
+#include <iostream>
+#include <string>
+#include <ctime>
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "Network.h"
+#include "levels.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 using namespace level;
 
-bool SUSPENDCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 3 )
-{
-	Usage(theClient);
-	return true;
-}
-
-/* Is the user authenticated? */
-sqlUser* theUser = bot->isAuthed(theClient, true);
-if(!theUser)
-{
-	return false;
-}
-
-/*
- * Trying to suspend a user, or a channel?
- * If there is no #, check this person's admin access..
- * If it passes, we can suspend a whole user account. <g>
- */
-
-if ((st[1][0] != '#') && (st[1][0] != '*'))
-{
-	/* Got enough admin access? */
-	int level = bot->getAdminAccessLevel(theUser);
-	if (level == 0)
-	{
-		Usage(theClient);
-		return true;
-	}
-    if ((level > 0) && (level < level::globalsuspend))
-    {
-    	bot->Notice(theClient,
-    			bot->getResponse(theUser, language::insuf_access,
-    					string("Sorry, you have insufficient access to perform that command.")));
-    	return true;
+bool SUSPENDCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 3) {
+        Usage(theClient);
+        return true;
     }
 
-	/* Does this user account even exist? */
-	sqlUser* targetUser = bot->getUserRecord(st[1]);
-	if (!targetUser)
-	{
-		bot->Notice(theClient,
-			bot->getResponse(theUser, language::not_registered,
-				string("I don't know who %s is")).c_str(),
-		    	st[1].c_str());
-		return true;
-	}
+    /* Is the user authenticated? */
+    sqlUser* theUser = bot->isAuthed(theClient, true);
+    if (!theUser) {
+        return false;
+    }
 
-	/*
-	 *  Check the target's admin access, if its >= ours, don't
-	 *  allow it. :)
-	 */
+    /*
+     * Trying to suspend a user, or a channel?
+     * If there is no #, check this person's admin access..
+     * If it passes, we can suspend a whole user account. <g>
+     */
 
-	int targetLevel = bot->getAdminAccessLevel(targetUser);
-	if (targetLevel >= level)
-	{
-		bot->Notice(theClient,
-			bot->getResponse(theUser,
-				language::suspend_access_higher,
-				string("Cannot suspend a user with equal or higher access than your own.")));
-		return false;
-	}
+    if ((st[1][0] != '#') && (st[1][0] != '*')) {
+        /* Got enough admin access? */
+        int level = bot->getAdminAccessLevel(theUser);
+        if (level == 0) {
+            Usage(theClient);
+            return true;
+        }
+        if ((level > 0) && (level < level::globalsuspend)) {
+            bot->Notice(
+                theClient,
+                bot->getResponse(
+                    theUser, language::insuf_access,
+                    string("Sorry, you have insufficient access to perform that command.")));
+            return true;
+        }
 
-	if (targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND))
-	{
-		bot->Notice(theClient, "%s is already suspended, you could always try execution?",
-			targetUser->getUserName().c_str());
-		return true;
-	}
+        /* Does this user account even exist? */
+        sqlUser* targetUser = bot->getUserRecord(st[1]);
+        if (!targetUser) {
+            bot->Notice(theClient,
+                        bot->getResponse(theUser, language::not_registered,
+                                         string("I don't know who %s is"))
+                            .c_str(),
+                        st[1].c_str());
+            return true;
+        }
 
-	// Suspend them.
-	targetUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
-	bot->sendAccountFlags(targetUser);
-	targetUser->commit(theClient);
-	bot->Notice(theClient, "%s has been globally suspended and will have level 0 access in all"
-		" channels until unsuspended.",
-		targetUser->getUserName().c_str());
+        /*
+         *  Check the target's admin access, if its >= ours, don't
+         *  allow it. :)
+         */
 
-	targetUser->writeEvent(sqlUser::EV_SUSPEND, theUser, st.assemble(2));
+        int targetLevel = bot->getAdminAccessLevel(targetUser);
+        if (targetLevel >= level) {
+            bot->Notice(
+                theClient,
+                bot->getResponse(
+                    theUser, language::suspend_access_higher,
+                    string("Cannot suspend a user with equal or higher access than your own.")));
+            return false;
+        }
 
-	//Deop the all newly suspended clients
-	for (sqlUser::networkClientListType::iterator cliPtr = targetUser->networkClientList.begin();
-			cliPtr != targetUser->networkClientList.end() ; ++cliPtr )
-	{
-		for (iClient::channelIterator chItr = (*cliPtr)->channels_begin(); chItr != (*cliPtr)->channels_end(); ++chItr)
-		{
-			ChannelUser* theChannelUser = (*chItr)->findUser(*cliPtr);
-			sqlChannel* theChan = bot->getChannelRecord((*chItr)->getName());
-			if ((theChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)) && (theChannelUser->getMode(ChannelUser::MODE_O)))
-			{
-				sqlLevel* tmpLevel = bot->getLevelRecord(targetUser, theChan);
-				if (tmpLevel)
-				{
-					bot->removeLevelCache(tmpLevel);
-					delete(tmpLevel);
-				}
-				bot->deopSuspendedOnChan(*chItr,targetUser);
-			}
-		}
-		bot->Notice((*cliPtr),"Your user account has been globally suspended.");
-	}
+        if (targetUser->getFlag(sqlUser::F_GLOBAL_SUSPEND)) {
+            bot->Notice(theClient, "%s is already suspended, you could always try execution?",
+                        targetUser->getUserName().c_str());
+            return true;
+        }
 
-	bot->logAdminMessage("%s (%s) has globally suspended %s's user account.",
-		theClient->getNickName().c_str(), theUser->getUserName().c_str(),
-		targetUser->getUserName().c_str());
+        // Suspend them.
+        targetUser->setFlag(sqlUser::F_GLOBAL_SUSPEND);
+        bot->sendAccountFlags(targetUser);
+        targetUser->commit(theClient);
+        bot->Notice(theClient,
+                    "%s has been globally suspended and will have level 0 access in all"
+                    " channels until unsuspended.",
+                    targetUser->getUserName().c_str());
 
-	return true;
-} //end of Global user suspend, begin channel suspend
+        targetUser->writeEvent(sqlUser::EV_SUSPEND, theUser, st.assemble(2));
 
-if( st.size() < 4 )
-{
-	Usage(theClient);
-	return true;
-}
+        // Deop the all newly suspended clients
+        for (sqlUser::networkClientListType::iterator cliPtr =
+                 targetUser->networkClientList.begin();
+             cliPtr != targetUser->networkClientList.end(); ++cliPtr) {
+            for (iClient::channelIterator chItr = (*cliPtr)->channels_begin();
+                 chItr != (*cliPtr)->channels_end(); ++chItr) {
+                ChannelUser* theChannelUser = (*chItr)->findUser(*cliPtr);
+                sqlChannel* theChan = bot->getChannelRecord((*chItr)->getName());
+                if ((theChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)) &&
+                    (theChannelUser->getMode(ChannelUser::MODE_O))) {
+                    sqlLevel* tmpLevel = bot->getLevelRecord(targetUser, theChan);
+                    if (tmpLevel) {
+                        bot->removeLevelCache(tmpLevel);
+                        delete (tmpLevel);
+                    }
+                    bot->deopSuspendedOnChan(*chItr, targetUser);
+                }
+            }
+            bot->Notice((*cliPtr), "Your user account has been globally suspended.");
+        }
 
-/* Is the channel registered? */
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if(!theChan)
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::chan_not_reg,
-			string("Sorry, %s isn't registered with me.")).c_str(),
-		st[1].c_str());
-	return false;
-}
+        bot->logAdminMessage("%s (%s) has globally suspended %s's user account.",
+                             theClient->getNickName().c_str(), theUser->getUserName().c_str(),
+                             targetUser->getUserName().c_str());
 
-/* Check level. */
-int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
-int suspendLevel = level;
-if ((level < level::suspend) || (( st[1] == "*" ) && (level < adminlevel::suspend)))
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::insuf_access,
-			string("Sorry, you have insufficient access to perform that command.")));
-	return false;
-}
+        return true;
+    } // end of Global user suspend, begin channel suspend
 
-/* Check whether the user is in the access list. */
-sqlUser* Target = bot->getUserRecord(st[2]);
-if(!Target)
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::not_registered,
-			string("I don't know who %s is")).c_str(),
-	    	st[2].c_str());
-	return true;
-}
+    if (st.size() < 4) {
+        Usage(theClient);
+        return true;
+    }
 
-int usrLevel = bot->getAccessLevel(Target, theChan);
-if (!usrLevel)
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser, language::doesnt_have_access,
-			string("%s doesn't appear to have access in %s.")).c_str(),
-	    	Target->getUserName().c_str(),
-		theChan->getName().c_str());
-	return true;
-}
+    /* Is the channel registered? */
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan) {
+        bot->Notice(theClient,
+                    bot->getResponse(theUser, language::chan_not_reg,
+                                     string("Sorry, %s isn't registered with me."))
+                        .c_str(),
+                    st[1].c_str());
+        return false;
+    }
 
-if (level <= usrLevel)
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::suspend_access_higher,
-			string("Cannot suspend a user with equal or higher access than your own.")));
-	return false;
-}
+    /* Check level. */
+    int level = bot->getEffectiveAccessLevel(theUser, theChan, true);
+    int suspendLevel = level;
+    if ((level < level::suspend) || ((st[1] == "*") && (level < adminlevel::suspend))) {
+        bot->Notice(theClient,
+                    bot->getResponse(
+                        theUser, language::insuf_access,
+                        string("Sorry, you have insufficient access to perform that command.")));
+        return false;
+    }
 
-time_t finalDuration;
-string suspReason;
+    /* Check whether the user is in the access list. */
+    sqlUser* Target = bot->getUserRecord(st[2]);
+    if (!Target) {
+        bot->Notice(
+            theClient,
+            bot->getResponse(theUser, language::not_registered, string("I don't know who %s is"))
+                .c_str(),
+            st[2].c_str());
+        return true;
+    }
 
-if (!IsTimeSpec(st[3])) //this means only a reason was specified, no duration, no level and we use the defaults
-{
-	suspReason = st.assemble(3);
-	finalDuration = 3 * 3600;
-}
-else
-	finalDuration = extractTime(st[3], 60);
+    int usrLevel = bot->getAccessLevel(Target, theChan);
+    if (!usrLevel) {
+        bot->Notice(theClient,
+                    bot->getResponse(theUser, language::doesnt_have_access,
+                                     string("%s doesn't appear to have access in %s."))
+                        .c_str(),
+                    Target->getUserName().c_str(), theChan->getName().c_str());
+        return true;
+    }
 
-/* If we have a length at least of 5, then if the 5th param is a number then it is the susp level
- * else the reason is specified
- */
-if ((st.size() > 4) && (suspReason.empty()))
-{
-	if (IsNumeric(st[4])) suspendLevel = atoi(st[4].c_str());
-	else suspReason = st.assemble(4);
-}
+    if (level <= usrLevel) {
+        bot->Notice(
+            theClient,
+            bot->getResponse(
+                theUser, language::suspend_access_higher,
+                string("Cannot suspend a user with equal or higher access than your own.")));
+        return false;
+    }
 
-if ((st.size() > 5) && (suspReason.empty()))
-{
-	suspReason = st.assemble(5);
-}
-/* Greater than a year? */
-if(finalDuration > 32140800 || finalDuration < 0)
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::inval_suspend_dur,
-			string("Invalid suspend duration.")));
-	return true;
-}
+    time_t finalDuration;
+    string suspReason;
 
-sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
-if (suspReason.empty()) suspReason = "No reason supplied.";
+    if (!IsTimeSpec(st[3])) // this means only a reason was specified, no duration, no level and we
+                            // use the defaults
+    {
+        suspReason = st.assemble(3);
+        finalDuration = 3 * 3600;
+    } else
+        finalDuration = extractTime(st[3], 60);
 
-if( 0 == finalDuration )
-{
-	/*
-	 * Was this suspension set with a higher suspend level?
-	 */
-	if (aLevel->getSuspendLevel() > level)
-	{
-		bot->Notice(theClient,
-			"Cannot unsuspend a user that was suspended at a higher level than your own access.");
-		return false;
-	}
-	if ((suspReason.size() < 2) || (suspReason.size() > 300))
-	{
-		//bot->Notice(theClient,"Your reason must be 2 - 300 charcters long.");
-		bot->Notice(theClient, bot->getResponse(theUser,language::reason_must).c_str(),2,300);
-		return false;
-	}
-	aLevel->setSuspendExpire(finalDuration);
-	aLevel->setSuspendBy(string());
-	aLevel->setSuspendReason(string());
-	aLevel->setLastModif(bot->currentTime());
-	aLevel->setLastModifBy( string( "("
-		+ theUser->getUserName()
-		+ ") "
-		+ theClient->getNickUserHost() ) );
+    /* If we have a length at least of 5, then if the 5th param is a number then it is the susp
+     * level else the reason is specified
+     */
+    if ((st.size() > 4) && (suspReason.empty())) {
+        if (IsNumeric(st[4]))
+            suspendLevel = atoi(st[4].c_str());
+        else
+            suspReason = st.assemble(4);
+    }
 
-	if( !aLevel->commit() )
-	{
-		bot->Notice( theClient,
-			"Error updating channel status." );
-		LOG( ERROR, "Failed to commit sqlLevel record" ) ;
-		return false;
-	}
+    if ((st.size() > 5) && (suspReason.empty())) {
+        suspReason = st.assemble(5);
+    }
+    /* Greater than a year? */
+    if (finalDuration > 32140800 || finalDuration < 0) {
+        bot->Notice(theClient, bot->getResponse(theUser, language::inval_suspend_dur,
+                                                string("Invalid suspend duration.")));
+        return true;
+    }
 
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::susp_cancelled,
-			string("SUSPENSION for %s is cancelled")).c_str(),
-		Target->getUserName().c_str());
-	if (Target != theUser)
-	{
-		bot->NoteAllAuthedClients(Target, bot->getResponse(Target,language::acc_unsusp).c_str(), theChan->getName().c_str());
-		// Announce the manager about the new access change
-		if (level < 500)
-		{
-			string theMessage = TokenStringsParams("%s unsuspended %s's access on channel %s",
-					theUser->getUserName().c_str(), Target->getUserName().c_str(), theChan->getName().c_str());
-			bot->NoteChannelManager(theChan, theMessage.c_str());
-		}
-	}
+    sqlLevel* aLevel = bot->getLevelRecord(Target, theChan);
+    if (suspReason.empty())
+        suspReason = "No reason supplied.";
 
-	return true;
-}
+    if (0 == finalDuration) {
+        /*
+         * Was this suspension set with a higher suspend level?
+         */
+        if (aLevel->getSuspendLevel() > level) {
+            bot->Notice(theClient, "Cannot unsuspend a user that was suspended at a higher level "
+                                   "than your own access.");
+            return false;
+        }
+        if ((suspReason.size() < 2) || (suspReason.size() > 300)) {
+            // bot->Notice(theClient,"Your reason must be 2 - 300 charcters long.");
+            bot->Notice(theClient, bot->getResponse(theUser, language::reason_must).c_str(), 2,
+                        300);
+            return false;
+        }
+        aLevel->setSuspendExpire(finalDuration);
+        aLevel->setSuspendBy(string());
+        aLevel->setSuspendReason(string());
+        aLevel->setLastModif(bot->currentTime());
+        aLevel->setLastModifBy(
+            string("(" + theUser->getUserName() + ") " + theClient->getNickUserHost()));
 
-if (aLevel->getSuspendExpire() > bot->currentTime())
-{
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::already_susp,
-			string("%s is already suspended on %s")).c_str(),
-		Target->getUserName().c_str(),
-		theChan->getName().c_str());
-	return false;
-}
+        if (!aLevel->commit()) {
+            bot->Notice(theClient, "Error updating channel status.");
+            LOG(ERROR, "Failed to commit sqlLevel record");
+            return false;
+        }
 
-if ((suspReason.size() < 2) || (suspReason.size() > 300))
-{
-	//bot->Notice(theClient,"Your reason must be 2 - 300 charcters long.");
-	bot->Notice(theClient, bot->getResponse(theUser,language::reason_must).c_str(),2,300);
-	return false;
-}
+        bot->Notice(theClient,
+                    bot->getResponse(theUser, language::susp_cancelled,
+                                     string("SUSPENSION for %s is cancelled"))
+                        .c_str(),
+                    Target->getUserName().c_str());
+        if (Target != theUser) {
+            bot->NoteAllAuthedClients(Target,
+                                      bot->getResponse(Target, language::acc_unsusp).c_str(),
+                                      theChan->getName().c_str());
+            // Announce the manager about the new access change
+            if (level < 500) {
+                string theMessage = TokenStringsParams(
+                    "%s unsuspended %s's access on channel %s", theUser->getUserName().c_str(),
+                    Target->getUserName().c_str(), theChan->getName().c_str());
+                bot->NoteChannelManager(theChan, theMessage.c_str());
+            }
+        }
 
-/*
- * Check any access level supplied, default to our access
- * if not.
- */
+        return true;
+    }
 
-if ((suspendLevel > level) || (suspendLevel > 500) || (suspendLevel <= 0))
-	suspendLevel = level;
+    if (aLevel->getSuspendExpire() > bot->currentTime()) {
+        bot->Notice(theClient,
+                    bot->getResponse(theUser, language::already_susp,
+                                     string("%s is already suspended on %s"))
+                        .c_str(),
+                    Target->getUserName().c_str(), theChan->getName().c_str());
+        return false;
+    }
 
-aLevel->setSuspendExpire(finalDuration + bot->currentTime());
-aLevel->setSuspendBy(theClient->getNickUserHost());
-aLevel->setSuspendLevel(suspendLevel);
-aLevel->setSuspendReason(suspReason);
-aLevel->setLastModif(bot->currentTime());
-aLevel->setLastModifBy( string( "("
-	+ theUser->getUserName()
-	+ ") "
-	+ theClient->getNickUserHost() ) );
+    if ((suspReason.size() < 2) || (suspReason.size() > 300)) {
+        // bot->Notice(theClient,"Your reason must be 2 - 300 charcters long.");
+        bot->Notice(theClient, bot->getResponse(theUser, language::reason_must).c_str(), 2, 300);
+        return false;
+    }
 
-aLevel->commit();
+    /*
+     * Check any access level supplied, default to our access
+     * if not.
+     */
 
-Channel* tmpChan = Network->findChannel(theChan->getName());
-if ((tmpChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)))
-	bot->deopSuspendedOnChan(tmpChan,Target);
+    if ((suspendLevel > level) || (suspendLevel > 500) || (suspendLevel <= 0))
+        suspendLevel = level;
 
-bot->Notice(theClient,
-	bot->getResponse(theUser,
-		language::susp_set,
-		string("SUSPENSION for %s will expire in %s")).c_str(),
-	Target->getUserName().c_str(),
-	prettyDuration(bot->currentTime() - finalDuration ).c_str());
-	if (Target != theUser)
-	{
-		bot->NoteAllAuthedClients(Target, bot->getResponse(Target,language::acc_susp).c_str(), theChan->getName().c_str());
-		// Announce the manager about the new access change
-		if (level < 500)
-		{
-			string theMessage = TokenStringsParams("%s suspended %s's access on channel %s",
-					theUser->getUserName().c_str(), Target->getUserName().c_str(), theChan->getName().c_str());
-			bot->NoteChannelManager(theChan, theMessage.c_str());
-		}
-	}
+    aLevel->setSuspendExpire(finalDuration + bot->currentTime());
+    aLevel->setSuspendBy(theClient->getNickUserHost());
+    aLevel->setSuspendLevel(suspendLevel);
+    aLevel->setSuspendReason(suspReason);
+    aLevel->setLastModif(bot->currentTime());
+    aLevel->setLastModifBy(
+        string("(" + theUser->getUserName() + ") " + theClient->getNickUserHost()));
 
-return true ;
+    aLevel->commit();
+
+    Channel* tmpChan = Network->findChannel(theChan->getName());
+    if ((tmpChan) && (theChan->getFlag(sqlChannel::F_STRICTOP)))
+        bot->deopSuspendedOnChan(tmpChan, Target);
+
+    bot->Notice(
+        theClient,
+        bot->getResponse(theUser, language::susp_set, string("SUSPENSION for %s will expire in %s"))
+            .c_str(),
+        Target->getUserName().c_str(), prettyDuration(bot->currentTime() - finalDuration).c_str());
+    if (Target != theUser) {
+        bot->NoteAllAuthedClients(Target, bot->getResponse(Target, language::acc_susp).c_str(),
+                                  theChan->getName().c_str());
+        // Announce the manager about the new access change
+        if (level < 500) {
+            string theMessage = TokenStringsParams(
+                "%s suspended %s's access on channel %s", theUser->getUserName().c_str(),
+                Target->getUserName().c_str(), theChan->getName().c_str());
+            bot->NoteChannelManager(theChan, theMessage.c_str());
+        }
+    }
+
+    return true;
 }
 
 } // namespace gnuworld.
