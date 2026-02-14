@@ -29,8 +29,8 @@ namespace gnuworld {
 
 namespace logging {
 
-using std::string ;
-using std::vector ;
+using std::string;
+using std::vector;
 
 class Logger {
 
@@ -50,12 +50,12 @@ class Logger {
      * Allow logging of messages
      */
     void log(const events::eventType&, const string&);
-    void log(const events::eventType&, const char*, ... );
+    void log(const events::eventType&, const char*, ...);
 
     /**
      * Type to contain logTargets
      */
-    typedef vector< logTarget* > logTargetsType;
+    typedef vector<logTarget*> logTargetsType;
 
     /**
      * Container for logTargets

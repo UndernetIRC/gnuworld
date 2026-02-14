@@ -20,19 +20,15 @@
  * $Id: msg_AD.cc,v 1.4 2005/03/25 03:07:29 dan_karrels Exp $
  */
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 CREATE_HANDLER(msg_AD)
 
-bool msg_AD::Execute( const xParameters& )
-{
-return true ;
-}
+bool msg_AD::Execute(const xParameters&) { return true; }
 
 } // namespace gnuworld

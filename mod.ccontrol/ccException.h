@@ -22,270 +22,201 @@
 #ifndef __CCEXCEPTION_H
 #define __CCEXCEPTION_H "$Id: ccException.h,v 1.13 2009/07/26 18:30:37 mrbean_ Exp $"
 
-#include	<string>
+#include <string>
 
-#include	<ctime>
+#include <ctime>
 
-#include	"dbHandle.h"
+#include "dbHandle.h"
 
-#include	"match.h"
+#include "match.h"
 
-namespace gnuworld
-{ 
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-typedef std::map<string, int> 		ipLclonesMapType;
+typedef std::map<string, int> ipLclonesMapType;
 
+class ccIpLisp {
+  public:
+    ccIpLisp(dbHandle* _SQLDb);
+    virtual ~ccIpLisp();
 
-class ccIpLisp
-{
-public:	
-	ccIpLisp(dbHandle* _SQLDb);
-	virtual ~ccIpLisp();
-	
+    inline bool isActive() const { return (active == 1 ? true : false); }
 
-	inline bool		isActive() const
-		{ return (active == 1 ? true : false); }
+    inline bool isNoGline() const { return (nogline == 1 ? true : false); }
 
-	inline bool		isNoGline() const
-		{ return (nogline == 1 ? true : false); }
+    inline bool isGlunidented() const { return (glunidented == 1 ? true : false); }
 
-	inline bool		isGlunidented() const
-		{ return (glunidented == 1 ? true : false); }
+    inline bool isForcecount() const { return (forcecount == 1 ? true : false); }
 
-	inline bool		isForcecount() const
-		{ return (forcecount == 1 ? true : false); }
+    inline int isv6() const { return v6; }
 
-	inline int		isv6() const
-		{ return v6; }
+    inline bool isGroup() const { return (group == 1 ? true : false); }
 
-	inline bool		isGroup() const
-		{ return (group == 1 ? true : false); }
+    inline const string& getName() const { return Name; }
 
-	inline const string& 		getName() const
-		{ return Name; }
-		
-	inline const int&		getID() const
-		{ return id; }
+    inline const int& getID() const { return id; }
 
-	inline const int&		getLimit() const
-		{ return maxlimit; }
-	
-	inline const int&		getIdentLimit() const
-		{ return maxIdentlimit; }
-	
-	inline const string&		getEmail() const
-		{ return email; }
-	
-	inline const int&		getCloneCidr() const
-		{ return clonecidr; }
-	
-	inline const string&		getAddedBy() const
-		{ return AddedBy; }
-		
-	inline time_t			getAddedOn() const
-		{ return AddedOn; }
+    inline const int& getLimit() const { return maxlimit; }
 
-	inline const string&		getModBy() const
-		{ return ModBy; }
-		
-	inline time_t			getModOn() const
-		{ return ModOn; }
+    inline const int& getIdentLimit() const { return maxIdentlimit; }
 
-	inline const int& 		getCount() const
-			{ return count; }
+    inline const string& getEmail() const { return email; }
 
-	inline void 		setName( const string& _Name ) 
-		{ Name = _Name; }
-		
-	inline void		setLimit( const int _maxlimit ) 
-		{  maxlimit = _maxlimit; }
-	
-	inline void		setIdentLimit( const int _maxIdentlimit ) 
-		{  maxIdentlimit = _maxIdentlimit; }
-	
-	inline void		setID( const int _id ) 
-		{  id = _id; }
+    inline const int& getCloneCidr() const { return clonecidr; }
 
-	inline void		setAddedBy( const string& _AddedBy) 
-		{ AddedBy = _AddedBy; }
-		
-	inline void		setAddedOn( const time_t _AddedOn )
-		{ AddedOn = _AddedOn; }
-	
-	inline void		setModBy( const string& _ModBy) 
-		{ ModBy = _ModBy; }
-		
-	inline void		setModOn( const time_t _ModOn )
-		{ ModOn = _ModOn; }
-		
-	inline void		setEmail( const string& _email )
-		{ email = _email; }
+    inline const string& getAddedBy() const { return AddedBy; }
 
-	inline void		setCloneCidr( const int _clonecidr ) 
-		{ clonecidr = _clonecidr; }
-	
-	inline void 	setActive( const int _active) 
-		{ active = _active; }
+    inline time_t getAddedOn() const { return AddedOn; }
 
-	inline void 	setNoGline( const int _nogline)
-		{ nogline = _nogline; }
+    inline const string& getModBy() const { return ModBy; }
 
-	inline void 	setGlunidented( const int _glunidented) 
-		{ glunidented = _glunidented; }
+    inline time_t getModOn() const { return ModOn; }
 
-	inline void 	setForcecount( const int _forcecount) 
-		{ forcecount = _forcecount; }
+    inline const int& getCount() const { return count; }
 
-	inline void 	setv6( const int _v6) 
-		{ v6 = _v6; }
+    inline void setName(const string& _Name) { Name = _Name; }
 
-	inline void 	setGroup( const int _group) 
-		{ group = _group; }
+    inline void setLimit(const int _maxlimit) { maxlimit = _maxlimit; }
 
-	inline void 		incCount( const int _count ) 
-		{ count += _count; }
-			
-	inline void		setSqldb(dbHandle* _SQLDb)
-		{ SQLDb = _SQLDb; }
-	
-	int		loadData(const string& Name);
-	
-	int		updateData();
-				
-	bool		Insert();
-	
-	bool		Delete();
-	
-	static unsigned int numAllocated;
+    inline void setIdentLimit(const int _maxIdentlimit) { maxIdentlimit = _maxIdentlimit; }
 
-	ipLclonesMapType 	ipLidentclonesMap;
+    inline void setID(const int _id) { id = _id; }
 
+    inline void setAddedBy(const string& _AddedBy) { AddedBy = _AddedBy; }
 
-protected:
-	
-	int		id;
-	int		forcecount;
-	int		glunidented;
-	int		v6;
-	int		group;
-	string 		Name;
-	string 		email;
-	int		clonecidr;
-	int 		maxlimit;
-	int 		maxIdentlimit;
-	int		count;
-	int		active;
-	int		nogline;
-	string 		AddedBy;
-	time_t		AddedOn;
-	string 		ModBy;
-	time_t		ModOn;
-	dbHandle* SQLDb;
+    inline void setAddedOn(const time_t _AddedOn) { AddedOn = _AddedOn; }
 
-}; 
+    inline void setModBy(const string& _ModBy) { ModBy = _ModBy; }
 
-class ccIpLnb
-{
-public:	
-	ccIpLnb(dbHandle* _SQLDb);
-	virtual ~ccIpLnb();
-	
-	inline bool operator==( const string& ExceptionHost ) const
-		{ return (!strcasecmp( cidr, ExceptionHost )
-		    || !match(cidr.c_str(),ExceptionHost.c_str())) ; }
+    inline void setModOn(const time_t _ModOn) { ModOn = _ModOn; }
 
-	inline bool		isActive() const
-		{ return ipLisp->isActive(); }
+    inline void setEmail(const string& _email) { email = _email; }
 
-	inline bool		isNoGline() const
-		{ return ipLisp->isNoGline(); }
+    inline void setCloneCidr(const int _clonecidr) { clonecidr = _clonecidr; }
 
-	inline bool		isForcecount() const
-		{ return ipLisp->isForcecount(); }
+    inline void setActive(const int _active) { active = _active; }
 
-	inline const string& 		getCidr() const
-			{ return cidr; }
-		
-	inline const string& 		getCidr1() const
-			{ return cidr1; }
+    inline void setNoGline(const int _nogline) { nogline = _nogline; }
 
-	inline const int& 		getCidr2() const
-			{ return cidr2; }
+    inline void setGlunidented(const int _glunidented) { glunidented = _glunidented; }
 
-	inline const int& 		getIpLispID() const
-			{ return ipLispid; }
+    inline void setForcecount(const int _forcecount) { forcecount = _forcecount; }
 
-	inline const int& 		getCount() const
-			{ return count; }
+    inline void setv6(const int _v6) { v6 = _v6; }
 
-	inline const ccIpLisp*		getIpLisp() const
-			{ return ipLisp; }
-	
-	inline const int& 		getCloneCidr() const
-			{ return ipLisp->getCloneCidr(); }
+    inline void setGroup(const int _group) { group = _group; }
 
-	inline const int& 		getLimit() const
-			{ return ipLisp->getLimit(); }
+    inline void incCount(const int _count) { count += _count; }
 
-	inline const int& 		getIdentLimit() const
-			{ return ipLisp->getIdentLimit(); }
+    inline void setSqldb(dbHandle* _SQLDb) { SQLDb = _SQLDb; }
 
-	inline const string&		getAddedBy() const
-		{ return AddedBy; }
-		
-	inline time_t			getAddedOn() const
-		{ return AddedOn; }
-	
-	inline void 		setIpLisp( ccIpLisp* _ipLisp ) 
-		{ ipLisp = _ipLisp; }
+    int loadData(const string& Name);
 
-	inline void 		setIpLispID( const int _ipLispid ) 
-		{ ipLispid = _ipLispid; }
-			
-	inline void 		incCount( const int _count ) 
-		{ count += _count; }
-			
-	inline void		setAddedBy( const string& _AddedBy) 
-		{ AddedBy = _AddedBy; }
-		
-	inline void		setAddedOn( const time_t _AddedOn )
-		{ AddedOn = _AddedOn; }
+    int updateData();
 
-	void 		setCidr( const string& _cidr );
+    bool Insert();
 
-	inline void		setSqldb(dbHandle* _SQLDb)
-		{ SQLDb = _SQLDb; }
+    bool Delete();
 
+    static unsigned int numAllocated;
 
+    ipLclonesMapType ipLidentclonesMap;
 
-	bool		Insert();
-	
-	bool		Delete();
+  protected:
+    int id;
+    int forcecount;
+    int glunidented;
+    int v6;
+    int group;
+    string Name;
+    string email;
+    int clonecidr;
+    int maxlimit;
+    int maxIdentlimit;
+    int count;
+    int active;
+    int nogline;
+    string AddedBy;
+    time_t AddedOn;
+    string ModBy;
+    time_t ModOn;
+    dbHandle* SQLDb;
+};
 
-	ipLclonesMapType 	ipLclonesMap;
+class ccIpLnb {
+  public:
+    ccIpLnb(dbHandle* _SQLDb);
+    virtual ~ccIpLnb();
 
+    inline bool operator==(const string& ExceptionHost) const {
+        return (!strcasecmp(cidr, ExceptionHost) || !match(cidr.c_str(), ExceptionHost.c_str()));
+    }
 
-	ccIpLisp*	ipLisp;
-	
-	static unsigned int numAllocated;
+    inline bool isActive() const { return ipLisp->isActive(); }
 
-protected:
+    inline bool isNoGline() const { return ipLisp->isNoGline(); }
 
-	int		ipLispid;
-	int		count;
-	string 		cidr;
-	string 		cidr1;
-	int		cidr2;
-	string 		AddedBy;
-	time_t		AddedOn;
-	dbHandle* SQLDb;
+    inline bool isForcecount() const { return ipLisp->isForcecount(); }
 
-}; 
-}
-}
+    inline const string& getCidr() const { return cidr; }
+
+    inline const string& getCidr1() const { return cidr1; }
+
+    inline const int& getCidr2() const { return cidr2; }
+
+    inline const int& getIpLispID() const { return ipLispid; }
+
+    inline const int& getCount() const { return count; }
+
+    inline const ccIpLisp* getIpLisp() const { return ipLisp; }
+
+    inline const int& getCloneCidr() const { return ipLisp->getCloneCidr(); }
+
+    inline const int& getLimit() const { return ipLisp->getLimit(); }
+
+    inline const int& getIdentLimit() const { return ipLisp->getIdentLimit(); }
+
+    inline const string& getAddedBy() const { return AddedBy; }
+
+    inline time_t getAddedOn() const { return AddedOn; }
+
+    inline void setIpLisp(ccIpLisp* _ipLisp) { ipLisp = _ipLisp; }
+
+    inline void setIpLispID(const int _ipLispid) { ipLispid = _ipLispid; }
+
+    inline void incCount(const int _count) { count += _count; }
+
+    inline void setAddedBy(const string& _AddedBy) { AddedBy = _AddedBy; }
+
+    inline void setAddedOn(const time_t _AddedOn) { AddedOn = _AddedOn; }
+
+    void setCidr(const string& _cidr);
+
+    inline void setSqldb(dbHandle* _SQLDb) { SQLDb = _SQLDb; }
+
+    bool Insert();
+
+    bool Delete();
+
+    ipLclonesMapType ipLclonesMap;
+
+    ccIpLisp* ipLisp;
+
+    static unsigned int numAllocated;
+
+  protected:
+    int ipLispid;
+    int count;
+    string cidr;
+    string cidr1;
+    int cidr2;
+    string AddedBy;
+    time_t AddedOn;
+    dbHandle* SQLDb;
+};
+} // namespace uworld
+} // namespace gnuworld
 #endif // __CCEXCEPTION_H

@@ -19,29 +19,25 @@
  *
  * $Id: STATUSCommand.cc,v 1.8 2005/01/12 03:50:29 dan_karrels Exp $
  */
-#include	<string>
-#include	<iomanip>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool STATUSCommand::Exec( iClient* theClient, const string& )
-{	 
-bot->MsgChanLog("STATUS\n");
+bool STATUSCommand::Exec(iClient* theClient, const string&) {
+    bot->MsgChanLog("STATUS\n");
 
-bot->showStatus(theClient);
-return true ;
+    bot->showStatus(theClient);
+    return true;
 }
 
-}
-}
-
+} // namespace uworld
+} // namespace gnuworld

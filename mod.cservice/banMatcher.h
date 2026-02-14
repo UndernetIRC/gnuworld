@@ -22,16 +22,15 @@
 #ifndef __BANMATCHER_H
 #define __BANMATCHER_H "$Id: banMatcher.h,v 1.3 2009/06/25 19:59:05 mrbean_ Exp $"
 
-#include	<string>
-#include	"iClient.h"
- 
-using std::string ;
+#include <string>
+#include "iClient.h"
 
-namespace gnuworld
-{ 
-	bool banMatch(const string&, const string&) ;
+using std::string;
 
-	bool banMatch( const string&, const iClient*) ;
-}
+namespace gnuworld {
+bool banMatch(const string&, const string&);
+
+bool banMatch(const string&, const iClient*);
+} // namespace gnuworld
 
 #endif // __BANMATCHER_H

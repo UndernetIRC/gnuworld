@@ -20,20 +20,15 @@
  * $Id: dbThread.cc,v 1.2 2002/08/08 21:44:00 dan_karrels Exp $
  */
 
-#include	"gThread.h"
-#include	"dbThread.h"
+#include "gThread.h"
+#include "dbThread.h"
 
+namespace gnuworld {
 
-namespace gnuworld
-{
+dbThread::dbThread() {}
 
-dbThread::dbThread()
-{}
+dbThread::~dbThread() {}
 
-dbThread::~dbThread()
-{}
-
-void dbThread::Exec()
-{}
+void dbThread::Exec() {}
 
 } // namespace gnuworld

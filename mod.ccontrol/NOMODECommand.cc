@@ -20,95 +20,77 @@
  * $Id: NOMODECommand.cc,v 1.8 2006/09/26 17:36:00 kewlio Exp $
  */
 
-#include	<string>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Constants.h"
-#include	"ccBadChannel.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Constants.h"
+#include "ccBadChannel.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool NOMODECommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 3 )
-	{
-	Usage( theClient ) ;
-	return true ;
-	}
+bool NOMODECommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 3) {
+        Usage(theClient);
+        return true;
+    }
 
-if(st[2].size() > channel::MaxName)
-	{
-	bot->Notice(theClient,"Channel name can't be more than %d characters",
-		channel::MaxName);
-	return false;
-	}
+    if (st[2].size() > channel::MaxName) {
+        bot->Notice(theClient, "Channel name can't be more than %d characters", channel::MaxName);
+        return false;
+    }
 
-bot->MsgChanLog("NOMODE %s\n",st.assemble(1).c_str());
-	    
-if(!strcasecmp(st[1],"ADD"))
-	{
-	if( st.size() < 4 )
-	{
-	    Usage( theClient ) ;
-		return true ;
-	}
+    bot->MsgChanLog("NOMODE %s\n", st.assemble(1).c_str());
 
-	ccBadChannel* NewChannel = bot->isBadChannel(st[2]);
-	if(NewChannel)
-		{
-		bot->Notice(theClient,"There is already a NOMODE entry for channel %s",st[2].c_str());
-		return true;
-		}
-	
-	NewChannel = new (std::nothrow) ccBadChannel(st[2],
-					st.assemble(3),
-					theClient->getRealNickUserHost());
-	assert(NewChannel != NULL);
-	if(!NewChannel->Insert(bot->SQLDb))
-		{
-		bot->Notice(theClient,"Error while inserting the NOMODE entry into the database");
-		return false;
-		}
-	bot->addBadChannel(NewChannel);
-	bot->Notice(theClient,"NOMODE for %s added successfully.", st[2].c_str());
-	}
-else if(!strcasecmp(st[1],"REM"))
-	{
-	ccBadChannel* OldChannel = bot->isBadChannel(st[2]);
-	if(!OldChannel)
-		{
-		bot->Notice(theClient,"There is no NOMODE entry for channel %s",st[2].c_str());
-		return true;
-		}
-	
-	bot->remBadChannel(OldChannel);
-	if(!OldChannel->Delete(bot->SQLDb))
-		{
-		bot->Notice(theClient,"Error while removing the NOMODE entry from the database");
-		return false;
-		}
-	delete OldChannel;
-	bot->Notice(theClient,"NOMODE for %s removed successfully.", st[2].c_str());
-	}
-else
-	{
-	bot->Notice(theClient,"NOMODE must get ADD/REM as first parameter");
-	return true;
-	}
+    if (!strcasecmp(st[1], "ADD")) {
+        if (st.size() < 4) {
+            Usage(theClient);
+            return true;
+        }
 
-	
-return true ;
+        ccBadChannel* NewChannel = bot->isBadChannel(st[2]);
+        if (NewChannel) {
+            bot->Notice(theClient, "There is already a NOMODE entry for channel %s", st[2].c_str());
+            return true;
+        }
+
+        NewChannel = new (std::nothrow)
+            ccBadChannel(st[2], st.assemble(3), theClient->getRealNickUserHost());
+        assert(NewChannel != NULL);
+        if (!NewChannel->Insert(bot->SQLDb)) {
+            bot->Notice(theClient, "Error while inserting the NOMODE entry into the database");
+            return false;
+        }
+        bot->addBadChannel(NewChannel);
+        bot->Notice(theClient, "NOMODE for %s added successfully.", st[2].c_str());
+    } else if (!strcasecmp(st[1], "REM")) {
+        ccBadChannel* OldChannel = bot->isBadChannel(st[2]);
+        if (!OldChannel) {
+            bot->Notice(theClient, "There is no NOMODE entry for channel %s", st[2].c_str());
+            return true;
+        }
+
+        bot->remBadChannel(OldChannel);
+        if (!OldChannel->Delete(bot->SQLDb)) {
+            bot->Notice(theClient, "Error while removing the NOMODE entry from the database");
+            return false;
+        }
+        delete OldChannel;
+        bot->Notice(theClient, "NOMODE for %s removed successfully.", st[2].c_str());
+    } else {
+        bot->Notice(theClient, "NOMODE must get ADD/REM as first parameter");
+        return true;
+    }
+
+    return true;
 }
 
-} // namepsace uworld
+} // namespace uworld
 
 } // namespace gnuworld

@@ -19,9 +19,9 @@
  * Checks to see whether the members of a channel have a common realname.
  */
 
-#include	<string>
-#include	<sstream>
-#include	<map>
+#include <string>
+#include <sstream>
+#include <map>
 
 #include "gnuworld_config.h"
 #include "dronescan.h"
@@ -31,50 +31,42 @@ namespace gnuworld {
 
 namespace ds {
 
-bool COMMONREALTest::isNormal( const Channel *theChannel )
-{
-	typedef std::map<std::string, unsigned short> realnameMapType;
-	realnameMapType realnameMap;
+bool COMMONREALTest::isNormal(const Channel* theChannel) {
+    typedef std::map<std::string, unsigned short> realnameMapType;
+    realnameMapType realnameMap;
 
-	Channel::const_userIterator chanItr = theChannel->userList_begin();
+    Channel::const_userIterator chanItr = theChannel->userList_begin();
 
-	for( ; chanItr != theChannel->userList_end() ; ++chanItr ) {
-		iClient *theClient = chanItr->second->getClient();
+    for (; chanItr != theChannel->userList_end(); ++chanItr) {
+        iClient* theClient = chanItr->second->getClient();
 
-		realnameMap[theClient->getDescription()]++;
-	}
+        realnameMap[theClient->getDescription()]++;
+    }
 
-	for( realnameMapType::const_iterator rnItr = realnameMap.begin() ;
-	     rnItr != realnameMap.end() ; ++rnItr) {
-		if(rnItr->second >= realCutoff) return false;
-	}
+    for (realnameMapType::const_iterator rnItr = realnameMap.begin(); rnItr != realnameMap.end();
+         ++rnItr) {
+        if (rnItr->second >= realCutoff)
+            return false;
+    }
 
-	return true;
+    return true;
 } // bool COMMONREALTest::isNormal(const Channel*)
 
+const std::string COMMONREALTest::getVariable() const { return "realCutoff"; }
 
-const std::string COMMONREALTest::getVariable() const
-{
-	return "realCutoff";
-}
+bool COMMONREALTest::setVariable(const std::string& var, const std::string& value) {
+    if ("REALCUTOFF" != var)
+        return false;
 
+    realCutoff = atoi(value.c_str());
 
-bool COMMONREALTest::setVariable( const std::string& var,
-	const std::string& value)
-{
-	if("REALCUTOFF" != var) return false;
-
-	realCutoff = atoi(value.c_str());
-
-	return true;
+    return true;
 } // bool COMMONREALTest::setVariable( const std::string&,const std::string& )
 
-
-const std::string COMMONREALTest::getStatus() const
-{
-	std::stringstream status;
-	status << "realCutoff: " << realCutoff;
-	return status.str();
+const std::string COMMONREALTest::getStatus() const {
+    std::stringstream status;
+    status << "realCutoff: " << realCutoff;
+    return status.str();
 }
 
 } // namespace ds

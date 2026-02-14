@@ -20,65 +20,53 @@
  * $Id: msg_RO.cc,v 1.1 2009/07/25 18:12:34 hidden1 Exp $
  */
 
-#include	<iostream>
-#include	<string>
+#include <iostream>
+#include <string>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include	"Network.h"
-#include	"ELog.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "Network.h"
+#include "ELog.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::endl ;
-using std::string ;
+using std::endl;
+using std::string;
 
 CREATE_HANDLER(msg_RO)
 
-bool msg_RO::Execute( const xParameters& Param )
-{
-if( Param.empty() )
-	{
-	elog	<< "msg_RO> Invalid number of "
-		<< "arguments"
-		<< endl ;
-	return false ;
-	}
+bool msg_RO::Execute(const xParameters& Param) {
+    if (Param.empty()) {
+        elog << "msg_RO> Invalid number of "
+             << "arguments" << endl;
+        return false;
+    }
 
-xClient* theClient = Network->findLocalClient( Param[ 2 ] ) ;
-if( NULL == theClient )
-	{
-	elog	<< "msg_RO> Unable to find nick: "
-		<< Param[ 1 ]
-		<< endl ;
-	return false ;
-	}
+    xClient* theClient = Network->findLocalClient(Param[2]);
+    if (NULL == theClient) {
+        elog << "msg_RO> Unable to find nick: " << Param[1] << endl;
+        return false;
+    }
 
-iServer* tmpServer = Network->findServer(Param[0]);
-if( NULL == tmpServer )
-	{
-	elog	<< "msg_RO> Unable to find server: "
-		<< Param[ 0 ]
-		<< endl ;
-	return false ;
-	}
+    iServer* tmpServer = Network->findServer(Param[0]);
+    if (NULL == tmpServer) {
+        elog << "msg_RO> Unable to find server: " << Param[0] << endl;
+        return false;
+    }
 
-string tMessage = string( tmpServer->getCharYY() ) + " RO " + theServer->getCharYY() + " ";
-for( xParameters::size_type i = 2 ; i < Param.size() ; ++i )
-	{
-	tMessage += Param[ i ] ;
-	if( (i + 1) < Param.size() )
-		{
-		tMessage += " " ;
-		}
-	}
+    string tMessage = string(tmpServer->getCharYY()) + " RO " + theServer->getCharYY() + " ";
+    for (xParameters::size_type i = 2; i < Param.size(); ++i) {
+        tMessage += Param[i];
+        if ((i + 1) < Param.size()) {
+            tMessage += " ";
+        }
+    }
 
-theClient->OnServerMessage( tmpServer, tMessage );
+    theClient->OnServerMessage(tmpServer, tMessage);
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld

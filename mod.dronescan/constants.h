@@ -23,7 +23,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include	<string>
+#include <string>
 
 namespace gnuworld {
 
@@ -31,11 +31,11 @@ namespace ds {
 
 namespace sql {
 
-	const std::string fakeclients = "SELECT fc.id, fc.nickname, "
-		"fc.username, fc.hostname, fc.realname, u.user_name, "
-		"fc.created_by, fc.created_on, fc.last_updated, fc.flags "
-		"FROM fakeclients AS fc JOIN users AS u ON "
-		"fc.created_by=u.id";
+const std::string fakeclients = "SELECT fc.id, fc.nickname, "
+                                "fc.username, fc.hostname, fc.realname, u.user_name, "
+                                "fc.created_by, fc.created_on, fc.last_updated, fc.flags "
+                                "FROM fakeclients AS fc JOIN users AS u ON "
+                                "fc.created_by=u.id";
 
 } // namespace sql
 

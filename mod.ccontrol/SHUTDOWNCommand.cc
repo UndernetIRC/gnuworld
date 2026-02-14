@@ -19,35 +19,30 @@
  *
  * $Id: SHUTDOWNCommand.cc,v 1.8 2005/01/08 23:33:42 dan_karrels Exp $
  */
-#include	<string>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"server.h"
+#include <string>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "server.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool SHUTDOWNCommand::Exec( iClient* theClient, const string& Message )
-{	 
-StringTokenizer st( Message ) ;
-	
-if(st.size() < 2) 
-	{
-	Usage(theClient);
-	return true;
-	}
-bot->MsgChanLog("SHUTDOWN %s\n",st.assemble(1).c_str());
+bool SHUTDOWNCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-server->Shutdown( st.assemble( 1 ) ) ;
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
+    bot->MsgChanLog("SHUTDOWN %s\n", st.assemble(1).c_str());
 
-return true;
+    server->Shutdown(st.assemble(1));
+
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld
-

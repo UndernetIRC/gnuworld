@@ -34,8 +34,8 @@ namespace ns {
 
 class nickserv;
 
-using std::string ;
-using std::vector ;
+using std::string;
+using std::vector;
 
 class sqlManager {
   public:
@@ -81,7 +81,7 @@ class sqlManager {
     dbHandle* SQLDb;
 
     /** The type used for the commit queue */
-    typedef vector< string > commitQueueType;
+    typedef vector<string> commitQueueType;
 
     /** Allow iteration over the commit queue */
     typedef commitQueueType::iterator CommitQueueItr;

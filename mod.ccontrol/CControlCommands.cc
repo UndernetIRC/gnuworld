@@ -19,27 +19,24 @@
  * $Id: CControlCommands.cc,v 1.16 2005/01/12 03:50:28 dan_karrels Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	<cstdlib>
+#include <cstdlib>
 
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"iClient.h"
-#include	"gnuworld_config.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "iClient.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-void Command::Usage( iClient* theClient )
-{
-bot->Notice( theClient, string( "Usage: " ) + ' ' + getInfo() ) ;
+void Command::Usage(iClient* theClient) {
+    bot->Notice(theClient, string("Usage: ") + ' ' + getInfo());
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld

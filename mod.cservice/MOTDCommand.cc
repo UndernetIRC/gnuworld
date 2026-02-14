@@ -19,34 +19,28 @@
  * $Id: MOTDCommand.cc,v 1.8 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"cservice.h"
-#include 	"responses.h"
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "cservice.h"
+#include "responses.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-bool MOTDCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() != 1 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool MOTDCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() != 1) {
+        Usage(theClient);
+        return true;
+    }
 
-	sqlUser* theUser = bot->isAuthed(theClient, false);
+    sqlUser* theUser = bot->isAuthed(theClient, false);
 
-	bot->Notice(theClient,
-		bot->getResponse(theUser,
-			language::motd,
-			string("No MOTD set.")));
+    bot->Notice(theClient, bot->getResponse(theUser, language::motd, string("No MOTD set.")));
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld.

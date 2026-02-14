@@ -24,18 +24,14 @@
 
 #include "logTarget.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
-class netData
-{
+class netData {
   public:
-
     /** Empty Constructor */
-   netData();
+    netData();
 
     /** Empty Destructor */
     ~netData();
@@ -47,7 +43,7 @@ class netData
     bool warned;
 
     /** This users logging status */
-   logging::events::eventType logMask;
+    logging::events::eventType logMask;
 }; // class netData
 
 } // namespace ns

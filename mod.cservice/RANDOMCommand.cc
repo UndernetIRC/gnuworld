@@ -19,26 +19,23 @@
  * $Id: RANDOMCommand.cc,v 1.6 2003/06/28 01:21:20 dan_karrels Exp $
  */
 
-#include	<string>
-#include	"StringTokenizer.h"
-#include	"ELog.h"
-#include	"Network.h"
-#include	"cservice.h"
+#include <string>
+#include "StringTokenizer.h"
+#include "ELog.h"
+#include "Network.h"
+#include "cservice.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-bool RANDOMCommand::Exec( iClient* theClient, const string& Message )
-{
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
+bool RANDOMCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld.

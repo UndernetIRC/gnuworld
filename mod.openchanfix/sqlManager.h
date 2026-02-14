@@ -29,13 +29,11 @@
 
 #include "dbHandle.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace cf
-{
-  // Forward declaration for the correct chanfix class in the cf namespace
-  class chanfix;
+namespace cf {
+// Forward declaration for the correct chanfix class in the cf namespace
+class chanfix;
 
 class sqlManager {
   public:

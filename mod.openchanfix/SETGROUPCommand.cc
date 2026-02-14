@@ -29,58 +29,52 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void SETGROUPCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void SETGROUPCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-sqlcfUser* targetUser = bot->isAuthed(st[1]);
-if (!targetUser) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::no_such_user,
-                              std::string("No such user %s.")).c_str(), st[1].c_str());
-  return;
-}
+    sqlcfUser* targetUser = bot->isAuthed(st[1]);
+    if (!targetUser) {
+        bot->SendTo(
+            theClient,
+            bot->getResponse(theUser, language::no_such_user, std::string("No such user %s."))
+                .c_str(),
+            st[1].c_str());
+        return;
+    }
 
-std::string group = string_lower(st[2]);
+    std::string group = string_lower(st[2]);
 
-if (targetUser->getGroup() == group) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::user_already_in_group,
-                              std::string("User %s is already in group %s.")).c_str(),
-                                          targetUser->getUserName().c_str(), group.c_str());
-  return;
-}
+    if (targetUser->getGroup() == group) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::user_already_in_group,
+                                     std::string("User %s is already in group %s."))
+                        .c_str(),
+                    targetUser->getUserName().c_str(), group.c_str());
+        return;
+    }
 
-targetUser->setGroup(group);
-targetUser->setLastUpdated(bot->currentTime());
-targetUser->setLastUpdatedBy( std::string( "("
-	+ theUser->getUserName()
-	+ ") "
-	+ theClient->getRealNickUserHost() ) );
-targetUser->commit(bot->getLocalDBHandle());
+    targetUser->setGroup(group);
+    targetUser->setLastUpdated(bot->currentTime());
+    targetUser->setLastUpdatedBy(
+        std::string("(" + theUser->getUserName() + ") " + theClient->getRealNickUserHost()));
+    targetUser->commit(bot->getLocalDBHandle());
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::set_group_for_user,
-                            std::string("Set group %s for user %s.")).c_str(),
-                                        group.c_str(), targetUser->getUserName().c_str());
+    bot->SendTo(theClient,
+                bot->getResponse(theUser, language::set_group_for_user,
+                                 std::string("Set group %s for user %s."))
+                    .c_str(),
+                group.c_str(), targetUser->getUserName().c_str());
 
-bot->logAdminMessage("%s (%s) SETGROUP %s %s",
-	    theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
-	    theClient->getRealNickUserHost().c_str(),
-	    targetUser->getUserName().c_str(),
-	    group.c_str());
+    bot->logAdminMessage(
+        "%s (%s) SETGROUP %s %s", theUser ? theUser->getUserName().c_str() : "!NOT-LOGGED-IN!",
+        theClient->getRealNickUserHost().c_str(), targetUser->getUserName().c_str(), group.c_str());
 
-bot->logLastComMessage(theClient, Message);
+    bot->logLastComMessage(theClient, Message);
 
-return;
-} //SETGROUPCommand::Exec
-} //namespace cf
-} //namespace gnuworld
+    return;
+} // SETGROUPCommand::Exec
+} // namespace cf
+} // namespace gnuworld

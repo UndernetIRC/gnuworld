@@ -26,103 +26,96 @@
 #ifndef __CLONER_H
 #define __CLONER_H "$Id: cloner.h,v 1.10 2004/06/04 20:17:23 jeekay Exp $"
 
-#include	<string>
-#include	<vector>
-#include	<list>
+#include <string>
+#include <vector>
+#include <list>
 
-#include	<ctime>
+#include <ctime>
 
-#include	"client.h"
-#include	"iClient.h"
-#include	"iServer.h"
+#include "client.h"
+#include "iClient.h"
+#include "iServer.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-class cloner : public xClient
-{
+class cloner : public xClient {
 
-typedef std::list< std::string > channelListType ;
+    typedef std::list<std::string> channelListType;
 
-public:
-  cloner( const std::string& configFileName ) ;
-  virtual ~cloner() ;
+  public:
+    cloner(const std::string& configFileName);
+    virtual ~cloner();
 
-  virtual void                OnAttach() ;
-  virtual void                OnConnect() ;
-  virtual void                OnDetach( const string& ) ;
-  virtual void                OnTimer( const xServer::timerID&, void* ) ;
-  virtual void                OnPrivateMessage( iClient*, const std::string&,
-                                bool secure = false ) ;
-  virtual void                OnNetworkKick( Channel*, iClient*,
-                                iClient*, const string&, bool ) ;
-private:
+    virtual void OnAttach();
+    virtual void OnConnect();
+    virtual void OnDetach(const string&);
+    virtual void OnTimer(const xServer::timerID&, void*);
+    virtual void OnPrivateMessage(iClient*, const std::string&, bool secure = false);
+    virtual void OnNetworkKick(Channel*, iClient*, iClient*, const string&, bool);
 
-  virtual void                addClone() ;
-  virtual size_t              joinClone( iClient*, Channel* ) ;
-  virtual size_t              joinClone( const size_t, Channel* ) ;
-  virtual size_t              partClone( iClient*, Channel*, const string ) ;
-  virtual size_t              partClone( const size_t, Channel*, const string ) ;
-  virtual size_t              quitClone( const size_t, const string ) ;
-  virtual size_t              quitClone( iClient*, const string ) ;
-  virtual bool                banMatch( const Channel*, const iClient* ) ;
+  private:
+    virtual void addClone();
+    virtual size_t joinClone(iClient*, Channel*);
+    virtual size_t joinClone(const size_t, Channel*);
+    virtual size_t partClone(iClient*, Channel*, const string);
+    virtual size_t partClone(const size_t, Channel*, const string);
+    virtual size_t quitClone(const size_t, const string);
+    virtual size_t quitClone(iClient*, const string);
+    virtual bool banMatch(const Channel*, const iClient*);
 
-  gnuworld::xServer::timerID	loadCloneTimer ;
-  gnuworld::xServer::timerID	cycleCloneTimer = 0 ;
-  gnuworld::xServer::timerID	delayJoinTimer = 0 ;
+    gnuworld::xServer::timerID loadCloneTimer;
+    gnuworld::xServer::timerID cycleCloneTimer = 0;
+    gnuworld::xServer::timerID delayJoinTimer = 0;
 
-  virtual bool                hasAccess( const std::string& ) const ;
+    virtual bool hasAccess(const std::string&) const;
 
-  virtual std::string         randomNick( int minLength = 5,
-                                int maxLength = 9 ) ;
-  virtual std::string         randomUser() ;
-  virtual std::string         randomHost() ;
-  virtual std::string         randomAccount() ;
-  virtual char                randomChar() ;
-  virtual iClient*            randomClone() ;
+    virtual std::string randomNick(int minLength = 5, int maxLength = 9);
+    virtual std::string randomUser();
+    virtual std::string randomHost();
+    virtual std::string randomAccount();
+    virtual char randomChar();
+    virtual iClient* randomClone();
 
-  struct cloneSettings {
-    bool ident = false ;
-    bool modeO = false ;
-    bool modeK = false ;
-    bool modeR = false ;
-    bool modeX = false ;
-    channelListType channels = {} ;
-  } ;
+    struct cloneSettings {
+        bool ident = false;
+        bool modeO = false;
+        bool modeK = false;
+        bool modeR = false;
+        bool modeX = false;
+        channelListType channels = {};
+    };
 
-  std::vector< struct cloneSettings > cloneQueue ;
+    std::vector<struct cloneSettings> cloneQueue;
 
-  bool                        cycleRun = false ;
-  float                       cyclePercentage = 0 ;
-  unsigned int                cycleTime = 0 ;
+    bool cycleRun = false;
+    float cyclePercentage = 0;
+    unsigned int cycleTime = 0;
 
-  std::list< std::string >    allowAccess ;
-  std::vector< std::string >  userNames ;
-  std::vector< std::string >  hostNames ;
-  std::vector< std::pair
-    < std::string, int > >    accountNames ;
+    std::list<std::string> allowAccess;
+    std::vector<std::string> userNames;
+    std::vector<std::string> hostNames;
+    std::vector<std::pair<std::string, int>> accountNames;
 
-  typedef std::vector
-            < iClient* >      cloneVectorType ;
-  cloneVectorType             clones ;
+    typedef std::vector<iClient*> cloneVectorType;
+    cloneVectorType clones;
 
-  iServer*                    fakeServer = nullptr ;
+    iServer* fakeServer = nullptr;
 
-  bool                        allowOpers ;
+    bool allowOpers;
 
-  size_t                      cloneBurstCount ;
-  size_t                      minNickLength ;
-  size_t                      maxNickLength ;
-  size_t                      delayCount = 0 ;
-  size_t                      joinCloneCount = 0 ;
+    size_t cloneBurstCount;
+    size_t minNickLength;
+    size_t maxNickLength;
+    size_t delayCount = 0;
+    size_t joinCloneCount = 0;
 
-  std::string                 cloneDescription ;
-  std::string                 cloneMode ;
-  std::string                 fakeServerName ;
-  std::string                 fakeServerDescription ;
+    std::string cloneDescription;
+    std::string cloneMode;
+    std::string fakeServerName;
+    std::string fakeServerDescription;
 
-  Channel*                    delayChan = nullptr ;
-} ;
+    Channel* delayChan = nullptr;
+};
 
 } // namespace gnuworld
 

@@ -30,88 +30,90 @@
 #include "StringTokenizer.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void HELPCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void HELPCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-if (st.size() < 2) {
-  if (bot->isAllowingTopFix())
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXNORMAL>"));
+    if (st.size() < 2) {
+        if (bot->isAllowingTopFix())
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXNORMAL>"));
 
-  if (theClient->isOper())
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXOPER>"));
+        if (theClient->isOper())
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXOPER>"));
 
-  if (!theUser)
-    return;
+        if (!theUser)
+            return;
 
-  bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXLOGGEDIN>"));
+        bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXLOGGEDIN>"));
 
-  if (theUser->getFlag(sqlcfUser::F_SERVERADMIN))
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXSERVERADMIN>"));
+        if (theUser->getFlag(sqlcfUser::F_SERVERADMIN))
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXSERVERADMIN>"));
 
-  if (theUser->getFlag(sqlcfUser::F_BLOCK))
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXBLOCK>"));
+        if (theUser->getFlag(sqlcfUser::F_BLOCK))
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXBLOCK>"));
 
-  if (theUser->getFlag(sqlcfUser::F_COMMENT))
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXCOMMENT>"));
+        if (theUser->getFlag(sqlcfUser::F_COMMENT))
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXCOMMENT>"));
 
-  if (theUser->getFlag(sqlcfUser::F_CHANFIX))
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXCHANFIX>"));
+        if (theUser->getFlag(sqlcfUser::F_CHANFIX))
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXCHANFIX>"));
 
-  if (theUser->getFlag(sqlcfUser::F_OWNER))
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXOWNER>"));
+        if (theUser->getFlag(sqlcfUser::F_OWNER))
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXOWNER>"));
 
-  if (theUser->getFlag(sqlcfUser::F_USERMANAGER))
-    bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXUSERADMIN>"));
+        if (theUser->getFlag(sqlcfUser::F_USERMANAGER))
+            bot->SendTo(theClient, bot->getHelpMessage(theUser, "<INDEXUSERADMIN>"));
 
-} else {
-  std::string msg = bot->getHelpMessage(theUser, string_upper(st.assemble(1)));
+    } else {
+        std::string msg = bot->getHelpMessage(theUser, string_upper(st.assemble(1)));
 
-  if (!msg.empty()) {
-    bool real = true;
-    const std::string Command = string_upper(st[1]);
+        if (!msg.empty()) {
+            bool real = true;
+            const std::string Command = string_upper(st[1]);
 
-    chanfix::commandMapType::iterator commHandler = bot->commandMap.find(Command);
-    if (commHandler == bot->commandMap.end())
-      real = false;
+            chanfix::commandMapType::iterator commHandler = bot->commandMap.find(Command);
+            if (commHandler == bot->commandMap.end())
+                real = false;
 
-    bot->SendTo(theClient, "\002%s\002", real ? commHandler->second->getInfo().c_str() : Command.c_str());
+            bot->SendTo(theClient, "\002%s\002",
+                        real ? commHandler->second->getInfo().c_str() : Command.c_str());
 
-    bot->SendFmtTo(theClient, msg);
+            bot->SendFmtTo(theClient, msg);
 
-    if (real) {
-      /* If you change this code, remember to change it in chanfix.cc */
-      sqlcfUser::flagType requiredFlags = commHandler->second->getRequiredFlags();
-      if (requiredFlags) {
-	if (requiredFlags == sqlcfUser::F_LOGGEDIN)
-	  bot->SendTo(theClient, "This command requires authentication.");
-	else {
-	  if (bot->getFlagChar(requiredFlags) != ' ')
-	    bot->SendTo(theClient,
-			bot->getResponse(theUser,
-				language::requires_auth_and_flag,
-				std::string("This command requires authentication and flag '%c'.")).c_str(),
-					bot->getFlagChar(requiredFlags));
-	  else
-	    bot->SendTo(theClient,
-			bot->getResponse(theUser,
-				language::requires_auth_and_flags,
-				std::string("This command requires authentication and one of these flags: \"%s\".")).c_str(),
-					bot->getFlagsString(requiredFlags).c_str());
-	}
-      }
+            if (real) {
+                /* If you change this code, remember to change it in chanfix.cc */
+                sqlcfUser::flagType requiredFlags = commHandler->second->getRequiredFlags();
+                if (requiredFlags) {
+                    if (requiredFlags == sqlcfUser::F_LOGGEDIN)
+                        bot->SendTo(theClient, "This command requires authentication.");
+                    else {
+                        if (bot->getFlagChar(requiredFlags) != ' ')
+                            bot->SendTo(
+                                theClient,
+                                bot->getResponse(
+                                       theUser, language::requires_auth_and_flag,
+                                       std::string(
+                                           "This command requires authentication and flag '%c'."))
+                                    .c_str(),
+                                bot->getFlagChar(requiredFlags));
+                        else
+                            bot->SendTo(
+                                theClient,
+                                bot->getResponse(theUser, language::requires_auth_and_flags,
+                                                 std::string("This command requires authentication "
+                                                             "and one of these flags: \"%s\"."))
+                                    .c_str(),
+                                bot->getFlagsString(requiredFlags).c_str());
+                    }
+                }
+            }
+        } else
+            bot->SendTo(theClient, "There is no help available for that topic.");
     }
-  } else
-    bot->SendTo(theClient, "There is no help available for that topic.");
 
-}
+} // HELPCommand::Exec
 
-} //HELPCommand::Exec
-
-} //namespace cf
-} //namespace gnuworld
+} // namespace cf
+} // namespace gnuworld

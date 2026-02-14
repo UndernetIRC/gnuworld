@@ -19,73 +19,61 @@
  *
  * $Id: UNJUPECommand.cc,v 1.3 2006/09/26 17:36:01 kewlio Exp $
  */
-#include	<new>
-#include	<string>
-#include	<iomanip>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"iServer.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"Network.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
+#include <new>
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "iServer.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "Network.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
-using std::string ;
+namespace gnuworld {
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool UNJUPECommand::Exec( iClient* theClient, const string& Message )
-{
+bool UNJUPECommand::Exec(iClient* theClient, const string& Message) {
 
-StringTokenizer st( Message ) ;
-if( st.size() < 2 )
-	{
-	Usage( theClient ) ;
-	return false ;
-	}
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return false;
+    }
 
-// The server name to be juped must have at least 1 '.'
-if( st[1].length() > server::MaxName) 
-	{
-	bot->Notice( theClient, "Bogus server name" ) ;
-	return false ;
-	}
-bot->MsgChanLog("UNJUPE %s\n",st.assemble(1).c_str());
+    // The server name to be juped must have at least 1 '.'
+    if (st[1].length() > server::MaxName) {
+        bot->Notice(theClient, "Bogus server name");
+        return false;
+    }
+    bot->MsgChanLog("UNJUPE %s\n", st.assemble(1).c_str());
 
-iServer* Server;
+    iServer* Server;
 
-if(string::npos != st[ 1 ].find_first_of( '*' ))
-	{
-	bot->Notice(theClient,"Sorry, but you must give a full server name when juping!");
-	return false;
-	}	
-else if(string::npos == st[ 1 ].find_first_of( '.' ))
-	{
-	bot->Notice( theClient, "Bogus server name" ) ;
-	return false ;
-	}
+    if (string::npos != st[1].find_first_of('*')) {
+        bot->Notice(theClient, "Sorry, but you must give a full server name when juping!");
+        return false;
+    } else if (string::npos == st[1].find_first_of('.')) {
+        bot->Notice(theClient, "Bogus server name");
+        return false;
+    }
 
-Server = Network->findServerName(st[1]);
-if(!Server)
-	{
-	bot->Notice(theClient,"Sorry, but i can't find that server!");
-	return false;
-	}
-if(!Server->isJupe())
-	{
-	bot->Notice(theClient,"Sorry, but the server is not juped!");
-	return false;
-	}
-server->DetachServer(Server);
+    Server = Network->findServerName(st[1]);
+    if (!Server) {
+        bot->Notice(theClient, "Sorry, but i can't find that server!");
+        return false;
+    }
+    if (!Server->isJupe()) {
+        bot->Notice(theClient, "Sorry, but the server is not juped!");
+        return false;
+    }
+    server->DetachServer(Server);
 
-
-return true ;
-
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld

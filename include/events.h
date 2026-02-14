@@ -28,67 +28,64 @@
 #ifndef __EVENTS_H
 #define __EVENTS_H "$Id: events.h,v 1.22 2010/09/05 17:26:35 denspike Exp $"
 
-#include	<string>
+#include <string>
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 /**
  * This is used to enumerate the possible network (non-channel)
  * events that gnuworld will track and deliver to registered
  * clients.
  */
-enum
-{
-	EVT_OPER,
-	EVT_NETBREAK,
-	EVT_NETJOIN,
-	EVT_BURST_CMPLT,
-	EVT_BURST_ACK,
-	EVT_EA_SENT,
-	EVT_GLINE,
-	EVT_REMGLINE,
-	EVT_JUPE,
-	EVT_UNJUPE,
-	EVT_QUIT,
-	EVT_KILL,
-	EVT_NICK,
-	EVT_CHNICK,
-	EVT_ACCOUNT,
-	EVT_ACCOUNT_FLAGS,
-	EVT_RAW,
-	EVT_XQUERY,
-	EVT_XREPLY,
-	EVT_NETCONF,
+enum {
+    EVT_OPER,
+    EVT_NETBREAK,
+    EVT_NETJOIN,
+    EVT_BURST_CMPLT,
+    EVT_BURST_ACK,
+    EVT_EA_SENT,
+    EVT_GLINE,
+    EVT_REMGLINE,
+    EVT_JUPE,
+    EVT_UNJUPE,
+    EVT_QUIT,
+    EVT_KILL,
+    EVT_NICK,
+    EVT_CHNICK,
+    EVT_ACCOUNT,
+    EVT_ACCOUNT_FLAGS,
+    EVT_RAW,
+    EVT_XQUERY,
+    EVT_XREPLY,
+    EVT_NETCONF,
 
-	// EVT_NOOP must always be last
-	EVT_NOOP
-} ;
+    // EVT_NOOP must always be last
+    EVT_NOOP
+};
 
 /**
  * The type used to represent network (non-channel) events.
  */
-typedef int eventType ;
+typedef int eventType;
 
 /**
  * This enumerates the possible channel events that gnuworld will
  * track and deliver to registered clients.
  */
-enum
-{
-	EVT_JOIN = EVT_NOOP,
-	EVT_PART,
-	EVT_SERVERMODE, // when server performs modes.
-	EVT_TOPIC, // passed even if TRACK_TOPIC is disabled
-	EVT_KICK, // moved to xClient::OnNetworkKick()
-	EVT_CREATE,
-	EVT_BURST
-} ;
+enum {
+    EVT_JOIN = EVT_NOOP,
+    EVT_PART,
+    EVT_SERVERMODE, // when server performs modes.
+    EVT_TOPIC,      // passed even if TRACK_TOPIC is disabled
+    EVT_KICK,       // moved to xClient::OnNetworkKick()
+    EVT_CREATE,
+    EVT_BURST
+};
 
 /**
  * The type used to store possible channel events.
  */
-typedef int channelEventType ;
+typedef int channelEventType;
 
 /**
  * Arguments for the various events:
@@ -123,7 +120,7 @@ typedef int channelEventType ;
  * EVT_XQUERY
  *  1) iServer* source (might add iClient* later)
  *  2) string* - routing
- *  3) string* - command  
+ *  3) string* - command
  * EVT_XREPLY
  *  1) iServer* source
  *  2) string* - routing
@@ -149,32 +146,32 @@ typedef int channelEventType ;
  */
 
 const std::string eventNames[] = {
-	"Oper Up", /* EVT_OPER */
-	"Net Break", /* EVT_NETBREAK */
-	"Net Join", /* EVT_NETJOIN */
-	"Burst Complete", /* EVT_BURST_CMPLT */
-	"Burst Acknowledge", /* EVT_BURST_ACK */
-	"Burst Acknowledge Sent", /* EVT_EA_SENT */
-	"Gline Add", /* EVT_GLINE */
-	"Gline Remove", /* EVT_REMGLINE */
-	"Server Jupe", /* EVT_JUPE */
-	"Server UnJupe", /* EVT_UNJUPE */
-	"Client Quit", /* EVT_QUIT */
-	"Client Kill", /* EVT_KILL */
-	"Client Connect", /* EVT_NICK */
-	"Nick Change", /* EVT_CHNICK */
-	"Account Login", /* EVT_ACCOUNT */
-	"Raw", /* EVT_RAW */
-	"XQuery", /* EVT_XQUERY */
-	"XReply", /* EVT_XREPLY */
-	"Channel Join", /* EVT_JOIN */
-	"Channel Part", /* EVT_PART */
-	"Channel Mode By Server", /* EVT_SERVERMODE */
-	"Channel Topic Change", /* EVT_TOPIC */
-	"Channel Kick", /* EVT_KICK */
-	"Channel Create", /* EVT_CREATE */
-	"Channel Burst" /* EVT_BURST */
-} ;
+    "Oper Up",                /* EVT_OPER */
+    "Net Break",              /* EVT_NETBREAK */
+    "Net Join",               /* EVT_NETJOIN */
+    "Burst Complete",         /* EVT_BURST_CMPLT */
+    "Burst Acknowledge",      /* EVT_BURST_ACK */
+    "Burst Acknowledge Sent", /* EVT_EA_SENT */
+    "Gline Add",              /* EVT_GLINE */
+    "Gline Remove",           /* EVT_REMGLINE */
+    "Server Jupe",            /* EVT_JUPE */
+    "Server UnJupe",          /* EVT_UNJUPE */
+    "Client Quit",            /* EVT_QUIT */
+    "Client Kill",            /* EVT_KILL */
+    "Client Connect",         /* EVT_NICK */
+    "Nick Change",            /* EVT_CHNICK */
+    "Account Login",          /* EVT_ACCOUNT */
+    "Raw",                    /* EVT_RAW */
+    "XQuery",                 /* EVT_XQUERY */
+    "XReply",                 /* EVT_XREPLY */
+    "Channel Join",           /* EVT_JOIN */
+    "Channel Part",           /* EVT_PART */
+    "Channel Mode By Server", /* EVT_SERVERMODE */
+    "Channel Topic Change",   /* EVT_TOPIC */
+    "Channel Kick",           /* EVT_KICK */
+    "Channel Create",         /* EVT_CREATE */
+    "Channel Burst"           /* EVT_BURST */
+};
 
 } // namespace gnuworld
 

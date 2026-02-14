@@ -30,67 +30,65 @@ namespace gnuworld {
 
 namespace ds {
 
-void MODUSERCommand::Exec( const iClient *theClient, const string& Message, const sqlUser* theUser )
-{
-	if(theUser->getAccess() < level::moduser) return ;
+void MODUSERCommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser) {
+    if (theUser->getAccess() < level::moduser)
+        return;
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	/* Usage:
-	 *  MODUSER (ACCESS)
-	 */
+    /* Usage:
+     *  MODUSER (ACCESS)
+     */
 
-	if(st.size() < 2) {
-		Usage(theClient);
-		return ;
-	}
+    if (st.size() < 2) {
+        Usage(theClient);
+        return;
+    }
 
-	string Command = string_upper(st[1]);
+    string Command = string_upper(st[1]);
 
-	if("ACCESS" == Command) {
-		/* Usage:
-		 *  MODUSER ACCESS <user> <level>
-		 */
-		if(st.size() != 4) {
-			Usage(theClient);
-			return ;
-		}
+    if ("ACCESS" == Command) {
+        /* Usage:
+         *  MODUSER ACCESS <user> <level>
+         */
+        if (st.size() != 4) {
+            Usage(theClient);
+            return;
+        }
 
-		/* Conditions:
-		 *  i) User must exist
-		 * ii) New level must be < the modifiers
-		 */
+        /* Conditions:
+         *  i) User must exist
+         * ii) New level must be < the modifiers
+         */
 
-		/* Does the user exist? */
+        /* Does the user exist? */
 
-		sqlUser *targetUser = bot->getSqlUser(st[2]);
-		if(!targetUser) {
-			bot->Reply(theClient, "No such user.");
-			return ;
-		}
+        sqlUser* targetUser = bot->getSqlUser(st[2]);
+        if (!targetUser) {
+            bot->Reply(theClient, "No such user.");
+            return;
+        }
 
-		/* Is the level less than the modifiers? */
-		unsigned int newLevel = atoi(st[3].c_str());
-		if(newLevel < 1 || newLevel >= theUser->getAccess()) {
-			bot->Reply(theClient, "You cannot grant a user equal or higher access than yourself.");
-			return ;
-		}
+        /* Is the level less than the modifiers? */
+        unsigned int newLevel = atoi(st[3].c_str());
+        if (newLevel < 1 || newLevel >= theUser->getAccess()) {
+            bot->Reply(theClient, "You cannot grant a user equal or higher access than yourself.");
+            return;
+        }
 
-		/* Conditions passed. Modify, update. */
-		targetUser->setAccess(newLevel);
-		if(targetUser->commit()) {
-			bot->Reply(theClient, "Successfully changed %s's access to %u.",
-				targetUser->getUserName().c_str(),
-				newLevel
-				);
-			return ;
-		} else {
-			bot->Reply(theClient, "There was a problem changing the access level.");
-			return ;
-		}
-	}
+        /* Conditions passed. Modify, update. */
+        targetUser->setAccess(newLevel);
+        if (targetUser->commit()) {
+            bot->Reply(theClient, "Successfully changed %s's access to %u.",
+                       targetUser->getUserName().c_str(), newLevel);
+            return;
+        } else {
+            bot->Reply(theClient, "There was a problem changing the access level.");
+            return;
+        }
+    }
 
-	return ;
+    return;
 
 } // MODUSERCommand::Exec(iClient*, const string&, const sqlUser*)
 

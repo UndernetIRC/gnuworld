@@ -20,54 +20,44 @@
  * $Id: LISTHOSTSCommand.cc,v 1.14 2006/09/26 17:35:59 kewlio Exp $
  */
 
-#include	<string>
-#include	<cstdlib>
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <cstdlib>
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
+using std::string;
 
-namespace uworld
-{
+namespace uworld {
 
-bool LISTHOSTSCommand::Exec( iClient* theClient, const string& Message)
-{	 
-StringTokenizer st( Message ) ;
+bool LISTHOSTSCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
+    if (st.size() < 2) {
+        Usage(theClient);
+        return true;
+    }
+    ccUser* tmpUser = bot->IsAuth(theClient);
+    bot->MsgChanLog("LISTHOSTS %s\n", st.assemble(1).c_str());
 
-if( st.size() < 2 )
-	{
-	Usage(theClient);
-	return true;
-	}
-ccUser* tmpUser = bot->IsAuth(theClient);
-bot->MsgChanLog("LISTHOSTS %s\n",st.assemble(1).c_str());
+    tmpUser = bot->GetOper(st[1]);
 
-tmpUser = bot->GetOper(st[1]);
-
-if(!tmpUser)
-	{
-        bot->Notice(theClient,"%s isn't on my access list",st[1].c_str());
+    if (!tmpUser) {
+        bot->Notice(theClient, "%s isn't on my access list", st[1].c_str());
         return false;
-	}
+    }
 
-if(bot->listHosts(tmpUser,theClient))
-	{
-	bot->Notice(theClient,"End of hosts for user %s",st[1].c_str());
-	}
-else
-	{
-	bot->Notice(theClient,"Error while accessing host list for %s",st[1].c_str());
-	}
+    if (bot->listHosts(tmpUser, theClient)) {
+        bot->Notice(theClient, "End of hosts for user %s", st[1].c_str());
+    } else {
+        bot->Notice(theClient, "Error while accessing host list for %s", st[1].c_str());
+    }
 
-return true;
+    return true;
 }
 
-}
+} // namespace uworld
 } // namespace gnuworld
-

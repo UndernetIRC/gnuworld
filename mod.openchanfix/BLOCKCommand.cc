@@ -31,95 +31,93 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-namespace gnuworld
-{
-namespace cf
-{
+namespace gnuworld {
+namespace cf {
 
-void BLOCKCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message)
-{
-StringTokenizer st(Message);
+void BLOCKCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
+    StringTokenizer st(Message);
 
-/* Check if channel blocking has been disabled in the config. */
-if (!bot->doChanBlocking()) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_blocking_disabled,
-                              std::string("Channel blocking is disabled.")).c_str());
-  return;
-}
+    /* Check if channel blocking has been disabled in the config. */
+    if (!bot->doChanBlocking()) {
+        bot->SendTo(theClient, bot->getResponse(theUser, language::channel_blocking_disabled,
+                                                std::string("Channel blocking is disabled."))
+                                   .c_str());
+        return;
+    }
 
-if (st[1][0] != '#') {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::invalid_channel_name,
-                              std::string("%s is an invalid channel name.")).c_str(),
-                                          st[1].c_str());
-  return;
-}
+    if (st[1][0] != '#') {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::invalid_channel_name,
+                                     std::string("%s is an invalid channel name."))
+                        .c_str(),
+                    st[1].c_str());
+        return;
+    }
 
-sqlChannel* theChan = bot->getChannelRecord(st[1]);
-if (!theChan) theChan = bot->newChannelRecord(st[1]);
+    sqlChannel* theChan = bot->getChannelRecord(st[1]);
+    if (!theChan)
+        theChan = bot->newChannelRecord(st[1]);
 
-if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
-  bot->SendTo(theClient,
-              bot->getResponse(theUser,
-                              language::channel_already_blocked,
-                              std::string("The channel %s is already blocked.")).c_str(),
-                                          theChan->getChannel().c_str());
-  return;
-}
+    if (theChan->getFlag(sqlChannel::F_BLOCKED)) {
+        bot->SendTo(theClient,
+                    bot->getResponse(theUser, language::channel_already_blocked,
+                                     std::string("The channel %s is already blocked."))
+                        .c_str(),
+                    theChan->getChannel().c_str());
+        return;
+    }
 
-theChan->setFlag(sqlChannel::F_BLOCKED);
+    theChan->setFlag(sqlChannel::F_BLOCKED);
 
-if (!theChan->useSQL())
-  theChan->Insert(bot->getLocalDBHandle());
-else
-  theChan->commit(bot->getLocalDBHandle());
+    if (!theChan->useSQL())
+        theChan->Insert(bot->getLocalDBHandle());
+    else
+        theChan->commit(bot->getLocalDBHandle());
 
-/* Add note to the channel about this command */
-theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_BLOCK, theClient, st.assemble(2));
+    /* Add note to the channel about this command */
+    theChan->addNote(bot->getLocalDBHandle(), sqlChannel::EV_BLOCK, theClient, st.assemble(2));
 
-bot->SendTo(theClient,
-            bot->getResponse(theUser,
-                            language::channel_has_been_blocked,
-                            std::string("The channel %s has been blocked.")).c_str(),
-                                        theChan->getChannel().c_str());
-
-/* Warn and remove from the queue if it is being fixed */
-std::string extraLog;
-Channel* netChan = Network->findChannel(st[1]);
-if (netChan) {
-  if (bot->isBeingChanFixed(netChan)) {
     bot->SendTo(theClient,
-		bot->getResponse(theUser,
-			language::aborting_manual_fix,
-			std::string("WARNING: Channel %s is being manually fixed; aborting fix as per BLOCK.")).c_str(),
-				    theChan->getChannel().c_str());
-    bot->stopFixingChan(netChan, true);
-    extraLog = " (current manual fix aborted)";
-  }
-  if (bot->isBeingAutoFixed(netChan)) {
-    bot->SendTo(theClient,
-		bot->getResponse(theUser,
-			language::aborting_auto_fix,
-			std::string("WARNING: Channel %s is being automatically fixed; aborting fix as per BLOCK.")).c_str(),
-				    theChan->getChannel().c_str());
-    bot->stopFixingChan(netChan, true);
-    extraLog = " (current autofix aborted)";
-  }
-}
+                bot->getResponse(theUser, language::channel_has_been_blocked,
+                                 std::string("The channel %s has been blocked."))
+                    .c_str(),
+                theChan->getChannel().c_str());
 
-/* Log command */
-bot->logAdminMessage("%s (%s) BLOCK %s%s",
-		     theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
-		     theClient->getRealNickUserHost().c_str(),
-		     theChan->getChannel().c_str(),
-		     extraLog.c_str());
+    /* Warn and remove from the queue if it is being fixed */
+    std::string extraLog;
+    Channel* netChan = Network->findChannel(st[1]);
+    if (netChan) {
+        if (bot->isBeingChanFixed(netChan)) {
+            bot->SendTo(theClient,
+                        bot->getResponse(theUser, language::aborting_manual_fix,
+                                         std::string("WARNING: Channel %s is being manually fixed; "
+                                                     "aborting fix as per BLOCK."))
+                            .c_str(),
+                        theChan->getChannel().c_str());
+            bot->stopFixingChan(netChan, true);
+            extraLog = " (current manual fix aborted)";
+        }
+        if (bot->isBeingAutoFixed(netChan)) {
+            bot->SendTo(theClient,
+                        bot->getResponse(theUser, language::aborting_auto_fix,
+                                         std::string("WARNING: Channel %s is being automatically "
+                                                     "fixed; aborting fix as per BLOCK."))
+                            .c_str(),
+                        theChan->getChannel().c_str());
+            bot->stopFixingChan(netChan, true);
+            extraLog = " (current autofix aborted)";
+        }
+    }
 
-bot->logLastComMessage(theClient, Message);
+    /* Log command */
+    bot->logAdminMessage(
+        "%s (%s) BLOCK %s%s",
+        theUser ? theUser->getUserName().c_str() : theClient->getNickName().c_str(),
+        theClient->getRealNickUserHost().c_str(), theChan->getChannel().c_str(), extraLog.c_str());
 
-return;
+    bot->logLastComMessage(theClient, Message);
+
+    return;
 }
 } // namespace cf
 } // namespace gnuworld

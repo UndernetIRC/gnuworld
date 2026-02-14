@@ -34,71 +34,77 @@ namespace chanfix {
 
 using std::string;
 
-cfChannel* chanfix::getChannel(const string& channel, bool create)
-{
-	mapChannels::iterator itr = channels.find(channel);
+cfChannel* chanfix::getChannel(const string& channel, bool create) {
+    mapChannels::iterator itr = channels.find(channel);
 
-	if( itr != channels.end() ) { return itr->second; }
+    if (itr != channels.end()) {
+        return itr->second;
+    }
 
-	if( ! create ) { return 0; }
+    if (!create) {
+        return 0;
+    }
 
-	cfChannel* newChan = new cfChannel(channel);
+    cfChannel* newChan = new cfChannel(channel);
 
-	channels[channel] = newChan;
+    channels[channel] = newChan;
 
-	return newChan;
+    return newChan;
 }
 
+void chanfix::doCountUpdate() {
+    /* Iterator over all available channels */
+    log(logging::DEBUG, "Starting count cycle");
 
-void chanfix::doCountUpdate()
-{
-	/* Iterator over all available channels */
-	log(logging::DEBUG, "Starting count cycle");
+    Timer myTimer;
 
-	Timer myTimer;
+    unsigned int channels = 0;
+    unsigned int ops = 0;
 
-	unsigned int channels = 0;
-	unsigned int ops = 0;
+    for (xNetwork::const_channelIterator itr = Network->channels_begin();
+         itr != Network->channels_end(); ++itr) {
+        Channel* tmpChannel = itr->second;
 
-	for( xNetwork::const_channelIterator itr = Network->channels_begin() ;
-	     itr != Network->channels_end() ;
-	     ++itr ) {
-		Channel *tmpChannel = itr->second;
+        ++channels;
 
-		++channels;
+        cfChannel* cfChan = 0;
 
-		cfChannel *cfChan = 0;
+        for (Channel::userIterator citr = tmpChannel->userList_begin();
+             citr != tmpChannel->userList_end(); ++citr) {
+            ChannelUser* chanUser = citr->second;
 
-		for( Channel::userIterator citr = tmpChannel->userList_begin() ;
-		     citr != tmpChannel->userList_end() ;
-		     ++citr ) {
-			ChannelUser *chanUser = citr->second;
+            if (!chanUser->isModeO()) {
+                continue;
+            }
+            if (!chanUser->getClient()->isModeR()) {
+                continue;
+            }
+            if (chanUser->getClient()->isModeK()) {
+                continue;
+            }
 
-			if( ! chanUser->isModeO() ) { continue ; }
-			if( ! chanUser->getClient()->isModeR() ) { continue ; }
-			if( chanUser->getClient()->isModeK() ) { continue ; }
+            if (!cfChan) {
+                cfChan = getChannel(tmpChannel->getName(), true);
+            }
 
-			if( ! cfChan ) { cfChan = getChannel(tmpChannel->getName(), true); }
+            ++ops;
 
-			++ops;
+            cfChannelUser* user = cfChan->getUser(chanUser->getClient()->getAccount());
 
-			cfChannelUser *user = cfChan->getUser(chanUser->getClient()->getAccount());
+            if (user->getPoints() >= confMaxPoints) {
+                continue;
+            }
 
-			if( user->getPoints() >= confMaxPoints ) { continue ; }
+            user->addPoints(confPointsAuth);
 
-			user->addPoints(confPointsAuth);
+            if (user->getPoints() >= confMaxPoints) {
+                user->setPoints(confMaxPoints);
+            }
+        }
+    }
 
-			if( user->getPoints() >= confMaxPoints ) {
-				user->setPoints(confMaxPoints);
-			}
-		}
-	}
-
-	log(logging::DEBUG, "Duration: %ums. Found %u channels and %u ops.",
-		myTimer.stopTimeMS(),
-		channels,
-		ops
-		);
+    log(logging::DEBUG, "Duration: %ums. Found %u channels and %u ops.", myTimer.stopTimeMS(),
+        channels, ops);
 }
 
 } // namespace chanfix

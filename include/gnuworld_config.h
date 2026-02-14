@@ -26,7 +26,7 @@
 /* GNUWorld main configuration file */
 /* All core settings are set/defined here.
  */
-#include	"defs.h"
+#include "defs.h"
 
 /**
  * CONFFILE

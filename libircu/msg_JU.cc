@@ -20,16 +20,15 @@
  * $Id: msg_JU.cc,v 1.9 2010/09/20 17:36:25 denspike Exp $
  */
 
-#include	<string>
+#include <string>
 
-#include	"gnuworld_config.h"
-#include	"server.h"
-#include 	"Network.h"
-#include	"xparameters.h"
-#include	"ServerCommandHandler.h"
+#include "gnuworld_config.h"
+#include "server.h"
+#include "Network.h"
+#include "xparameters.h"
+#include "ServerCommandHandler.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 using std::endl;
 
 CREATE_HANDLER(msg_JU)
@@ -37,81 +36,63 @@ CREATE_HANDLER(msg_JU)
 /**
  * JUPE message handler.
  */
-bool msg_JU::Execute( const xParameters& Param)
-{
+bool msg_JU::Execute(const xParameters& Param) {
 
-if (Param.size() < 6)
-	{
-	elog 	<< "msg_JU: Invalid number of arguments" 
-		<< endl;
-	return false;
-	}
-if(Param[2][0] == '+') 
-	{
-	/*
-	 * A new jupe is interduced, need to create an iServer for it
-	 * and notify all the modules
-	 */
-	std::string Reason = Param.assemble(5);
-	std::string SName =  Param[2];
-	SName = SName.substr(1);
-	std::string CTime = Param[4];
-	unsigned int intYY = 0;
-	char temp[3];
-	temp[2] = '\0';
-	if (!Network->allocateServerNumeric(intYY))
-		{
-		elog << "msg_JU> Error while allocating server numeric!"
-		     << endl;
-		return false;
-		}
-	const char* temp2 = inttobase64(temp,intYY,2);
-	
-	if (Reason[0] == ':')
-		{
-		Reason = Reason.substr(1);
-		};
-	iServer* jupeServer = new (std::nothrow) iServer(
-	base64toint(Param[0]),
-	temp2,
-	SName,
-	atoi(CTime.c_str()),
-	Reason
-	);
-	assert (jupeServer != 0);
-	jupeServer->setJupe();
-	if (!Network->addServer(jupeServer))
-		{
-		elog << "msg_JU> error while adding new server :(" << endl;
-		return false;
-		}
-	theServer->PostEvent(EVT_NETJOIN, //TODO add EVT_JUPE
-	static_cast< void* >(jupeServer),
-	NULL);
+    if (Param.size() < 6) {
+        elog << "msg_JU: Invalid number of arguments" << endl;
+        return false;
+    }
+    if (Param[2][0] == '+') {
+        /*
+         * A new jupe is interduced, need to create an iServer for it
+         * and notify all the modules
+         */
+        std::string Reason = Param.assemble(5);
+        std::string SName = Param[2];
+        SName = SName.substr(1);
+        std::string CTime = Param[4];
+        unsigned int intYY = 0;
+        char temp[3];
+        temp[2] = '\0';
+        if (!Network->allocateServerNumeric(intYY)) {
+            elog << "msg_JU> Error while allocating server numeric!" << endl;
+            return false;
+        }
+        const char* temp2 = inttobase64(temp, intYY, 2);
 
-	}
-else
-	{ // its a removal..
-	std::string SName =  Param[2];
-	SName = SName.substr(1);
-	iServer* jupeServer = Network->findServerName(SName);
-	if(!jupeServer)
-		{
-		elog << "msg_JU> Cant find server for removal" << endl;
-		return false;
-		}
-	if(jupeServer->getCharYY() == theServer->getCharYY())
-		{
-		elog << "msg_JU> Let's not even try to remove ourself" << endl;
-		return false;
-		}
-	// BUG: Nothing here?
-	if(!Network->removeServer(jupeServer->getIntYY(),true))
-		{}
-	}	
+        if (Reason[0] == ':') {
+            Reason = Reason.substr(1);
+        };
+        iServer* jupeServer = new (std::nothrow)
+            iServer(base64toint(Param[0]), temp2, SName, atoi(CTime.c_str()), Reason);
+        assert(jupeServer != 0);
+        jupeServer->setJupe();
+        if (!Network->addServer(jupeServer)) {
+            elog << "msg_JU> error while adding new server :(" << endl;
+            return false;
+        }
+        theServer->PostEvent(EVT_NETJOIN, // TODO add EVT_JUPE
+                             static_cast<void*>(jupeServer), NULL);
 
-// TODO
-return false ;
+    } else { // its a removal..
+        std::string SName = Param[2];
+        SName = SName.substr(1);
+        iServer* jupeServer = Network->findServerName(SName);
+        if (!jupeServer) {
+            elog << "msg_JU> Cant find server for removal" << endl;
+            return false;
+        }
+        if (jupeServer->getCharYY() == theServer->getCharYY()) {
+            elog << "msg_JU> Let's not even try to remove ourself" << endl;
+            return false;
+        }
+        // BUG: Nothing here?
+        if (!Network->removeServer(jupeServer->getIntYY(), true)) {
+        }
+    }
+
+    // TODO
+    return false;
 }
 
 } // namespace gnuworld

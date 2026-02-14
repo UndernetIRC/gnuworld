@@ -20,22 +20,21 @@
  * $Id: msg_GL.cc,v 1.9 2009/08/01 08:32:21 mrbean_ Exp $
  */
 
-#include	<new>
-#include	<iostream>
+#include <new>
+#include <iostream>
 
-#include	<cassert>
+#include <cassert>
 
-#include	"gnuworld_config.h"
-#include	"ServerCommandHandler.h"
-#include	"server.h"
-#include	"events.h"
-#include	"Gline.h"
-#include	"ELog.h"
-#include	"xparameters.h"
+#include "gnuworld_config.h"
+#include "ServerCommandHandler.h"
+#include "server.h"
+#include "events.h"
+#include "Gline.h"
+#include "ELog.h"
+#include "xparameters.h"
 
-namespace gnuworld
-{
-using std::endl ;
+namespace gnuworld {
+using std::endl;
 
 CREATE_HANDLER(msg_GL)
 
@@ -45,70 +44,54 @@ CREATE_HANDLER(msg_GL)
  *  (On Mon May 1 22:40:23 2000 GMT from SE5 for 180 seconds: remgline
  *  test.. 	[0])
  */
-bool msg_GL::Execute( const xParameters& Params )
-{
-if( '-' == Params[ 2 ][ 0 ] )
-	{
-	// Removing a gline
-	if( Params.size() < 3 )
-		{
-		elog	<< "msg_GL> Invalid number of arguments"
-			<< endl ;
-		return false ;
-		}
+bool msg_GL::Execute(const xParameters& Params) {
+    if ('-' == Params[2][0]) {
+        // Removing a gline
+        if (Params.size() < 3) {
+            elog << "msg_GL> Invalid number of arguments" << endl;
+            return false;
+        }
 
-	xServer::glineIterator gItr = theServer->findGlineIterator(
-		Params[ 2 ] + 1 ) ;
-	if( gItr == theServer->glines_end() )
-		{
-		// Unable to find the gline to be removed *shrug*
-		return true ;
-		}
+        xServer::glineIterator gItr = theServer->findGlineIterator(Params[2] + 1);
+        if (gItr == theServer->glines_end()) {
+            // Unable to find the gline to be removed *shrug*
+            return true;
+        }
 
-	// Let the modules know that it has been removed
-	theServer->PostEvent( EVT_REMGLINE,
-		static_cast< void* >( gItr->second ) ) ;
+        // Let the modules know that it has been removed
+        theServer->PostEvent(EVT_REMGLINE, static_cast<void*>(gItr->second));
 
-	// Clean up memory
-	delete gItr->second ;
-	theServer->eraseGline( gItr ) ;
+        // Clean up memory
+        delete gItr->second;
+        theServer->eraseGline(gItr);
 
-	return true ;
-	}
+        return true;
+    }
 
-// Else, adding a gline
-if( Params.size() < 5 )
-	{
-	elog	<< "msg_GL> Invalid number of arguments"
-		<< endl ;
-	return false ;
-	}
+    // Else, adding a gline
+    if (Params.size() < 5) {
+        elog << "msg_GL> Invalid number of arguments" << endl;
+        return false;
+    }
 
-Gline* newGline = new (std::nothrow) Gline(
-		Params[ 0 ],
-		Params[ 2 ] + 1,
-		Params[ Params.size() - 1 ],
-		atoi( Params[ 3 ] ),
-		atoi( Params[ 4 ] )) ;
-assert( newGline != 0 ) ;
+    Gline* newGline = new (std::nothrow) Gline(Params[0], Params[2] + 1, Params[Params.size() - 1],
+                                               atoi(Params[3]), atoi(Params[4]));
+    assert(newGline != 0);
 
-// Temporary variable
-{
-	xServer::glineIterator gItr = theServer->findGlineIterator(
-		newGline->getUserHost() ) ;
-	if( gItr != theServer->glines_end() )
-		{
-		// This gline is already present
-		delete gItr->second ;
-		theServer->eraseGline( gItr ) ;
-		}
-}
+    // Temporary variable
+    {
+        xServer::glineIterator gItr = theServer->findGlineIterator(newGline->getUserHost());
+        if (gItr != theServer->glines_end()) {
+            // This gline is already present
+            delete gItr->second;
+            theServer->eraseGline(gItr);
+        }
+    }
 
-theServer->addGline( newGline ) ;
-theServer->PostEvent( EVT_GLINE,
-	static_cast< void* >( newGline ) ) ;
+    theServer->addGline(newGline);
+    theServer->PostEvent(EVT_GLINE, static_cast<void*>(newGline));
 
-return true ;
+    return true;
 }
 
 } // namespace gnuworld

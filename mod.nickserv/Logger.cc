@@ -37,66 +37,53 @@ Logger* Logger::theLogger = 0;
 /**
  * Implementation of Logger as a singleton.
  */
-Logger* Logger::getInstance()
-{
-  if(!theLogger) theLogger = new Logger;
+Logger* Logger::getInstance() {
+    if (!theLogger)
+        theLogger = new Logger;
 
-  return theLogger;
+    return theLogger;
 }
-
 
 /**
  * Allow registration of a new log target
  */
-void Logger::addLogger(logTarget* theTarget)
-{
-  logTargets.push_back(theTarget);
-}
-
+void Logger::addLogger(logTarget* theTarget) { logTargets.push_back(theTarget); }
 
 /**
  * Allow a client to log an event type
  */
-void Logger::log(const events::eventType& theEvent, const string& theMessage)
-{
-  for(logTargetsType::iterator ptr = logTargets.begin(); ptr != logTargets.end(); ptr++) {
-    (*ptr)->log(theEvent, theMessage);
-  }
+void Logger::log(const events::eventType& theEvent, const string& theMessage) {
+    for (logTargetsType::iterator ptr = logTargets.begin(); ptr != logTargets.end(); ptr++) {
+        (*ptr)->log(theEvent, theMessage);
+    }
 }
-
 
 /**
  * Allow a client to log an event.
  * This is a convenience wrapper around log(events::eventType&, const string&).
  */
-void Logger::log(const events::eventType& theEvent, const char* format, ... ) {
-  char buffer[512];
+void Logger::log(const events::eventType& theEvent, const char* format, ...) {
+    char buffer[512];
 
-  va_list _list;
+    va_list _list;
 
-  va_start(_list, format);
-  ::vsnprintf(buffer, 512, format, _list);
-  va_end(_list);
+    va_start(_list, format);
+    ::vsnprintf(buffer, 512, format, _list);
+    va_end(_list);
 
-  log(theEvent, string(buffer));
+    log(theEvent, string(buffer));
 }
-
 
 /**
  * Empty constructor
  */
-Logger::Logger()
-{
-}
+Logger::Logger() {}
 
 /**
  * Destructor
  */
-Logger::~Logger()
-{
-}
+Logger::~Logger() {}
 
 } // namespace logging
 
 } // namespace gnuworld
-

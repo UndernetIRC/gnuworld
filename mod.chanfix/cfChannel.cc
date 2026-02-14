@@ -30,32 +30,26 @@ namespace chanfix {
 
 using std::string;
 
-cfChannel::cfChannel(const string& _name) :
-	name(_name)
-{
+cfChannel::cfChannel(const string& _name) : name(_name) {}
+
+cfChannel::~cfChannel() {
+    for (mapUsers::iterator itr = users.begin(); itr != users.end(); ++itr) {
+        delete itr->second;
+    }
 }
 
-cfChannel::~cfChannel()
-{
-for( mapUsers::iterator itr = users.begin() ;
-     itr != users.end() ;
-     ++itr ) {
-	delete itr->second;
-}
-}
+cfChannelUser* cfChannel::getUser(const string& username) {
+    mapUsers::iterator itr = users.find(username);
 
+    if (itr != users.end()) {
+        return itr->second;
+    }
 
-cfChannelUser* cfChannel::getUser(const string& username)
-{
-	mapUsers::iterator itr = users.find(username);
+    cfChannelUser* tmpUser = new cfChannelUser(username);
 
-	if( itr != users.end() ) { return itr->second; }
+    users[username] = tmpUser;
 
-	cfChannelUser *tmpUser = new cfChannelUser(username);
-
-	users[username] = tmpUser;
-
-	return tmpUser;
+    return tmpUser;
 }
 
 } // namespace chanfix

@@ -32,54 +32,41 @@ namespace chanfix {
 
 using std::endl;
 
-void chanfix::log(const logging::loglevel& level, const char* format, ... )
-{
-	char buf[1024] = {0};
-	va_list list;
+void chanfix::log(const logging::loglevel& level, const char* format, ...) {
+    char buf[1024] = {0};
+    va_list list;
 
-	va_start(list, format);
-	vsnprintf(buf, 1024, format, list);
-	va_end(list);
+    va_start(list, format);
+    vsnprintf(buf, 1024, format, list);
+    va_end(list);
 
-	log(level, std::string(buf));
+    log(level, std::string(buf));
 }
 
+void chanfix::log(const logging::loglevel& level, const std::string& message) {
+    if (0 == (confLogLevel & level)) {
+        return;
+    }
 
-void chanfix::log(const logging::loglevel& level,
-	const std::string& message)
-{
-	if( 0 == (confLogLevel & level) ) { return; }
+    /* Check our logging channel exists */
+    Channel* logChannel = Network->findChannel(confConsoleChannel);
 
-	/* Check our logging channel exists */
-	Channel *logChannel = Network->findChannel(confConsoleChannel);
+    if (!logChannel) {
+        elog << "chanfix> ERROR: Unable to locate logging channel." << endl;
+        return;
+    }
 
-	if( !logChannel ) {
-		elog	<< "chanfix> ERROR: Unable to locate logging channel."
-			<< endl;
-		return;
-	}
-
-	Message(logChannel, message.c_str());
+    Message(logChannel, message.c_str());
 }
 
+void chanfix::setConsoleTopic() {
+    char buffer[512];
+    sprintf(buffer, "Giving %u points per %us", confPointsAuth, confPeriod);
 
-void chanfix::setConsoleTopic()
-{
-	char buffer[512];
-	sprintf(buffer, "Giving %u points per %us",
-		confPointsAuth,
-		confPeriod
-		);
+    std::stringstream newTopic;
+    newTopic << this->getCharYYXXX() << " T " << confConsoleChannel << " :" << buffer << endl;
 
-	std::stringstream newTopic;
-	newTopic	<< this->getCharYYXXX()
-			<< " T "
-			<< confConsoleChannel
-			<< " :"
-			<< buffer
-			<< endl;
-
-	this->Write(newTopic.str());
+    this->Write(newTopic.str());
 }
 
 } // namespace chanfix

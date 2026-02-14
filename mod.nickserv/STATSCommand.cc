@@ -25,35 +25,32 @@
 #include "responses.h"
 #include "Stats.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-namespace ns
-{
+namespace ns {
 
 using std::string;
 
-bool STATSCommand::Exec(iClient* theClient, const string& )
-{
-bot->theStats->incStat("NS.CMD.STATS");
+bool STATSCommand::Exec(iClient* theClient, const string&) {
+    bot->theStats->incStat("NS.CMD.STATS");
 
-sqlUser* theUser = bot->isAuthed(theClient);
+    sqlUser* theUser = bot->isAuthed(theClient);
 
-if(!theUser || (theUser->getLevel() < level::admin::stats)) {
-  bot->Notice(theClient, responses::noAccess);
-  return true;
-}
+    if (!theUser || (theUser->getLevel() < level::admin::stats)) {
+        bot->Notice(theClient, responses::noAccess);
+        return true;
+    }
 
-Stats::statsMapType::const_iterator statsBegin = bot->theStats->getStatsMapBegin();
-Stats::statsMapType::const_iterator statsEnd   = bot->theStats->getStatsMapEnd();
+    Stats::statsMapType::const_iterator statsBegin = bot->theStats->getStatsMapBegin();
+    Stats::statsMapType::const_iterator statsEnd = bot->theStats->getStatsMapEnd();
 
-for(Stats::statsMapType::const_iterator ptr = statsBegin; ptr != statsEnd; ptr++) {
-  string stat = ptr->first;
-  unsigned int amount = ptr->second;
-  bot->Notice(theClient, "%s: %u", stat.c_str(), amount);
-}
+    for (Stats::statsMapType::const_iterator ptr = statsBegin; ptr != statsEnd; ptr++) {
+        string stat = ptr->first;
+        unsigned int amount = ptr->second;
+        bot->Notice(theClient, "%s: %u", stat.c_str(), amount);
+    }
 
-return true;
+    return true;
 } // STATSCommand
 
 } // namespace ns

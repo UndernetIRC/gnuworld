@@ -20,156 +20,154 @@
  * $Id: LOGINCommand.cc,v 1.32 2009/07/25 18:12:34 hidden1 Exp $
  */
 
-#include	<string>
-#include	<sstream>
-#include	<iostream>
-#include	<cstdlib>
-#include	"Network.h"
-#include	"ccontrol.h"
-#include	"CControlCommands.h"
-#include	"StringTokenizer.h"
-#include	"md5hash.h" 
-#include	"ccUser.h"
-#include	"events.h"
-#include	"ip.h"
-#include	"gnuworld_config.h"
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
+#include "Network.h"
+#include "ccontrol.h"
+#include "CControlCommands.h"
+#include "StringTokenizer.h"
+#include "md5hash.h"
+#include "ccUser.h"
+#include "events.h"
+#include "ip.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-using std::string ;
-using std::endl ;
-using std::ends ;
-using std::stringstream ;
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
 
-namespace uworld
-{
+namespace uworld {
 
-bool LOGINCommand::Exec( iClient* theClient, const string& Message)
-{
-StringTokenizer st( Message ) ;
+bool LOGINCommand::Exec(iClient* theClient, const string& Message) {
+    StringTokenizer st(Message);
 
-bool isAuthedToX = false;
+    bool isAuthedToX = false;
 
-if( st.size() < 3 )
-	{
-	Usage(theClient);
-	return true;
-	}
-//Try fetching the user authenticate entry
-ccUser* theUser = bot->IsAuth(theClient);
-if (theUser) 
-	{
-	if ((theUser->getAutoOp()) && (!theClient->isOper()))
-		bot->deAuthUser(theUser, theClient);
-	else 
-		{
-		//Dont let him authenticate under a new name (for now)
-		bot->Notice(theClient, "You are already authenticated! See DEAUTH command.");
-		return false;
-		}
-	}
+    if (st.size() < 3) {
+        Usage(theClient);
+        return true;
+    }
+    // Try fetching the user authenticate entry
+    ccUser* theUser = bot->IsAuth(theClient);
+    if (theUser) {
+        if ((theUser->getAutoOp()) && (!theClient->isOper()))
+            bot->deAuthUser(theUser, theClient);
+        else {
+            // Dont let him authenticate under a new name (for now)
+            bot->Notice(theClient, "You are already authenticated! See DEAUTH command.");
+            return false;
+        }
+    }
 
-	/*
-	 *  Find the user record, confirm authorisation and attach the record to this client. 
-	 */
-iServer* targetServer = Network->findServer( theClient->getIntYY() ) ;
-if( NULL == targetServer )
-	{
-	elog	<< "LOGINCommand> Unable to find server: "
-		<< theClient->getIntYY() << endl ;
-	return false ;
-	}
- 
-theUser = bot->GetOper(st[1]);
-if (!theUser) 
-	{
+    /*
+     *  Find the user record, confirm authorisation and attach the record to this client.
+     */
+    iServer* targetServer = Network->findServer(theClient->getIntYY());
+    if (NULL == targetServer) {
+        elog << "LOGINCommand> Unable to find server: " << theClient->getIntYY() << endl;
+        return false;
+    }
 
-	bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username: %s (%s)\n",
-		theClient->getRealNickUserHost().c_str(),
-		st[1].c_str(),
-		targetServer->getName().c_str());
-	if(theClient->isOper())
-		bot->Notice(theClient, "FALSE LOGIN, DENIED");
-	bot->addLogin(theClient);
-	return false;
-	}
-else
-	{ 
-	if (!strcasecmp(theClient->getAccount(), theUser->getAccount())) {
-		if ((theClient->getAccountID() == theUser->getAccountID()) || (theUser->getAccountID() == 0))
-			isAuthedToX = true;
-	}
+    theUser = bot->GetOper(st[1]);
+    if (!theUser) {
 
-	//Check if the user need to be operd to login
-	if((!theClient->isOper()) && (theUser->getNeedOp())) {
-		if (!theUser->getAutoOp()) {
-			bot->MsgChanLog("[FAILED LOGIN] %s - Not Oper'd\n",theClient->getRealNickUserHost().c_str());
-			bot->addLogin(theClient);
-			return false;
-		}
-	}
-	//Check if the users mask is in his access list
-	if((!theClient->isOper()) && (!bot->UserGotMask(theUser,theClient->getRealNickUserHost()))
-	    &&(!bot->UserGotMask( theUser,theClient->getNickName() + "!" + theClient->getUserName() + "@" + xIP(theClient->getIP()).GetNumericIP())))
-		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",theClient->getRealNickUserHost().c_str());
-		if(theClient->isOper()) 
-			bot->Notice(theClient, "FALSE LOGIN, DENIED");
-		bot->addLogin(theClient);
-		return false;
-		}
+        bot->MsgChanLog("[FAILED LOGIN] %s - Bad Username: %s (%s)\n",
+                        theClient->getRealNickUserHost().c_str(), st[1].c_str(),
+                        targetServer->getName().c_str());
+        if (theClient->isOper())
+            bot->Notice(theClient, "FALSE LOGIN, DENIED");
+        bot->addLogin(theClient);
+        return false;
+    } else {
+        if (!strcasecmp(theClient->getAccount(), theUser->getAccount())) {
+            if ((theClient->getAccountID() == theUser->getAccountID()) ||
+                (theUser->getAccountID() == 0))
+                isAuthedToX = true;
+        }
 
-	md5	hash; // MD5 hash algorithm object.
-	md5Digest digest; // MD5Digest algorithm object.
-	stringstream output;
-	string salt = theUser->getPassword().substr(0, 8);
-	string md5Part = theUser->getPassword().substr(8);
-	string guess = salt + st.assemble(2);
+        // Check if the user need to be operd to login
+        if ((!theClient->isOper()) && (theUser->getNeedOp())) {
+            if (!theUser->getAutoOp()) {
+                bot->MsgChanLog("[FAILED LOGIN] %s - Not Oper'd\n",
+                                theClient->getRealNickUserHost().c_str());
+                bot->addLogin(theClient);
+                return false;
+            }
+        }
+        // Check if the users mask is in his access list
+        if ((!theClient->isOper()) &&
+            (!bot->UserGotMask(theUser, theClient->getRealNickUserHost())) &&
+            (!bot->UserGotMask(theUser, theClient->getNickName() + "!" + theClient->getUserName() +
+                                            "@" + xIP(theClient->getIP()).GetNumericIP()))) {
+            bot->MsgChanLog("[FAILED LOGIN] %s - No HostMask\n",
+                            theClient->getRealNickUserHost().c_str());
+            if (theClient->isOper())
+                bot->Notice(theClient, "FALSE LOGIN, DENIED");
+            bot->addLogin(theClient);
+            return false;
+        }
 
-	// Build a MD5 hash based on our salt + the guessed password.
-	hash.update( (unsigned char *)guess.c_str(), strlen( guess.c_str() ));
-	hash.report( digest );
+        md5 hash;         // MD5 hash algorithm object.
+        md5Digest digest; // MD5Digest algorithm object.
+        stringstream output;
+        string salt = theUser->getPassword().substr(0, 8);
+        string md5Part = theUser->getPassword().substr(8);
+        string guess = salt + st.assemble(2);
 
-	// Convert the digest into an array of int's to output as hex for 
-	// comparison with the passwords generated by PHP.
-	int data[ MD5_DIGEST_LENGTH ];
-	int ii;
-	for( ii = 0; ii < MD5_DIGEST_LENGTH; ii++ )
-		{
-		data[ii] = digest[ii];
-		}
-	output << hex;
-	output.fill('0');
-	for( ii = 0; ii < MD5_DIGEST_LENGTH; ii++ ) {
-		output << setw(2) << data[ii];
-		}
-	output << ends;
+        // Build a MD5 hash based on our salt + the guessed password.
+        hash.update((unsigned char*)guess.c_str(), strlen(guess.c_str()));
+        hash.report(digest);
 
-	if (md5Part != output.str().c_str()) // If the MD5 hash's don't match..
-		{
-		bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password (%s)\n",theClient->getRealNickUserHost().c_str(), targetServer->getName().c_str());
-		if(theClient->isOper()) 
-			bot->Notice(theClient, "FALSE LOGIN, DENIED");
-		bot->addLogin(theClient);
-		return false;
-		}
-	if (isAuthedToX) {
-		if ((theUser->getAccountID() != theClient->getAccountID()) && (theUser->getAccountID() == 0)) {
-			// euworld has never received an accountID for this account before. Update the db.
-			theUser->setAccountID(theClient->getAccountID());
-			theUser->Update();
-			bot->Notice(theClient, "Your X account ID (%d) is now stored in my database along with your X account.", theClient->getAccountID());
-			bot->Notice(theClient, "This ensures that if your username expires and gets re-registered, I will see the difference. You should never see this message again");
-		}
-	}
-	//Ok the password match , prepare the ccUser data
-	bot->OkAuthUser(theClient, theUser);
-	} 
+        // Convert the digest into an array of int's to output as hex for
+        // comparison with the passwords generated by PHP.
+        int data[MD5_DIGEST_LENGTH];
+        int ii;
+        for (ii = 0; ii < MD5_DIGEST_LENGTH; ii++) {
+            data[ii] = digest[ii];
+        }
+        output << hex;
+        output.fill('0');
+        for (ii = 0; ii < MD5_DIGEST_LENGTH; ii++) {
+            output << setw(2) << data[ii];
+        }
+        output << ends;
 
-return true; 
-} 
+        if (md5Part != output.str().c_str()) // If the MD5 hash's don't match..
+        {
+            bot->MsgChanLog("[FAILED LOGIN] %s - Bad Password (%s)\n",
+                            theClient->getRealNickUserHost().c_str(),
+                            targetServer->getName().c_str());
+            if (theClient->isOper())
+                bot->Notice(theClient, "FALSE LOGIN, DENIED");
+            bot->addLogin(theClient);
+            return false;
+        }
+        if (isAuthedToX) {
+            if ((theUser->getAccountID() != theClient->getAccountID()) &&
+                (theUser->getAccountID() == 0)) {
+                // euworld has never received an accountID for this account before. Update the db.
+                theUser->setAccountID(theClient->getAccountID());
+                theUser->Update();
+                bot->Notice(theClient,
+                            "Your X account ID (%d) is now stored in my database along with your X "
+                            "account.",
+                            theClient->getAccountID());
+                bot->Notice(theClient,
+                            "This ensures that if your username expires and gets re-registered, I "
+                            "will see the difference. You should never see this message again");
+            }
+        }
+        // Ok the password match , prepare the ccUser data
+        bot->OkAuthUser(theClient, theUser);
+    }
 
+    return true;
 }
-} // namespace gnuworld
 
+} // namespace uworld
+} // namespace gnuworld

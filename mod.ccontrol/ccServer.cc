@@ -1,7 +1,7 @@
 /**
  * ccServer.cc
  * Server class
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,273 +19,185 @@
  *
  * $Id: ccServer.cc,v 1.18 2009/08/06 02:59:24 hidden1 Exp $
  */
- 
-#include	<sstream>
-#include	<string> 
 
-#include	<ctime>
-#include	<cstring> 
-#include	<cstdlib>
+#include <sstream>
+#include <string>
 
-#include	"dbHandle.h"
-#include	"ELog.h"
-#include	"misc.h"
-#include	"ccServer.h" 
-#include	"ccontrol.h"
-#include	"Constants.h"
-#include	"gnuworld_config.h"
+#include <ctime>
+#include <cstring>
+#include <cstdlib>
 
-namespace gnuworld
-{
-using std::string ; 
-using std::endl ; 
-using std::stringstream ;
-using std::ends ;
+#include "dbHandle.h"
+#include "ELog.h"
+#include "misc.h"
+#include "ccServer.h"
+#include "ccontrol.h"
+#include "Constants.h"
+#include "gnuworld_config.h"
 
-namespace uworld
-{
+namespace gnuworld {
+using std::endl;
+using std::ends;
+using std::string;
+using std::stringstream;
+
+namespace uworld {
 
 unsigned int ccServer::numAllocated = 0;
 
 ccServer::ccServer(dbHandle* _SQLDb)
- : Name(),
-   Uplink(),
-   Numeric(),
-   LastConnected( 0 ),
-   LastSplitted( 0 ),
-   SplitReason( "" ),
-   Version( "Unknown" ),
-   AddedOn( ::time(0) ),
-   LastUpdated( 0 ),
-   NetServer(NULL),
-   ReportMissing(true),
-   LagTime(0),
-   LastLagReport(0),
-   LastLagSent(0),
-   LastLagRecv(0),
-   SQLDb( _SQLDb )
-{
-++numAllocated;
+    : Name(), Uplink(), Numeric(), LastConnected(0), LastSplitted(0), SplitReason(""),
+      Version("Unknown"), AddedOn(::time(0)), LastUpdated(0), NetServer(NULL), ReportMissing(true),
+      LagTime(0), LastLagReport(0), LastLagSent(0), LastLagRecv(0), SQLDb(_SQLDb) {
+    ++numAllocated;
 }
 
-ccServer::~ccServer()
-{
---numAllocated;
+ccServer::~ccServer() { --numAllocated; }
+
+bool ccServer::Insert() {
+    static const char* Main = "INSERT INTO servers "
+                              "(Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason,"
+                              "Version,AddedOn,LastUpdated,ReportMissing) VALUES ('";
+
+    if (!dbConnected) {
+        return false;
+    }
+    stringstream theQuery;
+    theQuery << Main << escapeSQLChars(Name) << "','" << escapeSQLChars(Uplink) << "','"
+             << escapeSQLChars(Numeric) << "'," << LastConnected << "," << LastSplitted << ",'"
+             << escapeSQLChars(SplitReason) << "','" << escapeSQLChars(Version) << "'," << AddedOn
+             << "," << LastUpdated << "," << (ReportMissing ? "'t'" : "'n'") << ")" << ends;
+
+    elog << "ccontrol::Server::Insert::sqlQuery> " << theQuery.str().c_str() << endl;
+
+    if (SQLDb->Exec(theQuery))
+    // if( PGRES_COMMAND_OK == status )
+    {
+        return true;
+    } else {
+        elog << "ccontrol::Server::Insert> SQL Failure: " << SQLDb->ErrorMessage() << endl;
+        return false;
+    }
 }
 
-bool ccServer::Insert()
-{
-static const char *Main = "INSERT INTO servers (Name,LastUplink,LastNumeric,LastConnected,SplitedOn,SplitReason,Version,AddedOn,LastUpdated,ReportMissing) VALUES ('";
+bool ccServer::Update() {
+    static const char* Main = "UPDATE servers SET Name = '";
 
-if(!dbConnected)
-	{
-	return false;
-	}
-stringstream theQuery;
-theQuery	<< Main
-		<< escapeSQLChars(Name) <<"','"
-		<< escapeSQLChars(Uplink) << "','"
-		<< escapeSQLChars(Numeric) << "',"
-		<< LastConnected << ","
-		<< LastSplitted 
-		<< ",'" << escapeSQLChars(SplitReason)
-		<< "','" << escapeSQLChars(Version)
-		<< "'," << AddedOn
-		<< "," << LastUpdated
-		<< "," 
-		<< (ReportMissing ? "'t'" : "'n'")
-		<< ")" 
-		<< ends;
+    if (!dbConnected) {
+        return false;
+    }
 
-elog	<< "ccontrol::Server::Insert::sqlQuery> "
-	<< theQuery.str().c_str()
-	<< endl; 
+    stringstream theQuery;
+    theQuery << Main << escapeSQLChars(Name) << "', LastUplink = '" << escapeSQLChars(Uplink)
+             << "', LastNumeric = '" << escapeSQLChars(Numeric)
+             << "', LastConnected = " << LastConnected << ",SplitedOn = " << LastSplitted
+             << ", SplitReason = '" << escapeSQLChars(SplitReason) << "', Version = '"
+             << escapeSQLChars(Version) << "', AddedOn = " << AddedOn
+             << ", LastUpdated = " << LastUpdated
+             << ", ReportMissing = " << (ReportMissing ? "'t'" : "'n'") << " WHERE lower(Name) = '"
+             << string_lower(Name) << "'" << ends;
 
-if( SQLDb->Exec( theQuery ) )
-//if( PGRES_COMMAND_OK == status ) 
-	{
-	return true;
-	}
-else
-	{
-	elog	<< "ccontrol::Server::Insert> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
+    elog << "ccontrol::Server::Update> " << theQuery.str().c_str() << endl;
 
+    if (SQLDb->Exec(theQuery))
+    // if( PGRES_COMMAND_OK == status )
+    {
+        return true;
+    } else {
+        elog << "ccontrol::Server::Update> SQL Failure: " << SQLDb->ErrorMessage() << endl;
+        return false;
+    }
 }
 
-bool ccServer::Update()
-{
-static const char *Main = "UPDATE servers SET Name = '";
+bool ccServer::loadData(string ServerName) {
+    // static const char *Main = "SELECT
+    // name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers WHERE
+    // lower(Name) = '";
 
-if(!dbConnected)
-	{
-	return false;
-	}
+    if (!dbConnected) {
+        return false;
+    }
 
-stringstream theQuery;
-theQuery	<< Main
-		<< escapeSQLChars(Name)
-		<< "', LastUplink = '"
-		<< escapeSQLChars(Uplink)
-		<< "', LastNumeric = '"
-		<< escapeSQLChars(Numeric)
-		<< "', LastConnected = "
-		<< LastConnected
-		<< ",SplitedOn = "
-		<< LastSplitted
-		<< ", SplitReason = '"
-		<< escapeSQLChars(SplitReason)
-		<< "', Version = '"
-		<< escapeSQLChars(Version)
-		<< "', AddedOn = " 
-		<< AddedOn
-		<< ", LastUpdated = " 
-		<< LastUpdated
-		<< ", ReportMissing = " 
-		<< (ReportMissing ? "'t'" : "'n'")
-		<< " WHERE lower(Name) = '" << string_lower(Name)
-		<<  "'" << ends;
+    stringstream theQuery;
+    theQuery << server::Query << "Where lower(Name) = '" << escapeSQLChars(string_lower(ServerName))
+             << "'" << ends;
 
-elog	<< "ccontrol::Server::Update> "
-	<< theQuery.str().c_str()
-	<< endl; 
+    elog << "ccontrol::Server::LoadData> " << theQuery.str().c_str() << endl;
 
-if( SQLDb->Exec( theQuery ) )
-//if( PGRES_COMMAND_OK == status ) 
-	{
-	return true;
-	}
-else
-	{
-	elog	<< "ccontrol::Server::Update> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
+    if (!SQLDb->Exec(theQuery, true))
+    // if( PGRES_TUPLES_OK != status )
+    {
+        elog << "ccontrol::Server> SQL Failure: " << SQLDb->ErrorMessage() << endl;
+
+        return false;
+    }
+
+    return loadDataFromDB();
 }
 
-bool ccServer::loadData(string ServerName)
-{
-//static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,splitreason FROM servers WHERE 
-//lower(Name) = '";
+bool ccServer::loadNumericData(string ServNumeric) {
+    /*static const char *Main = "SELECT
+    name,lastuplink,lastconnected,splitedon,lastnumeric,SplitReason FROM servers WHERE LastNumeric =
+    '";*/
 
-if(!dbConnected)
-	{
-	return false;
-	}
+    if (!dbConnected) {
+        return false;
+    }
 
-stringstream theQuery;
-theQuery	<< server::Query
-		<< "Where lower(Name) = '"
-		<< escapeSQLChars(string_lower(ServerName))
-		<< "'" << ends;
+    stringstream theQuery;
+    theQuery << server::Query << "Where LastNumeric = '" << escapeSQLChars(ServNumeric) << "'"
+             << ends;
 
-elog	<< "ccontrol::Server::LoadData> "
-	<< theQuery.str().c_str()
-	<< endl; 
+    elog << "ccontrol::Server::LoadNumericData> " << theQuery.str().c_str() << endl;
 
-if( !SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::Server> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
+    if (!SQLDb->Exec(theQuery, true))
+    // if( PGRES_TUPLES_OK != status )
+    {
+        elog << "ccontrol::Server> SQL Failure: " << SQLDb->ErrorMessage() << endl;
 
-	return false ;
-	}
-
-return loadDataFromDB();
-
+        return false;
+    }
+    return loadDataFromDB();
 }
 
-bool ccServer::loadNumericData(string ServNumeric)
-{
-/*static const char *Main = "SELECT name,lastuplink,lastconnected,splitedon,lastnumeric,SplitReason FROM servers WHERE 
-LastNumeric = '";*/
+bool ccServer::loadDataFromDB(int place) {
 
-if(!dbConnected)
-	{
-	return false;
-	}
-
-stringstream theQuery;
-theQuery	<< server::Query
-		<< "Where LastNumeric = '"
-		<< escapeSQLChars(ServNumeric)
-		<< "'" << ends;
-
-elog	<< "ccontrol::Server::LoadNumericData> "
-	<< theQuery.str().c_str()
-	<< endl; 
-
-if( !SQLDb->Exec( theQuery, true ) )
-//if( PGRES_TUPLES_OK != status )
-	{
-	elog	<< "ccontrol::Server> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-
-	return false ;
-	}
-return loadDataFromDB();
-
+    if (SQLDb->Tuples() == 0)
+        return false;
+    Name = SQLDb->GetValue(place, 0);
+    Uplink = SQLDb->GetValue(0, 1);
+    LastConnected = static_cast<time_t>(atoi(SQLDb->GetValue(place, 2).c_str()));
+    LastSplitted = static_cast<time_t>(atoi(SQLDb->GetValue(place, 3).c_str()));
+    Numeric = SQLDb->GetValue(place, 4);
+    SplitReason = SQLDb->GetValue(place, 5);
+    Version = SQLDb->GetValue(place, 6);
+    AddedOn = static_cast<time_t>(atoi(SQLDb->GetValue(place, 7).c_str()));
+    LastUpdated = static_cast<time_t>(atoi(SQLDb->GetValue(place, 8).c_str()));
+    ReportMissing = (!strcasecmp(SQLDb->GetValue(place, 9), "t") ? true : false);
+    return true;
 }
 
-bool ccServer::loadDataFromDB(int place)
-{
+bool ccServer::Delete() {
+    static const char* Main = "DELETE FROM servers WHERE lower(Name) = '";
 
-if(SQLDb->Tuples() == 0 )
-    return false;
-Name = SQLDb->GetValue(place,0);
-Uplink = SQLDb->GetValue(0,1);
-LastConnected = static_cast< time_t >( 
-	atoi( SQLDb->GetValue(place,2).c_str() ) ) ;
-LastSplitted = static_cast< time_t >(
-	atoi( SQLDb->GetValue(place,3).c_str() ) ) ;
-Numeric = SQLDb->GetValue(place,4);
-SplitReason = SQLDb->GetValue(place,5);
-Version = SQLDb->GetValue(place,6);
-AddedOn = static_cast< time_t >(
-	atoi( SQLDb->GetValue(place,7).c_str() ) ) ;
-LastUpdated = static_cast< time_t >(
-	atoi( SQLDb->GetValue(place,8).c_str() ) ) ;
-ReportMissing = (!strcasecmp(SQLDb->GetValue(place,9),"t") ? true : false);
-return true;
+    if (!dbConnected) {
+        return false;
+    }
 
+    stringstream theQuery;
+    theQuery << Main << escapeSQLChars(string_lower(Name)) << "'" << ends;
+
+    elog << "ccontrol::Server::Delete> " << theQuery.str().c_str() << endl;
+
+    if (!SQLDb->Exec(theQuery))
+    // if( PGRES_COMMAND_OK != status )
+    {
+        elog << "ccontrol::Server::Delete> SQL Failure: " << SQLDb->ErrorMessage() << endl;
+        return false;
+    }
+    return true;
 }
 
-bool ccServer::Delete()
-{
-static const char *Main = "DELETE FROM servers WHERE lower(Name) = '";
+} // namespace uworld
 
-if(!dbConnected)
-	{
-	return false;
-	}
-
-stringstream theQuery;
-theQuery	<< Main
-		<< escapeSQLChars(string_lower(Name))
-		<< "'" << ends;
-
-elog	<< "ccontrol::Server::Delete> "
-	<< theQuery.str().c_str()
-	<< endl; 
-
-if( !SQLDb->Exec( theQuery ) )
-//if( PGRES_COMMAND_OK != status ) 
-	{
-	elog	<< "ccontrol::Server::Delete> SQL Failure: "
-		<< SQLDb->ErrorMessage()
-		<< endl ;
-	return false;
-	}
-return true;
-}
-
-}
-
-} //Namespace Gnuworld
+} // namespace gnuworld

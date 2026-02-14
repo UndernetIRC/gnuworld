@@ -34,113 +34,97 @@ namespace gnuworld {
 
 namespace ds {
 
-void LISTCommand::Exec( const iClient *theClient, const string& Message , const sqlUser* )
-{
-	/* Usage: LIST <name> */
+void LISTCommand::Exec(const iClient* theClient, const string& Message, const sqlUser*) {
+    /* Usage: LIST <name> */
 
-	StringTokenizer st(Message);
+    StringTokenizer st(Message);
 
-	if(st.size() < 2) {
-		Usage(theClient);
-		return ;
-	}
+    if (st.size() < 2) {
+        Usage(theClient);
+        return;
+    }
 
-	string Name = string_upper(st[1]);
+    string Name = string_upper(st[1]);
 
-	if("ACTIVE" == Name) {
-		if(bot->droneChannels.empty()) {
-			bot->Reply(theClient, "There are currently no active drone channels.");
-			return ;
-		}
+    if ("ACTIVE" == Name) {
+        if (bot->droneChannels.empty()) {
+            bot->Reply(theClient, "There are currently no active drone channels.");
+            return;
+        }
 
-		bot->Reply(theClient, "Active drone channels:");
+        bot->Reply(theClient, "Active drone channels:");
 
-		for(dronescan::droneChannelsType::const_iterator itr =
-		    bot->droneChannels.begin() ; itr != bot->droneChannels.end()
-		    ; ++itr) {
-			/* Does this channel still exist? */
-			Channel *theChannel = Network->findChannel(itr->first);
+        for (dronescan::droneChannelsType::const_iterator itr = bot->droneChannels.begin();
+             itr != bot->droneChannels.end(); ++itr) {
+            /* Does this channel still exist? */
+            Channel* theChannel = Network->findChannel(itr->first);
 
-			if(theChannel) {
-				bot->Reply(theClient, "  [%4u] (%u) %s",
-					theChannel->size(),
-					itr->second->getLastJoin(),
-					theChannel->getName().c_str()
-					);
-			} else {
-				bot->Reply(theClient, "  [   0] (%u) %s",
-					itr->second->getLastJoin(),
-					itr->first.c_str()
-					);
-			}
-		}
-	}
+            if (theChannel) {
+                bot->Reply(theClient, "  [%4u] (%u) %s", theChannel->size(),
+                           itr->second->getLastJoin(), theChannel->getName().c_str());
+            } else {
+                bot->Reply(theClient, "  [   0] (%u) %s", itr->second->getLastJoin(),
+                           itr->first.c_str());
+            }
+        }
+    }
 
-	if("FAKECLIENTS" == Name) {
-		if(bot->fakeClients.empty()) {
-			bot->Reply(theClient, "There are currently no fake clients.");
-			return ;
-		}
+    if ("FAKECLIENTS" == Name) {
+        if (bot->fakeClients.empty()) {
+            bot->Reply(theClient, "There are currently no fake clients.");
+            return;
+        }
 
-		bot->Reply(theClient, "Fake clients:");
+        bot->Reply(theClient, "Fake clients:");
 
-		for(dronescan::fcMapType::const_iterator itr =
-		    bot->fakeClients.begin() ; itr != bot->fakeClients.end() ;
-		    ++itr ) {
-			/* List the fake clients back to the user */
-			sqlFakeClient *theFake = itr->second;
+        for (dronescan::fcMapType::const_iterator itr = bot->fakeClients.begin();
+             itr != bot->fakeClients.end(); ++itr) {
+            /* List the fake clients back to the user */
+            sqlFakeClient* theFake = itr->second;
 
-			bot->Reply(theClient, "  (%02u %1s) %s",
-				theFake->getId(),
-				theFake->getFlagsString().c_str(),
-				theFake->getNickUserHost().c_str()
-				);
-		}
-	}
+            bot->Reply(theClient, "  (%02u %1s) %s", theFake->getId(),
+                       theFake->getFlagsString().c_str(), theFake->getNickUserHost().c_str());
+        }
+    }
 
-	if("JOINFLOOD" == Name) {
-		if(bot->jcChanMap.empty()) {
-			bot->Reply(theClient, "There are currently no channels being join flooded.");
-			return ;
-		}
+    if ("JOINFLOOD" == Name) {
+        if (bot->jcChanMap.empty()) {
+            bot->Reply(theClient, "There are currently no channels being join flooded.");
+            return;
+        }
 
-		bot->Reply(theClient, "Currently joinflooded channels:");
+        bot->Reply(theClient, "Currently joinflooded channels:");
 
-		for(dronescan::jcChanMapType::const_iterator itr =
-		    bot->jcChanMap.begin() ; itr != bot->jcChanMap.end()
-		    ; ++itr) {
-		    	if(itr->second->getNumOfJoins() >= bot->jcCutoff)
-				bot->Reply(theClient, "  %s (%u)",
-					itr->first.c_str(),
-					itr->second
-					);
-		}
-	}
+        for (dronescan::jcChanMapType::const_iterator itr = bot->jcChanMap.begin();
+             itr != bot->jcChanMap.end(); ++itr) {
+            if (itr->second->getNumOfJoins() >= bot->jcCutoff)
+                bot->Reply(theClient, "  %s (%u)", itr->first.c_str(), itr->second);
+        }
+    }
 
-	if("USERS" == Name) {
-		bot->Reply(theClient, "Users:");
-		for(dronescan::userMapType::const_iterator itr = bot->userMap.begin() ;
-		    itr != bot->userMap.end() ; ++itr) {
-			bot->Reply(theClient, "Username: %-10s Access: %4u",
-				itr->second->getUserName().c_str(),
-				itr->second->getAccess()
-				);
-		}
-	}
-	
-	if("EXCEPTIONALCHANNELS" == Name) {
-		if(bot->exceptionalChannels.empty()) {
-			bot->Reply(theClient,"There are currently no exceptional channels");
-			return;
-		}
-		bot->Reply(theClient,"Exceptional channels:");
-		for(dronescan::exceptionalChannelsType::const_iterator itr = 
-		    bot->exceptionalChannels.begin(); itr != bot->exceptionalChannels.end();++itr) {
-			bot->Reply(theClient,"Channel: %s",(*itr).c_str());
-		}
-	}    
+    if ("USERS" == Name) {
+        bot->Reply(theClient, "Users:");
+        for (dronescan::userMapType::const_iterator itr = bot->userMap.begin();
+             itr != bot->userMap.end(); ++itr) {
+            bot->Reply(theClient, "Username: %-10s Access: %4u", itr->second->getUserName().c_str(),
+                       itr->second->getAccess());
+        }
+    }
 
-	return ;
+    if ("EXCEPTIONALCHANNELS" == Name) {
+        if (bot->exceptionalChannels.empty()) {
+            bot->Reply(theClient, "There are currently no exceptional channels");
+            return;
+        }
+        bot->Reply(theClient, "Exceptional channels:");
+        for (dronescan::exceptionalChannelsType::const_iterator itr =
+                 bot->exceptionalChannels.begin();
+             itr != bot->exceptionalChannels.end(); ++itr) {
+            bot->Reply(theClient, "Channel: %s", (*itr).c_str());
+        }
+    }
+
+    return;
 } // LISTCommand::Exec(iClient*, const string&)
 
 } // namespace ds

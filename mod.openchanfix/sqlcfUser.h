@@ -1,4 +1,4 @@
-	/**
+/**
  * sqlcfUser.h
  *
  * This program is free software; you can redistribute it and/or
@@ -22,158 +22,131 @@
 #ifndef __sqlcfUser_H
 #define __sqlcfUser_H "$Id: sqlcfUser.h,v 1.4 2008/01/16 02:03:40 buzlip01 Exp $"
 
-#include	<string>
-#include	<vector>
-#include	<ctime>
-#include	<sstream>
-#include	"dbHandle.h"
+#include <string>
+#include <vector>
+#include <ctime>
+#include <sstream>
+#include "dbHandle.h"
 
 using namespace std;
 
-namespace gnuworld
-{
+namespace gnuworld {
 
 class iClient;
 
-namespace cf
-{
+namespace cf {
 
 class sqlManager;
 
-class sqlcfUser
-{
+class sqlcfUser {
 
-public:
+  public:
+    sqlcfUser(sqlManager*);
+    virtual ~sqlcfUser();
 
-	sqlcfUser(sqlManager*);
-	virtual ~sqlcfUser();
+    typedef unsigned short int flagType;
+    static const flagType F_SERVERADMIN; /* +a */
+    static const flagType F_BLOCK;       /* +b */
+    static const flagType F_COMMENT;     /* +c */
+    static const flagType F_CHANFIX;     /* +f */
+    static const flagType F_OWNER;       /* +o */
+    static const flagType F_USERMANAGER; /* +u */
+    static const flagType F_PERMBLOCKER; /* +p */
+    static const flagType F_LOGGEDIN;
 
-	typedef unsigned short int	flagType ;
-	static const flagType F_SERVERADMIN; /* +a */
-	static const flagType F_BLOCK; /* +b */
-	static const flagType F_COMMENT; /* +c */
-	static const flagType F_CHANFIX; /* +f */
-	static const flagType F_OWNER; /* +o */
-	static const flagType F_USERMANAGER; /* +u */
-	static const flagType F_PERMBLOCKER; /* +p */
-	static const flagType F_LOGGEDIN;
+    typedef std::list<std::string> hostListType;
 
-	typedef std::list< std::string >	hostListType;
+    /* Methods to get data attributes. */
 
-	/* Methods to get data attributes. */
+    inline const unsigned int& getID() const { return id; }
 
-	inline const unsigned int&	getID() const
-		{ return id ; }
+    inline const std::string& getUserName() const { return user_name; }
 
-	inline const std::string& getUserName() const
-		{ return user_name; }
+    inline int getCreated() const { return created; }
 
-	inline int getCreated() const
-		{ return created; }
+    inline time_t getLastSeen() const { return last_seen; }
 
-	inline time_t getLastSeen() const
-		{ return last_seen; }
+    inline time_t getLastUpdated() const { return last_updated; }
 
-	inline time_t getLastUpdated() const
-		{ return last_updated; }
+    inline const std::string& getLastUpdatedBy() const { return last_updated_by; }
 
-	inline const std::string& getLastUpdatedBy() const
-		{ return last_updated_by; }
+    inline const unsigned int& getLanguageId() const { return language_id; }
 
-	inline const unsigned int&	getLanguageId() const
-		{ return language_id ; }
+    inline const std::string& getGroup() const { return group; }
 
-	inline const std::string& getGroup() const
-		{ return group; }
+    inline bool getFlag(const flagType& whichFlag) const {
+        return ((flags & F_OWNER) || (flags & whichFlag));
+    }
 
-	inline bool	getFlag( const flagType& whichFlag ) const
-		{ return ((flags & F_OWNER) || (flags & whichFlag)) ; }
+    inline const flagType& getFlags() const { return flags; }
 
-	inline const flagType&		getFlags() const
-		{ return flags ; }
+    inline bool getIsSuspended() const { return isSuspended; }
 
-	inline bool getIsSuspended() const
-		{ return isSuspended; }
+    inline bool getUseNotice() const { return useNotice; }
 
-	inline bool getUseNotice() const
-		{ return useNotice; }
+    inline bool getNeedOper() const { return needOper; }
 
-	inline bool getNeedOper() const
-		{ return needOper; }
-		
-	inline const hostListType& getHostList() const
-		{ return hostList; }
+    inline const hostListType& getHostList() const { return hostList; }
 
-	/* Mutators */
+    /* Mutators */
 
-	inline void setUserName(const std::string& _user_name)
-		{ user_name = _user_name; }
+    inline void setUserName(const std::string& _user_name) { user_name = _user_name; }
 
-	inline void setCreated(const unsigned int _created)
-		{ created = _created; }
+    inline void setCreated(const unsigned int _created) { created = _created; }
 
-	inline void setLastSeen(const unsigned int _last_seen)
-		{ last_seen = _last_seen; }
+    inline void setLastSeen(const unsigned int _last_seen) { last_seen = _last_seen; }
 
-	inline void setLastUpdated(const unsigned int _last_updated)
-		{ last_updated = _last_updated; }
+    inline void setLastUpdated(const unsigned int _last_updated) { last_updated = _last_updated; }
 
-	inline void setLastUpdatedBy(const std::string& _last_updated_by)
-		{ last_updated_by = _last_updated_by; }
+    inline void setLastUpdatedBy(const std::string& _last_updated_by) {
+        last_updated_by = _last_updated_by;
+    }
 
-	inline void setLanguageId(const unsigned int _language_id)
-		{ language_id = _language_id; }
+    inline void setLanguageId(const unsigned int _language_id) { language_id = _language_id; }
 
-	inline void setGroup(const std::string& _group)
-		{ group = string_lower(_group); }
+    inline void setGroup(const std::string& _group) { group = string_lower(_group); }
 
-	inline void setFlag(const flagType& whichFlag)
-		{ flags |= whichFlag; }
+    inline void setFlag(const flagType& whichFlag) { flags |= whichFlag; }
 
-	inline void removeFlag(const flagType& whichFlag)
-		{ flags &= ~whichFlag; }
+    inline void removeFlag(const flagType& whichFlag) { flags &= ~whichFlag; }
 
-	inline void setSuspended(const bool _isSuspended)
-		{ isSuspended = _isSuspended; }
+    inline void setSuspended(const bool _isSuspended) { isSuspended = _isSuspended; }
 
-	inline void setNotice(const bool _useNotice)
-		{ useNotice = _useNotice; }
+    inline void setNotice(const bool _useNotice) { useNotice = _useNotice; }
 
-	inline void setNeedOper(const bool _needOper)
-		{ needOper = _needOper; }
+    inline void setNeedOper(const bool _needOper) { needOper = _needOper; }
 
-	/* Methods to alter our SQL status */
-	void setAllMembers(dbHandle*, int);
-	bool commit(dbHandle*);
-	bool Insert(dbHandle*);
-	bool Delete(dbHandle*);
+    /* Methods to alter our SQL status */
+    void setAllMembers(dbHandle*, int);
+    bool commit(dbHandle*);
+    bool Insert(dbHandle*);
+    bool Delete(dbHandle*);
 
-	/** Static member for keeping track of max user id */
-	static unsigned long int maxUserId;
+    /** Static member for keeping track of max user id */
+    static unsigned long int maxUserId;
 
-	void loadHostList(dbHandle*);
-	bool addHost(dbHandle*, const std::string&);		
-	bool delHost(dbHandle*, const std::string&);		
-	bool matchHost(const std::string&);
-	bool hasHost(const std::string&);
+    void loadHostList(dbHandle*);
+    bool addHost(dbHandle*, const std::string&);
+    bool delHost(dbHandle*, const std::string&);
+    bool matchHost(const std::string&);
+    bool hasHost(const std::string&);
 
-private:
+  private:
+    unsigned int id;
+    std::string user_name;
+    unsigned int created;
+    unsigned int last_seen;
+    unsigned int last_updated;
+    std::string last_updated_by;
+    unsigned int language_id;
+    std::string group;
+    flagType flags;
+    bool isSuspended;
+    bool useNotice;
+    bool needOper;
+    hostListType hostList;
 
-	unsigned int	id;
-	std::string	user_name;
-	unsigned int	created;
-	unsigned int	last_seen;
-	unsigned int	last_updated;
-	std::string	last_updated_by;
-	unsigned int	language_id;
-	std::string	group;
-	flagType	flags;
-	bool		isSuspended;
-	bool		useNotice;
-	bool		needOper;
-	hostListType	hostList;
-
-	sqlManager*	myManager;
+    sqlManager* myManager;
 }; // class sqlcfUser
 
 } // namespace cf

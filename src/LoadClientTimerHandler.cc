@@ -20,36 +20,31 @@
  * $Id: LoadClientTimerHandler.cc,v 1.11 2005/01/12 03:50:37 dan_karrels Exp $
  */
 
-#include	<iostream>
+#include <iostream>
 
-#include	"LoadClientTimerHandler.h"
-#include	"server.h"
-#include	"ELog.h"
-#include	"gnuworld_config.h"
+#include "LoadClientTimerHandler.h"
+#include "server.h"
+#include "ELog.h"
+#include "gnuworld_config.h"
 
-namespace gnuworld
-{
+namespace gnuworld {
 
-void LoadClientTimerHandler::OnTimer( const timerID&, void* )
-{
-//elog	<< "LoadClientTimerHandler::OnTimer("
-//	<< moduleName
-//	<< ", "
-//	<< configFileName
-//	<< ")"
-//	<< std::endl ;
+void LoadClientTimerHandler::OnTimer(const timerID&, void*) {
+    // elog	<< "LoadClientTimerHandler::OnTimer("
+    //	<< moduleName
+    //	<< ", "
+    //	<< configFileName
+    //	<< ")"
+    //	<< std::endl ;
 
-// Load the client from the module, attach it to the server, and
-// burst it onto the network
-if( !theServer->AttachClient( moduleName, configFileName, true ) )
-	{
-	elog	<< "LoadClientTimer> Failed to load client module: "
-		<< moduleName
-		<< std::endl ;
-	return ;
-	}
+    // Load the client from the module, attach it to the server, and
+    // burst it onto the network
+    if (!theServer->AttachClient(moduleName, configFileName, true)) {
+        elog << "LoadClientTimer> Failed to load client module: " << moduleName << std::endl;
+        return;
+    }
 
-delete this ;
+    delete this;
 }
 
 } // namespace gnuworld

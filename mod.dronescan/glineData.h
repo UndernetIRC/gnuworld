@@ -24,35 +24,33 @@ namespace gnuworld {
 
 namespace ds {
 
-
 /**
  * This class is a data container for glines which are in the gline queue
  */
 class glineData {
-public:
-	/** Constructor sets initial state to UNKNOWN. */
-	inline glineData(std::string _host, std::string _reason, time_t _expires)
-		{ host = _host; reason = _reason; expires = _expires;}
+  public:
+    /** Constructor sets initial state to UNKNOWN. */
+    inline glineData(std::string _host, std::string _reason, time_t _expires) {
+        host = _host;
+        reason = _reason;
+        expires = _expires;
+    }
 
-	inline const std::string getHost() const
-		{ return host; }
+    inline const std::string getHost() const { return host; }
 
-	inline const std::string getReason() const
-		{ return reason; }
+    inline const std::string getReason() const { return reason; }
 
-	inline time_t getExpires() const
-		{ return expires; }
+    inline time_t getExpires() const { return expires; }
 
+  protected:
+    /** The gline host */
+    std::string host;
 
-protected:
-	/** The gline host */
-	std::string	host;
-	
-	/** The gline reason */
-	std::string 	reason;
-	
-	/** The gline expiry */
-	time_t 		expires;
+    /** The gline reason */
+    std::string reason;
+
+    /** The gline expiry */
+    time_t expires;
 
 }; // class glineData
 
