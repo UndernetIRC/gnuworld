@@ -131,11 +131,13 @@ bool STATUSCommand::Exec(iClient* theClient, const string& Message) {
 
 #ifdef THERETURN_ENABLED
     if (theChan->hasW()) {
-        bot->Notice(theClient, "The channel is also registered with W.");
+        bot->Notice(theClient, "The channel is also registered with %s.",
+                    bot->getConfwNickName().c_str());
     }
 
     if (!theChan->hasW() && theChan->getWTS() > 0 && admLevel > 500) {
-        bot->Notice(theClient, "The channel was purged with W on %s",
+        bot->Notice(theClient, "The channel was purged with %s on %s",
+                    bot->getConfwNickName().c_str(),
                     prettyTime(theChan->getWTS()).c_str());
     }
 #endif
