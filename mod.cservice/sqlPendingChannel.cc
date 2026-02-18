@@ -59,7 +59,7 @@ sqlPendingChannel::~sqlPendingChannel() {
     for (trafficListType::iterator ptr = trafficList.begin(); ptr != trafficList.end(); ++ptr) {
         sqlPendingTraffic* toDie = ptr->second;
         //			elog << "Autocleanup of Traffic record for #" << toDie->ip_number <<
-        //endl;
+        // endl;
         delete (toDie);
     }
 
@@ -67,7 +67,7 @@ sqlPendingChannel::~sqlPendingChannel() {
          ptr != uniqueSupporterList.end(); ++ptr) {
         sqlPendingTraffic* toDie = ptr->second;
         //			elog << "Autocleanup of Traffic record for #" << toDie->ip_number <<
-        //endl;
+        // endl;
         delete (toDie);
     }
 }

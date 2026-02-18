@@ -129,6 +129,17 @@ bool STATUSCommand::Exec(iClient* theClient, const string& Message) {
         bot->Notice(theClient, "I'm \002not\002 in this channel.");
     }
 
+#ifdef THERETURN_ENABLED
+    if (theChan->hasW()) {
+        bot->Notice(theClient, "The channel is also registered with W.");
+    }
+
+    if (!theChan->hasW() && theChan->getWTS() > 0 && admLevel > 500) {
+        bot->Notice(theClient, "The channel was purged with W on %s",
+                    prettyTime(theChan->getWTS()).c_str());
+    }
+#endif
+
     bot->Notice(theClient, "MassDeopPro: %i", theChan->getMassDeopPro());
 
     string flagsSet;

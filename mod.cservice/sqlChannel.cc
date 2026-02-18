@@ -108,8 +108,12 @@ sqlChannel::sqlChannel(cservice* _bot)
       registered_ts(0), channel_ts(0), channel_mode(), userflags(0), last_topic(0), inChan(false),
       last_used(0), limit_offset(3), limit_period(20), last_limit_check(0), last_flood(0),
       limit_grace(2), limit_max(0), limit_joinmax(0), limit_joinsecs(0), limit_joinmode(),
-      limit_joinperiod(0), limit_jointimerID(0), max_bans(0), no_take(0), logger(_bot->getLogger()),
-      SQLDb(_bot->SQLDb) {}
+      limit_joinperiod(0), limit_jointimerID(0), max_bans(0), no_take(0),
+#ifdef THERETURN_ENABLED
+      hasw(false), w_ts(0),
+#endif
+      logger(_bot->getLogger()), SQLDb(_bot->SQLDb) {
+}
 
 bool sqlChannel::loadData(const string& channelName) {
     /*
@@ -120,11 +124,16 @@ bool sqlChannel::loadData(const string& channelName) {
     LOG(TRACE, "Attempting to load data for channel-name: {}", channelName);
 
     stringstream queryString;
-    queryString << "SELECT "
-                << sql::channel_fields
-                //<< " FROM channels WHERE registered_ts <> 0 AND lower(name) = '"
-                << " FROM channels WHERE lower(name) = '"
-                << escapeSQLChars(string_lower(channelName)) << "'" << ends;
+    queryString << "SELECT " << sql::channel_fields;
+#ifdef THERETURN_ENABLED
+    queryString << ",cw.status,cw.timestamp";
+#endif
+    queryString << " FROM channels ";
+#ifdef THERETURN_ENABLED
+    queryString << "LEFT JOIN channels_w cw on channels.id = cw.channel_id ";
+#endif
+    queryString << "WHERE lower(channels.name) = '" << escapeSQLChars(string_lower(channelName))
+                << "'";
 
     if (SQLDb->Exec(queryString, true))
     // if( PGRES_TUPLES_OK == status )
@@ -152,10 +161,15 @@ bool sqlChannel::loadData(int channelID) {
     LOG_MSG(TRACE, "Attempting to load data for channel-id: {}", channelID);
 
     stringstream queryString;
-    queryString << "SELECT "
-                << sql::channel_fields
-                //<< " FROM channels WHERE registered_ts <> 0 AND id = "
-                << " FROM channels WHERE id = " << channelID << ends;
+    queryString << "SELECT " << sql::channel_fields;
+#ifdef THERETURN_ENABLED
+    queryString << ",cw.status,cw.timestamp";
+#endif
+    queryString << " FROM channels ";
+#ifdef THERETURN_ENABLED
+    queryString << "LEFT JOIN channels_w cw on channels.id = cw.channel_id";
+#endif
+    queryString << "WHERE channels.id = " << channelID;
 
     if (SQLDb->Exec(queryString, true))
     // if( PGRES_TUPLES_OK == status )
@@ -206,9 +220,35 @@ void sqlChannel::setAllMembers(int row) {
     limit_joinsecs = atoi(SQLDb->GetValue(row, 22));
     limit_joinperiod = atoi(SQLDb->GetValue(row, 23));
     limit_joinmode = SQLDb->GetValue(row, 24);
+#ifdef THERETURN_ENABLED
+    hasw = atoi(SQLDb->GetValue(row, 25)); // This must always be the last column.
+    w_ts = atoi(SQLDb->GetValue(row, 26));
+#endif
 
     setAllFlood();
 }
+
+#ifdef THERETURN_ENABLED
+bool sqlChannel::setW(const bool status) {
+    hasw = status;
+
+    stringstream queryString;
+    queryString << "INSERT INTO channels_w (channel_id,status,timestamp) VALUES (" << id << ","
+                << status << ",date_part('epoch', CURRENT_TIMESTAMP)::int) "
+                << "ON CONFLICT (channel_id) DO UPDATE SET status = " << status
+                << ",timestamp=date_part('epoch', CURRENT_TIMESTAMP)::int "
+                << "RETURNING timestamp";
+
+    if (!SQLDb->Exec(queryString)) {
+        LOGSQL_ERROR(SQLDb);
+        return false;
+    }
+
+    w_ts = atoi(SQLDb->GetValue(0, 0));
+
+    return true;
+}
+#endif // THERETURN_ENABLED
 
 bool sqlChannel::commit() {
     /*

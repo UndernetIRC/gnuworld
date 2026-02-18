@@ -909,7 +909,8 @@ void ccontrol::OnServerMessage(iServer* Server, const string& Message, bool) {
         tmpServer->setLagTime(lagTime);
         tmpServer->setLastLagRecv(::time(0));
         // if ((lagTime > MAX_LAG_TIME) && ((::time(0) - tmpServer->getLastLagReport()) >
-        // LAG_REPORT_INTERVAL)) { 	tmpServer->setLastLagReport(::time(0)); 	MsgChanLag("[lag] %s is
+        // LAG_REPORT_INTERVAL)) { 	tmpServer->setLastLagReport(::time(0));
+        // MsgChanLag("[lag] %s is
         //%ds lagged", Server->getName().c_str(), (int) (lagTime / 1000));
         // }
     }

@@ -214,6 +214,9 @@ cservice::cservice(const string& args)
 #ifdef NEW_IRCU_FEATURES
     RegisterCommand(new CERTCommand(this, "CERT", "<ADD|REM|LIST> [fingerprint] [note]", 10));
 #endif
+#ifdef THERETURN_ENABLED
+    RegisterCommand(new WCommand(this, "W", "[join | part | purge] <#channel>", 10));
+#endif
     RegisterCommand(new OPCommand(this, "OP", "<#channel> [nick] [nick] ..", 3));
     RegisterCommand(new DEOPCommand(this, "DEOP", "<#channel> [nick] [nick] ..", 3));
     RegisterCommand(new VOICECommand(this, "VOICE", "<#channel> [nick] [nick] ..", 3));
@@ -2688,11 +2691,17 @@ struct newChanData {
 void cservice::updateChannels() {
     stringstream theQuery;
 
-    theQuery << "SELECT " << sql::channel_fields
-             << ",pending.manager_id as mngr_id,date_part('epoch', CURRENT_TIMESTAMP)::int as "
+    theQuery << "SELECT " << sql::channel_fields;
+#ifdef THERETURN_ENABLED
+    theQuery << ",cw.status,cw.timestamp";
+#endif
+    theQuery << ",pending.manager_id as mngr_id,date_part('epoch', CURRENT_TIMESTAMP)::int as "
                 "db_unixtime FROM "
-             << "channels LEFT JOIN pending ON channels.id = pending.channel_id "
-             << "WHERE channels.last_updated >= " << lastChannelRefresh
+             << "channels LEFT JOIN pending ON channels.id = pending.channel_id ";
+#ifdef THERETURN_ENABLED
+    theQuery << "LEFT JOIN channels_w cw on channels.id = cw.channel_id ";
+#endif
+    theQuery << "WHERE channels.last_updated >= " << lastChannelRefresh
              << " AND channels.registered_ts <> 0";
 
     if (!SQLDb->Exec(theQuery, true)) {
@@ -3848,7 +3857,7 @@ void cservice::checkNewIncomings() {
     unsigned int pendingTime = SupportDays * JudgeDaySeconds; // currentTime()
     stringstream theQuery;
     //	theQuery	<< "SELECT channels.name,channels.id,manager_id,users.user_name FROM
-    //channels,pending,users WHERE channels.id = pending.channel_id "
+    // channels,pending,users WHERE channels.id = pending.channel_id "
     theQuery << "SELECT channels.name,channels.id,users.user_name FROM channels,pending,users "
                 "WHERE channels.id = pending.channel_id "
              << "AND pending.status = 0 AND (pending.created_ts + " << pendingTime
@@ -4493,6 +4502,11 @@ void cservice::OnEvent(const eventType& theEvent, void* data1, void* data2, void
             // Process the channel OPLIST data from mod.openchanfix
             doXROplist(theServer, Routing, Message);
         }
+#ifdef THERETURN_ENABLED
+        if (Command == "REG" || Command == "PURGE" || Command == "PART" || Command == "JOIN") {
+            doXRW(theServer, Command, Message);
+        }
+#endif // THERETURN_ENABLED
         break;
     }
     case EVT_ACCOUNT: {
@@ -6621,7 +6635,7 @@ void cservice::checkDbConnectionStatus() {
             // TODO: Is this ok?
             SQLDb->Exec("LISTEN channels_u; LISTEN users_u; LISTEN levels_u;");
             //				SQLDb->ExecCommandOk("LISTEN channels_u; LISTEN users_u;
-            //LISTEN levels_u;");
+            // LISTEN levels_u;");
             logAdminMessage("Successfully reconnected to database server. Panic over ;)");
             connectRetries = 0;
         }
@@ -6630,14 +6644,19 @@ void cservice::checkDbConnectionStatus() {
 
 void cservice::preloadChannelCache() {
     stringstream theQuery;
-    theQuery << "SELECT " << sql::channel_fields << " FROM channels"
-             << " WHERE registered_ts <> 0" << ends;
+    theQuery << "SELECT " << sql::channel_fields;
+#ifdef THERETURN_ENABLED
+    theQuery << ",cw.status,cw.timestamp";
+#endif
+    theQuery << " FROM channels ";
+#ifdef THERETURN_ENABLED
+    theQuery << "LEFT JOIN channels_w cw on channels.id = cw.channel_id ";
+#endif
+    theQuery << "WHERE registered_ts <> 0";
 
     elog << "*** [CMaster::preloadChannelCache]: Loading all registered channel records: " << endl;
 
-    if (SQLDb->Exec(theQuery, true))
-    // if( PGRES_TUPLES_OK == status )
-    {
+    if (SQLDb->Exec(theQuery, true)) {
         for (unsigned int i = 0; i < SQLDb->Tuples(); i++) {
             /* Add this information to the channel cache. */
 
@@ -6651,6 +6670,8 @@ void cservice::preloadChannelCache() {
             sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 
         } // for()
+    } else {
+        LOGSQL_ERROR(SQLDb);
     } // if()
 
     elog << "*** [CMaster::preloadChannelCache]: Done. Loaded " << SQLDb->Tuples()
@@ -8493,6 +8514,100 @@ bool cservice::doXQOplist(const string& chanName) {
     return Write("%s XQ %s %s :%s", getCharYY().c_str(), chanfixServer->getCharYY().c_str(),
                  "AnyCServiceRouting", Message.c_str());
 }
+
+#ifdef THERETURN_ENABLED
+bool cservice::doXRW(iServer* theServer, const string& Command, const string& Message) {
+    if (!theServer)
+        return false;
+
+    if (theServer->getName() != wServerName) {
+        LOG(ERROR, "Received XR from invalid server ({}). Ignoring", theServer->getName());
+        return false;
+    }
+
+    StringTokenizer st(Message);
+    if (st.size() < 4) {
+        LOG(ERROR, "Invalid number of parameters.");
+        LOG(ERROR, "[W-XQ]: Invalid number of parameters: {}", Message);
+        return false;
+    }
+
+    string Status = st[1];
+    sqlChannel* theChan = getChannelRecord(st[2]);
+
+    if (!theChan) {
+        elog << "cservice::doXRW: Can't find the channel!" << endl;
+        return false;
+    }
+
+    iClient* theClient = Network->findClient(st[3]);
+    if (!theClient) {
+        LOG(ERROR, "We have lost the client?");
+        return false;
+    }
+
+    if (Command == "REG") {
+        // <W> XR <X> routing :REG <YES/NO> <#channel> <YYXXX> <password>
+        if (st.size() < 4) {
+            LOG(ERROR, "Invalid number of parameters.");
+            return false;
+        }
+
+        if (Status == "NO") {
+            LOG(ERROR, "{} rejected the registration of {}", wNickName, st[2]);
+            Notice(theClient, "Sorry, %s is unable to join that channel.", wNickName.c_str());
+
+            return false;
+        } else if (Status == "YES") {
+            logPrivAdminMessage("%s has been successfully registered with %s",
+                                theChan->getName().c_str(), wNickName.c_str());
+
+            Notice(theClient, "Congratulations! The channel %s is now registered with %s",
+                   st[2].c_str(), wNickName.c_str());
+            Notice(theClient, "Use the following command to login: /msg %s@%s login %s %s",
+                   wNickName.c_str(), wServerName.c_str(), theChan->getName().c_str(),
+                   st[4].c_str());
+            Notice(theClient,
+                   "To get a list of commands available to you, type /msg %s showcommands %s",
+                   wNickName.c_str(), theChan->getName().c_str());
+
+            theChan->setW(true);
+        }
+    } else if (Command == "PURGE") {
+        if (Status == "NO") {
+            LOG(ERROR, "{} rejected the purging of {}", wNickName, theChan->getName());
+            Notice(theClient,
+                   "Sorry, an error has occurred. Please contact a CService representative.");
+            return false;
+        } else if (Status == "YES") {
+            logPrivAdminMessage("%s has been successfully purged by %s.",
+                                theChan->getName().c_str(), wNickName.c_str());
+
+            Notice(theClient, "Done. The channel %s has been successfully purged by %s.",
+                   theChan->getName().c_str(), wNickName.c_str());
+
+            theChan->setW(false);
+        }
+    } else if (Command == "PART") {
+        if (Status == "NO") {
+            LOG(ERROR, "{} rejected to part {}", wNickName, theChan->getName());
+            Notice(theClient,
+                   "Sorry, an error has occurred. Please contact a CService representative.");
+        } else if (Status == "YES") {
+            Notice(theClient, "Done.");
+        }
+    } else if (Command == "JOIN") {
+        if (Status == "NO") {
+            LOG(ERROR, "{} rejected to join {}", wNickName, theChan->getName());
+            Notice(theClient,
+                   "Sorry, an error has occurred. Please contact a CService representative.");
+        } else if (Status == "YES") {
+            Notice(theClient, "Done.");
+        }
+    }
+    return true;
+}
+#endif // THERETURN_ENABLED
 
 bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const string& Message) {
     // AB XR Az iauth:15_d :OPLIST #empfoo

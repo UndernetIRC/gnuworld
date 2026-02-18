@@ -76,6 +76,7 @@ libcservice_la_SOURCES = \
 	mod.cservice/UNSUSPENDCommand.cc \
 	mod.cservice/VERIFYCommand.cc \
 	mod.cservice/VOICECommand.cc \
+	mod.cservice/WCommand.cc \
 	mod.cservice/WHITELISTCommand.cc \
 	mod.cservice/MODECommand.cc
 

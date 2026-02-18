@@ -75,7 +75,7 @@ bool LIMITSCommand::Exec(iClient* theClient, const string& Message) {
                         "SYNTAX: ADDISP <name> <max connections> <clones cidr> [abuse email]");
             // bot->Notice(theClient, "-f: forcecount - use it if you want limits to still be
             // enforced even if the netblocks" 	" of this isp are not the closest match for a
-            //client"); bot->Notice(theClient, "-i: inactive - deactivates glines and does not
+            // client"); bot->Notice(theClient, "-i: inactive - deactivates glines and does not
             // prevent new clients from connecting using iauth. It does reports only.");
             return true;
         }
