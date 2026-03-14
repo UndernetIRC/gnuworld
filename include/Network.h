@@ -33,12 +33,12 @@
 
 #include <ctime>
 
-#include	"iServer.h"
-#include	"iClient.h"
-#include	"Channel.h"
-#include	"client.h"
-#include	"misc.h" // struct noCaseCompare and rfc1459Compare
-#include	"gnuworld_config.h"
+#include "iServer.h"
+#include "iClient.h"
+#include "Channel.h"
+#include "client.h"
+#include "misc.h" // struct noCaseCompare and rfc1459Compare
+#include "gnuworld_config.h"
 
 namespace gnuworld {
 

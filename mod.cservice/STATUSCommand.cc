@@ -137,8 +137,7 @@ bool STATUSCommand::Exec(iClient* theClient, const string& Message) {
 
     if (!theChan->hasW() && theChan->getWTS() > 0 && admLevel > 500) {
         bot->Notice(theClient, "The channel was purged with %s on %s",
-                    bot->getConfwNickName().c_str(),
-                    prettyTime(theChan->getWTS()).c_str());
+                    bot->getConfwNickName().c_str(), prettyTime(theChan->getWTS()).c_str());
     }
 #endif
 
