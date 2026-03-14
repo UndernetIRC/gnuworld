@@ -7,8 +7,8 @@
 --             Added materialized views functions to track linked users by IP and ident
 --             Added indexes on user_sec_history table to improve performance
 --             Added get_linked_users function to get the linked users for a given username
-ALTER TABLE user_sec_history ADD COLUMN ident TEXT NOT NULL;
-ALTER TABLE user_sec_history ADD COLUMN deleted TEXT NOT NULLDEFAULT 'N';
+ALTER TABLE user_sec_history ADD COLUMN ident TEXT;
+ALTER TABLE user_sec_history ADD COLUMN deleted TEXT NOT NULL DEFAULT 'N';
 
 CREATE INDEX idx_user_sec_history_user_id ON user_sec_history(user_id);
 CREATE INDEX idx_user_sec_history_hostmask ON user_sec_history(hostmask);

@@ -149,6 +149,6 @@
 /**
  * Define this if you want to enable the integration with X/W (2002 edition).
  */
-#define THERETURN_ENABLED
+#undef THERETURN_ENABLED
 
 #endif // __CSERVICE_CONFIG_H

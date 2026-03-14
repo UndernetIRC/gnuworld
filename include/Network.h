@@ -37,7 +37,7 @@
 #include "iClient.h"
 #include "Channel.h"
 #include "client.h"
-#include "misc.h" // struct noCaseCompare
+#include "misc.h" // struct noCaseCompare and rfc1459Compare
 #include "gnuworld_config.h"
 
 namespace gnuworld {
@@ -114,12 +114,12 @@ class xNetwork {
      * This is the type used to store the network Channel
      * instances.
      */
-    typedef std::map<std::string, Channel*, noCaseCompare> channelMapType;
+    typedef std::map<std::string, Channel*, rfc1459Compare> channelMapType;
 
     /**
      * This is the type used to store the nick name/iClient* pairs.
      */
-    typedef std::map<std::string, iClient*, noCaseCompare> nickMapType;
+    typedef std::map<std::string, iClient*, rfc1459Compare> nickMapType;
 
     /**
      * The type used to store information about iClient's,

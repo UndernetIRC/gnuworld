@@ -36,8 +36,35 @@
 #include "match.h"
 
 namespace gnuworld {
-
 using std::string;
+
+/**
+ * Converts a character to its RFC1459 lowercase equivalent.
+ * In addition to standard ASCII A-Z -> a-z, RFC1459 defines:
+ *   [ -> {, ] -> }, \\ -> |, ^ -> ~
+ * @param c The character to convert.
+ * @return The RFC1459-lowercased character.
+ */
+unsigned char rfc1459_tolower(unsigned char c);
+
+/**
+ * Compares two strings using RFC1459 case-insensitive rules.
+ * Returns -1 if a < b, 1 if a > b, 0 if equal (RFC1459-insensitive).
+ * Shorter string is considered less if one is a prefix of the other.
+ * @param a First string (std::string_view)
+ * @param b Second string (std::string_view)
+ * @return Comparison result: -1, 0, or 1
+ */
+int rfc1459_compare(std::string_view a, std::string_view b);
+
+/**
+ * Checks if two strings are equal under RFC1459 case-insensitive rules.
+ * @param a First string (std::string_view)
+ * @param b Second string (std::string_view)
+ * @return true if equal (RFC1459-insensitive), false otherwise
+ */
+bool rfc1459_equal(std::string_view a, std::string_view b);
+
 /**
  * Return 0 if the two strings are equivalent, according to
  * case insensitive searches.
@@ -52,6 +79,15 @@ int strcasecmp(const string&, const string&);
 struct noCaseCompare {
     inline bool operator()(const string& lhs, const string& rhs) const {
         return (strcasecmp(lhs, rhs) < 0);
+    }
+};
+
+/**
+ * rfc1459 comparison struct for use by STL structures/algorithms.
+ */
+struct rfc1459Compare {
+    bool operator()(const std::string& a, const std::string& b) const {
+        return rfc1459_compare(a, b) < 0;
     }
 };
 

@@ -1145,7 +1145,7 @@ class xServer : public ConnectionManager, public ConnectionHandler, public Netwo
     /**
      * Type used to store the channel event map.
      */
-    typedef std::map<std::string, std::list<xClient*>*, noCaseCompare> channelEventMapType;
+    typedef std::map<std::string, std::list<xClient*>*, rfc1459Compare> channelEventMapType;
 
     /**
      * The structure used to maintain xClient registrations for
