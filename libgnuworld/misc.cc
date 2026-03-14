@@ -23,6 +23,7 @@
 #include <sys/resource.h>
 #include <string>
 #include <algorithm>
+#include <string_view>
 
 #include <cctype>
 #include <cstdio>
@@ -41,6 +42,71 @@
 #include "ELog.h"
 
 namespace gnuworld {
+/**
+ * Converts a character to its RFC1459 lowercase equivalent.
+ * In addition to standard ASCII A-Z -> a-z, RFC1459 defines:
+ *   [ -> {, ] -> }, \\ -> |, ^ -> ~
+ * @param c The character to convert.
+ * @return The RFC1459-lowercased character.
+ */
+unsigned char rfc1459_tolower(unsigned char c) {
+    // A-Z -> a-z
+    if (c >= 'A' && c <= 'Z')
+        return c + 32;
+
+    // RFC1459 extra mappings
+    switch (c) {
+    case '[':
+        return '{';
+    case ']':
+        return '}';
+    case '\\':
+        return '|';
+    default:
+        return c;
+    }
+}
+
+/**
+ * Compares two strings using RFC1459 case-insensitive rules.
+ * Returns -1 if a < b, 1 if a > b, 0 if equal (RFC1459-insensitive).
+ * Shorter string is considered less if one is a prefix of the other.
+ * @param a First string (std::string_view)
+ * @param b Second string (std::string_view)
+ * @return Comparison result: -1, 0, or 1
+ */
+int rfc1459_compare(std::string_view a, std::string_view b) {
+    size_t i = 0;
+    const size_t asz = a.size();
+    const size_t bsz = b.size();
+    const size_t n = (asz < bsz) ? asz : bsz;
+
+    for (; i < n; ++i) {
+        unsigned char ca = rfc1459_tolower((unsigned char)a[i]);
+        unsigned char cb = rfc1459_tolower((unsigned char)b[i]);
+
+        if (ca < cb)
+            return -1;
+        if (ca > cb)
+            return 1;
+    }
+
+    // prefix shorter string sorts first
+    if (asz < bsz)
+        return -1;
+    if (asz > bsz)
+        return 1;
+    return 0;
+}
+
+/**
+ * Checks if two strings are equal under RFC1459 case-insensitive rules.
+ * @param a First string (std::string_view)
+ * @param b Second string (std::string_view)
+ * @return true if equal (RFC1459-insensitive), false otherwise
+ */
+bool rfc1459_equal(std::string_view a, std::string_view b) { return rfc1459_compare(a, b) == 0; }
+
 /**
  * Create a string and copy into it (Key), but convert to all
  * lower case.

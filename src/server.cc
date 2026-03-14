@@ -2722,7 +2722,7 @@ bool xServer::BurstChannel(const string& chanName, const string& chanModes,
 
     // Need to burst the channel
     stringstream s;
-    s << getCharYY() << " B " << chanName << ' ' << burstTime << ' ' << chanModes;
+    s << getCharYY() << " B " << theChan->getName() << ' ' << burstTime << ' ' << chanModes;
 
     Write(s);
 
