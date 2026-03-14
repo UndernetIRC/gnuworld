@@ -601,8 +601,8 @@ am__libcservice_la_SOURCES_DIST = mod.cservice/banMatcher.cc \
 	mod.cservice/SUSPENDMECommand.cc mod.cservice/TOPICCommand.cc \
 	mod.cservice/UNBANCommand.cc mod.cservice/UNFORCECommand.cc \
 	mod.cservice/UNSUSPENDCommand.cc mod.cservice/VERIFYCommand.cc \
-	mod.cservice/VOICECommand.cc mod.cservice/WHITELISTCommand.cc \
-	mod.cservice/MODECommand.cc
+	mod.cservice/VOICECommand.cc mod.cservice/WCommand.cc \
+	mod.cservice/WHITELISTCommand.cc mod.cservice/MODECommand.cc
 @COND_MODCSERVICE_TRUE@am_libcservice_la_OBJECTS = mod.cservice/libcservice_la-banMatcher.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-cservice.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-cservice_crypt.lo \
@@ -670,6 +670,7 @@ am__libcservice_la_SOURCES_DIST = mod.cservice/banMatcher.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-UNSUSPENDCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-VERIFYCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-VOICECommand.lo \
+@COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-WCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-WHITELISTCommand.lo \
 @COND_MODCSERVICE_TRUE@	mod.cservice/libcservice_la-MODECommand.lo
 libcservice_la_OBJECTS = $(am_libcservice_la_OBJECTS)
@@ -1180,6 +1181,7 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-UNSUSPENDCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-VERIFYCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-VOICECommand.Plo \
+	mod.cservice/$(DEPDIR)/libcservice_la-WCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-WHITELISTCommand.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo \
@@ -2060,6 +2062,7 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODCSERVICE_TRUE@	mod.cservice/UNSUSPENDCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/VERIFYCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/VOICECommand.cc \
+@COND_MODCSERVICE_TRUE@	mod.cservice/WCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/WHITELISTCommand.cc \
 @COND_MODCSERVICE_TRUE@	mod.cservice/MODECommand.cc
 
@@ -2956,6 +2959,8 @@ mod.cservice/libcservice_la-VERIFYCommand.lo:  \
 mod.cservice/libcservice_la-VOICECommand.lo:  \
 	mod.cservice/$(am__dirstamp) \
 	mod.cservice/$(DEPDIR)/$(am__dirstamp)
+mod.cservice/libcservice_la-WCommand.lo: mod.cservice/$(am__dirstamp) \
+	mod.cservice/$(DEPDIR)/$(am__dirstamp)
 mod.cservice/libcservice_la-WHITELISTCommand.lo:  \
 	mod.cservice/$(am__dirstamp) \
 	mod.cservice/$(DEPDIR)/$(am__dirstamp)
@@ -3665,6 +3670,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-UNSUSPENDCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-VERIFYCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-VOICECommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-WCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-WHITELISTCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo@am__quote@ # am--include-marker
@@ -5196,6 +5202,13 @@ mod.cservice/libcservice_la-VOICECommand.lo: mod.cservice/VOICECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.cservice/VOICECommand.cc' object='mod.cservice/libcservice_la-VOICECommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.cservice/libcservice_la-VOICECommand.lo `test -f 'mod.cservice/VOICECommand.cc' || echo '$(srcdir)/'`mod.cservice/VOICECommand.cc
+
+mod.cservice/libcservice_la-WCommand.lo: mod.cservice/WCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT mod.cservice/libcservice_la-WCommand.lo -MD -MP -MF mod.cservice/$(DEPDIR)/libcservice_la-WCommand.Tpo -c -o mod.cservice/libcservice_la-WCommand.lo `test -f 'mod.cservice/WCommand.cc' || echo '$(srcdir)/'`mod.cservice/WCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.cservice/$(DEPDIR)/libcservice_la-WCommand.Tpo mod.cservice/$(DEPDIR)/libcservice_la-WCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.cservice/WCommand.cc' object='mod.cservice/libcservice_la-WCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.cservice/libcservice_la-WCommand.lo `test -f 'mod.cservice/WCommand.cc' || echo '$(srcdir)/'`mod.cservice/WCommand.cc
 
 mod.cservice/libcservice_la-WHITELISTCommand.lo: mod.cservice/WHITELISTCommand.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -MT mod.cservice/libcservice_la-WHITELISTCommand.lo -MD -MP -MF mod.cservice/$(DEPDIR)/libcservice_la-WHITELISTCommand.Tpo -c -o mod.cservice/libcservice_la-WHITELISTCommand.lo `test -f 'mod.cservice/WHITELISTCommand.cc' || echo '$(srcdir)/'`mod.cservice/WHITELISTCommand.cc
@@ -6853,6 +6866,7 @@ distclean: distclean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-UNSUSPENDCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-VERIFYCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-VOICECommand.Plo
+	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-WCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-WHITELISTCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo
@@ -7230,6 +7244,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-UNSUSPENDCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-VERIFYCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-VOICECommand.Plo
+	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-WCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-WHITELISTCommand.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-banMatcher.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-csGline.Plo

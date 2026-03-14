@@ -389,6 +389,9 @@ class cservice : public xClient {
     bool doXQLogin(iServer*, const string&, const string&);
     bool doXQIsCheck(iServer*, const string&, const string&, const string&);
     bool doXQSASL(iServer*, const string&, const string&);
+#ifdef THERETURN_ENABLED
+    bool doXRW(iServer*, const string&, const string&);
+#endif // THERETURN_ENABLED
 
     /**
      * Array of sqlUser flags and the corresponding accountFlags.

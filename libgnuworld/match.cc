@@ -1054,7 +1054,7 @@ int mmexec(const char* wcm, int wminlen, const char* rcm, int rminlen) {
 //			return 1;
 //
 //		/* If passed, we deal only with the hostip part, and because match() handles cidr
-//addresses too
+// addresses too
 //		 * our matching is complete.
 //		 */
 //		if (match(extractHostIP(mask), extractHostIP(address)) == 0)

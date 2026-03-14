@@ -38,8 +38,8 @@ namespace sql {
 const std::string channel_fields =
     "id,name,flags,mass_deop_pro,flood_pro,url,channels.description,comment,keywords,registered_ts,"
     "channel_ts,channel_mode,userflags,channels.last_updated,limit_offset,limit_period,limit_grace,"
-    "limit_max,max_bans,no_take,welcome,limit_joinmax,limit_joinsecs,limit_joinperiod,limit_"
-    "joinmode";
+    "limit_max,max_bans,no_take,welcome,limit_joinmax,limit_joinsecs,limit_joinperiod,"
+    "limit_joinmode";
 const std::string user_fields =
     "users.id,users.user_name,users.password,users.url,users.language_id,users.flags,users.last_"
     "updated_by,users.last_updated,users.signup_ts,users.email,users.maxlogins,users."

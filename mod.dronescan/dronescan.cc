@@ -844,7 +844,7 @@ void dronescan::processJoinPartChannels() {
                 //	{
                 //		if (glined.size() != 0) {
                 //		log(WARN,"Aborting glines for channel %s because only %d flooding
-                //clients from %d addresses were found",
+                // clients from %d addresses were found",
                 //			itr->first.c_str(),clientcount,glined.size());
                 //		}
                 //	}

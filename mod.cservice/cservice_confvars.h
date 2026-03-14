@@ -34,6 +34,8 @@
     CONFIG_VAR(std::string, limitJoinAllowedModes, "limitjoin_allowedmodes")                       \
     CONFIG_VAR(std::string, welcomeNewChanMessage, "welcome_newchan_message")                      \
     CONFIG_VAR(std::string, welcomeNewChanTopic, "welcome_newchan_topic")                          \
+    CONFIG_VAR(std::string, wServerName, "w_server")                                               \
+    CONFIG_VAR(std::string, wNickName, "w_nick")                                                   \
     CONFIG_VAR(int, updateInterval, "update_interval")                                             \
     CONFIG_VAR(int, expireInterval, "expire_interval")                                             \
     CONFIG_VAR(int, cacheInterval, "cache_interval")                                               \

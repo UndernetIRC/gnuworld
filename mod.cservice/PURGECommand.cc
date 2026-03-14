@@ -97,6 +97,15 @@ bool PURGECommand::Exec(iClient* theClient, const string& Message) {
         return false;
     }
 
+#ifdef THERETURN_ENABLED
+    /* Don't purge a channel registered with W. */
+    if (theChan->hasW()) {
+        bot->Notice(theClient, "This channel is registered with %s. Use /msg X W PURGE %s first",
+                    bot->getConfwNickName().c_str(), theChan->getName().c_str());
+        return false;
+    }
+#endif
+
     bool reop;
     string reason;
 

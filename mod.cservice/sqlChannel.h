@@ -34,6 +34,7 @@
 #include "dbHandle.h"
 #include "server.h"
 #include "sqlBan.h"
+#include "cservice_config.h"
 
 namespace gnuworld {
 
@@ -179,6 +180,11 @@ class sqlChannel {
     inline const string& getName() const { return name; }
 
     inline const flagType& getFlags() const { return flags; }
+
+#ifdef THERETURN_ENABLED
+    inline bool hasW() const { return hasw; }
+    inline const time_t& getWTS() const { return w_ts; }
+#endif // THERETURN_ENABLED
 
     inline bool getFlag(const flagType& whichFlag) const { return (flags & whichFlag); }
 
@@ -413,6 +419,9 @@ class sqlChannel {
      * object back to the database.
      */
     bool commit();
+#ifdef THERETURN_ENABLED
+    bool setW(const bool);
+#endif // THERETURN_ENABLED
     bool insertRecord();
     void setAllMembers(int);
 
@@ -503,6 +512,11 @@ class sqlChannel {
     unsigned int max_bans;
     unsigned int no_take;
     time_t now;
+
+#ifdef THERETURN_ENABLED
+    bool hasw;
+    time_t w_ts;
+#endif // THERETURN_ENABLED
 
     Logger* logger;
     dbHandle* SQLDb;
