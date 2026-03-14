@@ -7371,10 +7371,11 @@ cservice::AuthResult cservice::authenticateUser(AuthStruct& auth) {
     unsigned int ipr_ts;
     bool certAuth = false; // Set to true if the client has a certificate matching the username
 
-    /* 1: Check loginDelay. */
+    /* 1: Check loginDelay (except for SASL). */
     unsigned int useLoginDelay = getConfigVar("USE_LOGIN_DELAY")->asInt();
     unsigned int loginTime = getUplink()->getStartTime() + loginDelay;
-    if ((useLoginDelay == 1) && (loginTime >= (unsigned int)currentTime())) {
+    if ((useLoginDelay == 1 && auth.sasl == SaslMechanism::NO_SASL) &&
+        (loginTime >= (unsigned int)currentTime())) {
         return TOO_EARLY_TOLOGIN;
     }
 
@@ -7742,13 +7743,21 @@ bool cservice::processAuthentication(AuthStruct auth, std::string* Message) {
             auth.theUser->incFailedLogins();
     }
 
-    /* Send response only if it fails. If it succeeds, the message is sent from doCommonAuth() */
+    /* The client is online.
+     * If login succeeds, the message is sent from doCommonAuth().
+     * If it fails, and login is over SASL, the message is sent over XR.
+     * If it fails, and login is not over SASL, the message is sent as a Notice. */
     if (auth.theClient) {
         if (auth.result == AUTH_SUCCEEDED) {
             doCommonAuth(auth.theClient, auth.theUser->getUserName());
             return true;
         } else {
-            Notice(auth.theClient, authResponse);
+            if (auth.sasl == SaslMechanism::NO_SASL) {
+                Notice(auth.theClient, authResponse);
+            } else {
+                *Message = authResponse;
+            }
+
             return false;
         }
     }
@@ -8136,7 +8145,7 @@ bool cservice::doXQSASL(iServer* theServer, const string& Routing, const string&
             }
 
             elog << "cservice::doXQSASL: "
-                 << "Succesful auth for " << it->username << endl;
+                 << "Successful auth for " << it->username << endl;
 
             saslRequests.erase(it);
             return true;
