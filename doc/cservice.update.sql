@@ -1,6 +1,15 @@
 -- Timestamped updates for mod.cservice
 -- Apply appropriate updates when upgrading to a new version of cservice
 
+-- 2026-03-16: MrIron
+--             Added canonicalized channel name column
+ALTER TABLE channels ADD COLUMN canon_name TEXT UNIQUE;
+UPDATE channels SET canon_name = lower(
+  replace(replace(replace(name, '[', '{'), ']', '}'), '\\', '|')
+);
+ALTER TABLE channels ALTER COLUMN canon_name SET NOT NULL;
+CREATE UNIQUE INDEX channels_canon_name_idx ON channels(canon_name);
+
 -- 2025-04-01: Empus
 --             Added ident column to user_sec_history table
 --             Added deleted column to user_sec_history table

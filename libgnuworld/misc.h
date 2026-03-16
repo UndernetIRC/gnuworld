@@ -48,6 +48,14 @@ using std::string;
 unsigned char rfc1459_tolower(unsigned char c);
 
 /**
+ * Converts a string to its RFC1459 lowercase equivalent.
+ * Applies rfc1459_tolower to each character.
+ * @param s The string to convert.
+ * @return The RFC1459-lowercased string.
+ */
+std::string rfc1459_tolower(const std::string& s);
+
+/**
  * Compares two strings using RFC1459 case-insensitive rules.
  * Returns -1 if a < b, 1 if a > b, 0 if equal (RFC1459-insensitive).
  * Shorter string is considered less if one is a prefix of the other.
