@@ -41,7 +41,7 @@ using std::string;
 /**
  * Converts a character to its RFC1459 lowercase equivalent.
  * In addition to standard ASCII A-Z -> a-z, RFC1459 defines:
- *   [ -> {, ] -> }, \\ -> |, ^ -> ~
+ *   [ -> {, ] -> }, \\ -> |, ~ -> ^
  * @param c The character to convert.
  * @return The RFC1459-lowercased character.
  */
