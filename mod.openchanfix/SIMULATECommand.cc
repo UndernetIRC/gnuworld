@@ -108,15 +108,15 @@ void SIMULATECommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::st
         theChan->setMaxScore((*myOps.begin())->getPoints());
 
     if (theChan->getMaxScore() <=
-        static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE)) {
+        static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * bot->maxScore)) {
         bot->SendTo(
             theClient,
             bot->getResponse(theUser, language::highscore_channel,
                              std::string("The highscore in channel %s is %d which is lower than "
                                          "the minimum score required (%.2f * %d = %d)."))
                 .c_str(),
-            theChan->getChannel().c_str(), theChan->getMaxScore(), FIX_MIN_ABS_SCORE_END, MAX_SCORE,
-            static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
+            theChan->getChannel().c_str(), theChan->getMaxScore(), FIX_MIN_ABS_SCORE_END, bot->maxScore,
+            static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * bot->maxScore));
         return;
     }
 

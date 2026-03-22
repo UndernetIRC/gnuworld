@@ -68,24 +68,25 @@ void DUMPSQLCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::str
             sqlChanOp* curOp = chanOp->second;
 
             outFile << "INSERT INTO chanOps (channel, account, last_seen_as, "
-                    << "ts_firstopped, ts_lastopped";
-            for (int i = 0; i < DAYSAMPLES; i++)
-                outFile << ", day" << i;
-            outFile << ") VALUES ('"
+                    << "ts_firstopped, ts_lastopped) VALUES ('"
                     << escapeSQLChars(curOp->getChannel()) << "', '"
                     << escapeSQLChars(curOp->getAccount()) << "', '"
                     << escapeSQLChars(curOp->getLastSeenAs()) << "', "
                     << curOp->getTimeFirstOpped() << ", "
-                    << curOp->getTimeLastOpped();
-            for (int i = 0; i < DAYSAMPLES; i++)
-                outFile << ", " << curOp->getDay(i);
-            outFile << ") ON CONFLICT (channel, account) DO UPDATE SET "
+                    << curOp->getTimeLastOpped()
+                    << ") ON CONFLICT (channel, account) DO UPDATE SET "
                     << "last_seen_as = EXCLUDED.last_seen_as, "
                     << "ts_firstopped = EXCLUDED.ts_firstopped, "
-                    << "ts_lastopped = EXCLUDED.ts_lastopped";
-            for (int i = 0; i < DAYSAMPLES; i++)
-                outFile << ", day" << i << " = EXCLUDED.day" << i;
-            outFile << ";" << std::endl;
+                    << "ts_lastopped = EXCLUDED.ts_lastopped;" << std::endl;
+            for (size_t i = 0; i < curOp->getDaySize(); i++) {
+                if (curOp->getDay(i) == 0) continue;
+                outFile << "INSERT INTO chanops_daily (channel, account, day, points) VALUES ('"
+                        << escapeSQLChars(curOp->getChannel()) << "', '"
+                        << escapeSQLChars(curOp->getAccount()) << "', "
+                        << i << ", " << curOp->getDay(i)
+                        << ") ON CONFLICT (channel, account, day) DO UPDATE SET "
+                        << "points = EXCLUDED.points;" << std::endl;
+            }
 
             count++;
         }

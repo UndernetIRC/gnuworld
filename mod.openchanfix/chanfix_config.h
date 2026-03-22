@@ -146,15 +146,10 @@
 #define TEMPBLOCK_DURATION_TIME 3600
 
 /**
- * Maximum score a client can obtain.
+ * OPCOUNT, MAXOPCOUNT etc. below remain compile-time constants.
+ * MAX_SCORE and DAYSAMPLES are now runtime config values — see
+ * chanfix::maxScore and chanfix::daySamples in chanfix.h.
  */
-// #define MAX_SCORE	(static_cast<int>(DAYSAMPLES) * 86400 / POINTS_UPDATE_TIME)
-#define MAX_SCORE 7032
-/**
- * The maximum number of days to keep track of per channel -1,
- * e.g. a value of 15 means we track 14.00-14.99 days.
- */
-#define DAYSAMPLES 14
 
 /**
  * The maximum number of top ops to return to the user on

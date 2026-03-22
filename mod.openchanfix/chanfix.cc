@@ -262,6 +262,12 @@ void chanfix::readConfigFile(const std::string& configFileName) {
     adminLogFile = chanfixConfig->Require("adminLogFile")->second;
     debugLogFile = chanfixConfig->Require("debugLogFile")->second;
 
+    daySamples = atoi((chanfixConfig->Require("daysamples")->second).c_str());
+    if (daySamples < 1) daySamples = 14;
+    maxScore = daySamples * (86400 / POINTS_UPDATE_TIME);
+    bonusPointsPerDay = atoi((chanfixConfig->Require("bonusPointsPerDay")->second).c_str());
+    bonusMaxDaysBeforeDecay = atoi((chanfixConfig->Require("bonusMaxDaysBeforeDecay")->second).c_str());
+
     /* Set up the channels that chanfix should join */
     EConfig::const_iterator ptr = chanfixConfig->Find("joinChan");
     while (ptr != chanfixConfig->end() && ptr->first == "joinChan") {
@@ -1092,16 +1098,14 @@ void chanfix::precacheChanOps() {
     /* Retrieve the list of chanops */
     std::stringstream theQuery;
     std::string lastChan = "";
-    theQuery << "SELECT "
-                "channel,account,last_seen_as,ts_firstopped,ts_lastopped,day0,day1,day2,day3,day4,"
-                "day5,day6,day7,day8,day9,day10,day11,day12,day13 FROM chanOps ORDER BY channel "
-                "ASC, ts_firstopped ASC";
+    theQuery << "SELECT channel,account,last_seen_as,ts_firstopped,ts_lastopped "
+                "FROM chanOps ORDER BY channel ASC, ts_firstopped ASC";
 
     elog << "*** [chanfix::precacheChanOps]: Loading chanOps and their points ..." << std::endl;
 
     if (localDBHandle->Exec(theQuery.str(), true)) {
         for (unsigned int i = 0; i < localDBHandle->Tuples(); i++) {
-            sqlChanOp* newOp = new (std::nothrow) sqlChanOp(theManager);
+            sqlChanOp* newOp = new (std::nothrow) sqlChanOp(theManager, daySamples);
             assert(newOp != 0);
 
             newOp->setAllMembers(localDBHandle, i);
@@ -1125,11 +1129,37 @@ void chanfix::precacheChanOps() {
         ::exit(0);
     }
 
+    /* Load daily points from chanops_daily */
+    if (localDBHandle->Exec("SELECT channel, account, day, points FROM chanops_daily", true)) {
+        for (unsigned int i = 0; i < localDBHandle->Tuples(); i++) {
+            std::string chan = localDBHandle->GetValue(i, 0);
+            std::string acct = localDBHandle->GetValue(i, 1);
+            int daySlot = atoi(localDBHandle->GetValue(i, 2));
+            short pts = atoi(localDBHandle->GetValue(i, 3));
+
+            sqlChanOp* theOp = findChanOp(chan, acct);
+            if (theOp && daySlot >= 0 && daySlot < static_cast<int>(theOp->getDaySize())) {
+                theOp->setDayDirect(daySlot, pts);
+            }
+        }
+    }
+
+    /* Recalculate total points after loading daily data */
+    for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
+         ptr != sqlChanOps.end(); ++ptr) {
+        for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
+             chanOp != ptr->second.end(); ++chanOp) {
+            chanOp->second->calcTotalPoints();
+        }
+    }
+
+    /* Clean up daily rows outside current window */
+    std::stringstream cleanupQuery;
+    cleanupQuery << "DELETE FROM chanops_daily WHERE day >= " << daySamples;
+    localDBHandle->Exec(cleanupQuery.str());
+
     elog << "*** [chanfix::precacheChanOps]: Done. Loaded " << sqlChanOps.size() << " chanops."
          << std::endl;
-
-    /* Dispose of our connection instance */
-    // theManager->removeConnection(cacheCon);
 
     return;
 }
@@ -1290,7 +1320,7 @@ sqlChanOp* chanfix::findChanOp(const std::string& channel, const std::string& ac
 }
 
 sqlChanOp* chanfix::newChanOp(const std::string& channel, const std::string& account) {
-    sqlChanOp* newOp = new (std::nothrow) sqlChanOp(theManager);
+    sqlChanOp* newOp = new (std::nothrow) sqlChanOp(theManager, daySamples);
     assert(newOp != 0);
 
     /* elog << "chanfix::newChanOp> DEBUG: Added new operator: " << account << " on " << channel <<
@@ -1653,7 +1683,7 @@ void chanfix::autoFix() {
                                          (*myOps.begin())->getBonus());
 
                 if ((sqlChan->getMaxScore() >
-                     static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE)) &&
+                     static_cast<int>(static_cast<float>(FIX_MIN_ABS_SCORE_END) * maxScore)) &&
                     !sqlChan->getFlag(sqlChannel::F_BLOCKED) &&
                     !isTempBlocked(thisChan->getName())) {
                     elog << "chanfix::autoFix> DEBUG: " << thisChan->getName()
@@ -1769,8 +1799,8 @@ bool chanfix::simFix(sqlChannel* sqlChan, bool autofix, time_t c_Time, iClient* 
     if (myOps.begin() != myOps.end())
         sqlChan->setTMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
-    int maxScore = sqlChan->getTMaxScore();
-    if (maxScore <= FIX_MIN_ABS_SCORE_END * MAX_SCORE)
+    int chanMaxScore = sqlChan->getTMaxScore();
+    if (chanMaxScore <= FIX_MIN_ABS_SCORE_END * maxScore)
         return false;
 
     unsigned int maxOpped = (autofix ? AUTOFIX_NUM_OPPED : CHANFIX_NUM_OPPED);
@@ -1787,16 +1817,16 @@ bool chanfix::simFix(sqlChannel* sqlChan, bool autofix, time_t c_Time, iClient* 
 
     int max_time = (autofix ? AUTOFIX_MAXIMUM : CHANFIX_MAXIMUM);
     int min_score_abs =
-        static_cast<int>((MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
+        static_cast<int>((maxScore * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
                          static_cast<float>(time_since_start) / static_cast<float>(max_time) *
-                             (MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN) -
-                              static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
+                             (maxScore * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN) -
+                              static_cast<float>(FIX_MIN_ABS_SCORE_END) * maxScore));
 
     int min_score_rel =
-        static_cast<int>((maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
+        static_cast<int>((chanMaxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
                          static_cast<float>(time_since_start) / static_cast<float>(max_time) *
-                             (maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN) -
-                              static_cast<float>(FIX_MIN_REL_SCORE_END) * maxScore));
+                             (chanMaxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN) -
+                              static_cast<float>(FIX_MIN_REL_SCORE_END) * chanMaxScore));
 
     int min_score = min_score_abs;
     if (min_score_rel > min_score)
@@ -1865,7 +1895,7 @@ bool chanfix::simFix(sqlChannel* sqlChan, bool autofix, time_t c_Time, iClient* 
 
     SendTo(theClient, chanStatus.str().c_str());
 
-    if ((!numClientsToOp || maxScore < min_score) && (!autofix || !(numClientsToOp + currentOps))) {
+    if ((!numClientsToOp || chanMaxScore < min_score) && (!autofix || !(numClientsToOp + currentOps))) {
         if (autofix && !sqlChan->getSimModesRemoved()) {
 
             if (netChan->banList_size() || netChan->getMode(Channel::MODE_I) ||
@@ -1952,7 +1982,7 @@ bool chanfix::simulateFix(sqlChannel* sqlChan, bool autofix, iClient* theClient,
 
 bool chanfix::shouldCJoin(sqlChannel* sqlChan, bool autofix) {
     bool joinchan = false;
-    int maxScore;
+    int chanMaxScore;
     time_t fixstart;
 
     /* coder notes (mostly so i dont forget -sirv)
@@ -1970,9 +2000,9 @@ bool chanfix::shouldCJoin(sqlChannel* sqlChan, bool autofix) {
     if (myOps.begin() != myOps.end())
         sqlChan->setTMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
-    maxScore = sqlChan->getTMaxScore();
+    chanMaxScore = sqlChan->getTMaxScore();
 
-    if (maxScore <= FIX_MIN_ABS_SCORE_END * MAX_SCORE)
+    if (chanMaxScore <= FIX_MIN_ABS_SCORE_END * maxScore)
         return joinchan;
 
     unsigned int maxOpped = (autofix ? AUTOFIX_NUM_OPPED : CHANFIX_NUM_OPPED);
@@ -1991,16 +2021,16 @@ bool chanfix::shouldCJoin(sqlChannel* sqlChan, bool autofix) {
     int max_time = (autofix ? AUTOFIX_MAXIMUM : CHANFIX_MAXIMUM);
 
     int min_score_abs =
-        static_cast<int>((MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
+        static_cast<int>((maxScore * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
                          static_cast<float>(time_since_start) / static_cast<float>(max_time) *
-                             (MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN) -
-                              static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
+                             (maxScore * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN) -
+                              static_cast<float>(FIX_MIN_ABS_SCORE_END) * maxScore));
 
     int min_score_rel =
-        static_cast<int>((maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
+        static_cast<int>((chanMaxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
                          static_cast<float>(time_since_start) / static_cast<float>(max_time) *
-                             (maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN) -
-                              static_cast<float>(FIX_MIN_REL_SCORE_END) * maxScore));
+                             (chanMaxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN) -
+                              static_cast<float>(FIX_MIN_REL_SCORE_END) * chanMaxScore));
 
     int min_score = min_score_abs;
     if (min_score_rel > min_score)
@@ -2058,11 +2088,11 @@ bool chanfix::fixChan(sqlChannel* sqlChan, bool autofix) {
     if (myOps.begin() != myOps.end())
         sqlChan->setMaxScore((*myOps.begin())->getPoints() + (*myOps.begin())->getBonus());
 
-    int maxScore = sqlChan->getMaxScore();
+    int chanMaxScore = sqlChan->getMaxScore();
 
     /* If the max score of the channel is lower than the absolute minimum
      * score required, don't even bother trying. */
-    if (maxScore <= FIX_MIN_ABS_SCORE_END * MAX_SCORE)
+    if (chanMaxScore <= FIX_MIN_ABS_SCORE_END * maxScore)
         return false;
 
     /* Get the number of clients that should have ops */
@@ -2090,12 +2120,12 @@ bool chanfix::fixChan(sqlChannel* sqlChan, bool autofix) {
      * (max_time, fraction_abs_min * max_score)
      * at time t between 0 and max_time. */
     int min_score_abs =
-        static_cast<int>((MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
+        static_cast<int>((maxScore * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN)) -
                          static_cast<float>(time_since_start) / static_cast<float>(max_time) *
-                             (MAX_SCORE * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN) -
-                              static_cast<float>(FIX_MIN_ABS_SCORE_END) * MAX_SCORE));
+                             (maxScore * static_cast<float>(FIX_MIN_ABS_SCORE_BEGIN) -
+                              static_cast<float>(FIX_MIN_ABS_SCORE_END) * maxScore));
 
-    elog << "chanfix::fixChan> [" << netChan->getName() << "] max " << MAX_SCORE << ", begin "
+    elog << "chanfix::fixChan> [" << netChan->getName() << "] max " << maxScore << ", begin "
          << FIX_MIN_ABS_SCORE_BEGIN << ", end " << FIX_MIN_ABS_SCORE_END << ", time "
          << time_since_start << ", maxtime " << max_time << "." << std::endl;
 
@@ -2103,10 +2133,10 @@ bool chanfix::fixChan(sqlChannel* sqlChan, bool autofix) {
      * (max_time, fraction_rel_min * max_score_channel)
      * at time t between 0 and max_time. */
     int min_score_rel =
-        static_cast<int>((maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
+        static_cast<int>((chanMaxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN)) -
                          static_cast<float>(time_since_start) / static_cast<float>(max_time) *
-                             (maxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN) -
-                              static_cast<float>(FIX_MIN_REL_SCORE_END) * maxScore));
+                             (chanMaxScore * static_cast<float>(FIX_MIN_REL_SCORE_BEGIN) -
+                              static_cast<float>(FIX_MIN_REL_SCORE_END) * chanMaxScore));
 
     /* The minimum score needed for ops is the HIGHER of these two
      * scores. */
@@ -2125,7 +2155,7 @@ bool chanfix::fixChan(sqlChannel* sqlChan, bool autofix) {
         min_score = sqlChan->getMaxScore();
 
     elog << "chanfix::fixChan> [" << netChan->getName() << "] start " << sqlChan->getFixStart()
-         << ", delta " << time_since_start << ", max " << maxScore << ", minabs " << min_score_abs
+         << ", delta " << time_since_start << ", max " << chanMaxScore << ", minabs " << min_score_abs
          << ", minrel " << min_score_rel << "." << std::endl;
 
     /**
@@ -2174,7 +2204,7 @@ bool chanfix::fixChan(sqlChannel* sqlChan, bool autofix) {
     }
 
     /* If no scores are high enough, return. */
-    if ((!numClientsToOp || maxScore < min_score) && (!autofix || !(numClientsToOp + currentOps))) {
+    if ((!numClientsToOp || chanMaxScore < min_score) && (!autofix || !(numClientsToOp + currentOps))) {
         if (autofix && !sqlChan->getModesRemoved() && needsModesRemoved(netChan)) {
             ClearMode(netChan, "biklrD", true);
             sqlChan->setModesRemoved(true);
@@ -2567,7 +2597,7 @@ void chanfix::syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDelete
         return;
     }
 
-    /* 1. Process deletes */
+    /* 1. Process deletes — remove from both tables */
     for (pendingDeletesType::iterator it = snapDeletes.begin();
          it != snapDeletes.end(); ++it) {
         std::stringstream delQuery;
@@ -2588,31 +2618,33 @@ void chanfix::syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDelete
             syncThreadRunning = false;
             return;
         }
+        std::stringstream delDailyQuery;
+        delDailyQuery << "DELETE FROM chanops_daily WHERE channel = '"
+                      << escapeSQLChars(it->first) << "' AND account = '"
+                      << escapeSQLChars(it->second) << "'";
+        if (!threadCon->Exec(delDailyQuery.str())) {
+            elog << "*** [chanfix::syncWorker] Error deleting chanops_daily: "
+                 << threadCon->ErrorMessage() << std::endl;
+        }
     }
 
-    /* 2. UPSERT snapshot ops */
+    /* 2. UPSERT snapshot ops — metadata to chanOps, daily points to chanops_daily */
     int upsertsProcessed = 0;
     for (syncSnapshotType::iterator snap = snapOps.begin();
          snap != snapOps.end(); ++snap) {
+        /* 2a. UPSERT metadata into chanOps */
         std::stringstream upsertQuery;
         upsertQuery << "INSERT INTO chanOps (channel, account, last_seen_as, "
-                    << "ts_firstopped, ts_lastopped";
-        for (int i = 0; i < DAYSAMPLES; i++)
-            upsertQuery << ", day" << i;
-        upsertQuery << ") VALUES ('"
+                    << "ts_firstopped, ts_lastopped) VALUES ('"
                     << escapeSQLChars(snap->channel) << "', '"
                     << escapeSQLChars(snap->account) << "', '"
                     << escapeSQLChars(snap->lastSeenAs) << "', "
                     << snap->firstOpped << ", "
-                    << snap->lastOpped;
-        for (int i = 0; i < DAYSAMPLES; i++)
-            upsertQuery << ", " << snap->day[i];
-        upsertQuery << ") ON CONFLICT (channel, account) DO UPDATE SET "
+                    << snap->lastOpped
+                    << ") ON CONFLICT (channel, account) DO UPDATE SET "
                     << "last_seen_as = EXCLUDED.last_seen_as, "
                     << "ts_firstopped = EXCLUDED.ts_firstopped, "
                     << "ts_lastopped = EXCLUDED.ts_lastopped";
-        for (int i = 0; i < DAYSAMPLES; i++)
-            upsertQuery << ", day" << i << " = EXCLUDED.day" << i;
 
         if (!threadCon->Exec(upsertQuery.str())) {
             elog << "*** [chanfix::syncWorker] Error upserting chanOp ("
@@ -2629,6 +2661,42 @@ void chanfix::syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDelete
             syncThreadRunning = false;
             return;
         }
+
+        /* 2b. UPSERT daily points into chanops_daily */
+        if (snap->forceAllDays) {
+            /* Shutdown: write all non-zero day slots */
+            for (size_t i = 0; i < snap->day.size(); i++) {
+                if (snap->day[i] == 0) continue;
+                std::stringstream dayQuery;
+                dayQuery << "INSERT INTO chanops_daily (channel, account, day, points) VALUES ('"
+                         << escapeSQLChars(snap->channel) << "', '"
+                         << escapeSQLChars(snap->account) << "', "
+                         << i << ", " << snap->day[i]
+                         << ") ON CONFLICT (channel, account, day) DO UPDATE SET "
+                         << "points = EXCLUDED.points";
+                if (!threadCon->Exec(dayQuery.str())) {
+                    elog << "*** [chanfix::syncWorker] Error upserting chanops_daily: "
+                         << threadCon->ErrorMessage() << std::endl;
+                }
+            }
+        } else {
+            /* Periodic sync: only write the current day slot */
+            if (snap->currentDaySlot >= 0 &&
+                snap->currentDaySlot < static_cast<short>(snap->day.size())) {
+                std::stringstream dayQuery;
+                dayQuery << "INSERT INTO chanops_daily (channel, account, day, points) VALUES ('"
+                         << escapeSQLChars(snap->channel) << "', '"
+                         << escapeSQLChars(snap->account) << "', "
+                         << snap->currentDaySlot << ", " << snap->day[snap->currentDaySlot]
+                         << ") ON CONFLICT (channel, account, day) DO UPDATE SET "
+                         << "points = EXCLUDED.points";
+                if (!threadCon->Exec(dayQuery.str())) {
+                    elog << "*** [chanfix::syncWorker] Error upserting chanops_daily: "
+                         << threadCon->ErrorMessage() << std::endl;
+                }
+            }
+        }
+
         upsertsProcessed++;
     }
 
@@ -2703,8 +2771,9 @@ void chanfix::syncToDB(bool forceAll)
             snap.lastSeenAs = curOp->getLastSeenAs();
             snap.firstOpped = curOp->getTimeFirstOpped();
             snap.lastOpped = curOp->getTimeLastOpped();
-            for (int i = 0; i < DAYSAMPLES; i++)
-                snap.day[i] = curOp->getDay(i);
+            snap.day = curOp->getDays();
+            snap.currentDaySlot = currentDay;
+            snap.forceAllDays = forceAll;
 
             snapOps.push_back(snap);
             curOp->setDirty(false);
@@ -2782,7 +2851,7 @@ void chanfix::rotateDB() {
 
     short nextDay = currentDay;
     setCurrentDay();
-    if (nextDay >= (DAYSAMPLES - 1))
+    if (nextDay >= static_cast<short>(daySamples - 1))
         nextDay = 0;
     else
         nextDay++;
@@ -2794,7 +2863,7 @@ void chanfix::rotateDB() {
      * check it against the time that he/she was first opped.
      */
     time_t maxFirstOppedTS = currentTime() - (POINTS_UPDATE_TIME + 10);
-    time_t maxLastOppedTS = currentTime() - (DAYSAMPLES * 86400);
+    time_t maxLastOppedTS = currentTime() - (daySamples * 86400);
     sqlChanOp* curOp;
     std::string curChan;
 
@@ -3190,10 +3259,10 @@ int chanfix::getNewScore(sqlChanOp* chOp, time_t oldestTS) {
 
     double x;
 
-    if (daysSinceFirstOpOnChan < 30)
-        x = 100.0;
+    if (daysSinceFirstOpOnChan < static_cast<int>(bonusMaxDaysBeforeDecay))
+        x = static_cast<double>(bonusPointsPerDay);
     else
-        x = 3000.0 / daysSinceFirstOpOnChan;
+        x = static_cast<double>(bonusPointsPerDay * bonusMaxDaysBeforeDecay) / daysSinceFirstOpOnChan;
 
     /* GET NEW SCORE */
     int newScore = (x * daysSinceFirstOp);
@@ -3323,8 +3392,8 @@ bool chanfix::doXROplist(iServer* theServer, const string& Routing, const string
         if (days) {
             dayString.str("");
 
-            for (int i = 1; i <= DAYSAMPLES; i++) {
-                cScore = curOp->getDay((currentDay + i) % DAYSAMPLES);
+            for (unsigned int i = 1; i <= daySamples; i++) {
+                cScore = curOp->getDay((currentDay + i) % daySamples);
                 percent = static_cast<unsigned int>(
                     ((static_cast<float>(cScore) / static_cast<float>(86400 / POINTS_UPDATE_TIME)) *
                      100) +

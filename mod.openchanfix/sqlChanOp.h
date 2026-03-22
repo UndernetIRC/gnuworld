@@ -25,6 +25,7 @@
 #define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.6 2010/03/04 04:24:12 hidden1 Exp $"
 
 #include <string>
+#include <vector>
 #include "dbHandle.h"
 #include "chanfix_config.h"
 
@@ -37,7 +38,7 @@ class sqlManager;
 class sqlChanOp {
 
   public:
-    sqlChanOp(sqlManager*);
+    sqlChanOp(sqlManager*, unsigned int daySamples);
     virtual ~sqlChanOp();
 
     /*
@@ -104,6 +105,14 @@ class sqlChanOp {
     void setAllMembers(dbHandle*, int);
     void calcTotalPoints();
 
+    inline size_t getDaySize() const { return day.size(); }
+
+    inline void setDayDirect(size_t index, short pts) {
+        if (index < day.size()) day[index] = pts;
+    }
+
+    inline const std::vector<short>& getDays() const { return day; }
+
   private:
     std::string channel;
     std::string account;
@@ -114,7 +123,7 @@ class sqlChanOp {
 #endif
     time_t ts_firstopped;
     time_t ts_lastopped;
-    short day[DAYSAMPLES];
+    std::vector<short> day;
     bool OldestOp;
     bool dirty;
 

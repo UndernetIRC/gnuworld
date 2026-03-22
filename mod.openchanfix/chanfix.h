@@ -370,7 +370,9 @@ class chanfix : public xClient {
         std::string lastSeenAs;
         time_t firstOpped;
         time_t lastOpped;
-        short day[DAYSAMPLES];
+        std::vector<short> day;
+        short currentDaySlot;
+        bool forceAllDays;
     };
     typedef std::vector<SyncSnapshot> syncSnapshotType;
 
@@ -461,6 +463,10 @@ class chanfix : public xClient {
     unsigned int connectCheckFreq;
     std::string adminLogFile;
     std::string debugLogFile;
+    unsigned int daySamples;
+    unsigned int maxScore;
+    unsigned int bonusPointsPerDay;
+    unsigned int bonusMaxDaysBeforeDecay;
     std::string sqlHost;
     std::string sqlPort;
     std::string sqlcfUsername;
@@ -555,7 +561,7 @@ class chanfix : public xClient {
     inline void setDoChanBlocking(bool _enableChannelBlocking) {
         enableChannelBlocking = _enableChannelBlocking;
     }
-    inline void setCurrentDay() { currentDay = currentTime() / 86400 % DAYSAMPLES; }
+    inline void setCurrentDay() { currentDay = currentTime() / 86400 % daySamples; }
 
 }; // class chanfix
 
