@@ -29,6 +29,7 @@
 #include <csignal>
 #include <cstdarg>
 #include <ctime>
+#include <thread>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -89,9 +90,9 @@ chanfix::chanfix(const std::string& configFileName) : xClient(configFileName) {
     /* Initial finding of the channel service */
     chanServLinked = false;
 
-    /* Initial update/sync status */
-    updateInProgress = false;
+    /* Initial sync status */
     syncFailures = 0;
+    syncThreadRunning = false;
 
     std::string dbString = "host=" + sqlHost + " dbname=" + sqlDB + " port=" + sqlPort +
                            " user=" + sqlcfUsername + " password=" + sqlPass;
@@ -2535,67 +2536,154 @@ void chanfix::startTimers() {
 }
 
 /**
- * syncToDB - Incrementally sync dirty ops to the SQL database.
+ * syncWorker - Background thread function that writes snapshot data to SQL.
  *
- * Uses batched UPSERTs inside a single transaction. Only writes ops whose
- * dirty flag is set (or all ops if forceAll is true, e.g. on shutdown).
- * Also processes pending deletes from rotateDB().
- *
- * Error recovery: on any SQL error, issues ROLLBACK. Dirty flags remain set
- * so the next sync cycle retries. The UpdateGuard RAII pattern guarantees
- * updateInProgress is always reset. After MAX_SYNC_FAILURES consecutive
- * failures, an admin alert is sent to the console channel.
+ * Owns the snapshot vectors (passed by value). Opens its own DB connection
+ * since libpq connections are not thread-safe. Signals completion by setting
+ * syncThreadRunning to false.
  */
-void chanfix::syncToDB(bool forceAll)
+void chanfix::syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDeletes)
 {
-    if (updateInProgress) {
-        elog << "*** [chanfix::syncToDB] Sync already in progress; skipping."
-             << std::endl;
-        return;
-    }
-
-    UpdateGuard guard(updateInProgress);
-
-    dbHandle* cacheCon = localDBHandle;
+    /* Get our own DB connection for this thread */
+    dbHandle* threadCon = theManager->getConnection();
 
     /* Begin transaction */
-    if (!cacheCon->Exec("BEGIN")) {
-        elog << "*** [chanfix::syncToDB] Error starting transaction: "
-             << cacheCon->ErrorMessage() << std::endl;
+    if (!threadCon->Exec("BEGIN")) {
+        elog << "*** [chanfix::syncWorker] Error starting transaction: "
+             << threadCon->ErrorMessage() << std::endl;
         syncFailures++;
         if (syncFailures >= MAX_SYNC_FAILURES) {
             logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
                             "Data is accumulating in memory only!",
                             syncFailures);
         }
+        theManager->removeConnection(threadCon);
+        syncThreadRunning = false;
         return;
     }
 
-    /* 1. Process pending deletes */
-    for (pendingDeletesType::iterator it = pendingDeletes.begin();
-         it != pendingDeletes.end(); ++it) {
+    /* 1. Process deletes */
+    for (pendingDeletesType::iterator it = snapDeletes.begin();
+         it != snapDeletes.end(); ++it) {
         std::stringstream delQuery;
         delQuery << "DELETE FROM chanOps WHERE channel = '"
                  << escapeSQLChars(it->first) << "' AND account = '"
                  << escapeSQLChars(it->second) << "'";
-        if (!cacheCon->Exec(delQuery.str())) {
-            elog << "*** [chanfix::syncToDB] Error deleting chanOp: "
-                 << cacheCon->ErrorMessage() << std::endl;
-            cacheCon->Exec("ROLLBACK");
+        if (!threadCon->Exec(delQuery.str())) {
+            elog << "*** [chanfix::syncWorker] Error deleting chanOp: "
+                 << threadCon->ErrorMessage() << std::endl;
+            threadCon->Exec("ROLLBACK");
             syncFailures++;
             if (syncFailures >= MAX_SYNC_FAILURES) {
                 logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
                                 "Data is accumulating in memory only!",
                                 syncFailures);
             }
+            theManager->removeConnection(threadCon);
+            syncThreadRunning = false;
             return;
         }
     }
-    int deletesProcessed = pendingDeletes.size();
-    pendingDeletes.clear();
 
-    /* 2. UPSERT dirty ops */
+    /* 2. UPSERT snapshot ops */
     int upsertsProcessed = 0;
+    for (syncSnapshotType::iterator snap = snapOps.begin();
+         snap != snapOps.end(); ++snap) {
+        std::stringstream upsertQuery;
+        upsertQuery << "INSERT INTO chanOps (channel, account, last_seen_as, "
+                    << "ts_firstopped, ts_lastopped";
+        for (int i = 0; i < DAYSAMPLES; i++)
+            upsertQuery << ", day" << i;
+        upsertQuery << ") VALUES ('"
+                    << escapeSQLChars(snap->channel) << "', '"
+                    << escapeSQLChars(snap->account) << "', '"
+                    << escapeSQLChars(snap->lastSeenAs) << "', "
+                    << snap->firstOpped << ", "
+                    << snap->lastOpped;
+        for (int i = 0; i < DAYSAMPLES; i++)
+            upsertQuery << ", " << snap->day[i];
+        upsertQuery << ") ON CONFLICT (channel, account) DO UPDATE SET "
+                    << "last_seen_as = EXCLUDED.last_seen_as, "
+                    << "ts_firstopped = EXCLUDED.ts_firstopped, "
+                    << "ts_lastopped = EXCLUDED.ts_lastopped";
+        for (int i = 0; i < DAYSAMPLES; i++)
+            upsertQuery << ", day" << i << " = EXCLUDED.day" << i;
+
+        if (!threadCon->Exec(upsertQuery.str())) {
+            elog << "*** [chanfix::syncWorker] Error upserting chanOp ("
+                 << snap->channel << ", " << snap->account
+                 << "): " << threadCon->ErrorMessage() << std::endl;
+            threadCon->Exec("ROLLBACK");
+            syncFailures++;
+            if (syncFailures >= MAX_SYNC_FAILURES) {
+                logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
+                                "Data is accumulating in memory only!",
+                                syncFailures);
+            }
+            theManager->removeConnection(threadCon);
+            syncThreadRunning = false;
+            return;
+        }
+        upsertsProcessed++;
+    }
+
+    /* Commit transaction */
+    if (!threadCon->Exec("COMMIT")) {
+        elog << "*** [chanfix::syncWorker] Error committing transaction: "
+             << threadCon->ErrorMessage() << std::endl;
+        syncFailures++;
+        if (syncFailures >= MAX_SYNC_FAILURES) {
+            logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
+                            "Data is accumulating in memory only!",
+                            syncFailures);
+        }
+        theManager->removeConnection(threadCon);
+        syncThreadRunning = false;
+        return;
+    }
+
+    /* Success */
+    if (syncFailures > 0) {
+        logAdminMessage("SQL sync recovered after %d consecutive failure(s).",
+                        syncFailures);
+    }
+    syncFailures = 0;
+
+    logDebugMessage("SQL sync complete: %d upserts, %d deletes.",
+                    upsertsProcessed, static_cast<int>(snapDeletes.size()));
+
+    theManager->removeConnection(threadCon);
+    syncThreadRunning = false;
+}
+
+/**
+ * syncToDB - Incrementally sync dirty ops to the SQL database.
+ *
+ * Normal mode (forceAll=false): snapshots dirty ops into a vector and
+ * dispatches a background thread to write them. Returns immediately so
+ * the main event loop is not blocked by SQL operations.
+ *
+ * Shutdown mode (forceAll=true): waits for any running background sync,
+ * then runs synchronously to guarantee data is persisted before exit.
+ */
+void chanfix::syncToDB(bool forceAll)
+{
+    /* If shutdown, wait for any running background sync to finish first */
+    if (forceAll) {
+        while (syncThreadRunning) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
+    if (syncThreadRunning) {
+        elog << "*** [chanfix::syncToDB] Background sync still running; skipping."
+             << std::endl;
+        return;
+    }
+
+    /* 1. Build snapshot of dirty ops (main thread, fast) */
+    syncSnapshotType snapOps;
+
     for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
          ptr != sqlChanOps.end(); ++ptr) {
         for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
@@ -2604,75 +2692,44 @@ void chanfix::syncToDB(bool forceAll)
             if (!forceAll && !curOp->isDirty())
                 continue;
 
-            std::stringstream upsertQuery;
-            upsertQuery << "INSERT INTO chanOps (channel, account, last_seen_as, "
-                        << "ts_firstopped, ts_lastopped";
+            SyncSnapshot snap;
+            snap.channel = curOp->getChannel();
+            snap.account = curOp->getAccount();
+            snap.lastSeenAs = curOp->getLastSeenAs();
+            snap.firstOpped = curOp->getTimeFirstOpped();
+            snap.lastOpped = curOp->getTimeLastOpped();
             for (int i = 0; i < DAYSAMPLES; i++)
-                upsertQuery << ", day" << i;
-            upsertQuery << ") VALUES ('"
-                        << escapeSQLChars(curOp->getChannel()) << "', '"
-                        << escapeSQLChars(curOp->getAccount()) << "', '"
-                        << escapeSQLChars(curOp->getLastSeenAs()) << "', "
-                        << curOp->getTimeFirstOpped() << ", "
-                        << curOp->getTimeLastOpped();
-            for (int i = 0; i < DAYSAMPLES; i++)
-                upsertQuery << ", " << curOp->getDay(i);
-            upsertQuery << ") ON CONFLICT (channel, account) DO UPDATE SET "
-                        << "last_seen_as = EXCLUDED.last_seen_as, "
-                        << "ts_firstopped = EXCLUDED.ts_firstopped, "
-                        << "ts_lastopped = EXCLUDED.ts_lastopped";
-            for (int i = 0; i < DAYSAMPLES; i++)
-                upsertQuery << ", day" << i << " = EXCLUDED.day" << i;
+                snap.day[i] = curOp->getDay(i);
 
-            if (!cacheCon->Exec(upsertQuery.str())) {
-                elog << "*** [chanfix::syncToDB] Error upserting chanOp ("
-                     << curOp->getChannel() << ", " << curOp->getAccount()
-                     << "): " << cacheCon->ErrorMessage() << std::endl;
-                cacheCon->Exec("ROLLBACK");
-                syncFailures++;
-                if (syncFailures >= MAX_SYNC_FAILURES) {
-                    logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
-                                    "Data is accumulating in memory only!",
-                                    syncFailures);
-                }
-                return;
-            }
+            snapOps.push_back(snap);
             curOp->setDirty(false);
-            upsertsProcessed++;
         }
     }
 
-    /* Commit transaction */
-    if (!cacheCon->Exec("COMMIT")) {
-        elog << "*** [chanfix::syncToDB] Error committing transaction: "
-             << cacheCon->ErrorMessage() << std::endl;
-        /* Mark all ops dirty again since commit failed */
-        for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
-             ptr != sqlChanOps.end(); ++ptr) {
-            for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
-                 chanOp != ptr->second.end(); ++chanOp) {
-                chanOp->second->setDirty(true);
-            }
-        }
-        syncFailures++;
-        if (syncFailures >= MAX_SYNC_FAILURES) {
-            logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
-                            "Data is accumulating in memory only!",
-                            syncFailures);
-        }
+    /* Swap out pending deletes */
+    pendingDeletesType snapDeletes;
+    snapDeletes.swap(pendingDeletes);
+
+    /* Nothing to do? */
+    if (snapOps.empty() && snapDeletes.empty()) {
         return;
     }
 
-    /* Success — reset failure counter */
-    if (syncFailures > 0) {
-        logAdminMessage("SQL sync recovered after %d consecutive failure(s).",
-                        syncFailures);
-    }
-    syncFailures = 0;
+    logDebugMessage("SQL sync starting: %d dirty ops, %d pending deletes.",
+                    static_cast<int>(snapOps.size()),
+                    static_cast<int>(snapDeletes.size()));
 
-    if (upsertsProcessed > 0 || deletesProcessed > 0) {
-        logDebugMessage("SQL sync complete: %d upserts, %d deletes.",
-                        upsertsProcessed, deletesProcessed);
+    if (forceAll) {
+        /* Synchronous path for shutdown — must complete before exit */
+        syncThreadRunning = true;
+        syncWorker(std::move(snapOps), std::move(snapDeletes));
+        /* syncWorker sets syncThreadRunning = false on completion */
+    } else {
+        /* Background thread for periodic sync */
+        syncThreadRunning = true;
+        std::thread syncThread(&chanfix::syncWorker, this,
+                               std::move(snapOps), std::move(snapDeletes));
+        syncThread.detach();
     }
 }
 

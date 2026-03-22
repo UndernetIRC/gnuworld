@@ -36,11 +36,11 @@ void SHUTDOWNCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::st
     StringTokenizer st(Message);
 
     /*
-     * In the current single-threaded event loop, this check can never
-     * actually trigger: syncToDB() runs synchronously in OnTimer() and
-     * must complete before the next message (this command) is processed.
-     * The UpdateGuard RAII pattern guarantees the flag is always reset.
-     * Kept as defense-in-depth in case threading is reintroduced.
+     * syncToDB() dispatches a background thread for periodic syncs.
+     * This check blocks the command if a sync is currently running.
+     * The sync typically completes within seconds, so the user can
+     * retry shortly. The atomic syncThreadRunning flag is always
+     * reset by the background thread on completion.
      */
     if (bot->isUpdateRunning()) {
         bot->SendTo(theClient,
