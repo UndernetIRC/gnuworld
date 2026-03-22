@@ -15,6 +15,7 @@ libchanfix_la_SOURCES = \
 	mod.openchanfix/CHANFIXCommand.cc \
 	mod.openchanfix/CHECKCommand.cc \
 	mod.openchanfix/DEBUGCommand.cc \
+	mod.openchanfix/DUMPSQLCommand.cc \
 	mod.openchanfix/DELFLAGCommand.cc \
 	mod.openchanfix/DELHOSTCommand.cc \
 	mod.openchanfix/DELNOTECommand.cc \
