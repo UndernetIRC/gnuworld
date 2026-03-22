@@ -63,6 +63,10 @@ class sqlChanOp {
 
     inline bool isOldestOp() const { return OldestOp; }
 
+    inline bool isDirty() const { return dirty; }
+
+    inline void setDirty(bool _dirty) { dirty = _dirty; }
+
     /*
      *  Methods to set data attributes.
      */
@@ -78,20 +82,22 @@ class sqlChanOp {
     inline void setPoints(short _points) {
         day[currentDay] = _points;
         calcTotalPoints();
+        dirty = true;
     }
 
     inline void addPoint() {
         day[currentDay]++;
         calcTotalPoints();
+        dirty = true;
     }
 
-    inline void setLastSeenAs(std::string _nickUserHost) { nickUserHost = _nickUserHost; }
+    inline void setLastSeenAs(std::string _nickUserHost) { nickUserHost = _nickUserHost; dirty = true; }
 
-    inline void setTimeFirstOpped(time_t _ts_firstopped) { ts_firstopped = _ts_firstopped; }
+    inline void setTimeFirstOpped(time_t _ts_firstopped) { ts_firstopped = _ts_firstopped; dirty = true; }
 
-    inline void setTimeLastOpped(time_t _ts_lastopped) { ts_lastopped = _ts_lastopped; }
+    inline void setTimeLastOpped(time_t _ts_lastopped) { ts_lastopped = _ts_lastopped; dirty = true; }
 
-    inline void setDay(int _dayval, short _pointsval) { day[_dayval] = _pointsval; }
+    inline void setDay(int _dayval, short _pointsval) { day[_dayval] = _pointsval; dirty = true; }
 
     inline void setIsOldestOp(bool _oldestOp) { OldestOp = _oldestOp; }
 
@@ -110,6 +116,7 @@ class sqlChanOp {
     time_t ts_lastopped;
     short day[DAYSAMPLES];
     bool OldestOp;
+    bool dirty;
 
     sqlManager* myManager;
 }; // class

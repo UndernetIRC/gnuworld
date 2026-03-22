@@ -118,10 +118,11 @@
 #define DBROTATE_CHECK_TIME 3600
 
 /**
- * Interval between two consecutive SQL updates.
- * Default: every 12 hours
+ * Interval between two consecutive SQL sync operations.
+ * Dirty ops are flushed to the database at this interval.
+ * Default: every 5 minutes (matches POINTS_UPDATE_TIME)
  */
-#define SQL_UPDATE_TIME 86400
+#define SQL_SYNC_TIME 300
 
 /**
  * Interval between two consecutive checks for opless channels.

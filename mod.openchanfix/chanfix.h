@@ -26,6 +26,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <utility>
 #include <sstream>
 
 #include "client.h"
@@ -195,8 +196,6 @@ class chanfix : public xClient {
     void precacheChannels();
     void precacheUsers();
 
-    void printResourceStats();
-
     void changeState(STATE);
 
     time_t currentTime() { return ::time(0); }
@@ -264,8 +263,7 @@ class chanfix : public xClient {
 
     void expireTempBlocks();
 
-    void prepareUpdate(bool);
-    void updateDB();
+    void syncToDB(bool forceAll = false);
 #ifdef ENABLE_NEWSCORES
     int getNewScore(sqlChanOp*, time_t);
 #endif
@@ -357,18 +355,21 @@ class chanfix : public xClient {
     SimMapType simMap;
 
     /**
-     * The snapshot map for updating the SQL database
+     * Pending deletes to propagate to SQL on next sync
      */
-    typedef struct {
-        std::string account;
-        std::string lastSeenAs;
-        time_t firstOpped;
-        time_t lastOpped;
-        short day[DAYSAMPLES];
-    } snapShotStruct;
+    typedef std::list<std::pair<std::string, std::string>> pendingDeletesType;
+    pendingDeletesType pendingDeletes;
 
-    typedef std::multimap<std::string, snapShotStruct> DBMapType;
-    DBMapType snapShot;
+    /**
+     * RAII guard to ensure updateInProgress is always reset
+     */
+    struct UpdateGuard {
+        bool& flag;
+        UpdateGuard(bool& f) : flag(f) { flag = true; }
+        ~UpdateGuard() { flag = false; }
+    };
+
+    static const unsigned int MAX_SYNC_FAILURES = 3;
 
     /**
      * The db clients map
@@ -479,6 +480,11 @@ class chanfix : public xClient {
      * Update status variable
      */
     bool updateInProgress;
+
+    /**
+     * Consecutive sync failure counter
+     */
+    unsigned int syncFailures;
 
     /**
      * Timer declarations

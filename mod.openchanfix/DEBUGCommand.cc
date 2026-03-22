@@ -60,21 +60,12 @@ void DEBUGCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::strin
             return;
         }
 
-        if ((st.size() > 2) && string_upper(st[2]) == "THREADED") {
-            bot->logDebugMessage("%s (%s) ordered a manual DB update (threaded).",
-                                 theUser ? theUser->getUserName().c_str()
-                                         : theClient->getNickName().c_str(),
-                                 theClient->getRealNickUserHost().c_str());
-            bot->prepareUpdate(true);
-            return;
-        } else {
-            bot->logDebugMessage("%s (%s) ordered a manual DB update.",
-                                 theUser ? theUser->getUserName().c_str()
-                                         : theClient->getNickName().c_str(),
-                                 theClient->getRealNickUserHost().c_str());
-            bot->prepareUpdate(false);
-            return;
-        }
+        bot->logDebugMessage("%s (%s) ordered a manual DB sync.",
+                             theUser ? theUser->getUserName().c_str()
+                                     : theClient->getNickName().c_str(),
+                             theClient->getRealNickUserHost().c_str());
+        bot->syncToDB(true);
+        return;
     }
 
     bot->logLastComMessage(theClient, Message);
