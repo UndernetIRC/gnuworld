@@ -364,6 +364,8 @@ void chanfix::OnTimer(const xServer::timerID& theTimer, void*) {
     time_t theTime;
     if (theTimer == tidGivePoints) {
         /* 5 min timer, loop through channels and give all ops a point! */
+        elog << "[C] - INFO  - Scoring cycle: awarding points to opped users."
+             << std::endl;
         giveAllOpsPoints();
 
         /* Refresh Timer */
@@ -397,6 +399,8 @@ void chanfix::OnTimer(const xServer::timerID& theTimer, void*) {
         tidRotateDB = MyUplink->RegisterTimer(theTime, this, NULL);
     } else if (theTimer == tidUpdateDB) {
         /* Sync dirty ops to the database */
+        elog << "[C] - INFO  - SQL sync: writing dirty ops to database."
+             << std::endl;
         syncToDB();
 
         /* Refresh Timer */
@@ -2713,6 +2717,7 @@ void chanfix::syncToDB(bool forceAll)
 
     /* Nothing to do? */
     if (snapOps.empty() && snapDeletes.empty()) {
+        elog << "[C] - INFO  - SQL sync: no dirty ops to write." << std::endl;
         return;
     }
 
@@ -2852,6 +2857,8 @@ void chanfix::giveAllOpsPoints() {
     Channel* thisChan;
     ScoredOpsListType scoredOpsList;
     ScoredOpsListType::iterator scOpIter;
+    int scoredChans = 0;
+    int scoredOps = 0;
     for (xNetwork::channelIterator ptr = Network->channels_begin(); ptr != Network->channels_end();
          ptr++) {
         thisChan = ptr->second;
@@ -2871,11 +2878,17 @@ void chanfix::giveAllOpsPoints() {
                         givePoints(thisChan, curUser->getClient());
                         scoredOpsList.push_back(
                             ScoredOpsListType::value_type(curUser->getClient()->getAccount()));
+                        scoredOps++;
                     }
                 }
             }
+            scoredChans++;
         }
     }
+
+    elog << "[C] - INFO  - Scoring complete: "
+         << scoredOps << " ops scored across "
+         << scoredChans << " channels." << std::endl;
 
     return;
 } // giveAllOpsPoints
