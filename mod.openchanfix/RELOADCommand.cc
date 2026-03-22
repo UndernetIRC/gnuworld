@@ -35,8 +35,7 @@ namespace cf {
 void RELOADCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
     StringTokenizer st(Message);
 
-    /* See comment in SHUTDOWNCommand.cc — this check is defense-in-depth
-     * and cannot trigger in the current single-threaded event loop. */
+    /* See comment in SHUTDOWNCommand.cc — blocks if background sync is running. */
     if (bot->isUpdateRunning()) {
         bot->SendTo(theClient,
                     bot->getResponse(theUser, language::update_in_progress,

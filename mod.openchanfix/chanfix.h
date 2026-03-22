@@ -27,6 +27,7 @@
 #include <map>
 #include <list>
 #include <utility>
+#include <atomic>
 #include <sstream>
 
 #include "client.h"
@@ -264,6 +265,7 @@ class chanfix : public xClient {
     void expireTempBlocks();
 
     void syncToDB(bool forceAll = false);
+    void syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDeletes);
 #ifdef ENABLE_NEWSCORES
     int getNewScore(sqlChanOp*, time_t);
 #endif
@@ -361,13 +363,17 @@ class chanfix : public xClient {
     pendingDeletesType pendingDeletes;
 
     /**
-     * RAII guard to ensure updateInProgress is always reset
+     * Snapshot struct for copying dirty op data to the background thread
      */
-    struct UpdateGuard {
-        bool& flag;
-        UpdateGuard(bool& f) : flag(f) { flag = true; }
-        ~UpdateGuard() { flag = false; }
+    struct SyncSnapshot {
+        std::string channel;
+        std::string account;
+        std::string lastSeenAs;
+        time_t firstOpped;
+        time_t lastOpped;
+        short day[DAYSAMPLES];
     };
+    typedef std::vector<SyncSnapshot> syncSnapshotType;
 
     static const unsigned int MAX_SYNC_FAILURES = 3;
 
@@ -477,9 +483,9 @@ class chanfix : public xClient {
     bool chanServLinked;
 
     /**
-     * Update status variable
+     * Atomic flag for background sync thread status
      */
-    bool updateInProgress;
+    std::atomic<bool> syncThreadRunning;
 
     /**
      * Consecutive sync failure counter
@@ -525,7 +531,7 @@ class chanfix : public xClient {
     bool doManualFixNotice() { return manualFixNotice; }
     STATE getState() { return currentState; }
     bool isChanServLinked() { return chanServLinked; }
-    bool isUpdateRunning() { return updateInProgress; }
+    bool isUpdateRunning() { return syncThreadRunning.load(); }
     bool isAllowingTopFix() { return allowTopOpFix; }
     unsigned int getTopOpPercent() { return topOpPercent; }
     unsigned int getMinFixScore() { return minFixScore; }
