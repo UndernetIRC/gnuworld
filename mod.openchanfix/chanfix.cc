@@ -2799,8 +2799,9 @@ void chanfix::rotateDB() {
             curOp = chanOp->second;
             curOp->setDay(nextDay, 0);
             curOp->calcTotalPoints();
-            if (((curOp->getPoints() <= 0) && (maxFirstOppedTS > curOp->getTimeFirstOpped())) ||
-                (maxLastOppedTS > curOp->getTimeLastOpped())) {
+            if ((curOp->getPoints() <= 0) &&
+                ((maxFirstOppedTS > curOp->getTimeFirstOpped()) ||
+                 (maxLastOppedTS > curOp->getTimeLastOpped()))) {
                 pendingDeletes.push_back(std::make_pair(ptr->first, curOp->getAccount()));
                 ptr->second.erase(chanOp++);
                 delete curOp;
