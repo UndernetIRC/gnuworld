@@ -265,7 +265,6 @@ class chanfix : public xClient {
     void expireTempBlocks();
 
     void syncToDB(bool forceAll = false);
-    void syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDeletes);
 #ifdef ENABLE_NEWSCORES
     int getNewScore(sqlChanOp*, time_t);
 #endif
@@ -374,6 +373,8 @@ class chanfix : public xClient {
         short day[DAYSAMPLES];
     };
     typedef std::vector<SyncSnapshot> syncSnapshotType;
+
+    void syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDeletes);
 
     static const unsigned int MAX_SYNC_FAILURES = 3;
 
