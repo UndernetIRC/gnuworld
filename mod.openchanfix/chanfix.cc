@@ -128,6 +128,7 @@ chanfix::chanfix(const std::string& configFileName) : xClient(configFileName) {
 #ifdef CHANFIX_DEBUG
     RegisterCommand(new DEBUGCommand(this, "DEBUG", "<ROTATE|UPDATE>", 2, sqlcfUser::F_OWNER));
 #endif /* CHANFIX_DEBUG */
+    RegisterCommand(new DUMPSQLCommand(this, "DUMPSQL", "(no arguments)", 1, sqlcfUser::F_OWNER));
     RegisterCommand(new DELFLAGCommand(this, "DELFLAG", "<username> <flag>", 3,
                                        sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN));
     RegisterCommand(new DELHOSTCommand(this, "DELHOST", "<username> <nick!user@host>", 3,
