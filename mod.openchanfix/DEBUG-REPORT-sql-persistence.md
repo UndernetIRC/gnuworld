@@ -253,3 +253,10 @@ All issues described in this report have been fixed. The changes are:
    backup table. Legacy backup tables from the old code are handled on first startup.
 7. **Schema migration** — `doc/update_chanops_unique.sql` adds the UNIQUE
    constraint on `(channel, account)` required for the UPSERT syntax.
+8. **Background thread sync** — `syncToDB()` now snapshots dirty ops into a
+   `std::vector` on the main thread (<50ms) and dispatches a detached `std::thread`
+   to write UPSERTs. The main event loop is never blocked by SQL operations.
+   The background thread opens its own DB connection via `getConnection()`.
+   `std::atomic<bool> syncThreadRunning` replaces the old `updateInProgress` flag.
+   On shutdown (`forceAll=true`), the sync runs synchronously after waiting for
+   any running background thread to complete.
