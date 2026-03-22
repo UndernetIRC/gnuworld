@@ -35,11 +35,18 @@ namespace cf {
 void SHUTDOWNCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
     StringTokenizer st(Message);
 
+    /*
+     * In the current single-threaded event loop, this check can never
+     * actually trigger: syncToDB() runs synchronously in OnTimer() and
+     * must complete before the next message (this command) is processed.
+     * The UpdateGuard RAII pattern guarantees the flag is always reset.
+     * Kept as defense-in-depth in case threading is reintroduced.
+     */
     if (bot->isUpdateRunning()) {
         bot->SendTo(theClient,
                     bot->getResponse(theUser, language::update_in_progress,
-                                     std::string("This command cannot proceed while an update is "
-                                                 "in progress. Please try again later."))
+                                     std::string("A SQL sync is currently in progress. "
+                                                 "Please try again in a few seconds."))
                         .c_str());
         return;
     }

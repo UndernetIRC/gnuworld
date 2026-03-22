@@ -58,10 +58,6 @@
 #include "sqlChannel.h"
 #include "sqlcfUser.h"
 
-#ifdef CHANFIX_HAVE_BOOST_THREAD
-#include <boost/thread/thread.hpp>
-#endif /* CHANFIX_HAVE_BOOST_THREAD */
-
 namespace gnuworld {
 
 namespace cf {
@@ -93,8 +89,9 @@ chanfix::chanfix(const std::string& configFileName) : xClient(configFileName) {
     /* Initial finding of the channel service */
     chanServLinked = false;
 
-    /* Initial update status */
+    /* Initial update/sync status */
     updateInProgress = false;
+    syncFailures = 0;
 
     std::string dbString = "host=" + sqlHost + " dbname=" + sqlDB + " port=" + sqlPort +
                            " user=" + sqlcfUsername + " password=" + sqlPass;
@@ -355,23 +352,6 @@ void chanfix::OnAttach() {
     xClient::OnAttach();
 }
 
-/**
- * Thread class only used for score updates, updates on reload and shutdown are not threaded
- */
-#ifdef CHANFIX_HAVE_BOOST_THREAD
-class ClassUpdateDB {
-  public:
-    ClassUpdateDB(chanfix& cf) : cf_(cf) {}
-    void operator()() {
-        cf_.updateDB();
-        return;
-    }
-
-  private:
-    chanfix& cf_;
-};
-#endif /* CHANFIX_HAVE_BOOST_THREAD */
-
 /* OnTimer */
 void chanfix::OnTimer(const xServer::timerID& theTimer, void*) {
     time_t theTime;
@@ -409,11 +389,11 @@ void chanfix::OnTimer(const xServer::timerID& theTimer, void*) {
         theTime = time(NULL) + getSecsTilMidnight();
         tidRotateDB = MyUplink->RegisterTimer(theTime, this, NULL);
     } else if (theTimer == tidUpdateDB) {
-        /* Prepare to synchronize the database in a thread */
-        prepareUpdate(true);
+        /* Sync dirty ops to the database */
+        syncToDB();
 
         /* Refresh Timer */
-        theTime = time(NULL) + SQL_UPDATE_TIME;
+        theTime = time(NULL) + SQL_SYNC_TIME;
         tidUpdateDB = MyUplink->RegisterTimer(theTime, this, NULL);
     } else if (theTimer == tidTempBlocks) {
         /* Remove expired temporary blocks */
@@ -428,7 +408,7 @@ void chanfix::OnTimer(const xServer::timerID& theTimer, void*) {
 /* OnDetach */
 void chanfix::OnDetach(const std::string& reason) {
     /* Save our database */
-    prepareUpdate(false);
+    syncToDB(true);
 
     /* Delete our config */
     delete chanfixConfig;
@@ -1080,20 +1060,22 @@ void chanfix::precacheChanOps() {
     /* Get a connection instance to our backend */
     // dbHandle* cacheCon = theManager->getConnection();
 
-    /* Check for the backup table. If it exists, something went wrong. */
-    /* SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup' */
-    /* SELECT chanOpsBackup FROM information_schema.tables */
-    if (!localDBHandle->Exec("SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup'",
-                             true)) {
-        elog << "*** [chanfix::precacheChanOps]: Error checking for backup table presence: "
-             << localDBHandle->ErrorMessage() << std::endl;
-        return;
-    }
-
-    if (localDBHandle->Tuples() && atoi(localDBHandle->GetValue(0, 0))) {
-        elog << "*** [chanfix::precacheChanOps]: Backup table still exists! "
-             << "Something must have gone wrong on the last update. Exiting..." << std::endl;
-        ::exit(0);
+    /* Check for legacy backup table from old full-dump code */
+    if (localDBHandle->Exec("SELECT count(*) FROM pg_tables WHERE tablename = 'chanopsbackup'",
+                             true)
+        && localDBHandle->Tuples() && atoi(localDBHandle->GetValue(0, 0))) {
+        /* Check if the main chanOps table is empty */
+        if (localDBHandle->Exec("SELECT count(*) FROM chanOps", true)
+            && localDBHandle->Tuples() && atoi(localDBHandle->GetValue(0, 0)) == 0) {
+            /* Main table is empty — restore from backup */
+            elog << "*** [chanfix::precacheChanOps] Restoring chanOps from legacy backup table."
+                 << std::endl;
+            localDBHandle->Exec("INSERT INTO chanOps SELECT * FROM chanOpsBackup");
+        }
+        /* Drop the backup table either way */
+        elog << "*** [chanfix::precacheChanOps] Dropping legacy chanOpsBackup table."
+             << std::endl;
+        localDBHandle->Exec("DROP TABLE chanOpsBackup");
     }
 
     /* Retrieve the list of chanops */
@@ -2540,7 +2522,7 @@ void chanfix::startTimers() {
     tidGivePoints = MyUplink->RegisterTimer(theTime, this, NULL);
     theTime = time(NULL) + getSecsTilMidnight();
     tidRotateDB = MyUplink->RegisterTimer(theTime, this, NULL);
-    theTime = time(NULL) + SQL_UPDATE_TIME;
+    theTime = time(NULL) + SQL_SYNC_TIME;
     tidUpdateDB = MyUplink->RegisterTimer(theTime, this, NULL);
     theTime = time(NULL) + TEMPBLOCKS_CHECK_TIME;
     tidTempBlocks = MyUplink->RegisterTimer(theTime, this, NULL);
@@ -2548,212 +2530,145 @@ void chanfix::startTimers() {
 }
 
 /**
- * prepareUpdate - Copies the sqlChanOp map to a temporary multimap
+ * syncToDB - Incrementally sync dirty ops to the SQL database.
+ *
+ * Uses batched UPSERTs inside a single transaction. Only writes ops whose
+ * dirty flag is set (or all ops if forceAll is true, e.g. on shutdown).
+ * Also processes pending deletes from rotateDB().
+ *
+ * Error recovery: on any SQL error, issues ROLLBACK. Dirty flags remain set
+ * so the next sync cycle retries. The UpdateGuard RAII pattern guarantees
+ * updateInProgress is always reset. After MAX_SYNC_FAILURES consecutive
+ * failures, an admin alert is sent to the console channel.
  */
-#ifdef CHANFIX_HAVE_BOOST_THREAD
-void chanfix::prepareUpdate(bool threaded)
-#else
-void chanfix::prepareUpdate(bool)
-#endif /* CHANFIX_HAVE_BOOST_THREAD */
+void chanfix::syncToDB(bool forceAll)
 {
     if (updateInProgress) {
-        elog << "*** [chanfix::prepareUpdate] Update already in progress; not starting."
+        elog << "*** [chanfix::syncToDB] Sync already in progress; skipping."
              << std::endl;
         return;
     }
 
-    elog << "*** [chanfix::prepareUpdate] Updating the SQL database "
-#ifdef CHANFIX_HAVE_BOOST_THREAD
-         << (threaded ? "(threaded)." : "(unthreaded).")
-#else
-         << "(unthreaded [no boost])."
-#endif /* CHANFIX_HAVE_BOOST_THREAD */
-         << std::endl;
-    logDebugMessage("Starting to update the SQL database.");
+    UpdateGuard guard(updateInProgress);
 
-    /**
-     * Set updateInProgress boolean to true so that any other updates
-     * and/or requests for shutdown/reload will be denied.
-     */
-    updateInProgress = true;
-
-    /* Start our timer */
-    Timer snapShotTimer;
-    snapShotTimer.Start();
-
-    /* Clear the snapShot map */
-    snapShot.clear();
-
-    // snapShotStruct* curStruct = new (std::nothrow) snapShotStruct;
-    snapShotStruct curStruct;
-
-    sqlChanOp* curOp;
-    std::string curChan;
-    int i = 0;
-
-    for (sqlChanOpsType::iterator ptr = sqlChanOps.begin(); ptr != sqlChanOps.end(); ptr++) {
-        curChan = ptr->first;
-        for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
-             chanOp != ptr->second.end(); chanOp++) {
-            curOp = chanOp->second;
-
-            /* Fill the structures and maps */
-            curStruct.account = curOp->getAccount();
-            curStruct.lastSeenAs = curOp->getLastSeenAs();
-            curStruct.firstOpped = curOp->getTimeFirstOpped();
-            curStruct.lastOpped = curOp->getTimeLastOpped();
-
-            for (i = 0; i < DAYSAMPLES; i++) {
-                curStruct.day[i] = curOp->getDay(i);
-            }
-
-            snapShot.insert(DBMapType::value_type(curChan, curStruct));
-        }
-    }
-
-    logDebugMessage("Created snapshot map in %u ms.", snapShotTimer.stopTimeMS());
-
-#ifdef CHANFIX_HAVE_BOOST_THREAD
-    if (threaded) {
-        ClassUpdateDB updateDB(*this);
-        boost::thread pthrd(updateDB);
-        pthrd.join();
-    } else
-#endif /* CHANFIX_HAVE_BOOST_THREAD */
-        updateDB();
-    printResourceStats();
-    return;
-}
-
-/**
- * updateDB - Copies the contents of sqlChanOps to the SQL database
- * Note: Only threaded if called via the ClassUpdateDB function with
- * boost::thread
- */
-void chanfix::updateDB() {
-    /* Start our timer */
-    Timer updateDBTimer;
-    updateDBTimer.Start();
-
-    /* Get a connection instance to our backend */
     dbHandle* cacheCon = localDBHandle;
 
-    /* Check for the backup table. If it exists, something went wrong. */
-    /* SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup' */
-    /* SELECT chanOpsBackup FROM information_schema.tables */
-    if (!cacheCon->Exec("SELECT count(*) FROM pg_tables WHERE tablename = 'chanOpsBackup'", true)) {
-        elog << "*** [chanfix::updateDB]: Error checking for backup table presence: "
+    /* Begin transaction */
+    if (!cacheCon->Exec("BEGIN")) {
+        elog << "*** [chanfix::syncToDB] Error starting transaction: "
              << cacheCon->ErrorMessage() << std::endl;
+        syncFailures++;
+        if (syncFailures >= MAX_SYNC_FAILURES) {
+            logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
+                            "Data is accumulating in memory only!",
+                            syncFailures);
+        }
         return;
     }
 
-    if (cacheCon->Tuples() && atoi(cacheCon->GetValue(0, 0))) {
-        /* Drop the backup table. */
-        if (!cacheCon->Exec("DROP TABLE chanOpsBackup")) {
-            elog << "*** [chanfix::updateDB]: Error dropping backup table: "
+    /* 1. Process pending deletes */
+    for (pendingDeletesType::iterator it = pendingDeletes.begin();
+         it != pendingDeletes.end(); ++it) {
+        std::stringstream delQuery;
+        delQuery << "DELETE FROM chanOps WHERE channel = '"
+                 << escapeSQLChars(it->first) << "' AND account = '"
+                 << escapeSQLChars(it->second) << "'";
+        if (!cacheCon->Exec(delQuery.str())) {
+            elog << "*** [chanfix::syncToDB] Error deleting chanOp: "
                  << cacheCon->ErrorMessage() << std::endl;
+            cacheCon->Exec("ROLLBACK");
+            syncFailures++;
+            if (syncFailures >= MAX_SYNC_FAILURES) {
+                logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
+                                "Data is accumulating in memory only!",
+                                syncFailures);
+            }
             return;
         }
     }
+    int deletesProcessed = pendingDeletes.size();
+    pendingDeletes.clear();
 
-    /* Copy all data from the main table to the backup table. */
-    if (!cacheCon->Exec("CREATE TABLE chanOpsBackup AS SELECT * FROM chanOps")) {
-        elog << "*** [chanfix::updateDB]: Error creating backup table: " << cacheCon->ErrorMessage()
-             << std::endl;
-        return;
-    }
+    /* 2. UPSERT dirty ops */
+    int upsertsProcessed = 0;
+    for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
+         ptr != sqlChanOps.end(); ++ptr) {
+        for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
+             chanOp != ptr->second.end(); ++chanOp) {
+            sqlChanOp* curOp = chanOp->second;
+            if (!forceAll && !curOp->isDirty())
+                continue;
 
-    /* Truncate the current chanOps table. */
-    if (!cacheCon->Exec("TRUNCATE TABLE chanOps")) {
-        elog << "*** [chanfix::updateDB]: Error truncating current chanOps table: "
-             << cacheCon->ErrorMessage() << std::endl;
-        return;
-    }
+            std::stringstream upsertQuery;
+            upsertQuery << "INSERT INTO chanOps (channel, account, last_seen_as, "
+                        << "ts_firstopped, ts_lastopped";
+            for (int i = 0; i < DAYSAMPLES; i++)
+                upsertQuery << ", day" << i;
+            upsertQuery << ") VALUES ('"
+                        << escapeSQLChars(curOp->getChannel()) << "', '"
+                        << escapeSQLChars(curOp->getAccount()) << "', '"
+                        << escapeSQLChars(curOp->getLastSeenAs()) << "', "
+                        << curOp->getTimeFirstOpped() << ", "
+                        << curOp->getTimeLastOpped();
+            for (int i = 0; i < DAYSAMPLES; i++)
+                upsertQuery << ", " << curOp->getDay(i);
+            upsertQuery << ") ON CONFLICT (channel, account) DO UPDATE SET "
+                        << "last_seen_as = EXCLUDED.last_seen_as, "
+                        << "ts_firstopped = EXCLUDED.ts_firstopped, "
+                        << "ts_lastopped = EXCLUDED.ts_lastopped";
+            for (int i = 0; i < DAYSAMPLES; i++)
+                upsertQuery << ", day" << i << " = EXCLUDED.day" << i;
 
-    /* Copy the current chanOps to SQL. */
-    if (!cacheCon->Exec("COPY chanOps FROM stdin")) {
-        elog << "*** [chanfix::updateDB]: Error starting copy of chanOps table."
-             << cacheCon->ErrorMessage() << std::endl;
-        return;
-    }
-
-    std::stringstream theLine;
-    int chanOpsProcessed = 0;
-    int i = 0;
-
-    for (DBMapType::iterator ptr = snapShot.begin(); ptr != snapShot.end(); ptr++) {
-        theLine.str("");
-        theLine << escapeSQLChars(ptr->first) << "\t" << escapeSQLChars(ptr->second.account) << "\t"
-                << escapeSQLChars(ptr->second.lastSeenAs) << "\t" << ptr->second.firstOpped << "\t"
-                << ptr->second.lastOpped;
-
-        for (i = 0; i < DAYSAMPLES; i++) {
-            theLine << "\t" << ptr->second.day[i];
+            if (!cacheCon->Exec(upsertQuery.str())) {
+                elog << "*** [chanfix::syncToDB] Error upserting chanOp ("
+                     << curOp->getChannel() << ", " << curOp->getAccount()
+                     << "): " << cacheCon->ErrorMessage() << std::endl;
+                cacheCon->Exec("ROLLBACK");
+                syncFailures++;
+                if (syncFailures >= MAX_SYNC_FAILURES) {
+                    logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
+                                    "Data is accumulating in memory only!",
+                                    syncFailures);
+                }
+                return;
+            }
+            curOp->setDirty(false);
+            upsertsProcessed++;
         }
-
-        theLine << "\n";
-
-        cacheCon->PutLine(theLine.str());
-        chanOpsProcessed++;
     }
 
-    /* Send completion string for the end of the data. */
-    cacheCon->PutLine("\\.\n");
-
-    /**
-     * Synchronize with the backend.
-     * Returns 0 on success, 1 on failure
-     */
-    if (!cacheCon->StopCopyIn())
-    //  if (copyStatus != 0) {
-    {
-        elog << "*** [chanfix::updateDB] Error ending copy!"
-             //		<< copyStatus << " instead (should be 0 for success)."
-             << std::endl;
-        return;
-    }
-
-    /* Count the rows to see if the cache == number of rows in table. */
-    if (!cacheCon->Exec("SELECT count(*) FROM chanOps", true)) {
-        elog << "*** [chanfix::updateDB]: Error counting rows in chanOps table: "
+    /* Commit transaction */
+    if (!cacheCon->Exec("COMMIT")) {
+        elog << "*** [chanfix::syncToDB] Error committing transaction: "
              << cacheCon->ErrorMessage() << std::endl;
+        /* Mark all ops dirty again since commit failed */
+        for (sqlChanOpsType::iterator ptr = sqlChanOps.begin();
+             ptr != sqlChanOps.end(); ++ptr) {
+            for (sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.begin();
+                 chanOp != ptr->second.end(); ++chanOp) {
+                chanOp->second->setDirty(true);
+            }
+        }
+        syncFailures++;
+        if (syncFailures >= MAX_SYNC_FAILURES) {
+            logAdminMessage("CRITICAL: SQL sync has failed %d consecutive times. "
+                            "Data is accumulating in memory only!",
+                            syncFailures);
+        }
         return;
     }
 
-    int actualChanOpsProcessed = atoi(cacheCon->GetValue(0, 0));
-    if (actualChanOpsProcessed != chanOpsProcessed) {
-        elog << "*** [chanfix::updateDB] Error updating chanOps! "
-             << "Only " << actualChanOpsProcessed << " of " << chanOpsProcessed
-             << " chanops were copied to the SQL database." << std::endl;
-        logDebugMessage("ERROR: Only %d of %d chanops were updated in %u ms.",
-                        actualChanOpsProcessed, chanOpsProcessed, updateDBTimer.stopTimeMS());
-    } else {
-        elog << "*** [chanfix::updateDB]: Done. Copied " << actualChanOpsProcessed
-             << " chanops to the SQL database." << std::endl;
-        logDebugMessage("Synched %d members to the SQL database in %u ms.", actualChanOpsProcessed,
-                        updateDBTimer.stopTimeMS());
+    /* Success — reset failure counter */
+    if (syncFailures > 0) {
+        logAdminMessage("SQL sync recovered after %d consecutive failure(s).",
+                        syncFailures);
     }
+    syncFailures = 0;
 
-    /* Drop the backup table. */
-    if (!cacheCon->Exec("DROP TABLE chanOpsBackup")) {
-        elog << "*** [chanfix::updateDB]: Error dropping backup table (after completion): "
-             << cacheCon->ErrorMessage() << std::endl;
-        return;
+    if (upsertsProcessed > 0 || deletesProcessed > 0) {
+        logDebugMessage("SQL sync complete: %d upserts, %d deletes.",
+                        upsertsProcessed, deletesProcessed);
     }
-
-    /* Dispose of our connection instance */
-    // theManager->removeConnection(cacheCon);
-
-    /* Clean-up after ourselves and allow new updates to be started */
-    snapShot.clear();
-    updateInProgress = false;
-
-    return;
-}
-
-void chanfix::printResourceStats() {
-    logDebugMessage("Max. resident size used by chanfix (kB): %s",
-                    prettyNumber(getMemoryUsage()).c_str());
 }
 
 bool chanfix::isTempBlocked(const std::string& theChan) {
@@ -2823,6 +2738,7 @@ void chanfix::rotateDB() {
             curOp->calcTotalPoints();
             if (((curOp->getPoints() <= 0) && (maxFirstOppedTS > curOp->getTimeFirstOpped())) ||
                 (maxLastOppedTS > curOp->getTimeLastOpped())) {
+                pendingDeletes.push_back(std::make_pair(ptr->first, curOp->getAccount()));
                 ptr->second.erase(chanOp++);
                 delete curOp;
                 curOp = 0;

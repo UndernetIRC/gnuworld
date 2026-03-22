@@ -41,6 +41,7 @@ sqlChanOp::sqlChanOp(sqlManager* _myManager)
       day() {
     myManager = _myManager;
     OldestOp = false;
+    dirty = false;
 }
 
 void sqlChanOp::setAllMembers(dbHandle* theDB, int row) {
@@ -64,6 +65,7 @@ void sqlChanOp::setAllMembers(dbHandle* theDB, int row) {
     day[12] = atoi(theDB->GetValue(row, 17));
     day[13] = atoi(theDB->GetValue(row, 18));
     calcTotalPoints();
+    dirty = false;
 }
 
 void sqlChanOp::calcTotalPoints() {
