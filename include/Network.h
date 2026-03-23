@@ -209,6 +209,13 @@ class xNetwork {
     }
 
     /**
+     * Remove a netconf variable from the network table.
+     */
+    virtual void removeNetConf(const std::string& key) {
+        netConfMap.erase(key);
+    }
+
+    /**
      * Find a netconf variable by key.
      * Returns std::nullopt if not found.
      */

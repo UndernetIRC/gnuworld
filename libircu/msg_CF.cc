@@ -54,7 +54,7 @@ bool msg_CF::Execute(const xParameters& Param) {
 
     time_t timestamp = atoi(Param[1]);
     std::string key(Param[2]);
-    std::string value(Param.assemble(3));
+    std::string value = Param.size() > 3 ? Param.assemble(3) : "";
 
     auto netConf = Network->findNetConf(key);
     if (netConf && netConf->second > timestamp) {
@@ -65,13 +65,18 @@ bool msg_CF::Execute(const xParameters& Param) {
         return false;
     }
 
-    Network->addNetConf(key, value, timestamp);
-
-    elog << "msg_CF> Adding netconf variable: " << key << " (value: " << value << ")"
-         << " (timestamp: " << timestamp << ")" << std::endl;
+    // Delete?
+    if (value.empty()) {
+        Network->removeNetConf(key);
+        elog << "msg_CF> Removing netconf variable: " << key << std::endl;
+    } else {
+        Network->addNetConf(key, value, timestamp);
+        elog << "msg_CF> Adding netconf variable: " << key << " (value: " << value << ")"
+            << " (timestamp: " << timestamp << ")" << std::endl;
+    }
 
     // Post event to listening clients
-    theServer->PostEvent(EVT_NETCONF, static_cast<void*>(sourceServer), static_cast<void*>(&key));
+    theServer->PostEvent(value.empty() ? EVT_REMNETCONF : EVT_NETCONF, static_cast<void*>(sourceServer), static_cast<void*>(&key));
 
     // Return success
     return true;
