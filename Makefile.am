@@ -9,6 +9,39 @@ noinst_LTLIBRARIES =
 
 pkgdata_DATA = bin/server_command_map
 
+# Install migration files for configured modules
+if COND_MODCSERVICE
+install-data-local: install-cservice-migrations
+endif
+
+if COND_MODCCONTROL
+install-data-local: install-ccontrol-migrations
+endif
+
+if COND_MODDRONESCAN
+install-data-local: install-dronescan-migrations
+endif
+
+if COND_MODOPENCHANFIX
+install-data-local: install-openchanfix-migrations
+endif
+
+install-cservice-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/cservice
+	cp -r mod.cservice/migrations/* $(DESTDIR)$(prefix)/migrations/cservice/
+
+install-ccontrol-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/ccontrol
+	cp -r mod.ccontrol/migrations/* $(DESTDIR)$(prefix)/migrations/ccontrol/
+
+install-dronescan-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/dronescan
+	cp -r mod.dronescan/migrations/* $(DESTDIR)$(prefix)/migrations/dronescan/
+
+install-openchanfix-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/openchanfix
+	cp -r mod.openchanfix/migrations/* $(DESTDIR)$(prefix)/migrations/openchanfix/
+
 EXTRA_DIST = bin/ccontrol.example.conf \
 	bin/chanfix.example.conf \
 	bin/clientExample.example.conf \

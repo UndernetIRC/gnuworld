@@ -199,6 +199,11 @@ chanfix::chanfix(const std::string& configFileName) : xClient(configFileName) {
     /* Our global DB handler */
     localDBHandle = theManager->getConnection();
 
+    // Verify database migrations
+    if (!checkMigrationsAfterDBConnect("openchanfix", localDBHandle)) {
+        ::exit(1);
+    }
+
     /* Set our current day. */
     setCurrentDay();
 

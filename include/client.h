@@ -37,6 +37,9 @@
 
 namespace gnuworld {
 
+// Forward declarations
+class dbHandle;
+
 /**
  * This is the public concrete base class that represents
  * a client that may connect to this server.  To build a new
@@ -924,6 +927,25 @@ class xClient : public TimerHandler, public NetworkTarget {
      * Logger instance.
      */
     std::unique_ptr<Logger> logger;
+
+    /**
+     * Flag to track whether migrations have been checked for this module.
+     * Prevents repeated checks on the same instance.
+     */
+    bool migrationsChecked = false;
+
+    /**
+     * Check database migrations for this module.
+     * Verifies that all migration files have been applied to the database.
+     * Must be called after database connection is established.
+     *
+     * @param moduleName The name of the module (e.g., "cservice", "ccontrol")
+     *                   This is also used as the database name for migration tracking
+     * @param db Pointer to the database connection handle
+     * @return true if all migrations are applied, false otherwise
+     *         On failure, detailed error messages are logged to elog
+     */
+    bool checkMigrationsAfterDBConnect(const std::string& moduleName, dbHandle* db);
 };
 
 } // namespace gnuworld

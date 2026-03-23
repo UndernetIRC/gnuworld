@@ -27,6 +27,7 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <filesystem>
 
 #include <cstdio>
 #include <cctype>
@@ -45,6 +46,7 @@
 #include "EConfig.h"
 #include "StringTokenizer.h"
 #include "ELog.h"
+#include "MigrationChecker.h"
 #include "events.h"
 
 namespace gnuworld {
@@ -2140,6 +2142,40 @@ bool xClient::ClearMode(Channel* theChan, const string& modes, bool modeAsServer
                          modes.c_str(), chanKey.c_str());
         }
     }
+}
+
+bool xClient::checkMigrationsAfterDBConnect(const std::string& moduleName, dbHandle* db) {
+    // Guard against repeated checks
+    if (migrationsChecked) {
+        // Migrations were already checked; return the result of that check
+        // (true means they passed; if they failed, we would have already exited)
+        return true;
+    }
+
+    migrationsChecked = true;
+
+    // Only proceed if this module has a database connection
+    if (!db || moduleName.empty()) {
+        return true;
+    }
+
+    // Try multiple possible locations for migrations directory
+    // 1. First try installed location: ../migrations/{module}
+    // 2. Fall back to source directory: ./mod.{module}/migrations
+
+    std::string installedDir = "../migrations/" + moduleName;
+    std::string sourceDir = "./mod." + moduleName + "/migrations";
+
+    std::string migrationsDir = sourceDir; // default to source directory
+
+    // Check if installed location exists
+    if (std::filesystem::exists(installedDir)) {
+        migrationsDir = installedDir;
+    }
+
+    // Create MigrationChecker and run check
+    MigrationChecker checker(moduleName, db, logger.get(), migrationsDir);
+    return checker.check();
 }
 
 } // namespace gnuworld

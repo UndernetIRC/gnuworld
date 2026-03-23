@@ -45,4 +45,5 @@ EXTRA_DIST += \
 	mod.dronescan/sqlFakeClient.h \
 	mod.dronescan/sqlUser.h \
 	mod.dronescan/ChangeLog \
-	mod.dronescan/README
+	mod.dronescan/README \
+	mod.dronescan/migrations/README

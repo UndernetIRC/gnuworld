@@ -1,0 +1,40 @@
+Channel Services (CService) - Database Migrations
+
+Migration files for cservice schema updates.
+
+Naming Convention
+-----------------
+NNN_description.sql
+
+Examples:
+  001_add_users_column.sql
+  002_add_index_on_channels.sql
+  003_drop_deprecated_table.sql
+
+
+Example Migration File
+----------------------
+ALTER TABLE users ADD COLUMN IF NOT EXISTS new_field VARCHAR(100);
+CREATE INDEX IF NOT EXISTS idx_users_new_field ON users(new_field);
+
+
+Checking Applied Migrations
+----------------------------
+To see which migrations have been applied to the cservice database:
+
+  psql cservice -c "SELECT file FROM gnuworld_migrations WHERE module='cservice' ORDER BY applied_at;"
+
+
+Automatic Migration Application
+--------------------------------
+Migrations are applied automatically when cservice starts. Simply:
+
+  1. Place your migration file in this directory
+  2. Restart gnuworld
+  3. The migration will be automatically detected and applied
+
+The migration system will log each migration as it's applied.
+If a migration fails, gnuworld will exit with an error message.
+
+
+For detailed documentation, see ../../doc/README.migrations

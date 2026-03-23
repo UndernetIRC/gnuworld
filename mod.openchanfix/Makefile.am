@@ -69,5 +69,5 @@ EXTRA_DIST += \
 	mod.openchanfix/sqlChanOp.h \
 	mod.openchanfix/sqlChannel.h \
 	mod.openchanfix/sqlManager.h \
-	mod.openchanfix/sqlcfUser.h
-
+	mod.openchanfix/sqlcfUser.h \
+	mod.openchanfix/migrations/README

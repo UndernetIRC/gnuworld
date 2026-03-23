@@ -310,6 +310,11 @@ cservice::cservice(const string& args)
         elog << "*** [CMaster]: Connection established to SQL server. " << endl;
     }
 
+    // Verify database migrations
+    if (!checkMigrationsAfterDBConnect("cservice", SQLDb)) {
+        ::exit(1);
+    }
+
     if (SQLDb->Exec("SELECT date_part('epoch', CURRENT_TIMESTAMP)::int;", true)) {
         // Set our "Last Refresh" timers to the current database system time.
         time_t serverTime = atoi(SQLDb->GetValue(0, 0).c_str());

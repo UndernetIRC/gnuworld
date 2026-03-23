@@ -9,6 +9,7 @@ libgnuworld_la_SOURCES = \
 	libgnuworld/ConnectionManager.cc \
 	libgnuworld/EConfig.cc \
 	libgnuworld/ELog.cc \
+	libgnuworld/MigrationChecker.cc \
 	libgnuworld/Signal.cc \
 	libgnuworld/StringTokenizer.cc \
 	libgnuworld/gThread.cc \
@@ -21,7 +22,9 @@ libgnuworld_la_LDFLAGS = $(threadLib)
 
 libgnuworld_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libgnuworld
+	-I$(top_srcdir)/libgnuworld \
+	-I$(top_srcdir)/libnotifier \
+	-I$(top_srcdir)/db
 
 EXTRA_DIST += \
 	libgnuworld/Buffer.h \
@@ -30,6 +33,7 @@ EXTRA_DIST += \
 	libgnuworld/ConnectionManager.h \
 	libgnuworld/EConfig.h \
 	libgnuworld/ELog.h \
+	libgnuworld/MigrationChecker.h \
 	libgnuworld/gThread.h \
 	libgnuworld/ircd_chattr.h \
 	libgnuworld/match.h \

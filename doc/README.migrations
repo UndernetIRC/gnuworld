@@ -1,0 +1,237 @@
+GNUWorld Database Migration System
+===================================
+
+Overview
+--------
+
+The database migration system automatically tracks and applies SQL schema updates
+to GNUWorld module databases. When a gnuworld instance starts, it checks for any
+unapplied migration files and applies them automatically. If a migration fails to apply,
+the instance will exit with a clear error message.
+
+This system ensures that:
+- Schema updates are applied automatically on startup
+- All instances of gnuworld stay in sync with schema requirements
+- Migrations are tracked persistently in the database
+- Failed migrations are clearly reported with error details
+
+
+How It Works
+------------
+
+1. **gnuworld_migrations Table**
+   Each module database contains a gnuworld_migrations table that tracks which
+   migration files have been applied. The table has columns:
+   - id: Unique identifier
+   - module: Module name (e.g., "cservice", "ccontrol")
+   - file: The SQL filename that was applied (e.g., "001_add_column.sql")
+   - applied_at: ISO 8601 timestamp with timezone offset when the migration was applied
+     (e.g., "2026-03-23 14:30:45.123456+00:00")
+
+   This table is created automatically on first startup if it doesn't exist.
+
+2. **Migration Files**
+   Migration files are stored in each module's migrations directory:
+   - mod.cservice/migrations/
+   - mod.ccontrol/migrations/
+   - mod.dronescan/migrations/
+   - mod.openchanfix/migrations/
+
+   Files must follow the naming convention: NNN_description.sql
+   Where NNN is a three-digit number (001, 002, 003, etc.)
+
+3. **Startup Check and Auto-Apply**
+   When each module starts:
+   a) Database connection is established
+   b) Migration system checks for unapplied migrations
+   c) If all migrations are applied: startup continues normally
+   d) If any migrations are pending: they are applied automatically
+      - Each migration file is read and executed
+      - Successfully applied migrations are recorded in gnuworld_migrations
+   e) If any migration fails: startup exits with an error message
+      - Error message includes the failed migration name and SQL error details
+      - No other migrations are attempted after a failure
+
+4. **What If a Migration Fails?**
+   If a migration fails to apply:
+   a) The error message explains what went wrong
+   b) The module fails to start
+   c) You must fix the issue (database state or migration file)
+   d) Restart gnuworld to retry
+
+
+Creating New Migration Files
+----------------------------
+
+When you need to modify a module's database schema, create a migration file:
+
+1. **Determine the next migration number**
+   List existing migrations:
+     ls mod.cservice/migrations/
+
+   If the last migration is 002_add_table.sql, the next migration is 003
+
+2. **Create the migration file**
+   Create: mod.cservice/migrations/003_add_column.sql
+
+   Example content:
+     ALTER TABLE users ADD COLUMN IF NOT EXISTS new_field VARCHAR(100);
+     CREATE INDEX IF NOT EXISTS idx_users_new_field ON users(new_field);
+
+3. **Important: Make migrations idempotent**
+   Always use:
+     - CREATE TABLE IF NOT EXISTS
+     - ALTER TABLE ... ADD COLUMN IF NOT EXISTS
+     - CREATE INDEX IF NOT EXISTS
+     - DROP TABLE IF EXISTS
+
+   This ensures migrations can be safely re-run without errors.
+
+4. **Document the change**
+   Add a comment at the top of the migration file explaining what changed:
+
+     -- Migration 003: Add new_field column to users table for feature X
+     -- Purpose: Support tracking of user metadata
+     ALTER TABLE users ADD COLUMN IF NOT EXISTS new_field VARCHAR(100);
+
+5. **Test the migration**
+   Apply it manually to verify it works:
+     psql cservice < mod.cservice/migrations/003_add_column.sql
+
+   Verify the schema change:
+     psql cservice -c "\d users"
+
+
+Applying Migrations Automatically (Default Behavior)
+----------------------------------------------------
+
+Migrations are applied automatically when gnuworld starts. Simply restart gnuworld:
+
+  ./gnuworld -f bin/GNUWorld.conf
+
+The migration system will:
+1. Detect any unapplied migrations
+2. Apply them in order (001, 002, 003, etc.)
+3. Log each migration as it's applied
+4. Exit with an error if any migration fails
+
+
+Disabling Migration Files
+--------------------------------------------------
+
+To prevent a migration file refrom running, change the *.sql extension. e.g.,
+
+  mv ./mod.{module}/migrations/001_update_timestamp.sql ./mod.{module}/migrations/001_update_timestamp.sql.tmp
+
+
+Verifying Applied Migrations
+-----------------------------
+
+To check which migrations have been applied to a module database:
+
+  psql cservice -c "SELECT file FROM gnuworld_migrations WHERE module='cservice' ORDER BY applied_at;"
+
+Expected output:
+  file
+  ---------------------
+  001_add_column.sql
+  002_create_index.sql
+(2 rows)
+
+
+
+Troubleshooting
+---------------
+
+**Problem: gnuworld fails to start with a migration error**
+When a migration fails to apply, the error message will say:
+  ERROR [MigrationChecker]: Failed to apply migration 'XXX_name.sql'...
+
+Causes and solutions:
+- Syntax error in the migration file - fix the SQL in the file
+- Missing prerequisite (e.g., trying to add a column to a non-existent table) - fix the migration logic
+- Database permissions - ensure your database user has schema change permissions
+- Migration already partially applied - manually check the database state
+
+To recover:
+  1. Review the error message to understand what went wrong
+  2. Fix either the migration file or the database state
+  3. Restart gnuworld to retry the migration
+
+**Problem: A migration file has a syntax error**
+If a migration file has an SQL syntax error:
+  1. Fix the migration file directly (e.g., mod.cservice/migrations/001_name.sql)
+  2. Restart gnuworld
+  3. The migration will be retried and should succeed
+
+**Problem: gnuworld doesn't apply my new migration file**
+Ensure:
+  1. The file follows the naming convention: NNN_description.sql (e.g., 003_add_column.sql)
+  2. The file is in the correct directory: mod.{module}/migrations/
+  3. The file is readable by the gnuworld process
+  4. Restart gnuworld - migrations are checked on startup
+
+**Problem: Migration was applied but I want to undo it**
+The migration system does not support automated rollback. If you need to undo changes:
+  1. Write a new migration that reverses the previous one (e.g., migration 004 undoes 003)
+  2. Or manually undo the schema changes via psql
+  3. If you manually undo via psql, restart gnuworld (it will not re-apply if recorded)
+
+**Problem: Need to undo a migration (rollback)**
+The migration system does not support automated rollback. If you need to undo changes:
+  1. Write a new migration that reverses the previous one
+  2. Or manually undo the schema changes via SQL
+  3. Then run a new migration to record the change
+
+Example: If migration 003 added a column, write migration 004 to drop it:
+  -- Migration 004: Revert column added in migration 003
+  ALTER TABLE users DROP COLUMN IF EXISTS new_field;
+
+
+Best Practices
+--------------
+
+1. **One logical change per migration file**
+   Don't combine unrelated schema changes in a single migration.
+
+2. **Test migrations locally first**
+   Apply migrations to a test database before deploying to production.
+
+3. **Use descriptive migration names**
+   Bad: 001_update.sql
+   Good: 001_add_user_preferences_table.sql
+
+4. **Keep migrations small and focused**
+   Easier to debug if something goes wrong.
+
+5. **Document complex migrations**
+   Add comments explaining why the change was made.
+
+6. **Consider performance impact**
+   Large table modifications on production systems may require special handling.
+   Document any expected downtime or performance considerations.
+
+7. **Coordinate deployments**
+   If multiple gnuworld instances share a database, apply migrations before
+   restarting instances to avoid conflicts.
+
+8. **Back up before major migrations**
+   Before applying significant schema changes, back up your database:
+   pg_dump cservice > cservice_backup.sql
+
+
+
+Questions or Issues?
+--------------------
+
+If you encounter issues with the migration system:
+
+1. Check the error message - it usually tells you exactly what's wrong
+2. Read the troubleshooting section above
+3. Review the migration file that's causing issues
+4. Check your database permissions
+5. Consult the GNUWorld IRC channel: #coder-com on Undernet
+
+See also:
+- GNUWorld documentation: https://github.com/UndernetIRC/gnuworld
+- IRC support: irc.undernet.org #coder-com

@@ -197,6 +197,11 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
 
     elog << "dronescan> Established connection to SQL server." << std::endl;
 
+    // Verify database migrations
+    if (!checkMigrationsAfterDBConnect("dronescan", SQLDb)) {
+        ::exit(1);
+    }
+
     /* Preload caches */
     preloadFakeClientCache();
     preloadUserCache();

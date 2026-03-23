@@ -95,4 +95,5 @@ EXTRA_DIST += \
 	mod.ccontrol/CommandsDec.h \
 	mod.ccontrol/commLevels.h \
 	mod.ccontrol/Constants.h \
-	mod.ccontrol/README
+	mod.ccontrol/README \
+	mod.ccontrol/migrations/README

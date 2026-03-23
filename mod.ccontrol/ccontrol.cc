@@ -137,6 +137,12 @@ ccontrol::ccontrol(const string& configFileName) : xClient(configFileName) {
     } else {
         elog << "ccontrol::ccontrol> Connection established to SQL " << endl;
     }
+
+    // Verify database migrations
+    if (!checkMigrationsAfterDBConnect("ccontrol", SQLDb)) {
+        ::exit(1);
+    }
+
     dbConnected = true;
 
     // operChanReason is the reason used when kicking non-opers from

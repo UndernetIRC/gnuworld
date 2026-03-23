@@ -99,4 +99,5 @@ EXTRA_DIST += \
 	mod.cservice/sqlUser.h \
 	mod.cservice/csGline.h \
 	mod.cservice/README \
-	mod.cservice/RELEASE.NOTES
+	mod.cservice/RELEASE.NOTES \
+	mod.cservice/migrations/README
