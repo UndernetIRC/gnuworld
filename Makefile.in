@@ -133,7 +133,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/CommandsDec.h \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/commLevels.h \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/Constants.h \
-@COND_MODCCONTROL_TRUE@	mod.ccontrol/README
+@COND_MODCCONTROL_TRUE@	mod.ccontrol/README \
+@COND_MODCCONTROL_TRUE@	mod.ccontrol/migrations/README
 
 @COND_MODCHANFIX_TRUE@am__append_7 = libchanfix.la
 @COND_MODCHANFIX_TRUE@am__append_8 = \
@@ -167,7 +168,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODCSERVICE_TRUE@	mod.cservice/sqlUser.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/csGline.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/README \
-@COND_MODCSERVICE_TRUE@	mod.cservice/RELEASE.NOTES
+@COND_MODCSERVICE_TRUE@	mod.cservice/RELEASE.NOTES \
+@COND_MODCSERVICE_TRUE@	mod.cservice/migrations/README
 
 @COND_MODDRONESCAN_TRUE@am__append_15 = libdronescan.la
 @COND_MODDRONESCAN_TRUE@am__append_16 = \
@@ -182,7 +184,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/sqlFakeClient.h \
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/sqlUser.h \
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/ChangeLog \
-@COND_MODDRONESCAN_TRUE@	mod.dronescan/README
+@COND_MODDRONESCAN_TRUE@	mod.dronescan/README \
+@COND_MODDRONESCAN_TRUE@	mod.dronescan/migrations/README
 
 @COND_MODGNUTEST_TRUE@am__append_17 = libgnutest.la
 @COND_MODGNUTEST_TRUE@am__append_18 = mod.gnutest/gnutest.h
@@ -212,7 +215,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/sqlChanOp.h \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/sqlChannel.h \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/sqlManager.h \
-@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/sqlcfUser.h
+@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/sqlcfUser.h \
+@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/migrations/README
 
 @COND_MODSCANNER_TRUE@am__append_23 = libscanner.la
 @COND_MODSCANNER_TRUE@am__append_24 = \
@@ -740,10 +744,11 @@ am_libgnuworld_la_OBJECTS = libgnuworld/la-Buffer.lo \
 	libgnuworld/la-Connection.lo \
 	libgnuworld/la-ConnectionHandler.lo \
 	libgnuworld/la-ConnectionManager.lo libgnuworld/la-EConfig.lo \
-	libgnuworld/la-ELog.lo libgnuworld/la-Signal.lo \
-	libgnuworld/la-StringTokenizer.lo libgnuworld/la-gThread.lo \
-	libgnuworld/la-match.lo libgnuworld/la-md5hash.lo \
-	libgnuworld/la-threadworker.lo libgnuworld/la-misc.lo
+	libgnuworld/la-ELog.lo libgnuworld/la-MigrationChecker.lo \
+	libgnuworld/la-Signal.lo libgnuworld/la-StringTokenizer.lo \
+	libgnuworld/la-gThread.lo libgnuworld/la-match.lo \
+	libgnuworld/la-md5hash.lo libgnuworld/la-threadworker.lo \
+	libgnuworld/la-misc.lo
 libgnuworld_la_OBJECTS = $(am_libgnuworld_la_OBJECTS)
 libgnuworld_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -1009,6 +1014,7 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	libgnuworld/$(DEPDIR)/la-ConnectionManager.Plo \
 	libgnuworld/$(DEPDIR)/la-EConfig.Plo \
 	libgnuworld/$(DEPDIR)/la-ELog.Plo \
+	libgnuworld/$(DEPDIR)/la-MigrationChecker.Plo \
 	libgnuworld/$(DEPDIR)/la-Signal.Plo \
 	libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo \
 	libgnuworld/$(DEPDIR)/la-gThread.Plo \
@@ -1705,19 +1711,19 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	libgnuworld/Buffer.h libgnuworld/Connection.h \
 	libgnuworld/ConnectionHandler.h \
 	libgnuworld/ConnectionManager.h libgnuworld/EConfig.h \
-	libgnuworld/ELog.h libgnuworld/gThread.h \
-	libgnuworld/ircd_chattr.h libgnuworld/match.h \
-	libgnuworld/match_table.h libgnuworld/md5hash.h \
-	libgnuworld/threadworker.h libgnuworld/misc.h \
-	libgnuworld/MTrie.h libgnuworld/MTrie.cc libgnuworld/Signal.h \
-	libgnuworld/StringTokenizer.h libgnuworld/xparameters.h \
-	libnotifier/logger.h libnotifier/notifier.h \
-	libnotifier/prometheus.h libnotifier/pushover.h \
-	$(am__append_6) $(am__append_8) $(am__append_10) \
-	$(am__append_12) $(am__append_14) $(am__append_16) \
-	$(am__append_18) $(am__append_20) $(am__append_22) \
-	$(am__append_24) $(am__append_26) $(am__append_28) \
-	$(am__append_30)
+	libgnuworld/ELog.h libgnuworld/MigrationChecker.h \
+	libgnuworld/gThread.h libgnuworld/ircd_chattr.h \
+	libgnuworld/match.h libgnuworld/match_table.h \
+	libgnuworld/md5hash.h libgnuworld/threadworker.h \
+	libgnuworld/misc.h libgnuworld/MTrie.h libgnuworld/MTrie.cc \
+	libgnuworld/Signal.h libgnuworld/StringTokenizer.h \
+	libgnuworld/xparameters.h libnotifier/logger.h \
+	libnotifier/notifier.h libnotifier/prometheus.h \
+	libnotifier/pushover.h $(am__append_6) $(am__append_8) \
+	$(am__append_10) $(am__append_12) $(am__append_14) \
+	$(am__append_16) $(am__append_18) $(am__append_20) \
+	$(am__append_22) $(am__append_24) $(am__append_26) \
+	$(am__append_28) $(am__append_30)
 libgnuworldDB_la_SOURCES = \
 	db/gnuworldDB.cc \
 	db/pgsqlDB.cc
@@ -1735,6 +1741,7 @@ libgnuworld_la_SOURCES = \
 	libgnuworld/ConnectionManager.cc \
 	libgnuworld/EConfig.cc \
 	libgnuworld/ELog.cc \
+	libgnuworld/MigrationChecker.cc \
 	libgnuworld/Signal.cc \
 	libgnuworld/StringTokenizer.cc \
 	libgnuworld/gThread.cc \
@@ -1746,7 +1753,9 @@ libgnuworld_la_SOURCES = \
 libgnuworld_la_LDFLAGS = $(threadLib)
 libgnuworld_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/libgnuworld
+	-I$(top_srcdir)/libgnuworld \
+	-I$(top_srcdir)/libnotifier \
+	-I$(top_srcdir)/db
 
 libnotifier_la_SOURCES = libnotifier/logger.cc libnotifier/pushover.cc \
 	$(am__append_1)
@@ -3080,6 +3089,8 @@ libgnuworld/la-EConfig.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-ELog.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
+libgnuworld/la-MigrationChecker.lo: libgnuworld/$(am__dirstamp) \
+	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-Signal.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-StringTokenizer.lo: libgnuworld/$(am__dirstamp) \
@@ -3484,6 +3495,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-ConnectionManager.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-EConfig.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-ELog.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-MigrationChecker.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-Signal.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@libgnuworld/$(DEPDIR)/la-gThread.Plo@am__quote@ # am--include-marker
@@ -5441,6 +5453,13 @@ libgnuworld/la-ELog.lo: libgnuworld/ELog.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-ELog.lo `test -f 'libgnuworld/ELog.cc' || echo '$(srcdir)/'`libgnuworld/ELog.cc
 
+libgnuworld/la-MigrationChecker.lo: libgnuworld/MigrationChecker.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-MigrationChecker.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-MigrationChecker.Tpo -c -o libgnuworld/la-MigrationChecker.lo `test -f 'libgnuworld/MigrationChecker.cc' || echo '$(srcdir)/'`libgnuworld/MigrationChecker.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-MigrationChecker.Tpo libgnuworld/$(DEPDIR)/la-MigrationChecker.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/MigrationChecker.cc' object='libgnuworld/la-MigrationChecker.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-MigrationChecker.lo `test -f 'libgnuworld/MigrationChecker.cc' || echo '$(srcdir)/'`libgnuworld/MigrationChecker.cc
+
 libgnuworld/la-Signal.lo: libgnuworld/Signal.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-Signal.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-Signal.Tpo -c -o libgnuworld/la-Signal.lo `test -f 'libgnuworld/Signal.cc' || echo '$(srcdir)/'`libgnuworld/Signal.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-Signal.Tpo libgnuworld/$(DEPDIR)/la-Signal.Plo
@@ -6664,6 +6683,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@COND_MODCCONTROL_FALSE@@COND_MODCSERVICE_FALSE@@COND_MODDRONESCAN_FALSE@@COND_MODOPENCHANFIX_FALSE@install-data-local:
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -6680,6 +6700,7 @@ distclean: distclean-recursive
 	-rm -f libgnuworld/$(DEPDIR)/la-ConnectionManager.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-EConfig.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-ELog.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-MigrationChecker.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-Signal.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-gThread.Plo
@@ -7019,7 +7040,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-pkgdataDATA
+install-data-am: install-data-local install-pkgdataDATA
 
 install-dvi: install-dvi-recursive
 
@@ -7058,6 +7079,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f libgnuworld/$(DEPDIR)/la-ConnectionManager.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-EConfig.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-ELog.Plo
+	-rm -f libgnuworld/$(DEPDIR)/la-MigrationChecker.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-Signal.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-StringTokenizer.Plo
 	-rm -f libgnuworld/$(DEPDIR)/la-gThread.Plo
@@ -7413,21 +7435,46 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	distclean-libtool distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-binPROGRAMS install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-libLTLIBRARIES install-man install-pdf \
-	install-pdf-am install-pkgdataDATA install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
-	uninstall-pkgdataDATA
+	install-data-am install-data-local install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-libLTLIBRARIES \
+	install-man install-pdf install-pdf-am install-pkgdataDATA \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-libLTLIBRARIES uninstall-pkgdataDATA
 
 .PRECIOUS: Makefile
 
 
 @SET_MAKE@
+
+# Install migration files for configured modules
+@COND_MODCSERVICE_TRUE@install-data-local: install-cservice-migrations
+
+@COND_MODCCONTROL_TRUE@install-data-local: install-ccontrol-migrations
+
+@COND_MODDRONESCAN_TRUE@install-data-local: install-dronescan-migrations
+
+@COND_MODOPENCHANFIX_TRUE@install-data-local: install-openchanfix-migrations
+
+install-cservice-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/cservice
+	cp -r mod.cservice/migrations/* $(DESTDIR)$(prefix)/migrations/cservice/
+
+install-ccontrol-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/ccontrol
+	cp -r mod.ccontrol/migrations/* $(DESTDIR)$(prefix)/migrations/ccontrol/
+
+install-dronescan-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/dronescan
+	cp -r mod.dronescan/migrations/* $(DESTDIR)$(prefix)/migrations/dronescan/
+
+install-openchanfix-migrations:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/openchanfix
+	cp -r mod.openchanfix/migrations/* $(DESTDIR)$(prefix)/migrations/openchanfix/
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

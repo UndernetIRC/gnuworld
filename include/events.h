@@ -58,6 +58,7 @@ enum {
     EVT_XQUERY,
     EVT_XREPLY,
     EVT_NETCONF,
+    EVT_REMNETCONF,
 
     // EVT_NOOP must always be last
     EVT_NOOP
@@ -128,6 +129,9 @@ typedef int channelEventType;
  * EVT_NETCONF
  *  1) iServer* source
  *  2) string* - key
+ * EVT_REMNETCONF
+ * 1) iServer* source
+ * 2) string* - key
  *
  * Channel Events
  * --------------
@@ -164,6 +168,8 @@ const std::string eventNames[] = {
     "Raw",                    /* EVT_RAW */
     "XQuery",                 /* EVT_XQUERY */
     "XReply",                 /* EVT_XREPLY */
+    "Netconf Add",            /* EVT_NETCONF */
+    "Netconf Remove",         /* EVT_REMNETCONF */
     "Channel Join",           /* EVT_JOIN */
     "Channel Part",           /* EVT_PART */
     "Channel Mode By Server", /* EVT_SERVERMODE */
