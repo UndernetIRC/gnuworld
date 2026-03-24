@@ -130,7 +130,7 @@ std::vector<std::string> MigrationChecker::scanMigrationFiles() {
         }
 
         // Pattern: NNN_*.sql where NNN are digits
-        std::regex migrationPattern(R"(^(\d{3})_.*\.sql$)");
+        std::regex migrationPattern(R"(^(\d+)[-_].*\.sql$)");
 
         for (const auto& entry : std::filesystem::directory_iterator(migrationsDir)) {
             if (entry.is_regular_file()) {
