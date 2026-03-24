@@ -35,11 +35,18 @@ namespace cf {
 void SHUTDOWNCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::string& Message) {
     StringTokenizer st(Message);
 
+    /*
+     * syncToDB() dispatches a background thread for periodic syncs.
+     * This check blocks the command if a sync is currently running.
+     * The sync typically completes within seconds, so the user can
+     * retry shortly. The atomic syncThreadRunning flag is always
+     * reset by the background thread on completion.
+     */
     if (bot->isUpdateRunning()) {
         bot->SendTo(theClient,
                     bot->getResponse(theUser, language::update_in_progress,
-                                     std::string("This command cannot proceed while an update is "
-                                                 "in progress. Please try again later."))
+                                     std::string("A SQL sync is currently in progress. "
+                                                 "Please try again in a few seconds."))
                         .c_str());
         return;
     }

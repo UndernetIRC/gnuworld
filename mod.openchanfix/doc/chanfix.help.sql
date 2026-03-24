@@ -54,7 +54,8 @@ WHOGROUP	1	Shows all users in the specified group along with their flags. If no 
 <INDEXBLOCK>	1	\002Blocker (+b)\002: BLOCK UNBLOCK LISTBLOCKED
 <INDEXCOMMENT>	1	\002Commenter (+c)\002: ADDNOTE DELNOTE ALERT UNALERT (those 4 commands are oper level since 2024-05-04)
 <INDEXCHANFIX>	1	\002Chanfixer (+f)\002: CHANFIX SIMULATE (those 2 commands are oper level since 2011-09-11)
-<INDEXOWNER>	1	\002Owner (+o)\002: LASTCOM REHASH RELOAD SET SHUTDOWN
+<INDEXOWNER>	1	\002Owner (+o)\002: DUMPSQL LASTCOM REHASH RELOAD SET SHUTDOWN
+DUMPSQL	1	Dumps all in-memory chanOp data as SQL UPSERT statements to a timestamped file on disk. Use as emergency data recovery when the database is unreachable.
 <INDEXSERVERADMIN>	1	\002Server Admin (+a)\002: ADDUSER DELUSER ADDHOST DELHOST ADDFLAG DELFLAG WHOGROUP SUSPEND UNSUSPEND
 <INDEXUSERADMIN>	1	\002User Manager (+u)\002: ADDUSER DELUSER ADDHOST DELHOST ADDFLAG DELFLAG SETGROUP WHOGROUP SUSPEND UNSUSPEND
 \.

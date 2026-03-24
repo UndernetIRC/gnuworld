@@ -181,8 +181,8 @@ void OPLISTCommand::Exec(iClient* theClient, sqlcfUser* theUser, const std::stri
         if (days) {
             dayString.str("");
 
-            for (int i = 1; i <= DAYSAMPLES; i++) {
-                cScore = curOp->getDay((currentDay + i) % DAYSAMPLES);
+            for (unsigned int i = 1; i <= bot->daySamples; i++) {
+                cScore = curOp->getDay((currentDay + i) % bot->daySamples);
                 percent = static_cast<unsigned int>(
                     ((static_cast<float>(cScore) / static_cast<float>(86400 / POINTS_UPDATE_TIME)) *
                      100) +

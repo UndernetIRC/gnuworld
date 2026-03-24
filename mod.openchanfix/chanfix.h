@@ -26,6 +26,8 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <utility>
+#include <atomic>
 #include <sstream>
 
 #include "client.h"
@@ -195,8 +197,6 @@ class chanfix : public xClient {
     void precacheChannels();
     void precacheUsers();
 
-    void printResourceStats();
-
     void changeState(STATE);
 
     time_t currentTime() { return ::time(0); }
@@ -264,8 +264,7 @@ class chanfix : public xClient {
 
     void expireTempBlocks();
 
-    void prepareUpdate(bool);
-    void updateDB();
+    void syncToDB(bool forceAll = false);
 #ifdef ENABLE_NEWSCORES
     int getNewScore(sqlChanOp*, time_t);
 #endif
@@ -357,18 +356,29 @@ class chanfix : public xClient {
     SimMapType simMap;
 
     /**
-     * The snapshot map for updating the SQL database
+     * Pending deletes to propagate to SQL on next sync
      */
-    typedef struct {
+    typedef std::list<std::pair<std::string, std::string>> pendingDeletesType;
+    pendingDeletesType pendingDeletes;
+
+    /**
+     * Snapshot struct for copying dirty op data to the background thread
+     */
+    struct SyncSnapshot {
+        std::string channel;
         std::string account;
         std::string lastSeenAs;
         time_t firstOpped;
         time_t lastOpped;
-        short day[DAYSAMPLES];
-    } snapShotStruct;
+        std::vector<short> day;
+        short currentDaySlot;
+        bool forceAllDays;
+    };
+    typedef std::vector<SyncSnapshot> syncSnapshotType;
 
-    typedef std::multimap<std::string, snapShotStruct> DBMapType;
-    DBMapType snapShot;
+    void syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDeletes);
+
+    static const unsigned int MAX_SYNC_FAILURES = 3;
 
     /**
      * The db clients map
@@ -453,6 +463,10 @@ class chanfix : public xClient {
     unsigned int connectCheckFreq;
     std::string adminLogFile;
     std::string debugLogFile;
+    unsigned int daySamples;
+    unsigned int maxScore;
+    unsigned int bonusPointsPerDay;
+    unsigned int bonusMaxDaysBeforeDecay;
     std::string sqlHost;
     std::string sqlPort;
     std::string sqlcfUsername;
@@ -476,9 +490,14 @@ class chanfix : public xClient {
     bool chanServLinked;
 
     /**
-     * Update status variable
+     * Atomic flag for background sync thread status
      */
-    bool updateInProgress;
+    std::atomic<bool> syncThreadRunning;
+
+    /**
+     * Consecutive sync failure counter
+     */
+    unsigned int syncFailures;
 
     /**
      * Timer declarations
@@ -519,7 +538,7 @@ class chanfix : public xClient {
     bool doManualFixNotice() { return manualFixNotice; }
     STATE getState() { return currentState; }
     bool isChanServLinked() { return chanServLinked; }
-    bool isUpdateRunning() { return updateInProgress; }
+    bool isUpdateRunning() { return syncThreadRunning.load(); }
     bool isAllowingTopFix() { return allowTopOpFix; }
     unsigned int getTopOpPercent() { return topOpPercent; }
     unsigned int getMinFixScore() { return minFixScore; }
@@ -542,7 +561,7 @@ class chanfix : public xClient {
     inline void setDoChanBlocking(bool _enableChannelBlocking) {
         enableChannelBlocking = _enableChannelBlocking;
     }
-    inline void setCurrentDay() { currentDay = currentTime() / 86400 % DAYSAMPLES; }
+    inline void setCurrentDay() { currentDay = currentTime() / 86400 % daySamples; }
 
 }; // class chanfix
 

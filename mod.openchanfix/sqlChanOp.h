@@ -25,6 +25,7 @@
 #define __SQLCHANOP_H "$Id: sqlChanOp.h,v 1.6 2010/03/04 04:24:12 hidden1 Exp $"
 
 #include <string>
+#include <vector>
 #include "dbHandle.h"
 #include "chanfix_config.h"
 
@@ -37,7 +38,7 @@ class sqlManager;
 class sqlChanOp {
 
   public:
-    sqlChanOp(sqlManager*);
+    sqlChanOp(sqlManager*, unsigned int daySamples);
     virtual ~sqlChanOp();
 
     /*
@@ -63,6 +64,10 @@ class sqlChanOp {
 
     inline bool isOldestOp() const { return OldestOp; }
 
+    inline bool isDirty() const { return dirty; }
+
+    inline void setDirty(bool _dirty) { dirty = _dirty; }
+
     /*
      *  Methods to set data attributes.
      */
@@ -78,25 +83,35 @@ class sqlChanOp {
     inline void setPoints(short _points) {
         day[currentDay] = _points;
         calcTotalPoints();
+        dirty = true;
     }
 
     inline void addPoint() {
         day[currentDay]++;
         calcTotalPoints();
+        dirty = true;
     }
 
-    inline void setLastSeenAs(std::string _nickUserHost) { nickUserHost = _nickUserHost; }
+    inline void setLastSeenAs(std::string _nickUserHost) { nickUserHost = _nickUserHost; dirty = true; }
 
-    inline void setTimeFirstOpped(time_t _ts_firstopped) { ts_firstopped = _ts_firstopped; }
+    inline void setTimeFirstOpped(time_t _ts_firstopped) { ts_firstopped = _ts_firstopped; dirty = true; }
 
-    inline void setTimeLastOpped(time_t _ts_lastopped) { ts_lastopped = _ts_lastopped; }
+    inline void setTimeLastOpped(time_t _ts_lastopped) { ts_lastopped = _ts_lastopped; dirty = true; }
 
-    inline void setDay(int _dayval, short _pointsval) { day[_dayval] = _pointsval; }
+    inline void setDay(int _dayval, short _pointsval) { day[_dayval] = _pointsval; dirty = true; }
 
     inline void setIsOldestOp(bool _oldestOp) { OldestOp = _oldestOp; }
 
     void setAllMembers(dbHandle*, int);
     void calcTotalPoints();
+
+    inline size_t getDaySize() const { return day.size(); }
+
+    inline void setDayDirect(size_t index, short pts) {
+        if (index < day.size()) day[index] = pts;
+    }
+
+    inline const std::vector<short>& getDays() const { return day; }
 
   private:
     std::string channel;
@@ -108,8 +123,9 @@ class sqlChanOp {
 #endif
     time_t ts_firstopped;
     time_t ts_lastopped;
-    short day[DAYSAMPLES];
+    std::vector<short> day;
     bool OldestOp;
+    bool dirty;
 
     sqlManager* myManager;
 }; // class

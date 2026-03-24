@@ -162,5 +162,19 @@ adminLogFile = chanfix-admin.log
 # File where all debug information sent to backchan is logged and saved
 debugLogFile = chanfix-debug.log
 
+# ---------------------------------------------------------------------
+# Scoring settings
+
+# Number of days to track in the rolling scoring window.
+# Increasing this value does not require a database migration.
+daysamples = 14
+
+# Bonus points per day for the first-opped-date scoring system.
+# Used by the ENABLE_NEWSCORES bonus calculation.
+bonusPointsPerDay = 100
+
+# After this many days, the bonus points per day starts decaying.
+bonusMaxDaysBeforeDecay = 30
+
 # End of config file.
 # ---------------------------------------------------------------------
