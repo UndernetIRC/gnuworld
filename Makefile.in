@@ -448,6 +448,7 @@ am__libchanfix_la_SOURCES_DIST = mod.chanfix/chanfix.cc \
 	mod.openchanfix/CHANFIXCommand.cc \
 	mod.openchanfix/CHECKCommand.cc \
 	mod.openchanfix/DEBUGCommand.cc \
+	mod.openchanfix/DUMPSQLCommand.cc \
 	mod.openchanfix/DELFLAGCommand.cc \
 	mod.openchanfix/DELHOSTCommand.cc \
 	mod.openchanfix/DELNOTECommand.cc \
@@ -493,6 +494,7 @@ am__libchanfix_la_SOURCES_DIST = mod.chanfix/chanfix.cc \
 @COND_MODCHANFIX_FALSE@@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/libchanfix_la-CHANFIXCommand.lo \
 @COND_MODCHANFIX_FALSE@@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/libchanfix_la-CHECKCommand.lo \
 @COND_MODCHANFIX_FALSE@@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/libchanfix_la-DEBUGCommand.lo \
+@COND_MODCHANFIX_FALSE@@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/libchanfix_la-DUMPSQLCommand.lo \
 @COND_MODCHANFIX_FALSE@@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/libchanfix_la-DELFLAGCommand.lo \
 @COND_MODCHANFIX_FALSE@@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/libchanfix_la-DELHOSTCommand.lo \
 @COND_MODCHANFIX_FALSE@@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/libchanfix_la-DELNOTECommand.lo \
@@ -1255,6 +1257,7 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	mod.openchanfix/$(DEPDIR)/libchanfix_la-DELHOSTCommand.Plo \
 	mod.openchanfix/$(DEPDIR)/libchanfix_la-DELNOTECommand.Plo \
 	mod.openchanfix/$(DEPDIR)/libchanfix_la-DELUSERCommand.Plo \
+	mod.openchanfix/$(DEPDIR)/libchanfix_la-DUMPSQLCommand.Plo \
 	mod.openchanfix/$(DEPDIR)/libchanfix_la-HELPCommand.Plo \
 	mod.openchanfix/$(DEPDIR)/libchanfix_la-HISTORYCommand.Plo \
 	mod.openchanfix/$(DEPDIR)/libchanfix_la-INFOCommand.Plo \
@@ -1948,6 +1951,7 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/CHANFIXCommand.cc \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/CHECKCommand.cc \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/DEBUGCommand.cc \
+@COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/DUMPSQLCommand.cc \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/DELFLAGCommand.cc \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/DELHOSTCommand.cc \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/DELNOTECommand.cc \
@@ -2627,6 +2631,9 @@ mod.openchanfix/libchanfix_la-CHECKCommand.lo:  \
 	mod.openchanfix/$(am__dirstamp) \
 	mod.openchanfix/$(DEPDIR)/$(am__dirstamp)
 mod.openchanfix/libchanfix_la-DEBUGCommand.lo:  \
+	mod.openchanfix/$(am__dirstamp) \
+	mod.openchanfix/$(DEPDIR)/$(am__dirstamp)
+mod.openchanfix/libchanfix_la-DUMPSQLCommand.lo:  \
 	mod.openchanfix/$(am__dirstamp) \
 	mod.openchanfix/$(DEPDIR)/$(am__dirstamp)
 mod.openchanfix/libchanfix_la-DELFLAGCommand.lo:  \
@@ -3750,6 +3757,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.openchanfix/$(DEPDIR)/libchanfix_la-DELHOSTCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.openchanfix/$(DEPDIR)/libchanfix_la-DELNOTECommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.openchanfix/$(DEPDIR)/libchanfix_la-DELUSERCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.openchanfix/$(DEPDIR)/libchanfix_la-DUMPSQLCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.openchanfix/$(DEPDIR)/libchanfix_la-HELPCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.openchanfix/$(DEPDIR)/libchanfix_la-HISTORYCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.openchanfix/$(DEPDIR)/libchanfix_la-INFOCommand.Plo@am__quote@ # am--include-marker
@@ -4472,6 +4480,13 @@ mod.openchanfix/libchanfix_la-DEBUGCommand.lo: mod.openchanfix/DEBUGCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.openchanfix/DEBUGCommand.cc' object='mod.openchanfix/libchanfix_la-DEBUGCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.openchanfix/libchanfix_la-DEBUGCommand.lo `test -f 'mod.openchanfix/DEBUGCommand.cc' || echo '$(srcdir)/'`mod.openchanfix/DEBUGCommand.cc
+
+mod.openchanfix/libchanfix_la-DUMPSQLCommand.lo: mod.openchanfix/DUMPSQLCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT mod.openchanfix/libchanfix_la-DUMPSQLCommand.lo -MD -MP -MF mod.openchanfix/$(DEPDIR)/libchanfix_la-DUMPSQLCommand.Tpo -c -o mod.openchanfix/libchanfix_la-DUMPSQLCommand.lo `test -f 'mod.openchanfix/DUMPSQLCommand.cc' || echo '$(srcdir)/'`mod.openchanfix/DUMPSQLCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.openchanfix/$(DEPDIR)/libchanfix_la-DUMPSQLCommand.Tpo mod.openchanfix/$(DEPDIR)/libchanfix_la-DUMPSQLCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.openchanfix/DUMPSQLCommand.cc' object='mod.openchanfix/libchanfix_la-DUMPSQLCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.openchanfix/libchanfix_la-DUMPSQLCommand.lo `test -f 'mod.openchanfix/DUMPSQLCommand.cc' || echo '$(srcdir)/'`mod.openchanfix/DUMPSQLCommand.cc
 
 mod.openchanfix/libchanfix_la-DELFLAGCommand.lo: mod.openchanfix/DELFLAGCommand.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchanfix_la_CXXFLAGS) $(CXXFLAGS) -MT mod.openchanfix/libchanfix_la-DELFLAGCommand.lo -MD -MP -MF mod.openchanfix/$(DEPDIR)/libchanfix_la-DELFLAGCommand.Tpo -c -o mod.openchanfix/libchanfix_la-DELFLAGCommand.lo `test -f 'mod.openchanfix/DELFLAGCommand.cc' || echo '$(srcdir)/'`mod.openchanfix/DELFLAGCommand.cc
@@ -6955,6 +6970,7 @@ distclean: distclean-recursive
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DELHOSTCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DELNOTECommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DELUSERCommand.Plo
+	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DUMPSQLCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-HELPCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-HISTORYCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-INFOCommand.Plo
@@ -7334,6 +7350,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DELHOSTCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DELNOTECommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DELUSERCommand.Plo
+	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-DUMPSQLCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-HELPCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-HISTORYCommand.Plo
 	-rm -f mod.openchanfix/$(DEPDIR)/libchanfix_la-INFOCommand.Plo
