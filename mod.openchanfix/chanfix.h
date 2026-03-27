@@ -197,6 +197,8 @@ class chanfix : public xClient {
     void precacheChannels();
     void precacheUsers();
 
+    bool migrateDaySamples();
+
     void changeState(STATE);
 
     time_t currentTime() { return ::time(0); }
