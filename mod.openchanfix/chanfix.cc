@@ -269,7 +269,11 @@ void chanfix::readConfigFile(const std::string& configFileName) {
     debugLogFile = chanfixConfig->Require("debugLogFile")->second;
 
     daySamples = atoi((chanfixConfig->Require("daysamples")->second).c_str());
-    if (daySamples < 1) daySamples = 14;
+    if (daySamples < 1) {
+        elog << "chanfix::readConfigFile> FATAL: daysamples must be >= 1 (got "
+             << daySamples << "). Check your config file." << std::endl;
+        ::exit(1);
+    }
     maxScore = daySamples * (86400 / POINTS_UPDATE_TIME);
     bonusPointsPerDay = atoi((chanfixConfig->Require("bonusPointsPerDay")->second).c_str());
     bonusMaxDaysBeforeDecay = atoi((chanfixConfig->Require("bonusMaxDaysBeforeDecay")->second).c_str());
@@ -1157,14 +1161,14 @@ bool chanfix::migrateDaySamples() {
         localDBHandle->Exec(cleanQuery.str());
     }
 
-    /* Update the stored daySamples value */
+    /* Update the stored daySamples value (UPSERT to avoid a silent noop) */
     {
-        std::stringstream updateQuery;
-        updateQuery << "UPDATE variables SET var_value = '"
-                    << newDaySamples
-                    << "' WHERE var_name = 'daysamples'";
-        if (!localDBHandle->Exec(updateQuery.str())) {
-            elog << "*** [chanfix::migrateDaySamples] ERROR updating stored daySamples: "
+        std::stringstream upsertQuery;
+        upsertQuery << "INSERT INTO variables (var_name, var_value) VALUES ('daysamples', '"
+                    << escapeSQLChars(std::to_string(newDaySamples))
+                    << "') ON CONFLICT (var_name) DO UPDATE SET var_value = EXCLUDED.var_value";
+        if (!localDBHandle->Exec(upsertQuery.str())) {
+            elog << "*** [chanfix::migrateDaySamples] ERROR upserting stored daySamples: "
                  << localDBHandle->ErrorMessage() << std::endl;
             return false;
         }
