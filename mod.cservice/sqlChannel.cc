@@ -102,7 +102,7 @@ const int sqlChannel::EV_SUSPEND = 19;
 const int sqlChannel::EV_UNSUSPEND = 20;
 
 sqlChannel::sqlChannel(cservice* _bot)
-    : id(0), name(), flags(0), mass_deop_pro(3), flood_pro(0), msg_period(0), notice_period(0),
+    : id(0), name(), canon_name(), flags(0), mass_deop_pro(3), flood_pro(0), msg_period(0), notice_period(0),
       ctcp_period(0), flood_period(0), repeat_count(0), floodlevel(FLOODPRO_KICK),
       man_floodlevel(FLOODPRO_KICK), url(), description(), comment(), keywords(), welcome(),
       registered_ts(0), channel_ts(0), channel_mode(), userflags(0), last_topic(0), inChan(false),
@@ -132,7 +132,7 @@ bool sqlChannel::loadData(const string& channelName) {
 #ifdef THERETURN_ENABLED
     queryString << "LEFT JOIN channels_w cw on channels.id = cw.channel_id ";
 #endif
-    queryString << "WHERE lower(channels.name) = '" << escapeSQLChars(string_lower(channelName))
+    queryString << "WHERE lower(channels.canon_name) = '" << escapeSQLChars(rfc1459_tolower(channelName))
                 << "'";
 
     if (SQLDb->Exec(queryString, true))
@@ -197,32 +197,33 @@ void sqlChannel::setAllMembers(int row) {
 
     id = atoi(SQLDb->GetValue(row, 0).c_str());
     name = SQLDb->GetValue(row, 1);
-    flags = atoi(SQLDb->GetValue(row, 2).c_str());
-    mass_deop_pro = atoi(SQLDb->GetValue(row, 3).c_str());
-    flood_pro = atoi(SQLDb->GetValue(row, 4).c_str());
-    url = SQLDb->GetValue(row, 5);
-    description = SQLDb->GetValue(row, 6);
-    comment = SQLDb->GetValue(row, 7);
-    keywords = SQLDb->GetValue(row, 8);
-    registered_ts = atoi(SQLDb->GetValue(row, 9).c_str());
-    channel_ts = atoi(SQLDb->GetValue(row, 10).c_str());
-    channel_mode = SQLDb->GetValue(row, 11);
-    userflags = atoi(SQLDb->GetValue(row, 12));
-    last_updated = atoi(SQLDb->GetValue(row, 13));
-    limit_offset = atoi(SQLDb->GetValue(row, 14));
-    limit_period = atoi(SQLDb->GetValue(row, 15));
-    limit_grace = atoi(SQLDb->GetValue(row, 16));
-    limit_max = atoi(SQLDb->GetValue(row, 17));
-    max_bans = atoi(SQLDb->GetValue(row, 18));
-    no_take = atoi(SQLDb->GetValue(row, 19));
-    welcome = SQLDb->GetValue(row, 20);
-    limit_joinmax = atoi(SQLDb->GetValue(row, 21));
-    limit_joinsecs = atoi(SQLDb->GetValue(row, 22));
-    limit_joinperiod = atoi(SQLDb->GetValue(row, 23));
-    limit_joinmode = SQLDb->GetValue(row, 24);
+    canon_name = SQLDb->GetValue(row, 2);
+    flags = atoi(SQLDb->GetValue(row, 3).c_str());
+    mass_deop_pro = atoi(SQLDb->GetValue(row, 4).c_str());
+    flood_pro = atoi(SQLDb->GetValue(row, 5).c_str());
+    url = SQLDb->GetValue(row, 6);
+    description = SQLDb->GetValue(row, 7);
+    comment = SQLDb->GetValue(row, 8);
+    keywords = SQLDb->GetValue(row, 9);
+    registered_ts = atoi(SQLDb->GetValue(row, 10).c_str());
+    channel_ts = atoi(SQLDb->GetValue(row, 11).c_str());
+    channel_mode = SQLDb->GetValue(row, 12);
+    userflags = atoi(SQLDb->GetValue(row, 13));
+    last_updated = atoi(SQLDb->GetValue(row, 14));
+    limit_offset = atoi(SQLDb->GetValue(row, 15));
+    limit_period = atoi(SQLDb->GetValue(row, 16));
+    limit_grace = atoi(SQLDb->GetValue(row, 17));
+    limit_max = atoi(SQLDb->GetValue(row, 18));
+    max_bans = atoi(SQLDb->GetValue(row, 19));
+    no_take = atoi(SQLDb->GetValue(row, 20));
+    welcome = SQLDb->GetValue(row, 21);
+    limit_joinmax = atoi(SQLDb->GetValue(row, 22));
+    limit_joinsecs = atoi(SQLDb->GetValue(row, 23));
+    limit_joinperiod = atoi(SQLDb->GetValue(row, 24));
+    limit_joinmode = SQLDb->GetValue(row, 25);
 #ifdef THERETURN_ENABLED
-    hasw = atoi(SQLDb->GetValue(row, 25)); // This must always be the last column.
-    w_ts = atoi(SQLDb->GetValue(row, 26));
+    hasw = atoi(SQLDb->GetValue(row, 26)); // This must always be the last column.
+    w_ts = atoi(SQLDb->GetValue(row, 27));
 #endif
 
     setAllFlood();
@@ -260,7 +261,9 @@ bool sqlChannel::commit() {
     static const char* queryCondition = "WHERE id = ";
 
     stringstream queryString;
-    queryString << queryHeader << "SET flags = " << flags << ", "
+    queryString << queryHeader << "SET "
+                << "canon_name = '" << escapeSQLChars(canon_name) << "', "
+                << "flags = " << flags << ", "
                 << "mass_deop_pro = " << mass_deop_pro << ", "
                 << "flood_pro = " << flood_pro << ", "
                 << "url = '" << escapeSQLChars(url) << "', "
@@ -294,11 +297,11 @@ bool sqlChannel::commit() {
 }
 
 bool sqlChannel::insertRecord() {
-    static const char* queryHeader = "INSERT INTO channels (name, flags, registered_ts, "
+    static const char* queryHeader = "INSERT INTO channels (name, canon_name, flags, registered_ts, "
                                      "channel_ts, channel_mode, last_updated, no_take) VALUES (";
 
     stringstream queryString;
-    queryString << queryHeader << "'" << escapeSQLChars(name) << "', " << flags << ", "
+    queryString << queryHeader << "'" << escapeSQLChars(name) << "', '" << escapeSQLChars(canon_name) << "', " << flags << ", "
                 << registered_ts << ", " << channel_ts << ", '" << escapeSQLChars(channel_mode)
                 << "', "
                 << "date_part('epoch', CURRENT_TIMESTAMP)::int," << no_take << ")" << ends;
