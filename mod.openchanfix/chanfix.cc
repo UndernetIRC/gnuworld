@@ -1194,7 +1194,7 @@ void chanfix::precacheChanOps() {
         /* Check if the main chanOps table is empty */
         if (localDBHandle->Exec("SELECT count(*) FROM chanOps", true)
             && localDBHandle->Tuples() && atoi(localDBHandle->GetValue(0, 0)) == 0) {
-            /* Main table is empty — restore from backup */
+            /* Main table is empty - restore from backup */
             elog << "*** [chanfix::precacheChanOps] Restoring chanOps from legacy backup table."
                  << std::endl;
             localDBHandle->Exec("INSERT INTO chanOps SELECT * FROM chanOpsBackup");
@@ -2707,7 +2707,7 @@ void chanfix::syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDelete
         return;
     }
 
-    /* 1. Process deletes — remove from both tables */
+    /* 1. Process deletes - remove from both tables */
     for (pendingDeletesType::iterator it = snapDeletes.begin();
          it != snapDeletes.end(); ++it) {
         std::stringstream delQuery;
@@ -2738,7 +2738,7 @@ void chanfix::syncWorker(syncSnapshotType snapOps, pendingDeletesType snapDelete
         }
     }
 
-    /* 2. UPSERT snapshot ops — metadata to chanOps, daily points to chanops_daily */
+    /* 2. UPSERT snapshot ops - metadata to chanOps, daily points to chanops_daily */
     int upsertsProcessed = 0;
     for (syncSnapshotType::iterator snap = snapOps.begin();
          snap != snapOps.end(); ++snap) {
@@ -2905,7 +2905,7 @@ void chanfix::syncToDB(bool forceAll)
                     static_cast<int>(snapDeletes.size()));
 
     if (forceAll) {
-        /* Synchronous path for shutdown — must complete before exit */
+        /* Synchronous path for shutdown - must complete before exit */
         syncThreadRunning = true;
         syncWorker(std::move(snapOps), std::move(snapDeletes));
         /* syncWorker sets syncThreadRunning = false on completion */
