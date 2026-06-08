@@ -166,7 +166,9 @@ debugLogFile = chanfix-debug.log
 # Scoring settings
 
 # Number of days to track in the rolling scoring window.
-# Increasing this value does not require a database migration.
+# Changes to this value are automatically detected on startup:
+# the chanops_daily.day slots are shifted (and pruned if shrinking)
+# so that existing scores remain correctly aligned.
 daysamples = 14
 
 # Bonus points per day for the first-opped-date scoring system.

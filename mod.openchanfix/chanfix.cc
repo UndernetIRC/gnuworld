@@ -203,6 +203,12 @@ chanfix::chanfix(const std::string& configFileName) : xClient(configFileName) {
         ::exit(1);
     }
 
+    /* Check if daySamples config has changed and migrate if needed. */
+    if (!migrateDaySamples()) {
+        elog << "chanfix> FATAL: daySamples migration failed. Exiting." << std::endl;
+        ::exit(1);
+    }
+
     /* Set our current day. */
     setCurrentDay();
 
@@ -263,7 +269,11 @@ void chanfix::readConfigFile(const std::string& configFileName) {
     debugLogFile = chanfixConfig->Require("debugLogFile")->second;
 
     daySamples = atoi((chanfixConfig->Require("daysamples")->second).c_str());
-    if (daySamples < 1) daySamples = 14;
+    if (daySamples < 1) {
+        elog << "chanfix::readConfigFile> FATAL: daysamples must be >= 1 (got "
+             << daySamples << "). Check your config file." << std::endl;
+        ::exit(1);
+    }
     maxScore = daySamples * (86400 / POINTS_UPDATE_TIME);
     bonusPointsPerDay = atoi((chanfixConfig->Require("bonusPointsPerDay")->second).c_str());
     bonusMaxDaysBeforeDecay = atoi((chanfixConfig->Require("bonusMaxDaysBeforeDecay")->second).c_str());
@@ -1069,6 +1079,106 @@ void chanfix::doSqlError(const std::string& theQuery, const std::string& theErro
     elog << "SQL> Whilst executing: " << theQuery << std::endl;
     elog << "SQL> " << theError << std::endl;
     return;
+}
+
+bool chanfix::migrateDaySamples() {
+    unsigned int oldDaySamples = 14; /* default if not stored */
+
+    /* Read the stored daySamples value from the variables table */
+    if (localDBHandle->Exec(
+            "SELECT var_value FROM variables WHERE var_name = 'daysamples'", true)
+        && localDBHandle->Tuples()) {
+        oldDaySamples = atoi(localDBHandle->GetValue(0, 0));
+        if (oldDaySamples < 1) oldDaySamples = 14;
+    }
+
+    unsigned int newDaySamples = daySamples;
+
+    if (oldDaySamples == newDaySamples) {
+        elog << "*** [chanfix::migrateDaySamples] daySamples unchanged ("
+             << newDaySamples << "), no migration needed." << std::endl;
+        return true;
+    }
+
+    elog << "*** [chanfix::migrateDaySamples] daySamples changed from "
+         << oldDaySamples << " to " << newDaySamples
+         << ". Migrating chanops_daily ..." << std::endl;
+
+    time_t now = currentTime();
+    int oldCurrentDay = static_cast<int>(now / 86400 % oldDaySamples);
+    int newCurrentDay = static_cast<int>(now / 86400 % newDaySamples);
+
+    /* If shrinking, delete day slots that fall outside the new window */
+    if (newDaySamples < oldDaySamples) {
+        int minKeep = (oldCurrentDay - static_cast<int>(newDaySamples) + 1)
+                      % static_cast<int>(oldDaySamples);
+        if (minKeep < 0) minKeep += static_cast<int>(oldDaySamples);
+        int maxKeep = oldCurrentDay;
+
+        std::stringstream delQuery;
+        if (minKeep <= maxKeep) {
+            delQuery << "DELETE FROM chanops_daily WHERE day < "
+                     << minKeep << " OR day > " << maxKeep;
+        } else {
+            delQuery << "DELETE FROM chanops_daily WHERE day > "
+                     << maxKeep << " AND day < " << minKeep;
+        }
+
+        elog << "*** [chanfix::migrateDaySamples] Pruning old day slots: "
+             << delQuery.str() << std::endl;
+
+        if (!localDBHandle->Exec(delQuery.str())) {
+            elog << "*** [chanfix::migrateDaySamples] ERROR pruning: "
+                 << localDBHandle->ErrorMessage() << std::endl;
+            return false;
+        }
+    }
+
+    /* Shift day slots so that currentDay points to the same data */
+    if (oldCurrentDay != newCurrentDay) {
+        int shift = (newCurrentDay - oldCurrentDay)
+                    % static_cast<int>(newDaySamples);
+        if (shift < 0) shift += static_cast<int>(newDaySamples);
+
+        std::stringstream shiftQuery;
+        shiftQuery << "UPDATE chanops_daily SET day = (day + "
+                   << shift << ") % " << newDaySamples;
+
+        elog << "*** [chanfix::migrateDaySamples] Shifting day slots: "
+             << shiftQuery.str() << std::endl;
+
+        if (!localDBHandle->Exec(shiftQuery.str())) {
+            elog << "*** [chanfix::migrateDaySamples] ERROR shifting: "
+                 << localDBHandle->ErrorMessage() << std::endl;
+            return false;
+        }
+    }
+
+    /* Clean up any rows with day >= newDaySamples (safety net) */
+    {
+        std::stringstream cleanQuery;
+        cleanQuery << "DELETE FROM chanops_daily WHERE day >= " << newDaySamples;
+        localDBHandle->Exec(cleanQuery.str());
+    }
+
+    /* Update the stored daySamples value (UPSERT to avoid a silent noop) */
+    {
+        std::stringstream upsertQuery;
+        upsertQuery << "INSERT INTO variables (var_name, var_value) VALUES ('daysamples', '"
+                    << escapeSQLChars(std::to_string(newDaySamples))
+                    << "') ON CONFLICT (var_name) DO UPDATE SET var_value = EXCLUDED.var_value";
+        if (!localDBHandle->Exec(upsertQuery.str())) {
+            elog << "*** [chanfix::migrateDaySamples] ERROR upserting stored daySamples: "
+                 << localDBHandle->ErrorMessage() << std::endl;
+            return false;
+        }
+    }
+
+    elog << "*** [chanfix::migrateDaySamples] Migration complete. "
+         << "oldCurrentDay=" << oldCurrentDay
+         << " newCurrentDay=" << newCurrentDay << std::endl;
+
+    return true;
 }
 
 void chanfix::precacheChanOps() {

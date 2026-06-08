@@ -48,6 +48,14 @@ CREATE TABLE chanops_daily (
 	PRIMARY KEY (channel, account, day)
 );
 
+CREATE TABLE variables (
+	var_name VARCHAR(64) NOT NULL,
+	var_value VARCHAR(256) NOT NULL,
+	PRIMARY KEY (var_name)
+);
+
+INSERT INTO variables (var_name, var_value) VALUES ('daysamples', '14');
+
 CREATE TABLE channels (
 	id SERIAL,
 	channel TEXT NOT NULL UNIQUE,

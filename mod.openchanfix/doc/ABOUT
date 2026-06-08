@@ -10,7 +10,7 @@ the service can be manually invoked by mod.Chanfix administrators to reverse rec
 channel takeovers.
 
 By default, mod.Chanfix observes channels with at least 4 clients, and retains channel
-op score records for 2 weeks.
+op score records for 2 weeks (configurable via the daysamples setting).
 
 * How does it keep track of which people have been opped?
 
