@@ -1154,6 +1154,30 @@ bool chanfix::migrateDaySamples() {
         }
     }
 
+    /* If expanding, we need to move the following day slots at the end so they don't get erased the next days.
+       Note: The below is required in addition to the previous shifts.
+    */
+    if (newDaySamples > oldDaySamples) {
+        int shift = (newDaySamples - oldDaySamples);
+        int minDay = newCurrentDay;
+        int maxDay = (newCurrentDay + static_cast<int>(oldDaySamples)) % static_cast<int>(newDaySamples);
+        std::stringstream shiftQuery;
+        string tmpStr = (maxDay > minDay) ? " AND " : " OR ";
+        shiftQuery << "UPDATE chanops_daily SET day = (day + "
+                << shift << ") % " << newDaySamples
+                << " WHERE day > " << minDay
+                << tmpStr << "day < " << maxDay;
+
+        elog << "*** [chanfix::migrateDaySamples] Shifting day slots (part 2): "
+            << shiftQuery.str() << std::endl;
+
+        if (!localDBHandle->Exec(shiftQuery.str())) {
+            elog << "*** [chanfix::migrateDaySamples] ERROR shifting: "
+                << localDBHandle->ErrorMessage() << std::endl;
+            return false;
+        }
+    }
+
     /* Clean up any rows with day >= newDaySamples (safety net) */
     {
         std::stringstream cleanQuery;
