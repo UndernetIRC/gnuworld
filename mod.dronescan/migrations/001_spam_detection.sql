@@ -1,32 +1,11 @@
-CREATE TABLE users (
-	id serial,
-	user_name varchar(20) NOT NULL,
-	created int4 NOT NULL DEFAULT 0,
-	last_seen int4 NOT NULL DEFAULT 0,
-	last_updated int4 NOT NULL DEFAULT 0,
-	last_updated_by varchar(128) NOT NULL,
-	flags int4 NOT NULL DEFAULT 0,
-	access int4 NOT NULL DEFAULT 0,
-	PRIMARY KEY (id)
-);
------------------------
--- Legacy table; kept for backward compatibility with existing fakeClient code.
--- Not used for spam monitoring. See spyclients below.
-CREATE TABLE fakeclients (
-	id serial, 
-	nickname varchar(20) NOT NULL, 
-	username varchar(20) NOT NULL, 
-	hostname varchar(20) NOT NULL, 
-	realname varchar(50) NOT NULL, 
-	created_by int4 NOT NULL, 
-	created_on int4 NOT NULL, 
-	last_updated int4 NOT NULL,
-	flags int4 DEFAULT 0 NOT NULL,
-	PRIMARY KEY (id), 
-	FOREIGN KEY (created_by) REFERENCES users (id) ON UPDATE RESTRICT ON DELETE CASCADE,
-	UNIQUE (nickname)
-);
--------------------------
+-- =============================================================================
+-- 001_spam_detection.sql
+-- Spam detection system schema for dronescan.
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- spyclients
+-- -----------------------------------------------------------------------------
 -- Fake IRC clients spawned by dronescan to monitor channels for spam.
 -- These are introduced to the network as real clients via the P10 protocol.
 --
@@ -36,34 +15,26 @@ CREATE TABLE fakeclients (
 -- account / account_id: optional services authentication.
 --   account_id 0 means not authenticated.
 -- enabled: soft-disable without removing from the table.
+-- -----------------------------------------------------------------------------
 CREATE TABLE spyclients (
-	id          serial       PRIMARY KEY,
-	nickname    varchar(30)  NOT NULL,
-	username    varchar(20)  NOT NULL,
-	hostname    varchar(100) NOT NULL,
-	ip          varchar(45)  NOT NULL,
-	realname    varchar(50)  NOT NULL,
-	account     varchar(20)           DEFAULT NULL,
-	account_id  int4         NOT NULL  DEFAULT 0,
-	modes       varchar(20)  NOT NULL  DEFAULT '+i',
-	enabled     bool         NOT NULL  DEFAULT true,
-	created_by  int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL,
-	created_ts  int4         NOT NULL  DEFAULT 0,
-	modified_ts int4         NOT NULL  DEFAULT 0,
-	modified_by int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL,
-	UNIQUE (nickname)
+    id          serial       PRIMARY KEY,
+    nickname    varchar(30)  NOT NULL,
+    username    varchar(20)  NOT NULL,
+    hostname    varchar(100) NOT NULL,
+    ip          varchar(45)  NOT NULL,
+    realname    varchar(50)  NOT NULL,
+    account     varchar(20)           DEFAULT NULL,
+    account_id  int4         NOT NULL  DEFAULT 0,
+    modes       varchar(20)  NOT NULL  DEFAULT '+i',
+    enabled     bool         NOT NULL  DEFAULT true,
+    created_by  int                   DEFAULT NULL
+        REFERENCES users(id) ON DELETE SET NULL,
+    created_ts  int4         NOT NULL  DEFAULT 0,
+    modified_ts int4         NOT NULL  DEFAULT 0,
+    modified_by int                   DEFAULT NULL
+        REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE (nickname)
 );
--------------------------
-CREATE TABLE exceptionalChannels (
-	id serial,
-	name text unique not null
-);
-
--- =============================================================================
--- Spam detection system
--- =============================================================================
 
 -- -----------------------------------------------------------------------------
 -- spam_events
@@ -115,34 +86,34 @@ CREATE TABLE exceptionalChannels (
 --   regex is never tracked for repetition (e.g. to ignore URLs or greetings).
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_events (
-	id                     serial       PRIMARY KEY,
-	name                   varchar(100) NOT NULL,
-	description            text,
-	event_type             varchar(30)  NOT NULL,
-	-- PCRE2 pattern, integer threshold, or float threshold depending on event_type
-	event_param            text,
-	-- Bitmask: CHAN=1 PRIVMSG=2 NOTICE=4 PART=8 QUIT=16  (31 = all targets)
-	target                 int          NOT NULL DEFAULT 31,
-	case_sensitive         bool         NOT NULL DEFAULT false,
-	points                 int          NOT NULL DEFAULT 1,
-	-- Seconds before accumulated points from this event decay (per scoring unit, in memory)
-	point_expiry           int          NOT NULL DEFAULT 60,
-	-- Points stop accumulating after this many occurrences; NULL = unlimited
-	max_occurrence         int                   DEFAULT NULL,
-	-- CLIENT = per numeric nick (YYXXX / iClient);  IP = per IP address
-	points_per             varchar(10)  NOT NULL DEFAULT 'CLIENT',
-	-- Only score this event if the referenced event has also fired for the same user
-	requires_event_id      int                   DEFAULT NULL
-		REFERENCES spam_events(id) ON DELETE SET NULL,
-	enabled                bool         NOT NULL DEFAULT true,
-	-- TEXT_REPEAT-specific columns (ignored for all other event types)
-	repeat_crossuser       bool         NOT NULL DEFAULT false,
-	repeat_min_count       int          NOT NULL DEFAULT 2,
-	repeat_exclusion_regex text                  DEFAULT NULL,
-	created_ts             int4         NOT NULL DEFAULT 0,
-	modified_ts            int4         NOT NULL DEFAULT 0,
-	modified_by            int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL
+    id                     serial       PRIMARY KEY,
+    name                   varchar(100) NOT NULL,
+    description            text,
+    event_type             varchar(30)  NOT NULL,
+    -- PCRE2 pattern, integer threshold, or float threshold depending on event_type
+    event_param            text,
+    -- Bitmask: CHAN=1 PRIVMSG=2 NOTICE=4 PART=8 QUIT=16  (31 = all targets)
+    target                 int          NOT NULL DEFAULT 31,
+    case_sensitive         bool         NOT NULL DEFAULT false,
+    points                 int          NOT NULL DEFAULT 1,
+    -- Seconds before accumulated points from this event decay (per scoring unit, in memory)
+    point_expiry           int          NOT NULL DEFAULT 60,
+    -- Points stop accumulating after this many occurrences; NULL = unlimited
+    max_occurrence         int                   DEFAULT NULL,
+    -- CLIENT = per numeric nick (YYXXX / iClient);  IP = per IP address
+    points_per             varchar(10)  NOT NULL DEFAULT 'CLIENT',
+    -- Only score this event if the referenced event has also fired for the same user
+    requires_event_id      int                   DEFAULT NULL
+        REFERENCES spam_events(id) ON DELETE SET NULL,
+    enabled                bool         NOT NULL DEFAULT true,
+    -- TEXT_REPEAT-specific columns (ignored for all other event types)
+    repeat_crossuser       bool         NOT NULL DEFAULT false,
+    repeat_min_count       int          NOT NULL DEFAULT 2,
+    repeat_exclusion_regex text                  DEFAULT NULL,
+    created_ts             int4         NOT NULL DEFAULT 0,
+    modified_ts            int4         NOT NULL DEFAULT 0,
+    modified_by            int                   DEFAULT NULL
+        REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- -----------------------------------------------------------------------------
@@ -170,24 +141,24 @@ CREATE TABLE spam_events (
 --   Valid values: 'CLIENT', 'IP'
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_rules (
-	id                  serial       PRIMARY KEY,
-	name                varchar(100) NOT NULL,
-	description         text,
-	threshold           int          NOT NULL DEFAULT 10,
-	-- If set, this rule only fires after the referenced rule has already triggered
-	-- for the same user
-	wait_on_rule_id     int                   DEFAULT NULL
-		REFERENCES spam_rules(id) ON DELETE SET NULL,
-	-- true = all monitored channels (spam_rule_channels = exclusion list)
-	-- false = only channels listed in spam_rule_channels (inclusion list)
-	allchans            bool         NOT NULL DEFAULT true,
-	-- Overrides spam_events.points_per for all linked events; NULL = per-event default
-	points_per_override varchar(10)           DEFAULT NULL,
-	enabled             bool         NOT NULL DEFAULT true,
-	created_ts          int4         NOT NULL DEFAULT 0,
-	modified_ts         int4         NOT NULL DEFAULT 0,
-	modified_by         int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL
+    id                  serial       PRIMARY KEY,
+    name                varchar(100) NOT NULL,
+    description         text,
+    threshold           int          NOT NULL DEFAULT 10,
+    -- If set, this rule only fires after the referenced rule has already triggered
+    -- for the same user
+    wait_on_rule_id     int                   DEFAULT NULL
+        REFERENCES spam_rules(id) ON DELETE SET NULL,
+    -- true = all monitored channels (spam_rule_channels = exclusion list)
+    -- false = only channels listed in spam_rule_channels (inclusion list)
+    allchans            bool         NOT NULL DEFAULT true,
+    -- Overrides spam_events.points_per for all linked events; NULL = per-event default
+    points_per_override varchar(10)           DEFAULT NULL,
+    enabled             bool         NOT NULL DEFAULT true,
+    created_ts          int4         NOT NULL DEFAULT 0,
+    modified_ts         int4         NOT NULL DEFAULT 0,
+    modified_by         int                   DEFAULT NULL
+        REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- -----------------------------------------------------------------------------
@@ -198,11 +169,11 @@ CREATE TABLE spam_rules (
 -- points_override: NULL means use spam_events.points for this rule.
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_rule_events (
-	rule_id         int NOT NULL REFERENCES spam_rules(id)  ON DELETE CASCADE,
-	event_id        int NOT NULL REFERENCES spam_events(id) ON DELETE CASCADE,
-	-- NULL = use the default points defined in spam_events
-	points_override int          DEFAULT NULL,
-	PRIMARY KEY (rule_id, event_id)
+    rule_id         int NOT NULL REFERENCES spam_rules(id)  ON DELETE CASCADE,
+    event_id        int NOT NULL REFERENCES spam_events(id) ON DELETE CASCADE,
+    -- NULL = use the default points defined in spam_events
+    points_override int          DEFAULT NULL,
+    PRIMARY KEY (rule_id, event_id)
 );
 
 -- -----------------------------------------------------------------------------
@@ -218,23 +189,23 @@ CREATE TABLE spam_rule_events (
 --   is added to delay for timing jitter. Useful to avoid predictable patterns.
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_actions (
-	id          serial       PRIMARY KEY,
-	name        varchar(100) NOT NULL,
-	action_type varchar(20)  NOT NULL,
-	-- Duration in seconds (GLINE only)
-	duration    int                   DEFAULT 3600,
-	-- Reason string sent with the action (GLINE, KILL)
-	reason      text                  DEFAULT NULL,
-	-- Base delay in seconds before the action fires after the rule triggers
-	delay       int          NOT NULL DEFAULT 0,
-	-- Optional jitter: actual_delay = delay + random(rand_min, rand_max)
-	rand_min    int                   DEFAULT NULL,
-	rand_max    int                   DEFAULT NULL,
-	enabled     bool         NOT NULL DEFAULT true,
-	created_ts  int4         NOT NULL DEFAULT 0,
-	modified_ts int4         NOT NULL DEFAULT 0,
-	modified_by int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL
+    id          serial       PRIMARY KEY,
+    name        varchar(100) NOT NULL,
+    action_type varchar(20)  NOT NULL,
+    -- Duration in seconds (GLINE only)
+    duration    int                   DEFAULT 3600,
+    -- Reason string sent with the action (GLINE, KILL)
+    reason      text                  DEFAULT NULL,
+    -- Base delay in seconds before the action fires after the rule triggers
+    delay       int          NOT NULL DEFAULT 0,
+    -- Optional jitter: actual_delay = delay + random(rand_min, rand_max)
+    rand_min    int                   DEFAULT NULL,
+    rand_max    int                   DEFAULT NULL,
+    enabled     bool         NOT NULL DEFAULT true,
+    created_ts  int4         NOT NULL DEFAULT 0,
+    modified_ts int4         NOT NULL DEFAULT 0,
+    modified_by int                   DEFAULT NULL
+        REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- -----------------------------------------------------------------------------
@@ -253,17 +224,17 @@ CREATE TABLE spam_actions (
 --   delay_override           : overrides spam_actions.delay
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_rule_actions (
-	id                       serial      PRIMARY KEY,
-	rule_id                  int         NOT NULL REFERENCES spam_rules(id)   ON DELETE CASCADE,
-	action_id                int         NOT NULL REFERENCES spam_actions(id) ON DELETE CASCADE,
-	-- Denormalized from spam_actions.action_type for fast dispatch without extra join
-	action_type              varchar(20) NOT NULL,
-	-- NULL = use spam_actions.duration
-	action_duration_override int                  DEFAULT NULL,
-	-- NULL = use spam_actions.reason
-	action_reason_override   text                 DEFAULT NULL,
-	-- NULL = use spam_actions.delay
-	delay_override           int                  DEFAULT NULL
+    id                       serial      PRIMARY KEY,
+    rule_id                  int         NOT NULL REFERENCES spam_rules(id)   ON DELETE CASCADE,
+    action_id                int         NOT NULL REFERENCES spam_actions(id) ON DELETE CASCADE,
+    -- Denormalized from spam_actions.action_type for fast dispatch without extra join
+    action_type              varchar(20) NOT NULL,
+    -- NULL = use spam_actions.duration
+    action_duration_override int                  DEFAULT NULL,
+    -- NULL = use spam_actions.reason
+    action_reason_override   text                 DEFAULT NULL,
+    -- NULL = use spam_actions.delay
+    delay_override           int                  DEFAULT NULL
 );
 
 -- -----------------------------------------------------------------------------
@@ -274,14 +245,14 @@ CREATE TABLE spam_rule_actions (
 -- value: exact match or glob/mask pattern depending on type.
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_exclusions (
-	id             serial       PRIMARY KEY,
-	exclusion_type varchar(10)  NOT NULL,
-	value          varchar(200) NOT NULL,
-	created_ts     int4         NOT NULL DEFAULT 0,
-	modified_ts    int4         NOT NULL DEFAULT 0,
-	modified_by    int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL,
-	UNIQUE (exclusion_type, value)
+    id             serial       PRIMARY KEY,
+    exclusion_type varchar(10)  NOT NULL,
+    value          varchar(200) NOT NULL,
+    created_ts     int4         NOT NULL DEFAULT 0,
+    modified_ts    int4         NOT NULL DEFAULT 0,
+    modified_by    int                   DEFAULT NULL
+        REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE (exclusion_type, value)
 );
 
 -- -----------------------------------------------------------------------------
@@ -299,17 +270,17 @@ CREATE TABLE spam_exclusions (
 --   client presence would be undesirable or impractical.
 -- -----------------------------------------------------------------------------
 CREATE TABLE monitored_channels (
-	id            serial       PRIMARY KEY,
-	name          varchar(200) NOT NULL UNIQUE,
-	-- Force join even if channel is +i, +k, +l (full), or spy client is banned
-	forcejoin     bool         NOT NULL DEFAULT false,
-	-- Monitor via the main xClient bot directly; no spy client spawned
-	joinasservice bool         NOT NULL DEFAULT false,
-	enabled       bool         NOT NULL DEFAULT true,
-	created_ts    int4         NOT NULL DEFAULT 0,
-	modified_ts   int4         NOT NULL DEFAULT 0,
-	modified_by   int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL
+    id            serial       PRIMARY KEY,
+    name          varchar(200) NOT NULL UNIQUE,
+    -- Force join even if channel is +i, +k, +l (full), or spy client is banned
+    forcejoin     bool         NOT NULL DEFAULT false,
+    -- Monitor via the main xClient bot directly; no spy client spawned
+    joinasservice bool         NOT NULL DEFAULT false,
+    enabled       bool         NOT NULL DEFAULT true,
+    created_ts    int4         NOT NULL DEFAULT 0,
+    modified_ts   int4         NOT NULL DEFAULT 0,
+    modified_by   int                   DEFAULT NULL
+        REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- -----------------------------------------------------------------------------
@@ -329,7 +300,7 @@ CREATE TABLE monitored_channels (
 --   pre-configured before a channel is added to monitored_channels.
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_rule_channels (
-	rule_id      int          NOT NULL REFERENCES spam_rules(id) ON DELETE CASCADE,
-	channel_name varchar(200) NOT NULL,
-	PRIMARY KEY (rule_id, channel_name)
+    rule_id      int          NOT NULL REFERENCES spam_rules(id) ON DELETE CASCADE,
+    channel_name varchar(200) NOT NULL,
+    PRIMARY KEY (rule_id, channel_name)
 );
