@@ -40,8 +40,11 @@
 #include "dronescanTests.h"
 #include "sqlFakeClient.h"
 #include "sqlUser.h"
+#include "sqlSpyClient.h"
+#include "sqlMonitoredChannel.h"
 #include "Timer.h"
 #include "ip.h"
+#include "constants.h"
 
 #ifdef ENABLE_LOG4CPLUS
 #include <log4cplus/logger.h>
@@ -209,6 +212,7 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
         // If exceptional channels can't be loaded, we don't want glines to be turned on
         jcGlineEnable = false;
     }
+    refreshSpamCaches();
 
     /* Initialise statistics */
     customDataCounter = 0;
@@ -245,6 +249,8 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     RegisterCommand(new REMUSERCommand(this, "REMUSER", "<user>"));
     RegisterCommand(new STATUSCommand(this, "STATUS", ""));
     RegisterCommand(new RELOADCommand(this, "RELOAD", ""));
+    RegisterCommand(new SPAMCommand(this, "SPAM",
+        "(EVENT|RULE|ACTION|EXCLUSION) (ADD|DEL|LIST|SHOW|ADDEVENT|REMEVENT|ADDACTION|REMACTION) ..."));
 
     // in case RELOAD command is used, have to iterate the userlist to know how many clients per IP
     // are online for the gline count.
@@ -585,6 +591,34 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
     }
 }
 
+/**
+ * OnChannelMessage: called when an iClient sends a PRIVMSG to a channel.
+ * Feeds the message into the spam detection pipeline.
+ */
+void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan,
+                                 const std::string& Message)
+{
+    if (!Sender || !theChan || currentState != RUN)
+        return;
+    processSpamText(Sender, Message,
+                    spam_target::CHAN, theChan->getName());
+    xClient::OnChannelMessage(Sender, theChan, Message);
+}
+
+/**
+ * OnChannelNotice: called when an iClient sends a NOTICE to a channel.
+ * Feeds the notice into the spam detection pipeline with the NOTICE bit.
+ */
+void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan,
+                                const std::string& Message)
+{
+    if (!Sender || !theChan || currentState != RUN)
+        return;
+    processSpamText(Sender, Message,
+                    spam_target::NOTICE, theChan->getName());
+    xClient::OnChannelNotice(Sender, theChan, Message);
+}
+
 /** Clean up after ourselves */
 void dronescan::OnDetach(const std::string& message) {
     /* We need to delete() anything we have new()d
@@ -691,6 +725,7 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
 
         preloadUserCache();
         preloadExceptionalChannels();
+        refreshSpamCaches();
 
         theTime = time(0) + rcInterval;
         tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
@@ -1780,6 +1815,499 @@ bool dronescan::preloadExceptionalChannels() {
     elog << "dronescan::preloadExceptionalChannels> Loaded " << exceptionalChannels.size()
          << " exceptional channels." << std::endl;
     return true;
+}
+
+/** Reload all spam detection caches. */
+void dronescan::refreshSpamCaches()
+{
+    // Free compiled PCRE2 regexes before reloading events
+    for (spamRegexCacheType::iterator it = spamRegexCache.begin();
+         it != spamRegexCache.end(); ++it) {
+        if (it->second)
+            pcre2_code_free(it->second);
+    }
+    spamRegexCache.clear();
+
+    preloadSpamEvents();
+    preloadSpamRules();
+    preloadSpamActions();
+    preloadSpamRuleEvents();
+    preloadSpamRuleActions();
+    preloadSpamExclusions();
+    preloadSpyClients();
+    preloadMonitoredChannels();
+    preloadSpamRuleChannels();
+}
+
+void dronescan::preloadSpamEvents()
+{
+    for (spamEventsMapType::iterator it = spamEventsMap.begin(); it != spamEventsMap.end(); ++it)
+        delete it->second;
+    spamEventsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT id, name, description, event_type, event_param, target, "
+      << "case_sensitive, points, point_expiry, max_occurrence, "
+      << "requires_event_id, enabled, "
+      << "points_per, repeat_crossuser, repeat_min_count, repeat_exclusion_regex, "
+      << "created_ts, modified_ts, modified_by "
+      << "FROM spam_events ORDER BY id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        sqlSpamEvent* ev = new sqlSpamEvent(SQLDb);
+        ev->setAllMembers(i);
+        spamEventsMap[ev->getId()] = ev;
+
+        // Compile PCRE2 regex for PRIVMSG_REGEX events
+        if (ev->getEventType() == "PRIVMSG_REGEX" && !ev->getEventParam().empty()) {
+            int errcode;
+            PCRE2_SIZE erroffset;
+            uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
+            pcre2_code* re = pcre2_compile(
+                reinterpret_cast<PCRE2_SPTR>(ev->getEventParam().c_str()),
+                PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
+            if (re)
+                spamRegexCache[ev->getId()] = re;
+            else
+                elog << "dronescan::preloadSpamEvents> PCRE2 compile failed for event "
+                     << ev->getId() << " at offset " << erroffset << std::endl;
+        }
+    }
+    elog << "dronescan::preloadSpamEvents> Loaded " << spamEventsMap.size()
+         << " spam events." << std::endl;
+}
+
+void dronescan::preloadSpamRules()
+{
+    for (spamRulesMapType::iterator it = spamRulesMap.begin(); it != spamRulesMap.end(); ++it)
+        delete it->second;
+    spamRulesMap.clear();
+
+    std::stringstream q;
+    q << "SELECT id, name, description, threshold, wait_on_rule_id, "
+      << "allchans, points_per_override, "
+      << "enabled, created_ts, modified_ts, modified_by "
+      << "FROM spam_rules ORDER BY id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        sqlSpamRule* rule = new sqlSpamRule(SQLDb);
+        rule->setAllMembers(i);
+        spamRulesMap[rule->getId()] = rule;
+    }
+    elog << "dronescan::preloadSpamRules> Loaded " << spamRulesMap.size()
+         << " spam rules." << std::endl;
+}
+
+void dronescan::preloadSpamActions()
+{
+    for (spamActionsMapType::iterator it = spamActionsMap.begin(); it != spamActionsMap.end(); ++it)
+        delete it->second;
+    spamActionsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT id, name, action_type, duration, reason, delay, rand_min, rand_max, "
+      << "enabled, created_ts, modified_ts, modified_by "
+      << "FROM spam_actions ORDER BY id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        sqlSpamAction* act = new sqlSpamAction(SQLDb);
+        act->setAllMembers(i);
+        spamActionsMap[act->getId()] = act;
+    }
+    elog << "dronescan::preloadSpamActions> Loaded " << spamActionsMap.size()
+         << " spam actions." << std::endl;
+}
+
+void dronescan::preloadSpamRuleEvents()
+{
+    spamRuleEventsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT rule_id, event_id, points_override "
+      << "FROM spam_rule_events ORDER BY rule_id, event_id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    unsigned int total = 0;
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        int rule_id  = atoi(SQLDb->GetValue(i, 0));
+        int event_id = atoi(SQLDb->GetValue(i, 1));
+        const string po = SQLDb->GetValue(i, 2);
+        int points_override = !po.empty() ? atoi(po.c_str()) : -1;
+        spamRuleEventsMap[rule_id].push_back(std::make_pair(event_id, points_override));
+        ++total;
+    }
+    elog << "dronescan::preloadSpamRuleEvents> Loaded " << total
+         << " rule-event links." << std::endl;
+}
+
+void dronescan::preloadSpamRuleActions()
+{
+    for (spamRuleActionsMapType::iterator it = spamRuleActionsMap.begin();
+         it != spamRuleActionsMap.end(); ++it) {
+        for (size_t i = 0; i < it->second.size(); ++i)
+            delete it->second[i];
+    }
+    spamRuleActionsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT id, rule_id, action_id, action_type, "
+      << "action_duration_override, action_reason_override, delay_override "
+      << "FROM spam_rule_actions ORDER BY rule_id, id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    unsigned int total = 0;
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        sqlSpamRuleAction* ra = new sqlSpamRuleAction(SQLDb);
+        ra->setAllMembers(i);
+        spamRuleActionsMap[ra->getRuleId()].push_back(ra);
+        ++total;
+    }
+    elog << "dronescan::preloadSpamRuleActions> Loaded " << total
+         << " rule-action links." << std::endl;
+}
+
+void dronescan::preloadSpamExclusions()
+{
+    for (spamExclusionsListType::iterator it = spamExclusionsList.begin();
+         it != spamExclusionsList.end(); ++it)
+        delete *it;
+    spamExclusionsList.clear();
+
+    std::stringstream q;
+    q << "SELECT id, exclusion_type, value, created_ts, modified_ts, modified_by "
+      << "FROM spam_exclusions ORDER BY id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        sqlSpamExclusion* ex = new sqlSpamExclusion(SQLDb);
+        ex->setAllMembers(i);
+        spamExclusionsList.push_back(ex);
+    }
+    elog << "dronescan::preloadSpamExclusions> Loaded " << spamExclusionsList.size()
+         << " spam exclusions." << std::endl;
+}
+
+void dronescan::preloadSpyClients()
+{
+    for (spyClientsMapType::iterator it = spyClientsMap.begin();
+         it != spyClientsMap.end(); ++it)
+        delete it->second;
+    spyClientsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT id, nickname, username, hostname, ip, realname, "
+      << "account, account_id, modes, enabled, "
+      << "created_by, created_ts, modified_ts, modified_by "
+      << "FROM spyclients ORDER BY id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        sqlSpyClient* sc = new sqlSpyClient(SQLDb);
+        sc->setAllMembers(i);
+        spyClientsMap[sc->getId()] = sc;
+    }
+    elog << "dronescan::preloadSpyClients> Loaded " << spyClientsMap.size()
+         << " spy clients." << std::endl;
+}
+
+void dronescan::preloadMonitoredChannels()
+{
+    for (monitoredChannelsMapType::iterator it = monitoredChannelsMap.begin();
+         it != monitoredChannelsMap.end(); ++it)
+        delete it->second;
+    monitoredChannelsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT id, name, forcejoin, joinasservice, enabled, "
+      << "created_ts, modified_ts, modified_by "
+      << "FROM monitored_channels ORDER BY id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        sqlMonitoredChannel* mc = new sqlMonitoredChannel(SQLDb);
+        mc->setAllMembers(i);
+        // Key by lowercase channel name for case-insensitive lookups
+        string key = string_lower(mc->getName());
+        monitoredChannelsMap[key] = mc;
+    }
+    elog << "dronescan::preloadMonitoredChannels> Loaded " << monitoredChannelsMap.size()
+         << " monitored channels." << std::endl;
+}
+
+void dronescan::preloadSpamRuleChannels()
+{
+    spamRuleChannelsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT rule_id, channel_name FROM spam_rule_channels ORDER BY rule_id, channel_name";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    unsigned int total = 0;
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        int rule_id           = atoi(SQLDb->GetValue(i, 0).c_str());
+        string channel_name   = SQLDb->GetValue(i, 1);
+        spamRuleChannelsMap[rule_id].push_back(channel_name);
+        ++total;
+    }
+    elog << "dronescan::preloadSpamRuleChannels> Loaded " << total
+         << " rule-channel entries." << std::endl;
+}
+
+// ---------------------------------------------------------------------------
+// Spam processing helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * processSpamText: called whenever text arrives that should be checked for
+ * spam events. target_bit is the bitmask value for the traffic source
+ * (e.g. spam_target::CHAN). Only PRIVMSG_REGEX events are handled in
+ * Phase 3; other event types are silently skipped until implemented.
+ */
+void dronescan::processSpamText(iClient* theClient, const std::string& text,
+                                int target_bit, const std::string& channel_name)
+{
+    if (!theClient || currentState != RUN)
+        return;
+
+    const string scoringKey = theClient->getCharYYXXX();
+    const time_t now = ::time(0);
+
+    for (spamEventsMapType::const_iterator eit = spamEventsMap.begin();
+         eit != spamEventsMap.end(); ++eit)
+    {
+        sqlSpamEvent* ev = eit->second;
+        if (!ev->isEnabled())
+            continue;
+        if (!(ev->getTarget() & target_bit))
+            continue;
+        if (ev->getEventType() != "PRIVMSG_REGEX")
+            continue;  // other event types implemented in later phases
+
+        spamRegexCacheType::const_iterator rit = spamRegexCache.find(ev->getId());
+        if (rit == spamRegexCache.end() || !rit->second)
+            continue;
+
+        pcre2_match_data* mdata = pcre2_match_data_create_from_pattern(rit->second, nullptr);
+        int rc = pcre2_match(rit->second,
+                             reinterpret_cast<PCRE2_SPTR>(text.c_str()),
+                             text.size(), 0, 0, mdata, nullptr);
+        pcre2_match_data_free(mdata);
+
+        if (rc < 0)
+            continue;  // no match (or error)
+
+        // Match found ? update scoring
+        SpamScore& score = spamScoreMap[scoringKey][ev->getId()];
+        if (now - score.window_start > ev->getPointExpiry()) {
+            score.count        = 0;
+            score.window_start = now;
+        }
+        int maxOcc = ev->getMaxOccurrence();
+        if (maxOcc < 0 || score.count < maxOcc)
+            ++score.count;
+    }
+
+    evaluateSpamRules(theClient, channel_name);
+}
+
+/**
+ * evaluateSpamRules: after scores have been updated for a client, check
+ * whether any enabled rule has crossed its threshold.
+ */
+void dronescan::evaluateSpamRules(iClient* theClient, const std::string& channel_name)
+{
+    if (!theClient)
+        return;
+
+    const string lcChan     = string_lower(channel_name);
+    const string scoringKey = theClient->getCharYYXXX();
+    const time_t now        = ::time(0);
+
+    // Only process channels we are actually monitoring
+    if (!channel_name.empty() &&
+        monitoredChannelsMap.find(lcChan) == monitoredChannelsMap.end())
+        return;
+
+    for (spamRulesMapType::const_iterator rit = spamRulesMap.begin();
+         rit != spamRulesMap.end(); ++rit)
+    {
+        sqlSpamRule* rule = rit->second;
+        if (!rule->isEnabled())
+            continue;
+
+        // Channel scope check based on allchans flag
+        if (!channel_name.empty()) {
+            spamRuleChannelsMapType::const_iterator rcit =
+                spamRuleChannelsMap.find(rule->getId());
+            bool inList = false;
+            if (rcit != spamRuleChannelsMap.end()) {
+                const std::vector<string>& chans = rcit->second;
+                for (size_t i = 0; i < chans.size(); ++i) {
+                    if (string_lower(chans[i]) == lcChan) {
+                        inList = true;
+                        break;
+                    }
+                }
+            }
+            if (rule->isAllChans()) {
+                // exclusion mode: skip if channel is explicitly excluded
+                if (inList)
+                    continue;
+            } else {
+                // inclusion mode: skip if channel is NOT in the list
+                if (!inList)
+                    continue;
+            }
+        }
+
+        // Compute total score for this scoring key against this rule
+        spamRuleEventsMapType::const_iterator rei =
+            spamRuleEventsMap.find(rule->getId());
+        if (rei == spamRuleEventsMap.end())
+            continue;
+
+        int totalScore = 0;
+        for (size_t i = 0; i < rei->second.size(); ++i) {
+            int event_id       = rei->second[i].first;
+            int points_override = rei->second[i].second;
+
+            spamEventsMapType::const_iterator eit = spamEventsMap.find(event_id);
+            if (eit == spamEventsMap.end())
+                continue;
+            sqlSpamEvent* ev = eit->second;
+
+            spamScoreMapType::const_iterator ski = spamScoreMap.find(scoringKey);
+            if (ski == spamScoreMap.end())
+                continue;
+            std::map<int, SpamScore>::const_iterator sii = ski->second.find(event_id);
+            if (sii == ski->second.end())
+                continue;
+
+            const SpamScore& sc = sii->second;
+            // Check if the scoring window has expired
+            if ((now - sc.window_start) > ev->getPointExpiry())
+                continue;
+
+            int pts = (points_override >= 0) ? points_override : ev->getPoints();
+            totalScore += sc.count * pts;
+        }
+
+        if (totalScore >= rule->getThreshold()) {
+            fireRuleActions(rule, theClient, channel_name);
+
+            // Reset scores for all events linked to this rule to prevent
+            // immediate re-triggering
+            for (size_t i = 0; i < rei->second.size(); ++i) {
+                int event_id = rei->second[i].first;
+                spamScoreMapType::iterator ski = spamScoreMap.find(scoringKey);
+                if (ski != spamScoreMap.end())
+                    ski->second.erase(event_id);
+            }
+        }
+    }
+}
+
+/**
+ * fireRuleActions: execute all actions linked to the given rule for
+ * the offending client. Handles REPORT and GLINE; KILL is deferred.
+ */
+void dronescan::fireRuleActions(sqlSpamRule* rule, iClient* theClient,
+                                const std::string& channel_name)
+{
+    if (!rule || !theClient)
+        return;
+
+    spamRuleActionsMapType::const_iterator rait =
+        spamRuleActionsMap.find(rule->getId());
+    if (rait == spamRuleActionsMap.end())
+        return;
+
+    const string nick  = theClient->getNickName();
+    const string user  = theClient->getUserName();
+    const string host  = theClient->getInsecureHost();
+    const string ip    = xIP(theClient->getIP()).GetNumericIP();
+
+    for (size_t i = 0; i < rait->second.size(); ++i) {
+        sqlSpamRuleAction* ra = rait->second[i];
+
+        spamActionsMapType::const_iterator ait =
+            spamActionsMap.find(ra->getActionId());
+        if (ait == spamActionsMap.end())
+            continue;
+        sqlSpamAction* act = ait->second;
+        if (!act->isEnabled())
+            continue;
+
+        const string actionType = ra->getActionType();
+
+        // Determine effective reason
+        string reason = ra->getActionReasonOverride().empty()
+                        ? act->getReason()
+                        : ra->getActionReasonOverride();
+        if (reason.empty())
+            reason = "Spam detected";
+
+        if (actionType == "REPORT") {
+            char buf[512];
+            snprintf(buf, sizeof(buf),
+                "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s",
+                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                rule->getName().c_str(),
+                channel_name.empty() ? "(no channel)" : channel_name.c_str());
+            Message(consoleChannel, "%s", buf);
+
+        } else if (actionType == "GLINE") {
+            // Determine effective duration
+            int duration = (ra->getActionDurationOverride() >= 0)
+                           ? ra->getActionDurationOverride()
+                           : act->getDuration();
+            if (duration < 0)
+                duration = 3600;
+
+            glineData* gd = new (std::nothrow)
+                glineData("*@" + ip, reason, duration);
+            assert(gd != 0);
+            glineQueue.push_back(gd);
+
+            char buf[512];
+            snprintf(buf, sizeof(buf),
+                "SPAM[GLINE] Queued GLINE for %s!%s@%s (%s) ? rule '%s' ? reason: %s",
+                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                rule->getName().c_str(), reason.c_str());
+            Message(consoleChannel, "%s", buf);
+        }
+        // KILL deferred to a later phase
+    }
 }
 
 /** Register a new command. */

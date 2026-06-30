@@ -20,15 +20,29 @@
 #ifndef DRONESCAN_H
 #define DRONESCAN_H "$Id: dronescan.h,v 1.38 2009/05/28 10:37:31 hidden1 Exp $"
 
+#include <list>
 #include <map>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "client.h"
 
 #include "clientData.h"
 #include "jfChannel.h"
 #include "dbHandle.h"
+#include "sqlSpamEvent.h"
+#include "sqlSpamRule.h"
+#include "sqlSpamAction.h"
+#include "sqlSpamRuleAction.h"
+#include "sqlSpamExclusion.h"
+#include "sqlSpyClient.h"
+#include "sqlMonitoredChannel.h"
 #include "glineData.h"
+
+// PCRE2 for regex-based spam event matching
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 
 #ifdef ENABLE_LOG4CPLUS
 #include <log4cplus/loglevel.h>
@@ -52,6 +66,13 @@ class activeChannel;
 class Command;
 class sqlFakeClient;
 class sqlUser;
+class sqlSpamEvent;
+class sqlSpamRule;
+class sqlSpamAction;
+class sqlSpamRuleAction;
+class sqlSpamExclusion;
+class sqlSpyClient;
+class sqlMonitoredChannel;
 class Test;
 
 enum DS_STATE { BURST, RUN };
@@ -92,6 +113,14 @@ class dronescan : public xClient {
 
     /** Receive channel events. */
     virtual void OnChannelEvent(const channelEventType&, Channel*, void*, void*, void*, void*);
+
+    /** Receive channel messages (PRIVMSG to a channel). */
+    virtual void OnChannelMessage(iClient* Sender, Channel* theChan,
+                                  const std::string& Message);
+
+    /** Receive channel notices (NOTICE to a channel). */
+    virtual void OnChannelNotice(iClient* Sender, Channel* theChan,
+                                 const std::string& Message);
 
     /** Receive private messages. */
     virtual void OnPrivateMessage(iClient*, const std::string&, bool);
@@ -209,6 +238,25 @@ class dronescan : public xClient {
     void preloadUserCache();
     bool preloadExceptionalChannels();
 
+    /* Spam detection cache loaders */
+    void preloadSpamEvents();
+    void preloadSpamRules();
+    void preloadSpamActions();
+    void preloadSpamRuleEvents();
+    void preloadSpamRuleActions();
+    void preloadSpamExclusions();
+    void preloadSpyClients();
+    void preloadMonitoredChannels();
+    void preloadSpamRuleChannels();
+    void refreshSpamCaches();
+
+    /* Spam detection processing helpers */
+    void processSpamText(iClient* theClient, const std::string& text,
+                         int target_bit, const std::string& channel_name);
+    void evaluateSpamRules(iClient* theClient, const std::string& channel_name);
+    void fireRuleActions(sqlSpamRule* rule, iClient* theClient,
+                         const std::string& channel_name);
+
     /* Allow commands access to the database pointer */
     inline dbHandle* getSqlDb() { return SQLDb; }
 
@@ -219,6 +267,45 @@ class dronescan : public xClient {
     /** Internal variables */
     userMapType userMap;
     fcMapType fakeClients;
+
+    /* Spam detection caches */
+    typedef std::map<int, sqlSpamEvent*>                               spamEventsMapType;
+    typedef std::map<int, sqlSpamRule*>                                spamRulesMapType;
+    typedef std::map<int, sqlSpamAction*>                              spamActionsMapType;
+    // rule_id -> list of (event_id, points_override); -1 points_override means use event default
+    typedef std::map<int, std::vector<std::pair<int,int>>>             spamRuleEventsMapType;
+    // rule_id -> list of bound rule-actions
+    typedef std::map<int, std::vector<sqlSpamRuleAction*>>             spamRuleActionsMapType;
+    typedef std::list<sqlSpamExclusion*>                               spamExclusionsListType;
+    // spyclients: id -> sqlSpyClient*
+    typedef std::map<int, sqlSpyClient*>                               spyClientsMapType;
+    // monitored_channels: lowercase channel name -> sqlMonitoredChannel*
+    typedef std::map<std::string, sqlMonitoredChannel*>                monitoredChannelsMapType;
+    // spam_rule_channels: rule_id -> list of channel names
+    typedef std::map<int, std::vector<std::string>>                    spamRuleChannelsMapType;
+
+    spamEventsMapType       spamEventsMap;
+    spamRulesMapType        spamRulesMap;
+    spamActionsMapType      spamActionsMap;
+    spamRuleEventsMapType   spamRuleEventsMap;
+    spamRuleActionsMapType  spamRuleActionsMap;
+    spamExclusionsListType  spamExclusionsList;
+    spyClientsMapType       spyClientsMap;
+    monitoredChannelsMapType monitoredChannelsMap;
+    spamRuleChannelsMapType spamRuleChannelsMap;
+
+    /* PCRE2 regex cache: event_id -> compiled regex (PRIVMSG_REGEX events only) */
+    typedef std::map<int, pcre2_code*>                                 spamRegexCacheType;
+    spamRegexCacheType spamRegexCache;
+
+    /* In-memory spam scoring: scoringKey -> (event_id -> SpamScore) */
+    struct SpamScore {
+        int    count;        // occurrences within the current window
+        time_t window_start; // when the current window began
+        SpamScore() : count(0), window_start(0) {}
+    };
+    typedef std::map<std::string, std::map<int, SpamScore>>            spamScoreMapType;
+    spamScoreMapType spamScoreMap;
     clientsIPMapType clientsIPMap;
     clientsIPFloodMapType clientsIPFloodMap;
     int lastBurstTime;
