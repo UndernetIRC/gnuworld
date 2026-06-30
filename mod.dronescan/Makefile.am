@@ -1,6 +1,6 @@
 
 lib_LTLIBRARIES += libdronescan.la
-libdronescan_la_LDFLAGS = -module -export-dynamic
+libdronescan_la_LDFLAGS = -module -export-dynamic -lpcre2-8
 libdronescan_la_LIBADD = libgnuworldDB.la
 libdronescan_la_CXXFLAGS = -I$(top_srcdir)/db \
 	-I${top_srcdir}/libgnuworld \
@@ -12,6 +12,13 @@ libdronescan_la_SOURCES = 	\
 	mod.dronescan/Convert.cc		\
 	mod.dronescan/sqlFakeClient.cc	\
 	mod.dronescan/sqlUser.cc		\
+	mod.dronescan/sqlSpamEvent.cc	\
+	mod.dronescan/sqlSpamRule.cc	\
+	mod.dronescan/sqlSpamAction.cc	\
+	mod.dronescan/sqlSpamRuleAction.cc\
+	mod.dronescan/sqlSpamExclusion.cc\
+	mod.dronescan/sqlSpyClient.cc	\
+	mod.dronescan/sqlMonitoredChannel.cc\
 	mod.dronescan/ACCESSCommand.cc	\
 	mod.dronescan/ADDEXCEPTIONALCHANNELCommand.cc\
 	mod.dronescan/REMEXCEPTIONALCHANNELCommand.cc\
@@ -24,6 +31,7 @@ libdronescan_la_SOURCES = 	\
 	mod.dronescan/MODUSERCommand.cc	\
 	mod.dronescan/QUOTECommand.cc		\
 	mod.dronescan/REMUSERCommand.cc	\
+	mod.dronescan/SPAMCommand.cc		\
 	mod.dronescan/STATUSCommand.cc	\
 	mod.dronescan/ABNORMALSTest.cc	\
 	mod.dronescan/COMMONREALTest.cc	\
@@ -44,6 +52,13 @@ EXTRA_DIST += \
 	mod.dronescan/levels.h \
 	mod.dronescan/sqlFakeClient.h \
 	mod.dronescan/sqlUser.h \
+	mod.dronescan/sqlSpamEvent.h \
+	mod.dronescan/sqlSpamRule.h \
+	mod.dronescan/sqlSpamAction.h \
+	mod.dronescan/sqlSpamRuleAction.h \
+	mod.dronescan/sqlSpamExclusion.h \
+	mod.dronescan/sqlSpyClient.h \
+	mod.dronescan/sqlMonitoredChannel.h \
 	mod.dronescan/ChangeLog \
 	mod.dronescan/README \
 	mod.dronescan/migrations/README

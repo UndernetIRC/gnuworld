@@ -39,6 +39,22 @@ const std::string fakeclients = "SELECT fc.id, fc.nickname, "
 
 } // namespace sql
 
+/**
+ * Bitmask constants for spam_events.target.
+ * Values correspond to the traffic source(s) that an event monitors.
+ * Combine with bitwise OR; ALL (31) matches every source.
+ */
+namespace spam_target {
+
+const int CHAN    = 1;   // channel messages (PRIVMSG to a channel)
+const int PRIVMSG = 2;   // private messages sent to the bot or a spy client
+const int NOTICE  = 4;   // notices sent to the bot or a spy client
+const int PART    = 8;   // part messages
+const int QUIT    = 16;  // quit messages
+const int ALL     = 31;  // all of the above
+
+} // namespace spam_target
+
 } // namespace ds
 
 } // namespace gnuworld
