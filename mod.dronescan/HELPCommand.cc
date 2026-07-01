@@ -74,11 +74,13 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "TEXT: event_param is a PCRE2 regex applied to incoming text.");
     bot->Reply(theClient, "  Use the target bitmask to select which text sources to match:");
-    bot->Reply(theClient, "  chan=channel msgs  privmsg=DMs  notice=notices");
-    bot->Reply(theClient, "  part=part reasons  quit=quit msgs (quit matching not yet active)");
+    bot->Reply(theClient, "  chan_priv=channel PRIVMSGs  chan_not=channel NOTICEs");
+    bot->Reply(theClient, "  privmsg=DMs to bot/spy      notice=NOTICEs to bot/spy");
+    bot->Reply(theClient, "  part=part reasons           quit=quit msgs (not yet active)");
+    bot->Reply(theClient, "  \"chan\" is an alias for chan_priv+chan_not.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Target (comma-separated or \"all\"): chan privmsg notice part quit");
-    bot->Reply(theClient, "  Bitmask: chan=1 privmsg=2 notice=4 part=8 quit=16 all=31");
+    bot->Reply(theClient, "Target (comma-separated or \"all\"): chan_priv chan_not chan privmsg notice part quit");
+    bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 all=63");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: description  event_param  target  case_sensitive");
     bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id");
@@ -87,7 +89,9 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM EVENT ADD pill_regex TEXT chan,privmsg \"buy.*cheap.*pills\" 10 60");
+    bot->Reply(theClient, "  SPAM EVENT ADD chan_notice_spam TEXT chan_not \"spam.*notice\" 5 60");
     bot->Reply(theClient, "  SPAM EVENT ADD part_flood TEXT part \"bye|cya|leaving\" 5 60");
+    bot->Reply(theClient, "  SPAM EVENT ADD direct_spam TEXT privmsg,notice \"click.*here\" 10 60");
     bot->Reply(theClient, "  SPAM EVENT ADD repeat_flood TEXT_REPEAT all . 5 30 3");
     bot->Reply(theClient, "  SPAM EVENT SET 1 enabled yes");
     bot->Reply(theClient, "  SPAM EVENT SET 1 event_param \"new.*regex.*pattern\"");

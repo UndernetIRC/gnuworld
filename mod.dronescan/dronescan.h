@@ -125,6 +125,9 @@ class dronescan : public xClient {
     /** Receive private messages. */
     virtual void OnPrivateMessage(iClient*, const std::string&, bool);
 
+    /** Receive private notices (NOTICE directly to the bot). */
+    virtual void OnPrivateNotice(iClient*, const std::string&, bool);
+
     /** When we are being detached by the xServer */
     virtual void OnDetach(const std::string& = std::string("Server Shutdown"));
 

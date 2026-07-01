@@ -57,12 +57,14 @@ CREATE TABLE spyclients (
 --
 -- target: integer bitmask controlling which message sources this event watches.
 --   Bit values (combine with bitwise OR):
---     CHAN    = 1   channel messages / channel-scope events
---     PRIVMSG = 2   private messages sent to the bot or a spy client
---     NOTICE  = 4   notices sent to the bot or a spy client
---     PART    = 8   part messages
---     QUIT    = 16  quit messages
---   Examples: 1=chan only, 3=chan+privmsg, 31=all targets (default)
+--     CHAN_PRIV = 1   channel PRIVMSG
+--     PRIVMSG   = 2   PRIVMSG sent directly to the bot or a spy client
+--     CHAN_NOT   = 4   NOTICE sent to a channel
+--     PART      = 8   part messages
+--     QUIT      = 16  quit messages (deferred ? not yet surfaced by EVT_QUIT)
+--     NOTICE    = 32  NOTICE sent directly to the bot or a spy client
+--   Examples: 1=chan_priv only, 5=chan(priv+not), 63=all targets
+--   "chan" is an alias for CHAN_PRIV|CHAN_NOT (=5) in the SPAM command.
 --   For event types where direction is implicit (ENTROPY_NICK, KICK_COUNT, etc.),
 --   the target bitmask is ignored at runtime.
 --

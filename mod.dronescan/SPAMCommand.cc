@@ -38,7 +38,8 @@
  *   SPAM MONITORCHAN ENABLE <id>
  *   SPAM MONITORCHAN DISABLE <id>
  *
- * target bitmask: chan=1, privmsg=2, notice=4, part=8, quit=16, all=31
+ * target bitmask: chan_priv=1, privmsg=2, chan_not=4, part=8, quit=16, notice=32, all=63
+ *                  "chan" is an alias for chan_priv|chan_not (=5)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -109,7 +110,7 @@ static bool isValidExclusionType(const string& t)
 
 // Parse comma-separated target names to an integer bitmask.
 // Returns -1 on any invalid token.
-// e.g. "chan,privmsg" -> 3,  "all" -> 31
+// e.g. "chan_priv,privmsg" -> 3,  "all" -> 63,  "chan" -> 5 (chan_priv|chan_not)
 static int parseTargetBitmask(const string& s)
 {
     int mask = 0;
@@ -118,29 +119,32 @@ static int parseTargetBitmask(const string& s)
     while (std::getline(ss, tok, ',')) {
         if (tok.empty()) continue;
         const string p = string_lower(tok);
-        if      (p == "chan")    mask |= spam_target::CHAN;
-        else if (p == "privmsg") mask |= spam_target::PRIVMSG;
-        else if (p == "notice")  mask |= spam_target::NOTICE;
-        else if (p == "part")    mask |= spam_target::PART;
-        else if (p == "quit")    mask |= spam_target::QUIT;
-        else if (p == "all")     mask |= spam_target::ALL;
+        if      (p == "chan_priv") mask |= spam_target::CHAN_PRIV;
+        else if (p == "chan_not")  mask |= spam_target::CHAN_NOT;
+        else if (p == "chan")      mask |= spam_target::CHAN_PRIV | spam_target::CHAN_NOT;
+        else if (p == "privmsg")   mask |= spam_target::PRIVMSG;
+        else if (p == "notice")    mask |= spam_target::NOTICE;
+        else if (p == "part")      mask |= spam_target::PART;
+        else if (p == "quit")      mask |= spam_target::QUIT;
+        else if (p == "all")       mask |= spam_target::ALL;
         else return -1;
     }
     return (mask > 0) ? mask : -1;
 }
 
 // Decode an integer bitmask to a human-readable comma-separated string.
-// e.g. 31 -> "all",  3 -> "chan,privmsg"
+// e.g. 63 -> "all",  5 -> "chan_priv,chan_not"
 static string targetBitmaskToString(int mask)
 {
     if ((mask & spam_target::ALL) == spam_target::ALL)
         return "all";
     string s;
-    if (mask & spam_target::CHAN)    { if (!s.empty()) s += ","; s += "chan";    }
-    if (mask & spam_target::PRIVMSG) { if (!s.empty()) s += ","; s += "privmsg"; }
-    if (mask & spam_target::NOTICE)  { if (!s.empty()) s += ","; s += "notice";  }
-    if (mask & spam_target::PART)    { if (!s.empty()) s += ","; s += "part";    }
-    if (mask & spam_target::QUIT)    { if (!s.empty()) s += ","; s += "quit";    }
+    if (mask & spam_target::CHAN_PRIV) { if (!s.empty()) s += ","; s += "chan_priv"; }
+    if (mask & spam_target::CHAN_NOT)  { if (!s.empty()) s += ","; s += "chan_not";  }
+    if (mask & spam_target::PRIVMSG)   { if (!s.empty()) s += ","; s += "privmsg";  }
+    if (mask & spam_target::NOTICE)    { if (!s.empty()) s += ","; s += "notice";   }
+    if (mask & spam_target::PART)      { if (!s.empty()) s += ","; s += "part";     }
+    if (mask & spam_target::QUIT)      { if (!s.empty()) s += ","; s += "quit";     }
     return s.empty() ? "(none)" : s;
 }
 

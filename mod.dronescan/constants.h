@@ -42,16 +42,25 @@ const std::string fakeclients = "SELECT fc.id, fc.nickname, "
 /**
  * Bitmask constants for spam_events.target.
  * Values correspond to the traffic source(s) that an event monitors.
- * Combine with bitwise OR; ALL (31) matches every source.
+ * Combine with bitwise OR; ALL (63) matches every source.
+ *
+ *   CHAN_PRIV = 1   channel PRIVMSG (text sent to a channel)
+ *   PRIVMSG   = 2   PRIVMSG sent directly to the bot or a spy client
+ *   CHAN_NOT   = 4   NOTICE sent to a channel
+ *   PART      = 8   part messages
+ *   QUIT      = 16  quit messages (matching deferred ? see OnEvent EVT_QUIT)
+ *   NOTICE    = 32  NOTICE sent directly to the bot or a spy client
+ *   ALL       = 63  all of the above
  */
 namespace spam_target {
 
-const int CHAN    = 1;   // channel messages (PRIVMSG to a channel)
-const int PRIVMSG = 2;   // private messages sent to the bot or a spy client
-const int NOTICE  = 4;   // notices sent to the bot or a spy client
-const int PART    = 8;   // part messages
-const int QUIT    = 16;  // quit messages
-const int ALL     = 31;  // all of the above
+const int CHAN_PRIV = 1;   // channel PRIVMSG
+const int PRIVMSG   = 2;   // PRIVMSG sent directly to the bot or a spy client
+const int CHAN_NOT   = 4;   // NOTICE sent to a channel
+const int PART      = 8;   // part messages
+const int QUIT      = 16;  // quit messages
+const int NOTICE    = 32;  // NOTICE sent directly to the bot or a spy client
+const int ALL       = 63;  // all of the above
 
 } // namespace spam_target
 

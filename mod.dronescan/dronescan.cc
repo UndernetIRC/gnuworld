@@ -455,6 +455,9 @@ void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theCha
  * Here we receive private messages from iClients.
  */
 void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool) {
+    if (theClient && currentState == RUN)
+        processSpamText(theClient, Message, spam_target::PRIVMSG, "");
+
     sqlUser* theUser = getSqlUser(theClient->getAccount());
 
     /* If the client is opered, we might have a fake account */
@@ -628,13 +631,13 @@ void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan,
     if (!Sender || !theChan || currentState != RUN)
         return;
     processSpamText(Sender, Message,
-                    spam_target::CHAN, theChan->getName());
+                    spam_target::CHAN_PRIV, theChan->getName());
     xClient::OnChannelMessage(Sender, theChan, Message);
 }
 
 /**
  * OnChannelNotice: called when an iClient sends a NOTICE to a channel.
- * Feeds the notice into the spam detection pipeline with the NOTICE bit.
+ * Feeds the notice into the spam detection pipeline with the CHAN_NOT bit.
  */
 void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan,
                                 const std::string& Message)
@@ -642,8 +645,20 @@ void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan,
     if (!Sender || !theChan || currentState != RUN)
         return;
     processSpamText(Sender, Message,
-                    spam_target::NOTICE, theChan->getName());
+                    spam_target::CHAN_NOT, theChan->getName());
     xClient::OnChannelNotice(Sender, theChan, Message);
+}
+
+/**
+ * OnPrivateNotice: called when an iClient sends a NOTICE directly to the bot.
+ * Feeds the notice into the spam detection pipeline with the NOTICE bit.
+ */
+void dronescan::OnPrivateNotice(iClient* Sender, const std::string& Message, bool secure)
+{
+    if (!Sender || currentState != RUN)
+        return;
+    processSpamText(Sender, Message, spam_target::NOTICE, "");
+    xClient::OnPrivateNotice(Sender, Message, secure);
 }
 
 /** Clean up after ourselves */
@@ -2117,7 +2132,7 @@ void dronescan::preloadSpamRuleChannels()
 /**
  * processSpamText: called whenever text arrives that should be checked for
  * spam events. target_bit is the bitmask value for the traffic source
- * (e.g. spam_target::CHAN). Only TEXT events are handled currently;
+ * (e.g. spam_target::CHAN_PRIV). Only TEXT events are handled currently;
  * other event types are silently skipped until implemented.
  */
 void dronescan::processSpamText(iClient* theClient, const std::string& text,
