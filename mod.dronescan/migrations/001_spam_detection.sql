@@ -40,12 +40,13 @@ CREATE TABLE spyclients (
 -- spam_events
 -- -----------------------------------------------------------------------------
 -- Defines what to detect. event_type controls how event_param is interpreted:
---   PRIVMSG_REGEX  : event_param is a PCRE2 regex pattern matched against
---                    channel messages, privmsgs, or notices (see `target`)
+--   TEXT           : event_param is a PCRE2 regex pattern matched against
+--                    incoming text selected by the `target` bitmask.
+--                    Active targets: chan, privmsg, notice, part.
+--                    Quit message matching (target QUIT) is deferred -- quit
+--                    reasons are not yet surfaced by the event system.
 --   TEXT_REPEAT    : event_param is unused; matched text is tracked in memory.
 --                    See repeat_* columns below for TEXT_REPEAT-specific options.
---   QUIT_MSG       : event_param is a PCRE2 regex matched against quit messages
---   PART_MSG       : event_param is a PCRE2 regex matched against part messages
 --   ENTROPY_TEXT   : event_param is a float threshold (as text) for message entropy
 --   ENTROPY_NICK   : event_param is a float threshold (as text) for nick entropy
 --   JOIN_CHANNEL   : event_param is the exact channel name to watch

@@ -401,6 +401,10 @@ void dronescan::OnEvent(const eventType& theEvent, void* Data1, void* Data2, voi
 
     case EVT_KILL: /* Intentional drop through */
     case EVT_QUIT: {
+        // TODO: QUIT message text is not available here ? libircu/msg_Q.cc drops
+        // Param[1] before calling PostEvent(EVT_QUIT). The QUIT target bit exists
+        // in the schema but TEXT matching against quit reasons is a no-op until
+        // msg_Q.cc is extended to pass the quit message as Data2.
         iClient* theClient = static_cast<iClient*>(theEvent == EVT_KILL ? Data2 : Data1);
 
         /* Store usercount per IPs to a map */
@@ -437,6 +441,12 @@ void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theCha
         handleChannelJoin(theChannel, theClient);
     } else if (theEvent == EVT_PART) {
         handleChannelPart(theChannel, theClient);
+        // Feed part reason into spam detection (TEXT events with PART target)
+        const string partReason = (Data2 && currentState == RUN)
+            ? *static_cast<string*>(Data2) : string();
+        if (!partReason.empty())
+            processSpamText(theClient, partReason,
+                            spam_target::PART, theChannel->getName());
     }
     xClient::OnChannelEvent(theEvent, theChannel, Data1, Data2, Data3, Data4);
 }
@@ -1879,8 +1889,8 @@ void dronescan::preloadSpamEvents()
         ev->setAllMembers(i);
         spamEventsMap[ev->getId()] = ev;
 
-        // Compile PCRE2 regex for PRIVMSG_REGEX events
-        if (ev->getEventType() == "PRIVMSG_REGEX" && !ev->getEventParam().empty()) {
+        // Compile PCRE2 regex for TEXT events
+        if (ev->getEventType() == "TEXT" && !ev->getEventParam().empty()) {
             int errcode;
             PCRE2_SIZE erroffset;
             uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
@@ -2107,8 +2117,8 @@ void dronescan::preloadSpamRuleChannels()
 /**
  * processSpamText: called whenever text arrives that should be checked for
  * spam events. target_bit is the bitmask value for the traffic source
- * (e.g. spam_target::CHAN). Only PRIVMSG_REGEX events are handled in
- * Phase 3; other event types are silently skipped until implemented.
+ * (e.g. spam_target::CHAN). Only TEXT events are handled currently;
+ * other event types are silently skipped until implemented.
  */
 void dronescan::processSpamText(iClient* theClient, const std::string& text,
                                 int target_bit, const std::string& channel_name)
@@ -2127,7 +2137,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
             continue;
         if (!(ev->getTarget() & target_bit))
             continue;
-        if (ev->getEventType() != "PRIVMSG_REGEX")
+        if (ev->getEventType() != "TEXT")
             continue;  // other event types implemented in later phases
 
         spamRegexCacheType::const_iterator rit = spamRegexCache.find(ev->getId());

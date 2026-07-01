@@ -68,9 +68,14 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SHOW   <id>");
     bot->Reply(theClient, "  SET    <id> <field> <value>");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Event types: PRIVMSG_REGEX  TEXT_REPEAT  QUIT_MSG  PART_MSG");
+    bot->Reply(theClient, "Event types: TEXT          TEXT_REPEAT");
     bot->Reply(theClient, "             ENTROPY_TEXT  ENTROPY_NICK  JOIN_CHANNEL");
     bot->Reply(theClient, "             USERMODE  KICK_MSG  KICK_COUNT");
+    bot->Reply(theClient, " ");
+    bot->Reply(theClient, "TEXT: event_param is a PCRE2 regex applied to incoming text.");
+    bot->Reply(theClient, "  Use the target bitmask to select which text sources to match:");
+    bot->Reply(theClient, "  chan=channel msgs  privmsg=DMs  notice=notices");
+    bot->Reply(theClient, "  part=part reasons  quit=quit msgs (quit matching not yet active)");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Target (comma-separated or \"all\"): chan privmsg notice part quit");
     bot->Reply(theClient, "  Bitmask: chan=1 privmsg=2 notice=4 part=8 quit=16 all=31");
@@ -81,7 +86,8 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "            repeat_min_count  repeat_exclusion_regex");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
-    bot->Reply(theClient, "  SPAM EVENT ADD pill_regex PRIVMSG_REGEX chan,privmsg \"buy.*cheap.*pills\" 10 60");
+    bot->Reply(theClient, "  SPAM EVENT ADD pill_regex TEXT chan,privmsg \"buy.*cheap.*pills\" 10 60");
+    bot->Reply(theClient, "  SPAM EVENT ADD part_flood TEXT part \"bye|cya|leaving\" 5 60");
     bot->Reply(theClient, "  SPAM EVENT ADD repeat_flood TEXT_REPEAT all . 5 30 3");
     bot->Reply(theClient, "  SPAM EVENT SET 1 enabled yes");
     bot->Reply(theClient, "  SPAM EVENT SET 1 event_param \"new.*regex.*pattern\"");

@@ -88,7 +88,7 @@ static bool checkAccess(const iClient* theClient, const sqlUser* theUser,
 static bool isValidEventType(const string& t)
 {
     static const char* valid[] = {
-        "PRIVMSG_REGEX", "TEXT_REPEAT", "QUIT_MSG", "PART_MSG",
+        "TEXT", "TEXT_REPEAT",
         "ENTROPY_TEXT", "ENTROPY_NICK", "JOIN_CHANNEL",
         "USERMODE", "KICK_MSG", "KICK_COUNT", nullptr
     };
@@ -316,8 +316,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             ev->setDescription(value);
         } else if (field == "event_param") {
             ev->setEventParam(value);
-            // If PRIVMSG_REGEX event, recompile the regex cache
-            if (ev->getEventType() == "PRIVMSG_REGEX") {
+            // If TEXT event, recompile the regex cache
+            if (ev->getEventType() == "TEXT") {
                 dronescan::spamRegexCacheType::iterator ci =
                     bot->spamRegexCache.find(id);
                 if (ci != bot->spamRegexCache.end()) {
