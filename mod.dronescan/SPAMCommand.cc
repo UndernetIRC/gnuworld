@@ -803,7 +803,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
         stringstream iq;
         iq << "INSERT INTO spam_rule_channels (rule_id, channel_name) VALUES ("
-           << rule_id << ", '" << bot->getSqlDb()->Escape(chanName) << "')";
+           << rule_id << ", '" << escapeSQLChars(chanName) << "')";
         if (!bot->getSqlDb()->Exec(iq)) {
             bot->Reply(theClient,
                 "Failed to add channel '%s' to rule %d (duplicate?).",
@@ -828,7 +828,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
         stringstream dq;
         dq << "DELETE FROM spam_rule_channels WHERE rule_id = " << rule_id
-           << " AND channel_name = '" << bot->getSqlDb()->Escape(chanName) << "'";
+           << " AND channel_name = '" << escapeSQLChars(chanName) << "'";
         if (!bot->getSqlDb()->Exec(dq)) {
             bot->Reply(theClient,
                 "Failed to remove channel '%s' from rule %d.", chanName.c_str(), rule_id);
