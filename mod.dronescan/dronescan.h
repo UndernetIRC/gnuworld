@@ -436,6 +436,8 @@ class dronescan : public xClient {
     typedef commandMapType::value_type commandPairType;
     commandMapType commandMap;
 
+    friend class HELPCommand;
+
     /** Command configuration options */
     bool enableHello;
     bool RegisterCommand(Command*);

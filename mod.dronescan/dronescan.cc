@@ -250,6 +250,7 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
     RegisterCommand(new FAKECommand(this, "FAKE", "(activate)"));
     RegisterCommand(new HELLOCommand(this, "HELLO", "<account>"));
+    RegisterCommand(new HELPCommand(this, "HELP", "(<command>)"));
     RegisterCommand(new LISTCommand(this, "LIST", "(active|fakeclients|joinflood|users)"));
     RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS) <user> <level>"));
     RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));

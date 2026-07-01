@@ -28,6 +28,7 @@ libdronescan_la_SOURCES = 	\
 	mod.dronescan/CHECKCommand.cc		\
 	mod.dronescan/FAKECommand.cc		\
 	mod.dronescan/HELLOCommand.cc		\
+	mod.dronescan/HELPCommand.cc		\
 	mod.dronescan/LISTCommand.cc		\
 	mod.dronescan/MODUSERCommand.cc	\
 	mod.dronescan/QUOTECommand.cc		\
