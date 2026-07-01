@@ -2015,8 +2015,10 @@ void dronescan::refreshSpamCaches()
     preloadMonitoredChannels();
     preloadSpamRuleChannels();
 
-    // Resync live spy clients against the freshly loaded DB caches
-    resyncSpyClients();
+    // Resync live spy clients against the freshly loaded DB caches.
+    // MyUplink is NULL during the constructor ? only sync after network attach.
+    if (MyUplink)
+        resyncSpyClients();
 }
 
 void dronescan::preloadSpamEvents()
