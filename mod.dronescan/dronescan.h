@@ -22,6 +22,7 @@
 
 #include <list>
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -127,6 +128,11 @@ class dronescan : public xClient {
 
     /** Receive private notices (NOTICE directly to the bot). */
     virtual void OnPrivateNotice(iClient*, const std::string&, bool);
+
+    /** Handle kick events for spy client re-join logic. */
+    virtual void OnNetworkKick(Channel* theChan, iClient* srcClient,
+                               iClient* destClient, const std::string& kickMessage,
+                               bool authoritative);
 
     /** When we are being detached by the xServer */
     virtual void OnDetach(const std::string& = std::string("Server Shutdown"));
@@ -260,6 +266,64 @@ class dronescan : public xClient {
     void fireRuleActions(sqlSpamRule* rule, iClient* theClient,
                          const std::string& channel_name);
 
+    /* Spy client live management */
+
+    /** Introduce all enabled spy clients to the network. */
+    void introduceAllSpyClients();
+
+    /**
+     * Introduce a single spy client to the network.
+     * Returns the iClient* on success, nullptr on failure.
+     * If the desired nick is taken, tries other spy clients first,
+     * then falls back to nick + random suffix.
+     */
+    iClient* introduceSpyClient(sqlSpyClient* sc);
+
+    /** Detach a live spy client from the network and clean up maps. */
+    void detachSpyClient(int scId);
+
+    /**
+     * Find the best available spy client for the given channel.
+     * If forcejoin is false, skips channels that are +i, +k, +l(full),
+     * or where the spy client host matches a ban.
+     * Returns spy client id or -1 if none available.
+     */
+    int findBestSpyClient(const std::string& chanName, bool forcejoin);
+
+    /** Make a live spy client join the given channel immediately. */
+    void doSpyClientJoin(int scId, const std::string& chanName);
+
+    /**
+     * Schedule a spy client join with a random delay in [minDelay, maxDelay] seconds.
+     * minDelay=0, maxDelay=300 for new channels; 300/1500 after a kick.
+     */
+    void scheduleSpyClientJoin(int scId, const std::string& chanName,
+                               int minDelay, int maxDelay);
+
+    /** Voice a spy client in the console channel. */
+    void voiceSpyClientInConsole(iClient* ic);
+
+    /** Op a client in the console channel. */
+    void opInConsole(iClient* ic);
+
+    /** Returns true if the given iClient is one of our live spy clients. */
+    bool isSpyClient(const iClient* ic) const;
+
+    /** Returns the spy client id for the given iClient, or -1. */
+    int getSpyClientId(const iClient* ic) const;
+
+    /** Part a spy client from a monitored channel and update tracking maps. */
+    void partSpyClientFromChannel(int scId, const std::string& chanName);
+
+    /**
+     * Resync live spy clients against the DB caches:
+     * - detach clients that were removed from the DB
+     * - introduce newly added / re-enabled clients
+     * - if a removed/disabled client was monitoring a channel,
+     *   schedule another client to take over
+     */
+    void resyncSpyClients();
+
     /* Allow commands access to the database pointer */
     inline dbHandle* getSqlDb() { return SQLDb; }
 
@@ -298,6 +362,37 @@ class dronescan : public xClient {
     spyClientsMapType       spyClientsMap;
     monitoredChannelsMapType monitoredChannelsMap;
     spamRuleChannelsMapType spamRuleChannelsMap;
+
+    /* Live spy client state */
+
+    // spy client id -> live iClient* on the network
+    typedef std::map<int, iClient*>                                    liveSpyClientsMapType;
+    liveSpyClientsMapType liveSpyClientsMap;
+
+    // lowercase channel name -> spy client id currently assigned to it
+    typedef std::map<std::string, int>                                 chanActiveSpyMapType;
+    chanActiveSpyMapType chanActiveSpyMap;
+
+    // reverse map: spy client id -> lowercase channel name it is in (empty if not in a channel)
+    typedef std::map<int, std::string>                                 spyClientChanMapType;
+    spyClientChanMapType spyClientChanMap;
+
+    // Per-channel kick tracking: how many spy client kicks happened within 24h
+    struct ChanKickTrack {
+        int    count;
+        time_t firstKickTime;
+        ChanKickTrack() : count(0), firstKickTime(0) {}
+    };
+    typedef std::map<std::string, ChanKickTrack>                       chanKickTrackMapType;
+    chanKickTrackMapType chanKickTrackMap;
+
+    // Channels where monitoring has been stopped due to repeated kicks
+    typedef std::set<std::string>                                      kickStoppedChannelsType;
+    kickStoppedChannelsType kickStoppedChannels;
+
+    // Pending join timers: timerID -> {spy client id, channel name}
+    typedef std::map<xServer::timerID, std::pair<int, std::string>>   pendingJoinTimersType;
+    pendingJoinTimersType pendingJoinTimers;
 
     /* PCRE2 regex cache: event_id -> compiled regex (PRIVMSG_REGEX events only) */
     typedef std::map<int, pcre2_code*>                                 spamRegexCacheType;

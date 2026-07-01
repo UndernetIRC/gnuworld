@@ -1150,6 +1150,8 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spyClientsMap[sc->getId()] = sc;
+        // Introduce the new spy client to the network
+        bot->introduceSpyClient(sc);
         bot->Reply(theClient, "Spy client '%s' added with ID %d.",
                    sc->getNickname().c_str(), sc->getId());
         return;
@@ -1166,6 +1168,8 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Spy client %d not found.", id);
             return;
         }
+        // Detach from network before removing from DB
+        bot->detachSpyClient(id);
         if (!it->second->remove()) {
             bot->Reply(theClient, "Failed to delete spy client %d.", id);
             return;
@@ -1197,6 +1201,11 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Failed to update spy client %d.", id);
             return;
         }
+        // Apply live change
+        if (verb == "ENABLE")
+            bot->introduceSpyClient(sc);
+        else
+            bot->detachSpyClient(id);
         bot->Reply(theClient, "Spy client %d %s.",
                    id, verb == "ENABLE" ? "enabled" : "disabled");
         return;
@@ -1300,6 +1309,16 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->monitoredChannelsMap[chanName] = mc;
+        // Start monitoring: schedule a spy client join
+        if (!mc->isJoinAsService()) {
+            int scId = bot->findBestSpyClient(chanName, mc->isForceJoin());
+            if (scId >= 0)
+                bot->scheduleSpyClientJoin(scId, chanName, 0, 300);
+            else
+                bot->Reply(theClient, "Warning: no available spy client for %s.", chanName.c_str());
+        } else {
+            bot->getUplink()->JoinChannel(bot, chanName, "");
+        }
         bot->Reply(theClient, "Monitored channel '%s' added with ID %d.",
                    chanName.c_str(), mc->getId());
         return;
@@ -1323,6 +1342,13 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
         if (found == bot->monitoredChannelsMap.end()) {
             bot->Reply(theClient, "Monitored channel %d not found.", id);
             return;
+        }
+        // Part any spy client currently in this channel
+        {
+            const string chanKey = found->first;
+            dronescan::chanActiveSpyMapType::iterator sit = bot->chanActiveSpyMap.find(chanKey);
+            if (sit != bot->chanActiveSpyMap.end())
+                bot->partSpyClientFromChannel(sit->second, chanKey);
         }
         if (!found->second->remove()) {
             bot->Reply(theClient, "Failed to delete monitored channel %d.", id);
@@ -1361,6 +1387,25 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
         if (!mc->commit()) {
             bot->Reply(theClient, "Failed to update monitored channel %d.", id);
             return;
+        }
+        const string chanKey = string_lower(mc->getName());
+        if (verb == "DISABLE") {
+            // Part any active spy client from this channel
+            dronescan::chanActiveSpyMapType::iterator sit = bot->chanActiveSpyMap.find(chanKey);
+            if (sit != bot->chanActiveSpyMap.end())
+                bot->partSpyClientFromChannel(sit->second, chanKey);
+        } else {
+            // Enable: schedule a spy client join
+            if (!mc->isJoinAsService()) {
+                int scId = bot->findBestSpyClient(mc->getName(), mc->isForceJoin());
+                if (scId >= 0)
+                    bot->scheduleSpyClientJoin(scId, mc->getName(), 0, 300);
+                else
+                    bot->Reply(theClient, "Warning: no available spy client for %s.",
+                               mc->getName().c_str());
+            } else {
+                bot->getUplink()->JoinChannel(bot, mc->getName(), "");
+            }
         }
         bot->Reply(theClient, "Monitored channel %d %s.",
                    id, verb == "ENABLE" ? "enabled" : "disabled");
