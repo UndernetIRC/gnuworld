@@ -264,6 +264,8 @@ class dronescan : public xClient {
 
     inline int GetGlineQueueSize() { return glineQueue.size(); }
 
+    inline bool isHelloEnabled() { return enableHello; }
+
     /** Internal variables */
     userMapType userMap;
     fcMapType fakeClients;
@@ -433,6 +435,9 @@ class dronescan : public xClient {
     typedef std::map<std::string, Command*, noCaseCompare> commandMapType;
     typedef commandMapType::value_type commandPairType;
     commandMapType commandMap;
+
+    /** Command configuration options */
+    bool enableHello;
     bool RegisterCommand(Command*);
 
     /** Time of the last cache. */

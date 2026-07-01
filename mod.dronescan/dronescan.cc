@@ -230,6 +230,14 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
         fakeOperUser = 0;
     }
 
+    /* Load optional enableHello configuration */
+    EConfig::const_iterator helloIt = dronescanConfig->Find("enableHello");
+    if (helloIt != dronescanConfig->end() && atoi(helloIt->second.c_str()) == 1) {
+        enableHello = true;
+    } else {
+        enableHello = false;
+    }
+
     /* Set up our timer. */
     theTimer = new Timer();
 
@@ -241,6 +249,7 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     RegisterCommand(new ANALYSECommand(this, "ANALYSE", "<#channel>"));
     RegisterCommand(new CHECKCommand(this, "CHECK", "(<#channel>) (<user>)"));
     RegisterCommand(new FAKECommand(this, "FAKE", "(activate)"));
+    RegisterCommand(new HELLOCommand(this, "HELLO", "<account>"));
     RegisterCommand(new LISTCommand(this, "LIST", "(active|fakeclients|joinflood|users)"));
     RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS) <user> <level>"));
     RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
@@ -446,14 +455,27 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
         fakeOperUser->setLastSeen(::time(0));
     }
 
-    if (!theUser)
-        return;
     if (!theClient->isOper())
         return;
+    StringTokenizer st(Message);
+
+    if (st.size() < 1)
+        return;
+
+    string Command = string_upper(st[0]);
+
+    if (!theUser && Command != "HELLO") {
+        //log(INFO, "Oper %s is not authenticated for using command %s", theClient->getNickName().c_str(), Command.c_str());
+        elog << "Oper " << theClient->getNickName() << " is not authenticated for using command "
+             << Command << endl;
+        return;
+    }
 
     /* We have now seen this user! */
-    theUser->setLastSeen(::time(0));
-    theUser->commit();
+    if (theUser) {
+        theUser->setLastSeen(::time(0));
+        theUser->commit();
+    }
 
     /* If we are currently in BURST, we don't accept commands */
     /*if(BURST == currentState) {
@@ -461,12 +483,6 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
             return ;
     }*/
 
-    StringTokenizer st(Message);
-
-    if (st.size() < 1)
-        return;
-
-    string Command = string_upper(st[0]);
     commandMapType::iterator commandHandler = commandMap.find(Command);
 
     if (commandHandler != commandMap.end()) {
