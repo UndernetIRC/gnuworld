@@ -170,20 +170,40 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "No spam events defined.");
             return;
         }
-        bot->Reply(theClient, "%-4s %-20s %-16s %-8s %-6s %-6s %s",
-                   "ID", "Name", "Type", "Target", "Pts", "Expiry", "Enabled");
+        bot->Reply(theClient, "=== Spam Events (%zu) ===",
+                   bot->spamEventsMap.size());
         for (dronescan::spamEventsMapType::const_iterator it = bot->spamEventsMap.begin();
              it != bot->spamEventsMap.end(); ++it) {
             sqlSpamEvent* ev = it->second;
-            bot->Reply(theClient, "%-4d %-20s %-16s %-8s %-6d %-6d %s",
+            bot->Reply(theClient, "[%d] %-22s  Type: %-14s  Target: %-14s  Enabled: %s",
                        ev->getId(),
                        ev->getName().c_str(),
                        ev->getEventType().c_str(),
                        targetBitmaskToString(ev->getTarget()).c_str(),
+                       ev->isEnabled() ? "yes" : "no");
+            bot->Reply(theClient,
+                       "     Pts: %-5d  Expiry: %-5ds  PointsPer: %-8s  MaxOcc: %-10s  ReqEvent: %s",
                        ev->getPoints(),
                        ev->getPointExpiry(),
-                       ev->isEnabled() ? "yes" : "no");
+                       ev->getPointsPer().empty() ? "CLIENT" : ev->getPointsPer().c_str(),
+                       ev->getMaxOccurrence() >= 0
+                           ? std::to_string(ev->getMaxOccurrence()).c_str() : "unlimited",
+                       ev->getRequiresEventId() > 0
+                           ? std::to_string(ev->getRequiresEventId()).c_str() : "none");
+            bot->Reply(theClient,
+                       "     Param: %-32s  CaseSens: %s",
+                       ev->getEventParam().empty() ? "(none)" : ev->getEventParam().c_str(),
+                       ev->isCaseSensitive() ? "yes" : "no");
+            if (ev->getEventType() == "TEXT_REPEAT") {
+                bot->Reply(theClient,
+                    "     CrossUser: %-3s  MinCount: %-3d  ExclRegex: %s",
+                    ev->isRepeatCrossUser() ? "yes" : "no",
+                    ev->getRepeatMinCount(),
+                    ev->getRepeatExclusionRegex().empty()
+                        ? "(none)" : ev->getRepeatExclusionRegex().c_str());
+            }
         }
+        bot->Reply(theClient, "--- %zu event(s) ---", bot->spamEventsMap.size());
         return;
     }
 
@@ -416,17 +436,81 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "No spam rules defined.");
             return;
         }
-        bot->Reply(theClient, "%-4s %-25s %-9s %s",
-                   "ID", "Name", "Threshold", "Enabled");
+        bot->Reply(theClient, "=== Spam Rules (%zu) ===",
+                   bot->spamRulesMap.size());
         for (dronescan::spamRulesMapType::const_iterator it = bot->spamRulesMap.begin();
              it != bot->spamRulesMap.end(); ++it) {
             sqlSpamRule* rule = it->second;
-            bot->Reply(theClient, "%-4d %-25s %-9d %s",
+            bot->Reply(theClient,
+                       "[%d] %-25s  Threshold: %-5d  AllChans: %-3s  WaitOnRule: %-4s  PPOverride: %-8s  Enabled: %s",
                        rule->getId(),
                        rule->getName().c_str(),
                        rule->getThreshold(),
+                       rule->isAllChans() ? "yes" : "no",
+                       rule->getWaitOnRuleId() > 0
+                           ? std::to_string(rule->getWaitOnRuleId()).c_str() : "none",
+                       rule->getPointsPerOverride().empty()
+                           ? "(default)" : rule->getPointsPerOverride().c_str(),
                        rule->isEnabled() ? "yes" : "no");
+
+            // Linked events
+            dronescan::spamRuleEventsMapType::const_iterator rei =
+                bot->spamRuleEventsMap.find(rule->getId());
+            if (rei != bot->spamRuleEventsMap.end() && !rei->second.empty()) {
+                string evLine = "     Events:";
+                for (size_t i = 0; i < rei->second.size(); ++i) {
+                    int eid = rei->second[i].first;
+                    int po  = rei->second[i].second;
+                    dronescan::spamEventsMapType::const_iterator ei =
+                        bot->spamEventsMap.find(eid);
+                    const char* ename = (ei != bot->spamEventsMap.end())
+                                      ? ei->second->getName().c_str() : "?";
+                    evLine += " [" + std::to_string(eid) + "]" + ename;
+                    if (po >= 0)
+                        evLine += "(pts_ovr:" + std::to_string(po) + ")";
+                }
+                bot->Reply(theClient, "%s", evLine.c_str());
+            } else {
+                bot->Reply(theClient, "     Events: (none)");
+            }
+
+            // Linked actions
+            dronescan::spamRuleActionsMapType::const_iterator rai =
+                bot->spamRuleActionsMap.find(rule->getId());
+            if (rai != bot->spamRuleActionsMap.end() && !rai->second.empty()) {
+                string actLine = "     Actions:";
+                for (size_t i = 0; i < rai->second.size(); ++i) {
+                    sqlSpamRuleAction* ra = rai->second[i];
+                    dronescan::spamActionsMapType::const_iterator ai =
+                        bot->spamActionsMap.find(ra->getActionId());
+                    const char* aname = (ai != bot->spamActionsMap.end())
+                                      ? ai->second->getName().c_str() : "?";
+                    actLine += " [sra:" + std::to_string(ra->getId()) + "]" + aname
+                             + "(" + ra->getActionType() + " dur:"
+                             + (ra->getActionDurationOverride() >= 0
+                                 ? std::to_string(ra->getActionDurationOverride()) : "def")
+                             + " delay:"
+                             + (ra->getDelayOverride() >= 0
+                                 ? std::to_string(ra->getDelayOverride()) : "def")
+                             + ")";
+                }
+                bot->Reply(theClient, "%s", actLine.c_str());
+            } else {
+                bot->Reply(theClient, "     Actions: (none)");
+            }
+
+            // Channel inclusions/exclusions
+            dronescan::spamRuleChannelsMapType::const_iterator rci =
+                bot->spamRuleChannelsMap.find(rule->getId());
+            if (rci != bot->spamRuleChannelsMap.end() && !rci->second.empty()) {
+                const char* chanLabel = rule->isAllChans() ? "     Excl-Chans:" : "     Incl-Chans:";
+                string chanLine = chanLabel;
+                for (size_t i = 0; i < rci->second.size(); ++i)
+                    chanLine += " " + rci->second[i];
+                bot->Reply(theClient, "%s", chanLine.c_str());
+            }
         }
+        bot->Reply(theClient, "--- %zu rule(s) ---", bot->spamRulesMap.size());
         return;
     }
 
@@ -888,12 +972,13 @@ static void handleAction(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "No spam actions defined.");
             return;
         }
-        bot->Reply(theClient, "%-4s %-20s %-8s %-6s %-5s %s",
-                   "ID", "Name", "Type", "Dur", "Delay", "Enabled");
+        bot->Reply(theClient, "=== Spam Actions (%zu) ===",
+                   bot->spamActionsMap.size());
         for (dronescan::spamActionsMapType::const_iterator it = bot->spamActionsMap.begin();
              it != bot->spamActionsMap.end(); ++it) {
             sqlSpamAction* act = it->second;
-            bot->Reply(theClient, "%-4d %-20s %-8s %-6s %-5d %s",
+            bot->Reply(theClient,
+                       "[%d] %-20s  Type: %-8s  Dur: %-6s  Delay: %-5d  Enabled: %s",
                        act->getId(),
                        act->getName().c_str(),
                        act->getActionType().c_str(),
@@ -901,7 +986,10 @@ static void handleAction(dronescan* bot, const iClient* theClient,
                            ? std::to_string(act->getDuration()).c_str() : "N/A",
                        act->getDelay(),
                        act->isEnabled() ? "yes" : "no");
+            bot->Reply(theClient, "     Reason: %s",
+                       act->getReason().empty() ? "(none)" : act->getReason().c_str());
         }
+        bot->Reply(theClient, "--- %zu action(s) ---", bot->spamActionsMap.size());
         return;
     }
 
@@ -985,6 +1073,8 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "No spam exclusions defined.");
             return;
         }
+        bot->Reply(theClient, "=== Spam Exclusions (%zu) ===",
+                   bot->spamExclusionsList.size());
         bot->Reply(theClient, "%-4s %-8s %s", "ID", "Type", "Value");
         for (dronescan::spamExclusionsListType::const_iterator it =
                  bot->spamExclusionsList.begin();
@@ -994,6 +1084,7 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
                        (*it)->getExclusionType().c_str(),
                        (*it)->getValue().c_str());
         }
+        bot->Reply(theClient, "--- %zu exclusion(s) ---", bot->spamExclusionsList.size());
         return;
     }
 
@@ -1080,18 +1171,26 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "No spy clients defined.");
             return;
         }
-        bot->Reply(theClient, "%-4s %-12s %-10s %-24s %-7s",
-                   "ID", "Nick", "User", "Host", "Enabled");
+        bot->Reply(theClient, "=== Spy Clients (%zu) ===",
+                   bot->spyClientsMap.size());
         for (dronescan::spyClientsMapType::const_iterator it = bot->spyClientsMap.begin();
              it != bot->spyClientsMap.end(); ++it) {
             sqlSpyClient* sc = it->second;
-            bot->Reply(theClient, "%-4d %-12s %-10s %-24s %-7s",
+            bot->Reply(theClient,
+                       "[%d] %-12s  User: %-10s  Host: %-24s  IP: %-16s  Enabled: %s",
                        sc->getId(),
                        sc->getNickname().c_str(),
                        sc->getUsername().c_str(),
                        sc->getHostname().c_str(),
+                       sc->getIp().empty() ? "(none)" : sc->getIp().c_str(),
                        sc->isEnabled() ? "yes" : "no");
+            bot->Reply(theClient,
+                       "     Realname: %-24s  Account: %-16s  Modes: %s",
+                       sc->getRealname().empty() ? "(none)" : sc->getRealname().c_str(),
+                       sc->getAccount().empty() ? "(none)" : sc->getAccount().c_str(),
+                       sc->getModes().empty() ? "(none)" : sc->getModes().c_str());
         }
+        bot->Reply(theClient, "--- %zu spy client(s) ---", bot->spyClientsMap.size());
         return;
     }
 
@@ -1236,6 +1335,8 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "No monitored channels defined.");
             return;
         }
+        bot->Reply(theClient, "=== Monitored Channels (%zu) ===",
+                   bot->monitoredChannelsMap.size());
         bot->Reply(theClient, "%-4s %-32s %-8s %-11s %s",
                    "ID", "Channel", "ForceJoin", "JoinAsSvc", "Enabled");
         for (dronescan::monitoredChannelsMapType::const_iterator it =
@@ -1249,6 +1350,7 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
                        mc->isJoinAsService() ? "yes" : "no",
                        mc->isEnabled() ? "yes" : "no");
         }
+        bot->Reply(theClient, "--- %zu channel(s) ---", bot->monitoredChannelsMap.size());
         return;
     }
 
