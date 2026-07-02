@@ -288,15 +288,33 @@ class dronescan : public xClient {
     void refreshSpamCaches();
 
     /* Spam detection processing helpers */
+    // Lightweight snapshot of a client's identity, captured at the moment
+    // traffic is observed so that scoring/actions (REPORT, GLINE) still work
+    // even if the client has since quit (needed for crossuser TEXT_REPEAT).
+    struct SpamActor {
+        std::string numeric;   // YYXXX
+        std::string ip;        // numeric IP string
+        std::string nick;
+        std::string user;
+        std::string host;      // real host (not the +x hidden host)
+        SpamActor() {}
+    };
+    SpamActor makeActor(iClient* theClient) const;
+
     void processSpamText(iClient* theClient, const std::string& text,
                          int target_bit, const std::string& channel_name);
-    void evaluateSpamRules(iClient* theClient, const std::string& channel_name);
-    void fireRuleActions(sqlSpamRule* rule, iClient* theClient,
+    void scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
+                    const std::string& channel_name, time_t now);
+    void processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
+                            const std::string& text, const std::string& channel_name,
+                            time_t now, std::map<std::string, SpamActor>& actorsToEvaluate);
+    void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name);
+    void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                          const std::string& channel_name);
     // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
     // rule->isScoreGlobally() is true (channel segment omitted). unit is the
     // client's numeric nick, or its IP when rule->getPointsPer() == "IP".
-    std::string buildScoringKey(sqlSpamRule* rule, iClient* theClient,
+    std::string buildScoringKey(sqlSpamRule* rule, const SpamActor& actor,
                                 const std::string& channel_name) const;
 
     /* Spy client live management */
@@ -432,9 +450,13 @@ class dronescan : public xClient {
     typedef std::map<xServer::timerID, std::pair<int, std::string>>   pendingJoinTimersType;
     pendingJoinTimersType pendingJoinTimers;
 
-    /* PCRE2 regex cache: event_id -> compiled regex (PRIVMSG_REGEX events only) */
+    /* PCRE2 regex cache: event_id -> compiled regex (TEXT events only) */
     typedef std::map<int, pcre2_code*>                                 spamRegexCacheType;
     spamRegexCacheType spamRegexCache;
+
+    /* PCRE2 cache for repeat_exclusion_regex: event_id -> compiled regex
+     * (TEXT_REPEAT events only). Text matching this is never tracked. */
+    spamRegexCacheType spamRepeatExclusionCache;
 
     /* In-memory spam scoring: scoringKey -> (event_id -> SpamScore) */
     struct SpamScore {
@@ -444,6 +466,24 @@ class dronescan : public xClient {
     };
     typedef std::map<std::string, std::map<int, SpamScore>>            spamScoreMapType;
     spamScoreMapType spamScoreMap;
+
+    /* In-memory TEXT_REPEAT tracking. The key encodes the channel scope, so
+     * repeats are inherently per-channel/per-target (same text in two
+     * channels => two entries). Key layout (\x1f-separated):
+     *   crossuser : eventId + scope + cmpText
+     *   self-only : eventId + scope + numeric + cmpText
+     * where scope = lower(channel) or "privmsg", cmpText = text lowercased
+     * unless the event is case_sensitive. An entry is NOT erased when it
+     * fires; it persists for its window so later repeaters keep matching. */
+    struct RepeatEntry {
+        int    count;        // total occurrences in the current window
+        time_t window_start; // when the current window began
+        time_t expires_at;   // window_start + event point_expiry; for GC
+        std::map<std::string, SpamActor> participants; // by numeric (crossuser)
+        RepeatEntry() : count(0), window_start(0), expires_at(0) {}
+    };
+    typedef std::map<std::string, RepeatEntry>                         repeatTrackMapType;
+    repeatTrackMapType repeatTrackMap;
     clientsIPMapType clientsIPMap;
     clientsIPFloodMapType clientsIPFloodMap;
     int lastBurstTime;
@@ -566,6 +606,7 @@ class dronescan : public xClient {
     xServer::timerID tidClearNickCounter;
     xServer::timerID tidRefreshCaches;
     xServer::timerID tidGlineQueue;
+    xServer::timerID tidRepeatGC;   // periodic sweep of expired repeat entries
 
     /** Command map type. */
     typedef std::map<std::string, Command*, noCaseCompare> commandMapType;

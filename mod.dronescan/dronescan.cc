@@ -322,6 +322,10 @@ void dronescan::OnAttach() {
     theTime = time(0) + gbInterval;
     tidGlineQueue = MyUplink->RegisterTimer(theTime, this, 0);
 
+    /* Periodic GC of expired TEXT_REPEAT tracking entries (fixed 60s) */
+    theTime = time(0) + 60;
+    tidRepeatGC = MyUplink->RegisterTimer(theTime, this, 0);
+
     xClient::OnAttach();
 } // dronescan::OnAttach()
 
@@ -471,11 +475,25 @@ void dronescan::OnEvent(const eventType& theEvent, void* Data1, void* Data2, voi
 
     case EVT_KILL: /* Intentional drop through */
     case EVT_QUIT: {
-        // TODO: QUIT message text is not available here ? libircu/msg_Q.cc drops
-        // Param[1] before calling PostEvent(EVT_QUIT). The QUIT target bit exists
-        // in the schema but TEXT matching against quit reasons is a no-op until
-        // msg_Q.cc is extended to pass the quit message as Data2.
         iClient* theClient = static_cast<iClient*>(theEvent == EVT_KILL ? Data2 : Data1);
+
+        // QUIT-only: feed the quit reason into per-channel spam scoring for
+        // every monitored channel the user was on. msg_Q.cc passes the quit
+        // reason (Data2) and a channel-name snapshot (Data3) captured before
+        // the client was removed from its channels. The client is still a
+        // valid iClient* here (deleted only after PostEvent returns).
+        if (theEvent == EVT_QUIT && currentState == RUN) {
+            const std::string* quitReason = static_cast<const std::string*>(Data2);
+            const std::vector<std::string>* quitChans =
+                static_cast<const std::vector<std::string>*>(Data3);
+            if (quitReason && quitChans && !quitReason->empty()) {
+                for (std::vector<std::string>::const_iterator ci = quitChans->begin();
+                     ci != quitChans->end(); ++ci) {
+                    if (monitoredChannelsMap.count(string_lower(*ci)))
+                        processSpamText(theClient, *quitReason, spam_target::QUIT, *ci);
+                }
+            }
+        }
 
         /* Store usercount per IPs to a map */
         string IP = xIP(theClient->getIP()).GetNumericIP();
@@ -944,6 +962,10 @@ void dronescan::OnDetach(const std::string& message) {
     chanActiveSpyMap.clear();
     spyClientChanMap.clear();
 
+    /* Stop the repeat-tracking GC timer and drop tracking state */
+    MyUplink->UnRegisterTimer(tidRepeatGC, nullptr);
+    repeatTrackMap.clear();
+
     /* Done! */
     xClient::OnDetach(message);
 }
@@ -1025,6 +1047,21 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
 
         theTime = time(0) + gbInterval;
         tidGlineQueue = MyUplink->RegisterTimer(theTime, this, 0);
+    }
+
+    if (theTimer == tidRepeatGC) {
+        // Reclaim expired TEXT_REPEAT tracking entries
+        time_t nowGC = ::time(0);
+        for (repeatTrackMapType::iterator rit = repeatTrackMap.begin();
+             rit != repeatTrackMap.end(); ) {
+            if (nowGC > rit->second.expires_at)
+                rit = repeatTrackMap.erase(rit);
+            else
+                ++rit;
+        }
+
+        theTime = time(0) + 60;
+        tidRepeatGC = MyUplink->RegisterTimer(theTime, this, 0);
     }
 }
 
@@ -2117,6 +2154,17 @@ void dronescan::refreshSpamCaches()
     }
     spamRegexCache.clear();
 
+    // Free compiled repeat_exclusion_regex patterns
+    for (spamRegexCacheType::iterator it = spamRepeatExclusionCache.begin();
+         it != spamRepeatExclusionCache.end(); ++it) {
+        if (it->second)
+            pcre2_code_free(it->second);
+    }
+    spamRepeatExclusionCache.clear();
+
+    // Drop repeat-tracking state so it doesn't reference stale events
+    repeatTrackMap.clear();
+
     preloadSpamEvents();
     preloadSpamRules();
     preloadSpamActions();
@@ -2168,6 +2216,21 @@ void dronescan::preloadSpamEvents()
                 spamRegexCache[ev->getId()] = re;
             else
                 elog << "dronescan::preloadSpamEvents> PCRE2 compile failed for event "
+                     << ev->getId() << " at offset " << erroffset << std::endl;
+        }
+
+        // Compile repeat_exclusion_regex for TEXT_REPEAT events
+        if (ev->getEventType() == "TEXT_REPEAT" && !ev->getRepeatExclusionRegex().empty()) {
+            int errcode;
+            PCRE2_SIZE erroffset;
+            uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
+            pcre2_code* re = pcre2_compile(
+                reinterpret_cast<PCRE2_SPTR>(ev->getRepeatExclusionRegex().c_str()),
+                PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
+            if (re)
+                spamRepeatExclusionCache[ev->getId()] = re;
+            else
+                elog << "dronescan::preloadSpamEvents> repeat_exclusion_regex compile failed for event "
                      << ev->getId() << " at offset " << erroffset << std::endl;
         }
     }
@@ -2384,10 +2447,122 @@ void dronescan::preloadSpamRuleChannels()
 // ---------------------------------------------------------------------------
 
 /**
+ * makeActor: snapshot a client's identity so scoring/actions still work even
+ * if the client later quits (needed for crossuser TEXT_REPEAT). host is the
+ * real host, not the +x hidden host.
+ */
+dronescan::SpamActor dronescan::makeActor(iClient* theClient) const
+{
+    SpamActor a;
+    a.numeric = theClient->getCharYYXXX();
+    a.ip      = xIP(theClient->getIP()).GetNumericIP();
+    a.nick    = theClient->getNickName();
+    a.user    = theClient->getUserName();
+    a.host    = theClient->getRealInsecureHost();
+    return a;
+}
+
+/**
+ * scoreEvent: award one occurrence of a matched event to an actor, updating
+ * the per-rule scoring buckets. Shared by TEXT and TEXT_REPEAT.
+ */
+void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
+                           const std::string& channel_name, time_t now)
+{
+    spamEventRulesMapType::const_iterator erit = spamEventRulesMap.find(ev->getId());
+    if (erit == spamEventRulesMap.end())
+        return;  // event isn't linked to any rule; nothing to score
+
+    for (size_t i = 0; i < erit->second.size(); ++i) {
+        spamRulesMapType::const_iterator ruleIt = spamRulesMap.find(erit->second[i]);
+        if (ruleIt == spamRulesMap.end() || !ruleIt->second->isEnabled())
+            continue;
+        sqlSpamRule* rule = ruleIt->second;
+
+        const string key = buildScoringKey(rule, actor, channel_name);
+        SpamScore& score = spamScoreMap[key][ev->getId()];
+        if (now - score.window_start > ev->getPointExpiry()) {
+            score.count        = 0;
+            score.window_start = now;
+        }
+        elog << "dronescan::scoreEvent> Updating score for event " << ev->getId()
+             << " rule " << rule->getId()
+             << " (count=" << score.count << ", window_start=" << score.window_start
+             << ", point_expiry=" << ev->getPointExpiry() << ")" << std::endl;
+        int maxOcc = ev->getMaxOccurrence();
+        if (maxOcc < 0 || score.count < maxOcc)
+            ++score.count;
+    }
+}
+
+/**
+ * processRepeatEvent: TEXT_REPEAT detection. Tracks identical text per
+ * channel/target scope; fires (scores) once repeat_min_count is reached and
+ * keeps firing for every subsequent repeat within the window. The tracking
+ * entry is NOT erased on fire, so later repeaters keep being caught.
+ * For crossuser events, every involved participant is awarded on each fire,
+ * and each participant's identity is retained so actions still work after a
+ * participant quits.
+ */
+void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
+                                   const std::string& text, const std::string& channel_name,
+                                   time_t now, std::map<std::string, SpamActor>& actorsToEvaluate)
+{
+    // repeat_exclusion_regex: never track text matching this pattern
+    spamRegexCacheType::const_iterator xit = spamRepeatExclusionCache.find(ev->getId());
+    if (xit != spamRepeatExclusionCache.end() && xit->second) {
+        pcre2_match_data* mdata = pcre2_match_data_create_from_pattern(xit->second, nullptr);
+        int rc = pcre2_match(xit->second,
+                             reinterpret_cast<PCRE2_SPTR>(text.c_str()),
+                             text.size(), 0, 0, mdata, nullptr);
+        pcre2_match_data_free(mdata);
+        if (rc >= 0)
+            return;  // excluded from repeat tracking
+    }
+
+    const bool   crossuser = ev->isRepeatCrossUser();
+    const string cmp       = ev->isCaseSensitive() ? text : string_lower(text);
+    const string scope     = channel_name.empty() ? string("privmsg")
+                                                   : string_lower(channel_name);
+
+    const char SEP = '\x1f';
+    string key = std::to_string(ev->getId()) + SEP + scope + SEP;
+    if (!crossuser)
+        key += actor.numeric + SEP;
+    key += cmp;
+
+    RepeatEntry& e = repeatTrackMap[key];
+    if (e.window_start == 0 || (now - e.window_start) > ev->getPointExpiry()) {
+        e.count        = 0;
+        e.window_start = now;
+        e.participants.clear();
+    }
+    e.expires_at = now + ev->getPointExpiry();
+    ++e.count;
+    if (crossuser)
+        e.participants[actor.numeric] = actor;
+
+    if (e.count < ev->getRepeatMinCount())
+        return;  // not enough repeats yet
+
+    // Fire: award points, but leave the entry in place for further repeats.
+    if (crossuser) {
+        for (std::map<std::string, SpamActor>::const_iterator pit = e.participants.begin();
+             pit != e.participants.end(); ++pit) {
+            scoreEvent(ev, pit->second, channel_name, now);
+            actorsToEvaluate[pit->first] = pit->second;
+        }
+    } else {
+        scoreEvent(ev, actor, channel_name, now);
+        // actor is already in actorsToEvaluate (seeded by processSpamText)
+    }
+}
+
+/**
  * processSpamText: called whenever text arrives that should be checked for
  * spam events. target_bit is the bitmask value for the traffic source
- * (e.g. spam_target::CHAN_PRIV). Only TEXT events are handled currently;
- * other event types are silently skipped until implemented.
+ * (e.g. spam_target::CHAN_PRIV). Handles TEXT (regex) and TEXT_REPEAT
+ * (repetition) events; other event types are silently skipped.
  */
 void dronescan::processSpamText(iClient* theClient, const std::string& text,
                                 int target_bit, const std::string& channel_name)
@@ -2398,6 +2573,12 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
     elog << "dronescan::processSpamText> Checking text for spam events: " << text << std::endl;
     const time_t now = ::time(0);
 
+    const SpamActor actor = makeActor(theClient);
+    // Actors whose rules should be evaluated after scoring. The triggering
+    // actor is always evaluated; crossuser repeats add other participants.
+    std::map<std::string, SpamActor> actorsToEvaluate;
+    actorsToEvaluate[actor.numeric] = actor;
+
     for (spamEventsMapType::const_iterator eit = spamEventsMap.begin();
          eit != spamEventsMap.end(); ++eit)
     {
@@ -2406,6 +2587,11 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
             continue;
         if (!(ev->getTarget() & target_bit))
             continue;
+
+        if (ev->getEventType() == "TEXT_REPEAT") {
+            processRepeatEvent(ev, actor, text, channel_name, now, actorsToEvaluate);
+            continue;
+        }
         if (ev->getEventType() != "TEXT")
             continue;  // other event types implemented in later phases
 
@@ -2423,48 +2609,24 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
         if (rc < 0)
             continue;  // no match (or error)
 
-        // Match found ? update scoring independently for every rule this event feeds
-        spamEventRulesMapType::const_iterator erit = spamEventRulesMap.find(ev->getId());
-        if (erit == spamEventRulesMap.end())
-            continue;  // event isn't linked to any rule; nothing to score
-
-        for (size_t i = 0; i < erit->second.size(); ++i) {
-            spamRulesMapType::const_iterator ruleIt = spamRulesMap.find(erit->second[i]);
-            if (ruleIt == spamRulesMap.end() || !ruleIt->second->isEnabled())
-                continue;
-            sqlSpamRule* rule = ruleIt->second;
-
-            const string key = buildScoringKey(rule, theClient, channel_name);
-            SpamScore& score = spamScoreMap[key][ev->getId()];
-            if (now - score.window_start > ev->getPointExpiry()) {
-                score.count        = 0;
-                score.window_start = now;
-            }
-            elog << "dronescan::processSpamText> Updating score for event " << ev->getId()
-                 << " rule " << rule->getId()
-                 << " (count=" << score.count << ", window_start=" << score.window_start
-                 << ", point_expiry=" << ev->getPointExpiry() << ")" << std::endl;
-            int maxOcc = ev->getMaxOccurrence();
-            if (maxOcc < 0 || score.count < maxOcc)
-                ++score.count;
-        }
+        scoreEvent(ev, actor, channel_name, now);
     }
 
-    evaluateSpamRules(theClient, channel_name);
+    for (std::map<std::string, SpamActor>::const_iterator ait = actorsToEvaluate.begin();
+         ait != actorsToEvaluate.end(); ++ait)
+        evaluateSpamRules(ait->second, channel_name);
 }
 
 /**
- * buildScoringKey: the in-memory scoring bucket for a (rule, client, channel)
+ * buildScoringKey: the in-memory scoring bucket for a (rule, actor, channel)
  * triple. Format is "rule_id.channel_or_privmsg.unit", or "rule_id.unit" when
  * the rule scores globally (channel segment omitted). unit is the client's
  * numeric nick, unless the rule's points_per is "IP".
  */
-std::string dronescan::buildScoringKey(sqlSpamRule* rule, iClient* theClient,
+std::string dronescan::buildScoringKey(sqlSpamRule* rule, const SpamActor& actor,
                                        const std::string& channel_name) const
 {
-    const string unit = (rule->getPointsPer() == "IP")
-                       ? xIP(theClient->getIP()).GetNumericIP()
-                       : theClient->getCharYYXXX();
+    const string unit = (rule->getPointsPer() == "IP") ? actor.ip : actor.numeric;
 
     string key = std::to_string(rule->getId()) + ".";
     if (!rule->isScoreGlobally())
@@ -2474,14 +2636,11 @@ std::string dronescan::buildScoringKey(sqlSpamRule* rule, iClient* theClient,
 }
 
 /**
- * evaluateSpamRules: after scores have been updated for a client, check
+ * evaluateSpamRules: after scores have been updated for an actor, check
  * whether any enabled rule has crossed its threshold.
  */
-void dronescan::evaluateSpamRules(iClient* theClient, const std::string& channel_name)
+void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& channel_name)
 {
-    if (!theClient)
-        return;
-
     const string lcChan     = string_lower(channel_name);
     const time_t now        = ::time(0);
 
@@ -2528,7 +2687,7 @@ void dronescan::evaluateSpamRules(iClient* theClient, const std::string& channel
         if (rei == spamRuleEventsMap.end())
             continue;
 
-        const string scoringKey = buildScoringKey(rule, theClient, channel_name);
+        const string scoringKey = buildScoringKey(rule, actor, channel_name);
 
         int totalScore = 0;
         for (size_t i = 0; i < rei->second.size(); ++i) {
@@ -2557,7 +2716,7 @@ void dronescan::evaluateSpamRules(iClient* theClient, const std::string& channel
         }
 
         if (totalScore >= rule->getThreshold()) {
-            fireRuleActions(rule, theClient, channel_name);
+            fireRuleActions(rule, actor, channel_name);
 
             // Reset scores for all events linked to this rule to prevent
             // immediate re-triggering
@@ -2573,12 +2732,14 @@ void dronescan::evaluateSpamRules(iClient* theClient, const std::string& channel
 
 /**
  * fireRuleActions: execute all actions linked to the given rule for
- * the offending client. Handles REPORT and GLINE; KILL is deferred.
+ * the offending actor. Handles REPORT and GLINE; KILL is deferred.
+ * Uses the captured SpamActor identity so actions still work even if the
+ * offender has since quit (crossuser TEXT_REPEAT).
  */
-void dronescan::fireRuleActions(sqlSpamRule* rule, iClient* theClient,
+void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                                 const std::string& channel_name)
 {
-    if (!rule || !theClient)
+    if (!rule)
         return;
 
     spamRuleActionsMapType::const_iterator rait =
@@ -2586,10 +2747,10 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, iClient* theClient,
     if (rait == spamRuleActionsMap.end())
         return;
 
-    const string nick  = theClient->getNickName();
-    const string user  = theClient->getUserName();
-    const string host  = theClient->getInsecureHost();
-    const string ip    = xIP(theClient->getIP()).GetNumericIP();
+    const string& nick = actor.nick;
+    const string& user = actor.user;
+    const string& host = actor.host;
+    const string& ip   = actor.ip;
 
     for (size_t i = 0; i < rait->second.size(); ++i) {
         sqlSpamRuleAction* ra = rait->second[i];
@@ -2676,7 +2837,7 @@ void dronescan::voiceSpyClientInConsole(iClient* ic)
     Channel* consoleChan = Network->findChannel(consoleChannel);
     if (!consoleChan)
         return;
-    MyUplink->Mode(this, consoleChan, "+v", ic->getCharYYXXX());
+    Mode(consoleChan, "+v", ic->getCharYYXXX());
 }
 
 /** Op a client in the console channel. */
@@ -2685,7 +2846,7 @@ void dronescan::opInConsole(iClient* ic)
     Channel* consoleChan = Network->findChannel(consoleChannel);
     if (!consoleChan)
         return;
-    MyUplink->Mode(this, consoleChan, "+o", ic->getCharYYXXX());
+    Mode(consoleChan, "+o", ic->getCharYYXXX());
 }
 
 /**

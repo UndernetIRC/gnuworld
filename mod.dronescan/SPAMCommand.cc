@@ -389,6 +389,27 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             ev->setRepeatMinCount(atoi(value.c_str()));
         } else if (field == "repeat_exclusion_regex") {
             ev->setRepeatExclusionRegex(value);
+            // Recompile the exclusion regex cache so it takes effect live
+            dronescan::spamRegexCacheType::iterator ci =
+                bot->spamRepeatExclusionCache.find(id);
+            if (ci != bot->spamRepeatExclusionCache.end()) {
+                pcre2_code_free(ci->second);
+                bot->spamRepeatExclusionCache.erase(ci);
+            }
+            if (!value.empty()) {
+                int errcode;
+                PCRE2_SIZE erroffset;
+                uint32_t opts = PCRE2_UTF;
+                if (!ev->isCaseSensitive()) opts |= PCRE2_CASELESS;
+                pcre2_code* re = pcre2_compile(
+                    (PCRE2_SPTR)value.c_str(), PCRE2_ZERO_TERMINATED,
+                    opts, &errcode, &erroffset, nullptr);
+                if (re)
+                    bot->spamRepeatExclusionCache[id] = re;
+                else
+                    bot->Reply(theClient,
+                        "Warning: exclusion regex compile failed at offset %zu.", erroffset);
+            }
         } else {
             bot->Reply(theClient,
                 "Unknown field '%s'. Valid: description, event_param, target, case_sensitive, "
