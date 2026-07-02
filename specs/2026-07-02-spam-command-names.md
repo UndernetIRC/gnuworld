@@ -6,6 +6,7 @@ playwright: false
 frontend-design: false
 spec-version: 1
 created: 2026-07-02T14:00:00
+branch: feat/spam-command-names
 ---
 
 # Plan: SPAM command name-based identifiers

@@ -4,23 +4,23 @@
  * Top-level SPAM command dispatcher for dronescan.
  * Syntax:
  *   SPAM EVENT     ADD    <name> <type> <target> <param> <points> <expiry> [max_occ]
- *   SPAM EVENT     DEL    <id>
+ *   SPAM EVENT     DEL    <name>
  *   SPAM EVENT     LIST
- *   SPAM EVENT     SHOW   <id>
- *   SPAM EVENT     SET    <id> <field> <value>
+ *   SPAM EVENT     SHOW   <name>
+ *   SPAM EVENT     SET    <name> <field> <value>
  *   SPAM RULE      ADD    <name> <threshold>
- *   SPAM RULE      DEL    <id>
+ *   SPAM RULE      DEL    <name>
  *   SPAM RULE      LIST
- *   SPAM RULE      SHOW   <id>
- *   SPAM RULE      SET    <id> <field> <value>
- *   SPAM RULE      ADDEVENT   <rule_id> <event_id> [points_override]
- *   SPAM RULE      REMEVENT   <rule_id> <event_id>
- *   SPAM RULE      ADDACTION  <rule_id> <action_id> [dur_override] [reason_override] [delay_override]
- *   SPAM RULE      REMACTION  <spam_rule_action_id>
- *   SPAM RULE      ADDCHAN    <rule_id> <#channel>
- *   SPAM RULE      REMCHAN    <rule_id> <#channel>
+ *   SPAM RULE      SHOW   <name>
+ *   SPAM RULE      SET    <name> <field> <value>
+ *   SPAM RULE      ADDEVENT   <rule_name> <event_name> [points_override]
+ *   SPAM RULE      REMEVENT   <rule_name> <event_name>
+ *   SPAM RULE      ADDACTION  <rule_name> <action_name> [dur_override] [reason_override] [delay_override]
+ *   SPAM RULE      REMACTION  <rule_name> <action_name>
+ *   SPAM RULE      ADDCHAN    <rule_name> <#channel>
+ *   SPAM RULE      REMCHAN    <rule_name> <#channel>
  *   SPAM ACTION    ADD    <name> <type> [duration] [reason] [delay]
- *   SPAM ACTION    DEL    <id>
+ *   SPAM ACTION    DEL    <name>
  *   SPAM ACTION    LIST
  *   SPAM EXCLUSION ADD    <CHAN|NICK|IP|OPER> <value>
  *   SPAM EXCLUSION DEL    <id>
@@ -41,6 +41,11 @@
  * target bitmask: chan_priv=1, privmsg=2, chan_not=4, part=8, quit=16, notice=32,
  *                  ctcp=64, all=127
  *                  "chan" is an alias for chan_priv|chan_not (=5)
+ *
+ * Rule/event/action names are matched case-insensitively and must be
+ * unique within their table. RULE SET wait_on_rule_id and EVENT SET
+ * requires_event_id take a rule/event name as their value, or "none"
+ * (or an empty value) to clear the reference.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -107,6 +112,42 @@ static bool isValidActionType(const string& t)
 static bool isValidExclusionType(const string& t)
 {
     return (t == "CHAN" || t == "NICK" || t == "IP" || t == "OPER");
+}
+
+// ---------------------------------------------------------------------------
+// Helpers: case-insensitive name -> object lookups
+// ---------------------------------------------------------------------------
+static sqlSpamRule* findRuleByName(dronescan* bot, const string& name)
+{
+    const string lname = string_lower(name);
+    for (dronescan::spamRulesMapType::const_iterator it = bot->spamRulesMap.begin();
+         it != bot->spamRulesMap.end(); ++it) {
+        if (string_lower(it->second->getName()) == lname)
+            return it->second;
+    }
+    return nullptr;
+}
+
+static sqlSpamEvent* findEventByName(dronescan* bot, const string& name)
+{
+    const string lname = string_lower(name);
+    for (dronescan::spamEventsMapType::const_iterator it = bot->spamEventsMap.begin();
+         it != bot->spamEventsMap.end(); ++it) {
+        if (string_lower(it->second->getName()) == lname)
+            return it->second;
+    }
+    return nullptr;
+}
+
+static sqlSpamAction* findActionByName(dronescan* bot, const string& name)
+{
+    const string lname = string_lower(name);
+    for (dronescan::spamActionsMapType::const_iterator it = bot->spamActionsMap.begin();
+         it != bot->spamActionsMap.end(); ++it) {
+        if (string_lower(it->second->getName()) == lname)
+            return it->second;
+    }
+    return nullptr;
 }
 
 // Parse comma-separated target names to an integer bitmask.
@@ -212,15 +253,13 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
         if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM EVENT SHOW <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM EVENT SHOW <name>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::spamEventsMapType::const_iterator it = bot->spamEventsMap.find(id);
-        if (it == bot->spamEventsMap.end()) {
-            bot->Reply(theClient, "Event %d not found.", id);
+        sqlSpamEvent* ev = findEventByName(bot, st[3]);
+        if (!ev) {
+            bot->Reply(theClient, "Event '%s' not found.", st[3].c_str());
             return;
         }
-        sqlSpamEvent* ev = it->second;
         bot->Reply(theClient, "ID      : %d", ev->getId());
         bot->Reply(theClient, "Name    : %s", ev->getName().c_str());
         bot->Reply(theClient, "Type    : %s", ev->getEventType().c_str());
@@ -285,7 +324,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         ev->setModifiedBy(0);
 
         if (!ev->insert()) {
-            bot->Reply(theClient, "Failed to add spam event.");
+            bot->Reply(theClient, "Failed to add spam event (duplicate name?).");
             delete ev;
             return;
         }
@@ -299,39 +338,39 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM EVENT DEL <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM EVENT DEL <name>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::spamEventsMapType::iterator it = bot->spamEventsMap.find(id);
-        if (it == bot->spamEventsMap.end()) {
-            bot->Reply(theClient, "Event %d not found.", id);
+        sqlSpamEvent* ev = findEventByName(bot, st[3]);
+        if (!ev) {
+            bot->Reply(theClient, "Event '%s' not found.", st[3].c_str());
             return;
         }
-        if (!it->second->remove()) {
-            bot->Reply(theClient, "Failed to delete spam event %d.", id);
+        const int id = ev->getId();
+        const string evName = ev->getName();
+        if (!ev->remove()) {
+            bot->Reply(theClient, "Failed to delete spam event '%s'.", evName.c_str());
             return;
         }
-        delete it->second;
-        bot->spamEventsMap.erase(it);
-        bot->Reply(theClient, "Spam event %d deleted.", id);
+        delete ev;
+        bot->spamEventsMap.erase(id);
+        bot->Reply(theClient, "Spam event '%s' deleted.", evName.c_str());
         return;
     }
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM EVENT SET <id> <field> <value>
+        // SPAM EVENT SET <name> <field> <value>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM EVENT SET <id> <field> <value>");
+            bot->Reply(theClient, "Usage: SPAM EVENT SET <name> <field> <value>");
             return;
         }
-        int id = atoi(st[3].c_str());
-        dronescan::spamEventsMapType::iterator it = bot->spamEventsMap.find(id);
-        if (it == bot->spamEventsMap.end()) {
-            bot->Reply(theClient, "Event %d not found.", id);
+        sqlSpamEvent* ev = findEventByName(bot, st[3]);
+        if (!ev) {
+            bot->Reply(theClient, "Event '%s' not found.", st[3].c_str());
             return;
         }
-        sqlSpamEvent* ev = it->second;
+        const int id = ev->getId();
         const string field = string_lower(st[4]);
         const string value = (st.size() >= 6) ? st[5] : string();
 
@@ -380,7 +419,16 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         } else if (field == "max_occurrence") {
             ev->setMaxOccurrence(atoi(value.c_str()));
         } else if (field == "requires_event_id") {
-            ev->setRequiresEventId(atoi(value.c_str()));
+            if (value.empty() || string_lower(value) == "none") {
+                ev->setRequiresEventId(0);
+            } else {
+                sqlSpamEvent* reqEv = findEventByName(bot, value);
+                if (!reqEv) {
+                    bot->Reply(theClient, "Event '%s' not found.", value.c_str());
+                    return;
+                }
+                ev->setRequiresEventId(reqEv->getId());
+            }
         } else if (field == "enabled") {
             ev->setEnabled(value == "1" || value == "yes" || value == "true");
         } else if (field == "repeat_crossuser") {
@@ -535,15 +583,14 @@ static void handleRule(dronescan* bot, const iClient* theClient,
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
         if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM RULE SHOW <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM RULE SHOW <name>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::spamRulesMapType::const_iterator it = bot->spamRulesMap.find(id);
-        if (it == bot->spamRulesMap.end()) {
-            bot->Reply(theClient, "Rule %d not found.", id);
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
             return;
         }
-        sqlSpamRule* rule = it->second;
+        const int id = rule->getId();
         bot->Reply(theClient, "ID          : %d", rule->getId());
         bot->Reply(theClient, "Name        : %s", rule->getName().c_str());
         bot->Reply(theClient, "Threshold   : %d", rule->getThreshold());
@@ -630,7 +677,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         rule->setModifiedTs(::time(0));
 
         if (!rule->insert()) {
-            bot->Reply(theClient, "Failed to add spam rule.");
+            bot->Reply(theClient, "Failed to add spam rule (duplicate name?).");
             delete rule;
             return;
         }
@@ -643,20 +690,21 @@ static void handleRule(dronescan* bot, const iClient* theClient,
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM RULE DEL <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM RULE DEL <name>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::spamRulesMapType::iterator it = bot->spamRulesMap.find(id);
-        if (it == bot->spamRulesMap.end()) {
-            bot->Reply(theClient, "Rule %d not found.", id);
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
             return;
         }
-        if (!it->second->remove()) {
-            bot->Reply(theClient, "Failed to delete spam rule %d.", id);
+        const int id = rule->getId();
+        const string ruleName = rule->getName();
+        if (!rule->remove()) {
+            bot->Reply(theClient, "Failed to delete spam rule '%s'.", ruleName.c_str());
             return;
         }
-        delete it->second;
-        bot->spamRulesMap.erase(it);
+        delete rule;
+        bot->spamRulesMap.erase(id);
         // Clean up in-memory rule-event and rule-action entries too
         bot->spamRuleEventsMap.erase(id);
         dronescan::spamRuleActionsMapType::iterator rai = bot->spamRuleActionsMap.find(id);
@@ -665,30 +713,31 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                 delete rai->second[i];
             bot->spamRuleActionsMap.erase(rai);
         }
-        bot->Reply(theClient, "Spam rule %d deleted.", id);
+        bot->Reply(theClient, "Spam rule '%s' deleted.", ruleName.c_str());
         return;
     }
 
     // -- ADDEVENT ------------------------------------------------------------
     if (verb == "ADDEVENT") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE ADDEVENT <rule_id> <event_id> [points_override]
+        // SPAM RULE ADDEVENT <rule_name> <event_name> [points_override]
         if (st.size() < 5) {
             bot->Reply(theClient,
-                "Usage: SPAM RULE ADDEVENT <rule_id> <event_id> [points_override]");
+                "Usage: SPAM RULE ADDEVENT <rule_name> <event_name> [points_override]");
             return;
         }
-        int rule_id  = atoi(st[3].c_str());
-        int event_id = atoi(st[4].c_str());
-
-        if (bot->spamRulesMap.find(rule_id) == bot->spamRulesMap.end()) {
-            bot->Reply(theClient, "Rule %d not found.", rule_id);
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
             return;
         }
-        if (bot->spamEventsMap.find(event_id) == bot->spamEventsMap.end()) {
-            bot->Reply(theClient, "Event %d not found.", event_id);
+        sqlSpamEvent* ev = findEventByName(bot, st[4]);
+        if (!ev) {
+            bot->Reply(theClient, "Event '%s' not found.", st[4].c_str());
             return;
         }
+        const int rule_id  = rule->getId();
+        const int event_id = ev->getId();
         int po = (st.size() >= 6) ? atoi(st[5].c_str()) : -1;
 
         stringstream q;
@@ -701,7 +750,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamRuleEventsMap[rule_id].push_back(std::make_pair(event_id, po));
-        bot->Reply(theClient, "Event %d linked to rule %d%s.", event_id, rule_id,
+        bot->Reply(theClient, "Event '%s' linked to rule '%s'%s.",
+                   ev->getName().c_str(), rule->getName().c_str(),
                    po >= 0 ? (" (points override: " + std::to_string(po) + ")").c_str() : "");
         return;
     }
@@ -710,11 +760,21 @@ static void handleRule(dronescan* bot, const iClient* theClient,
     if (verb == "REMEVENT") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM RULE REMEVENT <rule_id> <event_id>");
+            bot->Reply(theClient, "Usage: SPAM RULE REMEVENT <rule_name> <event_name>");
             return;
         }
-        int rule_id  = atoi(st[3].c_str());
-        int event_id = atoi(st[4].c_str());
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
+            return;
+        }
+        sqlSpamEvent* ev = findEventByName(bot, st[4]);
+        if (!ev) {
+            bot->Reply(theClient, "Event '%s' not found.", st[4].c_str());
+            return;
+        }
+        const int rule_id  = rule->getId();
+        const int event_id = ev->getId();
 
         stringstream q;
         q << "DELETE FROM spam_rule_events WHERE rule_id = " << rule_id
@@ -737,38 +797,54 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                 }
             }
         }
-        bot->Reply(theClient, "Event %d unlinked from rule %d.", event_id, rule_id);
+        bot->Reply(theClient, "Event '%s' unlinked from rule '%s'.",
+                   ev->getName().c_str(), rule->getName().c_str());
         return;
     }
 
     // -- ADDACTION -----------------------------------------------------------
     if (verb == "ADDACTION") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE ADDACTION <rule_id> <action_id> [dur_override] [reason_override] [delay_override]
+        // SPAM RULE ADDACTION <rule_name> <action_name> [dur_override] [reason_override] [delay_override]
         if (st.size() < 5) {
             bot->Reply(theClient,
-                "Usage: SPAM RULE ADDACTION <rule_id> <action_id> "
+                "Usage: SPAM RULE ADDACTION <rule_name> <action_name> "
                 "[dur_override] [reason_override] [delay_override]");
             return;
         }
-        int rule_id   = atoi(st[3].c_str());
-        int action_id = atoi(st[4].c_str());
-
-        if (bot->spamRulesMap.find(rule_id) == bot->spamRulesMap.end()) {
-            bot->Reply(theClient, "Rule %d not found.", rule_id);
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
             return;
         }
-        dronescan::spamActionsMapType::const_iterator ait =
-            bot->spamActionsMap.find(action_id);
-        if (ait == bot->spamActionsMap.end()) {
-            bot->Reply(theClient, "Action %d not found.", action_id);
+        sqlSpamAction* action = findActionByName(bot, st[4]);
+        if (!action) {
+            bot->Reply(theClient, "Action '%s' not found.", st[4].c_str());
             return;
+        }
+        const int rule_id   = rule->getId();
+        const int action_id = action->getId();
+
+        // A rule may only bind a given action once (spam_rule_actions has a
+        // UNIQUE(rule_id, action_id) constraint) so REMACTION can identify a
+        // binding unambiguously by <rule_name> <action_name>.
+        dronescan::spamRuleActionsMapType::const_iterator existingIt =
+            bot->spamRuleActionsMap.find(rule_id);
+        if (existingIt != bot->spamRuleActionsMap.end()) {
+            for (size_t i = 0; i < existingIt->second.size(); ++i) {
+                if (existingIt->second[i]->getActionId() == action_id) {
+                    bot->Reply(theClient,
+                        "Action '%s' is already linked to rule '%s'.",
+                        action->getName().c_str(), rule->getName().c_str());
+                    return;
+                }
+            }
         }
 
         sqlSpamRuleAction* ra = new sqlSpamRuleAction(bot->getSqlDb());
         ra->setRuleId(rule_id);
         ra->setActionId(action_id);
-        ra->setActionType(ait->second->getActionType());
+        ra->setActionType(action->getActionType());
         if (st.size() >= 6) ra->setActionDurationOverride(atoi(st[5].c_str()));
         if (st.size() >= 7) ra->setActionReasonOverride(st[6]);
         if (st.size() >= 8) ra->setDelayOverride(atoi(st[7].c_str()));
@@ -779,65 +855,68 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamRuleActionsMap[rule_id].push_back(ra);
-        bot->Reply(theClient, "Action %d linked to rule %d (sra id: %d).",
-                   action_id, rule_id, ra->getId());
+        bot->Reply(theClient, "Action '%s' linked to rule '%s' (sra id: %d).",
+                   action->getName().c_str(), rule->getName().c_str(), ra->getId());
         return;
     }
 
     // -- REMACTION -----------------------------------------------------------
     if (verb == "REMACTION") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE REMACTION <spam_rule_action_id>
-        if (st.size() < 4) {
-            bot->Reply(theClient, "Usage: SPAM RULE REMACTION <spam_rule_action_id>");
+        // SPAM RULE REMACTION <rule_name> <action_name>
+        if (st.size() < 5) {
+            bot->Reply(theClient, "Usage: SPAM RULE REMACTION <rule_name> <action_name>");
             return;
         }
-        int sra_id = atoi(st[3].c_str());
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
+            return;
+        }
+        sqlSpamAction* action = findActionByName(bot, st[4]);
+        if (!action) {
+            bot->Reply(theClient, "Action '%s' not found.", st[4].c_str());
+            return;
+        }
 
-        // Find it across all rule buckets
-        bool found = false;
-        for (dronescan::spamRuleActionsMapType::iterator rit =
-                 bot->spamRuleActionsMap.begin();
-             rit != bot->spamRuleActionsMap.end(); ++rit) {
+        dronescan::spamRuleActionsMapType::iterator rit =
+            bot->spamRuleActionsMap.find(rule->getId());
+        if (rit != bot->spamRuleActionsMap.end()) {
             std::vector<sqlSpamRuleAction*>& vec = rit->second;
             for (std::vector<sqlSpamRuleAction*>::iterator vi = vec.begin();
                  vi != vec.end(); ++vi) {
-                if ((*vi)->getId() == sra_id) {
+                if ((*vi)->getActionId() == action->getId()) {
                     if (!(*vi)->remove()) {
-                        bot->Reply(theClient, "Failed to remove rule-action %d.", sra_id);
+                        bot->Reply(theClient, "Failed to remove rule-action binding.");
                         return;
                     }
                     delete *vi;
                     vec.erase(vi);
-                    found = true;
-                    break;
+                    bot->Reply(theClient, "Action '%s' unlinked from rule '%s'.",
+                               action->getName().c_str(), rule->getName().c_str());
+                    return;
                 }
             }
-            if (found) break;
         }
-        if (!found) {
-            bot->Reply(theClient, "Rule-action %d not found.", sra_id);
-            return;
-        }
-        bot->Reply(theClient, "Rule-action %d removed.", sra_id);
+        bot->Reply(theClient, "Action '%s' is not linked to rule '%s'.",
+                   action->getName().c_str(), rule->getName().c_str());
         return;
     }
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE SET <id> <field> <value>
+        // SPAM RULE SET <name> <field> <value>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM RULE SET <id> <field> <value>");
+            bot->Reply(theClient, "Usage: SPAM RULE SET <name> <field> <value>");
             return;
         }
-        int id = atoi(st[3].c_str());
-        dronescan::spamRulesMapType::iterator it = bot->spamRulesMap.find(id);
-        if (it == bot->spamRulesMap.end()) {
-            bot->Reply(theClient, "Rule %d not found.", id);
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
             return;
         }
-        sqlSpamRule* rule = it->second;
+        const int id = rule->getId();
         const string field = string_lower(st[4]);
         const string value = (st.size() >= 6) ? st[5] : string();
 
@@ -846,7 +925,16 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         } else if (field == "threshold") {
             rule->setThreshold(atoi(value.c_str()));
         } else if (field == "wait_on_rule_id") {
-            rule->setWaitOnRuleId(atoi(value.c_str()));
+            if (value.empty() || string_lower(value) == "none") {
+                rule->setWaitOnRuleId(0);
+            } else {
+                sqlSpamRule* waitRule = findRuleByName(bot, value);
+                if (!waitRule) {
+                    bot->Reply(theClient, "Rule '%s' not found.", value.c_str());
+                    return;
+                }
+                rule->setWaitOnRuleId(waitRule->getId());
+            }
         } else if (field == "enabled") {
             rule->setEnabled(value == "1" || value == "yes" || value == "true");
         } else if (field == "points_per") {
@@ -882,16 +970,17 @@ static void handleRule(dronescan* bot, const iClient* theClient,
     // -- ADDCHAN -------------------------------------------------------------
     if (verb == "ADDCHAN") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE ADDCHAN <rule_id> <#channel>
+        // SPAM RULE ADDCHAN <rule_name> <#channel>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM RULE ADDCHAN <rule_id> <#channel>");
+            bot->Reply(theClient, "Usage: SPAM RULE ADDCHAN <rule_name> <#channel>");
             return;
         }
-        int rule_id = atoi(st[3].c_str());
-        if (bot->spamRulesMap.find(rule_id) == bot->spamRulesMap.end()) {
-            bot->Reply(theClient, "Rule %d not found.", rule_id);
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
             return;
         }
+        const int rule_id = rule->getId();
         const string chanName = string_lower(st[4]);
 
         // Check for duplicate in in-memory map
@@ -901,8 +990,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             for (size_t i = 0; i < rci->second.size(); ++i) {
                 if (rci->second[i] == chanName) {
                     bot->Reply(theClient,
-                        "Channel '%s' is already listed for rule %d.",
-                        chanName.c_str(), rule_id);
+                        "Channel '%s' is already listed for rule '%s'.",
+                        chanName.c_str(), rule->getName().c_str());
                     return;
                 }
             }
@@ -913,24 +1002,30 @@ static void handleRule(dronescan* bot, const iClient* theClient,
            << rule_id << ", '" << escapeSQLChars(chanName) << "')";
         if (!bot->getSqlDb()->Exec(iq)) {
             bot->Reply(theClient,
-                "Failed to add channel '%s' to rule %d (duplicate?).",
-                chanName.c_str(), rule_id);
+                "Failed to add channel '%s' to rule '%s' (duplicate?).",
+                chanName.c_str(), rule->getName().c_str());
             return;
         }
         bot->spamRuleChannelsMap[rule_id].push_back(chanName);
-        bot->Reply(theClient, "Channel '%s' added to rule %d.", chanName.c_str(), rule_id);
+        bot->Reply(theClient, "Channel '%s' added to rule '%s'.",
+                   chanName.c_str(), rule->getName().c_str());
         return;
     }
 
     // -- REMCHAN -------------------------------------------------------------
     if (verb == "REMCHAN") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE REMCHAN <rule_id> <#channel>
+        // SPAM RULE REMCHAN <rule_name> <#channel>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM RULE REMCHAN <rule_id> <#channel>");
+            bot->Reply(theClient, "Usage: SPAM RULE REMCHAN <rule_name> <#channel>");
             return;
         }
-        int rule_id = atoi(st[3].c_str());
+        sqlSpamRule* rule = findRuleByName(bot, st[3]);
+        if (!rule) {
+            bot->Reply(theClient, "Rule '%s' not found.", st[3].c_str());
+            return;
+        }
+        const int rule_id = rule->getId();
         const string chanName = string_lower(st[4]);
 
         stringstream dq;
@@ -938,7 +1033,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
            << " AND channel_name = '" << escapeSQLChars(chanName) << "'";
         if (!bot->getSqlDb()->Exec(dq)) {
             bot->Reply(theClient,
-                "Failed to remove channel '%s' from rule %d.", chanName.c_str(), rule_id);
+                "Failed to remove channel '%s' from rule '%s'.",
+                chanName.c_str(), rule->getName().c_str());
             return;
         }
 
@@ -958,10 +1054,12 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         }
         if (!found) {
             bot->Reply(theClient,
-                "Channel '%s' was not found in rule %d's list.", chanName.c_str(), rule_id);
+                "Channel '%s' was not found in rule '%s's list.",
+                chanName.c_str(), rule->getName().c_str());
             return;
         }
-        bot->Reply(theClient, "Channel '%s' removed from rule %d.", chanName.c_str(), rule_id);
+        bot->Reply(theClient, "Channel '%s' removed from rule '%s'.",
+                   chanName.c_str(), rule->getName().c_str());
         return;
     }
 
@@ -1037,7 +1135,7 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         act->setModifiedTs(::time(0));
 
         if (!act->insert()) {
-            bot->Reply(theClient, "Failed to add spam action.");
+            bot->Reply(theClient, "Failed to add spam action (duplicate name?).");
             delete act;
             return;
         }
@@ -1050,21 +1148,22 @@ static void handleAction(dronescan* bot, const iClient* theClient,
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM ACTION DEL <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM ACTION DEL <name>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::spamActionsMapType::iterator it = bot->spamActionsMap.find(id);
-        if (it == bot->spamActionsMap.end()) {
-            bot->Reply(theClient, "Action %d not found.", id);
+        sqlSpamAction* act = findActionByName(bot, st[3]);
+        if (!act) {
+            bot->Reply(theClient, "Action '%s' not found.", st[3].c_str());
             return;
         }
-        if (!it->second->remove()) {
-            bot->Reply(theClient, "Failed to delete spam action %d.", id);
+        const int id = act->getId();
+        const string actName = act->getName();
+        if (!act->remove()) {
+            bot->Reply(theClient, "Failed to delete spam action '%s'.", actName.c_str());
             return;
         }
-        delete it->second;
-        bot->spamActionsMap.erase(it);
-        bot->Reply(theClient, "Spam action %d deleted.", id);
+        delete act;
+        bot->spamActionsMap.erase(id);
+        bot->Reply(theClient, "Spam action '%s' deleted.", actName.c_str());
         return;
     }
 

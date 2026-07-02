@@ -63,10 +63,10 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM EVENT subcommands:");
     bot->Reply(theClient, "  ADD    <name> <type> <target> <param> <points> <expiry> [max_occ]");
-    bot->Reply(theClient, "  DEL    <id>");
+    bot->Reply(theClient, "  DEL    <name>");
     bot->Reply(theClient, "  LIST");
-    bot->Reply(theClient, "  SHOW   <id>");
-    bot->Reply(theClient, "  SET    <id> <field> <value>");
+    bot->Reply(theClient, "  SHOW   <name>");
+    bot->Reply(theClient, "  SET    <name> <field> <value>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Event types: TEXT          TEXT_REPEAT");
     bot->Reply(theClient, "             ENTROPY_TEXT  ENTROPY_NICK  JOIN_CHANNEL");
@@ -85,7 +85,7 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 ctcp=64 all=127");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: description  event_param  target  case_sensitive");
-    bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id");
+    bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id (event name, or \"none\")");
     bot->Reply(theClient, "            enabled  repeat_crossuser");
     bot->Reply(theClient, "            repeat_min_count  repeat_exclusion_regex");
     bot->Reply(theClient, " ");
@@ -95,51 +95,51 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SPAM EVENT ADD part_flood TEXT part \"bye|cya|leaving\" 5 60");
     bot->Reply(theClient, "  SPAM EVENT ADD direct_spam TEXT privmsg,notice \"click.*here\" 10 60");
     bot->Reply(theClient, "  SPAM EVENT ADD repeat_flood TEXT_REPEAT all . 5 30 3");
-    bot->Reply(theClient, "  SPAM EVENT SET 1 enabled yes");
-    bot->Reply(theClient, "  SPAM EVENT SET 1 event_param \"new.*regex.*pattern\"");
-    bot->Reply(theClient, "  SPAM EVENT SET 1 target all");
-    bot->Reply(theClient, "  SPAM EVENT DEL 1");
+    bot->Reply(theClient, "  SPAM EVENT SET pill_regex enabled yes");
+    bot->Reply(theClient, "  SPAM EVENT SET pill_regex event_param \"new.*regex.*pattern\"");
+    bot->Reply(theClient, "  SPAM EVENT SET pill_regex target all");
+    bot->Reply(theClient, "  SPAM EVENT DEL pill_regex");
 }
 
 static void helpSpamRule(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM RULE subcommands:");
     bot->Reply(theClient, "  ADD        <name> <threshold>");
-    bot->Reply(theClient, "  DEL        <id>");
+    bot->Reply(theClient, "  DEL        <name>");
     bot->Reply(theClient, "  LIST");
-    bot->Reply(theClient, "  SHOW       <id>");
-    bot->Reply(theClient, "  SET        <id> <field> <value>");
-    bot->Reply(theClient, "  ADDEVENT   <rule_id> <event_id> [points_override]");
-    bot->Reply(theClient, "  REMEVENT   <rule_id> <event_id>");
-    bot->Reply(theClient, "  ADDACTION  <rule_id> <action_id> [dur_override] [reason_override] [delay_override]");
-    bot->Reply(theClient, "  REMACTION  <spam_rule_action_id>");
-    bot->Reply(theClient, "  ADDCHAN    <rule_id> <#channel>");
-    bot->Reply(theClient, "  REMCHAN    <rule_id> <#channel>");
+    bot->Reply(theClient, "  SHOW       <name>");
+    bot->Reply(theClient, "  SET        <name> <field> <value>");
+    bot->Reply(theClient, "  ADDEVENT   <rule_name> <event_name> [points_override]");
+    bot->Reply(theClient, "  REMEVENT   <rule_name> <event_name>");
+    bot->Reply(theClient, "  ADDACTION  <rule_name> <action_name> [dur_override] [reason_override] [delay_override]");
+    bot->Reply(theClient, "  REMACTION  <rule_name> <action_name>");
+    bot->Reply(theClient, "  ADDCHAN    <rule_name> <#channel>");
+    bot->Reply(theClient, "  REMCHAN    <rule_name> <#channel>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "A rule fires its actions when the total points from linked events");
     bot->Reply(theClient, "reach or exceed the threshold within the event expiry windows.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "SET fields: description  threshold  wait_on_rule_id  enabled");
+    bot->Reply(theClient, "SET fields: description  threshold  wait_on_rule_id (rule name, or \"none\")  enabled");
     bot->Reply(theClient, "            points_per  score_globally  allchans");
     bot->Reply(theClient, "  allchans=1 : rule applies to every channel (use ADDCHAN to exclude).");
     bot->Reply(theClient, "  allchans=0 : rule applies only to channels added with ADDCHAN.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM RULE ADD anti_spam_global 50");
-    bot->Reply(theClient, "  SPAM RULE SET 1 allchans yes");
-    bot->Reply(theClient, "  SPAM RULE SET 1 threshold 30");
-    bot->Reply(theClient, "  SPAM RULE ADDEVENT 1 2");
-    bot->Reply(theClient, "  SPAM RULE ADDEVENT 1 3 20     <- use 20 pts instead of event default");
-    bot->Reply(theClient, "  SPAM RULE ADDACTION 1 1 3600 \"Spam detected\" 0");
-    bot->Reply(theClient, "  SPAM RULE ADDCHAN  1 #watch-me");
-    bot->Reply(theClient, "  SPAM RULE REMCHAN  1 #watch-me");
+    bot->Reply(theClient, "  SPAM RULE SET anti_spam_global allchans yes");
+    bot->Reply(theClient, "  SPAM RULE SET anti_spam_global threshold 30");
+    bot->Reply(theClient, "  SPAM RULE ADDEVENT anti_spam_global pill_regex");
+    bot->Reply(theClient, "  SPAM RULE ADDEVENT anti_spam_global repeat_flood 20     <- use 20 pts instead of event default");
+    bot->Reply(theClient, "  SPAM RULE ADDACTION anti_spam_global gline_1h 3600 \"Spam detected\" 0");
+    bot->Reply(theClient, "  SPAM RULE ADDCHAN  anti_spam_global #watch-me");
+    bot->Reply(theClient, "  SPAM RULE REMCHAN  anti_spam_global #watch-me");
 }
 
 static void helpSpamAction(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM ACTION subcommands:");
     bot->Reply(theClient, "  ADD    <name> <type> [duration] [reason] [delay]");
-    bot->Reply(theClient, "  DEL    <id>");
+    bot->Reply(theClient, "  DEL    <name>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Action types: GLINE  KILL  REPORT");
@@ -151,7 +151,7 @@ static void helpSpamAction(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SPAM ACTION ADD gline_1h   GLINE  3600 \"Spam detected\"  0");
     bot->Reply(theClient, "  SPAM ACTION ADD kill_now   KILL   0    \"Spam\"            0");
     bot->Reply(theClient, "  SPAM ACTION ADD report_only REPORT");
-    bot->Reply(theClient, "  SPAM ACTION DEL 3");
+    bot->Reply(theClient, "  SPAM ACTION DEL report_only");
 }
 
 static void helpSpamExclusion(dronescan* bot, const iClient* theClient)
