@@ -2181,6 +2181,84 @@ void dronescan::refreshSpamCaches()
         resyncSpyClients();
 }
 
+/**
+ * compileEventRegex: (re)compile the TEXT event_param regex for ev into
+ * spamRegexCache, freeing any previously compiled pattern for this event
+ * id first. No-op (after freeing) for non-TEXT events or an empty param.
+ * Called on load, on EVENT ADD, and on EVENT SET (event_param or
+ * case_sensitive) so the compiled pattern never goes stale.
+ */
+void dronescan::compileEventRegex(sqlSpamEvent* ev)
+{
+    spamRegexCacheType::iterator ci = spamRegexCache.find(ev->getId());
+    if (ci != spamRegexCache.end()) {
+        pcre2_code_free(ci->second);
+        spamRegexCache.erase(ci);
+    }
+
+    if (ev->getEventType() != "TEXT" || ev->getEventParam().empty())
+        return;
+
+    int errcode;
+    PCRE2_SIZE erroffset;
+    uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
+    pcre2_code* re = pcre2_compile(
+        reinterpret_cast<PCRE2_SPTR>(ev->getEventParam().c_str()),
+        PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
+    if (re)
+        spamRegexCache[ev->getId()] = re;
+    else
+        elog << "dronescan::compileEventRegex> PCRE2 compile failed for event "
+             << ev->getId() << " at offset " << erroffset << std::endl;
+}
+
+/**
+ * compileRepeatExclusionRegex: same as compileEventRegex, but for the
+ * TEXT_REPEAT repeat_exclusion_regex / spamRepeatExclusionCache pair.
+ */
+void dronescan::compileRepeatExclusionRegex(sqlSpamEvent* ev)
+{
+    spamRegexCacheType::iterator ci = spamRepeatExclusionCache.find(ev->getId());
+    if (ci != spamRepeatExclusionCache.end()) {
+        pcre2_code_free(ci->second);
+        spamRepeatExclusionCache.erase(ci);
+    }
+
+    if (ev->getEventType() != "TEXT_REPEAT" || ev->getRepeatExclusionRegex().empty())
+        return;
+
+    int errcode;
+    PCRE2_SIZE erroffset;
+    uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
+    pcre2_code* re = pcre2_compile(
+        reinterpret_cast<PCRE2_SPTR>(ev->getRepeatExclusionRegex().c_str()),
+        PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
+    if (re)
+        spamRepeatExclusionCache[ev->getId()] = re;
+    else
+        elog << "dronescan::compileRepeatExclusionRegex> repeat_exclusion_regex compile "
+                "failed for event " << ev->getId() << " at offset " << erroffset << std::endl;
+}
+
+/**
+ * freeEventRegexes: free and erase any compiled regex cache entries for
+ * event_id. Called on EVENT DEL so deleted events don't leak pcre2_code*.
+ */
+void dronescan::freeEventRegexes(int event_id)
+{
+    spamRegexCacheType::iterator ci = spamRegexCache.find(event_id);
+    if (ci != spamRegexCache.end()) {
+        pcre2_code_free(ci->second);
+        spamRegexCache.erase(ci);
+    }
+
+    spamRegexCacheType::iterator xi = spamRepeatExclusionCache.find(event_id);
+    if (xi != spamRepeatExclusionCache.end()) {
+        pcre2_code_free(xi->second);
+        spamRepeatExclusionCache.erase(xi);
+    }
+}
+
 void dronescan::preloadSpamEvents()
 {
     for (spamEventsMapType::iterator it = spamEventsMap.begin(); it != spamEventsMap.end(); ++it)
@@ -2204,35 +2282,8 @@ void dronescan::preloadSpamEvents()
         ev->setAllMembers(i);
         spamEventsMap[ev->getId()] = ev;
 
-        // Compile PCRE2 regex for TEXT events
-        if (ev->getEventType() == "TEXT" && !ev->getEventParam().empty()) {
-            int errcode;
-            PCRE2_SIZE erroffset;
-            uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
-            pcre2_code* re = pcre2_compile(
-                reinterpret_cast<PCRE2_SPTR>(ev->getEventParam().c_str()),
-                PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
-            if (re)
-                spamRegexCache[ev->getId()] = re;
-            else
-                elog << "dronescan::preloadSpamEvents> PCRE2 compile failed for event "
-                     << ev->getId() << " at offset " << erroffset << std::endl;
-        }
-
-        // Compile repeat_exclusion_regex for TEXT_REPEAT events
-        if (ev->getEventType() == "TEXT_REPEAT" && !ev->getRepeatExclusionRegex().empty()) {
-            int errcode;
-            PCRE2_SIZE erroffset;
-            uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
-            pcre2_code* re = pcre2_compile(
-                reinterpret_cast<PCRE2_SPTR>(ev->getRepeatExclusionRegex().c_str()),
-                PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
-            if (re)
-                spamRepeatExclusionCache[ev->getId()] = re;
-            else
-                elog << "dronescan::preloadSpamEvents> repeat_exclusion_regex compile failed for event "
-                     << ev->getId() << " at offset " << erroffset << std::endl;
-        }
+        compileEventRegex(ev);
+        compileRepeatExclusionRegex(ev);
     }
     elog << "dronescan::preloadSpamEvents> Loaded " << spamEventsMap.size()
          << " spam events." << std::endl;

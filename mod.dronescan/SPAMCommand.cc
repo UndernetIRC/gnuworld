@@ -329,6 +329,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamEventsMap[ev->getId()] = ev;
+        bot->compileEventRegex(ev);
+        bot->compileRepeatExclusionRegex(ev);
         bot->Reply(theClient, "Spam event '%s' added with ID %d (target: %s).",
                    ev->getName().c_str(), ev->getId(),
                    targetBitmaskToString(ev->getTarget()).c_str());
@@ -353,6 +355,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         }
         delete ev;
         bot->spamEventsMap.erase(id);
+        bot->freeEventRegexes(id);
         bot->Reply(theClient, "Spam event '%s' deleted.", evName.c_str());
         return;
     }
@@ -378,29 +381,10 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             ev->setDescription(value);
         } else if (field == "event_param") {
             ev->setEventParam(value);
-            // If TEXT event, recompile the regex cache
-            if (ev->getEventType() == "TEXT") {
-                dronescan::spamRegexCacheType::iterator ci =
-                    bot->spamRegexCache.find(id);
-                if (ci != bot->spamRegexCache.end()) {
-                    pcre2_code_free(ci->second);
-                    bot->spamRegexCache.erase(ci);
-                }
-                if (!value.empty()) {
-                    int errcode;
-                    PCRE2_SIZE erroffset;
-                    uint32_t opts = PCRE2_UTF;
-                    if (!ev->isCaseSensitive()) opts |= PCRE2_CASELESS;
-                    pcre2_code* re = pcre2_compile(
-                        (PCRE2_SPTR)value.c_str(), PCRE2_ZERO_TERMINATED,
-                        opts, &errcode, &erroffset, nullptr);
-                    if (re)
-                        bot->spamRegexCache[id] = re;
-                    else
-                        bot->Reply(theClient,
-                            "Warning: regex compile failed at offset %zu.", erroffset);
-                }
-            }
+            bot->compileEventRegex(ev);
+            if (ev->getEventType() == "TEXT" && !value.empty() &&
+                bot->spamRegexCache.find(id) == bot->spamRegexCache.end())
+                bot->Reply(theClient, "Warning: regex compile failed.");
         } else if (field == "target") {
             int mask = parseTargetBitmask(value);
             if (mask < 0) {
@@ -412,6 +396,9 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             ev->setTarget(mask);
         } else if (field == "case_sensitive") {
             ev->setCaseSensitive(value == "1" || value == "yes" || value == "true");
+            // Recompile: the compiled pattern's PCRE2_CASELESS flag depends on this.
+            bot->compileEventRegex(ev);
+            bot->compileRepeatExclusionRegex(ev);
         } else if (field == "points") {
             ev->setPoints(atoi(value.c_str()));
         } else if (field == "point_expiry") {
@@ -437,27 +424,10 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             ev->setRepeatMinCount(atoi(value.c_str()));
         } else if (field == "repeat_exclusion_regex") {
             ev->setRepeatExclusionRegex(value);
-            // Recompile the exclusion regex cache so it takes effect live
-            dronescan::spamRegexCacheType::iterator ci =
-                bot->spamRepeatExclusionCache.find(id);
-            if (ci != bot->spamRepeatExclusionCache.end()) {
-                pcre2_code_free(ci->second);
-                bot->spamRepeatExclusionCache.erase(ci);
-            }
-            if (!value.empty()) {
-                int errcode;
-                PCRE2_SIZE erroffset;
-                uint32_t opts = PCRE2_UTF;
-                if (!ev->isCaseSensitive()) opts |= PCRE2_CASELESS;
-                pcre2_code* re = pcre2_compile(
-                    (PCRE2_SPTR)value.c_str(), PCRE2_ZERO_TERMINATED,
-                    opts, &errcode, &erroffset, nullptr);
-                if (re)
-                    bot->spamRepeatExclusionCache[id] = re;
-                else
-                    bot->Reply(theClient,
-                        "Warning: exclusion regex compile failed at offset %zu.", erroffset);
-            }
+            bot->compileRepeatExclusionRegex(ev);
+            if (ev->getEventType() == "TEXT_REPEAT" && !value.empty() &&
+                bot->spamRepeatExclusionCache.find(id) == bot->spamRepeatExclusionCache.end())
+                bot->Reply(theClient, "Warning: exclusion regex compile failed.");
         } else {
             bot->Reply(theClient,
                 "Unknown field '%s'. Valid: description, event_param, target, case_sensitive, "

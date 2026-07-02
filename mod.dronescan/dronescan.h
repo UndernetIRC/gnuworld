@@ -287,6 +287,13 @@ class dronescan : public xClient {
     void preloadSpamRuleChannels();
     void refreshSpamCaches();
 
+    /* PCRE2 compile lifecycle: called on load, create (EVENT ADD) and
+     * modify (EVENT SET) so a spam event's regex is always compiled from
+     * its current event_param/repeat_exclusion_regex/case_sensitive state. */
+    void compileEventRegex(sqlSpamEvent* ev);
+    void compileRepeatExclusionRegex(sqlSpamEvent* ev);
+    void freeEventRegexes(int event_id);
+
     /* Spam detection processing helpers */
     // Lightweight snapshot of a client's identity, captured at the moment
     // traffic is observed so that scoring/actions (REPORT, GLINE) still work
