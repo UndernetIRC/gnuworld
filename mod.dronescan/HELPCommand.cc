@@ -62,7 +62,7 @@ static string getCommandDescription(const string& cmdName)
 static void helpSpamEvent(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM EVENT subcommands:");
-    bot->Reply(theClient, "  ADD    <name> <type> <target> <param> <points> <expiry> [max_occ] [points_per]");
+    bot->Reply(theClient, "  ADD    <name> <type> <target> <param> <points> <expiry> [max_occ]");
     bot->Reply(theClient, "  DEL    <id>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SHOW   <id>");
@@ -84,7 +84,7 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: description  event_param  target  case_sensitive");
     bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id");
-    bot->Reply(theClient, "            enabled  points_per  repeat_crossuser");
+    bot->Reply(theClient, "            enabled  repeat_crossuser");
     bot->Reply(theClient, "            repeat_min_count  repeat_exclusion_regex");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
@@ -118,7 +118,7 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "reach or exceed the threshold within the event expiry windows.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: description  threshold  wait_on_rule_id  enabled");
-    bot->Reply(theClient, "            points_per_override  allchans");
+    bot->Reply(theClient, "            points_per  score_globally  allchans");
     bot->Reply(theClient, "  allchans=1 : rule applies to every channel (use ADDCHAN to exclude).");
     bot->Reply(theClient, "  allchans=0 : rule applies only to channels added with ADDCHAN.");
     bot->Reply(theClient, " ");

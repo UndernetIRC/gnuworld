@@ -115,8 +115,8 @@ class dronescan : public xClient {
     /** Receive channel events. */
     virtual void OnChannelEvent(const channelEventType&, Channel*, void*, void*, void*, void*);
 
-    /** Receive channel messages (PRIVMSG to a channel). */
-    virtual void OnChannelMessage(iClient* Sender, Channel* theChan,
+    /** Receive fake channel messages (PRIVMSG to a channel caught by a fake client). */
+    virtual void OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* theChan,
                                   const std::string& Message);
 
     /** Receive channel notices (NOTICE to a channel). */
@@ -265,6 +265,11 @@ class dronescan : public xClient {
     void evaluateSpamRules(iClient* theClient, const std::string& channel_name);
     void fireRuleActions(sqlSpamRule* rule, iClient* theClient,
                          const std::string& channel_name);
+    // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
+    // rule->isScoreGlobally() is true (channel segment omitted). unit is the
+    // client's numeric nick, or its IP when rule->getPointsPer() == "IP".
+    std::string buildScoringKey(sqlSpamRule* rule, iClient* theClient,
+                                const std::string& channel_name) const;
 
     /* Spy client live management */
 
@@ -343,6 +348,8 @@ class dronescan : public xClient {
     typedef std::map<int, sqlSpamAction*>                              spamActionsMapType;
     // rule_id -> list of (event_id, points_override); -1 points_override means use event default
     typedef std::map<int, std::vector<std::pair<int,int>>>             spamRuleEventsMapType;
+    // reverse of spamRuleEventsMap: event_id -> list of rule ids that include it
+    typedef std::map<int, std::vector<int>>                            spamEventRulesMapType;
     // rule_id -> list of bound rule-actions
     typedef std::map<int, std::vector<sqlSpamRuleAction*>>             spamRuleActionsMapType;
     typedef std::list<sqlSpamExclusion*>                               spamExclusionsListType;
@@ -357,6 +364,7 @@ class dronescan : public xClient {
     spamRulesMapType        spamRulesMap;
     spamActionsMapType      spamActionsMap;
     spamRuleEventsMapType   spamRuleEventsMap;
+    spamEventRulesMapType   spamEventRulesMap;
     spamRuleActionsMapType  spamRuleActionsMap;
     spamExclusionsListType  spamExclusionsList;
     spyClientsMapType       spyClientsMap;

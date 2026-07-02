@@ -32,7 +32,8 @@ class sqlSpamRule {
     inline int           getThreshold()        const { return threshold; }
     inline int           getWaitOnRuleId()     const { return wait_on_rule_id; }
     inline bool          isAllChans()          const { return allchans; }
-    inline const string& getPointsPerOverride()const { return points_per_override; }
+    inline const string& getPointsPer()        const { return points_per; }
+    inline bool          isScoreGlobally()     const { return score_globally; }
     inline bool          isEnabled()           const { return enabled; }
     inline int           getCreatedTs()        const { return created_ts; }
     inline int           getModifiedTs()       const { return modified_ts; }
@@ -45,7 +46,8 @@ class sqlSpamRule {
     inline void setThreshold(int v)                  { threshold = v; }
     inline void setWaitOnRuleId(int v)               { wait_on_rule_id = v; }
     inline void setAllChans(bool v)                  { allchans = v; }
-    inline void setPointsPerOverride(const string& v){ points_per_override = v; }
+    inline void setPointsPer(const string& v)        { points_per = v; }
+    inline void setScoreGlobally(bool v)             { score_globally = v; }
     inline void setEnabled(bool v)                   { enabled = v; }
     inline void setCreatedTs(int v)                  { created_ts = v; }
     inline void setModifiedTs(int v)                 { modified_ts = v; }
@@ -65,7 +67,8 @@ class sqlSpamRule {
     // true = all monitored channels (spam_rule_channels = exclusion list)
     // false = only channels in spam_rule_channels (inclusion list)
     bool   allchans;
-    string points_per_override;  // empty string means NULL (use per-event default)
+    string points_per;           // "CLIENT" or "IP"
+    bool   score_globally;
     bool   enabled;
     int    created_ts;
     int    modified_ts;

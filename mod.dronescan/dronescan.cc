@@ -365,7 +365,7 @@ void dronescan::BurstChannels() {
         } else {
             int scId = findBestSpyClient(mc->getName(), mc->isForceJoin());
             if (scId >= 0)
-                scheduleSpyClientJoin(scId, mc->getName(), 0, 300);
+                scheduleSpyClientJoin(scId, mc->getName(), 0, 10);
             else
                 Message(consoleChannel,
                         "[SpyClient] No available spy client for %s at burst.",
@@ -654,17 +654,17 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
 }
 
 /**
- * OnChannelMessage: called when an iClient sends a PRIVMSG to a channel.
+ * OnFakeChannelMessage: called when an iClient sends a PRIVMSG to a channel.
  * Feeds the message into the spam detection pipeline.
  */
-void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan,
+void dronescan::OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* theChan,
                                  const std::string& Message)
 {
     if (!Sender || !theChan || currentState != RUN)
         return;
     processSpamText(Sender, Message,
                     spam_target::CHAN_PRIV, theChan->getName());
-    xClient::OnChannelMessage(Sender, theChan, Message);
+    xClient::OnFakeChannelMessage(Sender, Target, theChan, Message);
 }
 
 /**
@@ -2031,7 +2031,7 @@ void dronescan::preloadSpamEvents()
     q << "SELECT id, name, description, event_type, event_param, target, "
       << "case_sensitive, points, point_expiry, max_occurrence, "
       << "requires_event_id, enabled, "
-      << "points_per, repeat_crossuser, repeat_min_count, repeat_exclusion_regex, "
+      << "repeat_crossuser, repeat_min_count, repeat_exclusion_regex, "
       << "created_ts, modified_ts, modified_by "
       << "FROM spam_events ORDER BY id";
 
@@ -2071,7 +2071,7 @@ void dronescan::preloadSpamRules()
 
     std::stringstream q;
     q << "SELECT id, name, description, threshold, wait_on_rule_id, "
-      << "allchans, points_per_override, "
+      << "allchans, points_per, score_globally, "
       << "enabled, created_ts, modified_ts, modified_by "
       << "FROM spam_rules ORDER BY id";
 
@@ -2115,6 +2115,7 @@ void dronescan::preloadSpamActions()
 void dronescan::preloadSpamRuleEvents()
 {
     spamRuleEventsMap.clear();
+    spamEventRulesMap.clear();
 
     std::stringstream q;
     q << "SELECT rule_id, event_id, points_override "
@@ -2131,6 +2132,7 @@ void dronescan::preloadSpamRuleEvents()
         const string po = SQLDb->GetValue(i, 2);
         int points_override = !po.empty() ? atoi(po.c_str()) : -1;
         spamRuleEventsMap[rule_id].push_back(std::make_pair(event_id, points_override));
+        spamEventRulesMap[event_id].push_back(rule_id);
         ++total;
     }
     elog << "dronescan::preloadSpamRuleEvents> Loaded " << total
@@ -2281,7 +2283,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
     if (!theClient || currentState != RUN)
         return;
 
-    const string scoringKey = theClient->getCharYYXXX();
+    elog << "dronescan::processSpamText> Checking text for spam events: " << text << std::endl;
     const time_t now = ::time(0);
 
     for (spamEventsMapType::const_iterator eit = spamEventsMap.begin();
@@ -2295,6 +2297,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
         if (ev->getEventType() != "TEXT")
             continue;  // other event types implemented in later phases
 
+        elog << "dronescan::processSpamText> Checking cache" << std::endl;
         spamRegexCacheType::const_iterator rit = spamRegexCache.find(ev->getId());
         if (rit == spamRegexCache.end() || !rit->second)
             continue;
@@ -2308,18 +2311,54 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
         if (rc < 0)
             continue;  // no match (or error)
 
-        // Match found ? update scoring
-        SpamScore& score = spamScoreMap[scoringKey][ev->getId()];
-        if (now - score.window_start > ev->getPointExpiry()) {
-            score.count        = 0;
-            score.window_start = now;
+        // Match found ? update scoring independently for every rule this event feeds
+        spamEventRulesMapType::const_iterator erit = spamEventRulesMap.find(ev->getId());
+        if (erit == spamEventRulesMap.end())
+            continue;  // event isn't linked to any rule; nothing to score
+
+        for (size_t i = 0; i < erit->second.size(); ++i) {
+            spamRulesMapType::const_iterator ruleIt = spamRulesMap.find(erit->second[i]);
+            if (ruleIt == spamRulesMap.end() || !ruleIt->second->isEnabled())
+                continue;
+            sqlSpamRule* rule = ruleIt->second;
+
+            const string key = buildScoringKey(rule, theClient, channel_name);
+            SpamScore& score = spamScoreMap[key][ev->getId()];
+            if (now - score.window_start > ev->getPointExpiry()) {
+                score.count        = 0;
+                score.window_start = now;
+            }
+            elog << "dronescan::processSpamText> Updating score for event " << ev->getId()
+                 << " rule " << rule->getId()
+                 << " (count=" << score.count << ", window_start=" << score.window_start
+                 << ", point_expiry=" << ev->getPointExpiry() << ")" << std::endl;
+            int maxOcc = ev->getMaxOccurrence();
+            if (maxOcc < 0 || score.count < maxOcc)
+                ++score.count;
         }
-        int maxOcc = ev->getMaxOccurrence();
-        if (maxOcc < 0 || score.count < maxOcc)
-            ++score.count;
     }
 
     evaluateSpamRules(theClient, channel_name);
+}
+
+/**
+ * buildScoringKey: the in-memory scoring bucket for a (rule, client, channel)
+ * triple. Format is "rule_id.channel_or_privmsg.unit", or "rule_id.unit" when
+ * the rule scores globally (channel segment omitted). unit is the client's
+ * numeric nick, unless the rule's points_per is "IP".
+ */
+std::string dronescan::buildScoringKey(sqlSpamRule* rule, iClient* theClient,
+                                       const std::string& channel_name) const
+{
+    const string unit = (rule->getPointsPer() == "IP")
+                       ? xIP(theClient->getIP()).GetNumericIP()
+                       : theClient->getCharYYXXX();
+
+    string key = std::to_string(rule->getId()) + ".";
+    if (!rule->isScoreGlobally())
+        key += (channel_name.empty() ? "privmsg" : string_lower(channel_name)) + ".";
+    key += unit;
+    return key;
 }
 
 /**
@@ -2332,7 +2371,6 @@ void dronescan::evaluateSpamRules(iClient* theClient, const std::string& channel
         return;
 
     const string lcChan     = string_lower(channel_name);
-    const string scoringKey = theClient->getCharYYXXX();
     const time_t now        = ::time(0);
 
     // Only process channels we are actually monitoring
@@ -2377,6 +2415,8 @@ void dronescan::evaluateSpamRules(iClient* theClient, const std::string& channel
             spamRuleEventsMap.find(rule->getId());
         if (rei == spamRuleEventsMap.end())
             continue;
+
+        const string scoringKey = buildScoringKey(rule, theClient, channel_name);
 
         int totalScore = 0;
         for (size_t i = 0; i < rei->second.size(); ++i) {
@@ -2826,7 +2866,7 @@ void dronescan::resyncSpyClients()
 
         int newScId = findBestSpyClient(chanName, mc->second->isForceJoin());
         if (newScId >= 0)
-            scheduleSpyClientJoin(newScId, chanName, 0, 300);
+            scheduleSpyClientJoin(newScId, chanName, 0, 10);
         else
             Message(consoleChannel,
                     "[SpyClient] No available spy client to take over %s after removal.",

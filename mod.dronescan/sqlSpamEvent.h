@@ -37,7 +37,6 @@ class sqlSpamEvent {
     inline int           getPoints()           const { return points; }
     inline int           getPointExpiry()      const { return point_expiry; }
     inline int           getMaxOccurrence()    const { return max_occurrence; }
-    inline const string& getPointsPer()        const { return points_per; }
     inline int           getRequiresEventId()  const { return requires_event_id; }
     inline bool          isEnabled()           const { return enabled; }
     inline bool          isRepeatCrossUser()   const { return repeat_crossuser; }
@@ -58,7 +57,6 @@ class sqlSpamEvent {
     inline void setPoints(int v)                      { points = v; }
     inline void setPointExpiry(int v)                 { point_expiry = v; }
     inline void setMaxOccurrence(int v)               { max_occurrence = v; }
-    inline void setPointsPer(const string& v)         { points_per = v; }
     inline void setRequiresEventId(int v)             { requires_event_id = v; }
     inline void setEnabled(bool v)                    { enabled = v; }
     inline void setRepeatCrossUser(bool v)            { repeat_crossuser = v; }
@@ -84,7 +82,6 @@ class sqlSpamEvent {
     int    points;
     int    point_expiry;
     int    max_occurrence;       // -1 means NULL / unlimited
-    string points_per;           // "CLIENT" or "IP"
     int    requires_event_id;    // 0 means NULL / no dependency
     bool   enabled;
     // TEXT_REPEAT-specific fields

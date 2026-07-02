@@ -97,12 +97,8 @@ CREATE TABLE exceptionalChannels (
 --   For event types where direction is implicit (ENTROPY_NICK, KICK_COUNT, etc.),
 --   the target bitmask is ignored at runtime.
 --
--- points_per: granularity for point accumulation.
---   CLIENT = per YYXXX numeric nick (same as per iClient, default)
---   IP     = per IP address (aggregates points across all nicks sharing the same IP)
---
 -- max_occurrence: points stop accumulating after this many occurrences per
---   scoring unit (CLIENT or IP). NULL = unlimited.
+--   scoring unit (CLIENT or IP, see spam_rules.points_per). NULL = unlimited.
 --
 -- requires_event_id: secondary event guard ? points are only scored if the
 --   referenced event has also recently fired for the same user.
@@ -132,8 +128,6 @@ CREATE TABLE spam_events (
 	point_expiry           int          NOT NULL DEFAULT 60,
 	-- Points stop accumulating after this many occurrences; NULL = unlimited
 	max_occurrence         int                   DEFAULT NULL,
-	-- CLIENT = per numeric nick (YYXXX / iClient);  IP = per IP address
-	points_per             varchar(10)  NOT NULL DEFAULT 'CLIENT',
 	-- Only score this event if the referenced event has also fired for the same user
 	requires_event_id      int                   DEFAULT NULL
 		REFERENCES spam_events(id) ON DELETE SET NULL,
@@ -168,9 +162,13 @@ CREATE TABLE spam_events (
 --   rule must be cleared first. This is enforced by the SPAM RULE command,
 --   not by a DB constraint.
 --
--- points_per_override: when set, overrides spam_events.points_per for every
---   event linked to this rule. NULL = use each event's own points_per value.
---   Valid values: 'CLIENT', 'IP'
+-- points_per: granularity for point accumulation for this rule's scoring key.
+--   CLIENT = per YYXXX numeric nick (same as per iClient, default)
+--   IP     = per IP address (aggregates points across all nicks sharing the same IP)
+--
+-- score_globally: controls whether this rule's scoring key aggregates points
+--   across all channels/privmsgs for a user (true), or is scoped separately
+--   per channel/privmsg (false, default). See dronescan.cc buildScoringKey().
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_rules (
 	id                  serial       PRIMARY KEY,
@@ -184,8 +182,10 @@ CREATE TABLE spam_rules (
 	-- true = all monitored channels (spam_rule_channels = exclusion list)
 	-- false = only channels listed in spam_rule_channels (inclusion list)
 	allchans            bool         NOT NULL DEFAULT true,
-	-- Overrides spam_events.points_per for all linked events; NULL = per-event default
-	points_per_override varchar(10)           DEFAULT NULL,
+	-- CLIENT = per numeric nick (YYXXX / iClient);  IP = per IP address
+	points_per          varchar(10)  NOT NULL DEFAULT 'CLIENT',
+	-- false = score per channel/privmsg separately; true = score globally for the user
+	score_globally      bool         NOT NULL DEFAULT false,
 	enabled             bool         NOT NULL DEFAULT true,
 	created_ts          int4         NOT NULL DEFAULT 0,
 	modified_ts         int4         NOT NULL DEFAULT 0,

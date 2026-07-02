@@ -3,7 +3,7 @@
  *
  * Top-level SPAM command dispatcher for dronescan.
  * Syntax:
- *   SPAM EVENT     ADD    <name> <type> <target> <param> <points> <expiry> [max_occ] [points_per]
+ *   SPAM EVENT     ADD    <name> <type> <target> <param> <points> <expiry> [max_occ]
  *   SPAM EVENT     DEL    <id>
  *   SPAM EVENT     LIST
  *   SPAM EVENT     SHOW   <id>
@@ -182,10 +182,9 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
                        targetBitmaskToString(ev->getTarget()).c_str(),
                        ev->isEnabled() ? "yes" : "no");
             bot->Reply(theClient,
-                       "     Pts: %-5d  Expiry: %-5ds  PointsPer: %-8s  MaxOcc: %-10s  ReqEvent: %s",
+                       "     Pts: %-5d  Expiry: %-5ds  MaxOcc: %-10s  ReqEvent: %s",
                        ev->getPoints(),
                        ev->getPointExpiry(),
-                       ev->getPointsPer().empty() ? "CLIENT" : ev->getPointsPer().c_str(),
                        ev->getMaxOccurrence() >= 0
                            ? std::to_string(ev->getMaxOccurrence()).c_str() : "unlimited",
                        ev->getRequiresEventId() > 0
@@ -226,9 +225,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         bot->Reply(theClient, "Target  : %s (mask=%d)",
                    targetBitmaskToString(ev->getTarget()).c_str(), ev->getTarget());
         bot->Reply(theClient, "CaseSens: %s", ev->isCaseSensitive() ? "yes" : "no");
-        bot->Reply(theClient, "Points  : %d  Expiry: %ds  PointsPer: %s",
-                   ev->getPoints(), ev->getPointExpiry(),
-                   ev->getPointsPer().empty() ? "CLIENT" : ev->getPointsPer().c_str());
+        bot->Reply(theClient, "Points  : %d  Expiry: %ds",
+                   ev->getPoints(), ev->getPointExpiry());
         bot->Reply(theClient, "MaxOcc  : %s",
                    ev->getMaxOccurrence() >= 0
                        ? std::to_string(ev->getMaxOccurrence()).c_str() : "unlimited");
@@ -279,8 +277,6 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         ev->setPointExpiry(atoi(st[8].c_str()));
         if (st.size() >= 10)
             ev->setMaxOccurrence(atoi(st[9].c_str()));
-        if (st.size() >= 11)
-            ev->setPointsPer(string_upper(st[10]));
         ev->setCreatedTs(::time(0));
         ev->setModifiedTs(::time(0));
         ev->setModifiedBy(0);
@@ -384,8 +380,6 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             ev->setRequiresEventId(atoi(value.c_str()));
         } else if (field == "enabled") {
             ev->setEnabled(value == "1" || value == "yes" || value == "true");
-        } else if (field == "points_per") {
-            ev->setPointsPer(string_upper(value));
         } else if (field == "repeat_crossuser") {
             ev->setRepeatCrossUser(value == "1" || value == "yes" || value == "true");
         } else if (field == "repeat_min_count") {
@@ -396,7 +390,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient,
                 "Unknown field '%s'. Valid: description, event_param, target, case_sensitive, "
                 "points, point_expiry, max_occurrence, requires_event_id, enabled, "
-                "points_per, repeat_crossuser, repeat_min_count, repeat_exclusion_regex",
+                "repeat_crossuser, repeat_min_count, repeat_exclusion_regex",
                 field.c_str());
             return;
         }
@@ -442,15 +436,15 @@ static void handleRule(dronescan* bot, const iClient* theClient,
              it != bot->spamRulesMap.end(); ++it) {
             sqlSpamRule* rule = it->second;
             bot->Reply(theClient,
-                       "[%d] %-25s  Threshold: %-5d  AllChans: %-3s  WaitOnRule: %-4s  PPOverride: %-8s  Enabled: %s",
+                       "[%d] %-25s  Threshold: %-5d  AllChans: %-3s  WaitOnRule: %-4s  PointsPer: %-8s  Global: %-3s  Enabled: %s",
                        rule->getId(),
                        rule->getName().c_str(),
                        rule->getThreshold(),
                        rule->isAllChans() ? "yes" : "no",
                        rule->getWaitOnRuleId() > 0
                            ? std::to_string(rule->getWaitOnRuleId()).c_str() : "none",
-                       rule->getPointsPerOverride().empty()
-                           ? "(default)" : rule->getPointsPerOverride().c_str(),
+                       rule->getPointsPer().c_str(),
+                       rule->isScoreGlobally() ? "yes" : "no",
                        rule->isEnabled() ? "yes" : "no");
 
             // Linked events
@@ -533,9 +527,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                    rule->getWaitOnRuleId(),
                    rule->getWaitOnRuleId() > 0 ? "" : " (none)");
         bot->Reply(theClient, "AllChans    : %s", rule->isAllChans() ? "yes" : "no");
-        bot->Reply(theClient, "PointsPerOvr: %s",
-                   rule->getPointsPerOverride().empty()
-                       ? "(default)" : rule->getPointsPerOverride().c_str());
+        bot->Reply(theClient, "PointsPer   : %s", rule->getPointsPer().c_str());
+        bot->Reply(theClient, "Global      : %s", rule->isScoreGlobally() ? "yes" : "no");
         bot->Reply(theClient, "Enabled     : %s", rule->isEnabled() ? "yes" : "no");
 
         // Channel inclusion/exclusion list
@@ -832,8 +825,10 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             rule->setWaitOnRuleId(atoi(value.c_str()));
         } else if (field == "enabled") {
             rule->setEnabled(value == "1" || value == "yes" || value == "true");
-        } else if (field == "points_per_override") {
-            rule->setPointsPerOverride(value.empty() ? string() : string_upper(value));
+        } else if (field == "points_per") {
+            rule->setPointsPer(string_upper(value));
+        } else if (field == "score_globally") {
+            rule->setScoreGlobally(value == "1" || value == "yes" || value == "true");
         } else if (field == "allchans") {
             bool newVal = (value == "1" || value == "yes" || value == "true");
             // Changing allchans resets the channel list
@@ -845,7 +840,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         } else {
             bot->Reply(theClient,
                 "Unknown field '%s'. Valid: description, threshold, wait_on_rule_id, "
-                "enabled, points_per_override, allchans",
+                "enabled, points_per, score_globally, allchans",
                 field.c_str());
             return;
         }
