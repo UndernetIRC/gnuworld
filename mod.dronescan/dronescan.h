@@ -409,8 +409,10 @@ class dronescan : public xClient {
     typedef std::map<std::string, int>                                 chanActiveSpyMapType;
     chanActiveSpyMapType chanActiveSpyMap;
 
-    // reverse map: spy client id -> lowercase channel name it is in (empty if not in a channel)
-    typedef std::map<int, std::string>                                 spyClientChanMapType;
+    // reverse map: spy client id -> set of lowercase channel names it currently
+    // covers (absent or empty = idle). A spy client may cover more than one
+    // channel once the pool of idle spy clients is exhausted.
+    typedef std::map<int, std::set<std::string>>                       spyClientChanMapType;
     spyClientChanMapType spyClientChanMap;
 
     // Per-channel kick tracking: how many spy client kicks happened within 24h

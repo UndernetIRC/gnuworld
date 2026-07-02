@@ -823,9 +823,17 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
 
     const string chanKey = string_lower(theChan->getName());
 
-    // Update our tracking maps
+    // Update our tracking maps - only this channel; the spy client may
+    // still be covering others.
     chanActiveSpyMap.erase(chanKey);
-    spyClientChanMap.erase(scId);
+    {
+        spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
+        if (sit != spyClientChanMap.end()) {
+            sit->second.erase(chanKey);
+            if (sit->second.empty())
+                spyClientChanMap.erase(sit);
+        }
+    }
 
     // Report to console
     const string kickerStr = srcClient ? srcClient->getNickName() : "<server>";
@@ -2807,9 +2815,15 @@ void dronescan::partSpyClientFromChannel(int scId, const std::string& chanName)
     if (theChan && theChan->findUser(ic))
         MyUplink->PartChannel(ic, chanName, "");
 
-    // Clean up tracking
+    // Clean up tracking - only this channel; the spy client may still be
+    // covering others.
     chanActiveSpyMap.erase(chanKey);
-    spyClientChanMap.erase(scId);
+    spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
+    if (sit != spyClientChanMap.end()) {
+        sit->second.erase(chanKey);
+        if (sit->second.empty())
+            spyClientChanMap.erase(sit);
+    }
 }
 
 /** Detach a live spy client from the network and clean up all maps. */
@@ -2821,14 +2835,17 @@ void dronescan::detachSpyClient(int scId)
 
     iClient* ic = lit->second;
 
-    // Part it from any channel it is monitoring
+    // Part it from every channel it is monitoring
     spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
     if (sit != spyClientChanMap.end()) {
-        const string& chanName = sit->second;
-        Channel* theChan = Network->findChannel(chanName);
-        if (theChan && theChan->findUser(ic))
-            MyUplink->PartChannel(ic, chanName, "");
-        chanActiveSpyMap.erase(chanName);
+        for (std::set<string>::const_iterator cit = sit->second.begin();
+             cit != sit->second.end(); ++cit) {
+            const string& chanName = *cit;
+            Channel* theChan = Network->findChannel(chanName);
+            if (theChan && theChan->findUser(ic))
+                MyUplink->PartChannel(ic, chanName, "");
+            chanActiveSpyMap.erase(chanName);
+        }
         spyClientChanMap.erase(sit);
     }
 
@@ -2838,11 +2855,19 @@ void dronescan::detachSpyClient(int scId)
 
 /**
  * Find the best available spy client for the given channel.
- * Returns spy client id or -1 if none is available.
+ * Prefers an idle spy client (covering no channels yet). If none is idle,
+ * falls back to the live spy client already covering the fewest channels,
+ * so a spy client can end up covering more than one channel once the pool
+ * is exhausted rather than leaving the channel unmonitored.
+ * Returns spy client id, or -1 only if there is no eligible live spy client
+ * at all.
  */
 int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
 {
     Channel* theChan = Network->findChannel(chanName);
+
+    int    bestBusyId    = -1;
+    size_t bestBusyCount = 0;
 
     for (spyClientsMapType::const_iterator it = spyClientsMap.begin();
          it != spyClientsMap.end(); ++it) {
@@ -2853,9 +2878,6 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
         liveSpyClientsMapType::const_iterator lit = liveSpyClientsMap.find(sc->getId());
         if (lit == liveSpyClientsMap.end()) continue;
         iClient* ic = lit->second;
-
-        // Must not already be in a channel
-        if (spyClientChanMap.count(sc->getId())) continue;
 
         if (!forcejoin && theChan) {
             // Skip +i (invite-only)
@@ -2869,9 +2891,23 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
             if (theChan->matchBan(ic->getNickUserHost())) continue;
         }
 
-        return sc->getId();
+        spyClientChanMapType::const_iterator cit = spyClientChanMap.find(sc->getId());
+        size_t chanCount = (cit != spyClientChanMap.end()) ? cit->second.size() : 0;
+
+        // Idle spy client - take it immediately
+        if (chanCount == 0)
+            return sc->getId();
+
+        // Otherwise remember the least-loaded busy candidate as a fallback
+        if (bestBusyId < 0 || chanCount < bestBusyCount) {
+            bestBusyId    = sc->getId();
+            bestBusyCount = chanCount;
+        }
     }
-    return -1;
+
+    // No idle spy client - reuse the least-loaded one already assigned
+    // elsewhere, or -1 if there is no eligible live spy client at all.
+    return bestBusyId;
 }
 
 /** Make a live spy client join the given channel immediately. */
@@ -2886,14 +2922,16 @@ void dronescan::doSpyClientJoin(int scId, const std::string& chanName)
     if (lit == liveSpyClientsMap.end())
         return;
 
-    // Check if the spy client is still available (not already assigned)
-    if (spyClientChanMap.count(scId))
+    // Already covering this exact channel - nothing to do. A spy client
+    // may otherwise already be covering other channels; that's fine.
+    spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
+    if (sit != spyClientChanMap.end() && sit->second.count(chanKey))
         return;
 
     iClient* ic = lit->second;
     MyUplink->JoinChannel(ic, chanName);
     chanActiveSpyMap[chanKey] = scId;
-    spyClientChanMap[scId]    = chanKey;
+    spyClientChanMap[scId].insert(chanKey);
 }
 
 /**
@@ -2936,10 +2974,13 @@ void dronescan::resyncSpyClients()
 
         if (!stillValid) {
             toDetach.push_back(scId);
-            // Record any channel this client was monitoring
+            // Record every channel this client was monitoring
             spyClientChanMapType::const_iterator cit = spyClientChanMap.find(scId);
-            if (cit != spyClientChanMap.end())
-                orphanedChans.push_back(cit->second);
+            if (cit != spyClientChanMap.end()) {
+                for (std::set<string>::const_iterator sIt = cit->second.begin();
+                     sIt != cit->second.end(); ++sIt)
+                    orphanedChans.push_back(*sIt);
+            }
         }
     }
 
