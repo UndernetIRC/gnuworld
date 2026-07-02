@@ -77,10 +77,12 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  chan_priv=channel PRIVMSGs  chan_not=channel NOTICEs");
     bot->Reply(theClient, "  privmsg=DMs to bot/spy      notice=NOTICEs to bot/spy");
     bot->Reply(theClient, "  part=part reasons           quit=quit msgs (not yet active)");
+    bot->Reply(theClient, "  ctcp=CTCP (direct or channel) to bot/spy, e.g. DCC/ACTION - match");
+    bot->Reply(theClient, "    DCC specifically with a regex like \"^DCC\" scoped to ctcp");
     bot->Reply(theClient, "  \"chan\" is an alias for chan_priv+chan_not.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Target (comma-separated or \"all\"): chan_priv chan_not chan privmsg notice part quit");
-    bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 all=63");
+    bot->Reply(theClient, "Target (comma-separated or \"all\"): chan_priv chan_not chan privmsg notice part quit ctcp");
+    bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 ctcp=64 all=127");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: description  event_param  target  case_sensitive");
     bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id");

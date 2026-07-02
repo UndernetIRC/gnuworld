@@ -377,6 +377,9 @@ void dronescan::BurstChannels() {
 } // dronescan::BurstChannels()
 
 void dronescan::OnCTCP(iClient* theClient, const string& CTCP, const string& Message, bool Secure) {
+    if (theClient && currentState == RUN)
+        processSpamText(theClient, CTCP, spam_target::CTCP, "");
+
     StringTokenizer st(CTCP);
 
     if (st.empty())
@@ -393,6 +396,48 @@ void dronescan::OnCTCP(iClient* theClient, const string& CTCP, const string& Mes
     }
 
     xClient::OnCTCP(theClient, CTCP, Message, Secure);
+}
+
+/**
+ * OnFakeCTCP: called when an iClient sends a CTCP directly to a fake
+ * (spy) client. Feeds the CTCP command line into the spam detection
+ * pipeline; spy clients do not auto-reply to CTCP.
+ */
+void dronescan::OnFakeCTCP(iClient* Sender, iClient* Target, const std::string& CTCP,
+                           const std::string& Message, bool Secure)
+{
+    if (!Sender || currentState != RUN)
+        return;
+    processSpamText(Sender, CTCP, spam_target::CTCP, "");
+    xClient::OnFakeCTCP(Sender, Target, CTCP, Message, Secure);
+}
+
+/**
+ * OnChannelCTCP: called when an iClient sends a CTCP to a channel
+ * (e.g. CTCP ACTION / "/me"). Feeds the CTCP command line into the
+ * spam detection pipeline.
+ */
+void dronescan::OnChannelCTCP(iClient* Sender, Channel* theChan,
+                              const std::string& CTCPCommand, const std::string& Message)
+{
+    if (!Sender || !theChan || currentState != RUN)
+        return;
+    processSpamText(Sender, CTCPCommand, spam_target::CTCP, theChan->getName());
+    xClient::OnChannelCTCP(Sender, theChan, CTCPCommand, Message);
+}
+
+/**
+ * OnFakeChannelCTCP: called when an iClient sends a channel CTCP caught
+ * by a fake (spy) client. Feeds the CTCP command line into the spam
+ * detection pipeline.
+ */
+void dronescan::OnFakeChannelCTCP(iClient* Sender, iClient* Target, Channel* theChan,
+                                  const std::string& CTCPCommand, const std::string& Message)
+{
+    if (!Sender || !theChan || currentState != RUN)
+        return;
+    processSpamText(Sender, CTCPCommand, spam_target::CTCP, theChan->getName());
+    xClient::OnFakeChannelCTCP(Sender, Target, theChan, CTCPCommand, Message);
 }
 
 /**
@@ -654,6 +699,36 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
 }
 
 /**
+ * OnFakePrivateMessage: called when an iClient sends a PRIVMSG directly to
+ * a fake (spy) client. Feeds the message into the spam detection pipeline.
+ * Unlike OnPrivateMessage, no command dispatch happens here - that logic
+ * is specific to real authenticated clients issuing bot commands.
+ */
+void dronescan::OnFakePrivateMessage(iClient* Sender, iClient* Target,
+                                     const std::string& Message, bool secure)
+{
+    if (!Sender || currentState != RUN)
+        return;
+    processSpamText(Sender, Message, spam_target::PRIVMSG, "");
+    xClient::OnFakePrivateMessage(Sender, Target, Message, secure);
+}
+
+/**
+ * OnChannelMessage: called when an iClient sends a PRIVMSG to a channel
+ * the main service client is a member of (e.g. joinasservice channels).
+ * Feeds the message into the spam detection pipeline.
+ */
+void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan,
+                                 const std::string& Message)
+{
+    if (!Sender || !theChan || currentState != RUN)
+        return;
+    processSpamText(Sender, Message,
+                    spam_target::CHAN_PRIV, theChan->getName());
+    xClient::OnChannelMessage(Sender, theChan, Message);
+}
+
+/**
  * OnFakeChannelMessage: called when an iClient sends a PRIVMSG to a channel.
  * Feeds the message into the spam detection pipeline.
  */
@@ -682,6 +757,21 @@ void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan,
 }
 
 /**
+ * OnFakeChannelNotice: called when an iClient sends a NOTICE to a channel
+ * caught by a fake (spy) client. Feeds the notice into the spam detection
+ * pipeline with the CHAN_NOT bit.
+ */
+void dronescan::OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* theChan,
+                                    const std::string& Message)
+{
+    if (!Sender || !theChan || currentState != RUN)
+        return;
+    processSpamText(Sender, Message,
+                    spam_target::CHAN_NOT, theChan->getName());
+    xClient::OnFakeChannelNotice(Sender, Target, theChan, Message);
+}
+
+/**
  * OnPrivateNotice: called when an iClient sends a NOTICE directly to the bot.
  * Feeds the notice into the spam detection pipeline with the NOTICE bit.
  */
@@ -691,6 +781,20 @@ void dronescan::OnPrivateNotice(iClient* Sender, const std::string& Message, boo
         return;
     processSpamText(Sender, Message, spam_target::NOTICE, "");
     xClient::OnPrivateNotice(Sender, Message, secure);
+}
+
+/**
+ * OnFakePrivateNotice: called when an iClient sends a NOTICE directly to a
+ * fake (spy) client. Feeds the notice into the spam detection pipeline
+ * with the NOTICE bit.
+ */
+void dronescan::OnFakePrivateNotice(iClient* Sender, iClient* Target,
+                                    const std::string& Message, bool secure)
+{
+    if (!Sender || currentState != RUN)
+        return;
+    processSpamText(Sender, Message, spam_target::NOTICE, "");
+    xClient::OnFakePrivateNotice(Sender, Target, Message, secure);
 }
 
 /**

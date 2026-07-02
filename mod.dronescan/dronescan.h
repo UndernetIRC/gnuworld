@@ -109,11 +109,27 @@ class dronescan : public xClient {
     /** This is called when we receive a CTCP */
     virtual void OnCTCP(iClient*, const std::string&, const std::string&, bool);
 
+    /** This is called when a fake client receives a CTCP */
+    virtual void OnFakeCTCP(iClient* Sender, iClient* Target, const std::string& CTCP,
+                            const std::string& Message, bool Secure);
+
+    /** This is called when we receive a channel CTCP */
+    virtual void OnChannelCTCP(iClient* Sender, Channel* theChan,
+                               const std::string& CTCPCommand, const std::string& Message);
+
+    /** This is called when a fake client receives a channel CTCP */
+    virtual void OnFakeChannelCTCP(iClient* Sender, iClient* Target, Channel* theChan,
+                                   const std::string& CTCPCommand, const std::string& Message);
+
     /** Receive network events. */
     virtual void OnEvent(const eventType&, void*, void*, void*, void*);
 
     /** Receive channel events. */
     virtual void OnChannelEvent(const channelEventType&, Channel*, void*, void*, void*, void*);
+
+    /** Receive channel messages (PRIVMSG to a channel, main service client only). */
+    virtual void OnChannelMessage(iClient* Sender, Channel* theChan,
+                                  const std::string& Message);
 
     /** Receive fake channel messages (PRIVMSG to a channel caught by a fake client). */
     virtual void OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* theChan,
@@ -123,11 +139,23 @@ class dronescan : public xClient {
     virtual void OnChannelNotice(iClient* Sender, Channel* theChan,
                                  const std::string& Message);
 
+    /** Receive fake channel notices (NOTICE to a channel caught by a fake client). */
+    virtual void OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* theChan,
+                                     const std::string& Message);
+
     /** Receive private messages. */
     virtual void OnPrivateMessage(iClient*, const std::string&, bool);
 
+    /** Receive fake private messages (PRIVMSG caught by a fake client). */
+    virtual void OnFakePrivateMessage(iClient* Sender, iClient* Target,
+                                      const std::string& Message, bool secure);
+
     /** Receive private notices (NOTICE directly to the bot). */
     virtual void OnPrivateNotice(iClient*, const std::string&, bool);
+
+    /** Receive fake private notices (NOTICE caught by a fake client). */
+    virtual void OnFakePrivateNotice(iClient* Sender, iClient* Target,
+                                     const std::string& Message, bool secure);
 
     /** Handle kick events for spy client re-join logic. */
     virtual void OnNetworkKick(Channel* theChan, iClient* srcClient,
