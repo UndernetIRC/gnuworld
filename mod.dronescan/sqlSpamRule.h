@@ -13,12 +13,24 @@
 #define SQLSPAMRULE_H
 
 #include <string>
+#include <vector>
 #include "dbHandle.h"
 
 namespace gnuworld {
 namespace ds {
 
 using std::string;
+
+class sqlSpamEvent;
+class sqlSpamRuleAction;
+
+// One event linked to a rule via spam_rule_events, plus that binding's
+// points_override (-1 = use the event's own points).
+struct RuleEventLink {
+    sqlSpamEvent* event;
+    int           pointsOverride;
+    RuleEventLink(sqlSpamEvent* e, int po) : event(e), pointsOverride(po) {}
+};
 
 class sqlSpamRule {
   public:
@@ -58,6 +70,17 @@ class sqlSpamRule {
     bool insert();
     bool remove();
 
+    /* Events and actions linked to this rule via spam_rule_events /
+     * spam_rule_actions, resolved by dronescan::relinkSpamGraph(). Not
+     * filtered by enabled state - callers check isEnabled() themselves. */
+    inline const std::vector<RuleEventLink>& getEvents() const  { return linkedEvents; }
+    inline void clearEvents()                                   { linkedEvents.clear(); }
+    inline void addEvent(sqlSpamEvent* e, int pointsOverride)    { linkedEvents.push_back(RuleEventLink(e, pointsOverride)); }
+
+    inline const std::vector<sqlSpamRuleAction*>& getActions() const { return linkedActions; }
+    inline void clearActions()                                  { linkedActions.clear(); }
+    inline void addAction(sqlSpamRuleAction* a)                 { linkedActions.push_back(a); }
+
   protected:
     int    id;
     string name;
@@ -75,6 +98,10 @@ class sqlSpamRule {
     int    modified_by;          // 0 means NULL
 
     dbHandle* SQLDb;
+
+    // In-memory link graph, not persisted; see getEvents()/getActions().
+    std::vector<RuleEventLink>      linkedEvents;
+    std::vector<sqlSpamRuleAction*> linkedActions;
 };
 
 } // namespace ds

@@ -2175,10 +2175,98 @@ void dronescan::refreshSpamCaches()
     preloadMonitoredChannels();
     preloadSpamRuleChannels();
 
+    relinkSpamGraph();
+
     // Resync live spy clients against the freshly loaded DB caches.
     // MyUplink is NULL during the constructor ? only sync after network attach.
     if (MyUplink)
         resyncSpyClients();
+}
+
+/**
+ * relinkSpamGraph: rebuild the pointer-linked spam object graph from the
+ * currently loaded id-keyed maps (spamRuleEventsMap, spamRuleActionsMap)
+ * and object maps (spamEventsMap, spamRulesMap, spamActionsMap).
+ *
+ * Full rebuild rather than incremental link/unlink: cheap (bounded by the
+ * number of event/rule/action bindings, which is admin-managed and small),
+ * and self-healing - any id in spamRuleEventsMap/spamRuleActionsMap that no
+ * longer resolves in the corresponding object map (e.g. the referenced
+ * event/rule/action was just deleted) is simply skipped, so no stale
+ * pointers survive a rebuild.
+ *
+ * Must be called after any structural change to the graph: on load (via
+ * refreshSpamCaches()), and after EVENT/RULE/ACTION ADD or DEL and
+ * ADDEVENT/REMEVENT/ADDACTION/REMACTION in SPAMCommand.cc. Deliberately NOT
+ * called for SET enabled - enabled state is checked live via isEnabled() by
+ * callers of getRules()/getEvents()/getActions(), so toggling it needs no
+ * relink.
+ */
+void dronescan::relinkSpamGraph()
+{
+    for (spamEventsMapType::const_iterator it = spamEventsMap.begin();
+         it != spamEventsMap.end(); ++it)
+        it->second->clearRules();
+
+    for (spamRulesMapType::const_iterator it = spamRulesMap.begin();
+         it != spamRulesMap.end(); ++it) {
+        it->second->clearEvents();
+        it->second->clearActions();
+    }
+
+    // spam_rule_events: link rule<->event both ways, unconditional on
+    // enabled state.
+    for (spamRuleEventsMapType::const_iterator rit = spamRuleEventsMap.begin();
+         rit != spamRuleEventsMap.end(); ++rit) {
+        spamRulesMapType::const_iterator ruleIt = spamRulesMap.find(rit->first);
+        if (ruleIt == spamRulesMap.end())
+            continue;
+        sqlSpamRule* rule = ruleIt->second;
+
+        const std::vector<std::pair<int,int>>& bindings = rit->second;
+        for (size_t i = 0; i < bindings.size(); ++i) {
+            const int event_id       = bindings[i].first;
+            const int points_override = bindings[i].second;
+
+            spamEventsMapType::const_iterator eventIt = spamEventsMap.find(event_id);
+            if (eventIt == spamEventsMap.end())
+                continue;
+            sqlSpamEvent* event = eventIt->second;
+
+            rule->addEvent(event, points_override);
+            event->addRule(rule);
+        }
+    }
+
+    // spam_rule_actions: resolve each binding's action pointer and link it
+    // to its rule, unconditional on enabled state.
+    for (spamRuleActionsMapType::const_iterator rit = spamRuleActionsMap.begin();
+         rit != spamRuleActionsMap.end(); ++rit) {
+        spamRulesMapType::const_iterator ruleIt = spamRulesMap.find(rit->first);
+        if (ruleIt == spamRulesMap.end())
+            continue;
+        sqlSpamRule* rule = ruleIt->second;
+
+        const std::vector<sqlSpamRuleAction*>& bindings = rit->second;
+        for (size_t i = 0; i < bindings.size(); ++i) {
+            sqlSpamRuleAction* ra = bindings[i];
+
+            spamActionsMapType::const_iterator actionIt = spamActionsMap.find(ra->getActionId());
+            if (actionIt == spamActionsMap.end()) {
+                ra->setAction(nullptr);
+                continue;
+            }
+            ra->setAction(actionIt->second);
+            rule->addAction(ra);
+        }
+    }
+
+    // Flat vector of every loaded event, for hot-path iteration.
+    spamEventsList.clear();
+    spamEventsList.reserve(spamEventsMap.size());
+    for (spamEventsMapType::const_iterator it = spamEventsMap.begin();
+         it != spamEventsMap.end(); ++it)
+        spamEventsList.push_back(it->second);
 }
 
 /**

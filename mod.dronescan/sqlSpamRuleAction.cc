@@ -23,7 +23,7 @@ sqlSpamRuleAction::sqlSpamRuleAction(dbHandle* _SQLDb)
     : id(0), rule_id(0), action_id(0), action_type(),
       action_duration_override(-1), action_reason_override(),
       delay_override(-1),
-      SQLDb(_SQLDb)
+      SQLDb(_SQLDb), actionPtr(nullptr)
 {}
 
 sqlSpamRuleAction::~sqlSpamRuleAction() {}

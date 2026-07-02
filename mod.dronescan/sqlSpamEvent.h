@@ -13,12 +13,15 @@
 #define SQLSPAMEVENT_H
 
 #include <string>
+#include <vector>
 #include "dbHandle.h"
 
 namespace gnuworld {
 namespace ds {
 
 using std::string;
+
+class sqlSpamRule;
 
 class sqlSpamEvent {
   public:
@@ -71,6 +74,13 @@ class sqlSpamEvent {
     bool insert();
     bool remove();
 
+    /* Rules linked to this event via spam_rule_events, resolved by
+     * dronescan::relinkSpamGraph(). Not filtered by enabled state - callers
+     * check rule->isEnabled() themselves, same as the DB-backed fields. */
+    inline const std::vector<sqlSpamRule*>& getRules() const { return linkedRules; }
+    inline void clearRules()                 { linkedRules.clear(); }
+    inline void addRule(sqlSpamRule* r)      { linkedRules.push_back(r); }
+
   protected:
     int    id;
     string name;
@@ -93,6 +103,9 @@ class sqlSpamEvent {
     int    modified_by;          // 0 means NULL
 
     dbHandle* SQLDb;
+
+    // In-memory link graph, not persisted; see getRules().
+    std::vector<sqlSpamRule*> linkedRules;
 };
 
 } // namespace ds

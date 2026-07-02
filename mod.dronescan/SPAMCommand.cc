@@ -331,6 +331,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         bot->spamEventsMap[ev->getId()] = ev;
         bot->compileEventRegex(ev);
         bot->compileRepeatExclusionRegex(ev);
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Spam event '%s' added with ID %d (target: %s).",
                    ev->getName().c_str(), ev->getId(),
                    targetBitmaskToString(ev->getTarget()).c_str());
@@ -356,6 +357,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         delete ev;
         bot->spamEventsMap.erase(id);
         bot->freeEventRegexes(id);
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Spam event '%s' deleted.", evName.c_str());
         return;
     }
@@ -652,6 +654,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamRulesMap[rule->getId()] = rule;
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Spam rule '%s' added with ID %d.",
                    rule->getName().c_str(), rule->getId());
         return;
@@ -683,6 +686,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                 delete rai->second[i];
             bot->spamRuleActionsMap.erase(rai);
         }
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Spam rule '%s' deleted.", ruleName.c_str());
         return;
     }
@@ -720,6 +724,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamRuleEventsMap[rule_id].push_back(std::make_pair(event_id, po));
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Event '%s' linked to rule '%s'%s.",
                    ev->getName().c_str(), rule->getName().c_str(),
                    po >= 0 ? (" (points override: " + std::to_string(po) + ")").c_str() : "");
@@ -767,6 +772,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                 }
             }
         }
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Event '%s' unlinked from rule '%s'.",
                    ev->getName().c_str(), rule->getName().c_str());
         return;
@@ -825,6 +831,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamRuleActionsMap[rule_id].push_back(ra);
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Action '%s' linked to rule '%s' (sra id: %d).",
                    action->getName().c_str(), rule->getName().c_str(), ra->getId());
         return;
@@ -862,6 +869,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                     }
                     delete *vi;
                     vec.erase(vi);
+                    bot->relinkSpamGraph();
                     bot->Reply(theClient, "Action '%s' unlinked from rule '%s'.",
                                action->getName().c_str(), rule->getName().c_str());
                     return;
@@ -1110,6 +1118,7 @@ static void handleAction(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamActionsMap[act->getId()] = act;
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Spam action '%s' added with ID %d.",
                    act->getName().c_str(), act->getId());
         return;
@@ -1133,6 +1142,7 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         }
         delete act;
         bot->spamActionsMap.erase(id);
+        bot->relinkSpamGraph();
         bot->Reply(theClient, "Spam action '%s' deleted.", actName.c_str());
         return;
     }

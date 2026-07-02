@@ -22,6 +22,8 @@ namespace ds {
 
 using std::string;
 
+class sqlSpamAction;
+
 class sqlSpamRuleAction {
   public:
     sqlSpamRuleAction(dbHandle*);
@@ -52,6 +54,11 @@ class sqlSpamRuleAction {
     bool insert();
     bool remove();
 
+    /* Resolved sqlSpamAction* for action_id, set by
+     * dronescan::relinkSpamGraph(). Not persisted. */
+    inline sqlSpamAction* getAction() const       { return actionPtr; }
+    inline void setAction(sqlSpamAction* a)       { actionPtr = a; }
+
   protected:
     int    id;
     int    rule_id;
@@ -62,6 +69,9 @@ class sqlSpamRuleAction {
     int    delay_override;           // -1 = NULL
 
     dbHandle* SQLDb;
+
+    // In-memory link, not persisted; see getAction().
+    sqlSpamAction* actionPtr;
 };
 
 } // namespace ds

@@ -294,6 +294,15 @@ class dronescan : public xClient {
     void compileRepeatExclusionRegex(sqlSpamEvent* ev);
     void freeEventRegexes(int event_id);
 
+    /* Rebuild the pointer-linked spam object graph (sqlSpamEvent::getRules(),
+     * sqlSpamRule::getEvents()/getActions(), spamEventsList) from the
+     * currently loaded spamEventsMap/spamRulesMap/spamActionsMap/
+     * spamRuleEventsMap/spamRuleActionsMap. Must be called after any
+     * structural change: load, EVENT/RULE/ACTION ADD or DEL, or
+     * ADDEVENT/REMEVENT/ADDACTION/REMACTION. Not needed for SET enabled -
+     * isEnabled() is checked live by callers, not baked into the links. */
+    void relinkSpamGraph();
+
     /* Spam detection processing helpers */
     // Lightweight snapshot of a client's identity, captured at the moment
     // traffic is observed so that scoring/actions (REPORT, GLINE) still work
@@ -412,6 +421,10 @@ class dronescan : public xClient {
     typedef std::map<std::string, sqlMonitoredChannel*>                monitoredChannelsMapType;
     // spam_rule_channels: rule_id -> list of channel names
     typedef std::map<int, std::vector<std::string>>                    spamRuleChannelsMapType;
+
+    // Flat vector of every loaded event, rebuilt by relinkSpamGraph();
+    // used for hot-path iteration instead of walking spamEventsMap's nodes.
+    std::vector<sqlSpamEvent*> spamEventsList;
 
     spamEventsMapType       spamEventsMap;
     spamRulesMapType        spamRulesMap;
