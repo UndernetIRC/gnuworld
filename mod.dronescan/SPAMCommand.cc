@@ -1511,9 +1511,8 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
         bot->monitoredChannelsMap[chanName] = mc;
         // Start monitoring: schedule a spy client join
         if (!mc->isJoinAsService()) {
-            int scId = bot->findBestSpyClient(chanName, mc->isForceJoin());
-            if (scId >= 0)
-                bot->scheduleSpyClientJoin(scId, chanName, 0, 300);
+            if (bot->findBestSpyClient(chanName, mc->isForceJoin()) >= 0)
+                bot->scheduleSpyClientJoin(chanName, mc->isForceJoin(), 0, 300);
             else
                 bot->Reply(theClient, "Warning: no available spy client for %s.", chanName.c_str());
         } else {
@@ -1597,9 +1596,8 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
         } else {
             // Enable: schedule a spy client join
             if (!mc->isJoinAsService()) {
-                int scId = bot->findBestSpyClient(mc->getName(), mc->isForceJoin());
-                if (scId >= 0)
-                    bot->scheduleSpyClientJoin(scId, mc->getName(), 0, 300);
+                if (bot->findBestSpyClient(mc->getName(), mc->isForceJoin()) >= 0)
+                    bot->scheduleSpyClientJoin(mc->getName(), mc->isForceJoin(), 0, 300);
                 else
                     bot->Reply(theClient, "Warning: no available spy client for %s.",
                                mc->getName().c_str());

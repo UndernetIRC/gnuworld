@@ -369,9 +369,8 @@ void dronescan::BurstChannels() {
         if (mc->isJoinAsService()) {
             MyUplink->JoinChannel(this, mc->getName(), "");
         } else {
-            int scId = findBestSpyClient(mc->getName(), mc->isForceJoin());
-            if (scId >= 0)
-                scheduleSpyClientJoin(scId, mc->getName(), 0, 10);
+            if (findBestSpyClient(mc->getName(), mc->isForceJoin()) >= 0)
+                scheduleSpyClientJoin(mc->getName(), mc->isForceJoin(), 0, 10);
             else
                 Message(consoleChannel,
                         "[SpyClient] No available spy client for %s at burst.",
@@ -888,9 +887,8 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
     monitoredChannelsMapType::const_iterator mc = monitoredChannelsMap.find(chanKey);
     bool forcejoin = (mc != monitoredChannelsMap.end()) ? mc->second->isForceJoin() : false;
 
-    int newScId = findBestSpyClient(theChan->getName(), forcejoin);
-    if (newScId >= 0) {
-        scheduleSpyClientJoin(newScId, theChan->getName(), 300, 1500);
+    if (findBestSpyClient(theChan->getName(), forcejoin) >= 0) {
+        scheduleSpyClientJoin(theChan->getName(), forcejoin, 300, 1500);
     } else {
         Message(consoleChannel,
                 "[SpyClient] No available spy client to replace %s in %s.",
@@ -980,10 +978,10 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
     {
         pendingJoinTimersType::iterator pit = pendingJoinTimers.find(theTimer);
         if (pit != pendingJoinTimers.end()) {
-            int scId             = pit->second.first;
+            bool forcejoin       = pit->second.first;
             string chanName      = pit->second.second;
             pendingJoinTimers.erase(pit);
-            doSpyClientJoin(scId, chanName);
+            doSpyClientJoin(chanName, forcejoin);
             return;
         }
     }
@@ -3163,6 +3161,9 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
             // Skip +l if channel is at capacity
             if (theChan->getMode(Channel::MODE_L) &&
                 theChan->size() >= theChan->getLimit()) continue;
+            // Skip +r (channel requires an identified user) if this spy
+            // client has no services account
+            if (theChan->getMode(Channel::MODE_R) && sc->getAccount().empty()) continue;
             // Skip if spy client host is banned
             if (theChan->matchBan(ic->getNickUserHost())) continue;
         }
@@ -3186,13 +3187,24 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
     return bestBusyId;
 }
 
-/** Make a live spy client join the given channel immediately. */
-void dronescan::doSpyClientJoin(int scId, const std::string& chanName)
+/**
+ * Select the best spy client for the given channel and make it join
+ * immediately. Selection happens here (not at schedule time) so it always
+ * sees up-to-date per-client channel load.
+ */
+void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin)
 {
     // Respect kick-stopped channels
     const string chanKey = string_lower(chanName);
     if (kickStoppedChannels.count(chanKey))
         return;
+
+    int scId = findBestSpyClient(chanName, forcejoin);
+    if (scId < 0) {
+        Message(consoleChannel,
+                "[SpyClient] No available spy client for %s.", chanName.c_str());
+        return;
+    }
 
     liveSpyClientsMapType::iterator lit = liveSpyClientsMap.find(scId);
     if (lit == liveSpyClientsMap.end())
@@ -3213,7 +3225,7 @@ void dronescan::doSpyClientJoin(int scId, const std::string& chanName)
 /**
  * Schedule a spy client join with a random delay in [minDelay, maxDelay] seconds.
  */
-void dronescan::scheduleSpyClientJoin(int scId, const std::string& chanName,
+void dronescan::scheduleSpyClientJoin(const std::string& chanName, bool forcejoin,
                                       int minDelay, int maxDelay)
 {
     if (kickStoppedChannels.count(string_lower(chanName)))
@@ -3225,7 +3237,7 @@ void dronescan::scheduleSpyClientJoin(int scId, const std::string& chanName,
 
     time_t fireAt = ::time(nullptr) + static_cast<time_t>(delay);
     xServer::timerID tid = MyUplink->RegisterTimer(fireAt, this, nullptr);
-    pendingJoinTimers[tid] = std::make_pair(scId, string_lower(chanName));
+    pendingJoinTimers[tid] = std::make_pair(forcejoin, string_lower(chanName));
 }
 
 /**
@@ -3285,9 +3297,8 @@ void dronescan::resyncSpyClients()
         if (!mc->second->isEnabled()) continue;
         if (mc->second->isJoinAsService()) continue;
 
-        int newScId = findBestSpyClient(chanName, mc->second->isForceJoin());
-        if (newScId >= 0)
-            scheduleSpyClientJoin(newScId, chanName, 0, 10);
+        if (findBestSpyClient(chanName, mc->second->isForceJoin()) >= 0)
+            scheduleSpyClientJoin(chanName, mc->second->isForceJoin(), 0, 10);
         else
             Message(consoleChannel,
                     "[SpyClient] No available spy client to take over %s after removal.",

@@ -352,19 +352,24 @@ class dronescan : public xClient {
     /**
      * Find the best available spy client for the given channel.
      * If forcejoin is false, skips channels that are +i, +k, +l(full),
-     * or where the spy client host matches a ban.
+     * +r (with no spy client account), or where the spy client host
+     * matches a ban.
      * Returns spy client id or -1 if none available.
      */
     int findBestSpyClient(const std::string& chanName, bool forcejoin);
 
-    /** Make a live spy client join the given channel immediately. */
-    void doSpyClientJoin(int scId, const std::string& chanName);
+    /**
+     * Select the best spy client for the given channel and make it join
+     * immediately. Selection happens here (not at schedule time) so it
+     * always sees up-to-date per-client channel load.
+     */
+    void doSpyClientJoin(const std::string& chanName, bool forcejoin);
 
     /**
      * Schedule a spy client join with a random delay in [minDelay, maxDelay] seconds.
      * minDelay=0, maxDelay=300 for new channels; 300/1500 after a kick.
      */
-    void scheduleSpyClientJoin(int scId, const std::string& chanName,
+    void scheduleSpyClientJoin(const std::string& chanName, bool forcejoin,
                                int minDelay, int maxDelay);
 
     /** Voice a spy client in the console channel. */
@@ -466,8 +471,8 @@ class dronescan : public xClient {
     typedef std::set<std::string>                                      kickStoppedChannelsType;
     kickStoppedChannelsType kickStoppedChannels;
 
-    // Pending join timers: timerID -> {spy client id, channel name}
-    typedef std::map<xServer::timerID, std::pair<int, std::string>>   pendingJoinTimersType;
+    // Pending join timers: timerID -> {forcejoin, channel name}
+    typedef std::map<xServer::timerID, std::pair<bool, std::string>>  pendingJoinTimersType;
     pendingJoinTimersType pendingJoinTimers;
 
     /* PCRE2 regex cache: event_id -> compiled regex (TEXT events only) */
