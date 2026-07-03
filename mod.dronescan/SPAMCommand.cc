@@ -487,7 +487,9 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         const string field = string_lower(st[4]);
         const string value = (st.size() >= 6) ? st[5] : string();
 
-        if (field == "description") {
+        if (field == "name") {
+            ev->setName(value);
+        } else if (field == "description") {
             ev->setDescription(value);
         } else if (field == "param") {
             ev->setParam(value);
@@ -540,7 +542,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
                 bot->Reply(theClient, "Warning: exclusion regex compile failed.");
         } else {
             bot->Reply(theClient,
-                "Unknown field '%s'. Valid: description, param, target, case_sensitive, "
+                "Unknown field '%s'. Valid: name, description, param, target, case_sensitive, "
                 "points, point_expiry, max_occurrence, requires_event_id, enabled, "
                 "repeat_crossuser, repeat_min_count, repeat_exclusion_regex",
                 field.c_str());
@@ -550,7 +552,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         ev->setModifiedTs(::time(0));
         ev->setModifiedBy(0);
         if (!ev->commit()) {
-            bot->Reply(theClient, "Failed to update event %d.", id);
+            bot->Reply(theClient, "Failed to update event %d%s.", id,
+                       field == "name" ? " (duplicate name?)" : "");
             return;
         }
         bot->Reply(theClient, "Event %d: %s set to '%s'.", id, field.c_str(), value.c_str());
@@ -1000,7 +1003,9 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         const string field = string_lower(st[4]);
         const string value = (st.size() >= 6) ? st[5] : string();
 
-        if (field == "description") {
+        if (field == "name") {
+            rule->setName(value);
+        } else if (field == "description") {
             rule->setDescription(value);
         } else if (field == "threshold") {
             rule->setThreshold(atoi(value.c_str()));
@@ -1031,7 +1036,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             rule->setAllChans(newVal);
         } else {
             bot->Reply(theClient,
-                "Unknown field '%s'. Valid: description, threshold, wait_on_rule_id, "
+                "Unknown field '%s'. Valid: name, description, threshold, wait_on_rule_id, "
                 "enabled, points_per, score_globally, allchans",
                 field.c_str());
             return;
@@ -1040,7 +1045,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         rule->setModifiedTs(::time(0));
         rule->setModifiedBy(0);
         if (!rule->commit()) {
-            bot->Reply(theClient, "Failed to update rule %d.", id);
+            bot->Reply(theClient, "Failed to update rule %d%s.", id,
+                       field == "name" ? " (duplicate name?)" : "");
             return;
         }
         bot->Reply(theClient, "Rule %d: %s set to '%s'.", id, field.c_str(), value.c_str());
@@ -1266,7 +1272,9 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         const string field = string_lower(st[4]);
         const string value = (st.size() >= 6) ? st[5] : string();
 
-        if (field == "action_type") {
+        if (field == "name") {
+            act->setName(value);
+        } else if (field == "action_type") {
             const string atype = string_upper(value);
             if (!isValidActionType(atype)) {
                 bot->Reply(theClient, "Invalid action type. Use: GLINE, KILL, REPORT");
@@ -1287,7 +1295,7 @@ static void handleAction(dronescan* bot, const iClient* theClient,
             act->setEnabled(value == "1" || value == "yes" || value == "true");
         } else {
             bot->Reply(theClient,
-                "Unknown field '%s'. Valid: action_type, duration, reason, delay, "
+                "Unknown field '%s'. Valid: name, action_type, duration, reason, delay, "
                 "rand_min, rand_max, enabled",
                 field.c_str());
             return;
@@ -1296,7 +1304,8 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         act->setModifiedTs(::time(0));
         act->setModifiedBy(0);
         if (!act->commit()) {
-            bot->Reply(theClient, "Failed to update action %d.", id);
+            bot->Reply(theClient, "Failed to update action %d%s.", id,
+                       field == "name" ? " (duplicate name?)" : "");
             return;
         }
         bot->relinkSpamGraph();
