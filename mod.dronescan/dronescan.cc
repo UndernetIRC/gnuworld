@@ -2429,7 +2429,6 @@ void dronescan::preloadSpamActions()
 void dronescan::preloadSpamRuleEvents()
 {
     spamRuleEventsMap.clear();
-    spamEventRulesMap.clear();
 
     std::stringstream q;
     q << "SELECT rule_id, event_id, points_override "
@@ -2446,7 +2445,6 @@ void dronescan::preloadSpamRuleEvents()
         const string po = SQLDb->GetValue(i, 2);
         int points_override = !po.empty() ? atoi(po.c_str()) : -1;
         spamRuleEventsMap[rule_id].push_back(std::make_pair(event_id, points_override));
-        spamEventRulesMap[event_id].push_back(rule_id);
         ++total;
     }
     elog << "dronescan::preloadSpamRuleEvents> Loaded " << total
@@ -2608,15 +2606,11 @@ dronescan::SpamActor dronescan::makeActor(iClient* theClient) const
 void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
                            const std::string& channel_name, time_t now)
 {
-    spamEventRulesMapType::const_iterator erit = spamEventRulesMap.find(ev->getId());
-    if (erit == spamEventRulesMap.end())
-        return;  // event isn't linked to any rule; nothing to score
-
-    for (size_t i = 0; i < erit->second.size(); ++i) {
-        spamRulesMapType::const_iterator ruleIt = spamRulesMap.find(erit->second[i]);
-        if (ruleIt == spamRulesMap.end() || !ruleIt->second->isEnabled())
+    const std::vector<sqlSpamRule*>& rules = ev->getRules();
+    for (size_t i = 0; i < rules.size(); ++i) {
+        sqlSpamRule* rule = rules[i];
+        if (!rule->isEnabled())
             continue;
-        sqlSpamRule* rule = ruleIt->second;
 
         const string key = buildScoringKey(rule, actor, channel_name);
         SpamScore& score = spamScoreMap[key][ev->getId()];
@@ -2718,10 +2712,9 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
     std::map<std::string, SpamActor> actorsToEvaluate;
     actorsToEvaluate[actor.numeric] = actor;
 
-    for (spamEventsMapType::const_iterator eit = spamEventsMap.begin();
-         eit != spamEventsMap.end(); ++eit)
+    for (size_t i = 0; i < spamEventsList.size(); ++i)
     {
-        sqlSpamEvent* ev = eit->second;
+        sqlSpamEvent* ev = spamEventsList[i];
         if (!ev->isEnabled())
             continue;
         if (!(ev->getTarget() & target_bit))
@@ -2821,22 +2814,15 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
         }
 
         // Compute total score for this scoring key against this rule
-        spamRuleEventsMapType::const_iterator rei =
-            spamRuleEventsMap.find(rule->getId());
-        if (rei == spamRuleEventsMap.end())
-            continue;
+        const std::vector<RuleEventLink>& links = rule->getEvents();
 
         const string scoringKey = buildScoringKey(rule, actor, channel_name);
 
         int totalScore = 0;
-        for (size_t i = 0; i < rei->second.size(); ++i) {
-            int event_id       = rei->second[i].first;
-            int points_override = rei->second[i].second;
-
-            spamEventsMapType::const_iterator eit = spamEventsMap.find(event_id);
-            if (eit == spamEventsMap.end())
-                continue;
-            sqlSpamEvent* ev = eit->second;
+        for (size_t i = 0; i < links.size(); ++i) {
+            sqlSpamEvent* ev = links[i].event;
+            int points_override = links[i].pointsOverride;
+            int event_id = ev->getId();
 
             spamScoreMapType::const_iterator ski = spamScoreMap.find(scoringKey);
             if (ski == spamScoreMap.end())
@@ -2859,11 +2845,10 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
 
             // Reset scores for all events linked to this rule to prevent
             // immediate re-triggering
-            for (size_t i = 0; i < rei->second.size(); ++i) {
-                int event_id = rei->second[i].first;
+            for (size_t i = 0; i < links.size(); ++i) {
                 spamScoreMapType::iterator ski = spamScoreMap.find(scoringKey);
                 if (ski != spamScoreMap.end())
-                    ski->second.erase(event_id);
+                    ski->second.erase(links[i].event->getId());
             }
         }
     }
@@ -2881,24 +2866,19 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
     if (!rule)
         return;
 
-    spamRuleActionsMapType::const_iterator rait =
-        spamRuleActionsMap.find(rule->getId());
-    if (rait == spamRuleActionsMap.end())
-        return;
+    const std::vector<sqlSpamRuleAction*>& actions = rule->getActions();
 
     const string& nick = actor.nick;
     const string& user = actor.user;
     const string& host = actor.host;
     const string& ip   = actor.ip;
 
-    for (size_t i = 0; i < rait->second.size(); ++i) {
-        sqlSpamRuleAction* ra = rait->second[i];
+    for (size_t i = 0; i < actions.size(); ++i) {
+        sqlSpamRuleAction* ra = actions[i];
 
-        spamActionsMapType::const_iterator ait =
-            spamActionsMap.find(ra->getActionId());
-        if (ait == spamActionsMap.end())
-            continue;
-        sqlSpamAction* act = ait->second;
+        // relinkSpamGraph() only adds a binding to rule->getActions() once
+        // its action pointer is resolved, so getAction() is never null here.
+        sqlSpamAction* act = ra->getAction();
         if (!act->isEnabled())
             continue;
 

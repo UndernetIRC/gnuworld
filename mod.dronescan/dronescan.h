@@ -408,10 +408,11 @@ class dronescan : public xClient {
     typedef std::map<int, sqlSpamEvent*>                               spamEventsMapType;
     typedef std::map<int, sqlSpamRule*>                                spamRulesMapType;
     typedef std::map<int, sqlSpamAction*>                              spamActionsMapType;
-    // rule_id -> list of (event_id, points_override); -1 points_override means use event default
+    // rule_id -> list of (event_id, points_override); -1 points_override means use event default.
+    // Backing store for relinkSpamGraph() and for SPAMCommand.cc's admin
+    // display/mutation logic; the hot path reads the resolved pointer graph
+    // (sqlSpamEvent::getRules(), sqlSpamRule::getEvents()) instead.
     typedef std::map<int, std::vector<std::pair<int,int>>>             spamRuleEventsMapType;
-    // reverse of spamRuleEventsMap: event_id -> list of rule ids that include it
-    typedef std::map<int, std::vector<int>>                            spamEventRulesMapType;
     // rule_id -> list of bound rule-actions
     typedef std::map<int, std::vector<sqlSpamRuleAction*>>             spamRuleActionsMapType;
     typedef std::list<sqlSpamExclusion*>                               spamExclusionsListType;
@@ -430,7 +431,6 @@ class dronescan : public xClient {
     spamRulesMapType        spamRulesMap;
     spamActionsMapType      spamActionsMap;
     spamRuleEventsMapType   spamRuleEventsMap;
-    spamEventRulesMapType   spamEventRulesMap;
     spamRuleActionsMapType  spamRuleActionsMap;
     spamExclusionsListType  spamExclusionsList;
     spyClientsMapType       spyClientsMap;
