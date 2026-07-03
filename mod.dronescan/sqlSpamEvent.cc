@@ -20,7 +20,7 @@ using std::endl;
 using std::stringstream;
 
 sqlSpamEvent::sqlSpamEvent(dbHandle* _SQLDb)
-    : id(0), name(), description(), event_type(), event_param(),
+    : id(0), name(), description(), event_type(), param(),
       target(31), case_sensitive(false), points(1), point_expiry(60),
       max_occurrence(-1), requires_event_id(0), enabled(true),
       repeat_crossuser(false), repeat_min_count(2), repeat_exclusion_regex(),
@@ -31,7 +31,7 @@ sqlSpamEvent::sqlSpamEvent(dbHandle* _SQLDb)
 sqlSpamEvent::~sqlSpamEvent() {}
 
 // Column order matches the SELECT in preloadSpamEvents():
-// id, name, description, event_type, event_param, target,
+// id, name, description, event_type, param, target,
 // case_sensitive, points, point_expiry, max_occurrence, requires_event_id, enabled,
 // repeat_crossuser, repeat_min_count, repeat_exclusion_regex,
 // created_ts, modified_ts, modified_by
@@ -41,7 +41,7 @@ void sqlSpamEvent::setAllMembers(int row)
     name                   = SQLDb->GetValue(row, 1);
     description            = SQLDb->GetValue(row, 2);
     event_type             = SQLDb->GetValue(row, 3);
-    event_param            = SQLDb->GetValue(row, 4);
+    param                  = SQLDb->GetValue(row, 4);
     target                 = atoi(SQLDb->GetValue(row, 5).c_str());
     case_sensitive         = (SQLDb->GetValue(row, 6) == "t");
     points                 = atoi(SQLDb->GetValue(row, 7).c_str());
@@ -68,7 +68,7 @@ bool sqlSpamEvent::commit()
       << "name = '"              << escapeSQLChars(name)               << "', "
       << "description = '"       << escapeSQLChars(description)        << "', "
       << "event_type = '"        << escapeSQLChars(event_type)         << "', "
-      << "event_param = '"       << escapeSQLChars(event_param)        << "', "
+      << "param = '"             << escapeSQLChars(param)              << "', "
       << "target = "             << target                             << ", "
       << "case_sensitive = "     << (case_sensitive ? "true" : "false") << ", "
       << "points = "             << points                             << ", "
@@ -95,14 +95,14 @@ bool sqlSpamEvent::insert()
 {
     stringstream q;
     q << "INSERT INTO spam_events "
-      << "(name, description, event_type, event_param, target, case_sensitive, "
+      << "(name, description, event_type, param, target, case_sensitive, "
       << "points, point_expiry, max_occurrence, requires_event_id, enabled, "
       << "repeat_crossuser, repeat_min_count, repeat_exclusion_regex, "
       << "created_ts, modified_ts, modified_by) VALUES ("
       << "'"  << escapeSQLChars(name)        << "', "
       << "'"  << escapeSQLChars(description) << "', "
       << "'"  << escapeSQLChars(event_type)  << "', "
-      << "'"  << escapeSQLChars(event_param) << "', "
+      << "'"  << escapeSQLChars(param)       << "', "
       << target                              << ", "
       << (case_sensitive ? "true" : "false") << ", "
       << points       << ", "

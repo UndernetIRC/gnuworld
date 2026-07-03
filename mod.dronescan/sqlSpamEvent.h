@@ -33,7 +33,7 @@ class sqlSpamEvent {
     inline const string& getName()             const { return name; }
     inline const string& getDescription()      const { return description; }
     inline const string& getEventType()        const { return event_type; }
-    inline const string& getEventParam()       const { return event_param; }
+    inline const string& getParam()            const { return param; }
     // target: bitmask ? CHAN=1, PRIVMSG=2, NOTICE=4, PART=8, QUIT=16, ALL=31
     inline int           getTarget()           const { return target; }
     inline bool          isCaseSensitive()     const { return case_sensitive; }
@@ -54,7 +54,7 @@ class sqlSpamEvent {
     inline void setName(const string& v)              { name = v; }
     inline void setDescription(const string& v)       { description = v; }
     inline void setEventType(const string& v)         { event_type = v; }
-    inline void setEventParam(const string& v)        { event_param = v; }
+    inline void setParam(const string& v)             { param = v; }
     inline void setTarget(int v)                      { target = v; }
     inline void setCaseSensitive(bool v)              { case_sensitive = v; }
     inline void setPoints(int v)                      { points = v; }
@@ -86,7 +86,7 @@ class sqlSpamEvent {
     string name;
     string description;
     string event_type;
-    string event_param;
+    string param;
     int    target;               // bitmask: CHAN=1, PRIVMSG=2, NOTICE=4, PART=8, QUIT=16
     bool   case_sensitive;
     int    points;

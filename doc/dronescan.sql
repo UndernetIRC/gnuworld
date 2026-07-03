@@ -68,20 +68,20 @@ CREATE TABLE exceptionalChannels (
 -- -----------------------------------------------------------------------------
 -- spam_events
 -- -----------------------------------------------------------------------------
--- Defines what to detect. event_type controls how event_param is interpreted:
---   TEXT           : event_param is a PCRE2 regex pattern matched against
+-- Defines what to detect. event_type controls how param is interpreted:
+--   TEXT           : param is a PCRE2 regex pattern matched against
 --                    incoming text selected by the `target` bitmask.
 --                    Active targets: chan_priv, chan_not, privmsg, notice, part.
 --                    Quit message matching (target QUIT) is deferred ? quit
 --                    reasons are not yet surfaced by the event system.
---   TEXT_REPEAT    : event_param is unused; matched text is tracked in memory.
+--   TEXT_REPEAT    : param is unused; matched text is tracked in memory.
 --                    See repeat_* columns below for TEXT_REPEAT-specific options.
---   ENTROPY_TEXT   : event_param is a float threshold (as text) for message entropy
---   ENTROPY_NICK   : event_param is a float threshold (as text) for nick entropy
---   JOIN_CHANNEL   : event_param is the exact channel name to watch
---   USERMODE       : event_param is the mode string to match (e.g. "+x")
---   KICK_MSG       : event_param is a PCRE2 regex matched against kick reasons
---   KICK_COUNT     : event_param is an integer; fires when a user has been kicked
+--   ENTROPY_TEXT   : param is a float threshold (as text) for message entropy
+--   ENTROPY_NICK   : param is a float threshold (as text) for nick entropy
+--   JOIN_CHANNEL   : param is the exact channel name to watch
+--   USERMODE       : param is the mode string to match (e.g. "+x")
+--   KICK_MSG       : param is a PCRE2 regex matched against kick reasons
+--   KICK_COUNT     : param is an integer; fires when a user has been kicked
 --                    from that many different channels
 --
 -- target: integer bitmask controlling which message sources this event watches.
@@ -122,7 +122,7 @@ CREATE TABLE spam_events (
 	description            text,
 	event_type             varchar(30)  NOT NULL,
 	-- PCRE2 pattern, integer threshold, or float threshold depending on event_type
-	event_param            text,
+	param                  text,
 	-- Bitmask: CHAN=1 PRIVMSG=2 NOTICE=4 PART=8 QUIT=16  (31 = all targets)
 	target                 int          NOT NULL DEFAULT 31,
 	case_sensitive         bool         NOT NULL DEFAULT false,

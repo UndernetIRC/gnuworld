@@ -40,6 +40,23 @@ void sqlSpamExclusion::setAllMembers(int row)
     modified_by    = !modBy.empty() ? atoi(modBy.c_str()) : 0;
 }
 
+bool sqlSpamExclusion::commit()
+{
+    stringstream q;
+    q << "UPDATE spam_exclusions SET "
+      << "exclusion_type = '" << escapeSQLChars(exclusion_type) << "', "
+      << "value = '"          << escapeSQLChars(value)          << "', "
+      << "modified_ts = "     << modified_ts                    << ", "
+      << "modified_by = "     << (modified_by > 0 ? std::to_string(modified_by) : "NULL")
+      << " WHERE id = "       << id;
+
+    if (!SQLDb->Exec(q)) {
+        elog << "sqlSpamExclusion::commit> " << SQLDb->ErrorMessage() << endl;
+        return false;
+    }
+    return true;
+}
+
 bool sqlSpamExclusion::insert()
 {
     stringstream q;

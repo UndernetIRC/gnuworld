@@ -63,6 +63,7 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM EVENT subcommands:");
     bot->Reply(theClient, "  ADD    <name> <type> <target> <param> <points> <expiry> [max_occ]");
+    bot->Reply(theClient, "         [-rule <rule_name>] [-repeat_count <n>]");
     bot->Reply(theClient, "  DEL    <name>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SHOW   <name>");
@@ -72,7 +73,7 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "             ENTROPY_TEXT  ENTROPY_NICK  JOIN_CHANNEL");
     bot->Reply(theClient, "             USERMODE  KICK_MSG  KICK_COUNT");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "TEXT: event_param is a PCRE2 regex applied to incoming text.");
+    bot->Reply(theClient, "TEXT: param is a PCRE2 regex applied to incoming text.");
     bot->Reply(theClient, "  Use the target bitmask to select which text sources to match:");
     bot->Reply(theClient, "  chan_priv=channel PRIVMSGs  chan_not=channel NOTICEs");
     bot->Reply(theClient, "  privmsg=DMs to bot/spy      notice=NOTICEs to bot/spy");
@@ -84,7 +85,12 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "Target (comma-separated or \"all\"): chan_priv chan_not chan privmsg notice part quit ctcp");
     bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 ctcp=64 all=127");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "SET fields: description  event_param  target  case_sensitive");
+    bot->Reply(theClient, "-rule <rule_name>    : link the new event to an existing rule right away");
+    bot->Reply(theClient, "                       (repeatable to link several rules in one ADD).");
+    bot->Reply(theClient, "-repeat_count <n>    : sets repeat_min_count. Mandatory for TEXT_REPEAT,");
+    bot->Reply(theClient, "                       invalid for any other event type.");
+    bot->Reply(theClient, " ");
+    bot->Reply(theClient, "SET fields: description  param  target  case_sensitive");
     bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id (event name, or \"none\")");
     bot->Reply(theClient, "            enabled  repeat_crossuser");
     bot->Reply(theClient, "            repeat_min_count  repeat_exclusion_regex");
@@ -94,9 +100,10 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SPAM EVENT ADD chan_notice_spam TEXT chan_not \"spam.*notice\" 5 60");
     bot->Reply(theClient, "  SPAM EVENT ADD part_flood TEXT part \"bye|cya|leaving\" 5 60");
     bot->Reply(theClient, "  SPAM EVENT ADD direct_spam TEXT privmsg,notice \"click.*here\" 10 60");
-    bot->Reply(theClient, "  SPAM EVENT ADD repeat_flood TEXT_REPEAT all . 5 30 3");
+    bot->Reply(theClient, "  SPAM EVENT ADD repeat_flood TEXT_REPEAT all . 5 30 3 -repeat_count 3");
+    bot->Reply(theClient, "  SPAM EVENT ADD pill_regex2 TEXT chan \"buy.*pills\" 10 60 -rule anti_spam_global");
     bot->Reply(theClient, "  SPAM EVENT SET pill_regex enabled yes");
-    bot->Reply(theClient, "  SPAM EVENT SET pill_regex event_param \"new.*regex.*pattern\"");
+    bot->Reply(theClient, "  SPAM EVENT SET pill_regex param \"new.*regex.*pattern\"");
     bot->Reply(theClient, "  SPAM EVENT SET pill_regex target all");
     bot->Reply(theClient, "  SPAM EVENT DEL pill_regex");
 }
@@ -141,16 +148,20 @@ static void helpSpamAction(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  ADD    <name> <type> [duration] [reason] [delay]");
     bot->Reply(theClient, "  DEL    <name>");
     bot->Reply(theClient, "  LIST");
+    bot->Reply(theClient, "  SET    <name> <field> <value>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Action types: GLINE  KILL  REPORT");
     bot->Reply(theClient, "  duration : seconds for GLINE (ignored for KILL/REPORT)");
     bot->Reply(theClient, "  reason   : gline/kill reason string");
     bot->Reply(theClient, "  delay    : seconds to wait before firing (0 = immediate)");
     bot->Reply(theClient, " ");
+    bot->Reply(theClient, "SET fields: action_type  duration  reason  delay  rand_min  rand_max  enabled");
+    bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM ACTION ADD gline_1h   GLINE  3600 \"Spam detected\"  0");
     bot->Reply(theClient, "  SPAM ACTION ADD kill_now   KILL   0    \"Spam\"            0");
     bot->Reply(theClient, "  SPAM ACTION ADD report_only REPORT");
+    bot->Reply(theClient, "  SPAM ACTION SET gline_1h duration 7200");
     bot->Reply(theClient, "  SPAM ACTION DEL report_only");
 }
 
@@ -160,6 +171,7 @@ static void helpSpamExclusion(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  ADD    <CHAN|NICK|IP|OPER> <value>");
     bot->Reply(theClient, "  DEL    <id>");
     bot->Reply(theClient, "  LIST");
+    bot->Reply(theClient, "  SET    <id> <field> <value>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Exclusion types:");
     bot->Reply(theClient, "  CHAN  - exempt a channel name from spam scanning");
@@ -167,10 +179,13 @@ static void helpSpamExclusion(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  IP   - exempt a host/IP from spam scoring");
     bot->Reply(theClient, "  OPER - exempt an oper account from spam scoring");
     bot->Reply(theClient, " ");
+    bot->Reply(theClient, "SET fields: exclusion_type  value");
+    bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM EXCLUSION ADD CHAN  #trusted-channel");
     bot->Reply(theClient, "  SPAM EXCLUSION ADD OPER  ServiceBot");
     bot->Reply(theClient, "  SPAM EXCLUSION ADD IP    192.168.1.0/24");
+    bot->Reply(theClient, "  SPAM EXCLUSION SET 2 value 192.168.2.0/24");
     bot->Reply(theClient, "  SPAM EXCLUSION DEL 2");
 }
 
@@ -181,36 +196,47 @@ static void helpSpamSpyClient(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  DEL     <id>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SHOW    <id>");
+    bot->Reply(theClient, "  SET     <id> <field> <value>");
     bot->Reply(theClient, "  ENABLE  <id>");
     bot->Reply(theClient, "  DISABLE <id>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Spy clients join monitored channels to observe traffic for spam detection.");
     bot->Reply(theClient, " ");
+    bot->Reply(theClient, "SET fields: nick  user  host  ip  realname  account  modes  enabled");
+    bot->Reply(theClient, "  (enabled behaves the same as ENABLE/DISABLE)");
+    bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 \"Observer\"");
+    bot->Reply(theClient, "  SPAM SPYCLIENT SET     1 nick NewSpyBot");
     bot->Reply(theClient, "  SPAM SPYCLIENT ENABLE  1");
     bot->Reply(theClient, "  SPAM SPYCLIENT DISABLE 1");
     bot->Reply(theClient, "  SPAM SPYCLIENT DEL     1");
 }
 
-static void helpSpamMonitorChan(dronescan* bot, const iClient* theClient)
+static void helpSpamChan(dronescan* bot, const iClient* theClient)
 {
-    bot->Reply(theClient, "SPAM MONITORCHAN subcommands:");
+    bot->Reply(theClient, "SPAM CHAN subcommands:");
     bot->Reply(theClient, "  ADD     <#channel> [forcejoin 0|1] [joinasservice 0|1]");
     bot->Reply(theClient, "  DEL     <id>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SHOW    <id>");
+    bot->Reply(theClient, "  SET     <id> <field> <value>");
     bot->Reply(theClient, "  ENABLE  <id>");
     bot->Reply(theClient, "  DISABLE <id>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "  forcejoin=1    : force-join the channel even if not invited");
     bot->Reply(theClient, "  joinasservice=1: join using service mode (+)");
     bot->Reply(theClient, " ");
+    bot->Reply(theClient, "SET fields: forcejoin  joinasservice  enabled");
+    bot->Reply(theClient, "  (channel name itself is immutable via SET - DEL+ADD to change it)");
+    bot->Reply(theClient, "  (enabled behaves the same as ENABLE/DISABLE)");
+    bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
-    bot->Reply(theClient, "  SPAM MONITORCHAN ADD #watch-this 1 0");
-    bot->Reply(theClient, "  SPAM MONITORCHAN ENABLE  2");
-    bot->Reply(theClient, "  SPAM MONITORCHAN DISABLE 2");
-    bot->Reply(theClient, "  SPAM MONITORCHAN DEL     2");
+    bot->Reply(theClient, "  SPAM CHAN ADD #watch-this 1 0");
+    bot->Reply(theClient, "  SPAM CHAN SET     2 forcejoin 0");
+    bot->Reply(theClient, "  SPAM CHAN ENABLE  2");
+    bot->Reply(theClient, "  SPAM CHAN DISABLE 2");
+    bot->Reply(theClient, "  SPAM CHAN DEL     2");
 }
 
 // ---------------------------------------------------------------------------
@@ -228,7 +254,7 @@ static void helpSpam(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  ACTION     - Actions executed when a rule threshold is reached");
     bot->Reply(theClient, "  EXCLUSION  - Channels/nicks/IPs/opers exempt from scanning");
     bot->Reply(theClient, "  SPYCLIENT  - Fake clients that observe channels");
-    bot->Reply(theClient, "  MONITORCHAN- Channels to monitor for spam");
+    bot->Reply(theClient, "  CHAN       - Channels to monitor for spam");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Workflow overview:");
     bot->Reply(theClient, "  1. Create EVENT(s) describing what triggers scoring");
@@ -238,13 +264,15 @@ static void helpSpam(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  5. Link actions to the rule (SPAM RULE ADDACTION)");
     bot->Reply(theClient, "  6. Optionally restrict the rule to specific channels (SPAM RULE ADDCHAN)");
     bot->Reply(theClient, " ");
+    bot->Reply(theClient, "Every object above supports SET <name/id> <field> <value> for in-place edits.");
+    bot->Reply(theClient, " ");
     bot->Reply(theClient, "Type HELP SPAM <object> for details on each section.");
     bot->Reply(theClient, "  e.g.  HELP SPAM EVENT");
     bot->Reply(theClient, "        HELP SPAM RULE");
     bot->Reply(theClient, "        HELP SPAM ACTION");
     bot->Reply(theClient, "        HELP SPAM EXCLUSION");
     bot->Reply(theClient, "        HELP SPAM SPYCLIENT");
-    bot->Reply(theClient, "        HELP SPAM MONITORCHAN");
+    bot->Reply(theClient, "        HELP SPAM CHAN");
 }
 
 // ---------------------------------------------------------------------------
@@ -264,10 +292,10 @@ void HELPCommand::Exec(const iClient* theClient, const string& Message, const sq
         else if (sub == "ACTION")      helpSpamAction(bot, theClient);
         else if (sub == "EXCLUSION")   helpSpamExclusion(bot, theClient);
         else if (sub == "SPYCLIENT")   helpSpamSpyClient(bot, theClient);
-        else if (sub == "MONITORCHAN") helpSpamMonitorChan(bot, theClient);
+        else if (sub == "CHAN")        helpSpamChan(bot, theClient);
         else {
             bot->Reply(theClient,
-                "Unknown SPAM section '%s'. Use: EVENT RULE ACTION EXCLUSION SPYCLIENT MONITORCHAN",
+                "Unknown SPAM section '%s'. Use: EVENT RULE ACTION EXCLUSION SPYCLIENT CHAN",
                 st[2].c_str());
         }
         return;

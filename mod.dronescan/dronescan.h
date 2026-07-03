@@ -289,7 +289,7 @@ class dronescan : public xClient {
 
     /* PCRE2 compile lifecycle: called on load, create (EVENT ADD) and
      * modify (EVENT SET) so a spam event's regex is always compiled from
-     * its current event_param/repeat_exclusion_regex/case_sensitive state. */
+     * its current param/repeat_exclusion_regex/case_sensitive state. */
     void compileEventRegex(sqlSpamEvent* ev);
     void compileRepeatExclusionRegex(sqlSpamEvent* ev);
     void freeEventRegexes(int event_id);

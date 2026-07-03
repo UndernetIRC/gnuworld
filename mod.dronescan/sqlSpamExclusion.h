@@ -42,6 +42,7 @@ class sqlSpamExclusion {
     inline void setModifiedBy(int v)            { modified_by = v; }
 
     void setAllMembers(int row);
+    bool commit();
     bool insert();
     bool remove();
 

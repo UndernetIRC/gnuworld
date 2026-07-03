@@ -269,7 +269,7 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     RegisterCommand(new RELOADCommand(this, "RELOAD", ""));
     RegisterCommand(new REHASHCommand(this, "REHASH", ""));
     RegisterCommand(new SPAMCommand(this, "SPAM",
-        "(EVENT|RULE|ACTION|EXCLUSION) (ADD|DEL|LIST|SHOW|ADDEVENT|REMEVENT|ADDACTION|REMACTION) ..."));
+        "<EVENT|RULE|ACTION|EXCLUSION|SPYCLIENT|CHAN> <verb> ..."));
 
     // in case RELOAD command is used, have to iterate the userlist to know how many clients per IP
     // are online for the gline count.
@@ -2278,10 +2278,10 @@ void dronescan::relinkSpamGraph()
 }
 
 /**
- * compileEventRegex: (re)compile the TEXT event_param regex for ev into
+ * compileEventRegex: (re)compile the TEXT param regex for ev into
  * spamRegexCache, freeing any previously compiled pattern for this event
  * id first. No-op (after freeing) for non-TEXT events or an empty param.
- * Called on load, on EVENT ADD, and on EVENT SET (event_param or
+ * Called on load, on EVENT ADD, and on EVENT SET (param or
  * case_sensitive) so the compiled pattern never goes stale.
  */
 void dronescan::compileEventRegex(sqlSpamEvent* ev)
@@ -2292,14 +2292,14 @@ void dronescan::compileEventRegex(sqlSpamEvent* ev)
         spamRegexCache.erase(ci);
     }
 
-    if (ev->getEventType() != "TEXT" || ev->getEventParam().empty())
+    if (ev->getEventType() != "TEXT" || ev->getParam().empty())
         return;
 
     int errcode;
     PCRE2_SIZE erroffset;
     uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
     pcre2_code* re = pcre2_compile(
-        reinterpret_cast<PCRE2_SPTR>(ev->getEventParam().c_str()),
+        reinterpret_cast<PCRE2_SPTR>(ev->getParam().c_str()),
         PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
     if (re)
         spamRegexCache[ev->getId()] = re;
@@ -2362,7 +2362,7 @@ void dronescan::preloadSpamEvents()
     spamEventsMap.clear();
 
     std::stringstream q;
-    q << "SELECT id, name, description, event_type, event_param, target, "
+    q << "SELECT id, name, description, event_type, param, target, "
       << "case_sensitive, points, point_expiry, max_occurrence, "
       << "requires_event_id, enabled, "
       << "repeat_crossuser, repeat_min_count, repeat_exclusion_regex, "
@@ -3263,7 +3263,7 @@ void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin)
         return;
 
     // The channel may have been removed/disabled from monitoring since this
-    // join was scheduled (e.g. via SPAM MONITORCHAN DEL/DISABLE, or dropped
+    // join was scheduled (e.g. via SPAM CHAN DEL/DISABLE, or dropped
     // on reload) - treat a stale timer firing for it as a no-op.
     monitoredChannelsMapType::const_iterator mcit = monitoredChannelsMap.find(chanKey);
     if (mcit == monitoredChannelsMap.end() || !mcit->second->isEnabled())
