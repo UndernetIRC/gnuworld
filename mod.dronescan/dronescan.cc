@@ -2688,7 +2688,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
     if (!theClient || currentState != RUN)
         return;
 
-    elog << "dronescan::processSpamText> Checking text for spam events: " << text << std::endl;
+    //elog << "dronescan::processSpamText> Checking text for spam events: " << text << std::endl;
     const time_t now = ::time(0);
 
     const SpamActor actor = makeActor(theClient);
@@ -2712,7 +2712,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
         if (ev->getEventType() != "TEXT")
             continue;  // other event types implemented in later phases
 
-        elog << "dronescan::processSpamText> Checking cache" << std::endl;
+        //elog << "dronescan::processSpamText> Checking cache" << std::endl;
         spamRegexCacheType::const_iterator rit = spamRegexCache.find(ev->getId());
         if (rit == spamRegexCache.end() || !rit->second)
             continue;
@@ -3027,7 +3027,7 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
         base64ip,
         sc->getHostname(),
         sc->getHostname(),
-        sc->getModes().empty() ? "+i" : sc->getModes(),
+        sc->getModes(),
         sc->getAccount(),
         static_cast<unsigned int>(sc->getAccountId()),
         0,              // account_flags
