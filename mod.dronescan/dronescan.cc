@@ -282,6 +282,16 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
             clientsIPMap.insert(std::make_pair(IP, 1));
         else
             clientsIPMap[IP]++;
+
+        if (wasReloaded) {
+            // These clients were already on the network before this module
+            // instance existed, so EVT_NICK never fired for them here and
+            // they have no clientData attached under our custom data key.
+            // The previous instance's clientData was freed when it unloaded.
+            clientData* theData = new clientData();
+            assert(cItr->second->setCustomData(this, theData));
+            ++customDataCounter;
+        }
     }
 
     if (wasReloaded) {
