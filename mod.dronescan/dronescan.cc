@@ -239,6 +239,12 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
         enableHello = false;
     }
 
+    /* Load optional spyClientsChannel configuration. If unset, spy clients
+     * don't join any channel on introduction. */
+    EConfig::const_iterator spyChanIt = dronescanConfig->Find("spyClientsChannel");
+    if (spyChanIt != dronescanConfig->end())
+        spyClientsChannel = spyChanIt->second;
+
     /* Set up our timer. */
     theTimer = new Timer();
 
@@ -3044,9 +3050,9 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
 
     liveSpyClientsMap[sc->getId()] = ic;
 
-    // Join console channel and get voiced
-    MyUplink->JoinChannel(ic, consoleChannel);
-    voiceSpyClientInConsole(ic);
+    // Join the configured spy clients channel, if any
+    if (!spyClientsChannel.empty())
+        MyUplink->JoinChannel(ic, spyClientsChannel);
 
     elog << "dronescan::introduceSpyClient> Introduced " << nick
          << " (id=" << sc->getId() << ") to the network." << endl;

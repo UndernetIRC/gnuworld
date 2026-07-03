@@ -592,6 +592,9 @@ class dronescan : public xClient {
     /** Configuration variables. */
     std::string consoleChannel;
     std::string consoleChannelModes;
+    // Optional: channel spy clients join on introduction. Empty (unset in
+    // the config) means spy clients don't join any channel at introduction.
+    std::string spyClientsChannel;
 
     /** State variable. */
     DS_STATE currentState;
