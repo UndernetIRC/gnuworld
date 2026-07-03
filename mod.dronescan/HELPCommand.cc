@@ -112,7 +112,7 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
 static void helpSpamRule(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM RULE subcommands:");
-    bot->Reply(theClient, "  ADD        <name> <threshold>");
+    bot->Reply(theClient, "  ADD        <name> <threshold> [-action <action_name>]");
     bot->Reply(theClient, "  DEL        <name>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SHOW       <name>");
@@ -127,6 +127,10 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "A rule fires its actions when the total points from linked events");
     bot->Reply(theClient, "reach or exceed the threshold within the event expiry windows.");
     bot->Reply(theClient, " ");
+    bot->Reply(theClient, "-action <action_name> : link the new rule to an existing action right away");
+    bot->Reply(theClient, "                        (repeatable). No override values - use ADDACTION");
+    bot->Reply(theClient, "                        afterward if you need dur/reason/delay overrides.");
+    bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: name  description  threshold  wait_on_rule_id (rule name, or \"none\")  enabled");
     bot->Reply(theClient, "            points_per  score_globally  allchans");
     bot->Reply(theClient, "  allchans=1 : rule applies to every channel (use ADDCHAN to exclude).");
@@ -134,6 +138,7 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM RULE ADD anti_spam_global 50");
+    bot->Reply(theClient, "  SPAM RULE ADD anti_spam_secondary 30 -action gline_1h -action report_only");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global name anti_spam_v2");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global allchans yes");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global threshold 30");

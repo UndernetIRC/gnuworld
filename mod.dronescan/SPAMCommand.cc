@@ -9,7 +9,7 @@
  *   SPAM EVENT     LIST
  *   SPAM EVENT     SHOW   <name>
  *   SPAM EVENT     SET    <name> <field> <value>
- *   SPAM RULE      ADD    <name> <threshold>
+ *   SPAM RULE      ADD    <name> <threshold> [-action <action_name>]
  *   SPAM RULE      DEL    <name>
  *   SPAM RULE      LIST
  *   SPAM RULE      SHOW   <name>
@@ -55,6 +55,9 @@
  * EVENT ADD's "-rule" option may be repeated to link the new event to
  * several rules in one call; "-repeat_count" is mandatory when <type> is
  * TEXT_REPEAT (it sets repeat_min_count) and invalid for any other type.
+ * RULE ADD's "-action" option may likewise be repeated to link the new
+ * rule to several existing actions in one call (no override values -
+ * use RULE ADDACTION afterward for those).
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -177,6 +180,51 @@ static bool linkEventToRule(dronescan* bot, sqlSpamRule* rule, sqlSpamEvent* ev,
         return false;
     bot->spamRuleEventsMap[rule_id].push_back(std::make_pair(event_id, pointsOverride));
     return true;
+}
+
+// Link an action to a rule via spam_rule_actions (duplicate-binding check +
+// INSERT + in-memory map update). Shared by "RULE ADDACTION" and the
+// "-action" flag on "RULE ADD". durOverride/delayOverride use -1 and
+// reasonOverride an empty string as "not provided" sentinels, matching
+// spam_rule_actions' own NULL-means-default convention.
+// Sets *outAlreadyLinked and returns nullptr if the rule already has this
+// action bound; returns nullptr on insert failure; caller is responsible
+// for calling bot->relinkSpamGraph() afterward on success.
+static sqlSpamRuleAction* linkActionToRule(dronescan* bot, sqlSpamRule* rule, sqlSpamAction* action,
+                                           int durOverride, const string& reasonOverride,
+                                           int delayOverride, bool* outAlreadyLinked)
+{
+    *outAlreadyLinked = false;
+    const int rule_id   = rule->getId();
+    const int action_id = action->getId();
+
+    // A rule may only bind a given action once (spam_rule_actions has a
+    // UNIQUE(rule_id, action_id) constraint).
+    dronescan::spamRuleActionsMapType::const_iterator existingIt =
+        bot->spamRuleActionsMap.find(rule_id);
+    if (existingIt != bot->spamRuleActionsMap.end()) {
+        for (size_t i = 0; i < existingIt->second.size(); ++i) {
+            if (existingIt->second[i]->getActionId() == action_id) {
+                *outAlreadyLinked = true;
+                return nullptr;
+            }
+        }
+    }
+
+    sqlSpamRuleAction* ra = new sqlSpamRuleAction(bot->getSqlDb());
+    ra->setRuleId(rule_id);
+    ra->setActionId(action_id);
+    ra->setActionType(action->getActionType());
+    if (durOverride >= 0) ra->setActionDurationOverride(durOverride);
+    if (!reasonOverride.empty()) ra->setActionReasonOverride(reasonOverride);
+    if (delayOverride >= 0) ra->setDelayOverride(delayOverride);
+
+    if (!ra->insert()) {
+        delete ra;
+        return nullptr;
+    }
+    bot->spamRuleActionsMap[rule_id].push_back(ra);
+    return ra;
 }
 
 // Parse comma-separated target names to an integer bitmask.
@@ -748,10 +796,43 @@ static void handleRule(dronescan* bot, const iClient* theClient,
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE ADD <name> <threshold>
+        // SPAM RULE ADD <name> <threshold> [-action <action_name>]
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM RULE ADD <name> <threshold>");
+            bot->Reply(theClient,
+                "Usage: SPAM RULE ADD <name> <threshold> [-action <action_name>]");
             return;
+        }
+
+        // Scan remaining tokens for -action (repeatable).
+        std::vector<string> actionNames;
+        size_t pos = 5;
+        while (pos < st.size()) {
+            const string flag = string_lower(st[pos]);
+            if (flag == "-action") {
+                if (pos + 1 >= st.size()) {
+                    bot->Reply(theClient, "-action requires an action name.");
+                    return;
+                }
+                actionNames.push_back(st[pos + 1]);
+                pos += 2;
+            } else {
+                bot->Reply(theClient,
+                    "Unknown option '%s'. Valid options: -action <action_name>.",
+                    st[pos].c_str());
+                return;
+            }
+        }
+
+        // Resolve every -action name up front so ADD fails fast on a typo
+        // instead of leaving a half-linked rule behind.
+        std::vector<sqlSpamAction*> actionsToLink;
+        for (size_t i = 0; i < actionNames.size(); ++i) {
+            sqlSpamAction* a = findActionByName(bot, actionNames[i]);
+            if (!a) {
+                bot->Reply(theClient, "Action '%s' not found.", actionNames[i].c_str());
+                return;
+            }
+            actionsToLink.push_back(a);
         }
 
         sqlSpamRule* rule = new sqlSpamRule(bot->getSqlDb());
@@ -766,9 +847,27 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamRulesMap[rule->getId()] = rule;
+
+        string linkedNames;
+        for (size_t i = 0; i < actionsToLink.size(); ++i) {
+            bool alreadyLinked = false;
+            sqlSpamRuleAction* ra = linkActionToRule(bot, rule, actionsToLink[i],
+                                                      -1, string(), -1, &alreadyLinked);
+            if (!ra) {
+                bot->Reply(theClient, "Warning: failed to link action '%s'%s.",
+                           actionsToLink[i]->getName().c_str(),
+                           alreadyLinked ? " (already linked)" : "");
+                continue;
+            }
+            if (!linkedNames.empty()) linkedNames += ", ";
+            linkedNames += actionsToLink[i]->getName();
+        }
         bot->relinkSpamGraph();
+
         bot->Reply(theClient, "Spam rule '%s' added with ID %d.",
                    rule->getName().c_str(), rule->getId());
+        if (!linkedNames.empty())
+            bot->Reply(theClient, "Linked to action(s): %s.", linkedNames.c_str());
         return;
     }
 
@@ -903,39 +1002,27 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Action '%s' not found.", st[4].c_str());
             return;
         }
-        const int rule_id   = rule->getId();
-        const int action_id = action->getId();
+        const int durOverride    = (st.size() >= 6) ? atoi(st[5].c_str()) : -1;
+        const string reasonOverride = (st.size() >= 7) ? st[6] : string();
+        const int delayOverride  = (st.size() >= 8) ? atoi(st[7].c_str()) : -1;
 
         // A rule may only bind a given action once (spam_rule_actions has a
         // UNIQUE(rule_id, action_id) constraint) so REMACTION can identify a
         // binding unambiguously by <rule_name> <action_name>.
-        dronescan::spamRuleActionsMapType::const_iterator existingIt =
-            bot->spamRuleActionsMap.find(rule_id);
-        if (existingIt != bot->spamRuleActionsMap.end()) {
-            for (size_t i = 0; i < existingIt->second.size(); ++i) {
-                if (existingIt->second[i]->getActionId() == action_id) {
-                    bot->Reply(theClient,
-                        "Action '%s' is already linked to rule '%s'.",
-                        action->getName().c_str(), rule->getName().c_str());
-                    return;
-                }
-            }
-        }
-
-        sqlSpamRuleAction* ra = new sqlSpamRuleAction(bot->getSqlDb());
-        ra->setRuleId(rule_id);
-        ra->setActionId(action_id);
-        ra->setActionType(action->getActionType());
-        if (st.size() >= 6) ra->setActionDurationOverride(atoi(st[5].c_str()));
-        if (st.size() >= 7) ra->setActionReasonOverride(st[6]);
-        if (st.size() >= 8) ra->setDelayOverride(atoi(st[7].c_str()));
-
-        if (!ra->insert()) {
-            bot->Reply(theClient, "Failed to link action %d to rule %d.", action_id, rule_id);
-            delete ra;
+        bool alreadyLinked = false;
+        sqlSpamRuleAction* ra = linkActionToRule(bot, rule, action,
+                                                  durOverride, reasonOverride, delayOverride,
+                                                  &alreadyLinked);
+        if (!ra) {
+            if (alreadyLinked)
+                bot->Reply(theClient,
+                    "Action '%s' is already linked to rule '%s'.",
+                    action->getName().c_str(), rule->getName().c_str());
+            else
+                bot->Reply(theClient, "Failed to link action %d to rule %d.",
+                           action->getId(), rule->getId());
             return;
         }
-        bot->spamRuleActionsMap[rule_id].push_back(ra);
         bot->relinkSpamGraph();
         bot->Reply(theClient, "Action '%s' linked to rule '%s' (sra id: %d).",
                    action->getName().c_str(), rule->getName().c_str(), ra->getId());
