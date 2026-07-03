@@ -3034,8 +3034,8 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
         sc->getHostname(),
         sc->getHostname(),
         sc->getModes(),
-        sc->getAccount(),
-        static_cast<unsigned int>(sc->getAccountId()),
+        string(),       // account - set via UserLogin() if needed
+        0,              // account_id - set via UserLogin() if needed
         0,              // account_flags
         string(),       // tls_fingerprint
         sc->getRealname(),
@@ -3046,6 +3046,11 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
         elog << "dronescan::introduceSpyClient> AttachClient failed for spy client "
              << sc->getId() << endl;
         return nullptr;
+    }
+
+    if (!sc->getAccount().empty()) {
+        MyUplink->UserLogin(ic, sc->getAccount(),
+                            static_cast<unsigned int>(sc->getAccountId()), 0, this);
     }
 
     liveSpyClientsMap[sc->getId()] = ic;
