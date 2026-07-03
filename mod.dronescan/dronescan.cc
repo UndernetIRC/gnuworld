@@ -570,7 +570,7 @@ void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theCha
  * Here we receive private messages from iClients.
  */
 void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool) {
-    if (theClient && currentState == RUN)
+    if ((theClient && currentState == RUN) && (!theClient->isOper()))
         processSpamText(theClient, Message, spam_target::PRIVMSG, "");
 
     sqlUser* theUser = getSqlUser(theClient->getAccount());
@@ -2628,6 +2628,7 @@ void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
             score.window_start = now;
         }
         elog << "dronescan::scoreEvent> Updating score for event " << ev->getId()
+             << "[" << ev->getName() << "] for actor " << actor.numeric
              << " rule " << rule->getId()
              << " (count=" << score.count << ", window_start=" << score.window_start
              << ", point_expiry=" << ev->getPointExpiry() << ")" << std::endl;
