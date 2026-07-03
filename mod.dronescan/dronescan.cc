@@ -2593,7 +2593,8 @@ dronescan::SpamActor dronescan::makeActor(iClient* theClient) const
  * the per-rule scoring buckets. Shared by TEXT and TEXT_REPEAT.
  */
 void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
-                           const std::string& channel_name, time_t now)
+                           const std::string& channel_name, time_t now,
+                           const std::string& text)
 {
     const std::vector<sqlSpamRule*>& rules = ev->getRules();
     for (size_t i = 0; i < rules.size(); ++i) {
@@ -2614,6 +2615,8 @@ void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
         int maxOcc = ev->getMaxOccurrence();
         if (maxOcc < 0 || score.count < maxOcc)
             ++score.count;
+        score.last_text    = text;
+        score.last_text_ts = now;
     }
 }
 
@@ -2671,11 +2674,11 @@ void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
     if (crossuser) {
         for (std::map<std::string, SpamActor>::const_iterator pit = e.participants.begin();
              pit != e.participants.end(); ++pit) {
-            scoreEvent(ev, pit->second, channel_name, now);
+            scoreEvent(ev, pit->second, channel_name, now, text);
             actorsToEvaluate[pit->first] = pit->second;
         }
     } else {
-        scoreEvent(ev, actor, channel_name, now);
+        scoreEvent(ev, actor, channel_name, now, text);
         // actor is already in actorsToEvaluate (seeded by processSpamText)
     }
 }
@@ -2730,7 +2733,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
         if (rc < 0)
             continue;  // no match (or error)
 
-        scoreEvent(ev, actor, channel_name, now);
+        scoreEvent(ev, actor, channel_name, now, text);
     }
 
     for (std::map<std::string, SpamActor>::const_iterator ait = actorsToEvaluate.begin();
@@ -2808,6 +2811,8 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
         const string scoringKey = buildScoringKey(rule, actor, channel_name);
 
         int totalScore = 0;
+        std::string triggerText;
+        time_t      triggerTs = 0;
         for (size_t i = 0; i < links.size(); ++i) {
             sqlSpamEvent* ev = links[i].event;
             int points_override = links[i].pointsOverride;
@@ -2827,10 +2832,17 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
 
             int pts = (points_override >= 0) ? points_override : ev->getPoints();
             totalScore += sc.count * pts;
+
+            // Track the most recently matched text among contributing
+            // events, to report the line that likely tipped the threshold.
+            if (sc.count > 0 && sc.last_text_ts >= triggerTs) {
+                triggerTs   = sc.last_text_ts;
+                triggerText = sc.last_text;
+            }
         }
 
         if (totalScore >= rule->getThreshold()) {
-            fireRuleActions(rule, actor, channel_name);
+            fireRuleActions(rule, actor, channel_name, triggerText);
 
             // Reset scores for all events linked to this rule to prevent
             // immediate re-triggering
@@ -2843,6 +2855,27 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
     }
 }
 
+namespace {
+
+// Strip control bytes (including IRC formatting codes, all below 0x20) and
+// cap length before embedding matched text in a REPORT message. ISO-8859-1
+// is single-byte, so no multi-byte handling is required.
+std::string sanitizeSpamTextForReport(const std::string& text)
+{
+    const size_t kMaxLen = 200;
+    std::string out;
+    out.reserve(std::min(text.size(), kMaxLen));
+    for (size_t i = 0; i < text.size() && out.size() < kMaxLen; ++i) {
+        unsigned char c = static_cast<unsigned char>(text[i]);
+        out += (c < 0x20 || c == 0x7F || (c >= 0x80 && c <= 0x9F)) ? ' ' : static_cast<char>(c);
+    }
+    if (text.size() > kMaxLen)
+        out += "...";
+    return out;
+}
+
+} // anonymous namespace
+
 /**
  * fireRuleActions: execute all actions linked to the given rule for
  * the offending actor. Handles REPORT and GLINE; KILL is deferred.
@@ -2850,7 +2883,8 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
  * offender has since quit (crossuser TEXT_REPEAT).
  */
 void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
-                                const std::string& channel_name)
+                                const std::string& channel_name,
+                                const std::string& triggerText)
 {
     if (!rule)
         return;
@@ -2881,12 +2915,22 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
             reason = "Spam detected";
 
         if (actionType == "REPORT") {
+            const std::string sanitizedText = sanitizeSpamTextForReport(triggerText);
             char buf[512];
-            snprintf(buf, sizeof(buf),
-                "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s",
-                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
-                rule->getName().c_str(),
-                channel_name.empty() ? "(no channel)" : channel_name.c_str());
+            if (sanitizedText.empty()) {
+                snprintf(buf, sizeof(buf),
+                    "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s",
+                    nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                    rule->getName().c_str(),
+                    channel_name.empty() ? "(no channel)" : channel_name.c_str());
+            } else {
+                snprintf(buf, sizeof(buf),
+                    "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s - text: \"%s\"",
+                    nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                    rule->getName().c_str(),
+                    channel_name.empty() ? "(no channel)" : channel_name.c_str(),
+                    sanitizedText.c_str());
+            }
             Message(consoleChannel, "%s", buf);
 
         } else if (actionType == "GLINE") {
@@ -3199,6 +3243,13 @@ void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin)
     if (kickStoppedChannels.count(chanKey))
         return;
 
+    // The channel may have been removed/disabled from monitoring since this
+    // join was scheduled (e.g. via SPAM MONITORCHAN DEL/DISABLE, or dropped
+    // on reload) - treat a stale timer firing for it as a no-op.
+    monitoredChannelsMapType::const_iterator mcit = monitoredChannelsMap.find(chanKey);
+    if (mcit == monitoredChannelsMap.end() || !mcit->second->isEnabled())
+        return;
+
     int scId = findBestSpyClient(chanName, forcejoin);
     if (scId < 0) {
         Message(consoleChannel,
@@ -3238,6 +3289,21 @@ void dronescan::scheduleSpyClientJoin(const std::string& chanName, bool forcejoi
     time_t fireAt = ::time(nullptr) + static_cast<time_t>(delay);
     xServer::timerID tid = MyUplink->RegisterTimer(fireAt, this, nullptr);
     pendingJoinTimers[tid] = std::make_pair(forcejoin, string_lower(chanName));
+}
+
+/** Cancel any pending spy-client-join timer(s) scheduled for the given channel. */
+void dronescan::cancelPendingJoinTimers(const std::string& chanName)
+{
+    const string chanKey = string_lower(chanName);
+    for (pendingJoinTimersType::iterator it = pendingJoinTimers.begin();
+         it != pendingJoinTimers.end(); ) {
+        if (it->second.second == chanKey) {
+            MyUplink->UnRegisterTimer(it->first, nullptr);
+            pendingJoinTimers.erase(it++);
+        } else {
+            ++it;
+        }
+    }
 }
 
 /**

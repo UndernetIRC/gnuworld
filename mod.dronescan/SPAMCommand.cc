@@ -1542,12 +1542,14 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Monitored channel %d not found.", id);
             return;
         }
-        // Part any spy client currently in this channel
+        // Part any spy client currently in this channel, and cancel any
+        // spy-client join that was scheduled but hasn't fired yet
         {
             const string chanKey = found->first;
             dronescan::chanActiveSpyMapType::iterator sit = bot->chanActiveSpyMap.find(chanKey);
             if (sit != bot->chanActiveSpyMap.end())
                 bot->partSpyClientFromChannel(sit->second, chanKey);
+            bot->cancelPendingJoinTimers(chanKey);
         }
         if (!found->second->remove()) {
             bot->Reply(theClient, "Failed to delete monitored channel %d.", id);
@@ -1589,10 +1591,12 @@ static void handleMonitorChan(dronescan* bot, const iClient* theClient,
         }
         const string chanKey = string_lower(mc->getName());
         if (verb == "DISABLE") {
-            // Part any active spy client from this channel
+            // Part any active spy client from this channel, and cancel any
+            // spy-client join that was scheduled but hasn't fired yet
             dronescan::chanActiveSpyMapType::iterator sit = bot->chanActiveSpyMap.find(chanKey);
             if (sit != bot->chanActiveSpyMap.end())
                 bot->partSpyClientFromChannel(sit->second, chanKey);
+            bot->cancelPendingJoinTimers(chanKey);
         } else {
             // Enable: schedule a spy client join
             if (!mc->isJoinAsService()) {

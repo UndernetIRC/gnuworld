@@ -320,13 +320,15 @@ class dronescan : public xClient {
     void processSpamText(iClient* theClient, const std::string& text,
                          int target_bit, const std::string& channel_name);
     void scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
-                    const std::string& channel_name, time_t now);
+                    const std::string& channel_name, time_t now,
+                    const std::string& text);
     void processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
                             const std::string& text, const std::string& channel_name,
                             time_t now, std::map<std::string, SpamActor>& actorsToEvaluate);
     void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name);
     void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
-                         const std::string& channel_name);
+                         const std::string& channel_name,
+                         const std::string& triggerText);
     // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
     // rule->isScoreGlobally() is true (channel segment omitted). unit is the
     // client's numeric nick, or its IP when rule->getPointsPer() == "IP".
@@ -371,6 +373,9 @@ class dronescan : public xClient {
      */
     void scheduleSpyClientJoin(const std::string& chanName, bool forcejoin,
                                int minDelay, int maxDelay);
+
+    /** Cancel any pending spy-client-join timer(s) scheduled for the given channel. */
+    void cancelPendingJoinTimers(const std::string& chanName);
 
     /** Voice a spy client in the console channel. */
     void voiceSpyClientInConsole(iClient* ic);
@@ -485,9 +490,12 @@ class dronescan : public xClient {
 
     /* In-memory spam scoring: scoringKey -> (event_id -> SpamScore) */
     struct SpamScore {
-        int    count;        // occurrences within the current window
-        time_t window_start; // when the current window began
-        SpamScore() : count(0), window_start(0) {}
+        int         count;        // occurrences within the current window
+        time_t      window_start; // when the current window began
+        std::string last_text;    // text of the most recent match that
+                                   // contributed to this event's count
+        time_t      last_text_ts; // wall-clock time last_text was set
+        SpamScore() : count(0), window_start(0), last_text_ts(0) {}
     };
     typedef std::map<std::string, std::map<int, SpamScore>>            spamScoreMapType;
     spamScoreMapType spamScoreMap;
