@@ -23,6 +23,7 @@ libdronescan_la_SOURCES = 	\
 	mod.dronescan/ADDEXCEPTIONALCHANNELCommand.cc\
 	mod.dronescan/REMEXCEPTIONALCHANNELCommand.cc\
 	mod.dronescan/RELOADCommand.cc\
+	mod.dronescan/REHASHCommand.cc\
 	mod.dronescan/ADDUSERCommand.cc	\
 	mod.dronescan/ANALYSECommand.cc	\
 	mod.dronescan/CHECKCommand.cc		\

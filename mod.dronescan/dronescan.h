@@ -624,7 +624,6 @@ class dronescan : public xClient {
     /** Timers for GNUWorld triggered events. */
     xServer::timerID tidClearJoinCounter;
     xServer::timerID tidClearNickCounter;
-    xServer::timerID tidRefreshCaches;
     xServer::timerID tidGlineQueue;
     xServer::timerID tidRepeatGC;   // periodic sweep of expired repeat entries
 
@@ -641,9 +640,6 @@ class dronescan : public xClient {
 
     /** Time of the last cache. */
     std::map<std::string, time_t> lastUpdated;
-
-    /** How often to refresh caches. */
-    unsigned int rcInterval;
 
     /** Fake sqlUser record for opered clients without accounts. */
     sqlUser* fakeOperUser;

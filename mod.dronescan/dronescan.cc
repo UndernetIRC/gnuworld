@@ -131,7 +131,6 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     // pcCutoff = atoi(dronescanConfig->Require("pcCutoff")->second.c_str());
     ncInterval = atoi(dronescanConfig->Require("ncInterval")->second.c_str());
     ncCutoff = atoi(dronescanConfig->Require("ncCutoff")->second.c_str());
-    rcInterval = atoi(dronescanConfig->Require("rcInterval")->second.c_str());
     jcMinJoinToGline = atoi(dronescanConfig->Require("jcMinJoinToGline")->second.c_str());
     jcGracePeriodBurstOrSplit =
         atoi(dronescanConfig->Require("jcGracePeriodBurstOrSplit")->second.c_str());
@@ -261,6 +260,7 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     RegisterCommand(new REMUSERCommand(this, "REMUSER", "<user>"));
     RegisterCommand(new STATUSCommand(this, "STATUS", ""));
     RegisterCommand(new RELOADCommand(this, "RELOAD", ""));
+    RegisterCommand(new REHASHCommand(this, "REHASH", ""));
     RegisterCommand(new SPAMCommand(this, "SPAM",
         "(EVENT|RULE|ACTION|EXCLUSION) (ADD|DEL|LIST|SHOW|ADDEVENT|REMEVENT|ADDACTION|REMACTION) ..."));
 
@@ -311,10 +311,6 @@ void dronescan::OnAttach() {
     /* Set up our JC counter */
     theTime = time(0) + jcInterval;
     tidClearJoinCounter = MyUplink->RegisterTimer(theTime, this, 0);
-
-    /* Set up cache refresh timer */
-    theTime = time(0) + rcInterval;
-    tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
 
     theTime = time(0) + ncInterval;
     tidClearNickCounter = MyUplink->RegisterTimer(theTime, this, 0);
@@ -1029,17 +1025,6 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
 
         theTime = time(0) + ncInterval;
         tidClearNickCounter = MyUplink->RegisterTimer(theTime, this, 0);
-    }
-
-    if (theTimer == tidRefreshCaches) {
-        log(DBG, "Refreshing caches");
-
-        preloadUserCache();
-        preloadExceptionalChannels();
-        refreshSpamCaches();
-
-        theTime = time(0) + rcInterval;
-        tidRefreshCaches = MyUplink->RegisterTimer(theTime, this, 0);
     }
 
     if (theTimer == tidGlineQueue) {
