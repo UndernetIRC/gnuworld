@@ -94,9 +94,10 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
         i++;
     }
     elog << "droneScan.start> i = " << i << endl;
-    if (i == 1) // if i == 1, it means i'm not connectd to a hub. If i > 1, it means the RELOAD
-                // command was sent
-        currentState = BURST;
+    // if i == 1, it means i'm not connectd to a hub. If i > 1, it means the RELOAD
+    // command was sent, and the network has already completed burst.
+    bool wasReloaded = (i > 1);
+    currentState = BURST;
     averageEntropy = 0;
     totalNicks = 0;
 
@@ -281,6 +282,14 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
             clientsIPMap.insert(std::make_pair(IP, 1));
         else
             clientsIPMap[IP]++;
+    }
+
+    if (wasReloaded) {
+        // The network has already completed burst, so no EVT_BURST_CMPLT
+        // will arrive to drive the BURST->RUN transition that populates
+        // charMap/averageEntropy and per-client state. Force it now that
+        // the rest of the client is fully set up.
+        changeState(RUN);
     }
 
 } // dronescan::dronescan(const string&)
