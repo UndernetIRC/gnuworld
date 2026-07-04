@@ -2724,6 +2724,13 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
     std::map<std::string, SpamActor> actorsToEvaluate;
     actorsToEvaluate[actor.numeric] = actor;
 
+    // For events with no channel context of their own (direct PRIVMSG to the
+    // bot/spy client), report the monitored channels the sender is on instead
+    // of "(no channel)". Channel-origin events keep their own channel name.
+    const std::string displayChannels = channel_name.empty()
+        ? monitoredChannelNamesForClient(theClient)
+        : channel_name;
+
     for (size_t i = 0; i < spamEventsList.size(); ++i)
     {
         sqlSpamEvent* ev = spamEventsList[i];
@@ -2758,7 +2765,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
 
     for (std::map<std::string, SpamActor>::const_iterator ait = actorsToEvaluate.begin();
          ait != actorsToEvaluate.end(); ++ait)
-        evaluateSpamRules(ait->second, channel_name);
+        evaluateSpamRules(ait->second, channel_name, displayChannels);
 }
 
 /**
@@ -2780,10 +2787,36 @@ std::string dronescan::buildScoringKey(sqlSpamRule* rule, const SpamActor& actor
 }
 
 /**
+ * monitoredChannelNamesForClient: comma-separated list of monitored channels
+ * theClient currently sits in, for use in reports about events with no
+ * channel context of their own.
+ */
+std::string dronescan::monitoredChannelNamesForClient(iClient* theClient) const
+{
+    if (!theClient)
+        return std::string();
+
+    std::string out;
+    for (iClient::const_channelIterator it = theClient->channels_begin();
+         it != theClient->channels_end(); ++it)
+    {
+        Channel* theChannel = *it;
+        if (monitoredChannelsMap.find(string_lower(theChannel->getName())) ==
+            monitoredChannelsMap.end())
+            continue;
+        if (!out.empty())
+            out += ", ";
+        out += theChannel->getName();
+    }
+    return out;
+}
+
+/**
  * evaluateSpamRules: after scores have been updated for an actor, check
  * whether any enabled rule has crossed its threshold.
  */
-void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& channel_name)
+void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
+                                  const std::string& displayChannels)
 {
     const string lcChan     = string_lower(channel_name);
     const time_t now        = ::time(0);
@@ -2862,7 +2895,7 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
         }
 
         if (totalScore >= rule->getThreshold()) {
-            fireRuleActions(rule, actor, channel_name, triggerText);
+            fireRuleActions(rule, actor, displayChannels, triggerText);
 
             // Reset scores for all events linked to this rule to prevent
             // immediate re-triggering
@@ -2903,7 +2936,7 @@ std::string sanitizeSpamTextForReport(const std::string& text)
  * offender has since quit (crossuser TEXT_REPEAT).
  */
 void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
-                                const std::string& channel_name,
+                                const std::string& displayChannels,
                                 const std::string& triggerText)
 {
     if (!rule)
@@ -2942,13 +2975,13 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                     "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s",
                     nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
                     rule->getName().c_str(),
-                    channel_name.empty() ? "(no channel)" : channel_name.c_str());
+                    displayChannels.empty() ? "(no channel)" : displayChannels.c_str());
             } else {
                 snprintf(buf, sizeof(buf),
                     "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s - text: \"%s\"",
                     nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
                     rule->getName().c_str(),
-                    channel_name.empty() ? "(no channel)" : channel_name.c_str(),
+                    displayChannels.empty() ? "(no channel)" : displayChannels.c_str(),
                     sanitizedText.c_str());
             }
             Message(consoleChannel, "%s", buf);

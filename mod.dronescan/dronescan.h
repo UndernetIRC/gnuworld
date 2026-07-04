@@ -325,15 +325,21 @@ class dronescan : public xClient {
     void processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
                             const std::string& text, const std::string& channel_name,
                             time_t now, std::map<std::string, SpamActor>& actorsToEvaluate);
-    void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name);
+    void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
+                          const std::string& displayChannels);
     void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
-                         const std::string& channel_name,
+                         const std::string& displayChannels,
                          const std::string& triggerText);
     // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
     // rule->isScoreGlobally() is true (channel segment omitted). unit is the
     // client's numeric nick, or its IP when rule->getPointsPer() == "IP".
     std::string buildScoringKey(sqlSpamRule* rule, const SpamActor& actor,
                                 const std::string& channel_name) const;
+    // Comma-separated list of monitored channels the client currently sits in
+    // (original-case names), for use in reports about events with no channel
+    // context of their own (i.e. direct PRIVMSG to the bot/spy client). Empty
+    // if the client is on no monitored channel.
+    std::string monitoredChannelNamesForClient(iClient* theClient) const;
 
     /* Spy client live management */
 
