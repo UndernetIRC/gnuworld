@@ -38,6 +38,9 @@ class sqlMonitoredChannel {
     inline int           getCreatedTs()    const { return created_ts; }
     inline int           getModifiedTs()   const { return modified_ts; }
     inline int           getModifiedBy()   const { return modified_by; }
+    // 0 means never triggered
+    inline int           getLastTriggeredTs()   const { return last_triggered_ts; }
+    inline const string& getLastTriggeredRule() const { return last_triggered_rule; }
 
     /* Mutators */
     inline void setId(int v)                   { id = v; }
@@ -48,6 +51,8 @@ class sqlMonitoredChannel {
     inline void setCreatedTs(int v)            { created_ts = v; }
     inline void setModifiedTs(int v)           { modified_ts = v; }
     inline void setModifiedBy(int v)           { modified_by = v; }
+    inline void setLastTriggeredTs(int v)          { last_triggered_ts = v; }
+    inline void setLastTriggeredRule(const string& v) { last_triggered_rule = v; }
 
     void setAllMembers(int row);
     bool commit();
@@ -63,6 +68,8 @@ class sqlMonitoredChannel {
     int    created_ts;
     int    modified_ts;
     int    modified_by;   // 0 means NULL
+    int    last_triggered_ts;   // 0 means NULL (never triggered)
+    string last_triggered_rule;
 
     dbHandle* SQLDb;
 };

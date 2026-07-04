@@ -2182,6 +2182,7 @@ void dronescan::refreshSpamCaches()
     preloadSpyClients();
     preloadMonitoredChannels();
     preloadSpamRuleChannels();
+    preloadMonitoredChannelSpyClients();
 
     relinkSpamGraph();
 
@@ -2281,8 +2282,11 @@ void dronescan::relinkSpamGraph()
  * compileEventRegex: (re)compile the TEXT param regex for ev into
  * spamRegexCache, freeing any previously compiled pattern for this event
  * id first. No-op (after freeing) for non-TEXT events or an empty param.
- * Called on load, on EVENT ADD, and on EVENT SET (param or
- * case_sensitive) so the compiled pattern never goes stale.
+ * Called on load, on EVENT ADD, and on EVENT SET (param) so the compiled
+ * pattern never goes stale.
+ *
+ * Case-sensitivity is not a compile flag here: prefix the pattern itself
+ * with "(?i)" (native PCRE2 syntax) for case-insensitive matching.
  */
 void dronescan::compileEventRegex(sqlSpamEvent* ev)
 {
@@ -2297,10 +2301,9 @@ void dronescan::compileEventRegex(sqlSpamEvent* ev)
 
     int errcode;
     PCRE2_SIZE erroffset;
-    uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
     pcre2_code* re = pcre2_compile(
         reinterpret_cast<PCRE2_SPTR>(ev->getParam().c_str()),
-        PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
+        PCRE2_ZERO_TERMINATED, 0, &errcode, &erroffset, nullptr);
     if (re)
         spamRegexCache[ev->getId()] = re;
     else
@@ -2547,7 +2550,8 @@ void dronescan::preloadMonitoredChannels()
 
     std::stringstream q;
     q << "SELECT id, name, forcejoin, joinasservice, enabled, "
-      << "created_ts, modified_ts, modified_by "
+      << "created_ts, modified_ts, modified_by, "
+      << "last_triggered_ts, last_triggered_rule "
       << "FROM monitored_channels ORDER BY id";
 
     if (!SQLDb->Exec(q, true)) {
@@ -2585,6 +2589,29 @@ void dronescan::preloadSpamRuleChannels()
     }
     elog << "dronescan::preloadSpamRuleChannels> Loaded " << total
          << " rule-channel entries." << std::endl;
+}
+
+void dronescan::preloadMonitoredChannelSpyClients()
+{
+    monitoredChannelSpyClientsMap.clear();
+
+    std::stringstream q;
+    q << "SELECT channel_id, spyclient_id FROM monitored_channel_spyclients "
+      << "ORDER BY channel_id, spyclient_id";
+
+    if (!SQLDb->Exec(q, true)) {
+        doSqlError(q.str(), SQLDb->ErrorMessage());
+        return;
+    }
+    unsigned int total = 0;
+    for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
+        int channel_id   = atoi(SQLDb->GetValue(i, 0).c_str());
+        int spyclient_id = atoi(SQLDb->GetValue(i, 1).c_str());
+        monitoredChannelSpyClientsMap[channel_id].push_back(spyclient_id);
+        ++total;
+    }
+    elog << "dronescan::preloadMonitoredChannelSpyClients> Loaded " << total
+         << " channel-spyclient entries." << std::endl;
 }
 
 // ---------------------------------------------------------------------------
@@ -2822,9 +2849,12 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
     const time_t now        = ::time(0);
 
     // Only process channels we are actually monitoring
-    if (!channel_name.empty() &&
-        monitoredChannelsMap.find(lcChan) == monitoredChannelsMap.end())
-        return;
+    monitoredChannelsMapType::const_iterator mcit = monitoredChannelsMap.end();
+    if (!channel_name.empty()) {
+        mcit = monitoredChannelsMap.find(lcChan);
+        if (mcit == monitoredChannelsMap.end())
+            return;
+    }
 
     for (spamRulesMapType::const_iterator rit = spamRulesMap.begin();
          rit != spamRulesMap.end(); ++rit)
@@ -2896,6 +2926,15 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
 
         if (totalScore >= rule->getThreshold()) {
             fireRuleActions(rule, actor, displayChannels, triggerText);
+
+            // Record last-triggered info for the monitored channel, for
+            // visibility in SPAM CHAN LIST/SHOW
+            if (mcit != monitoredChannelsMap.end()) {
+                sqlMonitoredChannel* mc = mcit->second;
+                mc->setLastTriggeredTs(now);
+                mc->setLastTriggeredRule(rule->getName());
+                mc->commit();
+            }
 
             // Reset scores for all events linked to this rule to prevent
             // immediate re-triggering
@@ -3230,6 +3269,13 @@ void dronescan::detachSpyClient(int scId)
  * falls back to the live spy client already covering the fewest channels,
  * so a spy client can end up covering more than one channel once the pool
  * is exhausted rather than leaving the channel unmonitored.
+ *
+ * If the channel has a restricted spy-client list (monitored_channel_spyclients
+ * via monitoredChannelSpyClientsMap), only those ids are considered, starting
+ * at a random position in the list and walking down it (wrapping around),
+ * instead of the full pool. Channels with no restriction keep the original
+ * full-pool iteration order - fully backward compatible.
+ *
  * Returns spy client id, or -1 only if there is no eligible live spy client
  * at all.
  */
@@ -3237,11 +3283,31 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
 {
     Channel* theChan = Network->findChannel(chanName);
 
+    std::vector<int> candidateIds;
+    monitoredChannelsMapType::const_iterator mcit =
+        monitoredChannelsMap.find(string_lower(chanName));
+    if (mcit != monitoredChannelsMap.end()) {
+        monitoredChannelSpyClientsMapType::const_iterator ridit =
+            monitoredChannelSpyClientsMap.find(mcit->second->getId());
+        if (ridit != monitoredChannelSpyClientsMap.end() && !ridit->second.empty()) {
+            const std::vector<int>& allowedIds = ridit->second;
+            size_t startIdx = static_cast<size_t>(rand()) % allowedIds.size();
+            for (size_t i = 0; i < allowedIds.size(); ++i)
+                candidateIds.push_back(allowedIds[(startIdx + i) % allowedIds.size()]);
+        }
+    }
+    if (candidateIds.empty()) {
+        for (spyClientsMapType::const_iterator it = spyClientsMap.begin();
+             it != spyClientsMap.end(); ++it)
+            candidateIds.push_back(it->first);
+    }
+
     int    bestBusyId    = -1;
     size_t bestBusyCount = 0;
 
-    for (spyClientsMapType::const_iterator it = spyClientsMap.begin();
-         it != spyClientsMap.end(); ++it) {
+    for (size_t ci = 0; ci < candidateIds.size(); ++ci) {
+        spyClientsMapType::const_iterator it = spyClientsMap.find(candidateIds[ci]);
+        if (it == spyClientsMap.end()) continue;  // stale id, skip
         sqlSpyClient* sc = it->second;
         if (!sc->isEnabled()) continue;
 

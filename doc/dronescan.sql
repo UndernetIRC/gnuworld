@@ -125,7 +125,11 @@ CREATE TABLE spam_events (
 	param                  text,
 	-- Bitmask: CHAN=1 PRIVMSG=2 NOTICE=4 PART=8 QUIT=16  (31 = all targets)
 	target                 int          NOT NULL DEFAULT 31,
-	case_sensitive         bool         NOT NULL DEFAULT false,
+	-- TEXT_REPEAT only: case-folds the dedup key used to detect repeated
+	-- text (see dronescan.cc processRepeatEvent()). Has no effect on TEXT
+	-- event regex matching; use an inline "(?i)" prefix in the pattern
+	-- itself for case-insensitive TEXT matching (native PCRE2 syntax).
+	case_sensitive         bool         NOT NULL DEFAULT true,
 	points                 int          NOT NULL DEFAULT 1,
 	-- Seconds before accumulated points from this event decay (per scoring unit, in memory)
 	point_expiry           int          NOT NULL DEFAULT 60,
@@ -303,18 +307,24 @@ CREATE TABLE spam_exclusions (
 -- joinasservice: if true, the main xClient bot itself monitors this channel
 --   directly with no spy client involved. Useful for channels where a fake
 --   client presence would be undesirable or impractical.
+--
+-- last_triggered_ts / last_triggered_rule: updated by
+--   dronescan::evaluateSpamRules() whenever a rule's threshold is crossed
+--   for this channel. NULL = no rule has ever fired here.
 -- -----------------------------------------------------------------------------
 CREATE TABLE monitored_channels (
-	id            serial       PRIMARY KEY,
-	name          varchar(200) NOT NULL UNIQUE,
+	id                  serial       PRIMARY KEY,
+	name                varchar(200) NOT NULL UNIQUE,
 	-- Force join even if channel is +i, +k, +l (full), or spy client is banned
-	forcejoin     bool         NOT NULL DEFAULT false,
+	forcejoin           bool         NOT NULL DEFAULT false,
 	-- Monitor via the main xClient bot directly; no spy client spawned
-	joinasservice bool         NOT NULL DEFAULT false,
-	enabled       bool         NOT NULL DEFAULT true,
-	created_ts    int4         NOT NULL DEFAULT 0,
-	modified_ts   int4         NOT NULL DEFAULT 0,
-	modified_by   int                   DEFAULT NULL
+	joinasservice       bool         NOT NULL DEFAULT false,
+	enabled             bool         NOT NULL DEFAULT true,
+	last_triggered_ts   int4                  DEFAULT NULL,
+	last_triggered_rule varchar(100)          DEFAULT NULL,
+	created_ts          int4         NOT NULL DEFAULT 0,
+	modified_ts         int4         NOT NULL DEFAULT 0,
+	modified_by         int                   DEFAULT NULL
 		REFERENCES users(id) ON DELETE SET NULL
 );
 
@@ -338,4 +348,19 @@ CREATE TABLE spam_rule_channels (
 	rule_id      int          NOT NULL REFERENCES spam_rules(id) ON DELETE CASCADE,
 	channel_name varchar(200) NOT NULL,
 	PRIMARY KEY (rule_id, channel_name)
+);
+
+-- -----------------------------------------------------------------------------
+-- monitored_channel_spyclients
+-- -----------------------------------------------------------------------------
+-- Optional restricted spy-client list per monitored channel. When a channel
+-- has rows here, dronescan::findBestSpyClient() only considers these spy
+-- clients (starting at a random position and walking down the list) instead
+-- of the full spy client pool. Channels with no rows here are unaffected
+-- (existing full-pool selection behavior).
+-- -----------------------------------------------------------------------------
+CREATE TABLE monitored_channel_spyclients (
+	channel_id   int NOT NULL REFERENCES monitored_channels(id) ON DELETE CASCADE,
+	spyclient_id int NOT NULL REFERENCES spyclients(id)         ON DELETE CASCADE,
+	PRIMARY KEY (channel_id, spyclient_id)
 );

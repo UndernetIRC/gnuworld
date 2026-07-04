@@ -36,6 +36,9 @@ class sqlSpamEvent {
     inline const string& getParam()            const { return param; }
     // target: bitmask ? CHAN=1, PRIVMSG=2, NOTICE=4, PART=8, QUIT=16, ALL=31
     inline int           getTarget()           const { return target; }
+    // TEXT_REPEAT only: case-folds the dedup key used to detect repeated
+    // text. Has no effect on TEXT event regex matching; use an inline
+    // "(?i)" prefix in param for case-insensitive TEXT matching instead.
     inline bool          isCaseSensitive()     const { return case_sensitive; }
     inline int           getPoints()           const { return points; }
     inline int           getPointExpiry()      const { return point_expiry; }

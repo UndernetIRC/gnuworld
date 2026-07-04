@@ -81,6 +81,8 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  ctcp=CTCP (direct or channel) to bot/spy, e.g. DCC/ACTION - match");
     bot->Reply(theClient, "    DCC specifically with a regex like \"^DCC\" scoped to ctcp");
     bot->Reply(theClient, "  \"chan\" is an alias for chan_priv+chan_not.");
+    bot->Reply(theClient, "  TEXT regex matching is case-sensitive by default; prefix the pattern");
+    bot->Reply(theClient, "  with \"(?i)\" for case-insensitive matching (native PCRE2 syntax).");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Target (comma-separated or \"all\"): chan_priv chan_not chan privmsg notice part quit ctcp");
     bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 ctcp=64 all=127");
@@ -90,7 +92,7 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "-repeat_count <n>    : sets repeat_min_count. Mandatory for TEXT_REPEAT,");
     bot->Reply(theClient, "                       invalid for any other event type.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "SET fields: name  description  param  target  case_sensitive");
+    bot->Reply(theClient, "SET fields: name  description  param  target  case_sensitive (TEXT_REPEAT only)");
     bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id (event name, or \"none\")");
     bot->Reply(theClient, "            enabled  repeat_crossuser");
     bot->Reply(theClient, "            repeat_min_count  repeat_exclusion_regex");
@@ -231,6 +233,8 @@ static void helpSpamChan(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SET     <id> <field> <value>");
     bot->Reply(theClient, "  ENABLE  <id>");
     bot->Reply(theClient, "  DISABLE <id>");
+    bot->Reply(theClient, "  ADDSPY  <#channel> <nick>");
+    bot->Reply(theClient, "  REMSPY  <#channel> <nick>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "  forcejoin=1    : force-join the channel even if not invited");
     bot->Reply(theClient, "  joinasservice=1: join using service mode (+)");
@@ -239,12 +243,19 @@ static void helpSpamChan(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  (channel name itself is immutable via SET - DEL+ADD to change it)");
     bot->Reply(theClient, "  (enabled behaves the same as ENABLE/DISABLE)");
     bot->Reply(theClient, " ");
+    bot->Reply(theClient, "ADDSPY/REMSPY restrict which spy clients may cover a channel. With no");
+    bot->Reply(theClient, "spy clients assigned, any configured spy client may be picked (default).");
+    bot->Reply(theClient, "With one or more assigned, selection starts at a random spy client in");
+    bot->Reply(theClient, "the list and walks down it instead of considering the full pool.");
+    bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM CHAN ADD #watch-this 1 0");
     bot->Reply(theClient, "  SPAM CHAN SET     2 forcejoin 0");
     bot->Reply(theClient, "  SPAM CHAN ENABLE  2");
     bot->Reply(theClient, "  SPAM CHAN DISABLE 2");
     bot->Reply(theClient, "  SPAM CHAN DEL     2");
+    bot->Reply(theClient, "  SPAM CHAN ADDSPY  #watch-this Spy1");
+    bot->Reply(theClient, "  SPAM CHAN REMSPY  #watch-this Spy1");
 }
 
 // ---------------------------------------------------------------------------

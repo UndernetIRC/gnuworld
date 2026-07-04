@@ -42,6 +42,8 @@
  *   SPAM CHAN      SET    <id> <field> <value>
  *   SPAM CHAN      ENABLE <id>
  *   SPAM CHAN      DISABLE <id>
+ *   SPAM CHAN      ADDSPY <#channel> <nick>
+ *   SPAM CHAN      REMSPY <#channel> <nick>
  *
  * target bitmask: chan_priv=1, privmsg=2, chan_not=4, part=8, quit=16, notice=32,
  *                  ctcp=64, all=127
@@ -160,6 +162,40 @@ static sqlSpamAction* findActionByName(dronescan* bot, const string& name)
             return it->second;
     }
     return nullptr;
+}
+
+static sqlSpyClient* findSpyClientByNick(dronescan* bot, const string& nick)
+{
+    const string lnick = string_lower(nick);
+    for (dronescan::spyClientsMapType::const_iterator it = bot->spyClientsMap.begin();
+         it != bot->spyClientsMap.end(); ++it) {
+        if (string_lower(it->second->getNickname()) == lnick)
+            return it->second;
+    }
+    return nullptr;
+}
+
+// Comma-separated nicknames of the spy clients restricted to channelId, or
+// an empty string if the channel has no restriction (any spy client may
+// join it).
+static string spyClientNickListForChannel(dronescan* bot, int channelId)
+{
+    dronescan::monitoredChannelSpyClientsMapType::const_iterator it =
+        bot->monitoredChannelSpyClientsMap.find(channelId);
+    if (it == bot->monitoredChannelSpyClientsMap.end() || it->second.empty())
+        return string();
+
+    string out;
+    for (size_t i = 0; i < it->second.size(); ++i) {
+        dronescan::spyClientsMapType::const_iterator scit =
+            bot->spyClientsMap.find(it->second[i]);
+        if (scit == bot->spyClientsMap.end())
+            continue;  // stale id
+        if (!out.empty())
+            out += ", ";
+        out += scit->second->getNickname();
+    }
+    return out;
 }
 
 // Link an event to a rule via spam_rule_events (INSERT + in-memory map
@@ -310,17 +346,21 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
                            ? std::to_string(ev->getMaxOccurrence()).c_str() : "unlimited",
                        ev->getRequiresEventId() > 0
                            ? std::to_string(ev->getRequiresEventId()).c_str() : "none");
-            bot->Reply(theClient,
-                       "     Param: %-32s  CaseSens: %s",
-                       ev->getParam().empty() ? "(none)" : ev->getParam().c_str(),
-                       ev->isCaseSensitive() ? "yes" : "no");
             if (ev->getEventType() == "TEXT_REPEAT") {
+                bot->Reply(theClient,
+                           "     Param: %-32s  CaseSens: %s",
+                           ev->getParam().empty() ? "(none)" : ev->getParam().c_str(),
+                           ev->isCaseSensitive() ? "yes" : "no");
                 bot->Reply(theClient,
                     "     CrossUser: %-3s  MinCount: %-3d  ExclRegex: %s",
                     ev->isRepeatCrossUser() ? "yes" : "no",
                     ev->getRepeatMinCount(),
                     ev->getRepeatExclusionRegex().empty()
                         ? "(none)" : ev->getRepeatExclusionRegex().c_str());
+            } else {
+                bot->Reply(theClient,
+                           "     Param: %s",
+                           ev->getParam().empty() ? "(none)" : ev->getParam().c_str());
             }
         }
         bot->Reply(theClient, "--- %zu event(s) ---", bot->spamEventsMap.size());
@@ -343,7 +383,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         bot->Reply(theClient, "Param   : %s", ev->getParam().c_str());
         bot->Reply(theClient, "Target  : %s (mask=%d)",
                    targetBitmaskToString(ev->getTarget()).c_str(), ev->getTarget());
-        bot->Reply(theClient, "CaseSens: %s", ev->isCaseSensitive() ? "yes" : "no");
+        if (ev->getEventType() == "TEXT_REPEAT")
+            bot->Reply(theClient, "CaseSens: %s", ev->isCaseSensitive() ? "yes" : "no");
         bot->Reply(theClient, "Points  : %d  Expiry: %ds",
                    ev->getPoints(), ev->getPointExpiry());
         bot->Reply(theClient, "MaxOcc  : %s",
@@ -555,10 +596,14 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             }
             ev->setTarget(mask);
         } else if (field == "case_sensitive") {
+            if (ev->getEventType() != "TEXT_REPEAT") {
+                bot->Reply(theClient,
+                    "case_sensitive only affects TEXT_REPEAT dedup matching. "
+                    "For TEXT event regex matching, prefix your pattern with "
+                    "'(?i)' instead to make it case-insensitive.");
+                return;
+            }
             ev->setCaseSensitive(value == "1" || value == "yes" || value == "true");
-            // Recompile: the compiled pattern's PCRE2_CASELESS flag depends on this.
-            bot->compileEventRegex(ev);
-            bot->compileRepeatExclusionRegex(ev);
         } else if (field == "points") {
             ev->setPoints(atoi(value.c_str()));
         } else if (field == "point_expiry") {
@@ -1779,7 +1824,7 @@ static void handleChan(dronescan* bot, const iClient* theClient,
 {
     if (st.size() < 3) {
         bot->Reply(theClient,
-            "Usage: SPAM CHAN <ADD|DEL|LIST|SHOW|SET|ENABLE|DISABLE> ...");
+            "Usage: SPAM CHAN <ADD|DEL|LIST|SHOW|SET|ENABLE|DISABLE|ADDSPY|REMSPY> ...");
         return;
     }
 
@@ -1794,18 +1839,27 @@ static void handleChan(dronescan* bot, const iClient* theClient,
         }
         bot->Reply(theClient, "=== Monitored Channels (%zu) ===",
                    bot->monitoredChannelsMap.size());
-        bot->Reply(theClient, "%-4s %-32s %-8s %-11s %s",
-                   "ID", "Channel", "ForceJoin", "JoinAsSvc", "Enabled");
+        bot->Reply(theClient, "%-4s %-32s %-8s %-11s %-7s %-10s %s",
+                   "ID", "Channel", "ForceJoin", "JoinAsSvc", "Enabled", "SpyClnts", "LastTrig");
         for (dronescan::monitoredChannelsMapType::const_iterator it =
                  bot->monitoredChannelsMap.begin();
              it != bot->monitoredChannelsMap.end(); ++it) {
             sqlMonitoredChannel* mc = it->second;
-            bot->Reply(theClient, "%-4d %-32s %-8s %-11s %s",
+            dronescan::monitoredChannelSpyClientsMapType::const_iterator sit =
+                bot->monitoredChannelSpyClientsMap.find(mc->getId());
+            const string spySummary = (sit != bot->monitoredChannelSpyClientsMap.end() &&
+                                        !sit->second.empty())
+                                       ? std::to_string(sit->second.size()) : "any";
+            const char* lastTrig = (mc->getLastTriggeredTs() > 0)
+                                   ? bot->Ago(mc->getLastTriggeredTs()) : "never";
+            bot->Reply(theClient, "%-4d %-32s %-8s %-11s %-7s %-10s %s",
                        mc->getId(),
                        mc->getName().c_str(),
                        mc->isForceJoin() ? "yes" : "no",
                        mc->isJoinAsService() ? "yes" : "no",
-                       mc->isEnabled() ? "yes" : "no");
+                       mc->isEnabled() ? "yes" : "no",
+                       spySummary.c_str(),
+                       lastTrig);
         }
         bot->Reply(theClient, "--- %zu channel(s) ---", bot->monitoredChannelsMap.size());
         return;
@@ -1830,11 +1884,19 @@ static void handleChan(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Monitored channel %d not found.", id);
             return;
         }
+        const string spyList = spyClientNickListForChannel(bot, found->getId());
         bot->Reply(theClient, "ID          : %d", found->getId());
         bot->Reply(theClient, "Channel     : %s", found->getName().c_str());
         bot->Reply(theClient, "ForceJoin   : %s", found->isForceJoin() ? "yes" : "no");
         bot->Reply(theClient, "JoinAsService: %s", found->isJoinAsService() ? "yes" : "no");
         bot->Reply(theClient, "Enabled     : %s", found->isEnabled() ? "yes" : "no");
+        bot->Reply(theClient, "SpyClients  : %s", spyList.empty() ? "any" : spyList.c_str());
+        if (found->getLastTriggeredTs() > 0)
+            bot->Reply(theClient, "LastTriggered: %s ago (rule '%s')",
+                       bot->Ago(found->getLastTriggeredTs()),
+                       found->getLastTriggeredRule().c_str());
+        else
+            bot->Reply(theClient, "LastTriggered: never");
         return;
     }
 
@@ -2042,8 +2104,113 @@ static void handleChan(dronescan* bot, const iClient* theClient,
         return;
     }
 
+    // -- ADDSPY ----------------------------------------------------------
+    if (verb == "ADDSPY") {
+        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        // SPAM CHAN ADDSPY <#channel> <nick>
+        if (st.size() < 5) {
+            bot->Reply(theClient, "Usage: SPAM CHAN ADDSPY <#channel> <nick>");
+            return;
+        }
+        const string chanName = string_lower(st[3]);
+        dronescan::monitoredChannelsMapType::const_iterator mcit =
+            bot->monitoredChannelsMap.find(chanName);
+        if (mcit == bot->monitoredChannelsMap.end()) {
+            bot->Reply(theClient, "Channel '%s' is not monitored.", chanName.c_str());
+            return;
+        }
+        sqlMonitoredChannel* mc = mcit->second;
+
+        sqlSpyClient* sc = findSpyClientByNick(bot, st[4]);
+        if (!sc) {
+            bot->Reply(theClient,
+                "Spy client '%s' not found. Use SPAM SPYCLIENT LIST to see valid nicks.",
+                st[4].c_str());
+            return;
+        }
+
+        std::vector<int>& allowed = bot->monitoredChannelSpyClientsMap[mc->getId()];
+        for (size_t i = 0; i < allowed.size(); ++i) {
+            if (allowed[i] == sc->getId()) {
+                bot->Reply(theClient, "Spy client '%s' is already allowed on '%s'.",
+                           sc->getNickname().c_str(), mc->getName().c_str());
+                return;
+            }
+        }
+
+        stringstream iq;
+        iq << "INSERT INTO monitored_channel_spyclients (channel_id, spyclient_id) VALUES ("
+           << mc->getId() << ", " << sc->getId() << ")";
+        if (!bot->getSqlDb()->Exec(iq)) {
+            bot->Reply(theClient, "Failed to add spy client '%s' to '%s' (duplicate?).",
+                       sc->getNickname().c_str(), mc->getName().c_str());
+            return;
+        }
+        allowed.push_back(sc->getId());
+        bot->Reply(theClient, "Spy client '%s' added to '%s'.",
+                   sc->getNickname().c_str(), mc->getName().c_str());
+        return;
+    }
+
+    // -- REMSPY ------------------------------------------------------------
+    if (verb == "REMSPY") {
+        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        // SPAM CHAN REMSPY <#channel> <nick>
+        if (st.size() < 5) {
+            bot->Reply(theClient, "Usage: SPAM CHAN REMSPY <#channel> <nick>");
+            return;
+        }
+        const string chanName = string_lower(st[3]);
+        dronescan::monitoredChannelsMapType::const_iterator mcit =
+            bot->monitoredChannelsMap.find(chanName);
+        if (mcit == bot->monitoredChannelsMap.end()) {
+            bot->Reply(theClient, "Channel '%s' is not monitored.", chanName.c_str());
+            return;
+        }
+        sqlMonitoredChannel* mc = mcit->second;
+
+        sqlSpyClient* sc = findSpyClientByNick(bot, st[4]);
+        if (!sc) {
+            bot->Reply(theClient, "Spy client '%s' not found.", st[4].c_str());
+            return;
+        }
+
+        stringstream dq;
+        dq << "DELETE FROM monitored_channel_spyclients WHERE channel_id = " << mc->getId()
+           << " AND spyclient_id = " << sc->getId();
+        if (!bot->getSqlDb()->Exec(dq)) {
+            bot->Reply(theClient, "Failed to remove spy client '%s' from '%s'.",
+                       sc->getNickname().c_str(), mc->getName().c_str());
+            return;
+        }
+
+        bool found = false;
+        dronescan::monitoredChannelSpyClientsMapType::iterator ait =
+            bot->monitoredChannelSpyClientsMap.find(mc->getId());
+        if (ait != bot->monitoredChannelSpyClientsMap.end()) {
+            std::vector<int>& vec = ait->second;
+            for (std::vector<int>::iterator vi = vec.begin(); vi != vec.end(); ++vi) {
+                if (*vi == sc->getId()) {
+                    vec.erase(vi);
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            bot->Reply(theClient,
+                "Spy client '%s' was not in the allowed list for '%s'.",
+                sc->getNickname().c_str(), mc->getName().c_str());
+            return;
+        }
+        bot->Reply(theClient, "Spy client '%s' removed from '%s'.",
+                   sc->getNickname().c_str(), mc->getName().c_str());
+        return;
+    }
+
     bot->Reply(theClient,
-        "Unknown verb '%s'. Use ADD, DEL, LIST, SHOW, SET, ENABLE, DISABLE.", st[2].c_str());
+        "Unknown verb '%s'. Use ADD, DEL, LIST, SHOW, SET, ENABLE, DISABLE, "
+        "ADDSPY, REMSPY.", st[2].c_str());
 }
 
 // ---------------------------------------------------------------------------

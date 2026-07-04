@@ -21,7 +21,7 @@ using std::stringstream;
 
 sqlSpamEvent::sqlSpamEvent(dbHandle* _SQLDb)
     : id(0), name(), description(), event_type(), param(),
-      target(31), case_sensitive(false), points(1), point_expiry(60),
+      target(31), case_sensitive(true), points(1), point_expiry(60),
       max_occurrence(-1), requires_event_id(0), enabled(true),
       repeat_crossuser(false), repeat_min_count(2), repeat_exclusion_regex(),
       created_ts(0), modified_ts(0), modified_by(0),

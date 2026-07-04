@@ -24,6 +24,7 @@ using std::stringstream;
 sqlMonitoredChannel::sqlMonitoredChannel(dbHandle* _SQLDb)
     : id(0), name(), forcejoin(false), joinasservice(false),
       enabled(true), created_ts(0), modified_ts(0), modified_by(0),
+      last_triggered_ts(0), last_triggered_rule(),
       SQLDb(_SQLDb)
 {}
 
@@ -31,7 +32,7 @@ sqlMonitoredChannel::~sqlMonitoredChannel() {}
 
 // Column order matches the SELECT in preloadMonitoredChannels():
 // id, name, forcejoin, joinasservice, enabled,
-// created_ts, modified_ts, modified_by
+// created_ts, modified_ts, modified_by, last_triggered_ts, last_triggered_rule
 void sqlMonitoredChannel::setAllMembers(int row)
 {
     id           = atoi(SQLDb->GetValue(row, 0).c_str());
@@ -43,6 +44,9 @@ void sqlMonitoredChannel::setAllMembers(int row)
     modified_ts  = atoi(SQLDb->GetValue(row, 6).c_str());
     const string modBy = SQLDb->GetValue(row, 7);
     modified_by  = !modBy.empty() ? atoi(modBy.c_str()) : 0;
+    const string lastTrigTs = SQLDb->GetValue(row, 8);
+    last_triggered_ts   = !lastTrigTs.empty() ? atoi(lastTrigTs.c_str()) : 0;
+    last_triggered_rule = SQLDb->GetValue(row, 9);
 }
 
 bool sqlMonitoredChannel::commit()
@@ -54,7 +58,9 @@ bool sqlMonitoredChannel::commit()
       << "joinasservice = "  << (joinasservice ? "true" : "false")     << ", "
       << "enabled = "        << (enabled ? "true" : "false")           << ", "
       << "modified_ts = "    << modified_ts                            << ", "
-      << "modified_by = "    << (modified_by > 0 ? std::to_string(modified_by) : "NULL")
+      << "modified_by = "    << (modified_by > 0 ? std::to_string(modified_by) : "NULL") << ", "
+      << "last_triggered_ts = "   << (last_triggered_ts > 0 ? std::to_string(last_triggered_ts) : "NULL") << ", "
+      << "last_triggered_rule = " << (last_triggered_rule.empty() ? "NULL" : ("'" + escapeSQLChars(last_triggered_rule) + "'"))
       << " WHERE id = "      << id;
 
     if (!SQLDb->Exec(q)) {

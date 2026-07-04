@@ -285,11 +285,14 @@ class dronescan : public xClient {
     void preloadSpyClients();
     void preloadMonitoredChannels();
     void preloadSpamRuleChannels();
+    void preloadMonitoredChannelSpyClients();
     void refreshSpamCaches();
 
     /* PCRE2 compile lifecycle: called on load, create (EVENT ADD) and
      * modify (EVENT SET) so a spam event's regex is always compiled from
-     * its current param/repeat_exclusion_regex/case_sensitive state. */
+     * its current param (compileEventRegex) or
+     * repeat_exclusion_regex/case_sensitive (compileRepeatExclusionRegex)
+     * state. */
     void compileEventRegex(sqlSpamEvent* ev);
     void compileRepeatExclusionRegex(sqlSpamEvent* ev);
     void freeEventRegexes(int event_id);
@@ -438,6 +441,8 @@ class dronescan : public xClient {
     typedef std::map<std::string, sqlMonitoredChannel*>                monitoredChannelsMapType;
     // spam_rule_channels: rule_id -> list of channel names
     typedef std::map<int, std::vector<std::string>>                    spamRuleChannelsMapType;
+    // monitored_channel_spyclients: monitored channel id -> list of allowed spyclient ids
+    typedef std::map<int, std::vector<int>>                            monitoredChannelSpyClientsMapType;
 
     // Flat vector of every loaded event, rebuilt by relinkSpamGraph();
     // used for hot-path iteration instead of walking spamEventsMap's nodes.
@@ -452,6 +457,7 @@ class dronescan : public xClient {
     spyClientsMapType       spyClientsMap;
     monitoredChannelsMapType monitoredChannelsMap;
     spamRuleChannelsMapType spamRuleChannelsMap;
+    monitoredChannelSpyClientsMapType monitoredChannelSpyClientsMap;
 
     /* Live spy client state */
 
