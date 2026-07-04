@@ -29,19 +29,19 @@
  *   SPAM EXCLUSION LIST
  *   SPAM EXCLUSION SET    <id> <field> <value>
  *   SPAM SPYCLIENT ADD    <nick> <user> <host> <ip> <realname> [account] [modes]
- *   SPAM SPYCLIENT DEL    <id>
+ *   SPAM SPYCLIENT DEL    <id|nick>
  *   SPAM SPYCLIENT LIST
- *   SPAM SPYCLIENT SHOW   <id>
- *   SPAM SPYCLIENT SET    <id> <field> <value>
- *   SPAM SPYCLIENT ENABLE <id>
- *   SPAM SPYCLIENT DISABLE <id>
+ *   SPAM SPYCLIENT SHOW   <id|nick>
+ *   SPAM SPYCLIENT SET    <id|nick> <field> <value>
+ *   SPAM SPYCLIENT ENABLE <id|nick>
+ *   SPAM SPYCLIENT DISABLE <id|nick>
  *   SPAM CHAN      ADD    <#channel> [forcejoin 0|1] [joinasservice 0|1]
- *   SPAM CHAN      DEL    <id>
+ *   SPAM CHAN      DEL    <#channel>
  *   SPAM CHAN      LIST
- *   SPAM CHAN      SHOW   <id>
- *   SPAM CHAN      SET    <id> <field> <value>
- *   SPAM CHAN      ENABLE <id>
- *   SPAM CHAN      DISABLE <id>
+ *   SPAM CHAN      SHOW   <#channel>
+ *   SPAM CHAN      SET    <#channel> <field> <value>
+ *   SPAM CHAN      ENABLE <#channel>
+ *   SPAM CHAN      DISABLE <#channel>
  *   SPAM CHAN      ADDSPY <#channel> <nick>
  *   SPAM CHAN      REMSPY <#channel> <nick>
  *
@@ -67,6 +67,7 @@
  * of the License, or (at your option) any later version.
  */
 
+#include <cctype>
 #include <sstream>
 #include <string>
 
@@ -173,6 +174,24 @@ static sqlSpyClient* findSpyClientByNick(dronescan* bot, const string& nick)
             return it->second;
     }
     return nullptr;
+}
+
+// Numeric argument -> id lookup (spyClientsMap is keyed by id); otherwise
+// nickname lookup. IRC nicknames can't start with a digit, so a purely
+// numeric argument is unambiguous.
+static sqlSpyClient* findSpyClientByIdOrNick(dronescan* bot, const string& arg)
+{
+    bool numeric = !arg.empty();
+    for (size_t i = 0; numeric && i < arg.size(); ++i)
+        if (!isdigit(static_cast<unsigned char>(arg[i])))
+            numeric = false;
+
+    if (numeric) {
+        dronescan::spyClientsMapType::const_iterator it =
+            bot->spyClientsMap.find(atoi(arg.c_str()));
+        return (it != bot->spyClientsMap.end()) ? it->second : nullptr;
+    }
+    return findSpyClientByNick(bot, arg);
 }
 
 // Comma-separated nicknames of the spy clients restricted to channelId, or
@@ -1640,15 +1659,13 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
         if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM SPYCLIENT SHOW <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM SPYCLIENT SHOW <id|nick>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::spyClientsMapType::const_iterator it = bot->spyClientsMap.find(id);
-        if (it == bot->spyClientsMap.end()) {
-            bot->Reply(theClient, "Spy client %d not found.", id);
+        sqlSpyClient* sc = findSpyClientByIdOrNick(bot, st[3]);
+        if (!sc) {
+            bot->Reply(theClient, "Spy client '%s' not found.", st[3].c_str());
             return;
         }
-        sqlSpyClient* sc = it->second;
         bot->Reply(theClient, "ID       : %d", sc->getId());
         bot->Reply(theClient, "Nick     : %s", sc->getNickname().c_str());
         bot->Reply(theClient, "User     : %s", sc->getUsername().c_str());
@@ -1702,23 +1719,24 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM SPYCLIENT DEL <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM SPYCLIENT DEL <id|nick>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::spyClientsMapType::iterator it = bot->spyClientsMap.find(id);
-        if (it == bot->spyClientsMap.end()) {
-            bot->Reply(theClient, "Spy client %d not found.", id);
+        sqlSpyClient* sc = findSpyClientByIdOrNick(bot, st[3]);
+        if (!sc) {
+            bot->Reply(theClient, "Spy client '%s' not found.", st[3].c_str());
             return;
         }
+        const int id = sc->getId();
+        const string nick = sc->getNickname();
         // Detach from network before removing from DB
         bot->detachSpyClient(id);
-        if (!it->second->remove()) {
-            bot->Reply(theClient, "Failed to delete spy client %d.", id);
+        if (!sc->remove()) {
+            bot->Reply(theClient, "Failed to delete spy client '%s'.", nick.c_str());
             return;
         }
-        delete it->second;
-        bot->spyClientsMap.erase(it);
-        bot->Reply(theClient, "Spy client %d deleted.", id);
+        delete sc;
+        bot->spyClientsMap.erase(id);
+        bot->Reply(theClient, "Spy client '%s' deleted.", nick.c_str());
         return;
     }
 
@@ -1726,48 +1744,45 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
     if (verb == "ENABLE" || verb == "DISABLE") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
         if (st.size() < 4) {
-            bot->Reply(theClient, "Usage: SPAM SPYCLIENT %s <id>", verb.c_str());
+            bot->Reply(theClient, "Usage: SPAM SPYCLIENT %s <id|nick>", verb.c_str());
             return;
         }
-        int id = atoi(st[3].c_str());
-        dronescan::spyClientsMapType::iterator it = bot->spyClientsMap.find(id);
-        if (it == bot->spyClientsMap.end()) {
-            bot->Reply(theClient, "Spy client %d not found.", id);
+        sqlSpyClient* sc = findSpyClientByIdOrNick(bot, st[3]);
+        if (!sc) {
+            bot->Reply(theClient, "Spy client '%s' not found.", st[3].c_str());
             return;
         }
-        sqlSpyClient* sc = it->second;
         sc->setEnabled(verb == "ENABLE");
         sc->setModifiedTs(::time(0));
         sc->setModifiedBy(0);
         if (!sc->commit()) {
-            bot->Reply(theClient, "Failed to update spy client %d.", id);
+            bot->Reply(theClient, "Failed to update spy client '%s'.", sc->getNickname().c_str());
             return;
         }
         // Apply live change
         if (verb == "ENABLE")
             bot->introduceSpyClient(sc);
         else
-            bot->detachSpyClient(id);
-        bot->Reply(theClient, "Spy client %d %s.",
-                   id, verb == "ENABLE" ? "enabled" : "disabled");
+            bot->detachSpyClient(sc->getId());
+        bot->Reply(theClient, "Spy client '%s' %s.",
+                   sc->getNickname().c_str(), verb == "ENABLE" ? "enabled" : "disabled");
         return;
     }
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM SPYCLIENT SET <id> <field> <value>
+        // SPAM SPYCLIENT SET <id|nick> <field> <value>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM SPYCLIENT SET <id> <field> <value>");
+            bot->Reply(theClient, "Usage: SPAM SPYCLIENT SET <id|nick> <field> <value>");
             return;
         }
-        int id = atoi(st[3].c_str());
-        dronescan::spyClientsMapType::iterator it = bot->spyClientsMap.find(id);
-        if (it == bot->spyClientsMap.end()) {
-            bot->Reply(theClient, "Spy client %d not found.", id);
+        sqlSpyClient* sc = findSpyClientByIdOrNick(bot, st[3]);
+        if (!sc) {
+            bot->Reply(theClient, "Spy client '%s' not found.", st[3].c_str());
             return;
         }
-        sqlSpyClient* sc = it->second;
+        const int id = sc->getId();
         const string field = string_lower(st[4]);
         const string value = (st.size() >= 6) ? st[5] : string();
         bool wasEnabled = sc->isEnabled();
@@ -1868,22 +1883,15 @@ static void handleChan(dronescan* bot, const iClient* theClient,
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
         if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM CHAN SHOW <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM CHAN SHOW <#channel>"); return; }
 
-        int id = atoi(st[3].c_str());
-        sqlMonitoredChannel* found = nullptr;
-        for (dronescan::monitoredChannelsMapType::const_iterator it =
-                 bot->monitoredChannelsMap.begin();
-             it != bot->monitoredChannelsMap.end(); ++it) {
-            if (it->second->getId() == id) {
-                found = it->second;
-                break;
-            }
-        }
-        if (!found) {
-            bot->Reply(theClient, "Monitored channel %d not found.", id);
+        dronescan::monitoredChannelsMapType::const_iterator it =
+            bot->monitoredChannelsMap.find(string_lower(st[3]));
+        if (it == bot->monitoredChannelsMap.end()) {
+            bot->Reply(theClient, "Channel '%s' is not monitored.", st[3].c_str());
             return;
         }
+        sqlMonitoredChannel* found = it->second;
         const string spyList = spyClientNickListForChannel(bot, found->getId());
         bot->Reply(theClient, "ID          : %d", found->getId());
         bot->Reply(theClient, "Channel     : %s", found->getName().c_str());
@@ -1947,22 +1955,15 @@ static void handleChan(dronescan* bot, const iClient* theClient,
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM CHAN DEL <id>"); return; }
+        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM CHAN DEL <#channel>"); return; }
 
-        int id = atoi(st[3].c_str());
-        dronescan::monitoredChannelsMapType::iterator found = bot->monitoredChannelsMap.end();
-        for (dronescan::monitoredChannelsMapType::iterator it =
-                 bot->monitoredChannelsMap.begin();
-             it != bot->monitoredChannelsMap.end(); ++it) {
-            if (it->second->getId() == id) {
-                found = it;
-                break;
-            }
-        }
+        dronescan::monitoredChannelsMapType::iterator found =
+            bot->monitoredChannelsMap.find(string_lower(st[3]));
         if (found == bot->monitoredChannelsMap.end()) {
-            bot->Reply(theClient, "Monitored channel %d not found.", id);
+            bot->Reply(theClient, "Channel '%s' is not monitored.", st[3].c_str());
             return;
         }
+        const string chanName = found->second->getName();
         // Part any spy client currently in this channel, and cancel any
         // spy-client join that was scheduled but hasn't fired yet
         {
@@ -1973,12 +1974,12 @@ static void handleChan(dronescan* bot, const iClient* theClient,
             bot->cancelPendingJoinTimers(chanKey);
         }
         if (!found->second->remove()) {
-            bot->Reply(theClient, "Failed to delete monitored channel %d.", id);
+            bot->Reply(theClient, "Failed to delete monitored channel '%s'.", chanName.c_str());
             return;
         }
         delete found->second;
         bot->monitoredChannelsMap.erase(found);
-        bot->Reply(theClient, "Monitored channel %d deleted.", id);
+        bot->Reply(theClient, "Monitored channel '%s' deleted.", chanName.c_str());
         return;
     }
 
@@ -1986,28 +1987,21 @@ static void handleChan(dronescan* bot, const iClient* theClient,
     if (verb == "ENABLE" || verb == "DISABLE") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
         if (st.size() < 4) {
-            bot->Reply(theClient, "Usage: SPAM CHAN %s <id>", verb.c_str());
+            bot->Reply(theClient, "Usage: SPAM CHAN %s <#channel>", verb.c_str());
             return;
         }
-        int id = atoi(st[3].c_str());
-        sqlMonitoredChannel* mc = nullptr;
-        for (dronescan::monitoredChannelsMapType::iterator it =
-                 bot->monitoredChannelsMap.begin();
-             it != bot->monitoredChannelsMap.end(); ++it) {
-            if (it->second->getId() == id) {
-                mc = it->second;
-                break;
-            }
-        }
-        if (!mc) {
-            bot->Reply(theClient, "Monitored channel %d not found.", id);
+        dronescan::monitoredChannelsMapType::iterator it =
+            bot->monitoredChannelsMap.find(string_lower(st[3]));
+        if (it == bot->monitoredChannelsMap.end()) {
+            bot->Reply(theClient, "Channel '%s' is not monitored.", st[3].c_str());
             return;
         }
+        sqlMonitoredChannel* mc = it->second;
         mc->setEnabled(verb == "ENABLE");
         mc->setModifiedTs(::time(0));
         mc->setModifiedBy(0);
         if (!mc->commit()) {
-            bot->Reply(theClient, "Failed to update monitored channel %d.", id);
+            bot->Reply(theClient, "Failed to update monitored channel '%s'.", mc->getName().c_str());
             return;
         }
         const string chanKey = string_lower(mc->getName());
@@ -2030,33 +2024,26 @@ static void handleChan(dronescan* bot, const iClient* theClient,
                 bot->getUplink()->JoinChannel(bot, mc->getName(), "");
             }
         }
-        bot->Reply(theClient, "Monitored channel %d %s.",
-                   id, verb == "ENABLE" ? "enabled" : "disabled");
+        bot->Reply(theClient, "Monitored channel '%s' %s.",
+                   mc->getName().c_str(), verb == "ENABLE" ? "enabled" : "disabled");
         return;
     }
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM CHAN SET <id> <field> <value>
+        // SPAM CHAN SET <#channel> <field> <value>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM CHAN SET <id> <field> <value>");
+            bot->Reply(theClient, "Usage: SPAM CHAN SET <#channel> <field> <value>");
             return;
         }
-        int id = atoi(st[3].c_str());
-        sqlMonitoredChannel* mc = nullptr;
-        for (dronescan::monitoredChannelsMapType::iterator it =
-                 bot->monitoredChannelsMap.begin();
-             it != bot->monitoredChannelsMap.end(); ++it) {
-            if (it->second->getId() == id) {
-                mc = it->second;
-                break;
-            }
-        }
-        if (!mc) {
-            bot->Reply(theClient, "Monitored channel %d not found.", id);
+        dronescan::monitoredChannelsMapType::iterator it =
+            bot->monitoredChannelsMap.find(string_lower(st[3]));
+        if (it == bot->monitoredChannelsMap.end()) {
+            bot->Reply(theClient, "Channel '%s' is not monitored.", st[3].c_str());
             return;
         }
+        sqlMonitoredChannel* mc = it->second;
         const string field = string_lower(st[4]);
         const string value = (st.size() >= 6) ? st[5] : string();
         const bool wasEnabled = mc->isEnabled();
@@ -2077,7 +2064,7 @@ static void handleChan(dronescan* bot, const iClient* theClient,
         mc->setModifiedTs(::time(0));
         mc->setModifiedBy(0);
         if (!mc->commit()) {
-            bot->Reply(theClient, "Failed to update monitored channel %d.", id);
+            bot->Reply(theClient, "Failed to update monitored channel '%s'.", mc->getName().c_str());
             return;
         }
         if (field == "enabled" && wasEnabled != mc->isEnabled()) {
@@ -2099,8 +2086,8 @@ static void handleChan(dronescan* bot, const iClient* theClient,
                 }
             }
         }
-        bot->Reply(theClient, "Monitored channel %d: %s set to '%s'.",
-                   id, field.c_str(), value.c_str());
+        bot->Reply(theClient, "Monitored channel '%s': %s set to '%s'.",
+                   mc->getName().c_str(), field.c_str(), value.c_str());
         return;
     }
 

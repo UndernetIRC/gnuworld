@@ -203,36 +203,37 @@ static void helpSpamSpyClient(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM SPYCLIENT subcommands:");
     bot->Reply(theClient, "  ADD     <nick> <user> <host> <ip> <realname> [account] [modes]");
-    bot->Reply(theClient, "  DEL     <id>");
+    bot->Reply(theClient, "  DEL     <id|nick>");
     bot->Reply(theClient, "  LIST");
-    bot->Reply(theClient, "  SHOW    <id>");
-    bot->Reply(theClient, "  SET     <id> <field> <value>");
-    bot->Reply(theClient, "  ENABLE  <id>");
-    bot->Reply(theClient, "  DISABLE <id>");
+    bot->Reply(theClient, "  SHOW    <id|nick>");
+    bot->Reply(theClient, "  SET     <id|nick> <field> <value>");
+    bot->Reply(theClient, "  ENABLE  <id|nick>");
+    bot->Reply(theClient, "  DISABLE <id|nick>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Spy clients join monitored channels to observe traffic for spam detection.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: nick  user  host  ip  realname  account  modes  enabled");
     bot->Reply(theClient, "  (enabled behaves the same as ENABLE/DISABLE)");
+    bot->Reply(theClient, "  (id keeps working after a nick change, since nick is mutable)");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 \"Observer\"");
-    bot->Reply(theClient, "  SPAM SPYCLIENT SET     1 nick NewSpyBot");
-    bot->Reply(theClient, "  SPAM SPYCLIENT ENABLE  1");
-    bot->Reply(theClient, "  SPAM SPYCLIENT DISABLE 1");
-    bot->Reply(theClient, "  SPAM SPYCLIENT DEL     1");
+    bot->Reply(theClient, "  SPAM SPYCLIENT SET     SpyBot nick NewSpyBot");
+    bot->Reply(theClient, "  SPAM SPYCLIENT ENABLE  SpyBot");
+    bot->Reply(theClient, "  SPAM SPYCLIENT DISABLE SpyBot");
+    bot->Reply(theClient, "  SPAM SPYCLIENT DEL     SpyBot");
 }
 
 static void helpSpamChan(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM CHAN subcommands:");
     bot->Reply(theClient, "  ADD     <#channel> [forcejoin 0|1] [joinasservice 0|1]");
-    bot->Reply(theClient, "  DEL     <id>");
+    bot->Reply(theClient, "  DEL     <#channel>");
     bot->Reply(theClient, "  LIST");
-    bot->Reply(theClient, "  SHOW    <id>");
-    bot->Reply(theClient, "  SET     <id> <field> <value>");
-    bot->Reply(theClient, "  ENABLE  <id>");
-    bot->Reply(theClient, "  DISABLE <id>");
+    bot->Reply(theClient, "  SHOW    <#channel>");
+    bot->Reply(theClient, "  SET     <#channel> <field> <value>");
+    bot->Reply(theClient, "  ENABLE  <#channel>");
+    bot->Reply(theClient, "  DISABLE <#channel>");
     bot->Reply(theClient, "  ADDSPY  <#channel> <nick>");
     bot->Reply(theClient, "  REMSPY  <#channel> <nick>");
     bot->Reply(theClient, " ");
@@ -250,10 +251,10 @@ static void helpSpamChan(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM CHAN ADD #watch-this 1 0");
-    bot->Reply(theClient, "  SPAM CHAN SET     2 forcejoin 0");
-    bot->Reply(theClient, "  SPAM CHAN ENABLE  2");
-    bot->Reply(theClient, "  SPAM CHAN DISABLE 2");
-    bot->Reply(theClient, "  SPAM CHAN DEL     2");
+    bot->Reply(theClient, "  SPAM CHAN SET     #watch-this forcejoin 0");
+    bot->Reply(theClient, "  SPAM CHAN ENABLE  #watch-this");
+    bot->Reply(theClient, "  SPAM CHAN DISABLE #watch-this");
+    bot->Reply(theClient, "  SPAM CHAN DEL     #watch-this");
     bot->Reply(theClient, "  SPAM CHAN ADDSPY  #watch-this Spy1");
     bot->Reply(theClient, "  SPAM CHAN REMSPY  #watch-this Spy1");
 }
