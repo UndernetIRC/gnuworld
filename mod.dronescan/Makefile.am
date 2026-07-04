@@ -1,6 +1,21 @@
 
 lib_LTLIBRARIES += libdronescan.la
-libdronescan_la_LDFLAGS = -module -export-dynamic
+
+# Tie the module's soname to the current commit count so every new
+# commit gets a distinct libdronescan.so.<N>. RELOAD unloads and
+# reloads this module in-process via libtool's lt_dlopen/lt_dlclose;
+# libltdl keeps its own process-wide cache of open modules keyed by
+# resolved filename (ltdl.c's tryall_dlopen()), and if a prior
+# unload ever leaves that cache entry behind (its ref_count not
+# reaching zero, for whatever reason), the next lt_dlopen() silently
+# reuses the stale, already-mapped handle instead of touching the
+# freshly-installed .so on disk. A soname that changes with every
+# commit means that stale-cache lookup can never match a new build,
+# so a RELOAD after `git pull && make install` is guaranteed to load
+# the new code regardless of whether the old handle was ever
+# properly released.
+DRONESCAN_BUILD_TAG := $(shell git -C $(top_srcdir) rev-list --count HEAD 2>/dev/null || echo 0)
+libdronescan_la_LDFLAGS = -module -export-dynamic -version-info $(DRONESCAN_BUILD_TAG):0:0
 libdronescan_la_LIBADD = libgnuworldDB.la -lpcre2-8
 libdronescan_la_CXXFLAGS = -I$(top_srcdir)/db \
 	-I${top_srcdir}/libgnuworld \
