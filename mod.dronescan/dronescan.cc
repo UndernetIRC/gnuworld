@@ -975,7 +975,7 @@ void dronescan::OnDetach(const std::string& message) {
     /* Detach all live spy clients */
     for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();
          it != liveSpyClientsMap.end(); ++it) {
-        MyUplink->DetachClient(it->second, "Dronescan detach");
+        MyUplink->DetachClient(it->second, "Leaving");
     }
     liveSpyClientsMap.clear();
     chanActiveSpyMap.clear();
