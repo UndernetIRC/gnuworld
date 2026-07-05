@@ -162,6 +162,9 @@ class dronescan : public xClient {
                                iClient* destClient, const std::string& kickMessage,
                                bool authoritative);
 
+    /** Append channel list and idle/signon time to WHOIS replies. */
+    virtual void OnWhois(iClient* sourceClient, iClient* targetClient);
+
     /** When we are being detached by the xServer */
     virtual void OnDetach(const std::string& = std::string("Server Shutdown"));
 

@@ -917,6 +917,126 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
     xClient::OnNetworkKick(theChan, srcClient, destClient, kickMessage, authoritative);
 }
 
+/**
+ * OnWhois: provide a full standard WHOIS reply (311, 319, 312, 313,
+ * 330, 317, 318) for the target client.
+ * Channels (319) are only listed if the target does not have usermode
+ * +k (services/kill-protected clients keep their channel list hidden).
+ * Per-channel visibility and status prefixes follow ircu2's do_whois()
+ * (ircd/m_whois.c): +s/+p channels are hidden unless sourceClient shares
+ * them, and entries are prefixed with @/+ for op/voice.
+ * There is no real idle-time tracking available here, so idle time
+ * (317) is only reported for fake/local clients (isFake()), as time
+ * elapsed since the client connected; real network clients have no
+ * meaningful local idle time to report.
+ * This makes the reply self-contained for targets with no home ircd
+ * (dronescan's own bot and spy/fake clients), while duplicating some
+ * fields (313, 330) that other services such as cservice may also send
+ * for real network clients.
+ */
+void dronescan::OnWhois(iClient* sourceClient, iClient* targetClient)
+{
+    if (!sourceClient || !targetClient) {
+        return;
+    }
+
+    const string& sourceNumeric = sourceClient->getCharYYXXX();
+    const string& targetNick = targetClient->getNickName();
+
+    std::stringstream s311;
+    s311 << getCharYY() << " 311 " << sourceNumeric << " " << targetNick << " "
+         << targetClient->getUserName() << " " << targetClient->getInsecureHost()
+         << " * :" << targetClient->getDescription() << std::ends;
+    Write(s311);
+
+    if (!targetClient->isModeK()) {
+        // Mirrors ShowChannel() in ircu2's m_whois.c: a +s/+p channel is
+        // only listed if sourceClient shares it with the target. Entries
+        // are prefixed with the target's status (@ op, + voice) and the
+        // list is split across multiple 319 lines if it grows too long
+        // for a single protocol line.
+        const string prefix = getCharYY() + " 319 " + sourceNumeric + " " + targetNick + " :";
+        const string::size_type maxLineLen = 400;
+        string buf;
+
+        iClient::const_channelIterator chanPtr = targetClient->channels_begin();
+        for (; chanPtr != targetClient->channels_end(); ++chanPtr) {
+            Channel* theChan = *chanPtr;
+
+            const bool isSecretOrPrivate =
+                theChan->getMode(Channel::MODE_S) || theChan->getMode(Channel::MODE_P);
+            if (isSecretOrPrivate && !theChan->findUser(sourceClient)) {
+                continue;
+            }
+
+            string entry;
+            if (ChannelUser* targetChanUser = theChan->findUser(targetClient)) {
+                if (targetChanUser->isModeO()) {
+                    entry += "@";
+                } else if (targetChanUser->isModeV()) {
+                    entry += "+";
+                }
+            }
+            entry += theChan->getName();
+
+            if (!buf.empty() && (buf.size() + 1 + entry.size() + prefix.size() > maxLineLen)) {
+                std::stringstream s319;
+                s319 << prefix << buf << std::ends;
+                Write(s319);
+                buf.clear();
+            }
+
+            if (!buf.empty()) {
+                buf += " ";
+            }
+            buf += entry;
+        }
+
+        if (!buf.empty()) {
+            std::stringstream s319;
+            s319 << prefix << buf << std::ends;
+            Write(s319);
+        }
+    }
+
+    const iServer* targetServer = targetClient->getServer();
+    if (targetServer) {
+        std::stringstream s312;
+        s312 << getCharYY() << " 312 " << sourceNumeric << " " << targetNick << " "
+             << targetServer->getName() << " :" << targetServer->getDescription() << std::ends;
+        Write(s312);
+    }
+
+    if (targetClient->isOper()) {
+        std::stringstream s313;
+        s313 << getCharYY() << " 313 " << sourceNumeric << " " << targetNick
+             << " :is an IRC Operator" << std::ends;
+        Write(s313);
+    }
+
+    if (!targetClient->getAccount().empty()) {
+        std::stringstream s330;
+        s330 << getCharYY() << " 330 " << sourceNumeric << " " << targetNick << " "
+             << targetClient->getAccount() << " :is logged in as" << std::ends;
+        Write(s330);
+    }
+
+    if (targetClient->isFake()) {
+        const time_t signOnTime = targetClient->getFirstNickTS();
+        const time_t idleTime = ::time(nullptr) - signOnTime;
+
+        std::stringstream s317;
+        s317 << getCharYY() << " 317 " << sourceNumeric << " " << targetNick << " "
+             << idleTime << " " << signOnTime << " :seconds idle, signon time" << std::ends;
+        Write(s317);
+    }
+
+    std::stringstream s318;
+    s318 << getCharYY() << " 318 " << sourceNumeric << " " << targetNick
+         << " :End of /WHOIS list." << std::ends;
+    Write(s318);
+}
+
 /** Clean up after ourselves */
 void dronescan::OnDetach(const std::string& message) {
     /* We need to delete() anything we have new()d
