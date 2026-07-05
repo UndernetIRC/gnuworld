@@ -925,6 +925,8 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
  * Per-channel visibility and status prefixes follow ircu2's do_whois()
  * (ircd/m_whois.c): +s/+p channels are hidden unless sourceClient shares
  * them, and entries are prefixed with @/+ for op/voice.
+ * The real server name/description (312) is only shown to IRC
+ * Operators; other clients see a generic "*.undernet.org" server.
  * There is no real idle-time tracking available here, so idle time
  * (317) is only reported for fake/local clients (isFake()), as time
  * elapsed since the client connected; real network clients have no
@@ -999,11 +1001,19 @@ void dronescan::OnWhois(iClient* sourceClient, iClient* targetClient)
         }
     }
 
-    const iServer* targetServer = targetClient->getServer();
-    if (targetServer) {
+    if (sourceClient->isOper()) {
+        const iServer* targetServer = targetClient->getServer();
+        if (targetServer) {
+            std::stringstream s312;
+            s312 << getCharYY() << " 312 " << sourceNumeric << " " << targetNick << " "
+                 << targetServer->getName() << " :" << targetServer->getDescription() << std::ends;
+            Write(s312);
+        }
+    } else {
+        // Hide the real server name/description from non-opers.
         std::stringstream s312;
-        s312 << getCharYY() << " 312 " << sourceNumeric << " " << targetNick << " "
-             << targetServer->getName() << " :" << targetServer->getDescription() << std::ends;
+        s312 << getCharYY() << " 312 " << sourceNumeric << " " << targetNick
+             << " *.undernet.org :The Undernet Underworld" << std::ends;
         Write(s312);
     }
 
