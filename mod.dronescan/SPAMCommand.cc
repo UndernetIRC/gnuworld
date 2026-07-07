@@ -46,8 +46,9 @@
  *   SPAM CHAN      REMSPY <#channel> <nick>
  *
  * target bitmask: chan_priv=1, privmsg=2, chan_not=4, part=8, quit=16, notice=32,
- *                  ctcp=64, all=127
- *                  "chan" is an alias for chan_priv|chan_not (=5)
+ *                  ctcp_priv=64, ctcp_chan=128, all=255
+ *                  "chan" is an alias for chan_priv|chan_not (=5); "ctcp" is an
+ *                  alias for ctcp_priv|ctcp_chan (=192)
  *
  * Rule/event/action names are matched case-insensitively and must be
  * unique within their table. RULE SET wait_on_rule_id and EVENT SET
@@ -295,7 +296,8 @@ static sqlSpamRuleAction* linkActionToRule(dronescan* bot, sqlSpamRule* rule, sq
 
 // Parse comma-separated target names to an integer bitmask.
 // Returns -1 on any invalid token.
-// e.g. "chan_priv,privmsg" -> 3,  "all" -> 127,  "chan" -> 5 (chan_priv|chan_not)
+// e.g. "chan_priv,privmsg" -> 3,  "all" -> 255,  "chan" -> 5 (chan_priv|chan_not),
+// "ctcp" -> 192 (ctcp_priv|ctcp_chan)
 static int parseTargetBitmask(const string& s)
 {
     int mask = 0;
@@ -311,7 +313,9 @@ static int parseTargetBitmask(const string& s)
         else if (p == "notice")    mask |= spam_target::NOTICE;
         else if (p == "part")      mask |= spam_target::PART;
         else if (p == "quit")      mask |= spam_target::QUIT;
-        else if (p == "ctcp")      mask |= spam_target::CTCP;
+        else if (p == "ctcp_priv") mask |= spam_target::CTCP_PRIV;
+        else if (p == "ctcp_chan") mask |= spam_target::CTCP_CHAN;
+        else if (p == "ctcp")      mask |= spam_target::CTCP_PRIV | spam_target::CTCP_CHAN;
         else if (p == "all")       mask |= spam_target::ALL;
         else return -1;
     }
@@ -319,7 +323,7 @@ static int parseTargetBitmask(const string& s)
 }
 
 // Decode an integer bitmask to a human-readable comma-separated string.
-// e.g. 127 -> "all",  5 -> "chan_priv,chan_not"
+// e.g. 255 -> "all",  5 -> "chan_priv,chan_not"
 static string targetBitmaskToString(int mask)
 {
     if ((mask & spam_target::ALL) == spam_target::ALL)
@@ -331,7 +335,8 @@ static string targetBitmaskToString(int mask)
     if (mask & spam_target::NOTICE)    { if (!s.empty()) s += ","; s += "notice";   }
     if (mask & spam_target::PART)      { if (!s.empty()) s += ","; s += "part";     }
     if (mask & spam_target::QUIT)      { if (!s.empty()) s += ","; s += "quit";     }
-    if (mask & spam_target::CTCP)      { if (!s.empty()) s += ","; s += "ctcp";     }
+    if (mask & spam_target::CTCP_PRIV) { if (!s.empty()) s += ","; s += "ctcp_priv"; }
+    if (mask & spam_target::CTCP_CHAN) { if (!s.empty()) s += ","; s += "ctcp_chan"; }
     return s.empty() ? "(none)" : s;
 }
 
@@ -455,7 +460,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         int targetMask = parseTargetBitmask(st[5]);
         if (targetMask < 0) {
             bot->Reply(theClient,
-                "Invalid target '%s'. Use comma-separated: chan,privmsg,notice,part,quit,ctcp,all",
+                "Invalid target '%s'. Use comma-separated: chan,privmsg,notice,part,quit,ctcp_priv,ctcp_chan,all",
                 st[5].c_str());
             return;
         }
@@ -620,7 +625,7 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             int mask = parseTargetBitmask(value);
             if (mask < 0) {
                 bot->Reply(theClient,
-                    "Invalid target '%s'. Use comma-separated: chan,privmsg,notice,part,quit,ctcp,all",
+                    "Invalid target '%s'. Use comma-separated: chan,privmsg,notice,part,quit,ctcp_priv,ctcp_chan,all",
                     value.c_str());
                 return;
             }

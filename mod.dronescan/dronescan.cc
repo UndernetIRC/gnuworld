@@ -402,7 +402,7 @@ void dronescan::BurstChannels() {
 
 void dronescan::OnCTCP(iClient* theClient, const string& CTCP, const string& Message, bool Secure) {
     if (theClient && currentState == RUN)
-        processSpamText(theClient, CTCP, spam_target::CTCP, "");
+        processSpamText(theClient, CTCP, spam_target::CTCP_PRIV, "");
 
     StringTokenizer st(CTCP);
 
@@ -432,7 +432,7 @@ void dronescan::OnFakeCTCP(iClient* Sender, iClient* Target, const std::string& 
 {
     if (!Sender || currentState != RUN)
         return;
-    processSpamText(Sender, CTCP, spam_target::CTCP, "");
+    processSpamText(Sender, CTCP, spam_target::CTCP_PRIV, "");
     xClient::OnFakeCTCP(Sender, Target, CTCP, Message, Secure);
 }
 
@@ -446,7 +446,7 @@ void dronescan::OnChannelCTCP(iClient* Sender, Channel* theChan,
 {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, CTCPCommand, spam_target::CTCP, theChan->getName());
+    processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName());
     xClient::OnChannelCTCP(Sender, theChan, CTCPCommand, Message);
 }
 
@@ -460,7 +460,7 @@ void dronescan::OnFakeChannelCTCP(iClient* Sender, iClient* Target, Channel* the
 {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, CTCPCommand, spam_target::CTCP, theChan->getName());
+    processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName());
     xClient::OnFakeChannelCTCP(Sender, Target, theChan, CTCPCommand, Message);
 }
 

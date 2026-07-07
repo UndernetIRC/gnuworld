@@ -92,11 +92,13 @@ CREATE TABLE exceptionalChannels (
 --     PART      = 8   part messages
 --     QUIT      = 16  quit messages (deferred ? not yet surfaced by EVT_QUIT)
 --     NOTICE    = 32  NOTICE sent directly to the bot or a spy client
---     CTCP      = 64  CTCP sent directly or to a channel, to the bot or a spy client
+--     CTCP_PRIV = 64  CTCP sent directly to the bot or a spy client
+--     CTCP_CHAN = 128 CTCP sent to a channel, seen by the bot or a spy client
 --                     (e.g. CTCP ACTION/"/me", or a DCC request - match DCC with a
---                     regex like "^DCC" scoped to this target, no separate DCC bit)
---   Examples: 1=chan_priv only, 5=chan(priv+not), 127=all targets
---   "chan" is an alias for CHAN_PRIV|CHAN_NOT (=5) in the SPAM command.
+--                     regex like "^DCC" scoped to ctcp_priv/ctcp_chan, no separate DCC bit)
+--   Examples: 1=chan_priv only, 5=chan(priv+not), 255=all targets
+--   "chan" is an alias for CHAN_PRIV|CHAN_NOT (=5) in the SPAM command;
+--   "ctcp" is an alias for CTCP_PRIV|CTCP_CHAN (=192).
 --   For event types where direction is implicit (ENTROPY_NICK, KICK_COUNT, etc.),
 --   the target bitmask is ignored at runtime.
 --
