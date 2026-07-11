@@ -47,6 +47,7 @@
 #include "Timer.h"
 #include "ip.h"
 #include "constants.h"
+#include "match.h"
 
 #ifdef ENABLE_LOG4CPLUS
 #include <log4cplus/logger.h>
@@ -2861,6 +2862,36 @@ void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
 }
 
 /**
+ * isSpamExcluded: check the loaded spam_exclusions rows for a match against
+ * this actor/channel. Returns true if detection should be bypassed entirely.
+ */
+bool dronescan::isSpamExcluded(const SpamActor& actor, const std::string& channel_name,
+                               bool isOper) const
+{
+    for (spamExclusionsListType::const_iterator it = spamExclusionsList.begin();
+         it != spamExclusionsList.end(); ++it) {
+        sqlSpamExclusion* ex = *it;
+        const string& type  = ex->getExclusionType();
+        const string& value = ex->getValue();
+
+        if (type == "CHAN") {
+            if (!channel_name.empty() && match(value, channel_name) == 0)
+                return true;
+        } else if (type == "NICK") {
+            if (match(value, actor.nick) == 0)
+                return true;
+        } else if (type == "IP") {
+            if (match(value, actor.ip) == 0)
+                return true;
+        } else if (type == "OPER") {
+            if (isOper && match(value, actor.nick) == 0)
+                return true;
+        }
+    }
+    return false;
+}
+
+/**
  * processSpamText: called whenever text arrives that should be checked for
  * spam events. target_bit is the bitmask value for the traffic source
  * (e.g. spam_target::CHAN_PRIV). Handles TEXT (regex) and TEXT_REPEAT
@@ -2876,6 +2907,10 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
     const time_t now = ::time(0);
 
     const SpamActor actor = makeActor(theClient);
+
+    if (isSpamExcluded(actor, channel_name, theClient->isOper()))
+        return;
+
     // Actors whose rules should be evaluated after scoring. The triggering
     // actor is always evaluated; crossuser repeats add other participants.
     std::map<std::string, SpamActor> actorsToEvaluate;
@@ -3174,8 +3209,27 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                 nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
                 rule->getName().c_str(), reason.c_str());
             Message(consoleChannel, "%s", buf);
+
+        } else if (actionType == "KILL") {
+            iClient* target = Network->findClient(actor.numeric);
+
+            char buf[512];
+            if (!target) {
+                snprintf(buf, sizeof(buf),
+                    "SPAM[KILL] %s!%s@%s (%s) ? rule '%s' ? client no longer connected, skipped",
+                    nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                    rule->getName().c_str());
+                Message(consoleChannel, "%s", buf);
+                continue;
+            }
+
+            Kill(target, reason);
+            snprintf(buf, sizeof(buf),
+                "SPAM[KILL] Killed %s!%s@%s (%s) ? rule '%s' ? reason: %s",
+                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                rule->getName().c_str(), reason.c_str());
+            Message(consoleChannel, "%s", buf);
         }
-        // KILL deferred to a later phase
     }
 }
 

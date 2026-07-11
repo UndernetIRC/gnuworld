@@ -346,6 +346,14 @@ class dronescan : public xClient {
     // context of their own (i.e. direct PRIVMSG to the bot/spy client). Empty
     // if the client is on no monitored channel.
     std::string monitoredChannelNamesForClient(iClient* theClient) const;
+    // True if the actor/channel combination matches any row in
+    // spam_exclusions, meaning all spam detection should be bypassed for
+    // this event entirely. CHAN is matched against channel_name (skipped if
+    // empty), NICK/IP against the actor's nick/ip, and OPER against the
+    // actor's nick but only when isOper is true. All matches are glob masks
+    // (see gnuworld::match()), case-insensitive.
+    bool isSpamExcluded(const SpamActor& actor, const std::string& channel_name,
+                        bool isOper) const;
 
     /* Spy client live management */
 

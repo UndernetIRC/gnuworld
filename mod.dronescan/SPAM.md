@@ -40,7 +40,7 @@ column-level comments there are the authoritative reference. Summary:
 | `spam_rule_events` | Many-to-many rule↔event link, with optional `points_override`. |
 | `spam_actions` | Reusable action templates: `GLINE`/`KILL`/`REPORT`, duration, reason, delay (+ jitter via `rand_min`/`rand_max`). |
 | `spam_rule_actions` | Many-to-many rule↔action link, with per-binding overrides for duration/reason/delay. |
-| `spam_exclusions` | `CHAN`/`NICK`/`IP`/`OPER` entries meant to bypass scanning. **Loaded at startup but not yet consulted by the scoring pipeline** — see [Known gaps](#known-gaps). |
+| `spam_exclusions` | `CHAN`/`NICK`/`IP`/`OPER` entries that bypass scanning entirely. |
 | `monitored_channels` | Channels dronescan watches; `forcejoin`, `joinasservice`, and last-triggered-rule tracking. |
 | `spam_rule_channels` | Per-rule channel exclusion/inclusion list (meaning depends on `spam_rules.allchans`). |
 | `monitored_channel_spyclients` | Optional restricted spy-client pool per channel. |
@@ -137,11 +137,15 @@ same window keep scoring.
      name, channels, and the triggering text) to the console channel.
    - `GLINE`: issues a GLINE using the action's (or override) duration and
      reason.
-   - `KILL`: deferred/not yet implemented.
+   - `KILL`: looks up the offender's still-connected `iClient` by numeric
+     (`Network->findClient`) and kills it with the action's (or override)
+     reason; silently skipped (with a console log line) if the client has
+     since quit.
 
    The `SpamActor` snapshot (nick/user/host/ip/numeric) is captured at
-   match time, so actions still resolve correctly even if the offender has
-   since quit — this is what makes crossuser `TEXT_REPEAT` reporting work.
+   match time, so REPORT/GLINE still resolve correctly even if the offender
+   has since quit — this is what makes crossuser `TEXT_REPEAT` reporting
+   work. KILL is the one action that needs the offender still connected.
 
 `wait_on_rule_id` chains rules ("only GLINE if the REPORT rule already
 fired for this actor") and `requires_event_id` gates an event on another
@@ -214,8 +218,16 @@ SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 "Observer"
 
 ### EXCLUSION
 
-`CHAN`/`NICK`/`IP`/`OPER` entries meant to exempt scanning; still id-keyed
-(no `name` column). See [Known gaps](#known-gaps) — not yet enforced.
+`CHAN`/`NICK`/`IP`/`OPER` entries that exempt scanning entirely; still
+id-keyed (no `name` column). Checked once per `processSpamText()` call, right
+after the actor's identity is captured and before any event is evaluated —
+a match bypasses all spam detection for that call. `value` is a glob mask
+(`gnuworld::match()`, case-insensitive; IP/CIDR masks are matched natively):
+`CHAN` against the channel the traffic occurred in (never matches direct
+PRIVMSG/NOTICE, which has no channel), `NICK`/`IP` against the actor's
+nick/ip, and `OPER` against the actor's nick but only when the client
+currently has `+o` (IRC operator) set — use `*` there to exempt opers
+unconditionally.
 
 ### SPYCLIENT
 
@@ -248,14 +260,14 @@ returns "Access denied."
 
 ## Known gaps
 
-- `spam_exclusions` rows are loaded at startup (`preloadSpamExclusions()`)
-  but nothing in the scoring pipeline currently consults them — exclusions
-  are not yet enforced.
 - `ENTROPY_TEXT`, `ENTROPY_NICK`, `JOIN_CHANNEL`, `USERMODE`, `KICK_MSG`,
   `KICK_COUNT` event types are recognized by the schema/command layer but
   not yet evaluated by `processSpamText`.
 - `target` bit `QUIT` (quit reasons) is passed through from `OnEvent`
   (`EVT_QUIT`) but matching against it is still marked deferred in the
   schema comments.
-- Action type `KILL` is recognized but not yet executed by
-  `fireRuleActions`.
+- `spam_actions.delay`/`rand_min`/`rand_max` (and `spam_rule_actions.
+  delay_override`) are loaded but not consulted by `fireRuleActions` —
+  actions fire immediately, with no delay or jitter.
+- `spam_exclusions.value` for `OPER` is matched only against the actor's
+  nick; there's no way to exempt by oper hostmask or services account.
