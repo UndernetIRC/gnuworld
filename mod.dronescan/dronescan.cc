@@ -1103,6 +1103,13 @@ void dronescan::OnDetach(const std::string& message) {
     }
     pendingJoinTimers.clear();
 
+    /* Cancel pending (delayed) spam action timers */
+    for (pendingSpamActionTimersType::iterator it = pendingSpamActionTimers.begin();
+         it != pendingSpamActionTimers.end(); ++it) {
+        MyUplink->UnRegisterTimer(it->first, nullptr);
+    }
+    pendingSpamActionTimers.clear();
+
     /* Detach all live spy clients */
     for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();
          it != liveSpyClientsMap.end(); ++it) {
@@ -1132,6 +1139,19 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
             string chanName      = pit->second.second;
             pendingJoinTimers.erase(pit);
             doSpyClientJoin(chanName, forcejoin);
+            return;
+        }
+    }
+
+    /* Handle pending (delayed) spam action timers */
+    {
+        pendingSpamActionTimersType::iterator sit = pendingSpamActionTimers.find(theTimer);
+        if (sit != pendingSpamActionTimers.end()) {
+            PendingSpamAction pending = sit->second;
+            pendingSpamActionTimers.erase(sit);
+            executeSpamAction(pending.actionType, pending.reason, pending.duration,
+                              pending.actor, pending.ruleName, pending.displayChannels,
+                              pending.triggerText);
             return;
         }
     }
@@ -3134,10 +3154,12 @@ std::string sanitizeSpamTextForReport(const std::string& text)
 } // anonymous namespace
 
 /**
- * fireRuleActions: execute all actions linked to the given rule for
- * the offending actor. Handles REPORT and GLINE; KILL is deferred.
- * Uses the captured SpamActor identity so actions still work even if the
- * offender has since quit (crossuser TEXT_REPEAT).
+ * fireRuleActions: resolve every action linked to the given rule (reason,
+ * duration, and delay+jitter, applying any spam_rule_actions overrides) for
+ * the offending actor. An action whose effective delay resolves to <= 0
+ * runs immediately via executeSpamAction(); otherwise it is scheduled on a
+ * one-shot timer (pendingSpamActionTimers), the same pattern used for
+ * delayed spy-client joins (see scheduleSpyClientJoin).
  */
 void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                                 const std::string& displayChannels,
@@ -3147,11 +3169,6 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         return;
 
     const std::vector<sqlSpamRuleAction*>& actions = rule->getActions();
-
-    const string& nick = actor.nick;
-    const string& user = actor.user;
-    const string& host = actor.host;
-    const string& ip   = actor.ip;
 
     for (size_t i = 0; i < actions.size(); ++i) {
         sqlSpamRuleAction* ra = actions[i];
@@ -3171,65 +3188,121 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         if (reason.empty())
             reason = "Spam detected";
 
-        if (actionType == "REPORT") {
-            const std::string sanitizedText = sanitizeSpamTextForReport(triggerText);
-            char buf[512];
-            if (sanitizedText.empty()) {
-                snprintf(buf, sizeof(buf),
-                    "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s",
-                    nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
-                    rule->getName().c_str(),
-                    displayChannels.empty() ? "(no channel)" : displayChannels.c_str());
-            } else {
-                snprintf(buf, sizeof(buf),
-                    "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s - text: \"%s\"",
-                    nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
-                    rule->getName().c_str(),
-                    displayChannels.empty() ? "(no channel)" : displayChannels.c_str(),
-                    sanitizedText.c_str());
-            }
-            Message(consoleChannel, "%s", buf);
+        // Determine effective duration (GLINE only; harmless for other types)
+        int duration = (ra->getActionDurationOverride() >= 0)
+                       ? ra->getActionDurationOverride()
+                       : act->getDuration();
+        if (duration < 0)
+            duration = 3600;
 
-        } else if (actionType == "GLINE") {
-            // Determine effective duration
-            int duration = (ra->getActionDurationOverride() >= 0)
-                           ? ra->getActionDurationOverride()
-                           : act->getDuration();
-            if (duration < 0)
-                duration = 3600;
+        // Determine effective delay: base delay (rule-action override, or
+        // the action template's own delay) plus optional jitter in
+        // [rand_min, rand_max], both from the action template.
+        int totalDelay = (ra->getDelayOverride() >= 0)
+                         ? ra->getDelayOverride()
+                         : act->getDelay();
+        if (totalDelay < 0)
+            totalDelay = 0;
 
-            glineData* gd = new (std::nothrow)
-                glineData("*@" + ip, reason, duration);
-            assert(gd != 0);
-            glineQueue.push_back(gd);
-
-            char buf[512];
-            snprintf(buf, sizeof(buf),
-                "SPAM[GLINE] Queued GLINE for %s!%s@%s (%s) ? rule '%s' ? reason: %s",
-                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
-                rule->getName().c_str(), reason.c_str());
-            Message(consoleChannel, "%s", buf);
-
-        } else if (actionType == "KILL") {
-            iClient* target = Network->findClient(actor.numeric);
-
-            char buf[512];
-            if (!target) {
-                snprintf(buf, sizeof(buf),
-                    "SPAM[KILL] %s!%s@%s (%s) ? rule '%s' ? client no longer connected, skipped",
-                    nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
-                    rule->getName().c_str());
-                Message(consoleChannel, "%s", buf);
-                continue;
-            }
-
-            Kill(target, reason);
-            snprintf(buf, sizeof(buf),
-                "SPAM[KILL] Killed %s!%s@%s (%s) ? rule '%s' ? reason: %s",
-                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
-                rule->getName().c_str(), reason.c_str());
-            Message(consoleChannel, "%s", buf);
+        if (act->getRandMin() >= 0 && act->getRandMax() >= 0) {
+            int lo = act->getRandMin();
+            int hi = act->getRandMax();
+            if (hi < lo)
+                std::swap(lo, hi);
+            totalDelay += lo + (rand() % (hi - lo + 1));
         }
+
+        if (totalDelay <= 0) {
+            executeSpamAction(actionType, reason, duration, actor,
+                              rule->getName(), displayChannels, triggerText);
+            continue;
+        }
+
+        PendingSpamAction pending;
+        pending.actionType      = actionType;
+        pending.reason          = reason;
+        pending.duration        = duration;
+        pending.actor           = actor;
+        pending.ruleName        = rule->getName();
+        pending.displayChannels = displayChannels;
+        pending.triggerText     = triggerText;
+
+        time_t fireAt = ::time(nullptr) + static_cast<time_t>(totalDelay);
+        xServer::timerID tid = MyUplink->RegisterTimer(fireAt, this, nullptr);
+        pendingSpamActionTimers[tid] = pending;
+    }
+}
+
+/**
+ * executeSpamAction: run a single already-resolved action (REPORT/GLINE/
+ * KILL) for the offending actor. Uses the captured SpamActor identity so
+ * REPORT/GLINE still work even if the offender has since quit (crossuser
+ * TEXT_REPEAT, or a delayed action outliving the offender's connection);
+ * KILL is the one action that needs the offender still connected and is
+ * silently skipped (with a console log line) otherwise.
+ */
+void dronescan::executeSpamAction(const std::string& actionType, const std::string& reason,
+                                  int duration, const SpamActor& actor,
+                                  const std::string& ruleName,
+                                  const std::string& displayChannels,
+                                  const std::string& triggerText)
+{
+    const string& nick = actor.nick;
+    const string& user = actor.user;
+    const string& host = actor.host;
+    const string& ip   = actor.ip;
+
+    if (actionType == "REPORT") {
+        const std::string sanitizedText = sanitizeSpamTextForReport(triggerText);
+        char buf[512];
+        if (sanitizedText.empty()) {
+            snprintf(buf, sizeof(buf),
+                "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s",
+                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                ruleName.c_str(),
+                displayChannels.empty() ? "(no channel)" : displayChannels.c_str());
+        } else {
+            snprintf(buf, sizeof(buf),
+                "SPAM[REPORT] %s!%s@%s (%s) triggered rule '%s' in %s - text: \"%s\"",
+                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                ruleName.c_str(),
+                displayChannels.empty() ? "(no channel)" : displayChannels.c_str(),
+                sanitizedText.c_str());
+        }
+        Message(consoleChannel, "%s", buf);
+
+    } else if (actionType == "GLINE") {
+        glineData* gd = new (std::nothrow)
+            glineData("*@" + ip, reason, duration);
+        assert(gd != 0);
+        glineQueue.push_back(gd);
+
+        char buf[512];
+        snprintf(buf, sizeof(buf),
+            "SPAM[GLINE] Queued GLINE for %s!%s@%s (%s) ? rule '%s' ? reason: %s",
+            nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+            ruleName.c_str(), reason.c_str());
+        Message(consoleChannel, "%s", buf);
+
+    } else if (actionType == "KILL") {
+        iClient* target = Network->findClient(actor.numeric);
+
+        char buf[512];
+        if (!target) {
+            snprintf(buf, sizeof(buf),
+                "SPAM[KILL] %s!%s@%s (%s) ? rule '%s' ? client no longer connected, skipped",
+                nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+                ruleName.c_str());
+            Message(consoleChannel, "%s", buf);
+            return;
+        }
+
+        Kill(target, reason);
+        snprintf(buf, sizeof(buf),
+            "SPAM[KILL] Killed %s!%s@%s (%s) ? rule '%s' ? reason: %s",
+            nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
+            ruleName.c_str(), reason.c_str());
+        Message(consoleChannel, "%s", buf);
     }
 }
 

@@ -71,9 +71,8 @@ CREATE TABLE exceptionalChannels (
 -- Defines what to detect. event_type controls how param is interpreted:
 --   TEXT           : param is a PCRE2 regex pattern matched against
 --                    incoming text selected by the `target` bitmask.
---                    Active targets: chan_priv, chan_not, privmsg, notice, part.
---                    Quit message matching (target QUIT) is deferred ? quit
---                    reasons are not yet surfaced by the event system.
+--                    Active targets: chan_priv, chan_not, privmsg, notice,
+--                    part, quit.
 --   TEXT_REPEAT    : param is unused; matched text is tracked in memory.
 --                    See repeat_* columns below for TEXT_REPEAT-specific options.
 --   ENTROPY_TEXT   : param is a float threshold (as text) for message entropy
@@ -90,7 +89,7 @@ CREATE TABLE exceptionalChannels (
 --     PRIVMSG   = 2   PRIVMSG sent directly to the bot or a spy client
 --     CHAN_NOT   = 4   NOTICE sent to a channel
 --     PART      = 8   part messages
---     QUIT      = 16  quit messages (deferred ? not yet surfaced by EVT_QUIT)
+--     QUIT      = 16  quit messages
 --     NOTICE    = 32  NOTICE sent directly to the bot or a spy client
 --     CTCP_PRIV = 64  CTCP sent directly to the bot or a spy client
 --     CTCP_CHAN = 128 CTCP sent to a channel, seen by the bot or a spy client

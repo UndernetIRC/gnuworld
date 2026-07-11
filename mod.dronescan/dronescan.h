@@ -323,6 +323,23 @@ class dronescan : public xClient {
     };
     SpamActor makeActor(iClient* theClient) const;
 
+    // A resolved action (type/reason/duration already computed from its
+    // spam_action template + any spam_rule_action overrides) waiting for its
+    // delay/jitter timer to fire. Captured entirely by value - no pointers
+    // into sqlSpamRule/sqlSpamAction - so a RULE/ACTION DEL while a timer is
+    // in flight cannot leave a dangling reference (same principle as the
+    // already-queued glineQueue entries).
+    struct PendingSpamAction {
+        std::string actionType;
+        std::string reason;
+        int         duration;
+        SpamActor   actor;
+        std::string ruleName;
+        std::string displayChannels;
+        std::string triggerText;
+        PendingSpamAction() : duration(-1) {}
+    };
+
     void processSpamText(iClient* theClient, const std::string& text,
                          int target_bit, const std::string& channel_name);
     void scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
@@ -333,9 +350,20 @@ class dronescan : public xClient {
                             time_t now, std::map<std::string, SpamActor>& actorsToEvaluate);
     void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
                           const std::string& displayChannels);
+    // Resolves each linked action's reason/duration/delay and either runs it
+    // immediately (executeSpamAction) or, if delay+jitter > 0, schedules a
+    // one-shot timer (see pendingSpamActionTimers) to run it later.
     void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                          const std::string& displayChannels,
                          const std::string& triggerText);
+    // Runs a single already-resolved action (REPORT/GLINE/KILL). Called
+    // either directly from fireRuleActions (no delay) or from OnTimer, once
+    // a PendingSpamAction's timer fires.
+    void executeSpamAction(const std::string& actionType, const std::string& reason,
+                           int duration, const SpamActor& actor,
+                           const std::string& ruleName,
+                           const std::string& displayChannels,
+                           const std::string& triggerText);
     // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
     // rule->isScoreGlobally() is true (channel segment omitted). unit is the
     // client's numeric nick, or its IP when rule->getPointsPer() == "IP".
@@ -502,6 +530,11 @@ class dronescan : public xClient {
     // Pending join timers: timerID -> {forcejoin, channel name}
     typedef std::map<xServer::timerID, std::pair<bool, std::string>>  pendingJoinTimersType;
     pendingJoinTimersType pendingJoinTimers;
+
+    // Spam actions waiting for their delay/jitter timer to fire; see
+    // fireRuleActions()/executeSpamAction()/PendingSpamAction.
+    typedef std::map<xServer::timerID, PendingSpamAction>              pendingSpamActionTimersType;
+    pendingSpamActionTimersType pendingSpamActionTimers;
 
     /* PCRE2 regex cache: event_id -> compiled regex (TEXT events only) */
     typedef std::map<int, pcre2_code*>                                 spamRegexCacheType;

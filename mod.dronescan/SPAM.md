@@ -131,21 +131,36 @@ same window keep scoring.
    events, ignoring any whose window has expired. If the total reaches
    `threshold`, **`fireRuleActions()`** runs and the rule's score buckets
    are reset to prevent immediate re-triggering.
-5. **`fireRuleActions(rule, actor, displayChannels, triggerText)`** runs
-   every enabled action linked to the rule:
+5. **`fireRuleActions(rule, actor, displayChannels, triggerText)`** resolves
+   every enabled action linked to the rule — reason, duration, and effective
+   delay (`spam_rule_actions.delay_override`, else `spam_actions.delay`,
+   plus jitter from `rand_min`/`rand_max` when both are set:
+   `actual_delay = delay + random(rand_min, rand_max)`). An action whose
+   effective delay is `<= 0` runs immediately via **`executeSpamAction()`**;
+   otherwise it's captured (by value — action type, reason, duration, the
+   `SpamActor` snapshot, rule name, channels, trigger text) into a
+   `PendingSpamAction` and scheduled on a one-shot timer
+   (`pendingSpamActionTimers`), the same delayed-timer pattern used for spy
+   client joins (`scheduleSpyClientJoin`). `OnTimer()` calls
+   `executeSpamAction()` when it fires.
+6. **`executeSpamAction(actionType, reason, duration, actor, ruleName,
+   displayChannels, triggerText)`** runs a single resolved action:
    - `REPORT`: logs a sanitized one-line summary (nick/user/host/ip, rule
      name, channels, and the triggering text) to the console channel.
-   - `GLINE`: issues a GLINE using the action's (or override) duration and
-     reason.
+   - `GLINE`: issues a GLINE using the resolved duration and reason.
    - `KILL`: looks up the offender's still-connected `iClient` by numeric
-     (`Network->findClient`) and kills it with the action's (or override)
-     reason; silently skipped (with a console log line) if the client has
-     since quit.
+     (`Network->findClient`) and kills it with the resolved reason; silently
+     skipped (with a console log line) if the client has since quit.
 
    The `SpamActor` snapshot (nick/user/host/ip/numeric) is captured at
    match time, so REPORT/GLINE still resolve correctly even if the offender
-   has since quit — this is what makes crossuser `TEXT_REPEAT` reporting
-   work. KILL is the one action that needs the offender still connected.
+   has since quit (or a delayed action outlives their connection) — this is
+   what makes crossuser `TEXT_REPEAT` reporting work. KILL is the one action
+   that needs the offender still connected. Because `PendingSpamAction`
+   holds no pointer into the triggering `sqlSpamRule`/`sqlSpamAction`, a
+   `RULE DEL`/`ACTION DEL` while a delayed action is in flight cannot leave
+   a dangling reference — the action still fires with the values resolved
+   at trigger time (same principle already relied on for `glineQueue`).
 
 `wait_on_rule_id` chains rules ("only GLINE if the REPORT rule already
 fired for this actor") and `requires_event_id` gates an event on another
@@ -263,11 +278,10 @@ returns "Access denied."
 - `ENTROPY_TEXT`, `ENTROPY_NICK`, `JOIN_CHANNEL`, `USERMODE`, `KICK_MSG`,
   `KICK_COUNT` event types are recognized by the schema/command layer but
   not yet evaluated by `processSpamText`.
-- `target` bit `QUIT` (quit reasons) is passed through from `OnEvent`
-  (`EVT_QUIT`) but matching against it is still marked deferred in the
-  schema comments.
-- `spam_actions.delay`/`rand_min`/`rand_max` (and `spam_rule_actions.
-  delay_override`) are loaded but not consulted by `fireRuleActions` —
-  actions fire immediately, with no delay or jitter.
+- `spam_rules.wait_on_rule_id` and `spam_events.requires_event_id` are
+  loaded from the DB and fully settable via `RULE SET`/`EVENT SET`, but
+  nothing in `evaluateSpamRules`/`scoreEvent` actually consults them yet —
+  rule chaining and event gating are not enforced despite being described
+  above as if they were.
 - `spam_exclusions.value` for `OPER` is matched only against the actor's
   nick; there's no way to exempt by oper hostmask or services account.
