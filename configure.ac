@@ -330,6 +330,7 @@ build_modopenchanfix=false
 build_modscanner=false
 build_modstats=false
 build_modsnoop=false
+build_moddebug=false
 
 NEW_MODS=""
 MOD_DIRS=""
@@ -378,6 +379,7 @@ for moduleName in $MOD_DIRS; do
     mod.scanner)	build_modscanner=true;;
     mod.stats)		build_modstats=true;;
     mod.snoop)		build_modsnoop=true;;
+    mod.debug)		build_moddebug=true;;
     *)			NEW_MODS="$NEW_MODS $moduleName";;
   esac
 done
@@ -394,6 +396,7 @@ AM_CONDITIONAL(COND_MODOPENCHANFIX,[test $build_modopenchanfix = true])
 AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
 AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
 AM_CONDITIONAL(COND_MODSNOOP,[test $build_modsnoop = true])
+AM_CONDITIONAL(COND_MODDEBUG,[test $build_moddebug = true])
 
 dnl Enable liboath by default if build_modcservice is set to true
 if test $build_modcservice = true; then

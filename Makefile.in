@@ -228,6 +228,11 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODSTATS_TRUE@am__append_26 = mod.stats/stats.h
 @COND_MODSNOOP_TRUE@am__append_27 = libsnoop.la
 @COND_MODSNOOP_TRUE@am__append_28 = mod.snoop/snoop.h
+@COND_MODDEBUG_TRUE@am__append_29 = libdebug.la
+@COND_MODDEBUG_TRUE@am__append_30 = \
+@COND_MODDEBUG_TRUE@	mod.debug/debug.h \
+@COND_MODDEBUG_TRUE@	mod.debug/debug-commands.h
+
 @COND_TESTDIR_TRUE@noinst_PROGRAMS = test_burst$(EXEEXT) \
 @COND_TESTDIR_TRUE@	test_mtrie_load$(EXEEXT) \
 @COND_TESTDIR_TRUE@	test_mtrie_perf_summary$(EXEEXT) \
@@ -239,8 +244,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_TESTDIR_TRUE@	test_bot$(EXEEXT) \
 @COND_TESTDIR_TRUE@	test_kick_transaction$(EXEEXT) \
 @COND_TESTDIR_TRUE@	$(am__EXEEXT_1)
-@COND_PCRE_TRUE@@COND_TESTDIR_TRUE@am__append_29 = test_regex
-@COND_TESTDIR_TRUE@am__append_30 = \
+@COND_PCRE_TRUE@@COND_TESTDIR_TRUE@am__append_31 = test_regex
+@COND_TESTDIR_TRUE@am__append_32 = \
 @COND_TESTDIR_TRUE@	test/testbot.h \
 @COND_TESTDIR_TRUE@	test/README.burst \
 @COND_TESTDIR_TRUE@	test/README.econfig \
@@ -685,6 +690,26 @@ libcservice_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(libcservice_la_CXXFLAGS) $(CXXFLAGS) \
 	$(libcservice_la_LDFLAGS) $(LDFLAGS) -o $@
 @COND_MODCSERVICE_TRUE@am_libcservice_la_rpath = -rpath $(libdir)
+libdebug_la_LIBADD =
+am__libdebug_la_SOURCES_DIST = mod.debug/debug.cc \
+	mod.debug/debug-commands.cc mod.debug/debug-xclient.cc \
+	mod.debug/USERINFOCommand.cc mod.debug/CHANINFOCommand.cc \
+	mod.debug/SERVERSCommand.cc mod.debug/SERVERINFOCommand.cc \
+	mod.debug/SHUTDOWNCommand.cc
+@COND_MODDEBUG_TRUE@am_libdebug_la_OBJECTS =  \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-debug.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-debug-commands.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-debug-xclient.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-USERINFOCommand.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-CHANINFOCommand.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-SERVERSCommand.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-SERVERINFOCommand.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-SHUTDOWNCommand.lo
+libdebug_la_OBJECTS = $(am_libdebug_la_OBJECTS)
+libdebug_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdebug_la_CXXFLAGS) \
+	$(CXXFLAGS) $(libdebug_la_LDFLAGS) $(LDFLAGS) -o $@
+@COND_MODDEBUG_TRUE@am_libdebug_la_rpath = -rpath $(libdir)
 @COND_MODDRONESCAN_TRUE@libdronescan_la_DEPENDENCIES =  \
 @COND_MODDRONESCAN_TRUE@	libgnuworldDB.la
 am__libdronescan_la_SOURCES_DIST = mod.dronescan/dronescan.cc \
@@ -1202,6 +1227,14 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingChannel.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-USERINFOCommand.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-debug-commands.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-debug-xclient.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-debug.Plo \
 	mod.dronescan/$(DEPDIR)/libdronescan_la-ABNORMALSTest.Plo \
 	mod.dronescan/$(DEPDIR)/libdronescan_la-ACCESSCommand.Plo \
 	mod.dronescan/$(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Plo \
@@ -1346,24 +1379,25 @@ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(libccontrol_la_SOURCES) $(libchanfix_la_SOURCES) \
 	$(libclientExample_la_SOURCES) $(libcloner_la_SOURCES) \
-	$(libcservice_la_SOURCES) $(libdronescan_la_SOURCES) \
-	$(libgnutest_la_SOURCES) $(libgnuworld_la_SOURCES) \
-	$(libgnuworldDB_la_SOURCES) $(libgnuworldcore_la_SOURCES) \
-	$(libircu_la_SOURCES) $(libnickserv_la_SOURCES) \
-	$(libnotifier_la_SOURCES) $(libscanner_la_SOURCES) \
-	$(libsnoop_la_SOURCES) $(libstats_la_SOURCES) \
-	$(gnuworld_SOURCES) $(test_bot_SOURCES) $(test_burst_SOURCES) \
-	$(test_econfig_SOURCES) $(test_gThread_SOURCES) \
-	$(test_kick_transaction_SOURCES) $(test_match_SOURCES) \
-	$(test_mtrie_SOURCES) $(test_mtrie_load_SOURCES) \
-	$(test_mtrie_perf_SOURCES) $(test_mtrie_perf_summary_SOURCES) \
-	$(test_regex_SOURCES) $(test_signal_SOURCES) \
-	$(test_stringtokenizer_SOURCES)
+	$(libcservice_la_SOURCES) $(libdebug_la_SOURCES) \
+	$(libdronescan_la_SOURCES) $(libgnutest_la_SOURCES) \
+	$(libgnuworld_la_SOURCES) $(libgnuworldDB_la_SOURCES) \
+	$(libgnuworldcore_la_SOURCES) $(libircu_la_SOURCES) \
+	$(libnickserv_la_SOURCES) $(libnotifier_la_SOURCES) \
+	$(libscanner_la_SOURCES) $(libsnoop_la_SOURCES) \
+	$(libstats_la_SOURCES) $(gnuworld_SOURCES) $(test_bot_SOURCES) \
+	$(test_burst_SOURCES) $(test_econfig_SOURCES) \
+	$(test_gThread_SOURCES) $(test_kick_transaction_SOURCES) \
+	$(test_match_SOURCES) $(test_mtrie_SOURCES) \
+	$(test_mtrie_load_SOURCES) $(test_mtrie_perf_SOURCES) \
+	$(test_mtrie_perf_summary_SOURCES) $(test_regex_SOURCES) \
+	$(test_signal_SOURCES) $(test_stringtokenizer_SOURCES)
 DIST_SOURCES = $(am__libccontrol_la_SOURCES_DIST) \
 	$(am__libchanfix_la_SOURCES_DIST) \
 	$(am__libclientExample_la_SOURCES_DIST) \
 	$(am__libcloner_la_SOURCES_DIST) \
 	$(am__libcservice_la_SOURCES_DIST) \
+	$(am__libdebug_la_SOURCES_DIST) \
 	$(am__libdronescan_la_SOURCES_DIST) \
 	$(am__libgnutest_la_SOURCES_DIST) $(libgnuworld_la_SOURCES) \
 	$(libgnuworldDB_la_SOURCES) $(libgnuworldcore_la_SOURCES) \
@@ -1431,6 +1465,7 @@ am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/db/Makefile.am \
 	$(srcdir)/mod.clientExample/Makefile.am \
 	$(srcdir)/mod.cloner/Makefile.am \
 	$(srcdir)/mod.cservice/Makefile.am \
+	$(srcdir)/mod.debug/Makefile.am \
 	$(srcdir)/mod.dronescan/Makefile.am \
 	$(srcdir)/mod.gnutest/Makefile.am \
 	$(srcdir)/mod.nickserv/Makefile.am \
@@ -1655,7 +1690,8 @@ lib_LTLIBRARIES = libgnuworldDB.la libircu.la libgnuworldcore.la \
 	$(am__append_5) $(am__append_7) $(am__append_9) \
 	$(am__append_11) $(am__append_13) $(am__append_15) \
 	$(am__append_17) $(am__append_19) $(am__append_21) \
-	$(am__append_23) $(am__append_25) $(am__append_27)
+	$(am__append_23) $(am__append_25) $(am__append_27) \
+	$(am__append_29)
 noinst_LTLIBRARIES = libgnuworld.la libnotifier.la
 pkgdata_DATA = bin/server_command_map
 EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
@@ -1664,10 +1700,10 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	bin/gnutest.example.conf bin/GNUWorld.example.conf \
 	bin/nickserv.example.conf bin/openchanfix.example.conf \
 	bin/scanner.example.conf bin/stats.example.conf \
-	contrib/00INDEX.TXT contrib/chktrans.py contrib/encrypt.sh \
-	doc/README.pgsql doc/README doc/README.appjudge \
-	doc/README.ccontrol doc/README.cservice doc/README.dronescan \
-	doc/README.sharedmemory doc/autokill.sql \
+	bin/debug.example.conf contrib/00INDEX.TXT contrib/chktrans.py \
+	contrib/encrypt.sh doc/README.pgsql doc/README \
+	doc/README.appjudge doc/README.ccontrol doc/README.cservice \
+	doc/README.dronescan doc/README.sharedmemory doc/autokill.sql \
 	doc/ccontrol.addme.sql doc/ccontrol.commands.sql \
 	doc/ccontrol.help.sql doc/ccontrol.sql doc/ccontrol.update.sql \
 	doc/checkvarargs.py doc/chktrans.py doc/cparse.py \
@@ -1726,7 +1762,7 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	$(am__append_10) $(am__append_12) $(am__append_14) \
 	$(am__append_16) $(am__append_18) $(am__append_20) \
 	$(am__append_22) $(am__append_24) $(am__append_26) \
-	$(am__append_28) $(am__append_30)
+	$(am__append_28) $(am__append_30) $(am__append_32)
 libgnuworldDB_la_SOURCES = \
 	db/gnuworldDB.cc \
 	db/pgsqlDB.cc
@@ -2164,6 +2200,21 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODSNOOP_TRUE@	-I${top_srcdir}/libnotifier
 
 @COND_MODSNOOP_TRUE@libsnoop_la_LDFLAGS = -module -export-dynamic
+@COND_MODDEBUG_TRUE@libdebug_la_CXXFLAGS = -I${top_srcdir}/include \
+@COND_MODDEBUG_TRUE@	-I${top_srcdir}/libgnuworld \
+@COND_MODDEBUG_TRUE@	-I${top_srcdir}/libnotifier
+
+@COND_MODDEBUG_TRUE@libdebug_la_LDFLAGS = -module -export-dynamic
+@COND_MODDEBUG_TRUE@libdebug_la_SOURCES = \
+@COND_MODDEBUG_TRUE@	mod.debug/debug.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/debug-commands.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/debug-xclient.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/USERINFOCommand.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/CHANINFOCommand.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/SERVERSCommand.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/SERVERINFOCommand.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/SHUTDOWNCommand.cc
+
 @COND_TESTDIR_TRUE@test_burst_SOURCES = test/burst.cc
 @COND_TESTDIR_TRUE@test_burst_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
 @COND_TESTDIR_TRUE@test_burst_LDADD = libgnuworld.la
@@ -2214,7 +2265,7 @@ all: all-recursive
 .SUFFIXES: .cc .lo .o .obj
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/db/Makefile.am $(srcdir)/libgnuworld/Makefile.am $(srcdir)/libnotifier/Makefile.am $(srcdir)/libircu/Makefile.am $(srcdir)/src/Makefile.am $(srcdir)/mod.ccontrol/Makefile.am $(srcdir)/mod.chanfix/Makefile.am $(srcdir)/mod.clientExample/Makefile.am $(srcdir)/mod.cloner/Makefile.am $(srcdir)/mod.cservice/Makefile.am $(srcdir)/mod.dronescan/Makefile.am $(srcdir)/mod.gnutest/Makefile.am $(srcdir)/mod.nickserv/Makefile.am $(srcdir)/mod.openchanfix/Makefile.am $(srcdir)/mod.scanner/Makefile.am $(srcdir)/mod.stats/Makefile.am $(srcdir)/mod.snoop/Makefile.am $(srcdir)/test/Makefile.am $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/db/Makefile.am $(srcdir)/libgnuworld/Makefile.am $(srcdir)/libnotifier/Makefile.am $(srcdir)/libircu/Makefile.am $(srcdir)/src/Makefile.am $(srcdir)/mod.ccontrol/Makefile.am $(srcdir)/mod.chanfix/Makefile.am $(srcdir)/mod.clientExample/Makefile.am $(srcdir)/mod.cloner/Makefile.am $(srcdir)/mod.cservice/Makefile.am $(srcdir)/mod.dronescan/Makefile.am $(srcdir)/mod.gnutest/Makefile.am $(srcdir)/mod.nickserv/Makefile.am $(srcdir)/mod.openchanfix/Makefile.am $(srcdir)/mod.scanner/Makefile.am $(srcdir)/mod.stats/Makefile.am $(srcdir)/mod.snoop/Makefile.am $(srcdir)/mod.debug/Makefile.am $(srcdir)/test/Makefile.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -2236,7 +2287,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles);; \
 	esac;
-$(srcdir)/db/Makefile.am $(srcdir)/libgnuworld/Makefile.am $(srcdir)/libnotifier/Makefile.am $(srcdir)/libircu/Makefile.am $(srcdir)/src/Makefile.am $(srcdir)/mod.ccontrol/Makefile.am $(srcdir)/mod.chanfix/Makefile.am $(srcdir)/mod.clientExample/Makefile.am $(srcdir)/mod.cloner/Makefile.am $(srcdir)/mod.cservice/Makefile.am $(srcdir)/mod.dronescan/Makefile.am $(srcdir)/mod.gnutest/Makefile.am $(srcdir)/mod.nickserv/Makefile.am $(srcdir)/mod.openchanfix/Makefile.am $(srcdir)/mod.scanner/Makefile.am $(srcdir)/mod.stats/Makefile.am $(srcdir)/mod.snoop/Makefile.am $(srcdir)/test/Makefile.am $(am__empty):
+$(srcdir)/db/Makefile.am $(srcdir)/libgnuworld/Makefile.am $(srcdir)/libnotifier/Makefile.am $(srcdir)/libircu/Makefile.am $(srcdir)/src/Makefile.am $(srcdir)/mod.ccontrol/Makefile.am $(srcdir)/mod.chanfix/Makefile.am $(srcdir)/mod.clientExample/Makefile.am $(srcdir)/mod.cloner/Makefile.am $(srcdir)/mod.cservice/Makefile.am $(srcdir)/mod.dronescan/Makefile.am $(srcdir)/mod.gnutest/Makefile.am $(srcdir)/mod.nickserv/Makefile.am $(srcdir)/mod.openchanfix/Makefile.am $(srcdir)/mod.scanner/Makefile.am $(srcdir)/mod.stats/Makefile.am $(srcdir)/mod.snoop/Makefile.am $(srcdir)/mod.debug/Makefile.am $(srcdir)/test/Makefile.am $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -2986,6 +3037,31 @@ mod.cservice/libcservice_la-MODECommand.lo:  \
 
 libcservice.la: $(libcservice_la_OBJECTS) $(libcservice_la_DEPENDENCIES) $(EXTRA_libcservice_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libcservice_la_LINK) $(am_libcservice_la_rpath) $(libcservice_la_OBJECTS) $(libcservice_la_LIBADD) $(LIBS)
+mod.debug/$(am__dirstamp):
+	@$(MKDIR_P) mod.debug
+	@: >>mod.debug/$(am__dirstamp)
+mod.debug/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) mod.debug/$(DEPDIR)
+	@: >>mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-debug.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-debug-commands.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-debug-xclient.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-USERINFOCommand.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-CHANINFOCommand.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-SERVERSCommand.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-SERVERINFOCommand.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-SHUTDOWNCommand.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
+
+libdebug.la: $(libdebug_la_OBJECTS) $(libdebug_la_DEPENDENCIES) $(EXTRA_libdebug_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libdebug_la_LINK) $(am_libdebug_la_rpath) $(libdebug_la_OBJECTS) $(libdebug_la_LIBADD) $(LIBS)
 mod.dronescan/$(am__dirstamp):
 	@$(MKDIR_P) mod.dronescan
 	@: >>mod.dronescan/$(am__dirstamp)
@@ -3473,6 +3549,8 @@ mostlyclean-compile:
 	-rm -f mod.cloner/*.lo
 	-rm -f mod.cservice/*.$(OBJEXT)
 	-rm -f mod.cservice/*.lo
+	-rm -f mod.debug/*.$(OBJEXT)
+	-rm -f mod.debug/*.lo
 	-rm -f mod.dronescan/*.$(OBJEXT)
 	-rm -f mod.dronescan/*.lo
 	-rm -f mod.gnutest/*.$(OBJEXT)
@@ -3702,6 +3780,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingChannel.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-USERINFOCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-debug-commands.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-debug-xclient.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-debug.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.dronescan/$(DEPDIR)/libdronescan_la-ABNORMALSTest.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.dronescan/$(DEPDIR)/libdronescan_la-ACCESSCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.dronescan/$(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Plo@am__quote@ # am--include-marker
@@ -5251,6 +5337,62 @@ mod.cservice/libcservice_la-MODECommand.lo: mod.cservice/MODECommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcservice_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.cservice/libcservice_la-MODECommand.lo `test -f 'mod.cservice/MODECommand.cc' || echo '$(srcdir)/'`mod.cservice/MODECommand.cc
 
+mod.debug/libdebug_la-debug.lo: mod.debug/debug.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-debug.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-debug.Tpo -c -o mod.debug/libdebug_la-debug.lo `test -f 'mod.debug/debug.cc' || echo '$(srcdir)/'`mod.debug/debug.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-debug.Tpo mod.debug/$(DEPDIR)/libdebug_la-debug.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/debug.cc' object='mod.debug/libdebug_la-debug.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-debug.lo `test -f 'mod.debug/debug.cc' || echo '$(srcdir)/'`mod.debug/debug.cc
+
+mod.debug/libdebug_la-debug-commands.lo: mod.debug/debug-commands.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-debug-commands.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-debug-commands.Tpo -c -o mod.debug/libdebug_la-debug-commands.lo `test -f 'mod.debug/debug-commands.cc' || echo '$(srcdir)/'`mod.debug/debug-commands.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-debug-commands.Tpo mod.debug/$(DEPDIR)/libdebug_la-debug-commands.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/debug-commands.cc' object='mod.debug/libdebug_la-debug-commands.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-debug-commands.lo `test -f 'mod.debug/debug-commands.cc' || echo '$(srcdir)/'`mod.debug/debug-commands.cc
+
+mod.debug/libdebug_la-debug-xclient.lo: mod.debug/debug-xclient.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-debug-xclient.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-debug-xclient.Tpo -c -o mod.debug/libdebug_la-debug-xclient.lo `test -f 'mod.debug/debug-xclient.cc' || echo '$(srcdir)/'`mod.debug/debug-xclient.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-debug-xclient.Tpo mod.debug/$(DEPDIR)/libdebug_la-debug-xclient.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/debug-xclient.cc' object='mod.debug/libdebug_la-debug-xclient.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-debug-xclient.lo `test -f 'mod.debug/debug-xclient.cc' || echo '$(srcdir)/'`mod.debug/debug-xclient.cc
+
+mod.debug/libdebug_la-USERINFOCommand.lo: mod.debug/USERINFOCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-USERINFOCommand.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-USERINFOCommand.Tpo -c -o mod.debug/libdebug_la-USERINFOCommand.lo `test -f 'mod.debug/USERINFOCommand.cc' || echo '$(srcdir)/'`mod.debug/USERINFOCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-USERINFOCommand.Tpo mod.debug/$(DEPDIR)/libdebug_la-USERINFOCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/USERINFOCommand.cc' object='mod.debug/libdebug_la-USERINFOCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-USERINFOCommand.lo `test -f 'mod.debug/USERINFOCommand.cc' || echo '$(srcdir)/'`mod.debug/USERINFOCommand.cc
+
+mod.debug/libdebug_la-CHANINFOCommand.lo: mod.debug/CHANINFOCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-CHANINFOCommand.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Tpo -c -o mod.debug/libdebug_la-CHANINFOCommand.lo `test -f 'mod.debug/CHANINFOCommand.cc' || echo '$(srcdir)/'`mod.debug/CHANINFOCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Tpo mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/CHANINFOCommand.cc' object='mod.debug/libdebug_la-CHANINFOCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-CHANINFOCommand.lo `test -f 'mod.debug/CHANINFOCommand.cc' || echo '$(srcdir)/'`mod.debug/CHANINFOCommand.cc
+
+mod.debug/libdebug_la-SERVERSCommand.lo: mod.debug/SERVERSCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-SERVERSCommand.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Tpo -c -o mod.debug/libdebug_la-SERVERSCommand.lo `test -f 'mod.debug/SERVERSCommand.cc' || echo '$(srcdir)/'`mod.debug/SERVERSCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Tpo mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/SERVERSCommand.cc' object='mod.debug/libdebug_la-SERVERSCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-SERVERSCommand.lo `test -f 'mod.debug/SERVERSCommand.cc' || echo '$(srcdir)/'`mod.debug/SERVERSCommand.cc
+
+mod.debug/libdebug_la-SERVERINFOCommand.lo: mod.debug/SERVERINFOCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-SERVERINFOCommand.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Tpo -c -o mod.debug/libdebug_la-SERVERINFOCommand.lo `test -f 'mod.debug/SERVERINFOCommand.cc' || echo '$(srcdir)/'`mod.debug/SERVERINFOCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Tpo mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/SERVERINFOCommand.cc' object='mod.debug/libdebug_la-SERVERINFOCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-SERVERINFOCommand.lo `test -f 'mod.debug/SERVERINFOCommand.cc' || echo '$(srcdir)/'`mod.debug/SERVERINFOCommand.cc
+
+mod.debug/libdebug_la-SHUTDOWNCommand.lo: mod.debug/SHUTDOWNCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-SHUTDOWNCommand.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Tpo -c -o mod.debug/libdebug_la-SHUTDOWNCommand.lo `test -f 'mod.debug/SHUTDOWNCommand.cc' || echo '$(srcdir)/'`mod.debug/SHUTDOWNCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Tpo mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/SHUTDOWNCommand.cc' object='mod.debug/libdebug_la-SHUTDOWNCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-SHUTDOWNCommand.lo `test -f 'mod.debug/SHUTDOWNCommand.cc' || echo '$(srcdir)/'`mod.debug/SHUTDOWNCommand.cc
+
 mod.dronescan/libdronescan_la-dronescan.lo: mod.dronescan/dronescan.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT mod.dronescan/libdronescan_la-dronescan.lo -MD -MP -MF mod.dronescan/$(DEPDIR)/libdronescan_la-dronescan.Tpo -c -o mod.dronescan/libdronescan_la-dronescan.lo `test -f 'mod.dronescan/dronescan.cc' || echo '$(srcdir)/'`mod.dronescan/dronescan.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.dronescan/$(DEPDIR)/libdronescan_la-dronescan.Tpo mod.dronescan/$(DEPDIR)/libdronescan_la-dronescan.Plo
@@ -6287,6 +6429,7 @@ clean-libtool:
 	-rm -rf mod.clientExample/.libs mod.clientExample/_libs
 	-rm -rf mod.cloner/.libs mod.cloner/_libs
 	-rm -rf mod.cservice/.libs mod.cservice/_libs
+	-rm -rf mod.debug/.libs mod.debug/_libs
 	-rm -rf mod.dronescan/.libs mod.dronescan/_libs
 	-rm -rf mod.gnutest/.libs mod.gnutest/_libs
 	-rm -rf mod.nickserv/.libs mod.nickserv/_libs
@@ -6676,6 +6819,8 @@ distclean-generic:
 	-$(am__rm_f) mod.cloner/$(am__dirstamp)
 	-$(am__rm_f) mod.cservice/$(DEPDIR)/$(am__dirstamp)
 	-$(am__rm_f) mod.cservice/$(am__dirstamp)
+	-$(am__rm_f) mod.debug/$(DEPDIR)/$(am__dirstamp)
+	-$(am__rm_f) mod.debug/$(am__dirstamp)
 	-$(am__rm_f) mod.dronescan/$(DEPDIR)/$(am__dirstamp)
 	-$(am__rm_f) mod.dronescan/$(am__dirstamp)
 	-$(am__rm_f) mod.gnutest/$(DEPDIR)/$(am__dirstamp)
@@ -6915,6 +7060,14 @@ distclean: distclean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingChannel.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-USERINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-debug-commands.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-debug-xclient.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-debug.Plo
 	-rm -f mod.dronescan/$(DEPDIR)/libdronescan_la-ABNORMALSTest.Plo
 	-rm -f mod.dronescan/$(DEPDIR)/libdronescan_la-ACCESSCommand.Plo
 	-rm -f mod.dronescan/$(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Plo
@@ -7295,6 +7448,14 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingChannel.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-USERINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-debug-commands.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-debug-xclient.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-debug.Plo
 	-rm -f mod.dronescan/$(DEPDIR)/libdronescan_la-ABNORMALSTest.Plo
 	-rm -f mod.dronescan/$(DEPDIR)/libdronescan_la-ACCESSCommand.Plo
 	-rm -f mod.dronescan/$(DEPDIR)/libdronescan_la-ADDEXCEPTIONALCHANNELCommand.Plo

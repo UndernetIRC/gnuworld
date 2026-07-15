@@ -666,6 +666,8 @@ pgsql_libdir
 pgsql_includedir
 LIBTOOL_DEPS
 NEW_MODS
+COND_MODDEBUG_FALSE
+COND_MODDEBUG_TRUE
 COND_MODSNOOP_FALSE
 COND_MODSNOOP_TRUE
 COND_MODSTATS_FALSE
@@ -23356,6 +23358,7 @@ build_modopenchanfix=false
 build_modscanner=false
 build_modstats=false
 build_modsnoop=false
+build_moddebug=false
 
 NEW_MODS=""
 MOD_DIRS=""
@@ -23403,6 +23406,7 @@ for moduleName in $MOD_DIRS; do
     mod.scanner)	build_modscanner=true;;
     mod.stats)		build_modstats=true;;
     mod.snoop)		build_modsnoop=true;;
+    mod.debug)		build_moddebug=true;;
     *)			NEW_MODS="$NEW_MODS $moduleName";;
   esac
 done
@@ -23501,6 +23505,14 @@ fi
 else
   COND_MODSNOOP_TRUE='#'
   COND_MODSNOOP_FALSE=
+fi
+
+ if test $build_moddebug = true; then
+  COND_MODDEBUG_TRUE=
+  COND_MODDEBUG_FALSE='#'
+else
+  COND_MODDEBUG_TRUE='#'
+  COND_MODDEBUG_FALSE=
 fi
 
 
@@ -23903,6 +23915,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COND_MODSNOOP_TRUE}" && test -z "${COND_MODSNOOP_FALSE}"; then
   as_fn_error $? "conditional \"COND_MODSNOOP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_MODDEBUG_TRUE}" && test -z "${COND_MODDEBUG_FALSE}"; then
+  as_fn_error $? "conditional \"COND_MODDEBUG\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
