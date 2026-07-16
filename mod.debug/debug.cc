@@ -41,10 +41,11 @@ debug::debug(const std::string& configFileName) : xClient(configFileName) {
         allowAccess.push_back(ptr->second);
     }
 
-    RegisterCommand(std::make_unique<USERINFOCommand>(this, "USERINFO", "<nickname>"));
+    RegisterCommand(std::make_unique<USERINFOCommand>(this, "USERINFO", "[-num] <nickname|numeric>"));
     RegisterCommand(std::make_unique<CHANINFOCommand>(this, "CHANINFO", "<#channel>"));
     RegisterCommand(std::make_unique<SERVERSCommand>(this, "SERVERS", ""));
-    RegisterCommand(std::make_unique<SERVERINFOCommand>(this, "SERVERINFO", "<servername>"));
+    RegisterCommand(
+        std::make_unique<SERVERINFOCommand>(this, "SERVERINFO", "[-num] <servername|mask|numeric>"));
     RegisterCommand(std::make_unique<SHUTDOWNCommand>(this, "SHUTDOWN", "[reason]"));
 }
 

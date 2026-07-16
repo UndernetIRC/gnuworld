@@ -18,30 +18,21 @@
  */
 
 #include <string>
+#include <vector>
 
 #include "Network.h"
 #include "StringTokenizer.h"
 #include "iServer.h"
+#include "match.h"
 #include "misc.h"
 
 #include "debug.h"
 #include "debug-commands.h"
 
 namespace gnuworld {
+namespace {
 
-void SERVERINFOCommand::Exec(const iClient* theClient, const std::string& Message) {
-    StringTokenizer st(Message);
-    if (st.size() < 2) {
-        Usage(theClient);
-        return;
-    }
-
-    iServer* theServer = Network->findServerName(st[1]);
-    if (theServer == nullptr) {
-        bot->Notice(theClient, "Unable to find server: %s", st[1].c_str());
-        return;
-    }
-
+void dumpServerInfo(debug* bot, const iClient* theClient, iServer* theServer) {
     const iServer* uplink = Network->findServer(theServer->getUplinkIntYY());
 
     bot->Notice(theClient, "Server: %s", theServer->getName().c_str());
@@ -61,6 +52,68 @@ void SERVERINFOCommand::Exec(const iClient* theClient, const std::string& Messag
                 theServer->getFlags(), theServer->isHub() ? "yes" : "no",
                 theServer->isService() ? "yes" : "no", theServer->isIPv6() ? "yes" : "no",
                 theServer->isJupe() ? "yes" : "no", theServer->isBursting() ? "yes" : "no");
+}
+
+} // namespace
+
+void SERVERINFOCommand::Exec(const iClient* theClient, const std::string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return;
+    }
+
+    bool byNumeric = false;
+    std::size_t argPos = 1;
+    if (!strcasecmp(st[1], "-num")) {
+        byNumeric = true;
+        argPos = 2;
+    }
+
+    if (st.size() <= argPos) {
+        Usage(theClient);
+        return;
+    }
+
+    const std::string& target = st[argPos];
+
+    if (byNumeric) {
+        iServer* theServer = Network->findServer(target);
+        if (theServer == nullptr) {
+            bot->Notice(theClient, "Unable to find server numeric: %s", target.c_str());
+            return;
+        }
+        dumpServerInfo(bot, theClient, theServer);
+        return;
+    }
+
+    std::vector<iServer*> matches;
+    for (const auto& [id, theServer] : Network->servers()) {
+        (void)id;
+        if (theServer == nullptr) {
+            continue;
+        }
+        // match() returns 0 on a successful match
+        if (match(target, theServer->getName()) == 0) {
+            matches.push_back(theServer);
+        }
+    }
+
+    if (matches.empty()) {
+        bot->Notice(theClient, "Unable to find server: %s", target.c_str());
+        return;
+    }
+
+    if (matches.size() > 1) {
+        bot->Notice(theClient, "Found %zu servers matching %s:", matches.size(), target.c_str());
+    }
+
+    for (std::size_t i = 0; i < matches.size(); ++i) {
+        if (matches.size() > 1) {
+            bot->Notice(theClient, "--- Match %zu/%zu ---", i + 1, matches.size());
+        }
+        dumpServerInfo(bot, theClient, matches[i]);
+    }
 }
 
 } // namespace gnuworld

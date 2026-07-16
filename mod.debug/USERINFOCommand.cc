@@ -67,7 +67,8 @@ std::string formatChannelEntry(Channel* theChannel, const iClient* Target) {
     return curChannel;
 }
 
-void noticeChannelList(debug* bot, const iClient* theClient, const std::vector<std::string>& channels) {
+void noticeChannelList(debug* bot, const iClient* theClient,
+                       const std::vector<std::string>& channels) {
     std::string chanNames;
     for (std::size_t i = 0; i < channels.size(); ++i) {
         if (!chanNames.empty() && (chanNames.size() + channels[i].size()) > 410) {
@@ -82,20 +83,8 @@ void noticeChannelList(debug* bot, const iClient* theClient, const std::vector<s
     bot->Notice(theClient, "On channels: %s", chanNames.c_str());
 }
 
-} // namespace
-
-void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message) {
-    StringTokenizer st(Message);
-    if (st.size() < 2) {
-        Usage(theClient);
-        return;
-    }
-
-    iClient* Target = Network->findNick(st[1]);
-    if (Target == nullptr) {
-        bot->Notice(theClient, "Unable to find nick: %s", st[1].c_str());
-        return;
-    }
+void dumpUserInfo(debug* bot, const iClient* theClient, iClient* Target) {
+    const std::string& nick = Target->getNickName();
 
     iServer* targetServer = Network->findServer(Target->getIntYY());
     if (targetServer == nullptr) {
@@ -104,11 +93,11 @@ void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message)
     }
 
     if (Target->isModeX() && Target->isModeR()) {
-        bot->Notice(theClient, "%s is %s (%s) [%s]", st[1].c_str(),
+        bot->Notice(theClient, "%s is %s (%s) [%s]", nick.c_str(),
                     Target->getNickUserHost().c_str(), Target->getRealNickUserHost().c_str(),
                     xIP(Target->getIP()).GetNumericIP().c_str());
     } else {
-        bot->Notice(theClient, "%s is %s [%s]", st[1].c_str(), Target->getNickUserHost().c_str(),
+        bot->Notice(theClient, "%s is %s [%s]", nick.c_str(), Target->getNickUserHost().c_str(),
                     xIP(Target->getIP()).GetNumericIP().c_str());
     }
 
@@ -129,19 +118,19 @@ void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message)
 #endif
 
     if (Target->getNickTS() != Target->getFirstNickTS()) {
-        bot->Notice(theClient, "%s has used its current nickname for %s [since %ld]", st[1].c_str(),
+        bot->Notice(theClient, "%s has used its current nickname for %s [since %ld]", nick.c_str(),
                     prettyDuration(Target->getNickTS()).c_str(), Target->getNickTS());
     }
 
-    bot->Notice(theClient, "%s has been connected for %s [since %ld]", st[1].c_str(),
+    bot->Notice(theClient, "%s has been connected for %s [since %ld]", nick.c_str(),
                 prettyDuration(Target->getFirstNickTS()).c_str(), Target->getFirstNickTS());
 
     if (Target->isModeR()) {
         std::string accountFlags;
         if (Target->getAccountFlag(iClient::X_TOTP_REQ_IPR) ||
             Target->getAccountFlag(iClient::X_TOTP_ENABLED)) {
-            accountFlags += Target->getAccountFlag(iClient::X_TOTP_REQ_IPR) ? "TOTP_REQ_IPR "
-                                                                            : "TOTP ";
+            accountFlags +=
+                Target->getAccountFlag(iClient::X_TOTP_REQ_IPR) ? "TOTP_REQ_IPR " : "TOTP ";
 
             std::string disabled;
             if (Target->getAccountFlag(iClient::X_WEB_DISABLE_TOTP))
@@ -159,13 +148,13 @@ void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message)
         if (Target->getAccountFlag(iClient::X_CERTONLY))
             accountFlags += "CERTONLY ";
 
-        bot->Notice(theClient, "%s is authed as [%s]", st[1].c_str(), Target->getAccount().c_str());
+        bot->Notice(theClient, "%s is authed as [%s]", nick.c_str(), Target->getAccount().c_str());
         bot->Notice(theClient, "Account ID: %u", Target->getAccountID());
         bot->Notice(theClient, "Account flags: 0x%04x", Target->getAccountFlags());
         if (!accountFlags.empty())
             bot->Notice(theClient, "Account flags (decoded): %s", accountFlags.c_str());
     } else {
-        bot->Notice(theClient, "%s is not authed", st[1].c_str());
+        bot->Notice(theClient, "%s is not authed", nick.c_str());
     }
 
     bot->Notice(theClient, "Numeric: %s, UserModes: %s, Server Numeric: %s (%s)",
@@ -173,20 +162,20 @@ void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message)
                 targetServer->getCharYY().c_str(), targetServer->getName().c_str());
 
     if (Target->isModeZ()) {
-        bot->Notice(theClient, "%s is connected using TLS", st[1].c_str());
+        bot->Notice(theClient, "%s is connected using TLS", nick.c_str());
         if (Target->hasTlsFingerprint())
             bot->Notice(theClient, "   Fingerprint: %s",
                         compactToCanonical(Target->getTlsFingerprint()).c_str());
     }
 
     if (Target->isOper())
-        bot->Notice(theClient, "%s is an IRC operator", st[1].c_str());
+        bot->Notice(theClient, "%s is an IRC operator", nick.c_str());
 
     if (Target->isFake())
-        bot->Notice(theClient, "%s is a fake client", st[1].c_str());
+        bot->Notice(theClient, "%s is a fake client", nick.c_str());
 
     if (Target->getMode(iClient::MODE_SERVICES)) {
-        bot->Notice(theClient, "%s is a service agent", st[1].c_str());
+        bot->Notice(theClient, "%s is a service agent", nick.c_str());
         return;
     }
 
@@ -204,6 +193,38 @@ void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message)
     noticeChannelList(bot, theClient, channels);
     bot->Notice(theClient, "* - Channel contains control codes");
     bot->Notice(theClient, "! - Channel is +s or +p");
+}
+
+} // namespace
+
+void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message) {
+    StringTokenizer st(Message);
+    if (st.size() < 2) {
+        Usage(theClient);
+        return;
+    }
+
+    bool byNumeric = false;
+    std::size_t argPos = 1;
+    if (!strcasecmp(st[1], "-num")) {
+        byNumeric = true;
+        argPos = 2;
+    }
+
+    if (st.size() <= argPos) {
+        Usage(theClient);
+        return;
+    }
+
+    const std::string& target = st[argPos];
+    iClient* Target = byNumeric ? Network->findClient(target) : Network->findNick(target);
+    if (Target == nullptr) {
+        bot->Notice(theClient, byNumeric ? "Unable to find numeric: %s" : "Unable to find nick: %s",
+                    target.c_str());
+        return;
+    }
+
+    dumpUserInfo(bot, theClient, Target);
 }
 
 } // namespace gnuworld
