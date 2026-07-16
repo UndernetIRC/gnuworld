@@ -4,7 +4,8 @@ lib_LTLIBRARIES += libdebug.la
 
 libdebug_la_CXXFLAGS = -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld \
-	-I${top_srcdir}/libnotifier
+	-I${top_srcdir}/libnotifier \
+	-Wno-overloaded-virtual
 
 libdebug_la_LDFLAGS = -module -export-dynamic
 

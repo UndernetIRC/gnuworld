@@ -72,6 +72,10 @@ xClient::xClient(const string& fileName) : configFileName(fileName) {
 
     Mode(conf.Require("mode")->second);
 
+    if (conf.Find("stealth") != conf.end()) {
+        stealth = conf.Require<bool>("stealth");
+    }
+
     /* Initialize logger */
     logger = std::make_unique<Logger>(this);
 }
@@ -92,10 +96,12 @@ void xClient::OnDetach(const string& Message) {
         return;
     }
 
-    stringstream s;
-    s << getCharYYXXX() << " Q :" << Message;
-
-    MyUplink->Write(s);
+    // Stealth modules were never introduced on the network
+    if (!IsStealth()) {
+        stringstream s;
+        s << getCharYYXXX() << " Q :" << Message;
+        MyUplink->Write(s);
+    }
 
     // xClient is no longer connected to the xServer.
     Connected = false;
@@ -165,7 +171,8 @@ bool xClient::Mode(const string& Value) {
     } // close while
 
     // Output to the network if we are connected
-    if (isConnected() && !Value.empty()) {
+    // Stealth modules have no client numeric on the wire
+    if (isConnected() && !Value.empty() && !IsStealth()) {
         stringstream s;
         s << getCharYYXXX() << " M " << getCharYYXXX() << " " << Value;
 
@@ -263,7 +270,7 @@ bool xClient::Mode(Channel* theChan, const string& modes, const string& args, bo
 }
 
 bool xClient::DoCTCP(iClient* Target, const string& CTCP, const string& Message) {
-    if (!isConnected()) {
+    if (!isConnected() || IsStealth()) {
         return false;
     }
 
@@ -355,27 +362,29 @@ bool xClient::FakeNotice(const Channel* theChan, const iClient* srcClient, const
 }
 
 bool xClient::Message(const iClient* Target, const string& Message) {
-    if (isConnected()) {
-        return MyUplink->Write("%s P %s :%s\r\n", getCharYYXXX().c_str(),
-                               Target->getCharYYXXX().c_str(), Message.c_str());
+    if (!isConnected() || IsStealth()) {
+        return false;
     }
-    return false;
+
+    return MyUplink->Write("%s P %s :%s\r\n", getCharYYXXX().c_str(),
+                           Target->getCharYYXXX().c_str(), Message.c_str());
 }
 
 bool xClient::Message(const iClient* Target, const char* Message, ...) {
-    if (isConnected() && Message && Message[0] != 0) {
-        char buffer[1024];
-        memset(buffer, 0, 1024);
-        va_list list;
-
-        va_start(list, Message);
-        vsnprintf(buffer, 1024, Message, list);
-        va_end(list);
-
-        return MyUplink->Write("%s P %s :%s\r\n", getCharYYXXX().c_str(),
-                               Target->getCharYYXXX().c_str(), buffer);
+    if (!isConnected() || IsStealth() || !Message || Message[0] == 0) {
+        return false;
     }
-    return false;
+
+    char buffer[1024];
+    memset(buffer, 0, 1024);
+    va_list list;
+
+    va_start(list, Message);
+    vsnprintf(buffer, 1024, Message, list);
+    va_end(list);
+
+    return MyUplink->Write("%s P %s :%s\r\n", getCharYYXXX().c_str(),
+                           Target->getCharYYXXX().c_str(), buffer);
 }
 
 bool xClient::Message(const string& Channel, const char* Message, ...) {
@@ -417,7 +426,7 @@ bool xClient::Notice(const iClient* Target, const string& Message) {
     // elog	<< "xClient::Notice( const iClient* )"
     //	<< endl ;
 
-    if (!isConnected()) {
+    if (!isConnected() || IsStealth()) {
         return false;
     }
 
@@ -429,19 +438,20 @@ bool xClient::Notice(const iClient* Target, const char* Message, ...) {
     // elog	<< "xClient::Notice( const iClient* )"
     //	<< endl ;
 
-    if (isConnected() && Message && Message[0] != 0) {
-        char buffer[1024];
-        memset(buffer, 0, 1024);
-        va_list list;
-
-        va_start(list, Message);
-        vsnprintf(buffer, 1024, Message, list);
-        va_end(list);
-
-        // O is the token for NOTICE, *shrug*
-        return Notice(Target, string(buffer));
+    if (!isConnected() || IsStealth() || !Message || Message[0] == 0) {
+        return false;
     }
-    return false;
+
+    char buffer[1024];
+    memset(buffer, 0, 1024);
+    va_list list;
+
+    va_start(list, Message);
+    vsnprintf(buffer, 1024, Message, list);
+    va_end(list);
+
+    // O is the token for NOTICE, *shrug*
+    return Notice(Target, string(buffer));
 }
 
 bool xClient::Notice(const string& Channel, const char* Message, ...) {

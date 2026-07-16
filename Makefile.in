@@ -2202,7 +2202,8 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODSNOOP_TRUE@libsnoop_la_LDFLAGS = -module -export-dynamic
 @COND_MODDEBUG_TRUE@libdebug_la_CXXFLAGS = -I${top_srcdir}/include \
 @COND_MODDEBUG_TRUE@	-I${top_srcdir}/libgnuworld \
-@COND_MODDEBUG_TRUE@	-I${top_srcdir}/libnotifier
+@COND_MODDEBUG_TRUE@	-I${top_srcdir}/libnotifier \
+@COND_MODDEBUG_TRUE@	-Wno-overloaded-virtual
 
 @COND_MODDEBUG_TRUE@libdebug_la_LDFLAGS = -module -export-dynamic
 @COND_MODDEBUG_TRUE@libdebug_la_SOURCES = \

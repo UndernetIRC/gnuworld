@@ -815,6 +815,12 @@ class xClient : public TimerHandler, public NetworkTarget {
     inline bool isConnected() const { return (MyUplink && MyUplink->isConnected()); }
 
     /**
+     * Return true if this module runs in stealth mode (no iClient
+     * created or burst; addressable only via nick@server).
+     */
+    inline bool IsStealth() const { return stealth; }
+
+    /**
      * Utility method for outputting client information to
      * a gnuworld logging stream.
      */
@@ -911,6 +917,12 @@ class xClient : public TimerHandler, public NetworkTarget {
      * to a network.
      */
     bool Connected;
+
+    /**
+     * True when this module operates without an online iClient
+     * (stealth = yes in config). Messages arrive via nick@server.
+     */
+    bool stealth = false;
 
     /**
      * This is the user mode of this client.

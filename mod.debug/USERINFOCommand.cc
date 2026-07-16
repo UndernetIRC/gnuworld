@@ -72,7 +72,7 @@ void noticeChannelList(debug* bot, const iClient* theClient,
     std::string chanNames;
     for (std::size_t i = 0; i < channels.size(); ++i) {
         if (!chanNames.empty() && (chanNames.size() + channels[i].size()) > 410) {
-            bot->Notice(theClient, "On channels: %s", chanNames.c_str());
+            bot->Notice(theClient, "On channels: {}", chanNames);
             chanNames.clear();
         }
         if (!chanNames.empty()) {
@@ -80,7 +80,7 @@ void noticeChannelList(debug* bot, const iClient* theClient,
         }
         chanNames += channels[i];
     }
-    bot->Notice(theClient, "On channels: %s", chanNames.c_str());
+    bot->Notice(theClient, "On channels: {}", chanNames);
 }
 
 void dumpUserInfo(debug* bot, const iClient* theClient, iClient* Target) {
@@ -88,42 +88,41 @@ void dumpUserInfo(debug* bot, const iClient* theClient, iClient* Target) {
 
     iServer* targetServer = Network->findServer(Target->getIntYY());
     if (targetServer == nullptr) {
-        bot->Notice(theClient, "Unable to find server for numeric: %d", Target->getIntYY());
+        bot->Notice(theClient, "Unable to find server for numeric: {}", Target->getIntYY());
         return;
     }
 
     if (Target->isModeX() && Target->isModeR()) {
-        bot->Notice(theClient, "%s is %s (%s) [%s]", nick.c_str(),
-                    Target->getNickUserHost().c_str(), Target->getRealNickUserHost().c_str(),
-                    xIP(Target->getIP()).GetNumericIP().c_str());
+        bot->Notice(theClient, "{} is {} ({}) [{}]", nick, Target->getNickUserHost(),
+                    Target->getRealNickUserHost(), xIP(Target->getIP()).GetNumericIP());
     } else {
-        bot->Notice(theClient, "%s is %s [%s]", nick.c_str(), Target->getNickUserHost().c_str(),
-                    xIP(Target->getIP()).GetNumericIP().c_str());
+        bot->Notice(theClient, "{} is {} [{}]", nick, Target->getNickUserHost(),
+                    xIP(Target->getIP()).GetNumericIP());
     }
 
-    bot->Notice(theClient, "Realname: %s", Target->getDescription().c_str());
-    bot->Notice(theClient, "Visible host: %s", Target->getInsecureHost().c_str());
-    bot->Notice(theClient, "Real host: %s", Target->getRealInsecureHost().c_str());
+    bot->Notice(theClient, "Realname: {}", Target->getDescription());
+    bot->Notice(theClient, "Visible host: {}", Target->getInsecureHost());
+    bot->Notice(theClient, "Real host: {}", Target->getRealInsecureHost());
 
 #ifdef ASUKA
     if (!Target->getSetHost().empty()) {
-        bot->Notice(theClient, "Set host: %s", Target->getSetHost().c_str());
+        bot->Notice(theClient, "Set host: {}", Target->getSetHost());
     }
 #endif
 
 #ifdef SRVX
     if (!Target->getFakeHost().empty()) {
-        bot->Notice(theClient, "Fake host: %s", Target->getFakeHost().c_str());
+        bot->Notice(theClient, "Fake host: {}", Target->getFakeHost());
     }
 #endif
 
     if (Target->getNickTS() != Target->getFirstNickTS()) {
-        bot->Notice(theClient, "%s has used its current nickname for %s [since %ld]", nick.c_str(),
-                    prettyDuration(Target->getNickTS()).c_str(), Target->getNickTS());
+        bot->Notice(theClient, "{} has used its current nickname for {} [since {}]", nick,
+                    prettyDuration(Target->getNickTS()), Target->getNickTS());
     }
 
-    bot->Notice(theClient, "%s has been connected for %s [since %ld]", nick.c_str(),
-                prettyDuration(Target->getFirstNickTS()).c_str(), Target->getFirstNickTS());
+    bot->Notice(theClient, "{} has been connected for {} [since {}]", nick,
+                prettyDuration(Target->getFirstNickTS()), Target->getFirstNickTS());
 
     if (Target->isModeR()) {
         std::string accountFlags;
@@ -148,34 +147,34 @@ void dumpUserInfo(debug* bot, const iClient* theClient, iClient* Target) {
         if (Target->getAccountFlag(iClient::X_CERTONLY))
             accountFlags += "CERTONLY ";
 
-        bot->Notice(theClient, "%s is authed as [%s]", nick.c_str(), Target->getAccount().c_str());
-        bot->Notice(theClient, "Account ID: %u", Target->getAccountID());
-        bot->Notice(theClient, "Account flags: 0x%04x", Target->getAccountFlags());
+        bot->Notice(theClient, "{} is authed as [{}]", nick, Target->getAccount());
+        bot->Notice(theClient, "Account ID: {}", Target->getAccountID());
+        bot->Notice(theClient, "Account flags: {:#04x}", Target->getAccountFlags());
         if (!accountFlags.empty())
-            bot->Notice(theClient, "Account flags (decoded): %s", accountFlags.c_str());
+            bot->Notice(theClient, "Account flags (decoded): {}", accountFlags);
     } else {
-        bot->Notice(theClient, "%s is not authed", nick.c_str());
+        bot->Notice(theClient, "{} is not authed", nick);
     }
 
-    bot->Notice(theClient, "Numeric: %s, UserModes: %s, Server Numeric: %s (%s)",
-                Target->getCharYYXXX().c_str(), Target->getStringModes().c_str(),
-                targetServer->getCharYY().c_str(), targetServer->getName().c_str());
+    bot->Notice(theClient, "Numeric: {}, UserModes: {}, Server Numeric: {} ({})",
+                Target->getCharYYXXX(), Target->getStringModes(), targetServer->getCharYY(),
+                targetServer->getName());
 
     if (Target->isModeZ()) {
-        bot->Notice(theClient, "%s is connected using TLS", nick.c_str());
+        bot->Notice(theClient, "{} is connected using TLS", nick);
         if (Target->hasTlsFingerprint())
-            bot->Notice(theClient, "   Fingerprint: %s",
-                        compactToCanonical(Target->getTlsFingerprint()).c_str());
+            bot->Notice(theClient, "   Fingerprint: {}",
+                        compactToCanonical(Target->getTlsFingerprint()));
     }
 
     if (Target->isOper())
-        bot->Notice(theClient, "%s is an IRC operator", nick.c_str());
+        bot->Notice(theClient, "{} is an IRC operator", nick);
 
     if (Target->isFake())
-        bot->Notice(theClient, "%s is a fake client", nick.c_str());
+        bot->Notice(theClient, "{} is a fake client", nick);
 
     if (Target->getMode(iClient::MODE_SERVICES)) {
-        bot->Notice(theClient, "%s is a service agent", nick.c_str());
+        bot->Notice(theClient, "{} is a service agent", nick);
         return;
     }
 
@@ -219,8 +218,11 @@ void USERINFOCommand::Exec(const iClient* theClient, const std::string& Message)
     const std::string& target = st[argPos];
     iClient* Target = byNumeric ? Network->findClient(target) : Network->findNick(target);
     if (Target == nullptr) {
-        bot->Notice(theClient, byNumeric ? "Unable to find numeric: %s" : "Unable to find nick: %s",
-                    target.c_str());
+        if (byNumeric) {
+            bot->Notice(theClient, "Unable to find numeric: {}", target);
+        } else {
+            bot->Notice(theClient, "Unable to find nick: {}", target);
+        }
         return;
     }
 

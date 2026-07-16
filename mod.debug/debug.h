@@ -20,9 +20,11 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <format>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "client.h"
@@ -41,6 +43,15 @@ class debug : public xClient {
     bool RegisterCommand(std::unique_ptr<Command>);
 
     [[nodiscard]] bool hasAccess(const std::string&) const;
+
+    // xClient overrides (see debug-xclient.cc). Stealth routes NOTICEs
+    // via the uplink; format overload hides printf-style Notice.
+    bool Notice(const iClient* Target, const std::string&) override;
+
+    template <typename... Args>
+    bool Notice(const iClient* Target, std::format_string<Args...> fmt, Args&&... args) {
+        return Notice(Target, std::format(fmt, std::forward<Args>(args)...));
+    }
 
   protected:
     using commandMapType = std::unordered_map<std::string, std::unique_ptr<Command>>;

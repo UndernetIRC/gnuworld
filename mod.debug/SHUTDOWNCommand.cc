@@ -31,7 +31,7 @@ void SHUTDOWNCommand::Exec(const iClient* theClient, const std::string& Message)
     StringTokenizer st(Message);
     const std::string reason = (st.size() < 2) ? "Server Shutdown" : st.assemble(1);
 
-    bot->Notice(theClient, "Shutting down: %s", reason.c_str());
+    bot->Notice(theClient, "Shutting down: {}", reason);
     bot->getUplink()->Shutdown(reason);
 }
 

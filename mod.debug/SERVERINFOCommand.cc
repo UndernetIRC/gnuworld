@@ -35,20 +35,19 @@ namespace {
 void dumpServerInfo(debug* bot, const iClient* theClient, iServer* theServer) {
     const iServer* uplink = Network->findServer(theServer->getUplinkIntYY());
 
-    bot->Notice(theClient, "Server: %s", theServer->getName().c_str());
-    bot->Notice(theClient, "Description: %s", theServer->getDescription().c_str());
-    bot->Notice(theClient, "Numeric: %s (intYY=%u)", theServer->getCharYY().c_str(),
-                theServer->getIntYY());
-    bot->Notice(theClient, "Uplink: %s (intYY=%u)", uplink ? uplink->getName().c_str() : "(none)",
+    bot->Notice(theClient, "Server: {}", theServer->getName());
+    bot->Notice(theClient, "Description: {}", theServer->getDescription());
+    bot->Notice(theClient, "Numeric: {} (intYY={})", theServer->getCharYY(), theServer->getIntYY());
+    bot->Notice(theClient, "Uplink: {} (intYY={})", uplink ? uplink->getName() : "(none)",
                 theServer->getUplinkIntYY());
-    bot->Notice(theClient, "Clients: %zu", Network->countClients(theServer));
-    bot->Notice(theClient, "Connected: %ld (%s ago)", theServer->getConnectTime(),
-                prettyDuration(theServer->getConnectTime()).c_str());
-    bot->Notice(theClient, "Start time: %ld (%s ago)", theServer->getStartTime(),
-                prettyDuration(theServer->getStartTime()).c_str());
-    bot->Notice(theClient, "Lag: %ld seconds (last update: %ld)", theServer->getLag(),
+    bot->Notice(theClient, "Clients: {}", Network->countClients(theServer));
+    bot->Notice(theClient, "Connected: {} ({} ago)", theServer->getConnectTime(),
+                prettyDuration(theServer->getConnectTime()));
+    bot->Notice(theClient, "Start time: {} ({} ago)", theServer->getStartTime(),
+                prettyDuration(theServer->getStartTime()));
+    bot->Notice(theClient, "Lag: {} seconds (last update: {})", theServer->getLag(),
                 theServer->getLastLagTS());
-    bot->Notice(theClient, "Flags: 0x%x  hub=%s service=%s ipv6=%s jupe=%s bursting=%s",
+    bot->Notice(theClient, "Flags: {:#x}  hub={} service={} ipv6={} jupe={} bursting={}",
                 theServer->getFlags(), theServer->isHub() ? "yes" : "no",
                 theServer->isService() ? "yes" : "no", theServer->isIPv6() ? "yes" : "no",
                 theServer->isJupe() ? "yes" : "no", theServer->isBursting() ? "yes" : "no");
@@ -80,7 +79,7 @@ void SERVERINFOCommand::Exec(const iClient* theClient, const std::string& Messag
     if (byNumeric) {
         iServer* theServer = Network->findServer(target);
         if (theServer == nullptr) {
-            bot->Notice(theClient, "Unable to find server numeric: %s", target.c_str());
+            bot->Notice(theClient, "Unable to find server numeric: {}", target);
             return;
         }
         dumpServerInfo(bot, theClient, theServer);
@@ -100,17 +99,17 @@ void SERVERINFOCommand::Exec(const iClient* theClient, const std::string& Messag
     }
 
     if (matches.empty()) {
-        bot->Notice(theClient, "Unable to find server: %s", target.c_str());
+        bot->Notice(theClient, "Unable to find server: {}", target);
         return;
     }
 
     if (matches.size() > 1) {
-        bot->Notice(theClient, "Found %zu servers matching %s:", matches.size(), target.c_str());
+        bot->Notice(theClient, "Found {} servers matching {}:", matches.size(), target);
     }
 
     for (std::size_t i = 0; i < matches.size(); ++i) {
         if (matches.size() > 1) {
-            bot->Notice(theClient, "--- Match %zu/%zu ---", i + 1, matches.size());
+            bot->Notice(theClient, "--- Match {}/{} ---", i + 1, matches.size());
         }
         dumpServerInfo(bot, theClient, matches[i]);
     }

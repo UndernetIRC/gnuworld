@@ -53,14 +53,13 @@ void SERVERSCommand::Exec(const iClient* theClient, const std::string&) {
 
         const iServer* uplink = Network->findServer(theServer->getUplinkIntYY());
 
-        bot->Notice(theClient, "  %s numeric=%s clients=%zu flags=%s uplink=%s",
-                    theServer->getName().c_str(), theServer->getCharYY().c_str(),
-                    Network->countClients(theServer), flags.c_str(),
-                    uplink ? uplink->getName().c_str() : "(none)");
+        bot->Notice(theClient, "  {} numeric={} clients={} flags={} uplink={}",
+                    theServer->getName(), theServer->getCharYY(), Network->countClients(theServer),
+                    flags, uplink ? uplink->getName() : "(none)");
         ++totalServers;
     }
 
-    bot->Notice(theClient, "Total servers: %u", totalServers);
+    bot->Notice(theClient, "Total servers: {}", totalServers);
 }
 
 } // namespace gnuworld

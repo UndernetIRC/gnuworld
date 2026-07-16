@@ -38,38 +38,36 @@ void CHANINFOCommand::Exec(const iClient* theClient, const std::string& Message)
 
     Channel* theChan = Network->findChannel(st[1]);
     if (theChan == nullptr) {
-        bot->Notice(theClient, "Unable to find channel %s", st[1].c_str());
+        bot->Notice(theClient, "Unable to find channel {}", st[1]);
         return;
     }
 
-    bot->Notice(theClient, "Channel: %s", theChan->getName().c_str());
-    bot->Notice(theClient, "Modes: %s (0x%x)", theChan->getModeString().c_str(),
-                theChan->getModes());
-    bot->Notice(theClient, "Created at time: %ld (%s ago)", theChan->getCreationTime(),
-                prettyDuration(theChan->getCreationTime()).c_str());
+    bot->Notice(theClient, "Channel: {}", theChan->getName());
+    bot->Notice(theClient, "Modes: {} ({:#x})", theChan->getModeString(), theChan->getModes());
+    bot->Notice(theClient, "Created at time: {} ({} ago)", theChan->getCreationTime(),
+                prettyDuration(theChan->getCreationTime()));
 
     if (theChan->getMode(Channel::MODE_K) || !theChan->getKey().empty()) {
-        bot->Notice(theClient, "Key: %s", theChan->getKey().c_str());
+        bot->Notice(theClient, "Key: {}", theChan->getKey());
     }
 
     if (theChan->getMode(Channel::MODE_L) || theChan->getLimit() != 0) {
-        bot->Notice(theClient, "Limit: %u", theChan->getLimit());
+        bot->Notice(theClient, "Limit: {}", theChan->getLimit());
     }
 
     if (theChan->getMode(Channel::MODE_A) || !theChan->getApass().empty()) {
-        bot->Notice(theClient, "Apass: %s", theChan->getApass().c_str());
+        bot->Notice(theClient, "Apass: {}", theChan->getApass());
     }
 
     if (theChan->getMode(Channel::MODE_U) || !theChan->getUpass().empty()) {
-        bot->Notice(theClient, "Upass: %s", theChan->getUpass().c_str());
+        bot->Notice(theClient, "Upass: {}", theChan->getUpass());
     }
 
 #ifdef TOPIC_TRACK
-    bot->Notice(theClient, "Topic: %s", theChan->getTopic().c_str());
+    bot->Notice(theClient, "Topic: {}", theChan->getTopic());
     if (theChan->getTopicTS() != 0) {
-        bot->Notice(theClient, "Topic set %s ago [%ld] by %s",
-                    prettyDuration(theChan->getTopicTS()).c_str(), theChan->getTopicTS(),
-                    theChan->getTopicWhoSet().c_str());
+        bot->Notice(theClient, "Topic set {} ago [{}] by {}", prettyDuration(theChan->getTopicTS()),
+                    theChan->getTopicTS(), theChan->getTopicWhoSet());
     }
 #endif
 
@@ -92,12 +90,11 @@ void CHANINFOCommand::Exec(const iClient* theClient, const std::string& Message)
         else if (theUser->isModeV())
             tmpMode = "+v:   ";
 
-        bot->Notice(theClient, "  %s%s!%s@%s (numeric: %s)", tmpMode, theUser->getNickName().c_str(),
-                    theUser->getUserName().c_str(), theUser->getHostName().c_str(),
-                    theUser->getCharYYXXX().c_str());
+        bot->Notice(theClient, "  {}{}!{}@{} (numeric: {})", tmpMode, theUser->getNickName(),
+                    theUser->getUserName(), theUser->getHostName(), theUser->getCharYYXXX());
     }
 
-    bot->Notice(theClient, "Number of channel users: %d (%d ops, %d voice)", theChan->size(),
+    bot->Notice(theClient, "Number of channel users: {} ({} ops, {} voice)", theChan->size(),
                 totalOps, totalVoice);
 
     if (theChan->banList_size() == 0) {
@@ -105,11 +102,11 @@ void CHANINFOCommand::Exec(const iClient* theClient, const std::string& Message)
         return;
     }
 
-    bot->Notice(theClient, "Ban list (%d):", theChan->banList_size());
+    bot->Notice(theClient, "Ban list ({}):", theChan->banList_size());
     std::string banLine;
     for (auto banItr = theChan->banList_begin(); banItr != theChan->banList_end(); ++banItr) {
         if (!banLine.empty() && (banLine.size() + banItr->size()) > 400) {
-            bot->Notice(theClient, "  %s", banLine.c_str());
+            bot->Notice(theClient, "  {}", banLine);
             banLine.clear();
         }
         if (!banLine.empty()) {
@@ -118,7 +115,7 @@ void CHANINFOCommand::Exec(const iClient* theClient, const std::string& Message)
         banLine += *banItr;
     }
     if (!banLine.empty()) {
-        bot->Notice(theClient, "  %s", banLine.c_str());
+        bot->Notice(theClient, "  {}", banLine);
     }
 }
 

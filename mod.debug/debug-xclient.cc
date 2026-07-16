@@ -21,11 +21,19 @@
 
 #include "StringTokenizer.h"
 #include "misc.h"
+#include "server.h"
 
 #include "debug.h"
 #include "debug-commands.h"
 
 namespace gnuworld {
+
+bool debug::Notice(const iClient* Target, const std::string& Message) {
+    if (IsStealth()) {
+        return getUplink()->Notice(const_cast<iClient*>(Target), Message);
+    }
+    return xClient::Notice(Target, Message);
+}
 
 void debug::OnPrivateMessage(iClient* theClient, const std::string& Message, bool) {
     if (!hasAccess(theClient->getAccount())) {
@@ -40,7 +48,7 @@ void debug::OnPrivateMessage(iClient* theClient, const std::string& Message, boo
     const auto command = string_upper(st[0]);
     const auto commandHandler = commandMap.find(command);
     if (commandHandler == commandMap.end()) {
-        Notice(theClient, "Invalid command: %s", command.c_str());
+        Notice(theClient, "Invalid command: {}", command);
         return;
     }
 

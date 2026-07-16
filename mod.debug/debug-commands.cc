@@ -30,7 +30,7 @@ bool debug::RegisterCommand(std::unique_ptr<Command> theCommand) {
 }
 
 void Command::Usage(const iClient* theClient) {
-    bot->Notice(theClient, "SYNTAX: %s - %s", getName().c_str(), getHelp().c_str());
+    bot->Notice(theClient, "SYNTAX: {} - {}", getName(), getHelp());
 }
 
 } // namespace gnuworld

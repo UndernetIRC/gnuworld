@@ -841,6 +841,18 @@ bool xServer::AttachClient(xClient* Client, bool doBurst) {
     // the server and its tables.
     Client->OnAttach();
 
+    // Stealth modules stay in localClients for nick@server routing but
+    // never get an iClient or a network N burst.
+    if (Client->IsStealth()) {
+        if (doBurst) {
+            Client->OnConnect();
+        }
+
+        elog << "Loaded stealth client, nickname: " << Client->getNickName()
+             << ", with config file: " << Client->getConfigFileName() << endl;
+        return true;
+    }
+
     // TODO: Remove any existing iClient from the xClient
 
     // Create a new iClient representation for this xClient
@@ -1097,10 +1109,12 @@ void xServer::UnloadClient(xClient* theClient, const string& reason) {
 void xServer::removeClient(xClient* theClient) {
     // Precondition: theClient != 0
 
-    // Remove this xClient's iClient instance
-    iClient* iClientPtr = Network->removeClient(theClient->getInstance());
-
-    PostEvent(EVT_QUIT, static_cast<void*>(iClientPtr));
+    // Remove this xClient's iClient instance (stealth modules have none)
+    iClient* iClientPtr = 0;
+    if (theClient->getInstance() != 0) {
+        iClientPtr = Network->removeClient(theClient->getInstance());
+        PostEvent(EVT_QUIT, static_cast<void*>(iClientPtr));
+    }
 
     // Remove any fake clients and fake servers associated with this
     // xClient.
@@ -1676,7 +1690,12 @@ void xServer::BurstClient(xClient* theClient) {
 void xServer::BurstClients() {
     xNetwork::localClientIterator ptr = Network->localClient_begin();
     while (ptr != Network->localClient_end()) {
-        BurstClient(ptr->second);
+        if (ptr->second->IsStealth()) {
+            // No N-line; still notify the module that we are linked
+            ptr->second->OnConnect();
+        } else {
+            BurstClient(ptr->second);
+        }
         ++ptr;
     }
 }
@@ -1684,7 +1703,9 @@ void xServer::BurstClients() {
 void xServer::BurstChannels() {
     xNetwork::localClientIterator ptr = Network->localClient_begin();
     while (ptr != Network->localClient_end()) {
-        ptr->second->BurstChannels();
+        if (!ptr->second->IsStealth()) {
+            ptr->second->BurstChannels();
+        }
         ++ptr;
     }
 }
