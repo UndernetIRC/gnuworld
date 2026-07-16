@@ -122,6 +122,7 @@ CREATE INDEX help_language_id_idx ON help (language_id);
 CREATE TABLE channels (
 	id SERIAL,
 	name TEXT NOT NULL UNIQUE,
+	canon_name TEXT NOT NULL UNIQUE,
 	flags INT4 NOT NULL DEFAULT '0',
 -- 0x0000 0001 - No Purge
 -- 0x0000 0002 - Special Channel
@@ -188,6 +189,7 @@ CREATE TABLE channels (
 
 -- A channel is inactive if the manager hasn't logged in for 21 days
 CREATE UNIQUE INDEX channels_name_idx ON channels(LOWER(name));
+CREATE UNIQUE INDEX channels_canon_name_idx ON channels(canon_name);
 
 -- Table for bans; channel_id references the channel entry this ban belongs to.
 CREATE TABLE bans (

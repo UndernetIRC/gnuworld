@@ -3569,7 +3569,7 @@ bool cservice::sqlRegisterChannel(iClient* theClient, sqlUser* mngrUsr, const st
     } else
         newChan->commit();
 
-    sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getName(), newChan));
+    sqlChannelCache.insert(cservice::sqlChannelHashType::value_type(newChan->getCanonicalName(), newChan));
     sqlChannelIDCache.insert(cservice::sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 
     // First delete previous levels
@@ -6671,7 +6671,7 @@ void cservice::preloadChannelCache() {
             newChan->setAllMembers(i);
             newChan->setLastUsed(currentTime());
 
-            sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getName(), newChan));
+            sqlChannelCache.insert(sqlChannelHashType::value_type(newChan->getCanonicalName(), newChan));
             sqlChannelIDCache.insert(sqlChannelIDHashType::value_type(newChan->getID(), newChan));
 
         } // for()
