@@ -54,6 +54,7 @@ EXTRA_DIST = bin/ccontrol.example.conf \
 	bin/openchanfix.example.conf \
 	bin/scanner.example.conf \
 	bin/stats.example.conf \
+	bin/debug.example.conf \
 	contrib/00INDEX.TXT \
 	contrib/chktrans.py \
 	contrib/encrypt.sh \
@@ -211,6 +212,10 @@ endif
 
 if COND_MODSNOOP
 include $(srcdir)/mod.snoop/Makefile.am
+endif
+
+if COND_MODDEBUG
+include $(srcdir)/mod.debug/Makefile.am
 endif
 
 if COND_TESTDIR
