@@ -3,3 +3,16 @@ config.log
 config.status
 libtool
 .dirstamp
+configure
+configure~
+aclocal.m4
+Makefile.in
+config-h.in
+stamp-h1
+Makefile
+.deps/
+.libs/
+*.la
+*.lo
+*.o
+autom4te.cache/

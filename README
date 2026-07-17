@@ -43,10 +43,16 @@ In order to build GNUWorld, you will need a compiler which
 supports the ANSI C++ Standard.  GNUmake is also recommended 
 (gmake).
 
-Change into the gnuworld directory, and run the configuration script:
+Change into the gnuworld directory, bootstrap the build system, then
+run the configuration script:
 
 cd gnuworld
+./autogen.sh
 ./configure
+
+You will need autoconf, automake, and libtool installed to run
+autogen.sh. pkg-config (or pkgconf) is optional at bootstrap time;
+it is used by configure to detect optional libraries such as libcurl.
 
 When you run configure, you may specify which clients to build.  Use
 the --enable-modules option to specify a comma separated list of

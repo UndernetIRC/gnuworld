@@ -1,6 +1,8 @@
 ## $Id: Makefile.am,v 1.26 2007/08/28 16:09:56 dan_karrels Exp $
 ## test
 
+ACLOCAL_AMFLAGS = -I m4
+
 @SET_MAKE@
 
 SUBDIRS = libltdl $(NEW_MODS)
@@ -155,9 +157,7 @@ EXTRA_DIST = bin/ccontrol.example.conf \
 	include/gw_hashmap.h \
 	include/moduleLoader.h \
 	include/server.h \
-	libltdl/acconfig.h \
 	libltdl/ltdl.h \
-	libltdl/config.h \
 	tools/checkgnuworld.sh
 
 if COND_PGSQL
