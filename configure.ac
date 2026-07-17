@@ -192,44 +192,6 @@ AC_ARG_WITH(prof,
 	[CXXFLAGS="$CXXFLAGS -pg"]
 )
 
-dnl The idea with this pgsql code is to check for a system installed
-dnl postgresql and use it if found. However, if the user specifies
-dnl an alternate install location, use that instead.
-
-dnl Prepare to capture the user's input for the location of a pgsql
-dnl installation.
-AC_ARG_WITH(pgconfig,
-	AS_HELP_STRING([--with-pgconfig=FILE],[Specify an alternate pg_config location.]),
-	[pg_config_binary=$withval], [pg_config_binary=""]
-)
-
-
-if test "x$pg_config_binary" = "x"; then
-	dnl pg_config was not specified; search for it it in PATH.
-	AC_PATH_PROG([pg_config_binary], [pg_config])
-
-	if test "x$pg_config_binary" = "x"; then
-		AC_MSG_ERROR([Could not find pg_config. Ensure that PostgreSQL is installed, or specify pg_config location using --with-pgconfig.])
-	fi
-elif test -f $pg_config_binary; then
-	AC_MSG_RESULT([Using pg_config: $pg_config_binary])
-else
-	AC_MSG_ERROR([pg_config file $pg_config_binary does not exist])
-fi
-
-pgsql_includedir=$($pg_config_binary --includedir)
-pgsql_libdir=$($pg_config_binary --libdir)
-
-CXXFLAGS="$CXXFLAGS -I$pgsql_includedir"
-CPPFLAGS="$CPPFLAGS -I$pgsql_includedir"
-LIBS="$LIBS -L$pgsql_libdir"
-
-dnl Check for the pgsql library and header file.
-dnl Need to generalize when mysql support is added.
-AC_CHECK_LIB(pq, PQconnectdb)
-AC_CHECK_HEADER([libpq-fe.h])
-AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
-
 dnl Enable log4cplus if required
 AC_ARG_WITH(log4cplus,
 	AS_HELP_STRING([--with-log4cplus],[Check log4cplus, if not enabled some modules may not have logging support]),
@@ -287,7 +249,7 @@ AC_ARG_WITH([libssl-include],
 
 if test "x$check_libssl" != "xno"; then
 	LDFLAGS="${LDFLAGS} -L${SSL_LIB} -lssl -lcrypto"
-	CXXFLAGS="${CXXFLAGS} -I${SSL_INCLUDE} -L${SSL_LIB}"
+	CXXFLAGS="${CXXFLAGS} -I${SSL_INCLUDE}"
 	AC_CHECK_FILE("$SSL_LIB/libssl.so",,
 		[AC_MSG_WARN([Unable to find libssl.so, please use --with-libssl-lib to specify the path])])
 	AC_CHECK_FILE("$SSL_INCLUDE/openssl/ssl.h",,
@@ -397,6 +359,61 @@ AM_CONDITIONAL(COND_MODSCANNER,[test $build_modscanner = true])
 AM_CONDITIONAL(COND_MODSTATS,[test $build_modstats = true])
 AM_CONDITIONAL(COND_MODSNOOP,[test $build_modsnoop = true])
 AM_CONDITIONAL(COND_MODDEBUG,[test $build_moddebug = true])
+
+dnl PostgreSQL is required by default. Skip checks only when every enabled
+dnl module is in the list below and no unknown/custom modules are built.
+check_pgsql=yes
+needs_pgsql=no
+for moduleName in $MOD_DIRS; do
+  case "$moduleName" in
+    mod.chanfix|mod.clientExample|mod.cloner|mod.debug|mod.gnutest|mod.scanner|mod.stats|mod.snoop)
+      ;;
+    *)
+      needs_pgsql=yes
+      ;;
+  esac
+done
+if test -n "$NEW_MODS"; then
+	needs_pgsql=yes
+fi
+if test $needs_pgsql = no; then
+	check_pgsql=no
+fi
+
+AC_ARG_WITH(pgconfig,
+	AS_HELP_STRING([--with-pgconfig=FILE],[Specify an alternate pg_config location (required when building database modules)]),
+	[pg_config_binary=$withval], [pg_config_binary=""]
+)
+
+if test "$check_pgsql" = "yes"; then
+	if test "x$pg_config_binary" = "x"; then
+		AC_PATH_PROG([pg_config_binary], [pg_config])
+		if test "x$pg_config_binary" = "x"; then
+			AC_MSG_ERROR([Could not find pg_config. PostgreSQL is required for the enabled modules. Ensure PostgreSQL is installed, specify pg_config location using --with-pgconfig, or disable database modules with --enable-modules.])
+		fi
+	elif test -f $pg_config_binary; then
+		AC_MSG_RESULT([Using pg_config: $pg_config_binary])
+	else
+		AC_MSG_ERROR([pg_config file $pg_config_binary does not exist])
+	fi
+
+	pgsql_includedir=$($pg_config_binary --includedir)
+	pgsql_libdir=$($pg_config_binary --libdir)
+
+	CXXFLAGS="$CXXFLAGS -I$pgsql_includedir"
+	CPPFLAGS="$CPPFLAGS -I$pgsql_includedir"
+	LIBS="$LIBS -L$pgsql_libdir"
+
+	AC_CHECK_LIB(pq, PQconnectdb)
+	AC_CHECK_HEADER([libpq-fe.h])
+	AC_DEFINE([HAVE_PGSQL],[],[Using PostGreSQL])
+else
+	AC_MSG_NOTICE([PostgreSQL not required for the selected modules; skipping checks.])
+	pgsql_includedir=
+	pgsql_libdir=
+fi
+
+AM_CONDITIONAL(COND_PGSQL,[test $check_pgsql = yes])
 
 dnl Enable liboath by default if build_modcservice is set to true
 if test $build_modcservice = true; then

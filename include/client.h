@@ -883,13 +883,13 @@ class xClient : public TimerHandler, public NetworkTarget {
      * This variable will be set by xNetwork once the
      * xClient links to the xServer.
      */
-    iClient* me;
+    iClient* me = nullptr;
 
     /**
      * MyUplink is a pointer to the xServer to which this
      * client is attached.
      */
-    xServer* MyUplink;
+    xServer* MyUplink = nullptr;
 
     /**
      * This bot's nick name.
@@ -916,7 +916,7 @@ class xClient : public TimerHandler, public NetworkTarget {
      * It says nothing of whether the xServer is connected
      * to a network.
      */
-    bool Connected;
+    bool Connected = false;
 
     /**
      * True when this module operates without an online iClient

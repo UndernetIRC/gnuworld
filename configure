@@ -666,6 +666,9 @@ pgsql_libdir
 pgsql_includedir
 LIBTOOL_DEPS
 NEW_MODS
+COND_PGSQL_FALSE
+COND_PGSQL_TRUE
+pg_config_binary
 COND_MODDEBUG_FALSE
 COND_MODDEBUG_TRUE
 COND_MODSNOOP_FALSE
@@ -696,7 +699,6 @@ HAVE_CXX20
 BOOST_THREAD_LIB
 BOOST_LDFLAGS
 BOOST_CPPFLAGS
-pg_config_binary
 COND_TESTDIR_FALSE
 COND_TESTDIR_TRUE
 COND_PROMETHEUS_FALSE
@@ -889,7 +891,6 @@ with_test
 with_pedantic
 with_optimization
 with_prof
-with_pgconfig
 with_log4cplus
 with_log4cplus_lib
 with_log4cplus_include
@@ -902,6 +903,7 @@ with_boost
 with_boost_libdir
 with_boost_thread
 enable_modules
+with_pgconfig
 with_liboath
 with_liboath_lib
 with_liboath_include
@@ -1593,7 +1595,6 @@ Optional Packages:
   --with-pedantic         Add -pedantic to compile options
   --with-optimization     Optimize the executables
   --with-prof             Generate profiling information
-  --with-pgconfig=FILE    Specify an alternate pg_config location.
   --with-log4cplus        Check log4cplus, if not enabled some modules may not
                           have logging support
   --with-log4cplus-lib=LOG4CPLUSLIBDIR
@@ -1622,6 +1623,8 @@ Optional Packages:
                           use the Thread library from boost - it is possible
                           to specify a certain library for the linker e.g.
                           --with-boost-thread=boost_thread-gcc-mt
+  --with-pgconfig=FILE    Specify an alternate pg_config location (required
+                          when building database modules)
   --without-liboath       Disable liboath. If mod.cservice is built without
                           liboath, TOTP must be disabled in
                           mod.cservice/cservice_conf.h.
@@ -21493,139 +21496,6 @@ fi
 
 
 
-
-# Check whether --with-pgconfig was given.
-if test ${with_pgconfig+y}
-then :
-  withval=$with_pgconfig; pg_config_binary=$withval
-else case e in #(
-  e) pg_config_binary=""
- ;;
-esac
-fi
-
-
-
-if test "x$pg_config_binary" = "x"; then
-		# Extract the first word of "pg_config", so it can be a program name with args.
-set dummy pg_config; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_path_pg_config_binary+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) case $pg_config_binary in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_pg_config_binary="$pg_config_binary" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_path_pg_config_binary="$as_dir$ac_word$ac_exec_ext"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac ;;
-esac
-fi
-pg_config_binary=$ac_cv_path_pg_config_binary
-if test -n "$pg_config_binary"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $pg_config_binary" >&5
-printf "%s\n" "$pg_config_binary" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-
-	if test "x$pg_config_binary" = "x"; then
-		as_fn_error $? "Could not find pg_config. Ensure that PostgreSQL is installed, or specify pg_config location using --with-pgconfig." "$LINENO" 5
-	fi
-elif test -f $pg_config_binary; then
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Using pg_config: $pg_config_binary" >&5
-printf "%s\n" "Using pg_config: $pg_config_binary" >&6; }
-else
-	as_fn_error $? "pg_config file $pg_config_binary does not exist" "$LINENO" 5
-fi
-
-pgsql_includedir=$($pg_config_binary --includedir)
-pgsql_libdir=$($pg_config_binary --libdir)
-
-CXXFLAGS="$CXXFLAGS -I$pgsql_includedir"
-CPPFLAGS="$CPPFLAGS -I$pgsql_includedir"
-LIBS="$LIBS -L$pgsql_libdir"
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for PQconnectdb in -lpq" >&5
-printf %s "checking for PQconnectdb in -lpq... " >&6; }
-if test ${ac_cv_lib_pq_PQconnectdb+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpq  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-namespace conftest {
-  extern "C" int PQconnectdb ();
-}
-int
-main (void)
-{
-return conftest::PQconnectdb ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_lib_pq_PQconnectdb=yes
-else case e in #(
-  e) ac_cv_lib_pq_PQconnectdb=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pq_PQconnectdb" >&5
-printf "%s\n" "$ac_cv_lib_pq_PQconnectdb" >&6; }
-if test "x$ac_cv_lib_pq_PQconnectdb" = xyes
-then :
-  printf "%s\n" "#define HAVE_LIBPQ 1" >>confdefs.h
-
-  LIBS="-lpq $LIBS"
-
-fi
-
-ac_fn_cxx_check_header_compile "$LINENO" "libpq-fe.h" "ac_cv_header_libpq_fe_h" "$ac_includes_default"
-if test "x$ac_cv_header_libpq_fe_h" = xyes
-then :
-
-fi
-
-
-printf "%s\n" "#define HAVE_PGSQL /**/" >>confdefs.h
-
-
-
 # Check whether --with-log4cplus was given.
 if test ${with_log4cplus+y}
 then :
@@ -21713,7 +21583,7 @@ fi
 
 if test "x$check_libssl" != "xno"; then
 	LDFLAGS="${LDFLAGS} -L${SSL_LIB} -lssl -lcrypto"
-	CXXFLAGS="${CXXFLAGS} -I${SSL_INCLUDE} -L${SSL_LIB}"
+	CXXFLAGS="${CXXFLAGS} -I${SSL_INCLUDE}"
 	as_ac_File=`printf "%s\n" "ac_cv_file_"$SSL_LIB/libssl.so"" | sed "$as_sed_sh"`
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for \"$SSL_LIB/libssl.so\"" >&5
 printf %s "checking for \"$SSL_LIB/libssl.so\"... " >&6; }
@@ -23516,6 +23386,170 @@ else
 fi
 
 
+check_pgsql=yes
+needs_pgsql=no
+for moduleName in $MOD_DIRS; do
+  case "$moduleName" in
+    mod.chanfix|mod.clientExample|mod.cloner|mod.debug|mod.gnutest|mod.scanner|mod.stats|mod.snoop)
+      ;;
+    *)
+      needs_pgsql=yes
+      ;;
+  esac
+done
+if test -n "$NEW_MODS"; then
+	needs_pgsql=yes
+fi
+if test $needs_pgsql = no; then
+	check_pgsql=no
+fi
+
+
+# Check whether --with-pgconfig was given.
+if test ${with_pgconfig+y}
+then :
+  withval=$with_pgconfig; pg_config_binary=$withval
+else case e in #(
+  e) pg_config_binary=""
+ ;;
+esac
+fi
+
+
+if test "$check_pgsql" = "yes"; then
+	if test "x$pg_config_binary" = "x"; then
+		# Extract the first word of "pg_config", so it can be a program name with args.
+set dummy pg_config; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_path_pg_config_binary+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) case $pg_config_binary in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_pg_config_binary="$pg_config_binary" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_path_pg_config_binary="$as_dir$ac_word$ac_exec_ext"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac ;;
+esac
+fi
+pg_config_binary=$ac_cv_path_pg_config_binary
+if test -n "$pg_config_binary"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $pg_config_binary" >&5
+printf "%s\n" "$pg_config_binary" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+		if test "x$pg_config_binary" = "x"; then
+			as_fn_error $? "Could not find pg_config. PostgreSQL is required for the enabled modules. Ensure PostgreSQL is installed, specify pg_config location using --with-pgconfig, or disable database modules with --enable-modules." "$LINENO" 5
+		fi
+	elif test -f $pg_config_binary; then
+		{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Using pg_config: $pg_config_binary" >&5
+printf "%s\n" "Using pg_config: $pg_config_binary" >&6; }
+	else
+		as_fn_error $? "pg_config file $pg_config_binary does not exist" "$LINENO" 5
+	fi
+
+	pgsql_includedir=$($pg_config_binary --includedir)
+	pgsql_libdir=$($pg_config_binary --libdir)
+
+	CXXFLAGS="$CXXFLAGS -I$pgsql_includedir"
+	CPPFLAGS="$CPPFLAGS -I$pgsql_includedir"
+	LIBS="$LIBS -L$pgsql_libdir"
+
+	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for PQconnectdb in -lpq" >&5
+printf %s "checking for PQconnectdb in -lpq... " >&6; }
+if test ${ac_cv_lib_pq_PQconnectdb+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpq  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+namespace conftest {
+  extern "C" int PQconnectdb ();
+}
+int
+main (void)
+{
+return conftest::PQconnectdb ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+  ac_cv_lib_pq_PQconnectdb=yes
+else case e in #(
+  e) ac_cv_lib_pq_PQconnectdb=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pq_PQconnectdb" >&5
+printf "%s\n" "$ac_cv_lib_pq_PQconnectdb" >&6; }
+if test "x$ac_cv_lib_pq_PQconnectdb" = xyes
+then :
+  printf "%s\n" "#define HAVE_LIBPQ 1" >>confdefs.h
+
+  LIBS="-lpq $LIBS"
+
+fi
+
+	ac_fn_cxx_check_header_compile "$LINENO" "libpq-fe.h" "ac_cv_header_libpq_fe_h" "$ac_includes_default"
+if test "x$ac_cv_header_libpq_fe_h" = xyes
+then :
+
+fi
+
+
+printf "%s\n" "#define HAVE_PGSQL /**/" >>confdefs.h
+
+else
+	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PostgreSQL not required for the selected modules; skipping checks." >&5
+printf "%s\n" "$as_me: PostgreSQL not required for the selected modules; skipping checks." >&6;}
+	pgsql_includedir=
+	pgsql_libdir=
+fi
+
+ if test $check_pgsql = yes; then
+  COND_PGSQL_TRUE=
+  COND_PGSQL_FALSE='#'
+else
+  COND_PGSQL_TRUE='#'
+  COND_PGSQL_FALSE=
+fi
+
+
 if test $build_modcservice = true; then
     check_liboath=yes
 else
@@ -23919,6 +23953,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COND_MODDEBUG_TRUE}" && test -z "${COND_MODDEBUG_FALSE}"; then
   as_fn_error $? "conditional \"COND_MODDEBUG\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_PGSQL_TRUE}" && test -z "${COND_PGSQL_FALSE}"; then
+  as_fn_error $? "conditional \"COND_PGSQL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
