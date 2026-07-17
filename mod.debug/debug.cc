@@ -34,22 +34,29 @@ xClient* _gnuwinit(const std::string& args) { return new debug(args); }
 }
 
 debug::debug(const std::string& configFileName) : xClient(configFileName) {
+    readConfigFile(configFileName);
+
+    RegisterCommand(
+        std::make_unique<USERINFOCommand>(this, "USERINFO", "[-num] <nickname|numeric>"));
+    RegisterCommand(std::make_unique<CHANINFOCommand>(this, "CHANINFO", "<#channel>"));
+    RegisterCommand(std::make_unique<SERVERSCommand>(this, "SERVERS", ""));
+    RegisterCommand(std::make_unique<SERVERINFOCommand>(this, "SERVERINFO",
+                                                        "[-num] <servername|mask|numeric>"));
+    RegisterCommand(std::make_unique<SHUTDOWNCommand>(this, "SHUTDOWN", "[reason]"));
+    RegisterCommand(std::make_unique<REHASHCommand>(this, "REHASH", ""));
+}
+
+debug::~debug() = default;
+
+void debug::readConfigFile(const std::string& configFileName) {
     EConfig conf(configFileName);
 
+    allowAccess.clear();
     for (auto ptr = conf.Find("permit_user"); ptr != conf.end() && ptr->first == "permit_user";
          ++ptr) {
         allowAccess.push_back(ptr->second);
     }
-
-    RegisterCommand(std::make_unique<USERINFOCommand>(this, "USERINFO", "[-num] <nickname|numeric>"));
-    RegisterCommand(std::make_unique<CHANINFOCommand>(this, "CHANINFO", "<#channel>"));
-    RegisterCommand(std::make_unique<SERVERSCommand>(this, "SERVERS", ""));
-    RegisterCommand(
-        std::make_unique<SERVERINFOCommand>(this, "SERVERINFO", "[-num] <servername|mask|numeric>"));
-    RegisterCommand(std::make_unique<SHUTDOWNCommand>(this, "SHUTDOWN", "[reason]"));
 }
-
-debug::~debug() = default;
 
 bool debug::hasAccess(const std::string& accountName) const {
     return std::ranges::any_of(allowAccess, [&](const std::string& account) {

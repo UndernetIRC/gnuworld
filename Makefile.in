@@ -695,7 +695,7 @@ am__libdebug_la_SOURCES_DIST = mod.debug/debug.cc \
 	mod.debug/debug-commands.cc mod.debug/debug-xclient.cc \
 	mod.debug/USERINFOCommand.cc mod.debug/CHANINFOCommand.cc \
 	mod.debug/SERVERSCommand.cc mod.debug/SERVERINFOCommand.cc \
-	mod.debug/SHUTDOWNCommand.cc
+	mod.debug/SHUTDOWNCommand.cc mod.debug/REHASHCommand.cc
 @COND_MODDEBUG_TRUE@am_libdebug_la_OBJECTS =  \
 @COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-debug.lo \
 @COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-debug-commands.lo \
@@ -704,7 +704,8 @@ am__libdebug_la_SOURCES_DIST = mod.debug/debug.cc \
 @COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-CHANINFOCommand.lo \
 @COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-SERVERSCommand.lo \
 @COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-SERVERINFOCommand.lo \
-@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-SHUTDOWNCommand.lo
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-SHUTDOWNCommand.lo \
+@COND_MODDEBUG_TRUE@	mod.debug/libdebug_la-REHASHCommand.lo
 libdebug_la_OBJECTS = $(am_libdebug_la_OBJECTS)
 libdebug_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdebug_la_CXXFLAGS) \
@@ -1228,6 +1229,7 @@ am__depfiles_remade = db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo \
 	mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo \
 	mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo \
+	mod.debug/$(DEPDIR)/libdebug_la-REHASHCommand.Plo \
 	mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo \
 	mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo \
 	mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo \
@@ -2214,7 +2216,8 @@ gnuworld_LDADD = libgnuworld.la libgnuworldcore.la $(LIBLTDL)
 @COND_MODDEBUG_TRUE@	mod.debug/CHANINFOCommand.cc \
 @COND_MODDEBUG_TRUE@	mod.debug/SERVERSCommand.cc \
 @COND_MODDEBUG_TRUE@	mod.debug/SERVERINFOCommand.cc \
-@COND_MODDEBUG_TRUE@	mod.debug/SHUTDOWNCommand.cc
+@COND_MODDEBUG_TRUE@	mod.debug/SHUTDOWNCommand.cc \
+@COND_MODDEBUG_TRUE@	mod.debug/REHASHCommand.cc
 
 @COND_TESTDIR_TRUE@test_burst_SOURCES = test/burst.cc
 @COND_TESTDIR_TRUE@test_burst_CXXFLAGS = -I${top_srcdir}/include -I${top_srcdir}/libgnuworld
@@ -3060,6 +3063,8 @@ mod.debug/libdebug_la-SERVERINFOCommand.lo: mod.debug/$(am__dirstamp) \
 	mod.debug/$(DEPDIR)/$(am__dirstamp)
 mod.debug/libdebug_la-SHUTDOWNCommand.lo: mod.debug/$(am__dirstamp) \
 	mod.debug/$(DEPDIR)/$(am__dirstamp)
+mod.debug/libdebug_la-REHASHCommand.lo: mod.debug/$(am__dirstamp) \
+	mod.debug/$(DEPDIR)/$(am__dirstamp)
 
 libdebug.la: $(libdebug_la_OBJECTS) $(libdebug_la_DEPENDENCIES) $(EXTRA_libdebug_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libdebug_la_LINK) $(am_libdebug_la_rpath) $(libdebug_la_OBJECTS) $(libdebug_la_LIBADD) $(LIBS)
@@ -3782,6 +3787,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-REHASHCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo@am__quote@ # am--include-marker
@@ -5393,6 +5399,13 @@ mod.debug/libdebug_la-SHUTDOWNCommand.lo: mod.debug/SHUTDOWNCommand.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/SHUTDOWNCommand.cc' object='mod.debug/libdebug_la-SHUTDOWNCommand.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-SHUTDOWNCommand.lo `test -f 'mod.debug/SHUTDOWNCommand.cc' || echo '$(srcdir)/'`mod.debug/SHUTDOWNCommand.cc
+
+mod.debug/libdebug_la-REHASHCommand.lo: mod.debug/REHASHCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -MT mod.debug/libdebug_la-REHASHCommand.lo -MD -MP -MF mod.debug/$(DEPDIR)/libdebug_la-REHASHCommand.Tpo -c -o mod.debug/libdebug_la-REHASHCommand.lo `test -f 'mod.debug/REHASHCommand.cc' || echo '$(srcdir)/'`mod.debug/REHASHCommand.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mod.debug/$(DEPDIR)/libdebug_la-REHASHCommand.Tpo mod.debug/$(DEPDIR)/libdebug_la-REHASHCommand.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mod.debug/REHASHCommand.cc' object='mod.debug/libdebug_la-REHASHCommand.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdebug_la_CXXFLAGS) $(CXXFLAGS) -c -o mod.debug/libdebug_la-REHASHCommand.lo `test -f 'mod.debug/REHASHCommand.cc' || echo '$(srcdir)/'`mod.debug/REHASHCommand.cc
 
 mod.dronescan/libdronescan_la-dronescan.lo: mod.dronescan/dronescan.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdronescan_la_CXXFLAGS) $(CXXFLAGS) -MT mod.dronescan/libdronescan_la-dronescan.lo -MD -MP -MF mod.dronescan/$(DEPDIR)/libdronescan_la-dronescan.Tpo -c -o mod.dronescan/libdronescan_la-dronescan.lo `test -f 'mod.dronescan/dronescan.cc' || echo '$(srcdir)/'`mod.dronescan/dronescan.cc
@@ -7062,6 +7075,7 @@ distclean: distclean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-REHASHCommand.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo
@@ -7450,6 +7464,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlPendingTraffic.Plo
 	-rm -f mod.cservice/$(DEPDIR)/libcservice_la-sqlUser.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-CHANINFOCommand.Plo
+	-rm -f mod.debug/$(DEPDIR)/libdebug_la-REHASHCommand.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERINFOCommand.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SERVERSCommand.Plo
 	-rm -f mod.debug/$(DEPDIR)/libdebug_la-SHUTDOWNCommand.Plo

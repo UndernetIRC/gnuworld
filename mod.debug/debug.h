@@ -42,6 +42,8 @@ class debug : public xClient {
 
     bool RegisterCommand(std::unique_ptr<Command>);
 
+    void readConfigFile(const std::string&);
+
     [[nodiscard]] bool hasAccess(const std::string&) const;
 
     // xClient overrides (see debug-xclient.cc). Stealth routes NOTICEs
