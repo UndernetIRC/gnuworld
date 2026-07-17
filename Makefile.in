@@ -112,13 +112,20 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COND_PROMETHEUS_TRUE@am__append_1 = libnotifier/prometheus.cc
-@COND_LIBCURL_TRUE@@COND_PROMETHEUS_TRUE@am__append_2 = -lcurl -lprometheus-cpp-core -lprometheus-cpp-pull
-@COND_LIBCURL_TRUE@@COND_PROMETHEUS_FALSE@am__append_3 = -lcurl
-@COND_LIBCURL_FALSE@@COND_PROMETHEUS_TRUE@am__append_4 = -lprometheus-cpp-core -lprometheus-cpp-pull
+@COND_PGSQL_TRUE@am__append_1 = libgnuworldDB.la
+@COND_PGSQL_TRUE@am__append_2 = \
+@COND_PGSQL_TRUE@	db/gnuworldDB.h \
+@COND_PGSQL_TRUE@	db/pgsqlDB.h \
+@COND_PGSQL_TRUE@	db/dbHandle.h
+
+@COND_PGSQL_TRUE@am__append_3 = libgnuworld/MigrationChecker.cc
+@COND_PROMETHEUS_TRUE@am__append_4 = libnotifier/prometheus.cc
+@COND_LIBCURL_TRUE@@COND_PROMETHEUS_TRUE@am__append_5 = -lcurl -lprometheus-cpp-core -lprometheus-cpp-pull
+@COND_LIBCURL_TRUE@@COND_PROMETHEUS_FALSE@am__append_6 = -lcurl
+@COND_LIBCURL_FALSE@@COND_PROMETHEUS_TRUE@am__append_7 = -lprometheus-cpp-core -lprometheus-cpp-pull
 bin_PROGRAMS = gnuworld$(EXEEXT)
-@COND_MODCCONTROL_TRUE@am__append_5 = libccontrol.la
-@COND_MODCCONTROL_TRUE@am__append_6 = \
+@COND_MODCCONTROL_TRUE@am__append_8 = libccontrol.la
+@COND_MODCCONTROL_TRUE@am__append_9 = \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/ccBadChannel.h \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/ccException.h \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/ccFloodData.h \
@@ -136,20 +143,20 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/README \
 @COND_MODCCONTROL_TRUE@	mod.ccontrol/migrations/README
 
-@COND_MODCHANFIX_TRUE@am__append_7 = libchanfix.la
-@COND_MODCHANFIX_TRUE@am__append_8 = \
+@COND_MODCHANFIX_TRUE@am__append_10 = libchanfix.la
+@COND_MODCHANFIX_TRUE@am__append_11 = \
 @COND_MODCHANFIX_TRUE@	mod.chanfix/chanfix.h \
 @COND_MODCHANFIX_TRUE@	mod.chanfix/cfChannel.h \
 @COND_MODCHANFIX_TRUE@	mod.chanfix/cfChannelUser.h \
 @COND_MODCHANFIX_TRUE@	mod.chanfix/chanfix-commands.h \
 @COND_MODCHANFIX_TRUE@	mod.chanfix/logging.h
 
-@COND_MODCLIENTEXAMPLE_TRUE@am__append_9 = libclientExample.la
-@COND_MODCLIENTEXAMPLE_TRUE@am__append_10 = mod.clientExample/clientExample.h
-@COND_MODCLONER_TRUE@am__append_11 = libcloner.la
-@COND_MODCLONER_TRUE@am__append_12 = mod.cloner/cloner.h
-@COND_MODCSERVICE_TRUE@am__append_13 = libcservice.la
-@COND_MODCSERVICE_TRUE@am__append_14 = \
+@COND_MODCLIENTEXAMPLE_TRUE@am__append_12 = libclientExample.la
+@COND_MODCLIENTEXAMPLE_TRUE@am__append_13 = mod.clientExample/clientExample.h
+@COND_MODCLONER_TRUE@am__append_14 = libcloner.la
+@COND_MODCLONER_TRUE@am__append_15 = mod.cloner/cloner.h
+@COND_MODCSERVICE_TRUE@am__append_16 = libcservice.la
+@COND_MODCSERVICE_TRUE@am__append_17 = \
 @COND_MODCSERVICE_TRUE@	mod.cservice/banMatcher.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/constants.h \
 @COND_MODCSERVICE_TRUE@	mod.cservice/cserviceCommands.h \
@@ -171,8 +178,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODCSERVICE_TRUE@	mod.cservice/RELEASE.NOTES \
 @COND_MODCSERVICE_TRUE@	mod.cservice/migrations/README
 
-@COND_MODDRONESCAN_TRUE@am__append_15 = libdronescan.la
-@COND_MODDRONESCAN_TRUE@am__append_16 = \
+@COND_MODDRONESCAN_TRUE@am__append_18 = libdronescan.la
+@COND_MODDRONESCAN_TRUE@am__append_19 = \
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/activeChannel.h \
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/clientData.h \
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/constants.h \
@@ -187,10 +194,10 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/README \
 @COND_MODDRONESCAN_TRUE@	mod.dronescan/migrations/README
 
-@COND_MODGNUTEST_TRUE@am__append_17 = libgnutest.la
-@COND_MODGNUTEST_TRUE@am__append_18 = mod.gnutest/gnutest.h
-@COND_MODNICKSERV_TRUE@am__append_19 = libnickserv.la
-@COND_MODNICKSERV_TRUE@am__append_20 = \
+@COND_MODGNUTEST_TRUE@am__append_20 = libgnutest.la
+@COND_MODGNUTEST_TRUE@am__append_21 = mod.gnutest/gnutest.h
+@COND_MODNICKSERV_TRUE@am__append_22 = libnickserv.la
+@COND_MODNICKSERV_TRUE@am__append_23 = \
 @COND_MODNICKSERV_TRUE@	mod.nickserv/levels.h \
 @COND_MODNICKSERV_TRUE@	mod.nickserv/Logger.h \
 @COND_MODNICKSERV_TRUE@	mod.nickserv/logTarget.h \
@@ -205,8 +212,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODNICKSERV_TRUE@	mod.nickserv/Updates \
 @COND_MODNICKSERV_TRUE@	mod.nickserv/README
 
-@COND_MODOPENCHANFIX_TRUE@am__append_21 = libchanfix.la
-@COND_MODOPENCHANFIX_TRUE@am__append_22 = \
+@COND_MODOPENCHANFIX_TRUE@am__append_24 = libchanfix.la
+@COND_MODOPENCHANFIX_TRUE@am__append_25 = \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/chanfix.h \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/chanfixCommands.h \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/chanfix_config.h \
@@ -218,18 +225,18 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/sqlcfUser.h \
 @COND_MODOPENCHANFIX_TRUE@	mod.openchanfix/migrations/README
 
-@COND_MODSCANNER_TRUE@am__append_23 = libscanner.la
-@COND_MODSCANNER_TRUE@am__append_24 = \
+@COND_MODSCANNER_TRUE@am__append_26 = libscanner.la
+@COND_MODSCANNER_TRUE@am__append_27 = \
 @COND_MODSCANNER_TRUE@	mod.scanner/dbThread.h \
 @COND_MODSCANNER_TRUE@	mod.scanner/scanner.h \
 @COND_MODSCANNER_TRUE@	mod.scanner/ScannerModule.h
 
-@COND_MODSTATS_TRUE@am__append_25 = libstats.la
-@COND_MODSTATS_TRUE@am__append_26 = mod.stats/stats.h
-@COND_MODSNOOP_TRUE@am__append_27 = libsnoop.la
-@COND_MODSNOOP_TRUE@am__append_28 = mod.snoop/snoop.h
-@COND_MODDEBUG_TRUE@am__append_29 = libdebug.la
-@COND_MODDEBUG_TRUE@am__append_30 = \
+@COND_MODSTATS_TRUE@am__append_28 = libstats.la
+@COND_MODSTATS_TRUE@am__append_29 = mod.stats/stats.h
+@COND_MODSNOOP_TRUE@am__append_30 = libsnoop.la
+@COND_MODSNOOP_TRUE@am__append_31 = mod.snoop/snoop.h
+@COND_MODDEBUG_TRUE@am__append_32 = libdebug.la
+@COND_MODDEBUG_TRUE@am__append_33 = \
 @COND_MODDEBUG_TRUE@	mod.debug/debug.h \
 @COND_MODDEBUG_TRUE@	mod.debug/debug-commands.h
 
@@ -244,8 +251,8 @@ bin_PROGRAMS = gnuworld$(EXEEXT)
 @COND_TESTDIR_TRUE@	test_bot$(EXEEXT) \
 @COND_TESTDIR_TRUE@	test_kick_transaction$(EXEEXT) \
 @COND_TESTDIR_TRUE@	$(am__EXEEXT_1)
-@COND_PCRE_TRUE@@COND_TESTDIR_TRUE@am__append_31 = test_regex
-@COND_TESTDIR_TRUE@am__append_32 = \
+@COND_PCRE_TRUE@@COND_TESTDIR_TRUE@am__append_34 = test_regex
+@COND_TESTDIR_TRUE@am__append_35 = \
 @COND_TESTDIR_TRUE@	test/testbot.h \
 @COND_TESTDIR_TRUE@	test/README.burst \
 @COND_TESTDIR_TRUE@	test/README.econfig \
@@ -767,28 +774,40 @@ libgnutest_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 @COND_MODGNUTEST_TRUE@am_libgnutest_la_rpath = -rpath $(libdir)
 libgnuworld_la_LIBADD =
+am__libgnuworld_la_SOURCES_DIST = libgnuworld/Buffer.cc \
+	libgnuworld/Connection.cc libgnuworld/ConnectionHandler.cc \
+	libgnuworld/ConnectionManager.cc libgnuworld/EConfig.cc \
+	libgnuworld/ELog.cc libgnuworld/Signal.cc \
+	libgnuworld/StringTokenizer.cc libgnuworld/gThread.cc \
+	libgnuworld/match.cc libgnuworld/md5hash.cc \
+	libgnuworld/threadworker.cc libgnuworld/misc.cc \
+	libgnuworld/MigrationChecker.cc
+@COND_PGSQL_TRUE@am__objects_1 = libgnuworld/la-MigrationChecker.lo
 am_libgnuworld_la_OBJECTS = libgnuworld/la-Buffer.lo \
 	libgnuworld/la-Connection.lo \
 	libgnuworld/la-ConnectionHandler.lo \
 	libgnuworld/la-ConnectionManager.lo libgnuworld/la-EConfig.lo \
-	libgnuworld/la-ELog.lo libgnuworld/la-MigrationChecker.lo \
-	libgnuworld/la-Signal.lo libgnuworld/la-StringTokenizer.lo \
-	libgnuworld/la-gThread.lo libgnuworld/la-match.lo \
-	libgnuworld/la-md5hash.lo libgnuworld/la-threadworker.lo \
-	libgnuworld/la-misc.lo
+	libgnuworld/la-ELog.lo libgnuworld/la-Signal.lo \
+	libgnuworld/la-StringTokenizer.lo libgnuworld/la-gThread.lo \
+	libgnuworld/la-match.lo libgnuworld/la-md5hash.lo \
+	libgnuworld/la-threadworker.lo libgnuworld/la-misc.lo \
+	$(am__objects_1)
 libgnuworld_la_OBJECTS = $(am_libgnuworld_la_OBJECTS)
 libgnuworld_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) \
 	$(libgnuworld_la_LDFLAGS) $(LDFLAGS) -o $@
 libgnuworldDB_la_LIBADD =
-am_libgnuworldDB_la_OBJECTS = db/libgnuworldDB_la-gnuworldDB.lo \
-	db/libgnuworldDB_la-pgsqlDB.lo
+am__libgnuworldDB_la_SOURCES_DIST = db/gnuworldDB.cc db/pgsqlDB.cc
+@COND_PGSQL_TRUE@am_libgnuworldDB_la_OBJECTS =  \
+@COND_PGSQL_TRUE@	db/libgnuworldDB_la-gnuworldDB.lo \
+@COND_PGSQL_TRUE@	db/libgnuworldDB_la-pgsqlDB.lo
 libgnuworldDB_la_OBJECTS = $(am_libgnuworldDB_la_OBJECTS)
 libgnuworldDB_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) \
 	$(libgnuworldDB_la_LDFLAGS) $(LDFLAGS) -o $@
+@COND_PGSQL_TRUE@am_libgnuworldDB_la_rpath = -rpath $(libdir)
 am__DEPENDENCIES_1 =
 libgnuworldcore_la_DEPENDENCIES = libgnuworld.la libnotifier.la \
 	$(am__DEPENDENCIES_1)
@@ -867,9 +886,9 @@ libnotifier_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__libnotifier_la_SOURCES_DIST = libnotifier/logger.cc \
 	libnotifier/pushover.cc libnotifier/prometheus.cc
-@COND_PROMETHEUS_TRUE@am__objects_1 = libnotifier/la-prometheus.lo
+@COND_PROMETHEUS_TRUE@am__objects_2 = libnotifier/la-prometheus.lo
 am_libnotifier_la_OBJECTS = libnotifier/la-logger.lo \
-	libnotifier/la-pushover.lo $(am__objects_1)
+	libnotifier/la-pushover.lo $(am__objects_2)
 libnotifier_la_OBJECTS = $(am_libnotifier_la_OBJECTS)
 libnotifier_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -1399,9 +1418,11 @@ DIST_SOURCES = $(am__libccontrol_la_SOURCES_DIST) \
 	$(am__libcservice_la_SOURCES_DIST) \
 	$(am__libdebug_la_SOURCES_DIST) \
 	$(am__libdronescan_la_SOURCES_DIST) \
-	$(am__libgnutest_la_SOURCES_DIST) $(libgnuworld_la_SOURCES) \
-	$(libgnuworldDB_la_SOURCES) $(libgnuworldcore_la_SOURCES) \
-	$(libircu_la_SOURCES) $(am__libnickserv_la_SOURCES_DIST) \
+	$(am__libgnutest_la_SOURCES_DIST) \
+	$(am__libgnuworld_la_SOURCES_DIST) \
+	$(am__libgnuworldDB_la_SOURCES_DIST) \
+	$(libgnuworldcore_la_SOURCES) $(libircu_la_SOURCES) \
+	$(am__libnickserv_la_SOURCES_DIST) \
 	$(am__libnotifier_la_SOURCES_DIST) \
 	$(am__libscanner_la_SOURCES_DIST) \
 	$(am__libsnoop_la_SOURCES_DIST) \
@@ -1686,12 +1707,12 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = libltdl $(NEW_MODS)
-lib_LTLIBRARIES = libgnuworldDB.la libircu.la libgnuworldcore.la \
-	$(am__append_5) $(am__append_7) $(am__append_9) \
-	$(am__append_11) $(am__append_13) $(am__append_15) \
-	$(am__append_17) $(am__append_19) $(am__append_21) \
-	$(am__append_23) $(am__append_25) $(am__append_27) \
-	$(am__append_29)
+lib_LTLIBRARIES = $(am__append_1) libircu.la libgnuworldcore.la \
+	$(am__append_8) $(am__append_10) $(am__append_12) \
+	$(am__append_14) $(am__append_16) $(am__append_18) \
+	$(am__append_20) $(am__append_22) $(am__append_24) \
+	$(am__append_26) $(am__append_28) $(am__append_30) \
+	$(am__append_32)
 noinst_LTLIBRARIES = libgnuworld.la libnotifier.la
 pkgdata_DATA = bin/server_command_map
 EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
@@ -1746,8 +1767,7 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	include/ip.h include/gnuworld_config.h include/gw_hashmap.h \
 	include/moduleLoader.h include/server.h libltdl/acconfig.h \
 	libltdl/ltdl.h libltdl/config.h tools/checkgnuworld.sh \
-	db/gnuworldDB.h db/pgsqlDB.h db/dbHandle.h \
-	libgnuworld/Buffer.h libgnuworld/Connection.h \
+	$(am__append_2) libgnuworld/Buffer.h libgnuworld/Connection.h \
 	libgnuworld/ConnectionHandler.h \
 	libgnuworld/ConnectionManager.h libgnuworld/EConfig.h \
 	libgnuworld/ELog.h libgnuworld/MigrationChecker.h \
@@ -1758,37 +1778,29 @@ EXTRA_DIST = bin/ccontrol.example.conf bin/chanfix.example.conf \
 	libgnuworld/Signal.h libgnuworld/StringTokenizer.h \
 	libgnuworld/xparameters.h libnotifier/logger.h \
 	libnotifier/notifier.h libnotifier/prometheus.h \
-	libnotifier/pushover.h $(am__append_6) $(am__append_8) \
-	$(am__append_10) $(am__append_12) $(am__append_14) \
-	$(am__append_16) $(am__append_18) $(am__append_20) \
-	$(am__append_22) $(am__append_24) $(am__append_26) \
-	$(am__append_28) $(am__append_30) $(am__append_32)
-libgnuworldDB_la_SOURCES = \
-	db/gnuworldDB.cc \
-	db/pgsqlDB.cc
+	libnotifier/pushover.h $(am__append_9) $(am__append_11) \
+	$(am__append_13) $(am__append_15) $(am__append_17) \
+	$(am__append_19) $(am__append_21) $(am__append_23) \
+	$(am__append_25) $(am__append_27) $(am__append_29) \
+	$(am__append_31) $(am__append_33) $(am__append_35)
+@COND_PGSQL_TRUE@libgnuworldDB_la_SOURCES = \
+@COND_PGSQL_TRUE@	db/gnuworldDB.cc \
+@COND_PGSQL_TRUE@	db/pgsqlDB.cc
 
-libgnuworldDB_la_CXXFLAGS = \
-	-I$(top_srcdir)/libgnuworld \
-	-I$(top_srcdir)/libnotifier \
-	-I$(top_srcdir)/include
+@COND_PGSQL_TRUE@libgnuworldDB_la_CXXFLAGS = \
+@COND_PGSQL_TRUE@	-I$(top_srcdir)/libgnuworld \
+@COND_PGSQL_TRUE@	-I$(top_srcdir)/libnotifier \
+@COND_PGSQL_TRUE@	-I$(top_srcdir)/include
 
-libgnuworldDB_la_LDFLAGS = -L$(pgsql_libdir) -lpq
-libgnuworld_la_SOURCES = \
-	libgnuworld/Buffer.cc \
-	libgnuworld/Connection.cc \
-	libgnuworld/ConnectionHandler.cc \
-	libgnuworld/ConnectionManager.cc \
-	libgnuworld/EConfig.cc \
-	libgnuworld/ELog.cc \
-	libgnuworld/MigrationChecker.cc \
-	libgnuworld/Signal.cc \
-	libgnuworld/StringTokenizer.cc \
-	libgnuworld/gThread.cc \
-	libgnuworld/match.cc \
-	libgnuworld/md5hash.cc \
-	libgnuworld/threadworker.cc \
-	libgnuworld/misc.cc
-
+@COND_PGSQL_TRUE@libgnuworldDB_la_LDFLAGS = -L$(pgsql_libdir) -lpq
+libgnuworld_la_SOURCES = libgnuworld/Buffer.cc \
+	libgnuworld/Connection.cc libgnuworld/ConnectionHandler.cc \
+	libgnuworld/ConnectionManager.cc libgnuworld/EConfig.cc \
+	libgnuworld/ELog.cc libgnuworld/Signal.cc \
+	libgnuworld/StringTokenizer.cc libgnuworld/gThread.cc \
+	libgnuworld/match.cc libgnuworld/md5hash.cc \
+	libgnuworld/threadworker.cc libgnuworld/misc.cc \
+	$(am__append_3)
 libgnuworld_la_LDFLAGS = $(threadLib)
 libgnuworld_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
@@ -1797,14 +1809,14 @@ libgnuworld_la_CXXFLAGS = \
 	-I$(top_srcdir)/db
 
 libnotifier_la_SOURCES = libnotifier/logger.cc libnotifier/pushover.cc \
-	$(am__append_1)
+	$(am__append_4)
 libnotifier_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/libgnuworld \
 	-I$(top_srcdir)/libnotifier
 
-libnotifier_la_LIBADD = $(am__append_2) $(am__append_3) \
-	$(am__append_4)
+libnotifier_la_LIBADD = $(am__append_5) $(am__append_6) \
+	$(am__append_7)
 libircu_la_SOURCES = \
 	libircu/msg_AC.cc \
 	libircu/msg_AD.cc \
@@ -3173,8 +3185,6 @@ libgnuworld/la-EConfig.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-ELog.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
-libgnuworld/la-MigrationChecker.lo: libgnuworld/$(am__dirstamp) \
-	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-Signal.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-StringTokenizer.lo: libgnuworld/$(am__dirstamp) \
@@ -3188,6 +3198,8 @@ libgnuworld/la-md5hash.lo: libgnuworld/$(am__dirstamp) \
 libgnuworld/la-threadworker.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 libgnuworld/la-misc.lo: libgnuworld/$(am__dirstamp) \
+	libgnuworld/$(DEPDIR)/$(am__dirstamp)
+libgnuworld/la-MigrationChecker.lo: libgnuworld/$(am__dirstamp) \
 	libgnuworld/$(DEPDIR)/$(am__dirstamp)
 
 libgnuworld.la: $(libgnuworld_la_OBJECTS) $(libgnuworld_la_DEPENDENCIES) $(EXTRA_libgnuworld_la_DEPENDENCIES) 
@@ -3204,7 +3216,7 @@ db/libgnuworldDB_la-pgsqlDB.lo: db/$(am__dirstamp) \
 	db/$(DEPDIR)/$(am__dirstamp)
 
 libgnuworldDB.la: $(libgnuworldDB_la_OBJECTS) $(libgnuworldDB_la_DEPENDENCIES) $(EXTRA_libgnuworldDB_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libgnuworldDB_la_LINK) -rpath $(libdir) $(libgnuworldDB_la_OBJECTS) $(libgnuworldDB_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libgnuworldDB_la_LINK) $(am_libgnuworldDB_la_rpath) $(libgnuworldDB_la_OBJECTS) $(libgnuworldDB_la_LIBADD) $(LIBS)
 src/$(am__dirstamp):
 	@$(MKDIR_P) src
 	@: >>src/$(am__dirstamp)
@@ -5611,13 +5623,6 @@ libgnuworld/la-ELog.lo: libgnuworld/ELog.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-ELog.lo `test -f 'libgnuworld/ELog.cc' || echo '$(srcdir)/'`libgnuworld/ELog.cc
 
-libgnuworld/la-MigrationChecker.lo: libgnuworld/MigrationChecker.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-MigrationChecker.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-MigrationChecker.Tpo -c -o libgnuworld/la-MigrationChecker.lo `test -f 'libgnuworld/MigrationChecker.cc' || echo '$(srcdir)/'`libgnuworld/MigrationChecker.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-MigrationChecker.Tpo libgnuworld/$(DEPDIR)/la-MigrationChecker.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/MigrationChecker.cc' object='libgnuworld/la-MigrationChecker.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-MigrationChecker.lo `test -f 'libgnuworld/MigrationChecker.cc' || echo '$(srcdir)/'`libgnuworld/MigrationChecker.cc
-
 libgnuworld/la-Signal.lo: libgnuworld/Signal.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-Signal.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-Signal.Tpo -c -o libgnuworld/la-Signal.lo `test -f 'libgnuworld/Signal.cc' || echo '$(srcdir)/'`libgnuworld/Signal.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-Signal.Tpo libgnuworld/$(DEPDIR)/la-Signal.Plo
@@ -5666,6 +5671,13 @@ libgnuworld/la-misc.lo: libgnuworld/misc.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/misc.cc' object='libgnuworld/la-misc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-misc.lo `test -f 'libgnuworld/misc.cc' || echo '$(srcdir)/'`libgnuworld/misc.cc
+
+libgnuworld/la-MigrationChecker.lo: libgnuworld/MigrationChecker.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -MT libgnuworld/la-MigrationChecker.lo -MD -MP -MF libgnuworld/$(DEPDIR)/la-MigrationChecker.Tpo -c -o libgnuworld/la-MigrationChecker.lo `test -f 'libgnuworld/MigrationChecker.cc' || echo '$(srcdir)/'`libgnuworld/MigrationChecker.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) libgnuworld/$(DEPDIR)/la-MigrationChecker.Tpo libgnuworld/$(DEPDIR)/la-MigrationChecker.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='libgnuworld/MigrationChecker.cc' object='libgnuworld/la-MigrationChecker.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworld_la_CXXFLAGS) $(CXXFLAGS) -c -o libgnuworld/la-MigrationChecker.lo `test -f 'libgnuworld/MigrationChecker.cc' || echo '$(srcdir)/'`libgnuworld/MigrationChecker.cc
 
 db/libgnuworldDB_la-gnuworldDB.lo: db/gnuworldDB.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgnuworldDB_la_CXXFLAGS) $(CXXFLAGS) -MT db/libgnuworldDB_la-gnuworldDB.lo -MD -MP -MF db/$(DEPDIR)/libgnuworldDB_la-gnuworldDB.Tpo -c -o db/libgnuworldDB_la-gnuworldDB.lo `test -f 'db/gnuworldDB.cc' || echo '$(srcdir)/'`db/gnuworldDB.cc

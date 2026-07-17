@@ -9,7 +9,6 @@ libgnuworld_la_SOURCES = \
 	libgnuworld/ConnectionManager.cc \
 	libgnuworld/EConfig.cc \
 	libgnuworld/ELog.cc \
-	libgnuworld/MigrationChecker.cc \
 	libgnuworld/Signal.cc \
 	libgnuworld/StringTokenizer.cc \
 	libgnuworld/gThread.cc \
@@ -17,6 +16,10 @@ libgnuworld_la_SOURCES = \
 	libgnuworld/md5hash.cc \
 	libgnuworld/threadworker.cc \
 	libgnuworld/misc.cc
+
+if COND_PGSQL
+libgnuworld_la_SOURCES += libgnuworld/MigrationChecker.cc
+endif
 
 libgnuworld_la_LDFLAGS = $(threadLib)
 

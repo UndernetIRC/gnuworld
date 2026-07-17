@@ -160,7 +160,9 @@ EXTRA_DIST = bin/ccontrol.example.conf \
 	libltdl/config.h \
 	tools/checkgnuworld.sh
 
+if COND_PGSQL
 include db/Makefile.am
+endif
 include libgnuworld/Makefile.am
 include libnotifier/Makefile.am
 include libircu/Makefile.am

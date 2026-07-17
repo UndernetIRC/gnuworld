@@ -46,7 +46,9 @@
 #include "EConfig.h"
 #include "StringTokenizer.h"
 #include "ELog.h"
+#ifdef HAVE_PGSQL
 #include "MigrationChecker.h"
+#endif
 #include "events.h"
 
 namespace gnuworld {
@@ -56,14 +58,9 @@ using std::make_pair;
 using std::string;
 using std::stringstream;
 
-xClient::xClient() {
-    me = 0;
-    MyUplink = NULL;
-}
+xClient::xClient() {}
 
 xClient::xClient(const string& fileName) : configFileName(fileName) {
-    MyUplink = 0;
-
     EConfig conf(fileName);
     nickName = conf.Require("nickname")->second;
     userName = conf.Require("username")->second;
@@ -2169,6 +2166,7 @@ bool xClient::checkMigrationsAfterDBConnect(const std::string& moduleName, dbHan
         return true;
     }
 
+#ifdef HAVE_PGSQL
     // Try multiple possible locations for migrations directory
     // 1. First try installed location: ../migrations/{module}
     // 2. Fall back to source directory: ./mod.{module}/migrations
@@ -2186,6 +2184,9 @@ bool xClient::checkMigrationsAfterDBConnect(const std::string& moduleName, dbHan
     // Create MigrationChecker and run check
     MigrationChecker checker(moduleName, db, logger.get(), migrationsDir);
     return checker.check();
+#else
+    return true;
+#endif
 }
 
 } // namespace gnuworld
