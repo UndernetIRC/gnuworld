@@ -17,7 +17,8 @@ libdebug_la_SOURCES = \
 	mod.debug/CHANINFOCommand.cc \
 	mod.debug/SERVERSCommand.cc \
 	mod.debug/SERVERINFOCommand.cc \
-	mod.debug/SHUTDOWNCommand.cc
+	mod.debug/SHUTDOWNCommand.cc \
+	mod.debug/REHASHCommand.cc
 
 EXTRA_DIST += \
 	mod.debug/debug.h \
