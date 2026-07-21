@@ -154,17 +154,19 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
 static void helpSpamAction(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM ACTION subcommands:");
-    bot->Reply(theClient, "  ADD    <name> <type> [duration] [reason] [delay]");
+    bot->Reply(theClient, "  ADD    <name> <type> [duration] [reason] [delay] [prefix_auto]");
     bot->Reply(theClient, "  DEL    <name>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SET    <name> <field> <value>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Action types: GLINE  KILL  REPORT");
-    bot->Reply(theClient, "  duration : seconds for GLINE (ignored for KILL/REPORT)");
-    bot->Reply(theClient, "  reason   : gline/kill reason string");
-    bot->Reply(theClient, "  delay    : seconds to wait before firing (0 = immediate)");
+    bot->Reply(theClient, "  duration    : seconds for GLINE (ignored for KILL/REPORT)");
+    bot->Reply(theClient, "  reason      : gline/kill reason string");
+    bot->Reply(theClient, "  delay       : seconds to wait before firing (0 = immediate)");
+    bot->Reply(theClient, "  prefix_auto : GLINE only, default yes - prepend \"AUTO \" ahead of the");
+    bot->Reply(theClient, "                \"[N] \" connected-client count already added to every gline");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "SET fields: name  action_type  duration  reason  delay  rand_min  rand_max  enabled");
+    bot->Reply(theClient, "SET fields: name  action_type  duration  reason  delay  rand_min  rand_max  enabled  prefix_auto");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM ACTION ADD gline_1h   GLINE  3600 \"Spam detected\"  0");
@@ -178,23 +180,28 @@ static void helpSpamAction(dronescan* bot, const iClient* theClient)
 static void helpSpamExclusion(dronescan* bot, const iClient* theClient)
 {
     bot->Reply(theClient, "SPAM EXCLUSION subcommands:");
-    bot->Reply(theClient, "  ADD    <CHAN|NICK|IP|OPER> <value>");
+    bot->Reply(theClient, "  ADD    <CHAN|NICK|IP|OPER|GATEWAYIP> <value>");
     bot->Reply(theClient, "  DEL    <id>");
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SET    <id> <field> <value>");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Exclusion types:");
-    bot->Reply(theClient, "  CHAN  - exempt a channel name from spam scanning");
-    bot->Reply(theClient, "  NICK - exempt a nickname pattern from spam scoring");
-    bot->Reply(theClient, "  IP   - exempt a host/IP from spam scoring");
-    bot->Reply(theClient, "  OPER - exempt an oper account from spam scoring");
+    bot->Reply(theClient, "  CHAN      - exempt a channel name from spam scanning");
+    bot->Reply(theClient, "  NICK      - exempt a nickname pattern from spam scoring");
+    bot->Reply(theClient, "  IP        - exempt a host/IP from spam scoring");
+    bot->Reply(theClient, "  OPER      - exempt an oper account from spam scoring");
+    bot->Reply(theClient, "  GATEWAYIP - does NOT exempt from scanning; marks a shared gateway IP");
+    bot->Reply(theClient, "              (irccloud, mibbit, etc.) as needing user@ip instead of");
+    bot->Reply(theClient, "              *@ip in any GLINE issued against it. value may be a plain");
+    bot->Reply(theClient, "              IP or CIDR block, IPv4 or IPv6.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: exclusion_type  value");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
-    bot->Reply(theClient, "  SPAM EXCLUSION ADD CHAN  #trusted-channel");
-    bot->Reply(theClient, "  SPAM EXCLUSION ADD OPER  ServiceBot");
-    bot->Reply(theClient, "  SPAM EXCLUSION ADD IP    192.168.1.0/24");
+    bot->Reply(theClient, "  SPAM EXCLUSION ADD CHAN      #trusted-channel");
+    bot->Reply(theClient, "  SPAM EXCLUSION ADD OPER      ServiceBot");
+    bot->Reply(theClient, "  SPAM EXCLUSION ADD IP        192.168.1.0/24");
+    bot->Reply(theClient, "  SPAM EXCLUSION ADD GATEWAYIP 5.254.36.56/29");
     bot->Reply(theClient, "  SPAM EXCLUSION SET 2 value 192.168.2.0/24");
     bot->Reply(theClient, "  SPAM EXCLUSION DEL 2");
 }
@@ -285,6 +292,9 @@ static void helpSpam(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  6. Optionally restrict the rule to specific channels (SPAM RULE ADDCHAN)");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Every object above supports SET <name/id> <field> <value> for in-place edits.");
+    bot->Reply(theClient, " ");
+    bot->Reply(theClient, "Multi-word arguments (reason, description, param, realname, etc.) must be");
+    bot->Reply(theClient, "wrapped in double quotes, e.g. \"Spam detected\"; a literal \" is written \\\".");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Type HELP SPAM <object> for details on each section.");
     bot->Reply(theClient, "  e.g.  HELP SPAM EVENT");
