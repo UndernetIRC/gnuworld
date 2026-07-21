@@ -52,8 +52,13 @@ class StringTokenizer {
      * Constructor receives the string to be
      * tokenized, and the delimiter by which
      * tokens will be generated.
+     * If respectQuotes is true, a token beginning with a double quote
+     * (") runs (delimiters included) until the next unescaped double
+     * quote, with the enclosing quotes stripped from the resulting
+     * token; \" inside such a run is collapsed to a literal ".
+     * Defaults to false, so every existing caller is unaffected.
      */
-    StringTokenizer(const std::string& = std::string(), char = ' ');
+    StringTokenizer(const std::string& = std::string(), char = ' ', bool respectQuotes = false);
 
     /**
      * The destructor is a NOOP because no streams have been
@@ -189,6 +194,12 @@ class StringTokenizer {
      * The delimiter by which the (original) string is tokenized.
      */
     char delimiter;
+
+    /**
+     * Whether Tokenize() should honor double-quoted runs (see the
+     * constructor's documentation).
+     */
+    bool respectQuotes;
 
     /**
      * The structure for holding the tokens.

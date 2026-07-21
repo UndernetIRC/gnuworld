@@ -20,11 +20,11 @@
  *   SPAM RULE      REMACTION  <rule_name> <action_name>
  *   SPAM RULE      ADDCHAN    <rule_name> <#channel>
  *   SPAM RULE      REMCHAN    <rule_name> <#channel>
- *   SPAM ACTION    ADD    <name> <type> [duration] [reason] [delay]
+ *   SPAM ACTION    ADD    <name> <type> [duration] [reason] [delay] [prefix_auto]
  *   SPAM ACTION    DEL    <name>
  *   SPAM ACTION    LIST
  *   SPAM ACTION    SET    <name> <field> <value>
- *   SPAM EXCLUSION ADD    <CHAN|NICK|IP|OPER> <value>
+ *   SPAM EXCLUSION ADD    <CHAN|NICK|IP|OPER|GATEWAYIP> <value>
  *   SPAM EXCLUSION DEL    <id>
  *   SPAM EXCLUSION LIST
  *   SPAM EXCLUSION SET    <id> <field> <value>
@@ -72,6 +72,11 @@
  * compound verbs use two letters instead of competing for "A"/"R":
  * AE=ADDEVENT, RE=REMEVENT, AA=ADDACTION, RA=REMACTION, AC=ADDCHAN,
  * RC=REMCHAN, AS=ADDSPY, RS=REMSPY.
+ *
+ * Multi-word arguments (reason, description, param, realname, etc.) must
+ * be wrapped in double quotes, e.g. "Spam detected". A literal double
+ * quote inside such an argument is written as \". Quoting is optional
+ * for single-word values.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -138,7 +143,7 @@ static bool isValidActionType(const string& t)
 
 static bool isValidExclusionType(const string& t)
 {
-    return (t == "CHAN" || t == "NICK" || t == "IP" || t == "OPER");
+    return (t == "CHAN" || t == "NICK" || t == "IP" || t == "OPER" || t == "GATEWAYIP");
 }
 
 // ---------------------------------------------------------------------------
@@ -1350,14 +1355,15 @@ static void handleAction(dronescan* bot, const iClient* theClient,
              it != bot->spamActionsMap.end(); ++it) {
             sqlSpamAction* act = it->second;
             bot->Reply(theClient,
-                       "[%d] %-20s  Type: %-8s  Dur: %-6s  Delay: %-5d  Enabled: %s",
+                       "[%d] %-20s  Type: %-8s  Dur: %-6s  Delay: %-5d  Enabled: %-3s  PrefixAuto: %s",
                        act->getId(),
                        act->getName().c_str(),
                        act->getActionType().c_str(),
                        act->getDuration() >= 0
                            ? std::to_string(act->getDuration()).c_str() : "N/A",
                        act->getDelay(),
-                       act->isEnabled() ? "yes" : "no");
+                       act->isEnabled() ? "yes" : "no",
+                       act->isPrefixAuto() ? "yes" : "no");
             bot->Reply(theClient, "     Reason: %s",
                        act->getReason().empty() ? "(none)" : act->getReason().c_str());
         }
@@ -1368,10 +1374,10 @@ static void handleAction(dronescan* bot, const iClient* theClient,
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM ACTION ADD <name> <type> [duration] [reason] [delay]
+        // SPAM ACTION ADD <name> <type> [duration] [reason] [delay] [prefix_auto]
         if (st.size() < 5) {
             bot->Reply(theClient,
-                "Usage: SPAM ACTION ADD <name> <type> [duration] [reason] [delay]");
+                "Usage: SPAM ACTION ADD <name> <type> [duration] [reason] [delay] [prefix_auto]");
             return;
         }
         const string atype = string_upper(st[4]);
@@ -1386,6 +1392,10 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         if (st.size() >= 6) act->setDuration(atoi(st[5].c_str()));
         if (st.size() >= 7) act->setReason(st[6]);
         if (st.size() >= 8) act->setDelay(atoi(st[7].c_str()));
+        if (st.size() >= 9) {
+            const string pa = st[8];
+            act->setPrefixAuto(pa == "1" || pa == "yes" || pa == "true");
+        }
         act->setCreatedTs(::time(0));
         act->setModifiedTs(::time(0));
 
@@ -1462,10 +1472,12 @@ static void handleAction(dronescan* bot, const iClient* theClient,
             act->setRandMax(atoi(value.c_str()));
         } else if (field == "enabled") {
             act->setEnabled(value == "1" || value == "yes" || value == "true");
+        } else if (field == "prefix_auto") {
+            act->setPrefixAuto(value == "1" || value == "yes" || value == "true");
         } else {
             bot->Reply(theClient,
                 "Unknown field '%s'. Valid: name, action_type, duration, reason, delay, "
-                "rand_min, rand_max, enabled",
+                "rand_min, rand_max, enabled, prefix_auto",
                 field.c_str());
             return;
         }
@@ -1508,11 +1520,11 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
         }
         bot->Reply(theClient, "=== Spam Exclusions (%zu) ===",
                    bot->spamExclusionsList.size());
-        bot->Reply(theClient, "%-4s %-8s %s", "ID", "Type", "Value");
+        bot->Reply(theClient, "%-4s %-9s %s", "ID", "Type", "Value");
         for (dronescan::spamExclusionsListType::const_iterator it =
                  bot->spamExclusionsList.begin();
              it != bot->spamExclusionsList.end(); ++it) {
-            bot->Reply(theClient, "%-4d %-8s %s",
+            bot->Reply(theClient, "%-4d %-9s %s",
                        (*it)->getId(),
                        (*it)->getExclusionType().c_str(),
                        (*it)->getValue().c_str());
@@ -1524,14 +1536,14 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
         if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM EXCLUSION ADD <CHAN|NICK|IP|OPER> <value>
+        // SPAM EXCLUSION ADD <CHAN|NICK|IP|OPER|GATEWAYIP> <value>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM EXCLUSION ADD <CHAN|NICK|IP|OPER> <value>");
+            bot->Reply(theClient, "Usage: SPAM EXCLUSION ADD <CHAN|NICK|IP|OPER|GATEWAYIP> <value>");
             return;
         }
         const string etype = string_upper(st[3]);
         if (!isValidExclusionType(etype)) {
-            bot->Reply(theClient, "Invalid exclusion type. Use: CHAN, NICK, IP, OPER");
+            bot->Reply(theClient, "Invalid exclusion type. Use: CHAN, NICK, IP, OPER, GATEWAYIP");
             return;
         }
 
@@ -1605,7 +1617,7 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
         if (field == "exclusion_type") {
             const string etype = string_upper(value);
             if (!isValidExclusionType(etype)) {
-                bot->Reply(theClient, "Invalid exclusion type. Use: CHAN, NICK, IP, OPER");
+                bot->Reply(theClient, "Invalid exclusion type. Use: CHAN, NICK, IP, OPER, GATEWAYIP");
                 return;
             }
             ex->setExclusionType(etype);
@@ -2227,7 +2239,9 @@ static void handleChan(dronescan* bot, const iClient* theClient,
 // ---------------------------------------------------------------------------
 void SPAMCommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser)
 {
-    StringTokenizer st(Message);
+    // respectQuotes=true: a "..." run is a single token, so free-text
+    // fields (reason, description, realname, etc.) may contain spaces.
+    StringTokenizer st(Message, ' ', true);
 
     if (st.size() < 2) {
         Usage(theClient);

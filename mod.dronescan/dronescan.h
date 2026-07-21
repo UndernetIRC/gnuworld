@@ -333,11 +333,12 @@ class dronescan : public xClient {
         std::string actionType;
         std::string reason;
         int         duration;
+        bool        prefixAuto;
         SpamActor   actor;
         std::string ruleName;
         std::string displayChannels;
         std::string triggerText;
-        PendingSpamAction() : duration(-1) {}
+        PendingSpamAction() : duration(-1), prefixAuto(true) {}
     };
 
     void processSpamText(iClient* theClient, const std::string& text,
@@ -360,7 +361,7 @@ class dronescan : public xClient {
     // either directly from fireRuleActions (no delay) or from OnTimer, once
     // a PendingSpamAction's timer fires.
     void executeSpamAction(const std::string& actionType, const std::string& reason,
-                           int duration, const SpamActor& actor,
+                           int duration, bool prefixAuto, const SpamActor& actor,
                            const std::string& ruleName,
                            const std::string& displayChannels,
                            const std::string& triggerText);
@@ -382,6 +383,12 @@ class dronescan : public xClient {
     // (see gnuworld::match()), case-insensitive.
     bool isSpamExcluded(const SpamActor& actor, const std::string& channel_name,
                         bool isOper) const;
+    // True if ip matches a spam_exclusions row of type GATEWAYIP (glob or
+    // CIDR mask, IPv4/IPv6 - see gnuworld::match()). Such IPs are known
+    // shared IRC gateways (e.g. irccloud, mibbit): a GLINE against them
+    // must use user@ip instead of the usual *@ip wildcard mask, or it
+    // collateral-damages every unrelated user behind the gateway.
+    bool glineNeedsIdent(const std::string& ip) const;
 
     /* Spy client live management */
 

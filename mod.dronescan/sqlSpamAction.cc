@@ -21,7 +21,7 @@ using std::stringstream;
 
 sqlSpamAction::sqlSpamAction(dbHandle* _SQLDb)
     : id(0), name(), action_type(), duration(3600), reason(),
-      delay(0), rand_min(-1), rand_max(-1), enabled(true),
+      delay(0), rand_min(-1), rand_max(-1), enabled(true), prefix_auto(true),
       created_ts(0), modified_ts(0), modified_by(0),
       SQLDb(_SQLDb)
 {}
@@ -30,7 +30,7 @@ sqlSpamAction::~sqlSpamAction() {}
 
 // Column order matches the SELECT in preloadSpamActions():
 // id, name, action_type, duration, reason, delay, rand_min, rand_max,
-// enabled, created_ts, modified_ts, modified_by
+// enabled, prefix_auto, created_ts, modified_ts, modified_by
 void sqlSpamAction::setAllMembers(int row)
 {
     id          = atoi(SQLDb->GetValue(row, 0).c_str());
@@ -45,9 +45,10 @@ void sqlSpamAction::setAllMembers(int row)
     const string rmax = SQLDb->GetValue(row, 7);
     rand_max    = !rmax.empty() ? atoi(rmax.c_str()) : -1;
     enabled     = (SQLDb->GetValue(row, 8) == "t");
-    created_ts  = atoi(SQLDb->GetValue(row, 9).c_str());
-    modified_ts = atoi(SQLDb->GetValue(row, 10).c_str());
-    const string modBy = SQLDb->GetValue(row, 11);
+    prefix_auto = (SQLDb->GetValue(row, 9) == "t");
+    created_ts  = atoi(SQLDb->GetValue(row, 10).c_str());
+    modified_ts = atoi(SQLDb->GetValue(row, 11).c_str());
+    const string modBy = SQLDb->GetValue(row, 12);
     modified_by = !modBy.empty() ? atoi(modBy.c_str()) : 0;
 }
 
@@ -63,6 +64,7 @@ bool sqlSpamAction::commit()
       << "rand_min = "     << (rand_min >= 0 ? std::to_string(rand_min) : "NULL") << ", "
       << "rand_max = "     << (rand_max >= 0 ? std::to_string(rand_max) : "NULL") << ", "
       << "enabled = "      << (enabled ? "true" : "false") << ", "
+      << "prefix_auto = "  << (prefix_auto ? "true" : "false") << ", "
       << "modified_ts = "  << modified_ts << ", "
       << "modified_by = "  << (modified_by > 0 ? std::to_string(modified_by) : "NULL")
       << " WHERE id = "    << id;
@@ -79,7 +81,7 @@ bool sqlSpamAction::insert()
     stringstream q;
     q << "INSERT INTO spam_actions "
       << "(name, action_type, duration, reason, delay, rand_min, rand_max, "
-      << "enabled, created_ts, modified_ts, modified_by) VALUES ("
+      << "enabled, prefix_auto, created_ts, modified_ts, modified_by) VALUES ("
       << "'"  << escapeSQLChars(name)        << "', "
       << "'"  << escapeSQLChars(action_type) << "', "
       << (duration >= 0 ? std::to_string(duration) : "NULL") << ", "
@@ -88,6 +90,7 @@ bool sqlSpamAction::insert()
       << (rand_min >= 0 ? std::to_string(rand_min) : "NULL") << ", "
       << (rand_max >= 0 ? std::to_string(rand_max) : "NULL") << ", "
       << (enabled ? "true" : "false") << ", "
+      << (prefix_auto ? "true" : "false") << ", "
       << created_ts  << ", "
       << modified_ts << ", "
       << (modified_by > 0 ? std::to_string(modified_by) : "NULL")

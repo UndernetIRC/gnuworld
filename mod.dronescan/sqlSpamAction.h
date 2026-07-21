@@ -35,6 +35,7 @@ class sqlSpamAction {
     inline int           getRandMin()    const { return rand_min; }
     inline int           getRandMax()    const { return rand_max; }
     inline bool          isEnabled()     const { return enabled; }
+    inline bool          isPrefixAuto()  const { return prefix_auto; }
     inline int           getCreatedTs()  const { return created_ts; }
     inline int           getModifiedTs() const { return modified_ts; }
     inline int           getModifiedBy() const { return modified_by; }
@@ -49,6 +50,7 @@ class sqlSpamAction {
     inline void setRandMin(int v)               { rand_min = v; }
     inline void setRandMax(int v)               { rand_max = v; }
     inline void setEnabled(bool v)              { enabled = v; }
+    inline void setPrefixAuto(bool v)           { prefix_auto = v; }
     inline void setCreatedTs(int v)             { created_ts = v; }
     inline void setModifiedTs(int v)            { modified_ts = v; }
     inline void setModifiedBy(int v)            { modified_by = v; }
@@ -68,6 +70,7 @@ class sqlSpamAction {
     int    rand_min;   // -1 means NULL
     int    rand_max;   // -1 means NULL
     bool   enabled;
+    bool   prefix_auto; // whether GLINE reasons get "AUTO " ahead of "[N] "
     int    created_ts;
     int    modified_ts;
     int    modified_by; // 0 means NULL

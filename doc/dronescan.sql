@@ -227,6 +227,12 @@ CREATE TABLE spam_rule_events (
 -- delay: base seconds to wait before executing the action after trigger.
 -- rand_min / rand_max: if both are set, a random value in [rand_min, rand_max]
 --   is added to delay for timing jitter. Useful to avoid predictable patterns.
+--
+-- prefix_auto (GLINE only): every gline sent through the gline queue already
+--   gets a "[N] " prefix (N = number of currently connected clients sharing
+--   the target IP). When prefix_auto is true, "AUTO " is additionally
+--   prepended ahead of that count ("AUTO [N] reason"); when false, the
+--   reason is just "[N] reason".
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_actions (
 	id          serial       PRIMARY KEY,
@@ -242,6 +248,8 @@ CREATE TABLE spam_actions (
 	rand_min    int                   DEFAULT NULL,
 	rand_max    int                   DEFAULT NULL,
 	enabled     bool         NOT NULL DEFAULT true,
+	-- Whether GLINE reasons get "AUTO " ahead of the "[N] " count
+	prefix_auto bool         NOT NULL DEFAULT true,
 	created_ts  int4         NOT NULL DEFAULT 0,
 	modified_ts int4         NOT NULL DEFAULT 0,
 	modified_by int                   DEFAULT NULL
@@ -280,9 +288,19 @@ CREATE TABLE spam_rule_actions (
 -- -----------------------------------------------------------------------------
 -- spam_exclusions
 -- -----------------------------------------------------------------------------
--- Entries in this table bypass all spam detection entirely.
--- exclusion_type: CHAN | NICK | IP | OPER
--- value: exact match or glob/mask pattern depending on type.
+-- exclusion_type: CHAN | NICK | IP | OPER | GATEWAYIP
+-- value: exact match or glob/mask pattern depending on type; for IP and
+--   GATEWAYIP, value may also be a CIDR block (IPv4 or IPv6), matched via
+--   gnuworld::match().
+--
+-- CHAN | NICK | IP | OPER entries bypass all spam detection entirely for a
+-- matching actor/channel.
+--
+-- GATEWAYIP does NOT bypass detection. It marks an IP (typically a shared
+-- IRC gateway such as irccloud or mibbit, where many unrelated users share
+-- one address) as requiring "user@ip" instead of the usual wildcard "*@ip"
+-- in any GLINE issued against it, so the gline doesn't collateral-damage
+-- every other user behind the same gateway.
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_exclusions (
 	id             serial       PRIMARY KEY,

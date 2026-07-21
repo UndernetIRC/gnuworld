@@ -38,9 +38,9 @@ column-level comments there are the authoritative reference. Summary:
 | `spam_events` | What to detect: type, regex/threshold `param`, `target` bitmask, points, expiry, TEXT_REPEAT-specific columns. |
 | `spam_rules` | A point `threshold`, scoring granularity (`points_per`, `score_globally`), optional `wait_on_rule_id` chaining, `allchans` channel-scope flag. |
 | `spam_rule_events` | Many-to-many rule↔event link, with optional `points_override`. |
-| `spam_actions` | Reusable action templates: `GLINE`/`KILL`/`REPORT`, duration, reason, delay (+ jitter via `rand_min`/`rand_max`). |
+| `spam_actions` | Reusable action templates: `GLINE`/`KILL`/`REPORT`, duration, reason, delay (+ jitter via `rand_min`/`rand_max`), `prefix_auto` (GLINE reason prefix). |
 | `spam_rule_actions` | Many-to-many rule↔action link, with per-binding overrides for duration/reason/delay. |
-| `spam_exclusions` | `CHAN`/`NICK`/`IP`/`OPER` entries that bypass scanning entirely. |
+| `spam_exclusions` | `CHAN`/`NICK`/`IP`/`OPER` entries that bypass scanning entirely, plus `GATEWAYIP` entries that force `user@ip` gline masks. |
 | `monitored_channels` | Channels dronescan watches; `forcejoin`, `joinasservice`, and last-triggered-rule tracking. |
 | `spam_rule_channels` | Per-rule channel exclusion/inclusion list (meaning depends on `spam_rules.allchans`). |
 | `monitored_channel_spyclients` | Optional restricted spy-client pool per channel. |
@@ -143,11 +143,18 @@ same window keep scoring.
    (`pendingSpamActionTimers`), the same delayed-timer pattern used for spy
    client joins (`scheduleSpyClientJoin`). `OnTimer()` calls
    `executeSpamAction()` when it fires.
-6. **`executeSpamAction(actionType, reason, duration, actor, ruleName,
-   displayChannels, triggerText)`** runs a single resolved action:
+6. **`executeSpamAction(actionType, reason, duration, prefixAuto, actor,
+   ruleName, displayChannels, triggerText)`** runs a single resolved action:
    - `REPORT`: logs a sanitized one-line summary (nick/user/host/ip, rule
      name, channels, and the triggering text) to the console channel.
-   - `GLINE`: issues a GLINE using the resolved duration and reason.
+   - `GLINE`: queues a GLINE using the resolved duration and reason. The
+     mask is `*@ip`, unless `ip` matches a `GATEWAYIP` exclusion entry, in
+     which case it's `user@ip` instead (see [EXCLUSION](#exclusion)). Every
+     queued gline (SPAM-triggered or not) gets a `[N] ` prefix from
+     `processGlineQueue()` — `N` is the number of clients currently
+     connected from that IP — and, when the action's `prefix_auto` is true
+     (the default), an additional `AUTO ` ahead of that:
+     `AUTO [N] reason` vs `[N] reason`.
    - `KILL`: looks up the offender's still-connected `iClient` by numeric
      (`Network->findClient`) and kills it with the resolved reason; silently
      skipped (with a console log line) if the client has since quit.
@@ -193,6 +200,10 @@ SPAM <object> <verb> [args]
 ```
 
 Objects: `EVENT`, `RULE`, `ACTION`, `EXCLUSION`, `SPYCLIENT`, `CHAN`.
+
+Multi-word arguments (reason, description, param, realname, etc.) must be
+wrapped in double quotes, e.g. `"Spam detected"`; a literal `"` inside one
+is written `\"`. Quoting is optional for single-word values.
 
 ### Typical workflow
 
@@ -243,6 +254,15 @@ PRIVMSG/NOTICE, which has no channel), `NICK`/`IP` against the actor's
 nick/ip, and `OPER` against the actor's nick but only when the client
 currently has `+o` (IRC operator) set — use `*` there to exempt opers
 unconditionally.
+
+`GATEWAYIP` is different: it does **not** bypass detection. It marks an IP
+(typically a shared IRC gateway such as irccloud or mibbit, where many
+unrelated users share one address) as requiring `user@ip` instead of the
+usual wildcard `*@ip` in any GLINE issued against it (see
+[executeSpamAction](#scoring-pipeline-dronescancc) above), so the gline
+doesn't collateral-damage every other user behind the same gateway. `value`
+may be a plain IP or a CIDR block, IPv4 or IPv6, e.g.
+`SPAM EXCLUSION ADD GATEWAYIP 5.254.36.56/29`.
 
 ### SPYCLIENT
 

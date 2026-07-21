@@ -30,10 +30,12 @@ namespace ds {
 class glineData {
   public:
     /** Constructor sets initial state to UNKNOWN. */
-    inline glineData(std::string _host, std::string _reason, time_t _expires) {
+    inline glineData(std::string _host, std::string _reason, time_t _expires,
+                      bool _prefixAuto = true) {
         host = _host;
         reason = _reason;
         expires = _expires;
+        prefixAuto = _prefixAuto;
     }
 
     inline const std::string getHost() const { return host; }
@@ -41,6 +43,10 @@ class glineData {
     inline const std::string getReason() const { return reason; }
 
     inline time_t getExpires() const { return expires; }
+
+    /** Whether processGlineQueue() should prepend "AUTO " ahead of the
+     * "[N] " count when sending this gline. */
+    inline bool getPrefixAuto() const { return prefixAuto; }
 
   protected:
     /** The gline host */
@@ -51,6 +57,9 @@ class glineData {
 
     /** The gline expiry */
     time_t expires;
+
+    /** Whether to prefix "AUTO " ahead of the "[N] " count */
+    bool prefixAuto;
 
 }; // class glineData
 

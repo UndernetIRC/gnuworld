@@ -1150,8 +1150,8 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
             PendingSpamAction pending = sit->second;
             pendingSpamActionTimers.erase(sit);
             executeSpamAction(pending.actionType, pending.reason, pending.duration,
-                              pending.actor, pending.ruleName, pending.displayChannels,
-                              pending.triggerText);
+                              pending.prefixAuto, pending.actor, pending.ruleName,
+                              pending.displayChannels, pending.triggerText);
             return;
         }
     }
@@ -1550,7 +1550,8 @@ void dronescan::processGlineQueue() {
             userCount = clientsIPMap[st[1]];
             us[0] = '\0';
             sprintf(us, "%d", userCount);
-            std::string glineReason = string("AUTO [") + us + string("] ") + curGline->getReason();
+            std::string glineReason = (curGline->getPrefixAuto() ? string("AUTO [") : string("["))
+                                     + us + string("] ") + curGline->getReason();
             MyUplink->setGline(nickName, curGline->getHost(), glineReason, curGline->getExpires(),
                                ::time(0), this);
 
@@ -2572,7 +2573,7 @@ void dronescan::preloadSpamActions()
 
     std::stringstream q;
     q << "SELECT id, name, action_type, duration, reason, delay, rand_min, rand_max, "
-      << "enabled, created_ts, modified_ts, modified_by "
+      << "enabled, prefix_auto, created_ts, modified_ts, modified_by "
       << "FROM spam_actions ORDER BY id";
 
     if (!SQLDb->Exec(q, true)) {
@@ -2912,6 +2913,23 @@ bool dronescan::isSpamExcluded(const SpamActor& actor, const std::string& channe
 }
 
 /**
+ * glineNeedsIdent: check the loaded spam_exclusions rows for a GATEWAYIP
+ * match against ip. match() already understands both glob masks and
+ * CIDR blocks (IPv4/IPv6), so a GATEWAYIP value may be a single IP or a
+ * CIDR range.
+ */
+bool dronescan::glineNeedsIdent(const std::string& ip) const
+{
+    for (spamExclusionsListType::const_iterator it = spamExclusionsList.begin();
+         it != spamExclusionsList.end(); ++it) {
+        sqlSpamExclusion* ex = *it;
+        if (ex->getExclusionType() == "GATEWAYIP" && match(ex->getValue(), ip) == 0)
+            return true;
+    }
+    return false;
+}
+
+/**
  * processSpamText: called whenever text arrives that should be checked for
  * spam events. target_bit is the bitmask value for the traffic source
  * (e.g. spam_target::CHAN_PRIV). Handles TEXT (regex) and TEXT_REPEAT
@@ -3212,8 +3230,10 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
             totalDelay += lo + (rand() % (hi - lo + 1));
         }
 
+        const bool prefixAuto = act->isPrefixAuto();
+
         if (totalDelay <= 0) {
-            executeSpamAction(actionType, reason, duration, actor,
+            executeSpamAction(actionType, reason, duration, prefixAuto, actor,
                               rule->getName(), displayChannels, triggerText);
             continue;
         }
@@ -3222,6 +3242,7 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         pending.actionType      = actionType;
         pending.reason          = reason;
         pending.duration        = duration;
+        pending.prefixAuto      = prefixAuto;
         pending.actor           = actor;
         pending.ruleName        = rule->getName();
         pending.displayChannels = displayChannels;
@@ -3242,7 +3263,7 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
  * silently skipped (with a console log line) otherwise.
  */
 void dronescan::executeSpamAction(const std::string& actionType, const std::string& reason,
-                                  int duration, const SpamActor& actor,
+                                  int duration, bool prefixAuto, const SpamActor& actor,
                                   const std::string& ruleName,
                                   const std::string& displayChannels,
                                   const std::string& triggerText)
@@ -3272,8 +3293,9 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         Message(consoleChannel, "%s", buf);
 
     } else if (actionType == "GLINE") {
+        const string mask = glineNeedsIdent(ip) ? (user + "@" + ip) : ("*@" + ip);
         glineData* gd = new (std::nothrow)
-            glineData("*@" + ip, reason, duration);
+            glineData(mask, reason, duration, prefixAuto);
         assert(gd != 0);
         glineQueue.push_back(gd);
 

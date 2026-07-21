@@ -39,7 +39,8 @@ using std::vector;
  *  delimiter: The specified delimiter by which
  *   we will tokenize the string
  */
-StringTokenizer::StringTokenizer(const string& buf, char _delimiter) : delimiter(_delimiter) {
+StringTokenizer::StringTokenizer(const string& buf, char _delimiter, bool _respectQuotes)
+    : delimiter(_delimiter), respectQuotes(_respectQuotes) {
     Tokenize(buf);
 }
 
@@ -97,8 +98,43 @@ void StringTokenizer::Tokenize(const string& buf) {
     // [buf.begin(), buf.end())
     string::const_iterator endPtr = buf.end();
 
+    // When respectQuotes is true, tracks whether we are currently inside
+    // a double-quoted run (opened by a " at the very start of a token).
+    bool inQuotes = false;
+
     // Iterate through the entire string
     for (; currentPtr != endPtr; ++currentPtr) {
+
+        // A " at the start of a fresh token opens a quoted run: the
+        // quote itself is not added to the token, and the delimiter
+        // loses its special meaning until the closing ".
+        if (respectQuotes && !inQuotes && (addMePtr == addMe) && ('"' == *currentPtr)) {
+            inQuotes = true;
+            continue;
+        }
+
+        if (respectQuotes && inQuotes) {
+            // \" inside a quoted run collapses to a literal ", staying
+            // in quote mode. Any other backslash is kept as-is.
+            if (('\\' == *currentPtr) && ((currentPtr + 1) != endPtr) && ('"' == *(currentPtr + 1))) {
+                *addMePtr = '"';
+                ++addMePtr;
+                ++currentPtr;
+                continue;
+            }
+
+            // The closing quote ends the run without being added.
+            if ('"' == *currentPtr) {
+                inQuotes = false;
+                continue;
+            }
+
+            // Inside quotes, every other character (including the
+            // delimiter) is added literally.
+            *addMePtr = *currentPtr;
+            ++addMePtr;
+            continue;
+        }
 
         // Is this the delimiter for which we are searching?
         if (delimiter == *currentPtr) {
