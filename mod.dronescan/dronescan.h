@@ -20,15 +20,30 @@
 #ifndef DRONESCAN_H
 #define DRONESCAN_H "$Id: dronescan.h,v 1.38 2009/05/28 10:37:31 hidden1 Exp $"
 
+#include <list>
 #include <map>
+#include <set>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "client.h"
 
 #include "clientData.h"
 #include "jfChannel.h"
 #include "dbHandle.h"
+#include "sqlSpamEvent.h"
+#include "sqlSpamRule.h"
+#include "sqlSpamAction.h"
+#include "sqlSpamRuleAction.h"
+#include "sqlSpamExclusion.h"
+#include "sqlSpyClient.h"
+#include "sqlMonitoredChannel.h"
 #include "glineData.h"
+
+// PCRE2 for regex-based spam event matching
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 
 #ifdef ENABLE_LOG4CPLUS
 #include <log4cplus/loglevel.h>
@@ -52,6 +67,13 @@ class activeChannel;
 class Command;
 class sqlFakeClient;
 class sqlUser;
+class sqlSpamEvent;
+class sqlSpamRule;
+class sqlSpamAction;
+class sqlSpamRuleAction;
+class sqlSpamExclusion;
+class sqlSpyClient;
+class sqlMonitoredChannel;
 class Test;
 
 enum DS_STATE { BURST, RUN };
@@ -87,14 +109,61 @@ class dronescan : public xClient {
     /** This is called when we receive a CTCP */
     virtual void OnCTCP(iClient*, const std::string&, const std::string&, bool);
 
+    /** This is called when a fake client receives a CTCP */
+    virtual void OnFakeCTCP(iClient* Sender, iClient* Target, const std::string& CTCP,
+                            const std::string& Message, bool Secure);
+
+    /** This is called when we receive a channel CTCP */
+    virtual void OnChannelCTCP(iClient* Sender, Channel* theChan,
+                               const std::string& CTCPCommand, const std::string& Message);
+
+    /** This is called when a fake client receives a channel CTCP */
+    virtual void OnFakeChannelCTCP(iClient* Sender, iClient* Target, Channel* theChan,
+                                   const std::string& CTCPCommand, const std::string& Message);
+
     /** Receive network events. */
     virtual void OnEvent(const eventType&, void*, void*, void*, void*);
 
     /** Receive channel events. */
     virtual void OnChannelEvent(const channelEventType&, Channel*, void*, void*, void*, void*);
 
+    /** Receive channel messages (PRIVMSG to a channel, main service client only). */
+    virtual void OnChannelMessage(iClient* Sender, Channel* theChan,
+                                  const std::string& Message);
+
+    /** Receive fake channel messages (PRIVMSG to a channel caught by a fake client). */
+    virtual void OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* theChan,
+                                  const std::string& Message);
+
+    /** Receive channel notices (NOTICE to a channel). */
+    virtual void OnChannelNotice(iClient* Sender, Channel* theChan,
+                                 const std::string& Message);
+
+    /** Receive fake channel notices (NOTICE to a channel caught by a fake client). */
+    virtual void OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* theChan,
+                                     const std::string& Message);
+
     /** Receive private messages. */
     virtual void OnPrivateMessage(iClient*, const std::string&, bool);
+
+    /** Receive fake private messages (PRIVMSG caught by a fake client). */
+    virtual void OnFakePrivateMessage(iClient* Sender, iClient* Target,
+                                      const std::string& Message, bool secure);
+
+    /** Receive private notices (NOTICE directly to the bot). */
+    virtual void OnPrivateNotice(iClient*, const std::string&, bool);
+
+    /** Receive fake private notices (NOTICE caught by a fake client). */
+    virtual void OnFakePrivateNotice(iClient* Sender, iClient* Target,
+                                     const std::string& Message, bool secure);
+
+    /** Handle kick events for spy client re-join logic. */
+    virtual void OnNetworkKick(Channel* theChan, iClient* srcClient,
+                               iClient* destClient, const std::string& kickMessage,
+                               bool authoritative);
+
+    /** Append channel list and idle/signon time to WHOIS replies. */
+    virtual void OnWhois(iClient* sourceClient, iClient* targetClient);
 
     /** When we are being detached by the xServer */
     virtual void OnDetach(const std::string& = std::string("Server Shutdown"));
@@ -209,6 +278,184 @@ class dronescan : public xClient {
     void preloadUserCache();
     bool preloadExceptionalChannels();
 
+    /* Spam detection cache loaders */
+    void preloadSpamEvents();
+    void preloadSpamRules();
+    void preloadSpamActions();
+    void preloadSpamRuleEvents();
+    void preloadSpamRuleActions();
+    void preloadSpamExclusions();
+    void preloadSpyClients();
+    void preloadMonitoredChannels();
+    void preloadSpamRuleChannels();
+    void preloadMonitoredChannelSpyClients();
+    void refreshSpamCaches();
+
+    /* PCRE2 compile lifecycle: called on load, create (EVENT ADD) and
+     * modify (EVENT SET) so a spam event's regex is always compiled from
+     * its current param (compileEventRegex) or
+     * repeat_exclusion_regex/case_sensitive (compileRepeatExclusionRegex)
+     * state. */
+    void compileEventRegex(sqlSpamEvent* ev);
+    void compileRepeatExclusionRegex(sqlSpamEvent* ev);
+    void freeEventRegexes(int event_id);
+
+    /* Rebuild the pointer-linked spam object graph (sqlSpamEvent::getRules(),
+     * sqlSpamRule::getEvents()/getActions(), spamEventsList) from the
+     * currently loaded spamEventsMap/spamRulesMap/spamActionsMap/
+     * spamRuleEventsMap/spamRuleActionsMap. Must be called after any
+     * structural change: load, EVENT/RULE/ACTION ADD or DEL, or
+     * ADDEVENT/REMEVENT/ADDACTION/REMACTION. Not needed for SET enabled -
+     * isEnabled() is checked live by callers, not baked into the links. */
+    void relinkSpamGraph();
+
+    /* Spam detection processing helpers */
+    // Lightweight snapshot of a client's identity, captured at the moment
+    // traffic is observed so that scoring/actions (REPORT, GLINE) still work
+    // even if the client has since quit (needed for crossuser TEXT_REPEAT).
+    struct SpamActor {
+        std::string numeric;   // YYXXX
+        std::string ip;        // numeric IP string
+        std::string nick;
+        std::string user;
+        std::string host;      // real host (not the +x hidden host)
+        SpamActor() {}
+    };
+    SpamActor makeActor(iClient* theClient) const;
+
+    // A resolved action (type/reason/duration already computed from its
+    // spam_action template + any spam_rule_action overrides) waiting for its
+    // delay/jitter timer to fire. Captured entirely by value - no pointers
+    // into sqlSpamRule/sqlSpamAction - so a RULE/ACTION DEL while a timer is
+    // in flight cannot leave a dangling reference (same principle as the
+    // already-queued glineQueue entries).
+    struct PendingSpamAction {
+        std::string actionType;
+        std::string reason;
+        int         duration;
+        bool        prefixAuto;
+        SpamActor   actor;
+        std::string ruleName;
+        std::string displayChannels;
+        std::string triggerText;
+        PendingSpamAction() : duration(-1), prefixAuto(true) {}
+    };
+
+    void processSpamText(iClient* theClient, const std::string& text,
+                         int target_bit, const std::string& channel_name);
+    void scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
+                    const std::string& channel_name, time_t now,
+                    const std::string& text);
+    void processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
+                            const std::string& text, const std::string& channel_name,
+                            time_t now, std::map<std::string, SpamActor>& actorsToEvaluate);
+    void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
+                          const std::string& displayChannels);
+    // Resolves each linked action's reason/duration/delay and either runs it
+    // immediately (executeSpamAction) or, if delay+jitter > 0, schedules a
+    // one-shot timer (see pendingSpamActionTimers) to run it later.
+    void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
+                         const std::string& displayChannels,
+                         const std::string& triggerText);
+    // Runs a single already-resolved action (REPORT/GLINE/KILL). Called
+    // either directly from fireRuleActions (no delay) or from OnTimer, once
+    // a PendingSpamAction's timer fires.
+    void executeSpamAction(const std::string& actionType, const std::string& reason,
+                           int duration, bool prefixAuto, const SpamActor& actor,
+                           const std::string& ruleName,
+                           const std::string& displayChannels,
+                           const std::string& triggerText);
+    // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
+    // rule->isScoreGlobally() is true (channel segment omitted). unit is the
+    // client's numeric nick, or its IP when rule->getPointsPer() == "IP".
+    std::string buildScoringKey(sqlSpamRule* rule, const SpamActor& actor,
+                                const std::string& channel_name) const;
+    // Comma-separated list of monitored channels the client currently sits in
+    // (original-case names), for use in reports about events with no channel
+    // context of their own (i.e. direct PRIVMSG to the bot/spy client). Empty
+    // if the client is on no monitored channel.
+    std::string monitoredChannelNamesForClient(iClient* theClient) const;
+    // True if the actor/channel combination matches any row in
+    // spam_exclusions, meaning all spam detection should be bypassed for
+    // this event entirely. CHAN is matched against channel_name (skipped if
+    // empty), NICK/IP against the actor's nick/ip, and OPER against the
+    // actor's nick but only when isOper is true. All matches are glob masks
+    // (see gnuworld::match()), case-insensitive.
+    bool isSpamExcluded(const SpamActor& actor, const std::string& channel_name,
+                        bool isOper) const;
+    // True if ip matches a spam_exclusions row of type GATEWAYIP (glob or
+    // CIDR mask, IPv4/IPv6 - see gnuworld::match()). Such IPs are known
+    // shared IRC gateways (e.g. irccloud, mibbit): a GLINE against them
+    // must use user@ip instead of the usual *@ip wildcard mask, or it
+    // collateral-damages every unrelated user behind the gateway.
+    bool glineNeedsIdent(const std::string& ip) const;
+
+    /* Spy client live management */
+
+    /** Introduce all enabled spy clients to the network. */
+    void introduceAllSpyClients();
+
+    /**
+     * Introduce a single spy client to the network.
+     * Returns the iClient* on success, nullptr on failure.
+     * If the desired nick is taken, tries other spy clients first,
+     * then falls back to nick + random suffix.
+     */
+    iClient* introduceSpyClient(sqlSpyClient* sc);
+
+    /** Detach a live spy client from the network and clean up maps. */
+    void detachSpyClient(int scId);
+
+    /**
+     * Find the best available spy client for the given channel.
+     * If forcejoin is false, skips channels that are +i, +k, +l(full),
+     * +r (with no spy client account), or where the spy client host
+     * matches a ban.
+     * Returns spy client id or -1 if none available.
+     */
+    int findBestSpyClient(const std::string& chanName, bool forcejoin);
+
+    /**
+     * Select the best spy client for the given channel and make it join
+     * immediately. Selection happens here (not at schedule time) so it
+     * always sees up-to-date per-client channel load.
+     */
+    void doSpyClientJoin(const std::string& chanName, bool forcejoin);
+
+    /**
+     * Schedule a spy client join with a random delay in [minDelay, maxDelay] seconds.
+     * minDelay=0, maxDelay=300 for new channels; 300/1500 after a kick.
+     */
+    void scheduleSpyClientJoin(const std::string& chanName, bool forcejoin,
+                               int minDelay, int maxDelay);
+
+    /** Cancel any pending spy-client-join timer(s) scheduled for the given channel. */
+    void cancelPendingJoinTimers(const std::string& chanName);
+
+    /** Voice a spy client in the console channel. */
+    void voiceSpyClientInConsole(iClient* ic);
+
+    /** Op a client in the console channel. */
+    void opInConsole(iClient* ic);
+
+    /** Returns true if the given iClient is one of our live spy clients. */
+    bool isSpyClient(const iClient* ic) const;
+
+    /** Returns the spy client id for the given iClient, or -1. */
+    int getSpyClientId(const iClient* ic) const;
+
+    /** Part a spy client from a monitored channel and update tracking maps. */
+    void partSpyClientFromChannel(int scId, const std::string& chanName);
+
+    /**
+     * Resync live spy clients against the DB caches:
+     * - detach clients that were removed from the DB
+     * - introduce newly added / re-enabled clients
+     * - if a removed/disabled client was monitoring a channel,
+     *   schedule another client to take over
+     */
+    void resyncSpyClients();
+
     /* Allow commands access to the database pointer */
     inline dbHandle* getSqlDb() { return SQLDb; }
 
@@ -216,9 +463,123 @@ class dronescan : public xClient {
 
     inline int GetGlineQueueSize() { return glineQueue.size(); }
 
+    inline bool isHelloEnabled() { return enableHello; }
+
     /** Internal variables */
     userMapType userMap;
     fcMapType fakeClients;
+
+    /* Spam detection caches */
+    typedef std::map<int, sqlSpamEvent*>                               spamEventsMapType;
+    typedef std::map<int, sqlSpamRule*>                                spamRulesMapType;
+    typedef std::map<int, sqlSpamAction*>                              spamActionsMapType;
+    // rule_id -> list of (event_id, points_override); -1 points_override means use event default.
+    // Backing store for relinkSpamGraph() and for SPAMCommand.cc's admin
+    // display/mutation logic; the hot path reads the resolved pointer graph
+    // (sqlSpamEvent::getRules(), sqlSpamRule::getEvents()) instead.
+    typedef std::map<int, std::vector<std::pair<int,int>>>             spamRuleEventsMapType;
+    // rule_id -> list of bound rule-actions
+    typedef std::map<int, std::vector<sqlSpamRuleAction*>>             spamRuleActionsMapType;
+    typedef std::list<sqlSpamExclusion*>                               spamExclusionsListType;
+    // spyclients: id -> sqlSpyClient*
+    typedef std::map<int, sqlSpyClient*>                               spyClientsMapType;
+    // monitored_channels: lowercase channel name -> sqlMonitoredChannel*
+    typedef std::map<std::string, sqlMonitoredChannel*>                monitoredChannelsMapType;
+    // spam_rule_channels: rule_id -> list of channel names
+    typedef std::map<int, std::vector<std::string>>                    spamRuleChannelsMapType;
+    // monitored_channel_spyclients: monitored channel id -> list of allowed spyclient ids
+    typedef std::map<int, std::vector<int>>                            monitoredChannelSpyClientsMapType;
+
+    // Flat vector of every loaded event, rebuilt by relinkSpamGraph();
+    // used for hot-path iteration instead of walking spamEventsMap's nodes.
+    std::vector<sqlSpamEvent*> spamEventsList;
+
+    spamEventsMapType       spamEventsMap;
+    spamRulesMapType        spamRulesMap;
+    spamActionsMapType      spamActionsMap;
+    spamRuleEventsMapType   spamRuleEventsMap;
+    spamRuleActionsMapType  spamRuleActionsMap;
+    spamExclusionsListType  spamExclusionsList;
+    spyClientsMapType       spyClientsMap;
+    monitoredChannelsMapType monitoredChannelsMap;
+    spamRuleChannelsMapType spamRuleChannelsMap;
+    monitoredChannelSpyClientsMapType monitoredChannelSpyClientsMap;
+
+    /* Live spy client state */
+
+    // spy client id -> live iClient* on the network
+    typedef std::map<int, iClient*>                                    liveSpyClientsMapType;
+    liveSpyClientsMapType liveSpyClientsMap;
+
+    // lowercase channel name -> spy client id currently assigned to it
+    typedef std::map<std::string, int>                                 chanActiveSpyMapType;
+    chanActiveSpyMapType chanActiveSpyMap;
+
+    // reverse map: spy client id -> set of lowercase channel names it currently
+    // covers (absent or empty = idle). A spy client may cover more than one
+    // channel once the pool of idle spy clients is exhausted.
+    typedef std::map<int, std::set<std::string>>                       spyClientChanMapType;
+    spyClientChanMapType spyClientChanMap;
+
+    // Per-channel kick tracking: how many spy client kicks happened within 24h
+    struct ChanKickTrack {
+        int    count;
+        time_t firstKickTime;
+        ChanKickTrack() : count(0), firstKickTime(0) {}
+    };
+    typedef std::map<std::string, ChanKickTrack>                       chanKickTrackMapType;
+    chanKickTrackMapType chanKickTrackMap;
+
+    // Channels where monitoring has been stopped due to repeated kicks
+    typedef std::set<std::string>                                      kickStoppedChannelsType;
+    kickStoppedChannelsType kickStoppedChannels;
+
+    // Pending join timers: timerID -> {forcejoin, channel name}
+    typedef std::map<xServer::timerID, std::pair<bool, std::string>>  pendingJoinTimersType;
+    pendingJoinTimersType pendingJoinTimers;
+
+    // Spam actions waiting for their delay/jitter timer to fire; see
+    // fireRuleActions()/executeSpamAction()/PendingSpamAction.
+    typedef std::map<xServer::timerID, PendingSpamAction>              pendingSpamActionTimersType;
+    pendingSpamActionTimersType pendingSpamActionTimers;
+
+    /* PCRE2 regex cache: event_id -> compiled regex (TEXT events only) */
+    typedef std::map<int, pcre2_code*>                                 spamRegexCacheType;
+    spamRegexCacheType spamRegexCache;
+
+    /* PCRE2 cache for repeat_exclusion_regex: event_id -> compiled regex
+     * (TEXT_REPEAT events only). Text matching this is never tracked. */
+    spamRegexCacheType spamRepeatExclusionCache;
+
+    /* In-memory spam scoring: scoringKey -> (event_id -> SpamScore) */
+    struct SpamScore {
+        int         count;        // occurrences within the current window
+        time_t      window_start; // when the current window began
+        std::string last_text;    // text of the most recent match that
+                                   // contributed to this event's count
+        time_t      last_text_ts; // wall-clock time last_text was set
+        SpamScore() : count(0), window_start(0), last_text_ts(0) {}
+    };
+    typedef std::map<std::string, std::map<int, SpamScore>>            spamScoreMapType;
+    spamScoreMapType spamScoreMap;
+
+    /* In-memory TEXT_REPEAT tracking. The key encodes the channel scope, so
+     * repeats are inherently per-channel/per-target (same text in two
+     * channels => two entries). Key layout (\x1f-separated):
+     *   crossuser : eventId + scope + cmpText
+     *   self-only : eventId + scope + numeric + cmpText
+     * where scope = lower(channel) or "privmsg", cmpText = text lowercased
+     * unless the event is case_sensitive. An entry is NOT erased when it
+     * fires; it persists for its window so later repeaters keep matching. */
+    struct RepeatEntry {
+        int    count;        // total occurrences in the current window
+        time_t window_start; // when the current window began
+        time_t expires_at;   // window_start + event point_expiry; for GC
+        std::map<std::string, SpamActor> participants; // by numeric (crossuser)
+        RepeatEntry() : count(0), window_start(0), expires_at(0) {}
+    };
+    typedef std::map<std::string, RepeatEntry>                         repeatTrackMapType;
+    repeatTrackMapType repeatTrackMap;
     clientsIPMapType clientsIPMap;
     clientsIPFloodMapType clientsIPFloodMap;
     int lastBurstTime;
@@ -307,6 +668,9 @@ class dronescan : public xClient {
     /** Configuration variables. */
     std::string consoleChannel;
     std::string consoleChannelModes;
+    // Optional: channel spy clients join on introduction. Empty (unset in
+    // the config) means spy clients don't join any channel at introduction.
+    std::string spyClientsChannel;
 
     /** State variable. */
     DS_STATE currentState;
@@ -339,20 +703,22 @@ class dronescan : public xClient {
     /** Timers for GNUWorld triggered events. */
     xServer::timerID tidClearJoinCounter;
     xServer::timerID tidClearNickCounter;
-    xServer::timerID tidRefreshCaches;
     xServer::timerID tidGlineQueue;
+    xServer::timerID tidRepeatGC;   // periodic sweep of expired repeat entries
 
     /** Command map type. */
     typedef std::map<std::string, Command*, noCaseCompare> commandMapType;
     typedef commandMapType::value_type commandPairType;
     commandMapType commandMap;
+
+    friend class HELPCommand;
+
+    /** Command configuration options */
+    bool enableHello;
     bool RegisterCommand(Command*);
 
     /** Time of the last cache. */
     std::map<std::string, time_t> lastUpdated;
-
-    /** How often to refresh caches. */
-    unsigned int rcInterval;
 
     /** Fake sqlUser record for opered clients without accounts. */
     sqlUser* fakeOperUser;

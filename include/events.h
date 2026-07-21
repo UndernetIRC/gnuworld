@@ -96,6 +96,9 @@ typedef int channelEventType;
  *  3) string* - reason
  * EVT_QUIT
  *  1) iClient*
+ *  2) const std::string* - quit reason (may be empty)
+ *  3) const std::vector<std::string>* - names of channels the client was on
+ *     (snapshot taken before the client is removed from its channels)
  * EVT_SQUIT
  *  1) iServer* - server being squit
  *  2) string* - source

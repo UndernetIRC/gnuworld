@@ -21,12 +21,15 @@
  */
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "server.h"
 #include "events.h"
 #include "Network.h"
 #include "iClient.h"
 #include "Network.h"
+#include "Channel.h"
 #include "ELog.h"
 #include "ServerCommandHandler.h"
 
@@ -47,16 +50,28 @@ bool msg_Q::Execute(const xParameters& Param) {
         return false;
     }
 
-    // xNetwork::removeClient will remove user<->channel associations
-    iClient* theClient = Network->removeClient(Param[0]);
+    iClient* theClient = Network->findClient(Param[0]);
     if (NULL == theClient) {
         elog << "msg_Q> Unable to find client: " << Param[0] << endl;
         return false;
     }
 
-    theServer->PostEvent(EVT_QUIT, static_cast<void*>(theClient));
+    // Snapshot the quit reason and channel membership BEFORE removeClient
+    // severs the user<->channel associations, so consumers (e.g. dronescan
+    // spam scoring) can match the quit reason per channel.
+    std::string quitReason = (Param.size() > 1) ? std::string(Param[1]) : std::string();
+    std::vector<std::string> quitChans;
+    for (iClient::const_channelIterator ci = theClient->channels_begin();
+         ci != theClient->channels_end(); ++ci)
+        quitChans.push_back((*ci)->getName());
 
-    // xNetwork::removeClient() will remove channel->user associations.
+    // xNetwork::removeClient will remove user<->channel associations
+    Network->removeClient(Param[0]);
+
+    theServer->PostEvent(EVT_QUIT, static_cast<void*>(theClient),
+                         static_cast<void*>(&quitReason),
+                         static_cast<void*>(&quitChans));
+
     delete theClient;
 
     return true;

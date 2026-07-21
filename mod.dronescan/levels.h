@@ -45,6 +45,10 @@ const unsigned short addExceptionalChannel = 750;
 const unsigned short remExceptionalChannel = 750;
 const unsigned short reload = 750;
 
+/* Spam detection: read (LIST/SHOW) vs write (ADD/DEL/ADDEVENT etc.) */
+const unsigned short spam_read  = 300;
+const unsigned short spam_write = 750;
+
 /* Commands at 1000 should really be debug commands only */
 
 const unsigned short analyse = 1000;
