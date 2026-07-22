@@ -883,7 +883,7 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
             kickerStr.c_str(),
             kickMessage.c_str());
 
-    // Kick tracking ? 24-hour window
+    // Kick tracking - 24-hour window
     time_t now = ::time(nullptr);
     ChanKickTrack& track = chanKickTrackMap[chanKey];
     if (track.count == 0 || (now - track.firstKickTime) > 86400) {
@@ -903,7 +903,7 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
         return;
     }
 
-    // Schedule a replacement ? use a different spy client if possible
+    // Schedule a replacement - use a different spy client if possible
     monitoredChannelsMapType::const_iterator mc = monitoredChannelsMap.find(chanKey);
     bool forcejoin = (mc != monitoredChannelsMap.end()) ? mc->second->isForceJoin() : false;
 
@@ -2339,7 +2339,7 @@ void dronescan::refreshSpamCaches()
     relinkSpamGraph();
 
     // Resync live spy clients against the freshly loaded DB caches.
-    // MyUplink is NULL during the constructor ? only sync after network attach.
+    // MyUplink is NULL during the constructor - only sync after network attach.
     if (MyUplink)
         resyncSpyClients();
 }
@@ -3301,7 +3301,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 
         char buf[512];
         snprintf(buf, sizeof(buf),
-            "SPAM[GLINE] Queued GLINE for %s!%s@%s (%s) ? rule '%s' ? reason: %s",
+            "SPAM[GLINE] Queued GLINE for %s!%s@%s (%s) - rule '%s' - reason: %s",
             nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
             ruleName.c_str(), reason.c_str());
         Message(consoleChannel, "%s", buf);
@@ -3312,7 +3312,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         char buf[512];
         if (!target) {
             snprintf(buf, sizeof(buf),
-                "SPAM[KILL] %s!%s@%s (%s) ? rule '%s' ? client no longer connected, skipped",
+                "SPAM[KILL] %s!%s@%s (%s) - rule '%s' - client no longer connected, skipped",
                 nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
                 ruleName.c_str());
             Message(consoleChannel, "%s", buf);
@@ -3321,7 +3321,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 
         Kill(target, reason);
         snprintf(buf, sizeof(buf),
-            "SPAM[KILL] Killed %s!%s@%s (%s) ? rule '%s' ? reason: %s",
+            "SPAM[KILL] Killed %s!%s@%s (%s) - rule '%s' - reason: %s",
             nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
             ruleName.c_str(), reason.c_str());
         Message(consoleChannel, "%s", buf);
@@ -3386,7 +3386,7 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
     if (liveSpyClientsMap.count(sc->getId()))
         return liveSpyClientsMap[sc->getId()];
 
-    // Determine nick ? fall back to nick+random if taken
+    // Determine nick - fall back to nick+random if taken
     string nick = sc->getNickname();
     if (Network->findClient(nick) != nullptr) {
         // Try to find another spy client's nick that is free
@@ -3418,7 +3418,7 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
         }
         if (!found)
             Message(consoleChannel,
-                    "[SpyClient] Nick collision for %s ? using %s instead.",
+                    "[SpyClient] Nick collision for %s - using %s instead.",
                     sc->getNickname().c_str(), nick.c_str());
     }
 
@@ -3429,7 +3429,7 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
     if (ipmask_parse(sc->getIp().c_str(), &ip, &ipmask_len)) {
         base64ip = string(xIP(ip).GetBase64IP());
     } else {
-        // Not a valid IP ? use a deterministic fallback
+        // Not a valid IP - use a deterministic fallback
         base64ip = "AAAAAA";
         elog << "dronescan::introduceSpyClient> Invalid IP string '"
              << sc->getIp() << "' for spy client " << sc->getId() << endl;

@@ -384,7 +384,7 @@ void HELPCommand::Exec(const iClient* theClient, const string& Message, const sq
         return;
     }
 
-    // ---- HELP (no args) ? list all commands --------------------------------
+    // ---- HELP (no args) - list all commands --------------------------------
     bot->Reply(theClient, "Available commands:");
     bot->Reply(theClient, " ");
 

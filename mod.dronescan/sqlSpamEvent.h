@@ -34,7 +34,7 @@ class sqlSpamEvent {
     inline const string& getDescription()      const { return description; }
     inline const string& getEventType()        const { return event_type; }
     inline const string& getParam()            const { return param; }
-    // target: bitmask ? CHAN=1, PRIVMSG=2, NOTICE=4, PART=8, QUIT=16, ALL=31
+    // target: bitmask - CHAN=1, PRIVMSG=2, NOTICE=4, PART=8, QUIT=16, ALL=31
     inline int           getTarget()           const { return target; }
     // TEXT_REPEAT only: case-folds the dedup key used to detect repeated
     // text. Has no effect on TEXT event regex matching; use an inline

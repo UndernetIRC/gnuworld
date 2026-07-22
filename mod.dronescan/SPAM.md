@@ -19,7 +19,7 @@ Spam detection works on a **score-and-threshold** model:
    ADDACTION`.
 4. **Monitored channels** (`SPAM CHAN`) are the channels dronescan actually
    watches. Watching is done either by the bot itself (`joinasservice`) or
-   by a **spy client** (`SPAM SPYCLIENT`) — a fake IRC client introduced via
+   by a **spy client** (`SPAM SPYCLIENT`) - a fake IRC client introduced via
    P10 that sits in the channel like a normal user.
 
 ```
@@ -37,9 +37,9 @@ column-level comments there are the authoritative reference. Summary:
 |---|---|
 | `spam_events` | What to detect: type, regex/threshold `param`, `target` bitmask, points, expiry, TEXT_REPEAT-specific columns. |
 | `spam_rules` | A point `threshold`, scoring granularity (`points_per`, `score_globally`), optional `wait_on_rule_id` chaining, `allchans` channel-scope flag. |
-| `spam_rule_events` | Many-to-many rule↔event link, with optional `points_override`. |
+| `spam_rule_events` | Many-to-many rule<->event link, with optional `points_override`. |
 | `spam_actions` | Reusable action templates: `GLINE`/`KILL`/`REPORT`, duration, reason, delay (+ jitter via `rand_min`/`rand_max`), `prefix_auto` (GLINE reason prefix). |
-| `spam_rule_actions` | Many-to-many rule↔action link, with per-binding overrides for duration/reason/delay. |
+| `spam_rule_actions` | Many-to-many rule<->action link, with per-binding overrides for duration/reason/delay. |
 | `spam_exclusions` | `CHAN`/`NICK`/`IP`/`OPER` entries that bypass scanning entirely, plus `GATEWAYIP` entries that force `user@ip` gline masks. |
 | `monitored_channels` | Channels dronescan watches; `forcejoin`, `joinasservice`, and last-triggered-rule tracking. |
 | `spam_rule_channels` | Per-rule channel exclusion/inclusion list (meaning depends on `spam_rules.allchans`). |
@@ -47,7 +47,7 @@ column-level comments there are the authoritative reference. Summary:
 | `spyclients` | Fake IRC clients (nick/user/host/ip/realname/account/modes) available to cover monitored channels. |
 
 Row identity for `spam_events`, `spam_rules`, and `spam_actions` is a
-case-insensitive-unique `name` (migration `004_spam_names_unique.sql`) — the
+case-insensitive-unique `name` (migration `004_spam_names_unique.sql`) - the
 admin command never asks for a numeric id for these three objects.
 
 Schema evolves via the numbered files in
@@ -89,7 +89,7 @@ Controls which traffic sources a `TEXT`/`TEXT_REPEAT` event watches
 | `ALL` | 255 | Everything |
 
 `chan` is a command-layer alias for `CHAN_PRIV|CHAN_NOT` (5); `ctcp` is an
-alias for `CTCP_PRIV|CTCP_CHAN` (192). There is no separate DCC bit — match
+alias for `CTCP_PRIV|CTCP_CHAN` (192). There is no separate DCC bit - match
 DCC requests with a regex like `^DCC` scoped to `ctcp_priv`/`ctcp_chan`.
 
 ### TEXT_REPEAT
@@ -117,12 +117,12 @@ same window keep scoring.
 2. **`scoreEvent(ev, actor, channel, now, text)`** finds every rule linked
    to the event, builds a scoring key via `buildScoringKey()`, and
    increments an in-memory occurrence counter for that
-   `(rule, actor-or-IP, channel)` bucket — capped at `max_occurrence` if
+   `(rule, actor-or-IP, channel)` bucket - capped at `max_occurrence` if
    set, and reset if the event's `point_expiry` window has elapsed.
 3. **`buildScoringKey(rule, actor, channel)`** produces
    `"<rule_id>.<channel-or-privmsg>.<unit>"` (or without the channel
    segment if `score_globally` is true). `unit` is the client's numeric
-   nick, or its IP if `points_per = IP` — so IP-scoped rules aggregate
+   nick, or its IP if `points_per = IP` - so IP-scoped rules aggregate
    points across all nicks sharing an address.
 4. **`evaluateSpamRules(actor, channel, displayChannels)`** runs after
    scoring, for every affected actor. For each enabled rule in scope for
@@ -132,12 +132,12 @@ same window keep scoring.
    `threshold`, **`fireRuleActions()`** runs and the rule's score buckets
    are reset to prevent immediate re-triggering.
 5. **`fireRuleActions(rule, actor, displayChannels, triggerText)`** resolves
-   every enabled action linked to the rule — reason, duration, and effective
+   every enabled action linked to the rule - reason, duration, and effective
    delay (`spam_rule_actions.delay_override`, else `spam_actions.delay`,
    plus jitter from `rand_min`/`rand_max` when both are set:
    `actual_delay = delay + random(rand_min, rand_max)`). An action whose
    effective delay is `<= 0` runs immediately via **`executeSpamAction()`**;
-   otherwise it's captured (by value — action type, reason, duration, the
+   otherwise it's captured (by value - action type, reason, duration, the
    `SpamActor` snapshot, rule name, channels, trigger text) into a
    `PendingSpamAction` and scheduled on a one-shot timer
    (`pendingSpamActionTimers`), the same delayed-timer pattern used for spy
@@ -151,8 +151,8 @@ same window keep scoring.
      mask is `*@ip`, unless `ip` matches a `GATEWAYIP` exclusion entry, in
      which case it's `user@ip` instead (see [EXCLUSION](#exclusion)). Every
      queued gline (SPAM-triggered or not) gets a `[N] ` prefix from
-     `processGlineQueue()` — `N` is the number of clients currently
-     connected from that IP — and, when the action's `prefix_auto` is true
+     `processGlineQueue()` - `N` is the number of clients currently
+     connected from that IP - and, when the action's `prefix_auto` is true
      (the default), an additional `AUTO ` ahead of that:
      `AUTO [N] reason` vs `[N] reason`.
    - `KILL`: looks up the offender's still-connected `iClient` by numeric
@@ -161,12 +161,12 @@ same window keep scoring.
 
    The `SpamActor` snapshot (nick/user/host/ip/numeric) is captured at
    match time, so REPORT/GLINE still resolve correctly even if the offender
-   has since quit (or a delayed action outlives their connection) — this is
+   has since quit (or a delayed action outlives their connection) - this is
    what makes crossuser `TEXT_REPEAT` reporting work. KILL is the one action
    that needs the offender still connected. Because `PendingSpamAction`
    holds no pointer into the triggering `sqlSpamRule`/`sqlSpamAction`, a
    `RULE DEL`/`ACTION DEL` while a delayed action is in flight cannot leave
-   a dangling reference — the action still fires with the values resolved
+   a dangling reference - the action still fires with the values resolved
    at trigger time (same principle already relied on for `glineQueue`).
 
 `wait_on_rule_id` chains rules ("only GLINE if the REPORT rule already
@@ -227,7 +227,7 @@ SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 "Observer"
   to existing rules immediately, and a mandatory `-repeat_count <n>` when
   `<type>` is `TEXT_REPEAT` (invalid otherwise).
 - `RULE ADD` accepts repeatable `-action <action_name>` to link existing
-  actions immediately (no override values in that shorthand — use
+  actions immediately (no override values in that shorthand - use
   `RULE ADDACTION` afterward for duration/reason/delay overrides).
 - `RULE SET wait_on_rule_id` and `EVENT SET requires_event_id` take a
   rule/event **name** as the value, or `none`/empty to clear the
@@ -246,13 +246,13 @@ SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 "Observer"
 
 `CHAN`/`NICK`/`IP`/`OPER` entries that exempt scanning entirely; still
 id-keyed (no `name` column). Checked once per `processSpamText()` call, right
-after the actor's identity is captured and before any event is evaluated —
+after the actor's identity is captured and before any event is evaluated -
 a match bypasses all spam detection for that call. `value` is a glob mask
 (`gnuworld::match()`, case-insensitive; IP/CIDR masks are matched natively):
 `CHAN` against the channel the traffic occurred in (never matches direct
 PRIVMSG/NOTICE, which has no channel), `NICK`/`IP` against the actor's
 nick/ip, and `OPER` against the actor's nick but only when the client
-currently has `+o` (IRC operator) set — use `*` there to exempt opers
+currently has `+o` (IRC operator) set - use `*` there to exempt opers
 unconditionally.
 
 `GATEWAYIP` is different: it does **not** bypass detection. It marks an IP
@@ -300,7 +300,7 @@ returns "Access denied."
   not yet evaluated by `processSpamText`.
 - `spam_rules.wait_on_rule_id` and `spam_events.requires_event_id` are
   loaded from the DB and fully settable via `RULE SET`/`EVENT SET`, but
-  nothing in `evaluateSpamRules`/`scoreEvent` actually consults them yet —
+  nothing in `evaluateSpamRules`/`scoreEvent` actually consults them yet -
   rule chaining and event gating are not enforced despite being described
   above as if they were.
 - `spam_exclusions.value` for `OPER` is matched only against the actor's
