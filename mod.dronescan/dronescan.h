@@ -52,6 +52,7 @@
 
 #define JF_GLINED "gnuworld.ds.jf.glined"
 #define JF_CSERVICE "gnuworld.ds.jf.cservice"
+#define SPAM_ACTION "gnuworld.ds.spam.action"
 
 #endif
 #define RecentlyGlinedIpsSize 150
@@ -199,6 +200,9 @@ class dronescan : public xClient {
     /** Report a SQL error to the appropriate places. */
     void doSqlError(const std::string&, const std::string&);
 
+    /** Log a dispatched command to the comlog table (read back by LASTCOM). */
+    void logCommandMessage(const iClient* theClient, const std::string& Message);
+
     /** Change the current state. */
     void changeState(DS_STATE);
 
@@ -261,6 +265,11 @@ class dronescan : public xClient {
 
 #ifdef ENABLE_LOG4CPLUS
     void log(const char*, const char*, ...);
+
+    /** Log a pre-built message with no fixed-size buffer, so long
+     * (untruncated) messages - e.g. full SPAM trigger text - are never
+     * cut off. */
+    void log(const char* cat, const std::string& message);
 #endif
 
     /** Set the topic of the console channel. */

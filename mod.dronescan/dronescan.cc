@@ -260,6 +260,7 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     RegisterCommand(new FAKECommand(this, "FAKE", "(activate)"));
     RegisterCommand(new HELLOCommand(this, "HELLO", "<account>"));
     RegisterCommand(new HELPCommand(this, "HELP", "(<command>)"));
+    RegisterCommand(new LASTCOMCommand(this, "LASTCOM", "(<count>) (<days>)"));
     RegisterCommand(new LISTCommand(this, "LIST", "(active|fakeclients|joinflood|users)"));
     RegisterCommand(new MODUSERCommand(this, "MODUSER", "(ACCESS) <user> <level>"));
     RegisterCommand(new QUOTECommand(this, "QUOTE", "<string>"));
@@ -612,6 +613,13 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
             Reply(theClient, "Sorry, I do not accept commands during a burst.");
             return ;
     }*/
+
+    /* Only log commands that are actually going to be dispatched - either
+     * via commandMap or one of the legacy hardcoded keywords below - not
+     * every raw/mistyped line an oper sends. */
+    static const std::set<std::string> legacyCommands{"INVITE", "STATS", "RESET", "INFO", "SET"};
+    if (commandMap.find(Command) != commandMap.end() || legacyCommands.count(Command))
+        logCommandMessage(theClient, Message);
 
     commandMapType::iterator commandHandler = commandMap.find(Command);
 
@@ -1574,6 +1582,21 @@ void dronescan::doSqlError(const string& theQuery, const string& theError) {
     elog << "SQL> " << theError << std::endl;
 }
 
+/** Log a dispatched command to the comlog table (read back by LASTCOM). */
+void dronescan::logCommandMessage(const iClient* theClient, const string& Message) {
+    const string username =
+        !theClient->getAccount().empty() ? theClient->getAccount() : theClient->getNickName();
+
+    std::stringstream insertQ;
+    insertQ << "INSERT into comlog (ts, username, command) VALUES (" << ::time(0) << ", '"
+            << escapeSQLChars(username) << "', '" << escapeSQLChars(Message) << "')"
+            << std::ends;
+
+    if (!SQLDb->Exec(insertQ.str())) {
+        doSqlError(insertQ.str(), SQLDb->ErrorMessage());
+    }
+}
+
 /** This function allows us to change our current state. */
 void dronescan::changeState(DS_STATE newState) {
     if (currentState == newState)
@@ -2130,6 +2153,10 @@ void dronescan::log(const char* cat, const char* format, ...) {
     va_end(_list);
 
     log4cplus::Logger::getInstance(cat).log(log4cplus::INFO_LOG_LEVEL, buffer);
+}
+
+void dronescan::log(const char* cat, const string& message) {
+    log4cplus::Logger::getInstance(cat).log(log4cplus::INFO_LOG_LEVEL, message);
 }
 #endif
 
@@ -3169,6 +3196,20 @@ std::string sanitizeSpamTextForReport(const std::string& text)
     return out;
 }
 
+// Same control-byte stripping as sanitizeSpamTextForReport() (so an
+// embedded CR/LF can't split a log line), but with no length cap and no
+// "..." - the SPAM action log must hold the complete, untruncated text.
+std::string sanitizeSpamTextForLog(const std::string& text)
+{
+    std::string out;
+    out.reserve(text.size());
+    for (size_t i = 0; i < text.size(); ++i) {
+        unsigned char c = static_cast<unsigned char>(text[i]);
+        out += (c < 0x20 || c == 0x7F || (c >= 0x80 && c <= 0x9F)) ? ' ' : static_cast<char>(c);
+    }
+    return out;
+}
+
 } // anonymous namespace
 
 /**
@@ -3292,6 +3333,15 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         }
         Message(consoleChannel, "%s", buf);
 
+#ifdef ENABLE_LOG4CPLUS
+        std::ostringstream logMsg;
+        logMsg << "SPAM[REPORT] " << nick << '!' << user << '@' << host << " (" << ip
+               << ") triggered rule '" << ruleName << "' in "
+               << (displayChannels.empty() ? "(no channel)" : displayChannels)
+               << " - text: \"" << sanitizeSpamTextForLog(triggerText) << '"';
+        log(SPAM_ACTION, logMsg.str());
+#endif
+
     } else if (actionType == "GLINE") {
         const string mask = glineNeedsIdent(ip) ? (user + "@" + ip) : ("*@" + ip);
         glineData* gd = new (std::nothrow)
@@ -3306,6 +3356,14 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
             ruleName.c_str(), reason.c_str());
         Message(consoleChannel, "%s", buf);
 
+#ifdef ENABLE_LOG4CPLUS
+        std::ostringstream logMsg;
+        logMsg << "SPAM[GLINE] Queued GLINE for " << nick << '!' << user << '@' << host << " ("
+               << ip << ") - mask: " << mask << " - duration: " << duration << "s - rule '"
+               << ruleName << "' - reason: " << sanitizeSpamTextForLog(reason);
+        log(SPAM_ACTION, logMsg.str());
+#endif
+
     } else if (actionType == "KILL") {
         iClient* target = Network->findClient(actor.numeric);
 
@@ -3316,6 +3374,13 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
                 nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
                 ruleName.c_str());
             Message(consoleChannel, "%s", buf);
+
+#ifdef ENABLE_LOG4CPLUS
+            std::ostringstream logMsg;
+            logMsg << "SPAM[KILL] " << nick << '!' << user << '@' << host << " (" << ip
+                   << ") - rule '" << ruleName << "' - client no longer connected, skipped";
+            log(SPAM_ACTION, logMsg.str());
+#endif
             return;
         }
 
@@ -3325,6 +3390,13 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
             nick.c_str(), user.c_str(), host.c_str(), ip.c_str(),
             ruleName.c_str(), reason.c_str());
         Message(consoleChannel, "%s", buf);
+
+#ifdef ENABLE_LOG4CPLUS
+        std::ostringstream logMsg;
+        logMsg << "SPAM[KILL] Killed " << nick << '!' << user << '@' << host << " (" << ip
+               << ") - rule '" << ruleName << "' - reason: " << sanitizeSpamTextForLog(reason);
+        log(SPAM_ACTION, logMsg.str());
+#endif
     }
 }
 

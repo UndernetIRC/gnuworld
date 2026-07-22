@@ -35,6 +35,7 @@ const unsigned short check = 300;
 const unsigned short fake = 300;
 const unsigned short list = 300;
 const unsigned short status = 300;
+const unsigned short lastcom = 300;
 
 /* Higher admin commands */
 
