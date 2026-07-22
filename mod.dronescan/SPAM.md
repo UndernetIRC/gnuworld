@@ -173,6 +173,21 @@ same window keep scoring.
 fired for this actor") and `requires_event_id` gates an event on another
 event having recently fired for the same user.
 
+### Logging
+
+Every `executeSpamAction()` outcome (REPORT, GLINE, KILL) is written, in
+addition to the console-channel announcement above, to a persistent
+`spam-action.log` file via the `gnuworld.ds.spam.action` log4cplus category
+(`bin/logging.properties`, same `DailyRollingFileAppender` mechanism as the
+existing `jf-glined.log`/`jf-cservice.log` join-flood logs). Unlike the
+console announcement — which truncates the trigger text to 200 bytes
+(`sanitizeSpamTextForReport()`) to keep it IRC-message-sized — the log file
+always holds the complete actor identity (nick!user@host/ip), rule name,
+and reason/trigger text, run through `sanitizeSpamTextForLog()` (same
+control-byte stripping, but no length cap and no `"..."`). Requires
+`--with-log4cplus` (see `CLAUDE.md`); logging is silently skipped if the
+module was built without it.
+
 ## Spy clients and monitored channels
 
 - `monitored_channels` lists the channels dronescan watches. Each can be
