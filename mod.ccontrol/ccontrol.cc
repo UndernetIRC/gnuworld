@@ -257,8 +257,9 @@ ccontrol::ccontrol(const string& configFileName) : xClient(configFileName) {
                                      true, commandLevel::flg_GLINE, false, true, false,
                                      operLevel::OPERLEVEL, false));
     RegisterCommand(new SCANGLINECommand(this, "SCANGLINE",
-                                         "<mask> "
-                                         "Search current network glines for glines matching <mask>",
+                                         "<mask>|ID <trackingid> "
+                                         "Search current network glines for glines matching "
+                                         "<mask>, or by tracking ID",
                                          false, commandLevel::flg_SCGLINE, false, true, false,
                                          operLevel::OPERLEVEL, false));
     RegisterCommand(new REMGLINECommand(this, "REMGLINE",
@@ -3474,7 +3475,7 @@ bool ccontrol::loadGlines() {
     }
 
     static const char* Main =
-        "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines";
+        "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason,TrackingId FROM glines";
 
     stringstream theQuery;
     theQuery << Main << ends;
@@ -3506,6 +3507,7 @@ bool ccontrol::loadGlines() {
         tempGline->setExpires(static_cast<time_t>(atoi(SQLDb->GetValue(i, 4).c_str())));
         tempGline->setLastUpdated(static_cast<time_t>(atoi(SQLDb->GetValue(i, 5).c_str())));
         tempGline->setReason(SQLDb->GetValue(i, 6));
+        tempGline->setTrackingId(SQLDb->GetValue(i, 7));
         addGline(tempGline);
     }
     return true;
@@ -4179,6 +4181,41 @@ void ccontrol::listGlines(iClient* theClient, string Mask) {
         }
     }
     Notice(theClient, "-= End Of Gline List =-");
+}
+
+void ccontrol::findGlineByTrackingId(iClient* theClient, const string& trackingId) {
+
+    ccGline* tempGline;
+    char gline_set[256];
+    string needle = " - ID: " + trackingId;
+
+    Notice(theClient, "-= Gline Search By ID: %s =-", trackingId.c_str());
+    for (glineIterator ptr = gline_begin(); ptr != gline_end(); ++ptr) {
+        tempGline = ptr->second;
+        if ((tempGline->getExpires() > ::time(0)) &&
+            (tempGline->getReason().find(needle) != string::npos)) {
+            sprintf(gline_set, "%s", Duration(time(NULL) - tempGline->getAddedOn()));
+            Notice(theClient,
+                   "Host: %s, Expires: [%ld] %s, Added by %s at [%ld] %s ago, Reason: %s",
+                   tempGline->getHost().c_str(), tempGline->getExpires(),
+                   Duration(tempGline->getExpires() - time(NULL)), tempGline->getAddedBy().c_str(),
+                   tempGline->getAddedOn(), gline_set, tempGline->getReason().c_str());
+        }
+    }
+
+    for (glineIterator ptr = rnGlineList.begin(); ptr != rnGlineList.end(); ++ptr) {
+        tempGline = ptr->second;
+        if ((tempGline->getExpires() > ::time(0)) &&
+            (tempGline->getReason().find(needle) != string::npos)) {
+            sprintf(gline_set, "%s", Duration(time(NULL) - tempGline->getAddedOn()));
+            Notice(theClient,
+                   "Host: %s, Expires: [%ld] %s, Added by %s at [%ld] %s ago, Reason: %s",
+                   tempGline->getHost().c_str(), tempGline->getExpires(),
+                   Duration(tempGline->getExpires() - time(NULL)), tempGline->getAddedBy().c_str(),
+                   tempGline->getAddedOn(), gline_set, tempGline->getReason().c_str());
+        }
+    }
+    Notice(theClient, "-= End Of Gline Search =-");
 }
 
 void ccontrol::listSuspended(iClient*) {}

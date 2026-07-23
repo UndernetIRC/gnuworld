@@ -306,9 +306,11 @@ SCAN		7	<-n realname> - match the specified realname (supports wildcards)
 SCAN		8	[-v] - display the first 15 matching users (rather than just a count)
 SCAN		9	[-i] - perform an ident report (listing number of unique idents found within the match)
 SCANGLINE		1	****** SCANGLINE COMMAND ******
-SCANGLINE		2	Scans the gline list for a gline matching a certain host
+SCANGLINE		2	Scans the gline list for a gline matching a certain host, or by tracking ID
 SCANGLINE		3	Syntax: /msg $BOT$ scangline <host mask>
 SCANGLINE		4	<host mask> - the host mask to lookup
+SCANGLINE		5	Syntax: /msg $BOT$ scangline ID <trackingid>
+SCANGLINE		6	<trackingid> - the tracking ID (shown at the end of a gline's reason as " - ID: ...") to look up
 SCHANGLINE		1	****** SCHANGLINE COMMAND ******
 SCHANGLINE		2	Glines all users on the given channel
 SCHANGLINE		3	Syntax: /msg $BOT$ schangline [-u] <#channel> [duration] <reason>

@@ -40,6 +40,11 @@ bool SCANGLINECommand::Exec(iClient* theClient, const string& Message) {
 
     bot->MsgChanLog("SCANGLINE %s\n", st.assemble(1).c_str());
 
+    if (st.size() >= 3 && string_upper(st[1]) == "ID") {
+        bot->findGlineByTrackingId(theClient, st[2]);
+        return true;
+    }
+
     bot->listGlines(theClient, st[1]);
 
     /*vector< const Gline* > glines = server->matchGline( st[ 1 ] ) ;

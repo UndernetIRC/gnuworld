@@ -768,6 +768,8 @@ class ccontrol : public xClient {
 
     void listGlines(iClient*, string Mask = "*");
 
+    void findGlineByTrackingId(iClient*, const string& trackingId);
+
     void listSuspended(iClient*);
 
     bool updateCommand(Command*);
