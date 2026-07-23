@@ -171,7 +171,7 @@ CREATE TABLE spam_events (
 --
 -- wait_on_rule_id: this rule only activates if the referenced rule has already
 --   fired for the same user (chained escalation).
---   Example: "only GLINE if the REPORT rule already fired."
+--   Example: "only GLINE if a lower-threshold rule for the same actor already fired."
 --
 -- allchans: controls which monitored_channels rows this rule applies to.
 --   true  (default): rule applies to ALL monitored channels.
@@ -190,6 +190,11 @@ CREATE TABLE spam_events (
 -- score_globally: controls whether this rule's scoring key aggregates points
 --   across all channels/privmsgs for a user (true), or is scoped separately
 --   per channel/privmsg (false, default). See dronescan.cc buildScoringKey().
+--
+-- silent: when true, a rule with zero enabled GLINE/KILL actions linked
+--   suppresses its console/report line when it fires (report-only rules go
+--   quiet). A rule with at least one enabled GLINE/KILL action always
+--   reports regardless of this flag. Defaults to false.
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_rules (
 	id                  serial       PRIMARY KEY,
@@ -208,6 +213,8 @@ CREATE TABLE spam_rules (
 	-- false = score per channel/privmsg separately; true = score globally for the user
 	score_globally      bool         NOT NULL DEFAULT false,
 	enabled             bool         NOT NULL DEFAULT true,
+	-- suppress report-only console line when true and no GLINE/KILL linked
+	silent              bool         NOT NULL DEFAULT false,
 	created_ts          int4         NOT NULL DEFAULT 0,
 	modified_ts         int4         NOT NULL DEFAULT 0,
 	modified_by         int                   DEFAULT NULL
@@ -235,7 +242,6 @@ CREATE TABLE spam_rule_events (
 -- Reusable action templates. action_type drives which fields are relevant:
 --   GLINE  : duration (seconds the gline lasts), reason
 --   KILL   : reason (sent with the kill)
---   REPORT : no extra fields; logs to the console channel
 --
 -- delay: base seconds to wait before executing the action after trigger.
 -- rand_min / rand_max: if both are set, a random value in [rand_min, rand_max]

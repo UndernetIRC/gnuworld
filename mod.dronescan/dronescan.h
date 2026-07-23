@@ -320,7 +320,7 @@ class dronescan : public xClient {
 
     /* Spam detection processing helpers */
     // Lightweight snapshot of a client's identity, captured at the moment
-    // traffic is observed so that scoring/actions (REPORT, GLINE) still work
+    // traffic is observed so that scoring/actions (report, GLINE) still work
     // even if the client has since quit (needed for crossuser TEXT_REPEAT).
     struct SpamActor {
         std::string numeric;   // YYXXX
@@ -345,8 +345,6 @@ class dronescan : public xClient {
         bool        prefixAuto;
         SpamActor   actor;
         std::string ruleName;
-        std::string displayChannels;
-        std::string triggerText;
         PendingSpamAction() : duration(-1), prefixAuto(true) {}
     };
 
@@ -360,20 +358,24 @@ class dronescan : public xClient {
                             time_t now, std::map<std::string, SpamActor>& actorsToEvaluate);
     void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
                           const std::string& displayChannels);
-    // Resolves each linked action's reason/duration/delay and either runs it
-    // immediately (executeSpamAction) or, if delay+jitter > 0, schedules a
-    // one-shot timer (see pendingSpamActionTimers) to run it later.
+    // Resolves each linked action's reason/duration/delay, builds and (unless
+    // the rule is silent with no GLINE/KILL actions) prints the single
+    // combined "[S] ..." console report line synchronously, then either runs
+    // each action immediately (executeSpamAction) or, if delay+jitter > 0,
+    // schedules a one-shot timer (see pendingSpamActionTimers) to run it
+    // later. Delayed actions are reported here, at schedule time - not when
+    // their timer actually fires.
     void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                          const std::string& displayChannels,
                          const std::string& triggerText);
-    // Runs a single already-resolved action (REPORT/GLINE/KILL). Called
-    // either directly from fireRuleActions (no delay) or from OnTimer, once
-    // a PendingSpamAction's timer fires.
+    // Runs a single already-resolved action (GLINE/KILL only - REPORT was
+    // removed). Called either directly from fireRuleActions (no delay) or
+    // from OnTimer, once a PendingSpamAction's timer fires. Never prints to
+    // console (that happens once, up front, in fireRuleActions); only queues
+    // the GLINE / calls Kill() and writes the log4cplus audit line.
     void executeSpamAction(const std::string& actionType, const std::string& reason,
                            int duration, bool prefixAuto, const SpamActor& actor,
-                           const std::string& ruleName,
-                           const std::string& displayChannels,
-                           const std::string& triggerText);
+                           const std::string& ruleName);
     // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
     // rule->isScoreGlobally() is true (channel segment omitted). unit is the
     // client's numeric nick, or its IP when rule->getPointsPer() == "IP".

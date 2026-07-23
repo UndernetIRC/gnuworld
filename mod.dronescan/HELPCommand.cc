@@ -134,13 +134,15 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "                        afterward if you need dur/reason/delay overrides.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: name  description  threshold  wait_on_rule_id (rule name, or \"none\")  enabled");
-    bot->Reply(theClient, "            points_per  score_globally  allchans");
+    bot->Reply(theClient, "            points_per  score_globally  allchans  silent");
     bot->Reply(theClient, "  allchans=1 : rule applies to every channel (use ADDCHAN to exclude).");
     bot->Reply(theClient, "  allchans=0 : rule applies only to channels added with ADDCHAN.");
+    bot->Reply(theClient, "  silent=1   : suppress the console report line when the rule has no");
+    bot->Reply(theClient, "               GLINE/KILL actions linked (report-only); never hides a real GLINE/KILL.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM RULE ADD anti_spam_global 50");
-    bot->Reply(theClient, "  SPAM RULE ADD anti_spam_secondary 30 -action gline_1h -action report_only");
+    bot->Reply(theClient, "  SPAM RULE ADD anti_spam_secondary 30 -action gline_1h -action kill_now");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global name anti_spam_v2");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global allchans yes");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global threshold 30");
@@ -159,8 +161,8 @@ static void helpSpamAction(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  LIST");
     bot->Reply(theClient, "  SET    <name> <field> <value>");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Action types: GLINE  KILL  REPORT");
-    bot->Reply(theClient, "  duration    : seconds for GLINE (ignored for KILL/REPORT)");
+    bot->Reply(theClient, "Action types: GLINE  KILL");
+    bot->Reply(theClient, "  duration    : seconds for GLINE (ignored for KILL)");
     bot->Reply(theClient, "  reason      : gline/kill reason string");
     bot->Reply(theClient, "  delay       : seconds to wait before firing (0 = immediate)");
     bot->Reply(theClient, "  prefix_auto : GLINE only, default yes - prepend \"AUTO \" ahead of the");
@@ -171,10 +173,9 @@ static void helpSpamAction(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM ACTION ADD gline_1h   GLINE  3600 \"Spam detected\"  0");
     bot->Reply(theClient, "  SPAM ACTION ADD kill_now   KILL   0    \"Spam\"            0");
-    bot->Reply(theClient, "  SPAM ACTION ADD report_only REPORT");
     bot->Reply(theClient, "  SPAM ACTION SET gline_1h name gline_short");
     bot->Reply(theClient, "  SPAM ACTION SET gline_1h duration 7200");
-    bot->Reply(theClient, "  SPAM ACTION DEL report_only");
+    bot->Reply(theClient, "  SPAM ACTION DEL kill_now");
 }
 
 static void helpSpamExclusion(dronescan* bot, const iClient* theClient)

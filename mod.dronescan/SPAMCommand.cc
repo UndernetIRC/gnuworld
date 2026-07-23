@@ -138,7 +138,7 @@ static bool isValidEventType(const string& t)
 
 static bool isValidActionType(const string& t)
 {
-    return (t == "GLINE" || t == "KILL" || t == "REPORT");
+    return (t == "GLINE" || t == "KILL");
 }
 
 static bool isValidExclusionType(const string& t)
@@ -726,7 +726,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
              it != bot->spamRulesMap.end(); ++it) {
             sqlSpamRule* rule = it->second;
             bot->Reply(theClient,
-                       "[%d] %-25s  Threshold: %-5d  AllChans: %-3s  WaitOnRule: %-4s  PointsPer: %-8s  Global: %-3s  Enabled: %s",
+                       "[%d] %-25s  Threshold: %-5d  AllChans: %-3s  WaitOnRule: %-4s  PointsPer: %-8s  Global: %-3s  Enabled: %-3s  Silent: %s",
                        rule->getId(),
                        rule->getName().c_str(),
                        rule->getThreshold(),
@@ -735,7 +735,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                            ? std::to_string(rule->getWaitOnRuleId()).c_str() : "none",
                        rule->getPointsPer().c_str(),
                        rule->isScoreGlobally() ? "yes" : "no",
-                       rule->isEnabled() ? "yes" : "no");
+                       rule->isEnabled() ? "yes" : "no",
+                       rule->isSilent() ? "yes" : "no");
 
             // Linked events
             dronescan::spamRuleEventsMapType::const_iterator rei =
@@ -819,6 +820,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         bot->Reply(theClient, "PointsPer   : %s", rule->getPointsPer().c_str());
         bot->Reply(theClient, "Global      : %s", rule->isScoreGlobally() ? "yes" : "no");
         bot->Reply(theClient, "Enabled     : %s", rule->isEnabled() ? "yes" : "no");
+        bot->Reply(theClient, "Silent      : %s", rule->isSilent() ? "yes" : "no");
 
         // Channel inclusion/exclusion list
         dronescan::spamRuleChannelsMapType::const_iterator rci =
@@ -1207,10 +1209,12 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             bot->getSqlDb()->Exec(dq);
             bot->spamRuleChannelsMap.erase(id);
             rule->setAllChans(newVal);
+        } else if (field == "silent") {
+            rule->setSilent(value == "1" || value == "yes" || value == "true");
         } else {
             bot->Reply(theClient,
                 "Unknown field '%s'. Valid: name, description, threshold, wait_on_rule_id, "
-                "enabled, points_per, score_globally, allchans",
+                "enabled, points_per, score_globally, allchans, silent",
                 field.c_str());
             return;
         }
@@ -1382,7 +1386,7 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         }
         const string atype = string_upper(st[4]);
         if (!isValidActionType(atype)) {
-            bot->Reply(theClient, "Invalid action type. Use: GLINE, KILL, REPORT");
+            bot->Reply(theClient, "Invalid action type. Use: GLINE, KILL");
             return;
         }
 
@@ -1456,7 +1460,7 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         } else if (field == "action_type") {
             const string atype = string_upper(value);
             if (!isValidActionType(atype)) {
-                bot->Reply(theClient, "Invalid action type. Use: GLINE, KILL, REPORT");
+                bot->Reply(theClient, "Invalid action type. Use: GLINE, KILL");
                 return;
             }
             act->setActionType(atype);

@@ -15,8 +15,10 @@ Spam detection works on a **score-and-threshold** model:
    **threshold**. When an actor's accumulated points from a rule's linked
    events reach the threshold, the rule fires.
 3. **Actions** (`SPAM ACTION`) describe what happens when a rule fires
-   (GLINE, KILL, or REPORT), and are linked to rules via `SPAM RULE
-   ADDACTION`.
+   (GLINE or KILL), and are linked to rules via `SPAM RULE ADDACTION`.
+   Reporting is no longer a linkable action: a single combined console
+   report line is printed automatically whenever a rule fires, governed by
+   the rule's `silent` flag (see [Console reporting](#console-reporting)).
 4. **Monitored channels** (`SPAM CHAN`) are the channels dronescan actually
    watches. Watching is done either by the bot itself (`joinasservice`) or
    by a **spy client** (`SPAM SPYCLIENT`) - a fake IRC client introduced via
@@ -36,9 +38,9 @@ column-level comments there are the authoritative reference. Summary:
 | Table | Purpose |
 |---|---|
 | `spam_events` | What to detect: type, regex/threshold `param`, `target` bitmask, points, expiry, TEXT_REPEAT-specific columns. |
-| `spam_rules` | A point `threshold`, scoring granularity (`points_per`, `score_globally`), optional `wait_on_rule_id` chaining, `allchans` channel-scope flag. |
+| `spam_rules` | A point `threshold`, scoring granularity (`points_per`, `score_globally`), optional `wait_on_rule_id` chaining, `allchans` channel-scope flag, `silent` flag (suppress report-only console lines). |
 | `spam_rule_events` | Many-to-many rule<->event link, with optional `points_override`. |
-| `spam_actions` | Reusable action templates: `GLINE`/`KILL`/`REPORT`, duration, reason, delay (+ jitter via `rand_min`/`rand_max`), `prefix_auto` (GLINE reason prefix). |
+| `spam_actions` | Reusable action templates: `GLINE`/`KILL`, duration, reason, delay (+ jitter via `rand_min`/`rand_max`), `prefix_auto` (GLINE reason prefix). |
 | `spam_rule_actions` | Many-to-many rule<->action link, with per-binding overrides for duration/reason/delay. |
 | `spam_exclusions` | `CHAN`/`NICK`/`IP`/`OPER` entries that bypass scanning entirely, plus `GATEWAYIP` entries that force `user@ip` gline masks. |
 | `monitored_channels` | Channels dronescan watches; `forcejoin`, `joinasservice`, and last-triggered-rule tracking. |
@@ -135,18 +137,23 @@ same window keep scoring.
    every enabled action linked to the rule - reason, duration, and effective
    delay (`spam_rule_actions.delay_override`, else `spam_actions.delay`,
    plus jitter from `rand_min`/`rand_max` when both are set:
-   `actual_delay = delay + random(rand_min, rand_max)`). An action whose
-   effective delay is `<= 0` runs immediately via **`executeSpamAction()`**;
-   otherwise it's captured (by value - action type, reason, duration, the
-   `SpamActor` snapshot, rule name, channels, trigger text) into a
-   `PendingSpamAction` and scheduled on a one-shot timer
+   `actual_delay = delay + random(rand_min, rand_max)`) - into a list of
+   `ResolvedSpamAction`s, *before* dispatching anything. It then builds and
+   prints the single combined `[S]` console report line synchronously (see
+   [Console reporting](#console-reporting)), showing each action's
+   *planned* delay - so a delayed GLINE/KILL is reported at the moment the
+   rule fires, not later when the timer actually goes off. Only after that
+   does it dispatch: an action whose effective delay is `<= 0` runs
+   immediately via **`executeSpamAction()`**; otherwise it's captured (by
+   value - action type, reason, duration, the `SpamActor` snapshot, rule
+   name) into a `PendingSpamAction` and scheduled on a one-shot timer
    (`pendingSpamActionTimers`), the same delayed-timer pattern used for spy
    client joins (`scheduleSpyClientJoin`). `OnTimer()` calls
    `executeSpamAction()` when it fires.
 6. **`executeSpamAction(actionType, reason, duration, prefixAuto, actor,
-   ruleName, displayChannels, triggerText)`** runs a single resolved action:
-   - `REPORT`: logs a sanitized one-line summary (nick/user/host/ip, rule
-     name, channels, and the triggering text) to the console channel.
+   ruleName)`** runs a single resolved action and never touches the
+   console (the report line was already printed up front by
+   `fireRuleActions()`):
    - `GLINE`: queues a GLINE using the resolved duration and reason. The
      mask is `*@ip`, unless `ip` matches a `GATEWAYIP` exclusion entry, in
      which case it's `user@ip` instead (see [EXCLUSION](#exclusion)). Every
@@ -157,11 +164,11 @@ same window keep scoring.
      `AUTO [N] reason` vs `[N] reason`.
    - `KILL`: looks up the offender's still-connected `iClient` by numeric
      (`Network->findClient`) and kills it with the resolved reason; silently
-     skipped (with a console log line) if the client has since quit.
+     skipped (logged only, no console line) if the client has since quit.
 
    The `SpamActor` snapshot (nick/user/host/ip/numeric) is captured at
-   match time, so REPORT/GLINE still resolve correctly even if the offender
-   has since quit (or a delayed action outlives their connection) - this is
+   match time, so GLINE still resolves correctly even if the offender has
+   since quit (or a delayed action outlives their connection) - this is
    what makes crossuser `TEXT_REPEAT` reporting work. KILL is the one action
    that needs the offender still connected. Because `PendingSpamAction`
    holds no pointer into the triggering `sqlSpamRule`/`sqlSpamAction`, a
@@ -169,24 +176,55 @@ same window keep scoring.
    a dangling reference - the action still fires with the values resolved
    at trigger time (same principle already relied on for `glineQueue`).
 
-`wait_on_rule_id` chains rules ("only GLINE if the REPORT rule already
-fired for this actor") and `requires_event_id` gates an event on another
-event having recently fired for the same user.
+`wait_on_rule_id` chains rules ("only GLINE if a lower-threshold rule for
+the same actor already fired") and `requires_event_id` gates an event on
+another event having recently fired for the same user.
+
+### Console reporting
+
+Whenever a rule fires, `fireRuleActions()` prints a single combined line to
+the console channel, prefixed `[S]`:
+
+```
+[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1,#chan2 -> GLINE 3600s (now), KILL (now) - "spam text here"
+[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1 -> GLINE 3600s (in 30s) - "spam text"
+[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1 -> report only - "spam text"
+```
+
+Multiple actions are comma-joined in `rule->getActions()` order; each GLINE
+fragment includes its resolved duration, KILL does not; each fragment shows
+`(now)` for a zero/negative resolved delay or `(in Ns)` otherwise - the
+*planned* delay, not the actual fire time. Trigger text is sanitized and
+capped the same way as before (`sanitizeSpamTextForReport()`, 200 bytes +
+`"..."`) and the ` - "..."` suffix is omitted entirely when there's no
+trigger text. Action reason strings are intentionally not shown here (they
+remain in the log4cplus audit trail and on the real gline/kill itself) to
+keep the line short.
+
+`spam_rules.silent`: when a rule has **zero** enabled GLINE/KILL actions
+linked, it would otherwise print a "report only" line with no real action
+taken; if `silent` is true, that line is suppressed entirely. A rule with
+at least one enabled GLINE/KILL action **always** reports, regardless of
+`silent` - silent can never hide a real gline/kill.
 
 ### Logging
 
-Every `executeSpamAction()` outcome (REPORT, GLINE, KILL) is written, in
-addition to the console-channel announcement above, to a persistent
+Every `executeSpamAction()` outcome (GLINE, KILL) is written to a persistent
 `spam-action.log` file via the `gnuworld.ds.spam.action` log4cplus category
 (`bin/logging.properties`, same `DailyRollingFileAppender` mechanism as the
-existing `jf-glined.log`/`jf-cservice.log` join-flood logs). Unlike the
-console announcement — which truncates the trigger text to 200 bytes
-(`sanitizeSpamTextForReport()`) to keep it IRC-message-sized — the log file
-always holds the complete actor identity (nick!user@host/ip), rule name,
-and reason/trigger text, run through `sanitizeSpamTextForLog()` (same
-control-byte stripping, but no length cap and no `"..."`). Requires
-`--with-log4cplus` (see `CLAUDE.md`); logging is silently skipped if the
-module was built without it.
+existing `jf-glined.log`/`jf-cservice.log` join-flood logs). This is
+independent of, and timed differently from, the `[S]` console line: the
+console line is printed once by `fireRuleActions()`, at the moment the rule
+fires - for a delayed action, that's at schedule time, showing the planned
+delay - while the log4cplus line is written by `executeSpamAction()` at
+actual execution time (immediately, or whenever the delay timer fires),
+recording what really happened and when. The log file also holds the
+complete actor identity (nick!user@host/ip), rule name, and
+reason/trigger text run through `sanitizeSpamTextForLog()` (same
+control-byte stripping as `sanitizeSpamTextForReport()`, but no length cap
+and no `"..."`) - unlike the console line, which truncates trigger text to
+200 bytes. Requires `--with-log4cplus` (see `CLAUDE.md`); logging is
+silently skipped if the module was built without it.
 
 ## Spy clients and monitored channels
 
@@ -256,6 +294,11 @@ SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 "Observer"
   to channels added via `ADDCHAN` (inclusion/whitelist). Toggling requires
   clearing existing `ADDCHAN` entries first (enforced by the command, not
   the DB).
+- `RULE silent`: `0` (default) = always print the combined `[S]` console
+  line when the rule fires; `1` = suppress that line when the rule has no
+  enabled GLINE/KILL actions linked (report-only). A rule with at least one
+  enabled GLINE/KILL action always reports regardless of this flag - see
+  [Console reporting](#console-reporting).
 
 ### EXCLUSION
 
