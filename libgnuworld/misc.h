@@ -294,6 +294,13 @@ std::string escapeJsonString(const std::string& input);
 /* Returns current UTC timestamp in ISO 8601 format. */
 std::string getCurrentTimestamp();
 
+/* Generates a unique gline tracking ID: "<prefix><epoch-seconds>-<counter>".
+ * The counter is a per-process value that never resets, so combined with
+ * the current time (taken at the moment of each call) the result is never
+ * reused, even across a process restart.
+ */
+std::string generateGlineId(char prefix);
+
 } // namespace gnuworld
 
 #endif /* __MISC__ */

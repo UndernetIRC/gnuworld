@@ -46,7 +46,8 @@ namespace uworld {
 unsigned int ccGline::numAllocated = 0;
 
 ccGline::ccGline(dbHandle* _SQLDb)
-    : Id(), AddedBy(), AddedOn(0), Expires(0), LastUpdated(0), Reason(), SQLDb(_SQLDb) {
+    : Id(), AddedBy(), AddedOn(0), Expires(0), LastUpdated(0), Reason(), TrackingId(),
+      SQLDb(_SQLDb) {
     ++numAllocated;
 }
 
@@ -70,13 +71,14 @@ bool ccGline::Insert() {
         return false;
     }
     // Now insert the new one
-    static const char* Main =
-        "INSERT INTO Glines (Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason) VALUES ('";
+    static const char* Main = "INSERT INTO Glines "
+                              "(Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason,TrackingId) "
+                              "VALUES ('";
 
     stringstream theQuery;
     theQuery << Main << escapeSQLChars(Host) << "','" << escapeSQLChars(AddedBy) << "'," << AddedOn
-             << "," << Expires << "," << LastUpdated << ",'" << escapeSQLChars(Reason) << "')"
-             << ends;
+             << "," << Expires << "," << LastUpdated << ",'" << escapeSQLChars(Reason) << "','"
+             << escapeSQLChars(TrackingId) << "')" << ends;
 
     elog << "Gline::Insert::sqlQuery> " << theQuery.str().c_str() << endl;
 
@@ -104,7 +106,8 @@ bool ccGline::Update() {
     stringstream theQuery;
     theQuery << Main << Id << "', Host = '" << escapeSQLChars(Host) << "', AddedBy = '"
              << escapeSQLChars(AddedBy) << "', AddedOn = " << AddedOn << ",ExpiresAt = " << Expires
-             << ",LastUpdated = " << LastUpdated << ",Reason = '" << escapeSQLChars(Reason) << "'"
+             << ",LastUpdated = " << LastUpdated << ",Reason = '" << escapeSQLChars(Reason)
+             << "',TrackingId = '" << escapeSQLChars(TrackingId) << "'"
              << " WHERE Id = " << Id << ends;
 
     elog << "ccontrol::Gline::Update> " << theQuery.str().c_str() << endl;
@@ -120,8 +123,8 @@ bool ccGline::Update() {
 }
 
 bool ccGline::loadData(int GlineId) {
-    static const char* Main =
-        "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Id = ";
+    static const char* Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason,"
+                               "TrackingId FROM glines WHERE Id = ";
 
     if (!dbConnected) {
         return false;
@@ -149,13 +152,14 @@ bool ccGline::loadData(int GlineId) {
     Expires = static_cast<time_t>(unsigned(atoi(SQLDb->GetValue(0, 4).c_str())));
     LastUpdated = static_cast<time_t>(unsigned(atoi(SQLDb->GetValue(0, 5).c_str())));
     Reason = SQLDb->GetValue(0, 6);
+    TrackingId = SQLDb->GetValue(0, 7);
 
     return true;
 }
 
 bool ccGline::loadData(const string& HostName) {
-    static const char* Main =
-        "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason FROM glines WHERE Host = '";
+    static const char* Main = "SELECT Id,Host,AddedBy,AddedOn,ExpiresAt,LastUpdated,Reason,"
+                               "TrackingId FROM glines WHERE Host = '";
 
     if (!dbConnected) {
         return false;
@@ -183,6 +187,7 @@ bool ccGline::loadData(const string& HostName) {
     Expires = static_cast<time_t>(atoi(SQLDb->GetValue(0, 4).c_str()));
     LastUpdated = static_cast<time_t>(atoi(SQLDb->GetValue(0, 5).c_str()));
     Reason = SQLDb->GetValue(0, 6);
+    TrackingId = SQLDb->GetValue(0, 7);
 
     return true;
 }

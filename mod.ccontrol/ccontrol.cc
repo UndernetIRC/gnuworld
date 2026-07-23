@@ -1944,6 +1944,9 @@ void ccontrol::addGlineToUplink(ccGline* theGline) {
     } else {
         Expires = theGline->getExpires() - time(0);
     }
+    string trackingId = generateGlineId('U');
+    theGline->setTrackingId(trackingId);
+    theGline->setReason(theGline->getReason() + " - ID: " + trackingId);
     MyUplink->setGline(theGline->getAddedBy(), theGline->getHost(), theGline->getReason(), Expires,
                        theGline->getLastUpdated(), this);
 }

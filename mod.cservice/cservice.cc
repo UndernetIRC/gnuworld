@@ -9422,6 +9422,7 @@ void cservice::addGlineToUplink(csGline* theGline) {
     } else {
         Expires = theGline->getExpires() - time(0);
     }
+    theGline->setReason(theGline->getReason() + " - ID: " + generateGlineId('X'));
     MyUplink->setGline(theGline->getAddedBy(), theGline->getHost(), theGline->getReason(), Expires,
                        theGline->getLastUpdated(), this);
 }

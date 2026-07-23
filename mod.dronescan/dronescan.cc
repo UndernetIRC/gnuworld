@@ -1556,7 +1556,8 @@ void dronescan::processGlineQueue() {
             us[0] = '\0';
             sprintf(us, "%d", userCount);
             std::string glineReason = (curGline->getPrefixAuto() ? string("AUTO [") : string("["))
-                                     + us + string("] ") + curGline->getReason();
+                                     + us + string("] ") + curGline->getReason()
+                                     + " - ID: " + generateGlineId('E');
             MyUplink->setGline(nickName, curGline->getHost(), glineReason, curGline->getExpires(),
                                ::time(0), this);
 

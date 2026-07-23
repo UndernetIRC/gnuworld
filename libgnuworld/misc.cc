@@ -748,4 +748,11 @@ std::string getCurrentTimestamp() {
     return oss.str();
 }
 
+std::string generateGlineId(char prefix) {
+    static unsigned long counter = 0;
+    std::ostringstream oss;
+    oss << prefix << static_cast<long>(::time(0)) << '-' << counter++;
+    return oss.str();
+}
+
 } // namespace gnuworld

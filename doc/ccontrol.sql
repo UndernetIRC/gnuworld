@@ -86,7 +86,8 @@ CREATE TABLE glines (
 	AddedOn INT4 NOT NULL,
 	ExpiresAt INT4 NOT NULL,
 	LastUpdated INT4 NOT NULL DEFAULT date_part('epoch', CURRENT_TIMESTAMP)::int,
-	Reason VARCHAR(255)
+	Reason VARCHAR(255),
+	TrackingId VARCHAR(32)
 	);
 				
 CREATE TABLE servers (

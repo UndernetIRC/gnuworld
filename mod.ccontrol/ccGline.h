@@ -56,6 +56,8 @@ class ccGline {
 
     inline const string& getReason() const { return Reason; }
 
+    inline const string& getTrackingId() const { return TrackingId; }
+
     // Methods for setting info
 
     inline void setId(const string& _Id) { Id = _Id; }
@@ -71,6 +73,8 @@ class ccGline {
     inline void setLastUpdated(const time_t& _LastUpdated) { LastUpdated = _LastUpdated; }
 
     inline void setReason(const string& _Reason) { Reason = _Reason; }
+
+    inline void setTrackingId(const string& _TrackingId) { TrackingId = _TrackingId; }
 
     inline void setSqldb(dbHandle* _SQLDb) { SQLDb = _SQLDb; }
 
@@ -96,6 +100,7 @@ class ccGline {
     time_t Expires;
     time_t LastUpdated;
     string Reason;
+    string TrackingId;
     dbHandle* SQLDb;
 
 }; // class ccGline
