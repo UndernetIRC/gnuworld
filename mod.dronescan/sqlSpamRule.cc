@@ -23,7 +23,8 @@ sqlSpamRule::sqlSpamRule(dbHandle* _SQLDb)
     : id(0), name(), description(), threshold(10),
       wait_on_rule_id(0), allchans(true), points_per("CLIENT"),
       score_globally(false),
-      enabled(true), silent(false), created_ts(0), modified_ts(0), modified_by(0),
+      enabled(true), silent(false), report_source("BOT"),
+      created_ts(0), modified_ts(0), modified_by(0),
       SQLDb(_SQLDb)
 {}
 
@@ -31,7 +32,7 @@ sqlSpamRule::~sqlSpamRule() {}
 
 // Column order matches the SELECT in preloadSpamRules():
 // id, name, description, threshold, wait_on_rule_id,
-// allchans, points_per, score_globally, enabled, silent,
+// allchans, points_per, score_globally, enabled, silent, report_source,
 // created_ts, modified_ts, modified_by
 void sqlSpamRule::setAllMembers(int row)
 {
@@ -47,9 +48,11 @@ void sqlSpamRule::setAllMembers(int row)
     score_globally       = (SQLDb->GetValue(row, 7) == "t");
     enabled              = (SQLDb->GetValue(row, 8) == "t");
     silent               = (SQLDb->GetValue(row, 9) == "t");
-    created_ts           = atoi(SQLDb->GetValue(row, 10).c_str());
-    modified_ts          = atoi(SQLDb->GetValue(row, 11).c_str());
-    const string modBy   = SQLDb->GetValue(row, 12);
+    const string rs      = SQLDb->GetValue(row, 10);
+    report_source        = !rs.empty() ? rs : "BOT";
+    created_ts           = atoi(SQLDb->GetValue(row, 11).c_str());
+    modified_ts          = atoi(SQLDb->GetValue(row, 12).c_str());
+    const string modBy   = SQLDb->GetValue(row, 13);
     modified_by          = !modBy.empty() ? atoi(modBy.c_str()) : 0;
 }
 
@@ -66,6 +69,7 @@ bool sqlSpamRule::commit()
       << "score_globally = "     << (score_globally ? "true" : "false") << ", "
       << "enabled = "            << (enabled ? "true" : "false") << ", "
       << "silent = "             << (silent ? "true" : "false") << ", "
+      << "report_source = "      << "'" << escapeSQLChars(report_source) << "', "
       << "modified_ts = "        << modified_ts << ", "
       << "modified_by = "        << (modified_by > 0 ? std::to_string(modified_by) : "NULL")
       << " WHERE id = "          << id;
@@ -82,7 +86,8 @@ bool sqlSpamRule::insert()
     stringstream q;
     q << "INSERT INTO spam_rules "
       << "(name, description, threshold, wait_on_rule_id, allchans, "
-      << "points_per, score_globally, enabled, silent, created_ts, modified_ts, modified_by) VALUES ("
+      << "points_per, score_globally, enabled, silent, report_source, "
+      << "created_ts, modified_ts, modified_by) VALUES ("
       << "'"  << escapeSQLChars(name)        << "', "
       << "'"  << escapeSQLChars(description) << "', "
       << threshold << ", "
@@ -92,6 +97,7 @@ bool sqlSpamRule::insert()
       << (score_globally ? "true" : "false") << ", "
       << (enabled ? "true" : "false") << ", "
       << (silent  ? "true" : "false") << ", "
+      << "'" << escapeSQLChars(report_source) << "', "
       << created_ts  << ", "
       << modified_ts << ", "
       << (modified_by > 0 ? std::to_string(modified_by) : "NULL")

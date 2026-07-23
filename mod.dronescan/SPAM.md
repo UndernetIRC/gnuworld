@@ -38,7 +38,7 @@ column-level comments there are the authoritative reference. Summary:
 | Table | Purpose |
 |---|---|
 | `spam_events` | What to detect: type, regex/threshold `param`, `target` bitmask, points, expiry, TEXT_REPEAT-specific columns. |
-| `spam_rules` | A point `threshold`, scoring granularity (`points_per`, `score_globally`), optional `wait_on_rule_id` chaining, `allchans` channel-scope flag, `silent` flag (suppress report-only console lines). |
+| `spam_rules` | A point `threshold`, scoring granularity (`points_per`, `score_globally`), optional `wait_on_rule_id` chaining, `allchans` channel-scope flag, `silent` flag (suppress report-only console lines), `report_source` (`BOT`/`SPYCLIENT` - who the console report line is sent as). |
 | `spam_rule_events` | Many-to-many rule<->event link, with optional `points_override`. |
 | `spam_actions` | Reusable action templates: `GLINE`/`KILL`, duration, reason, delay (+ jitter via `rand_min`/`rand_max`), `prefix_auto` (GLINE reason prefix). |
 | `spam_rule_actions` | Many-to-many rule<->action link, with per-binding overrides for duration/reason/delay. |
@@ -207,6 +207,18 @@ taken; if `silent` is true, that line is suppressed entirely. A rule with
 at least one enabled GLINE/KILL action **always** reports, regardless of
 `silent` - silent can never hide a real gline/kill.
 
+`spam_rules.report_source`: who the `[S]` line appears to be sent by, still
+always posted in `consoleChannel`. `BOT` (default) sends it from the bot
+itself (E), same as before this field existed. `SPYCLIENT` instead sends it
+as the spy client currently covering the channel the triggering event
+happened in (`dronescan::chanActiveSpyMap`, kept up to date as spy clients
+join/part monitored channels) via `FakeMessage()`, without requiring that
+spy client to be a member of `consoleChannel`. If no spy client covers that
+channel - e.g. the channel is watched via `joinasservice` instead of a spy
+client, or the triggering event was a channel-less direct PRIVMSG/NOTICE -
+it silently falls back to `BOT`, so a firing rule always produces its
+report line.
+
 ### Logging
 
 Every `executeSpamAction()` outcome (GLINE, KILL) is written to a persistent
@@ -299,6 +311,10 @@ SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 "Observer"
   enabled GLINE/KILL actions linked (report-only). A rule with at least one
   enabled GLINE/KILL action always reports regardless of this flag - see
   [Console reporting](#console-reporting).
+- `RULE report_source`: `BOT` (default) or `SPYCLIENT` - who the `[S]`
+  console line is sent as. `SPYCLIENT` reports as the spy client currently
+  covering the triggering channel, falling back to `BOT` when none does -
+  see [Console reporting](#console-reporting).
 
 ### EXCLUSION
 

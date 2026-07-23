@@ -2575,7 +2575,7 @@ void dronescan::preloadSpamRules()
     std::stringstream q;
     q << "SELECT id, name, description, threshold, wait_on_rule_id, "
       << "allchans, points_per, score_globally, "
-      << "enabled, silent, created_ts, modified_ts, modified_by "
+      << "enabled, silent, report_source, created_ts, modified_ts, modified_by "
       << "FROM spam_rules ORDER BY id";
 
     if (!SQLDb->Exec(q, true)) {
@@ -3154,7 +3154,7 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
         }
 
         if (totalScore >= rule->getThreshold()) {
-            fireRuleActions(rule, actor, displayChannels, triggerText);
+            fireRuleActions(rule, actor, channel_name, displayChannels, triggerText);
 
             // Record last-triggered info for the monitored channel, for
             // visibility in SPAM CHAN LIST/SHOW
@@ -3279,6 +3279,7 @@ std::string buildSpamReportLine(const std::string& ruleName,
  * pattern used for delayed spy-client joins (see scheduleSpyClientJoin).
  */
 void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
+                                const std::string& channel_name,
                                 const std::string& displayChannels,
                                 const std::string& triggerText)
 {
@@ -3345,7 +3346,33 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         const std::string line = buildSpamReportLine(
             rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
             displayChannels, triggerText, resolved);
-        Message(consoleChannel, "%s", line.c_str());
+
+        // report_source == "SPYCLIENT": send the line as the spy client
+        // currently covering the triggering channel, if one can be
+        // resolved; otherwise (BOT, or no such spy client - e.g. a
+        // joinasservice channel or a channel-less event) fall back to the
+        // normal bot-sent console line.
+        iClient* reportAs = nullptr;
+        if (rule->getReportSource() == "SPYCLIENT" && !channel_name.empty()) {
+            chanActiveSpyMapType::const_iterator scit =
+                chanActiveSpyMap.find(string_lower(channel_name));
+            if (scit != chanActiveSpyMap.end()) {
+                liveSpyClientsMapType::const_iterator lit =
+                    liveSpyClientsMap.find(scit->second);
+                if (lit != liveSpyClientsMap.end())
+                    reportAs = lit->second;
+            }
+        }
+
+        if (reportAs) {
+            Channel* consoleChan = Network->findChannel(consoleChannel);
+            if (consoleChan)
+                FakeMessage(consoleChan, reportAs, line);
+            else
+                Message(consoleChannel, "%s", line.c_str());
+        } else {
+            Message(consoleChannel, "%s", line.c_str());
+        }
     }
 
     for (size_t i = 0; i < resolved.size(); ++i) {

@@ -195,6 +195,15 @@ CREATE TABLE spam_events (
 --   suppresses its console/report line when it fires (report-only rules go
 --   quiet). A rule with at least one enabled GLINE/KILL action always
 --   reports regardless of this flag. Defaults to false.
+--
+-- report_source: who the console report line appears to be sent by.
+--   BOT       (default): always sent by the bot itself (E).
+--   SPYCLIENT: sent as the spy client currently covering the channel the
+--     triggering event happened in (dronescan::chanActiveSpyMap), so
+--     operators can see which spy client caught it. Falls back to BOT
+--     when no spy client covers that channel (e.g. joinasservice channels,
+--     or a channel-less direct PRIVMSG/NOTICE event) - a firing rule
+--     always produces its report line.
 -- -----------------------------------------------------------------------------
 CREATE TABLE spam_rules (
 	id                  serial       PRIMARY KEY,
@@ -215,6 +224,8 @@ CREATE TABLE spam_rules (
 	enabled             bool         NOT NULL DEFAULT true,
 	-- suppress report-only console line when true and no GLINE/KILL linked
 	silent              bool         NOT NULL DEFAULT false,
+	-- BOT (default) or SPYCLIENT - who the console report line is sent as
+	report_source       varchar(16)  NOT NULL DEFAULT 'BOT',
 	created_ts          int4         NOT NULL DEFAULT 0,
 	modified_ts         int4         NOT NULL DEFAULT 0,
 	modified_by         int                   DEFAULT NULL

@@ -134,11 +134,14 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "                        afterward if you need dur/reason/delay overrides.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: name  description  threshold  wait_on_rule_id (rule name, or \"none\")  enabled");
-    bot->Reply(theClient, "            points_per  score_globally  allchans  silent");
+    bot->Reply(theClient, "            points_per  score_globally  allchans  silent  report_source");
     bot->Reply(theClient, "  allchans=1 : rule applies to every channel (use ADDCHAN to exclude).");
     bot->Reply(theClient, "  allchans=0 : rule applies only to channels added with ADDCHAN.");
     bot->Reply(theClient, "  silent=1   : suppress the console report line when the rule has no");
     bot->Reply(theClient, "               GLINE/KILL actions linked (report-only); never hides a real GLINE/KILL.");
+    bot->Reply(theClient, "  report_source=BOT (default) or SPYCLIENT : who the console report line is sent");
+    bot->Reply(theClient, "               as. SPYCLIENT reports as the spy client covering the channel the");
+    bot->Reply(theClient, "               trigger happened in, falling back to BOT when none does.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM RULE ADD anti_spam_global 50");

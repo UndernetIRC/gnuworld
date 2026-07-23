@@ -821,6 +821,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         bot->Reply(theClient, "Global      : %s", rule->isScoreGlobally() ? "yes" : "no");
         bot->Reply(theClient, "Enabled     : %s", rule->isEnabled() ? "yes" : "no");
         bot->Reply(theClient, "Silent      : %s", rule->isSilent() ? "yes" : "no");
+        bot->Reply(theClient, "ReportSource: %s", rule->getReportSource().c_str());
 
         // Channel inclusion/exclusion list
         dronescan::spamRuleChannelsMapType::const_iterator rci =
@@ -1211,10 +1212,18 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             rule->setAllChans(newVal);
         } else if (field == "silent") {
             rule->setSilent(value == "1" || value == "yes" || value == "true");
+        } else if (field == "report_source") {
+            const string rs = string_upper(value);
+            if (rs != "BOT" && rs != "SPYCLIENT") {
+                bot->Reply(theClient,
+                    "Invalid report_source '%s'. Valid: BOT, SPYCLIENT", value.c_str());
+                return;
+            }
+            rule->setReportSource(rs);
         } else {
             bot->Reply(theClient,
                 "Unknown field '%s'. Valid: name, description, threshold, wait_on_rule_id, "
-                "enabled, points_per, score_globally, allchans, silent",
+                "enabled, points_per, score_globally, allchans, silent, report_source",
                 field.c_str());
             return;
         }

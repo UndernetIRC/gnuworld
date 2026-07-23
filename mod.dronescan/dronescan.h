@@ -366,6 +366,7 @@ class dronescan : public xClient {
     // later. Delayed actions are reported here, at schedule time - not when
     // their timer actually fires.
     void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
+                         const std::string& channel_name,
                          const std::string& displayChannels,
                          const std::string& triggerText);
     // Runs a single already-resolved action (GLINE/KILL only - REPORT was

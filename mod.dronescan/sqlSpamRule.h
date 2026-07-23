@@ -48,6 +48,7 @@ class sqlSpamRule {
     inline bool          isScoreGlobally()     const { return score_globally; }
     inline bool          isEnabled()           const { return enabled; }
     inline bool          isSilent()            const { return silent; }
+    inline const string& getReportSource()     const { return report_source; }
     inline int           getCreatedTs()        const { return created_ts; }
     inline int           getModifiedTs()       const { return modified_ts; }
     inline int           getModifiedBy()       const { return modified_by; }
@@ -63,6 +64,7 @@ class sqlSpamRule {
     inline void setScoreGlobally(bool v)             { score_globally = v; }
     inline void setEnabled(bool v)                   { enabled = v; }
     inline void setSilent(bool v)                    { silent = v; }
+    inline void setReportSource(const string& v)     { report_source = v; }
     inline void setCreatedTs(int v)                  { created_ts = v; }
     inline void setModifiedTs(int v)                 { modified_ts = v; }
     inline void setModifiedBy(int v)                 { modified_by = v; }
@@ -96,6 +98,7 @@ class sqlSpamRule {
     bool   score_globally;
     bool   enabled;
     bool   silent;                // suppress report-only console line
+    string report_source;         // "BOT" or "SPYCLIENT" - who reports it
     int    created_ts;
     int    modified_ts;
     int    modified_by;          // 0 means NULL
