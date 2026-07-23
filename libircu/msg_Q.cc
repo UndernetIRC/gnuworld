@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include "server.h"
 #include "events.h"
@@ -56,21 +55,15 @@ bool msg_Q::Execute(const xParameters& Param) {
         return false;
     }
 
-    // Snapshot the quit reason and channel membership BEFORE removeClient
-    // severs the user<->channel associations, so consumers (e.g. dronescan
-    // spam scoring) can match the quit reason per channel.
     std::string quitReason = (Param.size() > 1) ? std::string(Param[1]) : std::string();
-    std::vector<std::string> quitChans;
-    for (iClient::const_channelIterator ci = theClient->channels_begin();
-         ci != theClient->channels_end(); ++ci)
-        quitChans.push_back((*ci)->getName());
+
+    // Post the event before removing the client so that listeners still see
+    // it fully attached (channel membership, numeric, nick all valid).
+    theServer->PostEvent(EVT_QUIT, static_cast<void*>(theClient),
+                         static_cast<void*>(&quitReason));
 
     // xNetwork::removeClient will remove user<->channel associations
     Network->removeClient(Param[0]);
-
-    theServer->PostEvent(EVT_QUIT, static_cast<void*>(theClient),
-                         static_cast<void*>(&quitReason),
-                         static_cast<void*>(&quitChans));
 
     delete theClient;
 

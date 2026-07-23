@@ -500,19 +500,17 @@ void dronescan::OnEvent(const eventType& theEvent, void* Data1, void* Data2, voi
         iClient* theClient = static_cast<iClient*>(theEvent == EVT_KILL ? Data2 : Data1);
 
         // QUIT-only: feed the quit reason into per-channel spam scoring for
-        // every monitored channel the user was on. msg_Q.cc passes the quit
-        // reason (Data2) and a channel-name snapshot (Data3) captured before
-        // the client was removed from its channels. The client is still a
-        // valid iClient* here (deleted only after PostEvent returns).
+        // every monitored channel the user was on. msg_Q.cc posts this event
+        // before removing the client from the network, so theClient is still
+        // attached to its channels here.
         if (theEvent == EVT_QUIT && currentState == RUN) {
             const std::string* quitReason = static_cast<const std::string*>(Data2);
-            const std::vector<std::string>* quitChans =
-                static_cast<const std::vector<std::string>*>(Data3);
-            if (quitReason && quitChans && !quitReason->empty()) {
-                for (std::vector<std::string>::const_iterator ci = quitChans->begin();
-                     ci != quitChans->end(); ++ci) {
-                    if (monitoredChannelsMap.count(string_lower(*ci)))
-                        processSpamText(theClient, *quitReason, spam_target::QUIT, *ci);
+            if (quitReason && !quitReason->empty()) {
+                for (iClient::const_channelIterator ci = theClient->channels_begin();
+                     ci != theClient->channels_end(); ++ci) {
+                    if (monitoredChannelsMap.count(string_lower((*ci)->getName())))
+                        processSpamText(theClient, *quitReason, spam_target::QUIT,
+                                        (*ci)->getName());
                 }
             }
         }

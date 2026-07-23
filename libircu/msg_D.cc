@@ -97,9 +97,8 @@ bool msg_D::Execute(const xParameters& Param) {
         return false;
     }
 
-    // Find and remove the client that was just killed.
-    // xNetwork::removeClient will remove user<->channel associations
-    iClient* target = Network->removeClient(Param[1]);
+    // Find the client that is being killed.
+    iClient* target = Network->findClient(Param[1]);
 
     // Make sure we have valid pointers to both source
     // and target.
@@ -108,7 +107,9 @@ bool msg_D::Execute(const xParameters& Param) {
         return false;
     }
 
-    // Notify all listeners of the EVT_KILL event.
+    // Notify all listeners of the EVT_KILL event before removing the client,
+    // so that listeners still see it fully attached (channel membership,
+    // numeric, nick all valid).
     string reason(Param[2]);
 
     if (source != NULL) {
@@ -118,6 +119,9 @@ bool msg_D::Execute(const xParameters& Param) {
         theServer->PostEvent(EVT_KILL, static_cast<void*>(serverSource), static_cast<void*>(target),
                              static_cast<void*>(&reason));
     }
+
+    // xNetwork::removeClient will remove user<->channel associations
+    Network->removeClient(target);
 
     // Deallocate the memory associated with this iClient.
     delete target;
