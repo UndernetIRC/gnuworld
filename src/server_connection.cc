@@ -294,6 +294,51 @@ bool xServer::Write(const string& buf) {
     return true;
 }
 
+bool xServer::Write(const xParameters::tagListType& tags, const string& line) {
+#ifdef NEW_IRCU_FEATURES
+    if (tags.empty()) {
+        return Write(line);
+    }
+    return Write(xParameters::formatTagPrefix(tags) + line);
+#else
+    (void)tags;
+    return Write(line);
+#endif
+}
+
+bool xServer::Write(const xParameters::tagListType& tags, const stringstream& line) {
+    return Write(tags, string(line.str()));
+}
+
+bool xServer::Write(const xParameters::tagListType& tags, const char* format, ...) {
+    char buffer[4096] = {0};
+    va_list _list;
+    va_start(_list, format);
+    vsnprintf(buffer, sizeof(buffer), format, _list);
+    va_end(_list);
+    return Write(tags, string(buffer));
+}
+
+bool xServer::WriteWithTime(const string& line) {
+#ifdef NEW_IRCU_FEATURES
+    xParameters::tagListType tags{MessageTag{"time", formatServerTime()}};
+    return Write(tags, line);
+#else
+    return Write(line);
+#endif
+}
+
+bool xServer::WriteWithTime(const stringstream& line) { return WriteWithTime(string(line.str())); }
+
+bool xServer::WriteWithTime(const char* format, ...) {
+    char buffer[4096] = {0};
+    va_list _list;
+    va_start(_list, format);
+    vsnprintf(buffer, sizeof(buffer), format, _list);
+    va_end(_list);
+    return WriteWithTime(string(buffer));
+}
+
 bool xServer::WriteDuringBurst(const string& buf) {
     // Is there a valid connection?
     if (!isConnected()) {

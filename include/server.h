@@ -48,6 +48,7 @@
 #include "ConnectionManager.h"
 #include "ConnectionHandler.h"
 #include "Connection.h"
+#include "gnuworld_config.h"
 
 namespace gnuworld {
 
@@ -203,10 +204,23 @@ class xServer : public ConnectionManager, public ConnectionHandler, public Netwo
 
     /**
      * Append a std::string to the output buffer.
-     * The second argument determines if data should be written
-     * during burst time.
      */
     virtual bool Write(const std::string&);
+
+    /**
+     * Append a message with IRCv3 message-tags.
+     */
+    virtual bool Write(const xParameters::tagListType& tags, const std::string& line);
+    virtual bool Write(const xParameters::tagListType& tags, const std::stringstream& line);
+    virtual bool Write(const xParameters::tagListType& tags, const char* format, ...);
+
+    /**
+     * Append a message with an IRCv3 @time tag (server-time)
+     * set to the current UTC timestamp.
+     */
+    virtual bool WriteWithTime(const std::string& line);
+    virtual bool WriteWithTime(const std::stringstream& line);
+    virtual bool WriteWithTime(const char* format, ...);
 
     /**
      * Similar to the above signature of Write() except that data
@@ -1378,11 +1392,10 @@ class xServer : public ConnectionManager, public ConnectionHandler, public Netwo
      * The char array to be used to read in network data.
      * This is allocated only once in the server for
      * performance reasons.
-     * It is of fixed size since this buffer isn't used for
-     * actual reading from the network connection, only for
-     * handling a single network message a time (max 512 bytes).
+     * Sized for IRCv3 message-tags (IRC_MAX_TAGS) plus the
+     * classic IRC line (IRC_MAX_LINE), plus a NUL terminator.
      */
-    char inputCharBuffer[1024];
+    char inputCharBuffer[IRC_MAX_MESSAGE + 1];
 
     /**
      * True if all elog data should be output to clog.
