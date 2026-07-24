@@ -507,8 +507,32 @@ void xServer::Shutdown(const string& reason) {
 // This function parses and distributes incoming lines
 // of data
 void xServer::Process(char* s) {
-    if ((NULL == s) || (0 == s[0]) || (' ' == s[0])) {
+    if ((nullptr == s) || (0 == s[0]) || (' ' == s[0])) {
         return;
+    }
+
+    // IRCv3 message-tags: optional "@key=value;key2=value2 " prefix.
+    // Strip and parse them before the classic sender/command tokenization
+    // so existing handlers see an unchanged argument layout.
+    xParameters::tagListType messageTags;
+    if ('@' == s[0]) {
+        ++s; // skip '@'
+        char* tagStart = s;
+        while (*s && (' ' != *s)) {
+            ++s;
+        }
+        if (!*s) {
+            // Tags with no following command
+            return;
+        }
+        *s++ = 0;
+        while (*s && (' ' == *s)) {
+            ++s;
+        }
+        if (!*s) {
+            return;
+        }
+        xParameters::parseTags(tagStart, messageTags);
     }
 
     // isNumeric indicates whether or not the first
@@ -618,8 +642,11 @@ void xServer::Process(char* s) {
         // command.
         // Prepare the arguments for the command.
 
-        char* x = NULL;
+        char* x = nullptr;
         xParameters Param;
+        if (!messageTags.empty()) {
+            Param.setTags(std::move(messageTags));
+        }
 
         // Was this command was sent from a server
         // or client?

@@ -76,17 +76,35 @@
 #define MAX_TOPIC_LENGTH 145
 
 /**
+ * IRCv3 message-tags size limits (message-tags extension).
+ *
+ *   <server_max>   (4096)  :: '@' <tag_data 4094> ' '
+ *   <client_max>   (4096)  :: '@' <tag_data 4094> ' '
+ *   <combined_max> (8191)  :: '@' <tag_data 4094> ';' <tag_data 4094> ' '
+ *
+ * Tag section max includes leading '@' and trailing space.
+ * The remainder of the message stays at the classic IRC 512
+ * (including CRLF).
+ */
+#define IRC_MAX_TAG_DATA 4094
+#define IRC_MAX_TAGS 8191
+#define IRC_MAX_LINE 512
+#define IRC_MAX_MESSAGE (IRC_MAX_TAGS + IRC_MAX_LINE)
+
+/**
  * TOPIC_TRACK
  * Set if you want gnuworld to track topics in the network channels
  */
 #define TOPIC_TRACK
 
 /**
- * NO_FINGERPRINT_BURST
- * Disable this if gnuworld is linked to a hub that doesn't support fingerprint burst.
- * This should only be enabled when the uplink is running ircu with tls support.
+ * NEW_IRCU_FEATURES
+ * Enable protocol features that require a matching ircu uplink, e.g.:
+ * - TLS fingerprint burst (N ... +z)
+ * - Outbound IRCv3 message-tags on P10
+ * - CService: AC updates, SASL, network config, autohide (+x), etc.
  */
-#undef NO_FINGERPRINT_BURST
+#undef NEW_IRCU_FEATURES
 
 /**
  * USE_THREAD

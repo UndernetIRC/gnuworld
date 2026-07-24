@@ -755,4 +755,20 @@ std::string generateGlineId(char prefix) {
     return oss.str();
 }
 
+std::string formatServerTime() {
+    using namespace std::chrono;
+    const auto now = system_clock::now();
+    const auto secs = time_point_cast<seconds>(now);
+    const auto ms = duration_cast<milliseconds>(now - secs).count();
+
+    const std::time_t tt = system_clock::to_time_t(secs);
+    std::tm tm{};
+    gmtime_r(&tt, &tm);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setfill('0') << std::setw(3) << ms
+        << 'Z';
+    return oss.str();
+}
+
 } // namespace gnuworld
