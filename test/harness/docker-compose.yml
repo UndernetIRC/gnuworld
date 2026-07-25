@@ -1,0 +1,30 @@
+# GNUWorld integration-test stack: Postgres + gnuworld runtime image.
+#
+# Gnuworld uses host networking so it can reach FakeHub on 127.0.0.1
+# (pytest on the host) and Postgres on published port 5433.
+# Stdout is still captured via `docker compose run --rm -T`.
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: gnuworld
+      POSTGRES_PASSWORD: gnuworld
+      POSTGRES_DB: ccontrol
+    volumes:
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gnuworld -d ccontrol"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    ports:
+      - "5433:5432"
+
+  gnuworld:
+    build:
+      context: ../..
+      dockerfile: test/harness/docker/Dockerfile
+    network_mode: host
+    # Conf is bind-mounted per test via `compose run -v ...`
+    profiles: ["run"]

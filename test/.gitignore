@@ -1,4 +1,5 @@
 test_stringtokenizer
+test_stringtokenizer_trailing
 test_signal
 test_mtrie_perf_summary
 test_mtrie_perf
@@ -10,3 +11,8 @@ test_gThread
 test_econfig
 test_burst
 test_bot
+test_xparameters_tags
+harness/.venv/
+harness/.pytest_cache/
+harness/run/
+harness/**/__pycache__/

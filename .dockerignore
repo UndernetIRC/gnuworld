@@ -1,0 +1,14 @@
+.git
+**/*.o
+**/*.lo
+**/.libs
+**/.deps
+**/__pycache__
+**/.pytest_cache
+bin/*.log
+bin/debug.log
+bin/socket.log
+bin/gnuworld.pid
+lib/*.a
+ddd
+.vscode
