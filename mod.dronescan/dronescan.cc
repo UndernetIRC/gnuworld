@@ -3346,21 +3346,16 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 #ifndef ENABLE_LOG4CPLUS
     (void)ruleName;
 #endif
-    const string& nick = actor.nick;
-    const string& user = actor.user;
-    const string& host = actor.host;
-    const string& ip = actor.ip;
-
     if (actionType == "GLINE") {
-        const string mask = glineNeedsIdent(ip) ? (user + "@" + ip) : ("*@" + ip);
+        const string mask = glineNeedsIdent(actor.ip) ? (actor.user + "@" + actor.ip) : ("*@" + actor.ip);
         glineData* gd = new (std::nothrow) glineData(mask, reason, duration, prefixAuto);
         assert(gd != 0);
         glineQueue.push_back(gd);
 
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
-        logMsg << "SPAM[GLINE] Queued GLINE for " << actor.nick << '!' << user << '@' << actor.host
-               << " (" << ip << ") - mask: " << mask << " - duration: " << duration << "s - rule '"
+        logMsg << "SPAM[GLINE] Queued GLINE for " << actor.nick << '!' << actor.user << '@' << actor.host
+               << " (" << actor.ip << ") - mask: " << mask << " - duration: " << duration << "s - rule '"
                << ruleName << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
 #endif
@@ -3371,7 +3366,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         if (!target) {
 #ifdef ENABLE_LOG4CPLUS
             std::ostringstream logMsg;
-            logMsg << "SPAM[KILL] " << actor.nick << '!' << user << '@' << actor.host << " (" << ip
+            logMsg << "SPAM[KILL] " << actor.nick << '!' << actor.user << '@' << actor.host << " (" << actor.ip
                    << ") - rule '" << ruleName << "' - client no longer connected, skipped";
             log(SPAM_ACTION, logMsg.str());
 #endif
@@ -3381,8 +3376,8 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         Kill(target, reason);
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
-        logMsg << "SPAM[KILL] Killed " << actor.nick << '!' << user << '@' << actor.host << " ("
-               << ip << ") - rule '" << ruleName
+        logMsg << "SPAM[KILL] Killed " << actor.nick << '!' << actor.user << '@' << actor.host << " ("
+               << actor.ip << ") - rule '" << ruleName
                << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
 #endif
