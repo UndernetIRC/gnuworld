@@ -176,7 +176,7 @@ bool msg_N::Execute(const xParameters& params) {
             case 'f':
                 fakehost = params[currentArgIndex++];
                 break;
-#ifndef NO_FINGERPRINT_BURST
+#ifdef NEW_IRCU_FEATURES
             case 'z':
                 tlsFingerprint = params[currentArgIndex++];
                 break;

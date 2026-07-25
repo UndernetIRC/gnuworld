@@ -301,6 +301,11 @@ std::string getCurrentTimestamp();
  */
 std::string generateGlineId(char prefix);
 
+/**
+ * IRCv3 server-time / @time tag value: YYYY-MM-DDThh:mm:ss.sssZ (UTC).
+ */
+std::string formatServerTime();
+
 } // namespace gnuworld
 
 #endif /* __MISC__ */

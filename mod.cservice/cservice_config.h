@@ -22,6 +22,8 @@
 #ifndef __CSERVICE_CONFIG_H
 #define __CSERVICE_CONFIG_H "$Id: cservice_config.h,v 1.13 2006/09/26 17:36:04 kewlio Exp $"
 
+#include "gnuworld_config.h"
+
 /**
  * Define this if you wish for general debugging information
  * be logged.
@@ -121,18 +123,6 @@
  * take care of possible abuse of the function
  */
 #undef GLINE_ON_FLOODPRO
-
-/*
- * Enable this to enable the following features currently not released in ircu:
- * - Send new AC messages upon changes of sqlUser flags.
- * - TLS connections
- * - SASL authentication
- * - Network config
- * - Autohide hostmask (+x)
- * All servers on the network must run the appropriate version of ircu
- * in order not to get protocol violation messages.
- */
-#undef NEW_IRCU_FEATURES
 
 /**
  * Define the number of iterations for the SCRAM record generation.
