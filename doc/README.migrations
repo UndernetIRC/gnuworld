@@ -87,6 +87,22 @@ When you need to modify a module's database schema, create a migration file:
 
    This ensures migrations can be safely re-run without errors.
 
+   This isn't just theoretical: each module's doc/*.sql (e.g.
+   doc/dronescan.sql, mod.openchanfix/doc/chanfix.sql) is kept at the
+   CURRENT schema shape, not the original install shape. A fresh database
+   is loaded straight from that file, and every migration in the module's
+   migrations/ directory still runs against it afterward (its
+   gnuworld_migrations table starts empty). So a migration written only as
+   a one-way upgrade from an old schema (e.g. bare CREATE TABLE for a table
+   that already exists, or RENAME/DROP COLUMN for a column already in its
+   post-migration name/state) will fail on that fresh install. For
+   operations with no IF NOT EXISTS form in Postgres (RENAME COLUMN, ADD
+   CONSTRAINT), guard them in a `DO $$ ... $$` block that checks
+   information_schema.columns / pg_constraint before acting - PL/pgSQL only
+   plans the SQL inside an IF branch when that branch actually executes, so
+   referencing a legacy column/constraint there is safe even when it
+   doesn't exist.
+
 4. **Document the change**
    Add a comment at the top of the migration file explaining what changed:
 

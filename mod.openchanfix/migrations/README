@@ -18,6 +18,22 @@ ALTER TABLE chanOps ADD COLUMN IF NOT EXISTS last_op_time TIMESTAMP;
 CREATE INDEX IF NOT EXISTS idx_chanops_last_op_time ON chanOps(last_op_time);
 
 
+Migrations Must Be Safe Against the Current Schema Too
+--------------------------------------------------------
+../doc/chanfix.sql is kept at the current (post-migration) schema shape,
+not the original install shape. A fresh database is loaded from that file
+directly, then every migration in this directory still runs against it
+(gnuworld_migrations starts empty). So every migration must be idempotent
+against BOTH an older database AND a database already at HEAD shape: use
+CREATE TABLE/INDEX IF NOT EXISTS, ADD COLUMN IF NOT EXISTS, DROP COLUMN
+IF EXISTS, and guard RENAME COLUMN / ADD CONSTRAINT / references to
+columns that may no longer exist (no IF NOT EXISTS form in Postgres) with
+a DO $$ ... $$ block that checks information_schema.columns /
+pg_constraint first. PL/pgSQL only plans the SQL inside an IF branch when
+that branch actually executes, so referencing a legacy column inside a
+guarded IF is safe even when the column doesn't exist.
+
+
 Checking Applied Migrations
 ----------------------------
 To see which migrations have been applied to the openchanfix database:

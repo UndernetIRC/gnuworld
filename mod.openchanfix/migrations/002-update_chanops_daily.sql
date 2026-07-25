@@ -15,49 +15,62 @@ CREATE TABLE IF NOT EXISTS chanops_daily (
     PRIMARY KEY (channel, account, day)
 );
 
--- Step 2: Migrate non-zero day data from columns to rows
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 0, day0 FROM chanOps WHERE day0 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 1, day1 FROM chanOps WHERE day1 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 2, day2 FROM chanOps WHERE day2 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 3, day3 FROM chanOps WHERE day3 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 4, day4 FROM chanOps WHERE day4 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 5, day5 FROM chanOps WHERE day5 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 6, day6 FROM chanOps WHERE day6 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 7, day7 FROM chanOps WHERE day7 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 8, day8 FROM chanOps WHERE day8 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 9, day9 FROM chanOps WHERE day9 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 10, day10 FROM chanOps WHERE day10 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 11, day11 FROM chanOps WHERE day11 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 12, day12 FROM chanOps WHERE day12 > 0
-ON CONFLICT DO NOTHING;
-INSERT INTO chanops_daily (channel, account, day, points)
-SELECT channel, account, 13, day13 FROM chanOps WHERE day13 > 0
-ON CONFLICT DO NOTHING;
+-- Step 2: Migrate non-zero day data from columns to rows.
+-- Guarded: on a database already built from the current chanfix.sql, the
+-- dayN columns never existed in the first place (chanOps is already
+-- normalized), so this whole block is skipped. PL/pgSQL only plans the SQL
+-- inside a branch when that branch actually executes, so referencing dayN
+-- here is safe even when the columns don't exist.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'chanops' AND column_name = 'day0'
+  ) THEN
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 0, day0 FROM chanOps WHERE day0 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 1, day1 FROM chanOps WHERE day1 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 2, day2 FROM chanOps WHERE day2 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 3, day3 FROM chanOps WHERE day3 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 4, day4 FROM chanOps WHERE day4 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 5, day5 FROM chanOps WHERE day5 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 6, day6 FROM chanOps WHERE day6 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 7, day7 FROM chanOps WHERE day7 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 8, day8 FROM chanOps WHERE day8 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 9, day9 FROM chanOps WHERE day9 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 10, day10 FROM chanOps WHERE day10 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 11, day11 FROM chanOps WHERE day11 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 12, day12 FROM chanOps WHERE day12 > 0
+    ON CONFLICT DO NOTHING;
+    INSERT INTO chanops_daily (channel, account, day, points)
+    SELECT channel, account, 13, day13 FROM chanOps WHERE day13 > 0
+    ON CONFLICT DO NOTHING;
+  END IF;
+END $$;
 
 -- Step 3: Drop the day columns from chanOps
 ALTER TABLE chanOps DROP COLUMN IF EXISTS day0;

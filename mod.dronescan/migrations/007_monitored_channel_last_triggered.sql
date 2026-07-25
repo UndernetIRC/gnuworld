@@ -9,5 +9,5 @@
 --   psql -d <dbname> -f 007_monitored_channel_last_triggered.sql
 -- =============================================================================
 
-ALTER TABLE monitored_channels ADD COLUMN last_triggered_ts   int4        DEFAULT NULL;
-ALTER TABLE monitored_channels ADD COLUMN last_triggered_rule varchar(100) DEFAULT NULL;
+ALTER TABLE monitored_channels ADD COLUMN IF NOT EXISTS last_triggered_ts   int4        DEFAULT NULL;
+ALTER TABLE monitored_channels ADD COLUMN IF NOT EXISTS last_triggered_rule varchar(100) DEFAULT NULL;

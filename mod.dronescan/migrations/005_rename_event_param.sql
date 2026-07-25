@@ -14,6 +14,17 @@
 --   psql -d <dbname> -f 005_rename_event_param.sql
 -- =============================================================================
 
-ALTER TABLE spam_events RENAME COLUMN event_param TO param;
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'spam_events' AND column_name = 'event_param'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'spam_events' AND column_name = 'param'
+    ) THEN
+        ALTER TABLE spam_events RENAME COLUMN event_param TO param;
+    END IF;
+END $$;
 
 UPDATE spam_events SET param = NULL WHERE event_type = 'TEXT_REPEAT';

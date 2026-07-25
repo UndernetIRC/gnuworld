@@ -7,10 +7,10 @@
 -- command is TEXT (not a bounded varchar) so long commands are never
 -- truncated.
 
-CREATE TABLE comlog (
+CREATE TABLE IF NOT EXISTS comlog (
 	id       serial      PRIMARY KEY,
 	ts       int4        NOT NULL,
 	username varchar(128) NOT NULL,
 	command  text        NOT NULL
 );
-CREATE INDEX comlog_ts_idx ON comlog (ts);
+CREATE INDEX IF NOT EXISTS comlog_ts_idx ON comlog (ts);

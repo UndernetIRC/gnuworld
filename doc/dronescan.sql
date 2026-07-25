@@ -163,6 +163,8 @@ CREATE TABLE spam_events (
 		REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE UNIQUE INDEX ux_spam_events_name_lower ON spam_events (lower(name));
+
 -- -----------------------------------------------------------------------------
 -- spam_rules
 -- -----------------------------------------------------------------------------
@@ -232,6 +234,8 @@ CREATE TABLE spam_rules (
 		REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE UNIQUE INDEX ux_spam_rules_name_lower ON spam_rules (lower(name));
+
 -- -----------------------------------------------------------------------------
 -- spam_rule_events
 -- -----------------------------------------------------------------------------
@@ -286,6 +290,8 @@ CREATE TABLE spam_actions (
 		REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE UNIQUE INDEX ux_spam_actions_name_lower ON spam_actions (lower(name));
+
 -- -----------------------------------------------------------------------------
 -- spam_rule_actions
 -- -----------------------------------------------------------------------------
@@ -312,7 +318,8 @@ CREATE TABLE spam_rule_actions (
 	-- NULL = use spam_actions.reason
 	action_reason_override   text                 DEFAULT NULL,
 	-- NULL = use spam_actions.delay
-	delay_override           int                  DEFAULT NULL
+	delay_override           int                  DEFAULT NULL,
+	CONSTRAINT ux_spam_rule_actions_rule_action UNIQUE (rule_id, action_id)
 );
 
 -- -----------------------------------------------------------------------------

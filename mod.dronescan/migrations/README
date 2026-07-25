@@ -18,6 +18,19 @@ ALTER TABLE scans ADD COLUMN IF NOT EXISTS scan_timestamp TIMESTAMP;
 CREATE INDEX IF NOT EXISTS idx_scans_timestamp ON scans(scan_timestamp);
 
 
+Migrations Must Be Safe Against the Current Schema Too
+--------------------------------------------------------
+../../doc/dronescan.sql is kept at the current (post-migration) schema
+shape, not the original install shape. A fresh database is loaded from
+that file directly, then every migration in this directory still runs
+against it (gnuworld_migrations starts empty). So every migration must be
+idempotent against BOTH an older database AND a database already at HEAD
+shape: use CREATE TABLE/INDEX IF NOT EXISTS, ADD COLUMN IF NOT EXISTS,
+DROP COLUMN IF EXISTS, and guard RENAME COLUMN / ADD CONSTRAINT (no
+IF NOT EXISTS form in Postgres) with a DO $$ ... $$ block that checks
+information_schema.columns / pg_constraint first.
+
+
 Checking Applied Migrations
 ----------------------------
 To see which migrations have been applied to the dronescan database:

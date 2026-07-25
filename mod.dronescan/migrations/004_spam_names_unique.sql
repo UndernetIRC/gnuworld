@@ -20,9 +20,16 @@
 --   psql -d <dbname> -f 004_spam_names_unique.sql
 -- =============================================================================
 
-CREATE UNIQUE INDEX ux_spam_events_name_lower  ON spam_events  (lower(name));
-CREATE UNIQUE INDEX ux_spam_rules_name_lower   ON spam_rules   (lower(name));
-CREATE UNIQUE INDEX ux_spam_actions_name_lower ON spam_actions (lower(name));
+CREATE UNIQUE INDEX IF NOT EXISTS ux_spam_events_name_lower  ON spam_events  (lower(name));
+CREATE UNIQUE INDEX IF NOT EXISTS ux_spam_rules_name_lower   ON spam_rules   (lower(name));
+CREATE UNIQUE INDEX IF NOT EXISTS ux_spam_actions_name_lower ON spam_actions (lower(name));
 
-ALTER TABLE spam_rule_actions
-    ADD CONSTRAINT ux_spam_rule_actions_rule_action UNIQUE (rule_id, action_id);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'ux_spam_rule_actions_rule_action'
+    ) THEN
+        ALTER TABLE spam_rule_actions
+            ADD CONSTRAINT ux_spam_rule_actions_rule_action UNIQUE (rule_id, action_id);
+    END IF;
+END $$;

@@ -16,7 +16,7 @@
 --   account_id 0 means not authenticated.
 -- enabled: soft-disable without removing from the table.
 -- -----------------------------------------------------------------------------
-CREATE TABLE spyclients (
+CREATE TABLE IF NOT EXISTS spyclients (
     id          serial       PRIMARY KEY,
     nickname    varchar(30)  NOT NULL,
     username    varchar(20)  NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE spyclients (
 -- repeat_exclusion_regex: TEXT_REPEAT only. PCRE2 pattern; text matching this
 --   regex is never tracked for repetition (e.g. to ignore URLs or greetings).
 -- -----------------------------------------------------------------------------
-CREATE TABLE spam_events (
+CREATE TABLE IF NOT EXISTS spam_events (
     id                     serial       PRIMARY KEY,
     name                   varchar(100) NOT NULL,
     description            text,
@@ -143,7 +143,7 @@ CREATE TABLE spam_events (
 --   event linked to this rule. NULL = use each event's own points_per value.
 --   Valid values: 'CLIENT', 'IP'
 -- -----------------------------------------------------------------------------
-CREATE TABLE spam_rules (
+CREATE TABLE IF NOT EXISTS spam_rules (
     id                  serial       PRIMARY KEY,
     name                varchar(100) NOT NULL,
     description         text,
@@ -171,7 +171,7 @@ CREATE TABLE spam_rules (
 -- The same event can contribute to multiple rules with different point values.
 -- points_override: NULL means use spam_events.points for this rule.
 -- -----------------------------------------------------------------------------
-CREATE TABLE spam_rule_events (
+CREATE TABLE IF NOT EXISTS spam_rule_events (
     rule_id         int NOT NULL REFERENCES spam_rules(id)  ON DELETE CASCADE,
     event_id        int NOT NULL REFERENCES spam_events(id) ON DELETE CASCADE,
     -- NULL = use the default points defined in spam_events
@@ -191,7 +191,7 @@ CREATE TABLE spam_rule_events (
 -- rand_min / rand_max: if both are set, a random value in [rand_min, rand_max]
 --   is added to delay for timing jitter. Useful to avoid predictable patterns.
 -- -----------------------------------------------------------------------------
-CREATE TABLE spam_actions (
+CREATE TABLE IF NOT EXISTS spam_actions (
     id          serial       PRIMARY KEY,
     name        varchar(100) NOT NULL,
     action_type varchar(20)  NOT NULL,
@@ -226,7 +226,7 @@ CREATE TABLE spam_actions (
 --   action_reason_override   : overrides spam_actions.reason
 --   delay_override           : overrides spam_actions.delay
 -- -----------------------------------------------------------------------------
-CREATE TABLE spam_rule_actions (
+CREATE TABLE IF NOT EXISTS spam_rule_actions (
     id                       serial      PRIMARY KEY,
     rule_id                  int         NOT NULL REFERENCES spam_rules(id)   ON DELETE CASCADE,
     action_id                int         NOT NULL REFERENCES spam_actions(id) ON DELETE CASCADE,
@@ -247,7 +247,7 @@ CREATE TABLE spam_rule_actions (
 -- exclusion_type: CHAN | NICK | IP | OPER
 -- value: exact match or glob/mask pattern depending on type.
 -- -----------------------------------------------------------------------------
-CREATE TABLE spam_exclusions (
+CREATE TABLE IF NOT EXISTS spam_exclusions (
     id             serial       PRIMARY KEY,
     exclusion_type varchar(10)  NOT NULL,
     value          varchar(200) NOT NULL,
@@ -272,7 +272,7 @@ CREATE TABLE spam_exclusions (
 --   directly with no spy client involved. Useful for channels where a fake
 --   client presence would be undesirable or impractical.
 -- -----------------------------------------------------------------------------
-CREATE TABLE monitored_channels (
+CREATE TABLE IF NOT EXISTS monitored_channels (
     id            serial       PRIMARY KEY,
     name          varchar(200) NOT NULL UNIQUE,
     -- Force join even if channel is +i, +k, +l (full), or spy client is banned
@@ -302,7 +302,7 @@ CREATE TABLE monitored_channels (
 --   monitored_channels.name, so that rule-channel associations can be
 --   pre-configured before a channel is added to monitored_channels.
 -- -----------------------------------------------------------------------------
-CREATE TABLE spam_rule_channels (
+CREATE TABLE IF NOT EXISTS spam_rule_channels (
     rule_id      int          NOT NULL REFERENCES spam_rules(id) ON DELETE CASCADE,
     channel_name varchar(200) NOT NULL,
     PRIMARY KEY (rule_id, channel_name)
