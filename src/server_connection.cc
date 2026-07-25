@@ -173,6 +173,12 @@ void xServer::OnRead(Connection* theConn, const string& line) {
         --len;
     }
 
+    if (len + 1 >= sizeof(inputCharBuffer)) {
+        elog << "xServer::OnRead> Rejecting oversized line (" << (len + 1) << " bytes, max "
+             << (sizeof(inputCharBuffer) - 1) << ")" << endl;
+        return;
+    }
+
     memset(inputCharBuffer, 0, sizeof(inputCharBuffer));
     strncpy(inputCharBuffer, line.c_str(), len + 1);
 
