@@ -59,14 +59,14 @@ const std::string fakeclients = "SELECT fc.id, fc.nickname, "
 namespace spam_target {
 
 const int CHAN_PRIV = 1;   // channel PRIVMSG
-const int PRIVMSG   = 2;   // PRIVMSG sent directly to the bot or a spy client
-const int CHAN_NOT   = 4;   // NOTICE sent to a channel
-const int PART      = 8;   // part messages
-const int QUIT      = 16;  // quit messages
-const int NOTICE    = 32;  // NOTICE sent directly to the bot or a spy client
+const int PRIVMSG = 2;     // PRIVMSG sent directly to the bot or a spy client
+const int CHAN_NOT = 4;    // NOTICE sent to a channel
+const int PART = 8;        // part messages
+const int QUIT = 16;       // quit messages
+const int NOTICE = 32;     // NOTICE sent directly to the bot or a spy client
 const int CTCP_PRIV = 64;  // CTCP sent directly to the bot or a spy client
 const int CTCP_CHAN = 128; // CTCP sent to a channel, seen by the bot or a spy client
-const int ALL       = 255; // all of the above
+const int ALL = 255;       // all of the above
 
 } // namespace spam_target
 

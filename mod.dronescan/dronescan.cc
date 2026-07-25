@@ -3346,7 +3346,9 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 #ifndef ENABLE_LOG4CPLUS
     (void)ruleName;
 #endif
+    const string& nick = actor.nick;
     const string& user = actor.user;
+    const string& host = actor.host;
     const string& ip = actor.ip;
 
     if (actionType == "GLINE") {

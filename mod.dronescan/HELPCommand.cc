@@ -35,32 +35,46 @@ using std::string;
 // ---------------------------------------------------------------------------
 // Per-command short descriptions
 // ---------------------------------------------------------------------------
-static string getCommandDescription(const string& cmdName)
-{
-    if (cmdName == "ACCESS")               return "View access level of yourself or another user";
-    if (cmdName == "ADDUSER")              return "Add a new user with a given access level";
-    if (cmdName == "ADDEXCEPTIONALCHANNEL") return "Exempt a channel from drone detection";
-    if (cmdName == "ANALYSE")             return "Run a detailed analysis on a channel";
-    if (cmdName == "CHECK")               return "Check a channel or user against active tests";
-    if (cmdName == "FAKE")                return "Manage fake clients used for detection testing";
-    if (cmdName == "HELLO")               return "Authenticate yourself with an account name";
-    if (cmdName == "HELP")                return "Show help for all or a specific command";
-    if (cmdName == "LIST")                return "List active channels, fake clients, floods, or users";
-    if (cmdName == "MODUSER")             return "Modify a user attribute (e.g. access level)";
-    if (cmdName == "QUOTE")               return "Send a raw IRC line to the server";
-    if (cmdName == "REMEXCEPTIONALCHANNEL") return "Remove a channel from the exemption list";
-    if (cmdName == "REMUSER")             return "Remove a user from the system";
-    if (cmdName == "RELOAD")              return "Reload configuration and reinitialise the module";
-    if (cmdName == "STATUS")              return "Show dronescan uptime, test states, and queue sizes";
-    if (cmdName == "SPAM")                return "Manage spam detection events, rules, actions, and exclusions";
+static string getCommandDescription(const string& cmdName) {
+    if (cmdName == "ACCESS")
+        return "View access level of yourself or another user";
+    if (cmdName == "ADDUSER")
+        return "Add a new user with a given access level";
+    if (cmdName == "ADDEXCEPTIONALCHANNEL")
+        return "Exempt a channel from drone detection";
+    if (cmdName == "ANALYSE")
+        return "Run a detailed analysis on a channel";
+    if (cmdName == "CHECK")
+        return "Check a channel or user against active tests";
+    if (cmdName == "FAKE")
+        return "Manage fake clients used for detection testing";
+    if (cmdName == "HELLO")
+        return "Authenticate yourself with an account name";
+    if (cmdName == "HELP")
+        return "Show help for all or a specific command";
+    if (cmdName == "LIST")
+        return "List active channels, fake clients, floods, or users";
+    if (cmdName == "MODUSER")
+        return "Modify a user attribute (e.g. access level)";
+    if (cmdName == "QUOTE")
+        return "Send a raw IRC line to the server";
+    if (cmdName == "REMEXCEPTIONALCHANNEL")
+        return "Remove a channel from the exemption list";
+    if (cmdName == "REMUSER")
+        return "Remove a user from the system";
+    if (cmdName == "RELOAD")
+        return "Reload configuration and reinitialise the module";
+    if (cmdName == "STATUS")
+        return "Show dronescan uptime, test states, and queue sizes";
+    if (cmdName == "SPAM")
+        return "Manage spam detection events, rules, actions, and exclusions";
     return "";
 }
 
 // ---------------------------------------------------------------------------
 // Detailed help for individual SPAM sub-objects
 // ---------------------------------------------------------------------------
-static void helpSpamEvent(dronescan* bot, const iClient* theClient)
-{
+static void helpSpamEvent(dronescan* bot, const iClient* theClient) {
     bot->Reply(theClient, "SPAM EVENT subcommands:");
     bot->Reply(theClient, "  ADD    <name> <type> <target> <param> <points> <expiry> [max_occ]");
     bot->Reply(theClient, "         [-rule <rule_name>] [-repeat_count <n>]");
@@ -78,32 +92,45 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  chan_priv=channel PRIVMSGs  chan_not=channel NOTICEs");
     bot->Reply(theClient, "  privmsg=DMs to bot/spy      notice=NOTICEs to bot/spy");
     bot->Reply(theClient, "  part=part reasons           quit=quit msgs (not yet active)");
-    bot->Reply(theClient, "  ctcp_priv=direct CTCP to bot/spy  ctcp_chan=channel CTCP, e.g. DCC/ACTION");
-    bot->Reply(theClient, "    - match DCC specifically with a regex like \"^DCC\" scoped to ctcp_priv/ctcp_chan");
-    bot->Reply(theClient, "  \"chan\" is an alias for chan_priv+chan_not; \"ctcp\" is an alias for ctcp_priv+ctcp_chan.");
+    bot->Reply(theClient,
+               "  ctcp_priv=direct CTCP to bot/spy  ctcp_chan=channel CTCP, e.g. DCC/ACTION");
+    bot->Reply(
+        theClient,
+        "    - match DCC specifically with a regex like \"^DCC\" scoped to ctcp_priv/ctcp_chan");
+    bot->Reply(theClient, "  \"chan\" is an alias for chan_priv+chan_not; \"ctcp\" is an alias for "
+                          "ctcp_priv+ctcp_chan.");
     bot->Reply(theClient, "  TEXT regex matching is case-sensitive by default; prefix the pattern");
     bot->Reply(theClient, "  with \"(?i)\" for case-insensitive matching (native PCRE2 syntax).");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Target (comma-separated or \"all\"): chan_priv chan_not chan privmsg notice part quit ctcp_priv ctcp_chan ctcp");
-    bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 ctcp_priv=64 ctcp_chan=128 all=255");
+    bot->Reply(theClient, "Target (comma-separated or \"all\"): chan_priv chan_not chan privmsg "
+                          "notice part quit ctcp_priv ctcp_chan ctcp");
+    bot->Reply(theClient, "  Bitmask: chan_priv=1 privmsg=2 chan_not=4 part=8 quit=16 notice=32 "
+                          "ctcp_priv=64 ctcp_chan=128 all=255");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "-rule <rule_name>    : link the new event to an existing rule right away");
+    bot->Reply(theClient,
+               "-rule <rule_name>    : link the new event to an existing rule right away");
     bot->Reply(theClient, "                       (repeatable to link several rules in one ADD).");
-    bot->Reply(theClient, "-repeat_count <n>    : sets repeat_min_count. Mandatory for TEXT_REPEAT,");
+    bot->Reply(theClient,
+               "-repeat_count <n>    : sets repeat_min_count. Mandatory for TEXT_REPEAT,");
     bot->Reply(theClient, "                       invalid for any other event type.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "SET fields: name  description  param  target  case_sensitive (TEXT_REPEAT only)");
-    bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id (event name, or \"none\")");
+    bot->Reply(theClient,
+               "SET fields: name  description  param  target  case_sensitive (TEXT_REPEAT only)");
+    bot->Reply(theClient, "            points  point_expiry  max_occurrence  requires_event_id "
+                          "(event name, or \"none\")");
     bot->Reply(theClient, "            enabled  repeat_crossuser");
     bot->Reply(theClient, "            repeat_min_count  repeat_exclusion_regex");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
-    bot->Reply(theClient, "  SPAM EVENT ADD pill_regex TEXT chan,privmsg \"buy.*cheap.*pills\" 10 60");
+    bot->Reply(theClient,
+               "  SPAM EVENT ADD pill_regex TEXT chan,privmsg \"buy.*cheap.*pills\" 10 60");
     bot->Reply(theClient, "  SPAM EVENT ADD chan_notice_spam TEXT chan_not \"spam.*notice\" 5 60");
     bot->Reply(theClient, "  SPAM EVENT ADD part_flood TEXT part \"bye|cya|leaving\" 5 60");
     bot->Reply(theClient, "  SPAM EVENT ADD direct_spam TEXT privmsg,notice \"click.*here\" 10 60");
     bot->Reply(theClient, "  SPAM EVENT ADD repeat_flood TEXT_REPEAT all . 5 30 3 -repeat_count 3");
-    bot->Reply(theClient, "  SPAM EVENT ADD pill_regex2 TEXT chan \"buy.*pills\" 10 60 -rule anti_spam_global");
+    bot->Reply(
+        theClient,
+        "  SPAM EVENT ADD pill_regex2 TEXT chan \"buy.*pills\" 10 60 -rule anti_spam_global");
     bot->Reply(theClient, "  SPAM EVENT SET pill_regex name new_pill_regex");
     bot->Reply(theClient, "  SPAM EVENT SET pill_regex enabled yes");
     bot->Reply(theClient, "  SPAM EVENT SET pill_regex param \"new.*regex.*pattern\"");
@@ -111,8 +138,7 @@ static void helpSpamEvent(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SPAM EVENT DEL pill_regex");
 }
 
-static void helpSpamRule(dronescan* bot, const iClient* theClient)
-{
+static void helpSpamRule(dronescan* bot, const iClient* theClient) {
     bot->Reply(theClient, "SPAM RULE subcommands:");
     bot->Reply(theClient, "  ADD        <name> <threshold> [-action <action_name>]");
     bot->Reply(theClient, "  DEL        <name>");
@@ -121,7 +147,9 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SET        <name> <field> <value>");
     bot->Reply(theClient, "  ADDEVENT   <rule_name> <event_name> [points_override]");
     bot->Reply(theClient, "  REMEVENT   <rule_name> <event_name>");
-    bot->Reply(theClient, "  ADDACTION  <rule_name> <action_name> [dur_override] [reason_override] [delay_override]");
+    bot->Reply(
+        theClient,
+        "  ADDACTION  <rule_name> <action_name> [dur_override] [reason_override] [delay_override]");
     bot->Reply(theClient, "  REMACTION  <rule_name> <action_name>");
     bot->Reply(theClient, "  ADDCHAN    <rule_name> <#channel>");
     bot->Reply(theClient, "  REMCHAN    <rule_name> <#channel>");
@@ -129,35 +157,47 @@ static void helpSpamRule(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "A rule fires its actions when the total points from linked events");
     bot->Reply(theClient, "reach or exceed the threshold within the event expiry windows.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "-action <action_name> : link the new rule to an existing action right away");
-    bot->Reply(theClient, "                        (repeatable). No override values - use ADDACTION");
-    bot->Reply(theClient, "                        afterward if you need dur/reason/delay overrides.");
+    bot->Reply(theClient,
+               "-action <action_name> : link the new rule to an existing action right away");
+    bot->Reply(theClient,
+               "                        (repeatable). No override values - use ADDACTION");
+    bot->Reply(theClient,
+               "                        afterward if you need dur/reason/delay overrides.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "SET fields: name  description  threshold  wait_on_rule_id (rule name, or \"none\")  enabled");
-    bot->Reply(theClient, "            points_per  score_globally  allchans  silent  report_source");
+    bot->Reply(theClient, "SET fields: name  description  threshold  wait_on_rule_id (rule name, "
+                          "or \"none\")  enabled");
+    bot->Reply(theClient,
+               "            points_per  score_globally  allchans  silent  report_source");
     bot->Reply(theClient, "  allchans=1 : rule applies to every channel (use ADDCHAN to exclude).");
     bot->Reply(theClient, "  allchans=0 : rule applies only to channels added with ADDCHAN.");
     bot->Reply(theClient, "  silent=1   : suppress the console report line when the rule has no");
-    bot->Reply(theClient, "               GLINE/KILL actions linked (report-only); never hides a real GLINE/KILL.");
-    bot->Reply(theClient, "  report_source=BOT (default) or SPYCLIENT : who the console report line is sent");
-    bot->Reply(theClient, "               as. SPYCLIENT reports as the spy client covering the channel the");
-    bot->Reply(theClient, "               trigger happened in, falling back to BOT when none does.");
+    bot->Reply(
+        theClient,
+        "               GLINE/KILL actions linked (report-only); never hides a real GLINE/KILL.");
+    bot->Reply(theClient,
+               "  report_source=BOT (default) or SPYCLIENT : who the console report line is sent");
+    bot->Reply(theClient,
+               "               as. SPYCLIENT reports as the spy client covering the channel the");
+    bot->Reply(theClient,
+               "               trigger happened in, falling back to BOT when none does.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM RULE ADD anti_spam_global 50");
-    bot->Reply(theClient, "  SPAM RULE ADD anti_spam_secondary 30 -action gline_1h -action kill_now");
+    bot->Reply(theClient,
+               "  SPAM RULE ADD anti_spam_secondary 30 -action gline_1h -action kill_now");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global name anti_spam_v2");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global allchans yes");
     bot->Reply(theClient, "  SPAM RULE SET anti_spam_global threshold 30");
     bot->Reply(theClient, "  SPAM RULE ADDEVENT anti_spam_global pill_regex");
-    bot->Reply(theClient, "  SPAM RULE ADDEVENT anti_spam_global repeat_flood 20     <- use 20 pts instead of event default");
-    bot->Reply(theClient, "  SPAM RULE ADDACTION anti_spam_global gline_1h 3600 \"Spam detected\" 0");
+    bot->Reply(theClient, "  SPAM RULE ADDEVENT anti_spam_global repeat_flood 20     <- use 20 pts "
+                          "instead of event default");
+    bot->Reply(theClient,
+               "  SPAM RULE ADDACTION anti_spam_global gline_1h 3600 \"Spam detected\" 0");
     bot->Reply(theClient, "  SPAM RULE ADDCHAN  anti_spam_global #watch-me");
     bot->Reply(theClient, "  SPAM RULE REMCHAN  anti_spam_global #watch-me");
 }
 
-static void helpSpamAction(dronescan* bot, const iClient* theClient)
-{
+static void helpSpamAction(dronescan* bot, const iClient* theClient) {
     bot->Reply(theClient, "SPAM ACTION subcommands:");
     bot->Reply(theClient, "  ADD    <name> <type> [duration] [reason] [delay] [prefix_auto]");
     bot->Reply(theClient, "  DEL    <name>");
@@ -168,10 +208,13 @@ static void helpSpamAction(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  duration    : seconds for GLINE (ignored for KILL)");
     bot->Reply(theClient, "  reason      : gline/kill reason string");
     bot->Reply(theClient, "  delay       : seconds to wait before firing (0 = immediate)");
-    bot->Reply(theClient, "  prefix_auto : GLINE only, default yes - prepend \"AUTO \" ahead of the");
-    bot->Reply(theClient, "                \"[N] \" connected-client count already added to every gline");
+    bot->Reply(theClient,
+               "  prefix_auto : GLINE only, default yes - prepend \"AUTO \" ahead of the");
+    bot->Reply(theClient,
+               "                \"[N] \" connected-client count already added to every gline");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "SET fields: name  action_type  duration  reason  delay  rand_min  rand_max  enabled  prefix_auto");
+    bot->Reply(theClient, "SET fields: name  action_type  duration  reason  delay  rand_min  "
+                          "rand_max  enabled  prefix_auto");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Examples:");
     bot->Reply(theClient, "  SPAM ACTION ADD gline_1h   GLINE  3600 \"Spam detected\"  0");
@@ -181,8 +224,7 @@ static void helpSpamAction(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SPAM ACTION DEL kill_now");
 }
 
-static void helpSpamExclusion(dronescan* bot, const iClient* theClient)
-{
+static void helpSpamExclusion(dronescan* bot, const iClient* theClient) {
     bot->Reply(theClient, "SPAM EXCLUSION subcommands:");
     bot->Reply(theClient, "  ADD    <CHAN|NICK|IP|OPER|GATEWAYIP> <value>");
     bot->Reply(theClient, "  DEL    <id>");
@@ -196,7 +238,8 @@ static void helpSpamExclusion(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  OPER      - exempt an oper account from spam scoring");
     bot->Reply(theClient, "  GATEWAYIP - does NOT exempt from scanning; marks a shared gateway IP");
     bot->Reply(theClient, "              (irccloud, mibbit, etc.) as needing user@ip instead of");
-    bot->Reply(theClient, "              *@ip in any GLINE issued against it. value may be a plain");
+    bot->Reply(theClient,
+               "              *@ip in any GLINE issued against it. value may be a plain");
     bot->Reply(theClient, "              IP or CIDR block, IPv4 or IPv6.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: exclusion_type  value");
@@ -210,8 +253,7 @@ static void helpSpamExclusion(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SPAM EXCLUSION DEL 2");
 }
 
-static void helpSpamSpyClient(dronescan* bot, const iClient* theClient)
-{
+static void helpSpamSpyClient(dronescan* bot, const iClient* theClient) {
     bot->Reply(theClient, "SPAM SPYCLIENT subcommands:");
     bot->Reply(theClient, "  ADD     <nick> <user> <host> <ip> <realname> [account] [modes]");
     bot->Reply(theClient, "  DEL     <id|nick>");
@@ -221,7 +263,8 @@ static void helpSpamSpyClient(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  ENABLE  <id|nick>");
     bot->Reply(theClient, "  DISABLE <id|nick>");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Spy clients join monitored channels to observe traffic for spam detection.");
+    bot->Reply(theClient,
+               "Spy clients join monitored channels to observe traffic for spam detection.");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "SET fields: nick  user  host  ip  realname  account  modes  enabled");
     bot->Reply(theClient, "  (enabled behaves the same as ENABLE/DISABLE)");
@@ -235,8 +278,7 @@ static void helpSpamSpyClient(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  SPAM SPYCLIENT DEL     SpyBot");
 }
 
-static void helpSpamChan(dronescan* bot, const iClient* theClient)
-{
+static void helpSpamChan(dronescan* bot, const iClient* theClient) {
     bot->Reply(theClient, "SPAM CHAN subcommands:");
     bot->Reply(theClient, "  ADD     <#channel> [forcejoin 0|1] [joinasservice 0|1]");
     bot->Reply(theClient, "  DEL     <#channel>");
@@ -256,7 +298,8 @@ static void helpSpamChan(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  (enabled behaves the same as ENABLE/DISABLE)");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "ADDSPY/REMSPY restrict which spy clients may cover a channel. With no");
-    bot->Reply(theClient, "spy clients assigned, any configured spy client may be picked (default).");
+    bot->Reply(theClient,
+               "spy clients assigned, any configured spy client may be picked (default).");
     bot->Reply(theClient, "With one or more assigned, selection starts at a random spy client in");
     bot->Reply(theClient, "the list and walks down it instead of considering the full pool.");
     bot->Reply(theClient, " ");
@@ -273,8 +316,7 @@ static void helpSpamChan(dronescan* bot, const iClient* theClient)
 // ---------------------------------------------------------------------------
 // Full SPAM overview (HELP SPAM)
 // ---------------------------------------------------------------------------
-static void helpSpam(dronescan* bot, const iClient* theClient)
-{
+static void helpSpam(dronescan* bot, const iClient* theClient) {
     bot->Reply(theClient, "SPAM - Spam detection management");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Top-level syntax: SPAM <object> <verb> [args]");
@@ -293,12 +335,16 @@ static void helpSpam(dronescan* bot, const iClient* theClient)
     bot->Reply(theClient, "  3. Create a RULE with a point threshold");
     bot->Reply(theClient, "  4. Link events to the rule (SPAM RULE ADDEVENT)");
     bot->Reply(theClient, "  5. Link actions to the rule (SPAM RULE ADDACTION)");
-    bot->Reply(theClient, "  6. Optionally restrict the rule to specific channels (SPAM RULE ADDCHAN)");
+    bot->Reply(theClient,
+               "  6. Optionally restrict the rule to specific channels (SPAM RULE ADDCHAN)");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Every object above supports SET <name/id> <field> <value> for in-place edits.");
+    bot->Reply(theClient,
+               "Every object above supports SET <name/id> <field> <value> for in-place edits.");
     bot->Reply(theClient, " ");
-    bot->Reply(theClient, "Multi-word arguments (reason, description, param, realname, etc.) must be");
-    bot->Reply(theClient, "wrapped in double quotes, e.g. \"Spam detected\"; a literal \" is written \\\".");
+    bot->Reply(theClient,
+               "Multi-word arguments (reason, description, param, realname, etc.) must be");
+    bot->Reply(theClient,
+               "wrapped in double quotes, e.g. \"Spam detected\"; a literal \" is written \\\".");
     bot->Reply(theClient, " ");
     bot->Reply(theClient, "Type HELP SPAM <object> for details on each section.");
     bot->Reply(theClient, "  e.g.  HELP SPAM EVENT");
@@ -312,8 +358,7 @@ static void helpSpam(dronescan* bot, const iClient* theClient)
 // ---------------------------------------------------------------------------
 // Main entry point
 // ---------------------------------------------------------------------------
-void HELPCommand::Exec(const iClient* theClient, const string& Message, const sqlUser*)
-{
+void HELPCommand::Exec(const iClient* theClient, const string& Message, const sqlUser*) {
     StringTokenizer st(Message);
 
     // HELP [command [subobject]]
@@ -321,16 +366,22 @@ void HELPCommand::Exec(const iClient* theClient, const string& Message, const sq
     // ---- HELP SPAM <sub> ---------------------------------------------------
     if (st.size() >= 3 && string_upper(st[1]) == "SPAM") {
         const string sub = string_upper(st[2]);
-        if      (sub == "EVENT")       helpSpamEvent(bot, theClient);
-        else if (sub == "RULE")        helpSpamRule(bot, theClient);
-        else if (sub == "ACTION")      helpSpamAction(bot, theClient);
-        else if (sub == "EXCLUSION")   helpSpamExclusion(bot, theClient);
-        else if (sub == "SPYCLIENT")   helpSpamSpyClient(bot, theClient);
-        else if (sub == "CHAN")        helpSpamChan(bot, theClient);
+        if (sub == "EVENT")
+            helpSpamEvent(bot, theClient);
+        else if (sub == "RULE")
+            helpSpamRule(bot, theClient);
+        else if (sub == "ACTION")
+            helpSpamAction(bot, theClient);
+        else if (sub == "EXCLUSION")
+            helpSpamExclusion(bot, theClient);
+        else if (sub == "SPYCLIENT")
+            helpSpamSpyClient(bot, theClient);
+        else if (sub == "CHAN")
+            helpSpamChan(bot, theClient);
         else {
             bot->Reply(theClient,
-                "Unknown SPAM section '%s'. Use: EVENT RULE ACTION EXCLUSION SPYCLIENT CHAN",
-                st[2].c_str());
+                       "Unknown SPAM section '%s'. Use: EVENT RULE ACTION EXCLUSION SPYCLIENT CHAN",
+                       st[2].c_str());
         }
         return;
     }
@@ -347,8 +398,7 @@ void HELPCommand::Exec(const iClient* theClient, const string& Message, const sq
 
         dronescan::commandMapType::const_iterator it = bot->commandMap.find(targetCmd);
         if (it == bot->commandMap.end()) {
-            bot->Reply(theClient, "Unknown command '%s'. Type HELP for a list.",
-                       targetCmd.c_str());
+            bot->Reply(theClient, "Unknown command '%s'. Type HELP for a list.", targetCmd.c_str());
             return;
         }
 
@@ -397,15 +447,13 @@ void HELPCommand::Exec(const iClient* theClient, const string& Message, const sq
         Command* cmd = it->second;
         const string& name = cmd->getName();
         const string& usage = cmd->getHelp();
-        const string  desc  = getCommandDescription(name);
+        const string desc = getCommandDescription(name);
 
         if (!usage.empty())
-            bot->Reply(theClient, "  %-30s %s",
-                       (name + " " + usage).c_str(),
+            bot->Reply(theClient, "  %-30s %s", (name + " " + usage).c_str(),
                        desc.empty() ? "" : ("- " + desc).c_str());
         else
-            bot->Reply(theClient, "  %-30s %s",
-                       name.c_str(),
+            bot->Reply(theClient, "  %-30s %s", name.c_str(),
                        desc.empty() ? "" : ("- " + desc).c_str());
     }
 
