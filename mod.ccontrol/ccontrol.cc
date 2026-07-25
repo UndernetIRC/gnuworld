@@ -6165,8 +6165,8 @@ bool ccontrol::glineChannelUsers(iClient* theClient, Channel* theChan, const str
         //   omitted  - legacy senders; treat as no account (backwards compatible)
         //   *        - explicitly no account
         //   <name>   - logged-in account name
-        // Realname is located by the first ':'-prefixed token at index >= 5,
-        // so the optional account token does not shift a fixed fullname index.
+        // Realname is the IRC trailing parameter (st.trailing()), so the
+        // optional account token does not shift a fixed fullname index.
         StringTokenizer st(Message);
         if (st.size() < 6) {
             return 0;
@@ -6188,16 +6188,7 @@ bool ccontrol::glineChannelUsers(iClient* theClient, Channel* theChan, const str
         ipmask_parse(IP.c_str(), &theIP, NULL);
         string base64IP = string(xIP(theIP).GetBase64IP());
 
-        size_t fullnameIdx = 5;
-        for (size_t i = 5; i < st.size(); ++i) {
-            if (!st[i].empty() && st[i][0] == ':') {
-                fullnameIdx = i;
-                break;
-            }
-        }
-        string fullname = st.assemble(fullnameIdx);
-        if (fullname.substr(0, 1) == ":")
-            fullname = fullname.substr(1);
+        string fullname = st.trailing().value_or(st.assemble(5));
         fullname = theServer->getCharYY() + " " + fullname;
 
         iClient* newClient = new (std::nothrow) iClient(

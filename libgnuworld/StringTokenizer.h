@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 #include <iostream>
 
 namespace gnuworld {
@@ -127,6 +128,13 @@ class StringTokenizer {
      * original string, delimiters included.
      */
     std::string assemble(const size_type& = 0, int = -1) const;
+
+    /**
+     * Return the IRC trailing parameter: everything from the first
+     * token that begins with ':', with that leading ':' stripped.
+     * Returns std::nullopt if no such token exists.
+     */
+    std::optional<std::string> trailing() const;
 
     /**
      * The immutable iterator type to use for walking through

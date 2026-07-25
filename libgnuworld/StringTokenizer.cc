@@ -116,7 +116,8 @@ void StringTokenizer::Tokenize(const string& buf) {
         if (respectQuotes && inQuotes) {
             // \" inside a quoted run collapses to a literal ", staying
             // in quote mode. Any other backslash is kept as-is.
-            if (('\\' == *currentPtr) && ((currentPtr + 1) != endPtr) && ('"' == *(currentPtr + 1))) {
+            if (('\\' == *currentPtr) && ((currentPtr + 1) != endPtr) &&
+                ('"' == *(currentPtr + 1))) {
                 *addMePtr = '"';
                 ++addMePtr;
                 ++currentPtr;
@@ -209,6 +210,22 @@ string StringTokenizer::assemble(const size_type& start, int end) const {
 
     // Return the assembled string
     return retMe;
+}
+
+/**
+ * trailing()
+ * Return the IRC trailing parameter: everything from the first
+ * token that begins with ':', with that leading ':' stripped.
+ * Returns std::nullopt if no such token exists.
+ */
+std::optional<string> StringTokenizer::trailing() const {
+    for (size_type i = 0; i < size(); ++i) {
+        if (!array[i].empty() && array[i][0] == ':') {
+            string t = assemble(i);
+            return t.substr(1);
+        }
+    }
+    return std::nullopt;
 }
 
 StringTokenizer::size_type StringTokenizer::totalChars() const {
