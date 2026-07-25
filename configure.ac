@@ -9,7 +9,7 @@ AC_INIT([gnuworld],[3.0])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([include/defs.h])
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 AM_SILENT_RULES([yes])
 
 AM_PROG_AR
@@ -414,6 +414,17 @@ else
 fi
 
 AM_CONDITIONAL(COND_PGSQL,[test $check_pgsql = yes])
+
+dnl PCRE2 is required by mod.dronescan (spam TEXT / KICK_MSG regex matching).
+if test $build_moddronescan = true; then
+	AC_CHECK_HEADER([pcre2.h],
+		[],
+		[AC_MSG_ERROR([pcre2.h is required when building mod.dronescan. Install libpcre2 development headers, or omit mod.dronescan from --enable-modules.])],
+		[#define PCRE2_CODE_UNIT_WIDTH 8])
+	AC_CHECK_LIB([pcre2-8], [pcre2_compile_8],
+		[true],
+		[AC_MSG_ERROR([libpcre2-8 is required when building mod.dronescan. Install libpcre2, or omit mod.dronescan from --enable-modules.])])
+fi
 
 dnl Enable liboath by default if build_modcservice is set to true
 if test $build_modcservice = true; then

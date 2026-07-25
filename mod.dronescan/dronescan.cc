@@ -3137,6 +3137,7 @@ std::string sanitizeSpamTextForReport(const std::string& text) {
 // Same control-byte stripping as sanitizeSpamTextForReport() (so an
 // embedded CR/LF can't split a log line), but with no length cap and no
 // "..." - the SPAM action log must hold the complete, untruncated text.
+#ifdef ENABLE_LOG4CPLUS
 std::string sanitizeSpamTextForLog(const std::string& text) {
     std::string out;
     out.reserve(text.size());
@@ -3146,6 +3147,7 @@ std::string sanitizeSpamTextForLog(const std::string& text) {
     }
     return out;
 }
+#endif
 
 // One action resolved from a spam_rule_actions binding (reason/duration/
 // delay already computed from the spam_actions template + any per-rule
@@ -3341,6 +3343,9 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
 void dronescan::executeSpamAction(const std::string& actionType, const std::string& reason,
                                   int duration, bool prefixAuto, const SpamActor& actor,
                                   const std::string& ruleName) {
+#ifndef ENABLE_LOG4CPLUS
+    (void)ruleName;
+#endif
     const string& nick = actor.nick;
     const string& user = actor.user;
     const string& host = actor.host;
@@ -3354,8 +3359,8 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
-        logMsg << "SPAM[GLINE] Queued GLINE for " << nick << '!' << user << '@' << host << " ("
-               << ip << ") - mask: " << mask << " - duration: " << duration << "s - rule '"
+        logMsg << "SPAM[GLINE] Queued GLINE for " << actor.nick << '!' << user << '@' << actor.host
+               << " (" << ip << ") - mask: " << mask << " - duration: " << duration << "s - rule '"
                << ruleName << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
 #endif
@@ -3366,7 +3371,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         if (!target) {
 #ifdef ENABLE_LOG4CPLUS
             std::ostringstream logMsg;
-            logMsg << "SPAM[KILL] " << nick << '!' << user << '@' << host << " (" << ip
+            logMsg << "SPAM[KILL] " << actor.nick << '!' << user << '@' << actor.host << " (" << ip
                    << ") - rule '" << ruleName << "' - client no longer connected, skipped";
             log(SPAM_ACTION, logMsg.str());
 #endif
@@ -3376,8 +3381,9 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         Kill(target, reason);
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
-        logMsg << "SPAM[KILL] Killed " << nick << '!' << user << '@' << host << " (" << ip
-               << ") - rule '" << ruleName << "' - reason: " << sanitizeSpamTextForLog(reason);
+        logMsg << "SPAM[KILL] Killed " << actor.nick << '!' << user << '@' << actor.host << " ("
+               << ip << ") - rule '" << ruleName
+               << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
 #endif
     }
