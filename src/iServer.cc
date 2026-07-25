@@ -34,11 +34,6 @@ namespace gnuworld {
 
 using std::string;
 
-const iServer::flagType iServer::FLAG_JUPE = 0x01;
-const iServer::flagType iServer::FLAG_HUB = 0x02;
-const iServer::flagType iServer::FLAG_SERVICE = 0x04;
-const iServer::flagType iServer::FLAG_IPV6 = 0x08;
-
 iServer::iServer(const unsigned int& _uplink, const string& _yyxxx, const string& _name,
                  const time_t& _connectTime, const string& _description)
     : NetworkTarget(_yyxxx), uplinkIntYY(_uplink), name(_name), connectTime(_connectTime),
@@ -63,6 +58,9 @@ void iServer::setFlags(const string& newFlags) {
             break;
         case '6':
             setIPv6();
+            break;
+        case 'z':
+            setTLS();
             break;
         case '+':
             break;
