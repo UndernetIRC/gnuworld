@@ -31,7 +31,7 @@ class glineData {
   public:
     /** Constructor sets initial state to UNKNOWN. */
     inline glineData(std::string _host, std::string _reason, time_t _expires,
-                      bool _prefixAuto = true) {
+                     bool _prefixAuto = true) {
         host = _host;
         reason = _reason;
         expires = _expires;

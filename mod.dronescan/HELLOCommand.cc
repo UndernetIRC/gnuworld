@@ -38,19 +38,13 @@ void HELLOCommand::Exec(const iClient* theClient, const string& Message, const s
 
     /* Check if the user is already authenticated */
     if (!theClient->getAccount().empty()) {
-        bot->Reply(theClient, "You are already authenticated as %s", 
+        bot->Reply(theClient, "You are already authenticated as %s",
                    theClient->getAccount().c_str());
         return;
     }
 
     /* Perform the authentication using UserLogin */
-    bot->getUplink()->UserLogin(
-        const_cast<iClient*>(theClient),
-        accountName,
-        0,
-        0,
-        bot
-    );
+    bot->getUplink()->UserLogin(const_cast<iClient*>(theClient), accountName, 0, 0, bot);
 
     bot->Reply(theClient, "Successfully authenticated as %s", accountName.c_str());
 

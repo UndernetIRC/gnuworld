@@ -16,13 +16,10 @@
  *   SPAM RULE      SET    <name> <field> <value>
  *   SPAM RULE      ADDEVENT   <rule_name> <event_name> [points_override]
  *   SPAM RULE      REMEVENT   <rule_name> <event_name>
- *   SPAM RULE      ADDACTION  <rule_name> <action_name> [dur_override] [reason_override] [delay_override]
- *   SPAM RULE      REMACTION  <rule_name> <action_name>
- *   SPAM RULE      ADDCHAN    <rule_name> <#channel>
- *   SPAM RULE      REMCHAN    <rule_name> <#channel>
- *   SPAM ACTION    ADD    <name> <type> [duration] [reason] [delay] [prefix_auto]
- *   SPAM ACTION    DEL    <name>
- *   SPAM ACTION    LIST
+ *   SPAM RULE      ADDACTION  <rule_name> <action_name> [dur_override] [reason_override]
+ * [delay_override] SPAM RULE      REMACTION  <rule_name> <action_name> SPAM RULE      ADDCHAN
+ * <rule_name> <#channel> SPAM RULE      REMCHAN    <rule_name> <#channel> SPAM ACTION    ADD <name>
+ * <type> [duration] [reason] [delay] [prefix_auto] SPAM ACTION    DEL    <name> SPAM ACTION    LIST
  *   SPAM ACTION    SET    <name> <field> <value>
  *   SPAM EXCLUSION ADD    <CHAN|NICK|IP|OPER|GATEWAYIP> <value>
  *   SPAM EXCLUSION DEL    <id>
@@ -111,9 +108,8 @@ using std::stringstream;
 // ---------------------------------------------------------------------------
 // Helper: check minimum access
 // ---------------------------------------------------------------------------
-static bool checkAccess(const iClient* theClient, const sqlUser* theUser,
-                        dronescan* bot, unsigned short required)
-{
+static bool checkAccess(const iClient* theClient, const sqlUser* theUser, dronescan* bot,
+                        unsigned short required) {
     if (theUser->getAccess() < required) {
         bot->Reply(theClient, "Access denied.");
         return false;
@@ -124,33 +120,26 @@ static bool checkAccess(const iClient* theClient, const sqlUser* theUser,
 // ---------------------------------------------------------------------------
 // Helpers: valid event types / action types
 // ---------------------------------------------------------------------------
-static bool isValidEventType(const string& t)
-{
-    static const char* valid[] = {
-        "TEXT", "TEXT_REPEAT",
-        "ENTROPY_TEXT", "ENTROPY_NICK", "JOIN_CHANNEL",
-        "USERMODE", "KICK_MSG", "KICK_COUNT", nullptr
-    };
+static bool isValidEventType(const string& t) {
+    static const char* valid[] = {"TEXT",         "TEXT_REPEAT",  "ENTROPY_TEXT",
+                                  "ENTROPY_NICK", "JOIN_CHANNEL", "USERMODE",
+                                  "KICK_MSG",     "KICK_COUNT",   nullptr};
     for (int i = 0; valid[i]; ++i)
-        if (t == valid[i]) return true;
+        if (t == valid[i])
+            return true;
     return false;
 }
 
-static bool isValidActionType(const string& t)
-{
-    return (t == "GLINE" || t == "KILL");
-}
+static bool isValidActionType(const string& t) { return (t == "GLINE" || t == "KILL"); }
 
-static bool isValidExclusionType(const string& t)
-{
+static bool isValidExclusionType(const string& t) {
     return (t == "CHAN" || t == "NICK" || t == "IP" || t == "OPER" || t == "GATEWAYIP");
 }
 
 // ---------------------------------------------------------------------------
 // Helpers: case-insensitive name -> object lookups
 // ---------------------------------------------------------------------------
-static sqlSpamRule* findRuleByName(dronescan* bot, const string& name)
-{
+static sqlSpamRule* findRuleByName(dronescan* bot, const string& name) {
     const string lname = string_lower(name);
     for (dronescan::spamRulesMapType::const_iterator it = bot->spamRulesMap.begin();
          it != bot->spamRulesMap.end(); ++it) {
@@ -160,8 +149,7 @@ static sqlSpamRule* findRuleByName(dronescan* bot, const string& name)
     return nullptr;
 }
 
-static sqlSpamEvent* findEventByName(dronescan* bot, const string& name)
-{
+static sqlSpamEvent* findEventByName(dronescan* bot, const string& name) {
     const string lname = string_lower(name);
     for (dronescan::spamEventsMapType::const_iterator it = bot->spamEventsMap.begin();
          it != bot->spamEventsMap.end(); ++it) {
@@ -171,8 +159,7 @@ static sqlSpamEvent* findEventByName(dronescan* bot, const string& name)
     return nullptr;
 }
 
-static sqlSpamAction* findActionByName(dronescan* bot, const string& name)
-{
+static sqlSpamAction* findActionByName(dronescan* bot, const string& name) {
     const string lname = string_lower(name);
     for (dronescan::spamActionsMapType::const_iterator it = bot->spamActionsMap.begin();
          it != bot->spamActionsMap.end(); ++it) {
@@ -182,8 +169,7 @@ static sqlSpamAction* findActionByName(dronescan* bot, const string& name)
     return nullptr;
 }
 
-static sqlSpyClient* findSpyClientByNick(dronescan* bot, const string& nick)
-{
+static sqlSpyClient* findSpyClientByNick(dronescan* bot, const string& nick) {
     const string lnick = string_lower(nick);
     for (dronescan::spyClientsMapType::const_iterator it = bot->spyClientsMap.begin();
          it != bot->spyClientsMap.end(); ++it) {
@@ -196,8 +182,7 @@ static sqlSpyClient* findSpyClientByNick(dronescan* bot, const string& nick)
 // Numeric argument -> id lookup (spyClientsMap is keyed by id); otherwise
 // nickname lookup. IRC nicknames can't start with a digit, so a purely
 // numeric argument is unambiguous.
-static sqlSpyClient* findSpyClientByIdOrNick(dronescan* bot, const string& arg)
-{
+static sqlSpyClient* findSpyClientByIdOrNick(dronescan* bot, const string& arg) {
     bool numeric = !arg.empty();
     for (size_t i = 0; numeric && i < arg.size(); ++i)
         if (!isdigit(static_cast<unsigned char>(arg[i])))
@@ -214,8 +199,7 @@ static sqlSpyClient* findSpyClientByIdOrNick(dronescan* bot, const string& arg)
 // Comma-separated nicknames of the spy clients restricted to channelId, or
 // an empty string if the channel has no restriction (any spy client may
 // join it).
-static string spyClientNickListForChannel(dronescan* bot, int channelId)
-{
+static string spyClientNickListForChannel(dronescan* bot, int channelId) {
     dronescan::monitoredChannelSpyClientsMapType::const_iterator it =
         bot->monitoredChannelSpyClientsMap.find(channelId);
     if (it == bot->monitoredChannelSpyClientsMap.end() || it->second.empty())
@@ -223,10 +207,9 @@ static string spyClientNickListForChannel(dronescan* bot, int channelId)
 
     string out;
     for (size_t i = 0; i < it->second.size(); ++i) {
-        dronescan::spyClientsMapType::const_iterator scit =
-            bot->spyClientsMap.find(it->second[i]);
+        dronescan::spyClientsMapType::const_iterator scit = bot->spyClientsMap.find(it->second[i]);
         if (scit == bot->spyClientsMap.end())
-            continue;  // stale id
+            continue; // stale id
         if (!out.empty())
             out += ", ";
         out += scit->second->getNickname();
@@ -238,15 +221,13 @@ static string spyClientNickListForChannel(dronescan* bot, int channelId)
 // update). Shared by "RULE ADDEVENT" and the "-rule" flag on "EVENT ADD".
 // Caller is responsible for calling bot->relinkSpamGraph() afterward.
 static bool linkEventToRule(dronescan* bot, sqlSpamRule* rule, sqlSpamEvent* ev,
-                            int pointsOverride)
-{
-    const int rule_id  = rule->getId();
+                            int pointsOverride) {
+    const int rule_id = rule->getId();
     const int event_id = ev->getId();
 
     stringstream q;
-    q << "INSERT INTO spam_rule_events (rule_id, event_id, points_override) VALUES ("
-      << rule_id << ", " << event_id << ", "
-      << (pointsOverride >= 0 ? std::to_string(pointsOverride) : "NULL")
+    q << "INSERT INTO spam_rule_events (rule_id, event_id, points_override) VALUES (" << rule_id
+      << ", " << event_id << ", " << (pointsOverride >= 0 ? std::to_string(pointsOverride) : "NULL")
       << ")";
     if (!bot->getSqlDb()->Exec(q))
         return false;
@@ -264,10 +245,9 @@ static bool linkEventToRule(dronescan* bot, sqlSpamRule* rule, sqlSpamEvent* ev,
 // for calling bot->relinkSpamGraph() afterward on success.
 static sqlSpamRuleAction* linkActionToRule(dronescan* bot, sqlSpamRule* rule, sqlSpamAction* action,
                                            int durOverride, const string& reasonOverride,
-                                           int delayOverride, bool* outAlreadyLinked)
-{
+                                           int delayOverride, bool* outAlreadyLinked) {
     *outAlreadyLinked = false;
-    const int rule_id   = rule->getId();
+    const int rule_id = rule->getId();
     const int action_id = action->getId();
 
     // A rule may only bind a given action once (spam_rule_actions has a
@@ -287,9 +267,12 @@ static sqlSpamRuleAction* linkActionToRule(dronescan* bot, sqlSpamRule* rule, sq
     ra->setRuleId(rule_id);
     ra->setActionId(action_id);
     ra->setActionType(action->getActionType());
-    if (durOverride >= 0) ra->setActionDurationOverride(durOverride);
-    if (!reasonOverride.empty()) ra->setActionReasonOverride(reasonOverride);
-    if (delayOverride >= 0) ra->setDelayOverride(delayOverride);
+    if (durOverride >= 0)
+        ra->setActionDurationOverride(durOverride);
+    if (!reasonOverride.empty())
+        ra->setActionReasonOverride(reasonOverride);
+    if (delayOverride >= 0)
+        ra->setDelayOverride(delayOverride);
 
     if (!ra->insert()) {
         delete ra;
@@ -303,57 +286,98 @@ static sqlSpamRuleAction* linkActionToRule(dronescan* bot, sqlSpamRule* rule, sq
 // Returns -1 on any invalid token.
 // e.g. "chan_priv,privmsg" -> 3,  "all" -> 255,  "chan" -> 5 (chan_priv|chan_not),
 // "ctcp" -> 192 (ctcp_priv|ctcp_chan)
-static int parseTargetBitmask(const string& s)
-{
+static int parseTargetBitmask(const string& s) {
     int mask = 0;
     string tok;
     std::istringstream ss(s);
     while (std::getline(ss, tok, ',')) {
-        if (tok.empty()) continue;
+        if (tok.empty())
+            continue;
         const string p = string_lower(tok);
-        if      (p == "chan_priv") mask |= spam_target::CHAN_PRIV;
-        else if (p == "chan_not")  mask |= spam_target::CHAN_NOT;
-        else if (p == "chan")      mask |= spam_target::CHAN_PRIV | spam_target::CHAN_NOT;
-        else if (p == "privmsg")   mask |= spam_target::PRIVMSG;
-        else if (p == "notice")    mask |= spam_target::NOTICE;
-        else if (p == "part")      mask |= spam_target::PART;
-        else if (p == "quit")      mask |= spam_target::QUIT;
-        else if (p == "ctcp_priv") mask |= spam_target::CTCP_PRIV;
-        else if (p == "ctcp_chan") mask |= spam_target::CTCP_CHAN;
-        else if (p == "ctcp")      mask |= spam_target::CTCP_PRIV | spam_target::CTCP_CHAN;
-        else if (p == "all")       mask |= spam_target::ALL;
-        else return -1;
+        if (p == "chan_priv")
+            mask |= spam_target::CHAN_PRIV;
+        else if (p == "chan_not")
+            mask |= spam_target::CHAN_NOT;
+        else if (p == "chan")
+            mask |= spam_target::CHAN_PRIV | spam_target::CHAN_NOT;
+        else if (p == "privmsg")
+            mask |= spam_target::PRIVMSG;
+        else if (p == "notice")
+            mask |= spam_target::NOTICE;
+        else if (p == "part")
+            mask |= spam_target::PART;
+        else if (p == "quit")
+            mask |= spam_target::QUIT;
+        else if (p == "ctcp_priv")
+            mask |= spam_target::CTCP_PRIV;
+        else if (p == "ctcp_chan")
+            mask |= spam_target::CTCP_CHAN;
+        else if (p == "ctcp")
+            mask |= spam_target::CTCP_PRIV | spam_target::CTCP_CHAN;
+        else if (p == "all")
+            mask |= spam_target::ALL;
+        else
+            return -1;
     }
     return (mask > 0) ? mask : -1;
 }
 
 // Decode an integer bitmask to a human-readable comma-separated string.
 // e.g. 255 -> "all",  5 -> "chan_priv,chan_not"
-static string targetBitmaskToString(int mask)
-{
+static string targetBitmaskToString(int mask) {
     if ((mask & spam_target::ALL) == spam_target::ALL)
         return "all";
     string s;
-    if (mask & spam_target::CHAN_PRIV) { if (!s.empty()) s += ","; s += "chan_priv"; }
-    if (mask & spam_target::CHAN_NOT)  { if (!s.empty()) s += ","; s += "chan_not";  }
-    if (mask & spam_target::PRIVMSG)   { if (!s.empty()) s += ","; s += "privmsg";  }
-    if (mask & spam_target::NOTICE)    { if (!s.empty()) s += ","; s += "notice";   }
-    if (mask & spam_target::PART)      { if (!s.empty()) s += ","; s += "part";     }
-    if (mask & spam_target::QUIT)      { if (!s.empty()) s += ","; s += "quit";     }
-    if (mask & spam_target::CTCP_PRIV) { if (!s.empty()) s += ","; s += "ctcp_priv"; }
-    if (mask & spam_target::CTCP_CHAN) { if (!s.empty()) s += ","; s += "ctcp_chan"; }
+    if (mask & spam_target::CHAN_PRIV) {
+        if (!s.empty())
+            s += ",";
+        s += "chan_priv";
+    }
+    if (mask & spam_target::CHAN_NOT) {
+        if (!s.empty())
+            s += ",";
+        s += "chan_not";
+    }
+    if (mask & spam_target::PRIVMSG) {
+        if (!s.empty())
+            s += ",";
+        s += "privmsg";
+    }
+    if (mask & spam_target::NOTICE) {
+        if (!s.empty())
+            s += ",";
+        s += "notice";
+    }
+    if (mask & spam_target::PART) {
+        if (!s.empty())
+            s += ",";
+        s += "part";
+    }
+    if (mask & spam_target::QUIT) {
+        if (!s.empty())
+            s += ",";
+        s += "quit";
+    }
+    if (mask & spam_target::CTCP_PRIV) {
+        if (!s.empty())
+            s += ",";
+        s += "ctcp_priv";
+    }
+    if (mask & spam_target::CTCP_CHAN) {
+        if (!s.empty())
+            s += ",";
+        s += "ctcp_chan";
+    }
     return s.empty() ? "(none)" : s;
 }
 
 // ---------------------------------------------------------------------------
 // EVENT subcommands
 // ---------------------------------------------------------------------------
-static void handleEvent(dronescan* bot, const iClient* theClient,
-                        const sqlUser* theUser, const StringTokenizer& st)
-{
+static void handleEvent(dronescan* bot, const iClient* theClient, const sqlUser* theUser,
+                        const StringTokenizer& st) {
     if (st.size() < 3) {
-        bot->Reply(theClient,
-            "Usage: SPAM EVENT <ADD(A)|DEL(D)|LIST(L)|SHOW|SET> ...");
+        bot->Reply(theClient, "Usage: SPAM EVENT <ADD(A)|DEL(D)|LIST(L)|SHOW|SET> ...");
         return;
     }
 
@@ -361,45 +385,39 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
 
     // -- LIST ----------------------------------------------------------------
     if (verb == "LIST" || verb == "L") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
 
         if (bot->spamEventsMap.empty()) {
             bot->Reply(theClient, "No spam events defined.");
             return;
         }
-        bot->Reply(theClient, "=== Spam Events (%zu) ===",
-                   bot->spamEventsMap.size());
+        bot->Reply(theClient, "=== Spam Events (%zu) ===", bot->spamEventsMap.size());
         for (dronescan::spamEventsMapType::const_iterator it = bot->spamEventsMap.begin();
              it != bot->spamEventsMap.end(); ++it) {
             sqlSpamEvent* ev = it->second;
             bot->Reply(theClient, "[%d] %-22s  Type: %-14s  Target: %-14s  Enabled: %s",
-                       ev->getId(),
-                       ev->getName().c_str(),
-                       ev->getEventType().c_str(),
+                       ev->getId(), ev->getName().c_str(), ev->getEventType().c_str(),
                        targetBitmaskToString(ev->getTarget()).c_str(),
                        ev->isEnabled() ? "yes" : "no");
-            bot->Reply(theClient,
-                       "     Pts: %-5d  Expiry: %-5ds  MaxOcc: %-10s  ReqEvent: %s",
-                       ev->getPoints(),
-                       ev->getPointExpiry(),
-                       ev->getMaxOccurrence() >= 0
-                           ? std::to_string(ev->getMaxOccurrence()).c_str() : "unlimited",
+            bot->Reply(theClient, "     Pts: %-5d  Expiry: %-5ds  MaxOcc: %-10s  ReqEvent: %s",
+                       ev->getPoints(), ev->getPointExpiry(),
+                       ev->getMaxOccurrence() >= 0 ? std::to_string(ev->getMaxOccurrence()).c_str()
+                                                   : "unlimited",
                        ev->getRequiresEventId() > 0
-                           ? std::to_string(ev->getRequiresEventId()).c_str() : "none");
+                           ? std::to_string(ev->getRequiresEventId()).c_str()
+                           : "none");
             if (ev->getEventType() == "TEXT_REPEAT") {
-                bot->Reply(theClient,
-                           "     Param: %-32s  CaseSens: %s",
+                bot->Reply(theClient, "     Param: %-32s  CaseSens: %s",
                            ev->getParam().empty() ? "(none)" : ev->getParam().c_str(),
                            ev->isCaseSensitive() ? "yes" : "no");
-                bot->Reply(theClient,
-                    "     CrossUser: %-3s  MinCount: %-3d  ExclRegex: %s",
-                    ev->isRepeatCrossUser() ? "yes" : "no",
-                    ev->getRepeatMinCount(),
-                    ev->getRepeatExclusionRegex().empty()
-                        ? "(none)" : ev->getRepeatExclusionRegex().c_str());
+                bot->Reply(theClient, "     CrossUser: %-3s  MinCount: %-3d  ExclRegex: %s",
+                           ev->isRepeatCrossUser() ? "yes" : "no", ev->getRepeatMinCount(),
+                           ev->getRepeatExclusionRegex().empty()
+                               ? "(none)"
+                               : ev->getRepeatExclusionRegex().c_str());
             } else {
-                bot->Reply(theClient,
-                           "     Param: %s",
+                bot->Reply(theClient, "     Param: %s",
                            ev->getParam().empty() ? "(none)" : ev->getParam().c_str());
             }
         }
@@ -409,8 +427,12 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
 
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM EVENT SHOW <name>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM EVENT SHOW <name>");
+            return;
+        }
 
         sqlSpamEvent* ev = findEventByName(bot, st[3]);
         if (!ev) {
@@ -425,13 +447,11 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
                    targetBitmaskToString(ev->getTarget()).c_str(), ev->getTarget());
         if (ev->getEventType() == "TEXT_REPEAT")
             bot->Reply(theClient, "CaseSens: %s", ev->isCaseSensitive() ? "yes" : "no");
-        bot->Reply(theClient, "Points  : %d  Expiry: %ds",
-                   ev->getPoints(), ev->getPointExpiry());
+        bot->Reply(theClient, "Points  : %d  Expiry: %ds", ev->getPoints(), ev->getPointExpiry());
         bot->Reply(theClient, "MaxOcc  : %s",
-                   ev->getMaxOccurrence() >= 0
-                       ? std::to_string(ev->getMaxOccurrence()).c_str() : "unlimited");
-        bot->Reply(theClient, "Requires: event %d%s",
-                   ev->getRequiresEventId(),
+                   ev->getMaxOccurrence() >= 0 ? std::to_string(ev->getMaxOccurrence()).c_str()
+                                               : "unlimited");
+        bot->Reply(theClient, "Requires: event %d%s", ev->getRequiresEventId(),
                    ev->getRequiresEventId() > 0 ? "" : " (none)");
         bot->Reply(theClient, "Enabled : %s", ev->isEnabled() ? "yes" : "no");
         if (ev->getEventType() == "TEXT_REPEAT") {
@@ -440,20 +460,22 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Repeat min count    : %d", ev->getRepeatMinCount());
             bot->Reply(theClient, "Repeat excl regex   : %s",
                        ev->getRepeatExclusionRegex().empty()
-                           ? "(none)" : ev->getRepeatExclusionRegex().c_str());
+                           ? "(none)"
+                           : ev->getRepeatExclusionRegex().c_str());
         }
         return;
     }
 
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM EVENT ADD <name> <type> <target> <param> <points> <expiry> [max_occ]
         //                [-rule <rule_name>] [-repeat_count <n>]
         if (st.size() < 9) {
             bot->Reply(theClient,
-                "Usage: SPAM EVENT ADD <name> <type> <target> <param> <points> <expiry> "
-                "[max_occ] [-rule <rule_name>] [-repeat_count <n>]");
+                       "Usage: SPAM EVENT ADD <name> <type> <target> <param> <points> <expiry> "
+                       "[max_occ] [-rule <rule_name>] [-repeat_count <n>]");
             return;
         }
 
@@ -465,8 +487,9 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         int targetMask = parseTargetBitmask(st[5]);
         if (targetMask < 0) {
             bot->Reply(theClient,
-                "Invalid target '%s'. Use comma-separated: chan,privmsg,notice,part,quit,ctcp_priv,ctcp_chan,all",
-                st[5].c_str());
+                       "Invalid target '%s'. Use comma-separated: "
+                       "chan,privmsg,notice,part,quit,ctcp_priv,ctcp_chan,all",
+                       st[5].c_str());
             return;
         }
 
@@ -503,7 +526,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
                 hasRepeatCount = true;
                 pos += 2;
             } else {
-                bot->Reply(theClient,
+                bot->Reply(
+                    theClient,
                     "Unknown option '%s'. Valid options: -rule <rule_name>, -repeat_count <n>.",
                     st[pos].c_str());
                 return;
@@ -562,7 +586,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
                            rulesToLink[i]->getName().c_str());
                 continue;
             }
-            if (!linkedNames.empty()) linkedNames += ", ";
+            if (!linkedNames.empty())
+                linkedNames += ", ";
             linkedNames += rulesToLink[i]->getName();
         }
         bot->relinkSpamGraph();
@@ -577,8 +602,12 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
 
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL" || verb == "D") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM EVENT DEL <name>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM EVENT DEL <name>");
+            return;
+        }
 
         sqlSpamEvent* ev = findEventByName(bot, st[3]);
         if (!ev) {
@@ -601,7 +630,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM EVENT SET <name> <field> <value>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM EVENT SET <name> <field> <value>");
@@ -630,17 +660,17 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
             int mask = parseTargetBitmask(value);
             if (mask < 0) {
                 bot->Reply(theClient,
-                    "Invalid target '%s'. Use comma-separated: chan,privmsg,notice,part,quit,ctcp_priv,ctcp_chan,all",
-                    value.c_str());
+                           "Invalid target '%s'. Use comma-separated: "
+                           "chan,privmsg,notice,part,quit,ctcp_priv,ctcp_chan,all",
+                           value.c_str());
                 return;
             }
             ev->setTarget(mask);
         } else if (field == "case_sensitive") {
             if (ev->getEventType() != "TEXT_REPEAT") {
-                bot->Reply(theClient,
-                    "case_sensitive only affects TEXT_REPEAT dedup matching. "
-                    "For TEXT event regex matching, prefix your pattern with "
-                    "'(?i)' instead to make it case-insensitive.");
+                bot->Reply(theClient, "case_sensitive only affects TEXT_REPEAT dedup matching. "
+                                      "For TEXT event regex matching, prefix your pattern with "
+                                      "'(?i)' instead to make it case-insensitive.");
                 return;
             }
             ev->setCaseSensitive(value == "1" || value == "yes" || value == "true");
@@ -674,7 +704,8 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
                 bot->spamRepeatExclusionCache.find(id) == bot->spamRepeatExclusionCache.end())
                 bot->Reply(theClient, "Warning: exclusion regex compile failed.");
         } else {
-            bot->Reply(theClient,
+            bot->Reply(
+                theClient,
                 "Unknown field '%s'. Valid: name, description, param, target, case_sensitive, "
                 "points, point_expiry, max_occurrence, requires_event_id, enabled, "
                 "repeat_crossuser, repeat_min_count, repeat_exclusion_regex",
@@ -693,20 +724,19 @@ static void handleEvent(dronescan* bot, const iClient* theClient,
         return;
     }
 
-    bot->Reply(theClient,
-        "Unknown verb '%s'. Use ADD(A), DEL(D), LIST(L), SHOW, SET.", st[2].c_str());
+    bot->Reply(theClient, "Unknown verb '%s'. Use ADD(A), DEL(D), LIST(L), SHOW, SET.",
+               st[2].c_str());
 }
 
 // ---------------------------------------------------------------------------
 // RULE subcommands
 // ---------------------------------------------------------------------------
-static void handleRule(dronescan* bot, const iClient* theClient,
-                       const sqlUser* theUser, const StringTokenizer& st)
-{
+static void handleRule(dronescan* bot, const iClient* theClient, const sqlUser* theUser,
+                       const StringTokenizer& st) {
     if (st.size() < 3) {
         bot->Reply(theClient,
-            "Usage: SPAM RULE <ADD(A)|DEL(D)|LIST(L)|SHOW|SET|ADDEVENT(AE)|REMEVENT(RE)|"
-            "ADDACTION(AA)|REMACTION(RA)|ADDCHAN(AC)|REMCHAN(RC)> ...");
+                   "Usage: SPAM RULE <ADD(A)|DEL(D)|LIST(L)|SHOW|SET|ADDEVENT(AE)|REMEVENT(RE)|"
+                   "ADDACTION(AA)|REMACTION(RA)|ADDCHAN(AC)|REMCHAN(RC)> ...");
         return;
     }
 
@@ -714,29 +744,26 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
     // -- LIST ----------------------------------------------------------------
     if (verb == "LIST" || verb == "L") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
 
         if (bot->spamRulesMap.empty()) {
             bot->Reply(theClient, "No spam rules defined.");
             return;
         }
-        bot->Reply(theClient, "=== Spam Rules (%zu) ===",
-                   bot->spamRulesMap.size());
+        bot->Reply(theClient, "=== Spam Rules (%zu) ===", bot->spamRulesMap.size());
         for (dronescan::spamRulesMapType::const_iterator it = bot->spamRulesMap.begin();
              it != bot->spamRulesMap.end(); ++it) {
             sqlSpamRule* rule = it->second;
             bot->Reply(theClient,
-                       "[%d] %-25s  Threshold: %-5d  AllChans: %-3s  WaitOnRule: %-4s  PointsPer: %-8s  Global: %-3s  Enabled: %-3s  Silent: %s",
-                       rule->getId(),
-                       rule->getName().c_str(),
-                       rule->getThreshold(),
+                       "[%d] %-25s  Threshold: %-5d  AllChans: %-3s  WaitOnRule: %-4s  PointsPer: "
+                       "%-8s  Global: %-3s  Enabled: %-3s  Silent: %s",
+                       rule->getId(), rule->getName().c_str(), rule->getThreshold(),
                        rule->isAllChans() ? "yes" : "no",
-                       rule->getWaitOnRuleId() > 0
-                           ? std::to_string(rule->getWaitOnRuleId()).c_str() : "none",
-                       rule->getPointsPer().c_str(),
-                       rule->isScoreGlobally() ? "yes" : "no",
-                       rule->isEnabled() ? "yes" : "no",
-                       rule->isSilent() ? "yes" : "no");
+                       rule->getWaitOnRuleId() > 0 ? std::to_string(rule->getWaitOnRuleId()).c_str()
+                                                   : "none",
+                       rule->getPointsPer().c_str(), rule->isScoreGlobally() ? "yes" : "no",
+                       rule->isEnabled() ? "yes" : "no", rule->isSilent() ? "yes" : "no");
 
             // Linked events
             dronescan::spamRuleEventsMapType::const_iterator rei =
@@ -745,11 +772,10 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                 string evLine = "     Events:";
                 for (size_t i = 0; i < rei->second.size(); ++i) {
                     int eid = rei->second[i].first;
-                    int po  = rei->second[i].second;
-                    dronescan::spamEventsMapType::const_iterator ei =
-                        bot->spamEventsMap.find(eid);
-                    const char* ename = (ei != bot->spamEventsMap.end())
-                                      ? ei->second->getName().c_str() : "?";
+                    int po = rei->second[i].second;
+                    dronescan::spamEventsMapType::const_iterator ei = bot->spamEventsMap.find(eid);
+                    const char* ename =
+                        (ei != bot->spamEventsMap.end()) ? ei->second->getName().c_str() : "?";
                     evLine += " [" + std::to_string(eid) + "]" + ename;
                     if (po >= 0)
                         evLine += "(pts_ovr:" + std::to_string(po) + ")";
@@ -768,16 +794,17 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                     sqlSpamRuleAction* ra = rai->second[i];
                     dronescan::spamActionsMapType::const_iterator ai =
                         bot->spamActionsMap.find(ra->getActionId());
-                    const char* aname = (ai != bot->spamActionsMap.end())
-                                      ? ai->second->getName().c_str() : "?";
-                    actLine += " [sra:" + std::to_string(ra->getId()) + "]" + aname
-                             + "(" + ra->getActionType() + " dur:"
-                             + (ra->getActionDurationOverride() >= 0
-                                 ? std::to_string(ra->getActionDurationOverride()) : "def")
-                             + " delay:"
-                             + (ra->getDelayOverride() >= 0
-                                 ? std::to_string(ra->getDelayOverride()) : "def")
-                             + ")";
+                    const char* aname =
+                        (ai != bot->spamActionsMap.end()) ? ai->second->getName().c_str() : "?";
+                    actLine += " [sra:" + std::to_string(ra->getId()) + "]" + aname + "(" +
+                               ra->getActionType() + " dur:" +
+                               (ra->getActionDurationOverride() >= 0
+                                    ? std::to_string(ra->getActionDurationOverride())
+                                    : "def") +
+                               " delay:" +
+                               (ra->getDelayOverride() >= 0 ? std::to_string(ra->getDelayOverride())
+                                                            : "def") +
+                               ")";
                 }
                 bot->Reply(theClient, "%s", actLine.c_str());
             } else {
@@ -788,7 +815,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             dronescan::spamRuleChannelsMapType::const_iterator rci =
                 bot->spamRuleChannelsMap.find(rule->getId());
             if (rci != bot->spamRuleChannelsMap.end() && !rci->second.empty()) {
-                const char* chanLabel = rule->isAllChans() ? "     Excl-Chans:" : "     Incl-Chans:";
+                const char* chanLabel =
+                    rule->isAllChans() ? "     Excl-Chans:" : "     Incl-Chans:";
                 string chanLine = chanLabel;
                 for (size_t i = 0; i < rci->second.size(); ++i)
                     chanLine += " " + rci->second[i];
@@ -801,8 +829,12 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM RULE SHOW <name>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM RULE SHOW <name>");
+            return;
+        }
 
         sqlSpamRule* rule = findRuleByName(bot, st[3]);
         if (!rule) {
@@ -813,8 +845,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         bot->Reply(theClient, "ID          : %d", rule->getId());
         bot->Reply(theClient, "Name        : %s", rule->getName().c_str());
         bot->Reply(theClient, "Threshold   : %d", rule->getThreshold());
-        bot->Reply(theClient, "WaitOnRule  : %d%s",
-                   rule->getWaitOnRuleId(),
+        bot->Reply(theClient, "WaitOnRule  : %d%s", rule->getWaitOnRuleId(),
                    rule->getWaitOnRuleId() > 0 ? "" : " (none)");
         bot->Reply(theClient, "AllChans    : %s", rule->isAllChans() ? "yes" : "no");
         bot->Reply(theClient, "PointsPer   : %s", rule->getPointsPer().c_str());
@@ -824,28 +855,24 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         bot->Reply(theClient, "ReportSource: %s", rule->getReportSource().c_str());
 
         // Channel inclusion/exclusion list
-        dronescan::spamRuleChannelsMapType::const_iterator rci =
-            bot->spamRuleChannelsMap.find(id);
+        dronescan::spamRuleChannelsMapType::const_iterator rci = bot->spamRuleChannelsMap.find(id);
         if (rci != bot->spamRuleChannelsMap.end() && !rci->second.empty()) {
-            const char* listLabel = rule->isAllChans()
-                ? "Chan exclusions:" : "Chan inclusions:";
+            const char* listLabel = rule->isAllChans() ? "Chan exclusions:" : "Chan inclusions:";
             bot->Reply(theClient, "%s", listLabel);
             for (size_t i = 0; i < rci->second.size(); ++i)
                 bot->Reply(theClient, "  %s", rci->second[i].c_str());
         }
 
         // Linked events
-        dronescan::spamRuleEventsMapType::const_iterator rei =
-            bot->spamRuleEventsMap.find(id);
+        dronescan::spamRuleEventsMapType::const_iterator rei = bot->spamRuleEventsMap.find(id);
         if (rei != bot->spamRuleEventsMap.end() && !rei->second.empty()) {
             bot->Reply(theClient, "Events:");
             for (size_t i = 0; i < rei->second.size(); ++i) {
                 int eid = rei->second[i].first;
-                int po  = rei->second[i].second;
-                dronescan::spamEventsMapType::const_iterator ei =
-                    bot->spamEventsMap.find(eid);
-                const char* ename = (ei != bot->spamEventsMap.end())
-                                  ? ei->second->getName().c_str() : "?";
+                int po = rei->second[i].second;
+                dronescan::spamEventsMapType::const_iterator ei = bot->spamEventsMap.find(eid);
+                const char* ename =
+                    (ei != bot->spamEventsMap.end()) ? ei->second->getName().c_str() : "?";
                 if (po >= 0)
                     bot->Reply(theClient, "  [%d] %s (points override: %d)", eid, ename, po);
                 else
@@ -856,25 +883,25 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         }
 
         // Linked actions
-        dronescan::spamRuleActionsMapType::const_iterator rai =
-            bot->spamRuleActionsMap.find(id);
+        dronescan::spamRuleActionsMapType::const_iterator rai = bot->spamRuleActionsMap.find(id);
         if (rai != bot->spamRuleActionsMap.end() && !rai->second.empty()) {
             bot->Reply(theClient, "Actions:");
             for (size_t i = 0; i < rai->second.size(); ++i) {
                 sqlSpamRuleAction* ra = rai->second[i];
                 dronescan::spamActionsMapType::const_iterator ai =
                     bot->spamActionsMap.find(ra->getActionId());
-                const char* aname = (ai != bot->spamActionsMap.end())
-                                  ? ai->second->getName().c_str() : "?";
-                bot->Reply(theClient, "  [sra:%d] action:%d (%s) type:%s dur:%s reason:%s delay:%s",
-                           ra->getId(), ra->getActionId(), aname,
-                           ra->getActionType().c_str(),
-                           ra->getActionDurationOverride() >= 0
-                               ? std::to_string(ra->getActionDurationOverride()).c_str() : "default",
-                           ra->getActionReasonOverride().empty() ? "default"
-                               : ra->getActionReasonOverride().c_str(),
-                           ra->getDelayOverride() >= 0
-                               ? std::to_string(ra->getDelayOverride()).c_str() : "default");
+                const char* aname =
+                    (ai != bot->spamActionsMap.end()) ? ai->second->getName().c_str() : "?";
+                bot->Reply(
+                    theClient, "  [sra:%d] action:%d (%s) type:%s dur:%s reason:%s delay:%s",
+                    ra->getId(), ra->getActionId(), aname, ra->getActionType().c_str(),
+                    ra->getActionDurationOverride() >= 0
+                        ? std::to_string(ra->getActionDurationOverride()).c_str()
+                        : "default",
+                    ra->getActionReasonOverride().empty() ? "default"
+                                                          : ra->getActionReasonOverride().c_str(),
+                    ra->getDelayOverride() >= 0 ? std::to_string(ra->getDelayOverride()).c_str()
+                                                : "default");
             }
         } else {
             bot->Reply(theClient, "Actions   : (none)");
@@ -884,11 +911,12 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM RULE ADD <name> <threshold> [-action <action_name>]
         if (st.size() < 5) {
             bot->Reply(theClient,
-                "Usage: SPAM RULE ADD <name> <threshold> [-action <action_name>]");
+                       "Usage: SPAM RULE ADD <name> <threshold> [-action <action_name>]");
             return;
         }
 
@@ -905,9 +933,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                 actionNames.push_back(st[pos + 1]);
                 pos += 2;
             } else {
-                bot->Reply(theClient,
-                    "Unknown option '%s'. Valid options: -action <action_name>.",
-                    st[pos].c_str());
+                bot->Reply(theClient, "Unknown option '%s'. Valid options: -action <action_name>.",
+                           st[pos].c_str());
                 return;
             }
         }
@@ -940,21 +967,22 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         string linkedNames;
         for (size_t i = 0; i < actionsToLink.size(); ++i) {
             bool alreadyLinked = false;
-            sqlSpamRuleAction* ra = linkActionToRule(bot, rule, actionsToLink[i],
-                                                      -1, string(), -1, &alreadyLinked);
+            sqlSpamRuleAction* ra =
+                linkActionToRule(bot, rule, actionsToLink[i], -1, string(), -1, &alreadyLinked);
             if (!ra) {
                 bot->Reply(theClient, "Warning: failed to link action '%s'%s.",
                            actionsToLink[i]->getName().c_str(),
                            alreadyLinked ? " (already linked)" : "");
                 continue;
             }
-            if (!linkedNames.empty()) linkedNames += ", ";
+            if (!linkedNames.empty())
+                linkedNames += ", ";
             linkedNames += actionsToLink[i]->getName();
         }
         bot->relinkSpamGraph();
 
-        bot->Reply(theClient, "Spam rule '%s' added with ID %d.",
-                   rule->getName().c_str(), rule->getId());
+        bot->Reply(theClient, "Spam rule '%s' added with ID %d.", rule->getName().c_str(),
+                   rule->getId());
         if (!linkedNames.empty())
             bot->Reply(theClient, "Linked to action(s): %s.", linkedNames.c_str());
         return;
@@ -962,8 +990,12 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL" || verb == "D") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM RULE DEL <name>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM RULE DEL <name>");
+            return;
+        }
 
         sqlSpamRule* rule = findRuleByName(bot, st[3]);
         if (!rule) {
@@ -993,11 +1025,12 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
     // -- ADDEVENT ------------------------------------------------------------
     if (verb == "ADDEVENT" || verb == "AE") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM RULE ADDEVENT <rule_name> <event_name> [points_override]
         if (st.size() < 5) {
             bot->Reply(theClient,
-                "Usage: SPAM RULE ADDEVENT <rule_name> <event_name> [points_override]");
+                       "Usage: SPAM RULE ADDEVENT <rule_name> <event_name> [points_override]");
             return;
         }
         sqlSpamRule* rule = findRuleByName(bot, st[3]);
@@ -1013,20 +1046,21 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         int po = (st.size() >= 6) ? atoi(st[5].c_str()) : -1;
 
         if (!linkEventToRule(bot, rule, ev, po)) {
-            bot->Reply(theClient, "Failed to link event %d to rule %d.",
-                       ev->getId(), rule->getId());
+            bot->Reply(theClient, "Failed to link event %d to rule %d.", ev->getId(),
+                       rule->getId());
             return;
         }
         bot->relinkSpamGraph();
-        bot->Reply(theClient, "Event '%s' linked to rule '%s'%s.",
-                   ev->getName().c_str(), rule->getName().c_str(),
+        bot->Reply(theClient, "Event '%s' linked to rule '%s'%s.", ev->getName().c_str(),
+                   rule->getName().c_str(),
                    po >= 0 ? (" (points override: " + std::to_string(po) + ")").c_str() : "");
         return;
     }
 
     // -- REMEVENT ------------------------------------------------------------
     if (verb == "REMEVENT" || verb == "RE") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM RULE REMEVENT <rule_name> <event_name>");
             return;
@@ -1041,7 +1075,7 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Event '%s' not found.", st[4].c_str());
             return;
         }
-        const int rule_id  = rule->getId();
+        const int rule_id = rule->getId();
         const int event_id = ev->getId();
 
         stringstream q;
@@ -1053,12 +1087,11 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         }
 
         // Remove from in-memory map
-        dronescan::spamRuleEventsMapType::iterator rei =
-            bot->spamRuleEventsMap.find(rule_id);
+        dronescan::spamRuleEventsMapType::iterator rei = bot->spamRuleEventsMap.find(rule_id);
         if (rei != bot->spamRuleEventsMap.end()) {
-            std::vector<std::pair<int,int>>& vec = rei->second;
-            for (std::vector<std::pair<int,int>>::iterator vi = vec.begin();
-                 vi != vec.end(); ++vi) {
+            std::vector<std::pair<int, int>>& vec = rei->second;
+            for (std::vector<std::pair<int, int>>::iterator vi = vec.begin(); vi != vec.end();
+                 ++vi) {
                 if (vi->first == event_id) {
                     vec.erase(vi);
                     break;
@@ -1066,19 +1099,20 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             }
         }
         bot->relinkSpamGraph();
-        bot->Reply(theClient, "Event '%s' unlinked from rule '%s'.",
-                   ev->getName().c_str(), rule->getName().c_str());
+        bot->Reply(theClient, "Event '%s' unlinked from rule '%s'.", ev->getName().c_str(),
+                   rule->getName().c_str());
         return;
     }
 
     // -- ADDACTION -----------------------------------------------------------
     if (verb == "ADDACTION" || verb == "AA") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        // SPAM RULE ADDACTION <rule_name> <action_name> [dur_override] [reason_override] [delay_override]
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
+        // SPAM RULE ADDACTION <rule_name> <action_name> [dur_override] [reason_override]
+        // [delay_override]
         if (st.size() < 5) {
-            bot->Reply(theClient,
-                "Usage: SPAM RULE ADDACTION <rule_name> <action_name> "
-                "[dur_override] [reason_override] [delay_override]");
+            bot->Reply(theClient, "Usage: SPAM RULE ADDACTION <rule_name> <action_name> "
+                                  "[dur_override] [reason_override] [delay_override]");
             return;
         }
         sqlSpamRule* rule = findRuleByName(bot, st[3]);
@@ -1091,25 +1125,23 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             bot->Reply(theClient, "Action '%s' not found.", st[4].c_str());
             return;
         }
-        const int durOverride    = (st.size() >= 6) ? atoi(st[5].c_str()) : -1;
+        const int durOverride = (st.size() >= 6) ? atoi(st[5].c_str()) : -1;
         const string reasonOverride = (st.size() >= 7) ? st[6] : string();
-        const int delayOverride  = (st.size() >= 8) ? atoi(st[7].c_str()) : -1;
+        const int delayOverride = (st.size() >= 8) ? atoi(st[7].c_str()) : -1;
 
         // A rule may only bind a given action once (spam_rule_actions has a
         // UNIQUE(rule_id, action_id) constraint) so REMACTION can identify a
         // binding unambiguously by <rule_name> <action_name>.
         bool alreadyLinked = false;
-        sqlSpamRuleAction* ra = linkActionToRule(bot, rule, action,
-                                                  durOverride, reasonOverride, delayOverride,
-                                                  &alreadyLinked);
+        sqlSpamRuleAction* ra = linkActionToRule(bot, rule, action, durOverride, reasonOverride,
+                                                 delayOverride, &alreadyLinked);
         if (!ra) {
             if (alreadyLinked)
-                bot->Reply(theClient,
-                    "Action '%s' is already linked to rule '%s'.",
-                    action->getName().c_str(), rule->getName().c_str());
+                bot->Reply(theClient, "Action '%s' is already linked to rule '%s'.",
+                           action->getName().c_str(), rule->getName().c_str());
             else
-                bot->Reply(theClient, "Failed to link action %d to rule %d.",
-                           action->getId(), rule->getId());
+                bot->Reply(theClient, "Failed to link action %d to rule %d.", action->getId(),
+                           rule->getId());
             return;
         }
         bot->relinkSpamGraph();
@@ -1120,7 +1152,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
     // -- REMACTION -----------------------------------------------------------
     if (verb == "REMACTION" || verb == "RA") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM RULE REMACTION <rule_name> <action_name>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM RULE REMACTION <rule_name> <action_name>");
@@ -1141,8 +1174,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             bot->spamRuleActionsMap.find(rule->getId());
         if (rit != bot->spamRuleActionsMap.end()) {
             std::vector<sqlSpamRuleAction*>& vec = rit->second;
-            for (std::vector<sqlSpamRuleAction*>::iterator vi = vec.begin();
-                 vi != vec.end(); ++vi) {
+            for (std::vector<sqlSpamRuleAction*>::iterator vi = vec.begin(); vi != vec.end();
+                 ++vi) {
                 if ((*vi)->getActionId() == action->getId()) {
                     if (!(*vi)->remove()) {
                         bot->Reply(theClient, "Failed to remove rule-action binding.");
@@ -1157,14 +1190,15 @@ static void handleRule(dronescan* bot, const iClient* theClient,
                 }
             }
         }
-        bot->Reply(theClient, "Action '%s' is not linked to rule '%s'.",
-                   action->getName().c_str(), rule->getName().c_str());
+        bot->Reply(theClient, "Action '%s' is not linked to rule '%s'.", action->getName().c_str(),
+                   rule->getName().c_str());
         return;
     }
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM RULE SET <name> <field> <value>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM RULE SET <name> <field> <value>");
@@ -1215,16 +1249,16 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         } else if (field == "report_source") {
             const string rs = string_upper(value);
             if (rs != "BOT" && rs != "SPYCLIENT") {
-                bot->Reply(theClient,
-                    "Invalid report_source '%s'. Valid: BOT, SPYCLIENT", value.c_str());
+                bot->Reply(theClient, "Invalid report_source '%s'. Valid: BOT, SPYCLIENT",
+                           value.c_str());
                 return;
             }
             rule->setReportSource(rs);
         } else {
             bot->Reply(theClient,
-                "Unknown field '%s'. Valid: name, description, threshold, wait_on_rule_id, "
-                "enabled, points_per, score_globally, allchans, silent, report_source",
-                field.c_str());
+                       "Unknown field '%s'. Valid: name, description, threshold, wait_on_rule_id, "
+                       "enabled, points_per, score_globally, allchans, silent, report_source",
+                       field.c_str());
             return;
         }
 
@@ -1241,7 +1275,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 
     // -- ADDCHAN -------------------------------------------------------------
     if (verb == "ADDCHAN" || verb == "AC") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM RULE ADDCHAN <rule_name> <#channel>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM RULE ADDCHAN <rule_name> <#channel>");
@@ -1261,32 +1296,31 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         if (rci != bot->spamRuleChannelsMap.end()) {
             for (size_t i = 0; i < rci->second.size(); ++i) {
                 if (rci->second[i] == chanName) {
-                    bot->Reply(theClient,
-                        "Channel '%s' is already listed for rule '%s'.",
-                        chanName.c_str(), rule->getName().c_str());
+                    bot->Reply(theClient, "Channel '%s' is already listed for rule '%s'.",
+                               chanName.c_str(), rule->getName().c_str());
                     return;
                 }
             }
         }
 
         stringstream iq;
-        iq << "INSERT INTO spam_rule_channels (rule_id, channel_name) VALUES ("
-           << rule_id << ", '" << escapeSQLChars(chanName) << "')";
+        iq << "INSERT INTO spam_rule_channels (rule_id, channel_name) VALUES (" << rule_id << ", '"
+           << escapeSQLChars(chanName) << "')";
         if (!bot->getSqlDb()->Exec(iq)) {
-            bot->Reply(theClient,
-                "Failed to add channel '%s' to rule '%s' (duplicate?).",
-                chanName.c_str(), rule->getName().c_str());
+            bot->Reply(theClient, "Failed to add channel '%s' to rule '%s' (duplicate?).",
+                       chanName.c_str(), rule->getName().c_str());
             return;
         }
         bot->spamRuleChannelsMap[rule_id].push_back(chanName);
-        bot->Reply(theClient, "Channel '%s' added to rule '%s'.",
-                   chanName.c_str(), rule->getName().c_str());
+        bot->Reply(theClient, "Channel '%s' added to rule '%s'.", chanName.c_str(),
+                   rule->getName().c_str());
         return;
     }
 
     // -- REMCHAN -------------------------------------------------------------
     if (verb == "REMCHAN" || verb == "RC") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM RULE REMCHAN <rule_name> <#channel>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM RULE REMCHAN <rule_name> <#channel>");
@@ -1304,16 +1338,14 @@ static void handleRule(dronescan* bot, const iClient* theClient,
         dq << "DELETE FROM spam_rule_channels WHERE rule_id = " << rule_id
            << " AND channel_name = '" << escapeSQLChars(chanName) << "'";
         if (!bot->getSqlDb()->Exec(dq)) {
-            bot->Reply(theClient,
-                "Failed to remove channel '%s' from rule '%s'.",
-                chanName.c_str(), rule->getName().c_str());
+            bot->Reply(theClient, "Failed to remove channel '%s' from rule '%s'.", chanName.c_str(),
+                       rule->getName().c_str());
             return;
         }
 
         // Remove from in-memory map
         bool found = false;
-        dronescan::spamRuleChannelsMapType::iterator rci =
-            bot->spamRuleChannelsMap.find(rule_id);
+        dronescan::spamRuleChannelsMapType::iterator rci = bot->spamRuleChannelsMap.find(rule_id);
         if (rci != bot->spamRuleChannelsMap.end()) {
             std::vector<string>& vec = rci->second;
             for (std::vector<string>::iterator vi = vec.begin(); vi != vec.end(); ++vi) {
@@ -1325,17 +1357,17 @@ static void handleRule(dronescan* bot, const iClient* theClient,
             }
         }
         if (!found) {
-            bot->Reply(theClient,
-                "Channel '%s' was not found in rule '%s's list.",
-                chanName.c_str(), rule->getName().c_str());
+            bot->Reply(theClient, "Channel '%s' was not found in rule '%s's list.",
+                       chanName.c_str(), rule->getName().c_str());
             return;
         }
-        bot->Reply(theClient, "Channel '%s' removed from rule '%s'.",
-                   chanName.c_str(), rule->getName().c_str());
+        bot->Reply(theClient, "Channel '%s' removed from rule '%s'.", chanName.c_str(),
+                   rule->getName().c_str());
         return;
     }
 
-    bot->Reply(theClient,
+    bot->Reply(
+        theClient,
         "Unknown verb '%s'. Use ADD(A), DEL(D), LIST(L), SHOW, SET, "
         "ADDEVENT(AE), REMEVENT(RE), ADDACTION(AA), REMACTION(RA), ADDCHAN(AC), REMCHAN(RC).",
         st[2].c_str());
@@ -1344,9 +1376,8 @@ static void handleRule(dronescan* bot, const iClient* theClient,
 // ---------------------------------------------------------------------------
 // ACTION subcommands
 // ---------------------------------------------------------------------------
-static void handleAction(dronescan* bot, const iClient* theClient,
-                         const sqlUser* theUser, const StringTokenizer& st)
-{
+static void handleAction(dronescan* bot, const iClient* theClient, const sqlUser* theUser,
+                         const StringTokenizer& st) {
     if (st.size() < 3) {
         bot->Reply(theClient, "Usage: SPAM ACTION <ADD(A)|DEL(D)|LIST(L)|SET(S)> ...");
         return;
@@ -1356,27 +1387,24 @@ static void handleAction(dronescan* bot, const iClient* theClient,
 
     // -- LIST ----------------------------------------------------------------
     if (verb == "LIST" || verb == "L") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
 
         if (bot->spamActionsMap.empty()) {
             bot->Reply(theClient, "No spam actions defined.");
             return;
         }
-        bot->Reply(theClient, "=== Spam Actions (%zu) ===",
-                   bot->spamActionsMap.size());
+        bot->Reply(theClient, "=== Spam Actions (%zu) ===", bot->spamActionsMap.size());
         for (dronescan::spamActionsMapType::const_iterator it = bot->spamActionsMap.begin();
              it != bot->spamActionsMap.end(); ++it) {
             sqlSpamAction* act = it->second;
-            bot->Reply(theClient,
-                       "[%d] %-20s  Type: %-8s  Dur: %-6s  Delay: %-5d  Enabled: %-3s  PrefixAuto: %s",
-                       act->getId(),
-                       act->getName().c_str(),
-                       act->getActionType().c_str(),
-                       act->getDuration() >= 0
-                           ? std::to_string(act->getDuration()).c_str() : "N/A",
-                       act->getDelay(),
-                       act->isEnabled() ? "yes" : "no",
-                       act->isPrefixAuto() ? "yes" : "no");
+            bot->Reply(
+                theClient,
+                "[%d] %-20s  Type: %-8s  Dur: %-6s  Delay: %-5d  Enabled: %-3s  PrefixAuto: %s",
+                act->getId(), act->getName().c_str(), act->getActionType().c_str(),
+                act->getDuration() >= 0 ? std::to_string(act->getDuration()).c_str() : "N/A",
+                act->getDelay(), act->isEnabled() ? "yes" : "no",
+                act->isPrefixAuto() ? "yes" : "no");
             bot->Reply(theClient, "     Reason: %s",
                        act->getReason().empty() ? "(none)" : act->getReason().c_str());
         }
@@ -1386,10 +1414,12 @@ static void handleAction(dronescan* bot, const iClient* theClient,
 
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM ACTION ADD <name> <type> [duration] [reason] [delay] [prefix_auto]
         if (st.size() < 5) {
-            bot->Reply(theClient,
+            bot->Reply(
+                theClient,
                 "Usage: SPAM ACTION ADD <name> <type> [duration] [reason] [delay] [prefix_auto]");
             return;
         }
@@ -1402,9 +1432,12 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         sqlSpamAction* act = new sqlSpamAction(bot->getSqlDb());
         act->setName(st[3]);
         act->setActionType(atype);
-        if (st.size() >= 6) act->setDuration(atoi(st[5].c_str()));
-        if (st.size() >= 7) act->setReason(st[6]);
-        if (st.size() >= 8) act->setDelay(atoi(st[7].c_str()));
+        if (st.size() >= 6)
+            act->setDuration(atoi(st[5].c_str()));
+        if (st.size() >= 7)
+            act->setReason(st[6]);
+        if (st.size() >= 8)
+            act->setDelay(atoi(st[7].c_str()));
         if (st.size() >= 9) {
             const string pa = st[8];
             act->setPrefixAuto(pa == "1" || pa == "yes" || pa == "true");
@@ -1419,15 +1452,19 @@ static void handleAction(dronescan* bot, const iClient* theClient,
         }
         bot->spamActionsMap[act->getId()] = act;
         bot->relinkSpamGraph();
-        bot->Reply(theClient, "Spam action '%s' added with ID %d.",
-                   act->getName().c_str(), act->getId());
+        bot->Reply(theClient, "Spam action '%s' added with ID %d.", act->getName().c_str(),
+                   act->getId());
         return;
     }
 
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL" || verb == "D") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM ACTION DEL <name>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM ACTION DEL <name>");
+            return;
+        }
 
         sqlSpamAction* act = findActionByName(bot, st[3]);
         if (!act) {
@@ -1449,7 +1486,8 @@ static void handleAction(dronescan* bot, const iClient* theClient,
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET" || verb == "S") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM ACTION SET <name> <field> <value>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM ACTION SET <name> <field> <value>");
@@ -1489,9 +1527,9 @@ static void handleAction(dronescan* bot, const iClient* theClient,
             act->setPrefixAuto(value == "1" || value == "yes" || value == "true");
         } else {
             bot->Reply(theClient,
-                "Unknown field '%s'. Valid: name, action_type, duration, reason, delay, "
-                "rand_min, rand_max, enabled, prefix_auto",
-                field.c_str());
+                       "Unknown field '%s'. Valid: name, action_type, duration, reason, delay, "
+                       "rand_min, rand_max, enabled, prefix_auto",
+                       field.c_str());
             return;
         }
 
@@ -1513,9 +1551,8 @@ static void handleAction(dronescan* bot, const iClient* theClient,
 // ---------------------------------------------------------------------------
 // EXCLUSION subcommands
 // ---------------------------------------------------------------------------
-static void handleExclusion(dronescan* bot, const iClient* theClient,
-                             const sqlUser* theUser, const StringTokenizer& st)
-{
+static void handleExclusion(dronescan* bot, const iClient* theClient, const sqlUser* theUser,
+                            const StringTokenizer& st) {
     if (st.size() < 3) {
         bot->Reply(theClient, "Usage: SPAM EXCLUSION <ADD(A)|DEL(D)|LIST(L)|SET(S)> ...");
         return;
@@ -1525,21 +1562,18 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
 
     // -- LIST ----------------------------------------------------------------
     if (verb == "LIST" || verb == "L") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
 
         if (bot->spamExclusionsList.empty()) {
             bot->Reply(theClient, "No spam exclusions defined.");
             return;
         }
-        bot->Reply(theClient, "=== Spam Exclusions (%zu) ===",
-                   bot->spamExclusionsList.size());
+        bot->Reply(theClient, "=== Spam Exclusions (%zu) ===", bot->spamExclusionsList.size());
         bot->Reply(theClient, "%-4s %-9s %s", "ID", "Type", "Value");
-        for (dronescan::spamExclusionsListType::const_iterator it =
-                 bot->spamExclusionsList.begin();
+        for (dronescan::spamExclusionsListType::const_iterator it = bot->spamExclusionsList.begin();
              it != bot->spamExclusionsList.end(); ++it) {
-            bot->Reply(theClient, "%-4d %-9s %s",
-                       (*it)->getId(),
-                       (*it)->getExclusionType().c_str(),
+            bot->Reply(theClient, "%-4d %-9s %s", (*it)->getId(), (*it)->getExclusionType().c_str(),
                        (*it)->getValue().c_str());
         }
         bot->Reply(theClient, "--- %zu exclusion(s) ---", bot->spamExclusionsList.size());
@@ -1548,10 +1582,12 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
 
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM EXCLUSION ADD <CHAN|NICK|IP|OPER|GATEWAYIP> <value>
         if (st.size() < 5) {
-            bot->Reply(theClient, "Usage: SPAM EXCLUSION ADD <CHAN|NICK|IP|OPER|GATEWAYIP> <value>");
+            bot->Reply(theClient,
+                       "Usage: SPAM EXCLUSION ADD <CHAN|NICK|IP|OPER|GATEWAYIP> <value>");
             return;
         }
         const string etype = string_upper(st[3]);
@@ -1572,15 +1608,19 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
             return;
         }
         bot->spamExclusionsList.push_back(ex);
-        bot->Reply(theClient, "Exclusion added: %s %s (id: %d).",
-                   etype.c_str(), st[4].c_str(), ex->getId());
+        bot->Reply(theClient, "Exclusion added: %s %s (id: %d).", etype.c_str(), st[4].c_str(),
+                   ex->getId());
         return;
     }
 
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL" || verb == "D") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM EXCLUSION DEL <id>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM EXCLUSION DEL <id>");
+            return;
+        }
 
         int id = atoi(st[3].c_str());
         bool found = false;
@@ -1607,7 +1647,8 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET" || verb == "S") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM EXCLUSION SET <id> <field> <value>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM EXCLUSION SET <id> <field> <value>");
@@ -1615,10 +1656,12 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
         }
         const int id = atoi(st[3].c_str());
         sqlSpamExclusion* ex = nullptr;
-        for (dronescan::spamExclusionsListType::const_iterator it =
-                 bot->spamExclusionsList.begin();
+        for (dronescan::spamExclusionsListType::const_iterator it = bot->spamExclusionsList.begin();
              it != bot->spamExclusionsList.end(); ++it) {
-            if ((*it)->getId() == id) { ex = *it; break; }
+            if ((*it)->getId() == id) {
+                ex = *it;
+                break;
+            }
         }
         if (!ex) {
             bot->Reply(theClient, "Exclusion %d not found.", id);
@@ -1630,15 +1673,16 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
         if (field == "exclusion_type") {
             const string etype = string_upper(value);
             if (!isValidExclusionType(etype)) {
-                bot->Reply(theClient, "Invalid exclusion type. Use: CHAN, NICK, IP, OPER, GATEWAYIP");
+                bot->Reply(theClient,
+                           "Invalid exclusion type. Use: CHAN, NICK, IP, OPER, GATEWAYIP");
                 return;
             }
             ex->setExclusionType(etype);
         } else if (field == "value") {
             ex->setValue(value);
         } else {
-            bot->Reply(theClient,
-                "Unknown field '%s'. Valid: exclusion_type, value", field.c_str());
+            bot->Reply(theClient, "Unknown field '%s'. Valid: exclusion_type, value",
+                       field.c_str());
             return;
         }
 
@@ -1658,12 +1702,11 @@ static void handleExclusion(dronescan* bot, const iClient* theClient,
 // ---------------------------------------------------------------------------
 // SPYCLIENT subcommands
 // ---------------------------------------------------------------------------
-static void handleSpyClient(dronescan* bot, const iClient* theClient,
-                             const sqlUser* theUser, const StringTokenizer& st)
-{
+static void handleSpyClient(dronescan* bot, const iClient* theClient, const sqlUser* theUser,
+                            const StringTokenizer& st) {
     if (st.size() < 3) {
         bot->Reply(theClient,
-            "Usage: SPAM SPYCLIENT <ADD(A)|DEL|LIST(L)|SHOW|SET|ENABLE(E)|DISABLE> ...");
+                   "Usage: SPAM SPYCLIENT <ADD(A)|DEL|LIST(L)|SHOW|SET|ENABLE(E)|DISABLE> ...");
         return;
     }
 
@@ -1671,26 +1714,22 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
 
     // -- LIST ----------------------------------------------------------------
     if (verb == "LIST" || verb == "L") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
         if (bot->spyClientsMap.empty()) {
             bot->Reply(theClient, "No spy clients defined.");
             return;
         }
-        bot->Reply(theClient, "=== Spy Clients (%zu) ===",
-                   bot->spyClientsMap.size());
+        bot->Reply(theClient, "=== Spy Clients (%zu) ===", bot->spyClientsMap.size());
         for (dronescan::spyClientsMapType::const_iterator it = bot->spyClientsMap.begin();
              it != bot->spyClientsMap.end(); ++it) {
             sqlSpyClient* sc = it->second;
-            bot->Reply(theClient,
-                       "[%d] %-12s  User: %-10s  Host: %-24s  IP: %-16s  Enabled: %s",
-                       sc->getId(),
-                       sc->getNickname().c_str(),
-                       sc->getUsername().c_str(),
+            bot->Reply(theClient, "[%d] %-12s  User: %-10s  Host: %-24s  IP: %-16s  Enabled: %s",
+                       sc->getId(), sc->getNickname().c_str(), sc->getUsername().c_str(),
                        sc->getHostname().c_str(),
                        sc->getIp().empty() ? "(none)" : sc->getIp().c_str(),
                        sc->isEnabled() ? "yes" : "no");
-            bot->Reply(theClient,
-                       "     Realname: %-24s  Account: %-16s  Modes: %s",
+            bot->Reply(theClient, "     Realname: %-24s  Account: %-16s  Modes: %s",
                        sc->getRealname().empty() ? "(none)" : sc->getRealname().c_str(),
                        sc->getAccount().empty() ? "(none)" : sc->getAccount().c_str(),
                        sc->getModes().empty() ? "(none)" : sc->getModes().c_str());
@@ -1701,8 +1740,12 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
 
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM SPYCLIENT SHOW <id|nick>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM SPYCLIENT SHOW <id|nick>");
+            return;
+        }
 
         sqlSpyClient* sc = findSpyClientByIdOrNick(bot, st[3]);
         if (!sc) {
@@ -1725,10 +1768,12 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
 
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM SPYCLIENT ADD <nick> <user> <host> <ip> <realname> [account] [modes]
         if (st.size() < 8) {
-            bot->Reply(theClient,
+            bot->Reply(
+                theClient,
                 "Usage: SPAM SPYCLIENT ADD <nick> <user> <host> <ip> <realname> [account] [modes]");
             return;
         }
@@ -1739,8 +1784,10 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
         sc->setHostname(st[5]);
         sc->setIp(st[6]);
         sc->setRealname(st[7]);
-        if (st.size() >= 9) sc->setAccount(st[8]);
-        if (st.size() >= 10) sc->setModes(st[9]);
+        if (st.size() >= 9)
+            sc->setAccount(st[8]);
+        if (st.size() >= 10)
+            sc->setModes(st[9]);
         sc->setEnabled(true);
         sc->setCreatedTs(::time(0));
         sc->setModifiedTs(::time(0));
@@ -1754,15 +1801,19 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
         bot->spyClientsMap[sc->getId()] = sc;
         // Introduce the new spy client to the network
         bot->introduceSpyClient(sc);
-        bot->Reply(theClient, "Spy client '%s' added with ID %d.",
-                   sc->getNickname().c_str(), sc->getId());
+        bot->Reply(theClient, "Spy client '%s' added with ID %d.", sc->getNickname().c_str(),
+                   sc->getId());
         return;
     }
 
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM SPYCLIENT DEL <id|nick>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM SPYCLIENT DEL <id|nick>");
+            return;
+        }
 
         sqlSpyClient* sc = findSpyClientByIdOrNick(bot, st[3]);
         if (!sc) {
@@ -1786,7 +1837,8 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
     // -- ENABLE / DISABLE ----------------------------------------------------
     if (verb == "ENABLE" || verb == "E" || verb == "DISABLE") {
         const bool enabling = (verb == "ENABLE" || verb == "E");
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         if (st.size() < 4) {
             bot->Reply(theClient, "Usage: SPAM SPYCLIENT %s <id|nick>", verb.c_str());
             return;
@@ -1808,14 +1860,15 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
             bot->introduceSpyClient(sc);
         else
             bot->detachSpyClient(sc->getId());
-        bot->Reply(theClient, "Spy client '%s' %s.",
-                   sc->getNickname().c_str(), enabling ? "enabled" : "disabled");
+        bot->Reply(theClient, "Spy client '%s' %s.", sc->getNickname().c_str(),
+                   enabling ? "enabled" : "disabled");
         return;
     }
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM SPYCLIENT SET <id|nick> <field> <value>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM SPYCLIENT SET <id|nick> <field> <value>");
@@ -1849,9 +1902,9 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
             sc->setEnabled(value == "1" || value == "yes" || value == "true");
         } else {
             bot->Reply(theClient,
-                "Unknown field '%s'. Valid: nick, user, host, ip, realname, "
-                "account, modes, enabled",
-                field.c_str());
+                       "Unknown field '%s'. Valid: nick, user, host, ip, realname, "
+                       "account, modes, enabled",
+                       field.c_str());
             return;
         }
 
@@ -1872,20 +1925,18 @@ static void handleSpyClient(dronescan* bot, const iClient* theClient,
     }
 
     bot->Reply(theClient,
-        "Unknown verb '%s'. Use ADD(A), DEL, LIST(L), SHOW, SET, ENABLE(E), DISABLE.",
-        st[2].c_str());
+               "Unknown verb '%s'. Use ADD(A), DEL, LIST(L), SHOW, SET, ENABLE(E), DISABLE.",
+               st[2].c_str());
 }
 
 // ---------------------------------------------------------------------------
 // CHAN subcommands
 // ---------------------------------------------------------------------------
-static void handleChan(dronescan* bot, const iClient* theClient,
-                        const sqlUser* theUser, const StringTokenizer& st)
-{
+static void handleChan(dronescan* bot, const iClient* theClient, const sqlUser* theUser,
+                       const StringTokenizer& st) {
     if (st.size() < 3) {
-        bot->Reply(theClient,
-            "Usage: SPAM CHAN <ADD(A)|DEL|LIST(L)|SHOW|SET|ENABLE(E)|DISABLE|"
-            "ADDSPY(AS)|REMSPY(RS)> ...");
+        bot->Reply(theClient, "Usage: SPAM CHAN <ADD(A)|DEL|LIST(L)|SHOW|SET|ENABLE(E)|DISABLE|"
+                              "ADDSPY(AS)|REMSPY(RS)> ...");
         return;
     }
 
@@ -1893,34 +1944,31 @@ static void handleChan(dronescan* bot, const iClient* theClient,
 
     // -- LIST ----------------------------------------------------------------
     if (verb == "LIST" || verb == "L") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
         if (bot->monitoredChannelsMap.empty()) {
             bot->Reply(theClient, "No monitored channels defined.");
             return;
         }
-        bot->Reply(theClient, "=== Monitored Channels (%zu) ===",
-                   bot->monitoredChannelsMap.size());
-        bot->Reply(theClient, "%-4s %-32s %-8s %-11s %-7s %-10s %s",
-                   "ID", "Channel", "ForceJoin", "JoinAsSvc", "Enabled", "SpyClnts", "LastTrig");
+        bot->Reply(theClient, "=== Monitored Channels (%zu) ===", bot->monitoredChannelsMap.size());
+        bot->Reply(theClient, "%-4s %-32s %-8s %-11s %-7s %-10s %s", "ID", "Channel", "ForceJoin",
+                   "JoinAsSvc", "Enabled", "SpyClnts", "LastTrig");
         for (dronescan::monitoredChannelsMapType::const_iterator it =
                  bot->monitoredChannelsMap.begin();
              it != bot->monitoredChannelsMap.end(); ++it) {
             sqlMonitoredChannel* mc = it->second;
             dronescan::monitoredChannelSpyClientsMapType::const_iterator sit =
                 bot->monitoredChannelSpyClientsMap.find(mc->getId());
-            const string spySummary = (sit != bot->monitoredChannelSpyClientsMap.end() &&
-                                        !sit->second.empty())
-                                       ? std::to_string(sit->second.size()) : "any";
-            const char* lastTrig = (mc->getLastTriggeredTs() > 0)
-                                   ? bot->Ago(mc->getLastTriggeredTs()) : "never";
-            bot->Reply(theClient, "%-4d %-32s %-8s %-11s %-7s %-10s %s",
-                       mc->getId(),
-                       mc->getName().c_str(),
-                       mc->isForceJoin() ? "yes" : "no",
-                       mc->isJoinAsService() ? "yes" : "no",
-                       mc->isEnabled() ? "yes" : "no",
-                       spySummary.c_str(),
-                       lastTrig);
+            const string spySummary =
+                (sit != bot->monitoredChannelSpyClientsMap.end() && !sit->second.empty())
+                    ? std::to_string(sit->second.size())
+                    : "any";
+            const char* lastTrig =
+                (mc->getLastTriggeredTs() > 0) ? bot->Ago(mc->getLastTriggeredTs()) : "never";
+            bot->Reply(theClient, "%-4d %-32s %-8s %-11s %-7s %-10s %s", mc->getId(),
+                       mc->getName().c_str(), mc->isForceJoin() ? "yes" : "no",
+                       mc->isJoinAsService() ? "yes" : "no", mc->isEnabled() ? "yes" : "no",
+                       spySummary.c_str(), lastTrig);
         }
         bot->Reply(theClient, "--- %zu channel(s) ---", bot->monitoredChannelsMap.size());
         return;
@@ -1928,8 +1976,12 @@ static void handleChan(dronescan* bot, const iClient* theClient,
 
     // -- SHOW ----------------------------------------------------------------
     if (verb == "SHOW") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_read)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM CHAN SHOW <#channel>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_read))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM CHAN SHOW <#channel>");
+            return;
+        }
 
         dronescan::monitoredChannelsMapType::const_iterator it =
             bot->monitoredChannelsMap.find(string_lower(st[3]));
@@ -1956,11 +2008,12 @@ static void handleChan(dronescan* bot, const iClient* theClient,
 
     // -- ADD -----------------------------------------------------------------
     if (verb == "ADD" || verb == "A") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM CHAN ADD <#channel> [forcejoin 0|1] [joinasservice 0|1]
         if (st.size() < 4) {
             bot->Reply(theClient,
-                "Usage: SPAM CHAN ADD <#channel> [forcejoin 0|1] [joinasservice 0|1]");
+                       "Usage: SPAM CHAN ADD <#channel> [forcejoin 0|1] [joinasservice 0|1]");
             return;
         }
         const string chanName = string_lower(st[3]);
@@ -1993,15 +2046,19 @@ static void handleChan(dronescan* bot, const iClient* theClient,
         } else {
             bot->getUplink()->JoinChannel(bot, chanName, "");
         }
-        bot->Reply(theClient, "Monitored channel '%s' added with ID %d.",
-                   chanName.c_str(), mc->getId());
+        bot->Reply(theClient, "Monitored channel '%s' added with ID %d.", chanName.c_str(),
+                   mc->getId());
         return;
     }
 
     // -- DEL -----------------------------------------------------------------
     if (verb == "DEL") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
-        if (st.size() < 4) { bot->Reply(theClient, "Usage: SPAM CHAN DEL <#channel>"); return; }
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
+        if (st.size() < 4) {
+            bot->Reply(theClient, "Usage: SPAM CHAN DEL <#channel>");
+            return;
+        }
 
         dronescan::monitoredChannelsMapType::iterator found =
             bot->monitoredChannelsMap.find(string_lower(st[3]));
@@ -2032,7 +2089,8 @@ static void handleChan(dronescan* bot, const iClient* theClient,
     // -- ENABLE / DISABLE ----------------------------------------------------
     if (verb == "ENABLE" || verb == "E" || verb == "DISABLE") {
         const bool enabling = (verb == "ENABLE" || verb == "E");
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         if (st.size() < 4) {
             bot->Reply(theClient, "Usage: SPAM CHAN %s <#channel>", verb.c_str());
             return;
@@ -2048,7 +2106,8 @@ static void handleChan(dronescan* bot, const iClient* theClient,
         mc->setModifiedTs(::time(0));
         mc->setModifiedBy(0);
         if (!mc->commit()) {
-            bot->Reply(theClient, "Failed to update monitored channel '%s'.", mc->getName().c_str());
+            bot->Reply(theClient, "Failed to update monitored channel '%s'.",
+                       mc->getName().c_str());
             return;
         }
         const string chanKey = string_lower(mc->getName());
@@ -2071,14 +2130,15 @@ static void handleChan(dronescan* bot, const iClient* theClient,
                 bot->getUplink()->JoinChannel(bot, mc->getName(), "");
             }
         }
-        bot->Reply(theClient, "Monitored channel '%s' %s.",
-                   mc->getName().c_str(), enabling ? "enabled" : "disabled");
+        bot->Reply(theClient, "Monitored channel '%s' %s.", mc->getName().c_str(),
+                   enabling ? "enabled" : "disabled");
         return;
     }
 
     // -- SET -----------------------------------------------------------------
     if (verb == "SET") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM CHAN SET <#channel> <field> <value>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM CHAN SET <#channel> <field> <value>");
@@ -2102,16 +2162,16 @@ static void handleChan(dronescan* bot, const iClient* theClient,
         } else if (field == "enabled") {
             mc->setEnabled(value == "1" || value == "yes" || value == "true");
         } else {
-            bot->Reply(theClient,
-                "Unknown field '%s'. Valid: forcejoin, joinasservice, enabled",
-                field.c_str());
+            bot->Reply(theClient, "Unknown field '%s'. Valid: forcejoin, joinasservice, enabled",
+                       field.c_str());
             return;
         }
 
         mc->setModifiedTs(::time(0));
         mc->setModifiedBy(0);
         if (!mc->commit()) {
-            bot->Reply(theClient, "Failed to update monitored channel '%s'.", mc->getName().c_str());
+            bot->Reply(theClient, "Failed to update monitored channel '%s'.",
+                       mc->getName().c_str());
             return;
         }
         if (field == "enabled" && wasEnabled != mc->isEnabled()) {
@@ -2133,14 +2193,15 @@ static void handleChan(dronescan* bot, const iClient* theClient,
                 }
             }
         }
-        bot->Reply(theClient, "Monitored channel '%s': %s set to '%s'.",
-                   mc->getName().c_str(), field.c_str(), value.c_str());
+        bot->Reply(theClient, "Monitored channel '%s': %s set to '%s'.", mc->getName().c_str(),
+                   field.c_str(), value.c_str());
         return;
     }
 
     // -- ADDSPY ----------------------------------------------------------
     if (verb == "ADDSPY" || verb == "AS") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM CHAN ADDSPY <#channel> <nick>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM CHAN ADDSPY <#channel> <nick>");
@@ -2158,8 +2219,8 @@ static void handleChan(dronescan* bot, const iClient* theClient,
         sqlSpyClient* sc = findSpyClientByNick(bot, st[4]);
         if (!sc) {
             bot->Reply(theClient,
-                "Spy client '%s' not found. Use SPAM SPYCLIENT LIST to see valid nicks.",
-                st[4].c_str());
+                       "Spy client '%s' not found. Use SPAM SPYCLIENT LIST to see valid nicks.",
+                       st[4].c_str());
             return;
         }
 
@@ -2181,14 +2242,15 @@ static void handleChan(dronescan* bot, const iClient* theClient,
             return;
         }
         allowed.push_back(sc->getId());
-        bot->Reply(theClient, "Spy client '%s' added to '%s'.",
-                   sc->getNickname().c_str(), mc->getName().c_str());
+        bot->Reply(theClient, "Spy client '%s' added to '%s'.", sc->getNickname().c_str(),
+                   mc->getName().c_str());
         return;
     }
 
     // -- REMSPY ------------------------------------------------------------
     if (verb == "REMSPY" || verb == "RS") {
-        if (!checkAccess(theClient, theUser, bot, level::spam_write)) return;
+        if (!checkAccess(theClient, theUser, bot, level::spam_write))
+            return;
         // SPAM CHAN REMSPY <#channel> <nick>
         if (st.size() < 5) {
             bot->Reply(theClient, "Usage: SPAM CHAN REMSPY <#channel> <nick>");
@@ -2232,26 +2294,25 @@ static void handleChan(dronescan* bot, const iClient* theClient,
             }
         }
         if (!found) {
-            bot->Reply(theClient,
-                "Spy client '%s' was not in the allowed list for '%s'.",
-                sc->getNickname().c_str(), mc->getName().c_str());
+            bot->Reply(theClient, "Spy client '%s' was not in the allowed list for '%s'.",
+                       sc->getNickname().c_str(), mc->getName().c_str());
             return;
         }
-        bot->Reply(theClient, "Spy client '%s' removed from '%s'.",
-                   sc->getNickname().c_str(), mc->getName().c_str());
+        bot->Reply(theClient, "Spy client '%s' removed from '%s'.", sc->getNickname().c_str(),
+                   mc->getName().c_str());
         return;
     }
 
     bot->Reply(theClient,
-        "Unknown verb '%s'. Use ADD(A), DEL, LIST(L), SHOW, SET, ENABLE(E), DISABLE, "
-        "ADDSPY(AS), REMSPY(RS).", st[2].c_str());
+               "Unknown verb '%s'. Use ADD(A), DEL, LIST(L), SHOW, SET, ENABLE(E), DISABLE, "
+               "ADDSPY(AS), REMSPY(RS).",
+               st[2].c_str());
 }
 
 // ---------------------------------------------------------------------------
 // SPAMCommand::Exec ? top-level dispatcher
 // ---------------------------------------------------------------------------
-void SPAMCommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser)
-{
+void SPAMCommand::Exec(const iClient* theClient, const string& Message, const sqlUser* theUser) {
     // respectQuotes=true: a "..." run is a single token, so free-text
     // fields (reason, description, realname, etc.) may contain spaces.
     StringTokenizer st(Message, ' ', true);
@@ -2263,14 +2324,33 @@ void SPAMCommand::Exec(const iClient* theClient, const string& Message, const sq
 
     const string obj = string_upper(st[1]);
 
-    if (obj == "EVENT"     || obj == "E")  { handleEvent(bot, theClient, theUser, st);       return; }
-    if (obj == "RULE"      || obj == "R")  { handleRule(bot, theClient, theUser, st);        return; }
-    if (obj == "ACTION"    || obj == "A")  { handleAction(bot, theClient, theUser, st);      return; }
-    if (obj == "EXCLUSION" || obj == "EX") { handleExclusion(bot, theClient, theUser, st);   return; }
-    if (obj == "SPYCLIENT" || obj == "S")  { handleSpyClient(bot, theClient, theUser, st);   return; }
-    if (obj == "CHAN"      || obj == "C")  { handleChan(bot, theClient, theUser, st);        return; }
+    if (obj == "EVENT" || obj == "E") {
+        handleEvent(bot, theClient, theUser, st);
+        return;
+    }
+    if (obj == "RULE" || obj == "R") {
+        handleRule(bot, theClient, theUser, st);
+        return;
+    }
+    if (obj == "ACTION" || obj == "A") {
+        handleAction(bot, theClient, theUser, st);
+        return;
+    }
+    if (obj == "EXCLUSION" || obj == "EX") {
+        handleExclusion(bot, theClient, theUser, st);
+        return;
+    }
+    if (obj == "SPYCLIENT" || obj == "S") {
+        handleSpyClient(bot, theClient, theUser, st);
+        return;
+    }
+    if (obj == "CHAN" || obj == "C") {
+        handleChan(bot, theClient, theUser, st);
+        return;
+    }
 
-    bot->Reply(theClient,
+    bot->Reply(
+        theClient,
         "Usage: SPAM <EVENT(E)|RULE(R)|ACTION(A)|EXCLUSION(EX)|SPYCLIENT(S)|CHAN(C)> <verb> ...");
 }
 

@@ -270,8 +270,8 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     RegisterCommand(new STATUSCommand(this, "STATUS", ""));
     RegisterCommand(new RELOADCommand(this, "RELOAD", ""));
     RegisterCommand(new REHASHCommand(this, "REHASH", ""));
-    RegisterCommand(new SPAMCommand(this, "SPAM",
-        "<EVENT|RULE|ACTION|EXCLUSION|SPYCLIENT|CHAN> <verb> ..."));
+    RegisterCommand(
+        new SPAMCommand(this, "SPAM", "<EVENT|RULE|ACTION|EXCLUSION|SPYCLIENT|CHAN> <verb> ..."));
 
     // in case RELOAD command is used, have to iterate the userlist to know how many clients per IP
     // are online for the gline count.
@@ -385,7 +385,8 @@ void dronescan::BurstChannels() {
     for (monitoredChannelsMapType::const_iterator it = monitoredChannelsMap.begin();
          it != monitoredChannelsMap.end(); ++it) {
         sqlMonitoredChannel* mc = it->second;
-        if (!mc->isEnabled()) continue;
+        if (!mc->isEnabled())
+            continue;
 
         if (mc->isJoinAsService()) {
             MyUplink->JoinChannel(this, mc->getName(), "");
@@ -393,8 +394,7 @@ void dronescan::BurstChannels() {
             if (findBestSpyClient(mc->getName(), mc->isForceJoin()) >= 0)
                 scheduleSpyClientJoin(mc->getName(), mc->isForceJoin(), 0, 10);
             else
-                Message(consoleChannel,
-                        "[SpyClient] No available spy client for %s at burst.",
+                Message(consoleChannel, "[SpyClient] No available spy client for %s at burst.",
                         mc->getName().c_str());
         }
     }
@@ -430,8 +430,7 @@ void dronescan::OnCTCP(iClient* theClient, const string& CTCP, const string& Mes
  * pipeline; spy clients do not auto-reply to CTCP.
  */
 void dronescan::OnFakeCTCP(iClient* Sender, iClient* Target, const std::string& CTCP,
-                           const std::string& Message, bool Secure)
-{
+                           const std::string& Message, bool Secure) {
     if (!Sender || currentState != RUN)
         return;
     processSpamText(Sender, CTCP, spam_target::CTCP_PRIV, "");
@@ -443,9 +442,8 @@ void dronescan::OnFakeCTCP(iClient* Sender, iClient* Target, const std::string& 
  * (e.g. CTCP ACTION / "/me"). Feeds the CTCP command line into the
  * spam detection pipeline.
  */
-void dronescan::OnChannelCTCP(iClient* Sender, Channel* theChan,
-                              const std::string& CTCPCommand, const std::string& Message)
-{
+void dronescan::OnChannelCTCP(iClient* Sender, Channel* theChan, const std::string& CTCPCommand,
+                              const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
     processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName());
@@ -458,8 +456,7 @@ void dronescan::OnChannelCTCP(iClient* Sender, Channel* theChan,
  * detection pipeline.
  */
 void dronescan::OnFakeChannelCTCP(iClient* Sender, iClient* Target, Channel* theChan,
-                                  const std::string& CTCPCommand, const std::string& Message)
-{
+                                  const std::string& CTCPCommand, const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
     processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName());
@@ -557,11 +554,10 @@ void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theCha
     } else if (theEvent == EVT_PART) {
         handleChannelPart(theChannel, theClient);
         // Feed part reason into spam detection (TEXT events with PART target)
-        const string partReason = (Data2 && currentState == RUN)
-            ? *static_cast<string*>(Data2) : string();
+        const string partReason =
+            (Data2 && currentState == RUN) ? *static_cast<string*>(Data2) : string();
         if (!partReason.empty())
-            processSpamText(theClient, partReason,
-                            spam_target::PART, theChannel->getName());
+            processSpamText(theClient, partReason, spam_target::PART, theChannel->getName());
     }
     xClient::OnChannelEvent(theEvent, theChannel, Data1, Data2, Data3, Data4);
 }
@@ -594,7 +590,8 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
     string Command = string_upper(st[0]);
 
     if (!theUser && Command != "HELLO") {
-        //log(INFO, "Oper %s is not authenticated for using command %s", theClient->getNickName().c_str(), Command.c_str());
+        // log(INFO, "Oper %s is not authenticated for using command %s",
+        // theClient->getNickName().c_str(), Command.c_str());
         elog << "Oper " << theClient->getNickName() << " is not authenticated for using command "
              << Command << endl;
         return;
@@ -749,9 +746,8 @@ void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool
  * Unlike OnPrivateMessage, no command dispatch happens here - that logic
  * is specific to real authenticated clients issuing bot commands.
  */
-void dronescan::OnFakePrivateMessage(iClient* Sender, iClient* Target,
-                                     const std::string& Message, bool secure)
-{
+void dronescan::OnFakePrivateMessage(iClient* Sender, iClient* Target, const std::string& Message,
+                                     bool secure) {
     if (!Sender || currentState != RUN)
         return;
     processSpamText(Sender, Message, spam_target::PRIVMSG, "");
@@ -763,13 +759,10 @@ void dronescan::OnFakePrivateMessage(iClient* Sender, iClient* Target,
  * the main service client is a member of (e.g. joinasservice channels).
  * Feeds the message into the spam detection pipeline.
  */
-void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan,
-                                 const std::string& Message)
-{
+void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan, const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message,
-                    spam_target::CHAN_PRIV, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName());
     xClient::OnChannelMessage(Sender, theChan, Message);
 }
 
@@ -778,12 +771,10 @@ void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan,
  * Feeds the message into the spam detection pipeline.
  */
 void dronescan::OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* theChan,
-                                 const std::string& Message)
-{
+                                     const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message,
-                    spam_target::CHAN_PRIV, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName());
     xClient::OnFakeChannelMessage(Sender, Target, theChan, Message);
 }
 
@@ -791,13 +782,10 @@ void dronescan::OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* 
  * OnChannelNotice: called when an iClient sends a NOTICE to a channel.
  * Feeds the notice into the spam detection pipeline with the CHAN_NOT bit.
  */
-void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan,
-                                const std::string& Message)
-{
+void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan, const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message,
-                    spam_target::CHAN_NOT, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName());
     xClient::OnChannelNotice(Sender, theChan, Message);
 }
 
@@ -807,12 +795,10 @@ void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan,
  * pipeline with the CHAN_NOT bit.
  */
 void dronescan::OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* theChan,
-                                    const std::string& Message)
-{
+                                    const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message,
-                    spam_target::CHAN_NOT, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName());
     xClient::OnFakeChannelNotice(Sender, Target, theChan, Message);
 }
 
@@ -820,8 +806,7 @@ void dronescan::OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* t
  * OnPrivateNotice: called when an iClient sends a NOTICE directly to the bot.
  * Feeds the notice into the spam detection pipeline with the NOTICE bit.
  */
-void dronescan::OnPrivateNotice(iClient* Sender, const std::string& Message, bool secure)
-{
+void dronescan::OnPrivateNotice(iClient* Sender, const std::string& Message, bool secure) {
     if (!Sender || currentState != RUN)
         return;
     processSpamText(Sender, Message, spam_target::NOTICE, "");
@@ -833,9 +818,8 @@ void dronescan::OnPrivateNotice(iClient* Sender, const std::string& Message, boo
  * fake (spy) client. Feeds the notice into the spam detection pipeline
  * with the NOTICE bit.
  */
-void dronescan::OnFakePrivateNotice(iClient* Sender, iClient* Target,
-                                    const std::string& Message, bool secure)
-{
+void dronescan::OnFakePrivateNotice(iClient* Sender, iClient* Target, const std::string& Message,
+                                    bool secure) {
     if (!Sender || currentState != RUN)
         return;
     processSpamText(Sender, Message, spam_target::NOTICE, "");
@@ -851,10 +835,8 @@ void dronescan::OnFakePrivateNotice(iClient* Sender, iClient* Target,
  *  - If 2+ kicks in 24h: stop monitoring that channel.
  *  - Otherwise: schedule another spy client to rejoin after 300-1500s.
  */
-void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
-                              iClient* destClient, const string& kickMessage,
-                              bool authoritative)
-{
+void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient, iClient* destClient,
+                              const string& kickMessage, bool authoritative) {
     int scId = getSpyClientId(destClient);
     if (scId < 0) {
         xClient::OnNetworkKick(theChan, srcClient, destClient, kickMessage, authoritative);
@@ -882,11 +864,8 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
 
     // Report to console
     const string kickerStr = srcClient ? srcClient->getNickName() : "<server>";
-    Message(consoleChannel,
-            "[SpyClient] %s was kicked from %s by %s (%s).",
-            destClient->getNickName().c_str(),
-            theChan->getName().c_str(),
-            kickerStr.c_str(),
+    Message(consoleChannel, "[SpyClient] %s was kicked from %s by %s (%s).",
+            destClient->getNickName().c_str(), theChan->getName().c_str(), kickerStr.c_str(),
             kickMessage.c_str());
 
     // Kick tracking - 24-hour window
@@ -894,7 +873,7 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
     ChanKickTrack& track = chanKickTrackMap[chanKey];
     if (track.count == 0 || (now - track.firstKickTime) > 86400) {
         // Start a new window
-        track.count        = 1;
+        track.count = 1;
         track.firstKickTime = now;
     } else {
         ++track.count;
@@ -916,8 +895,7 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
     if (findBestSpyClient(theChan->getName(), forcejoin) >= 0) {
         scheduleSpyClientJoin(theChan->getName(), forcejoin, 300, 1500);
     } else {
-        Message(consoleChannel,
-                "[SpyClient] No available spy client to replace %s in %s.",
+        Message(consoleChannel, "[SpyClient] No available spy client to replace %s in %s.",
                 destClient->getNickName().c_str(), theChan->getName().c_str());
     }
 
@@ -943,8 +921,7 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient,
  * fields (313, 330) that other services such as cservice may also send
  * for real network clients.
  */
-void dronescan::OnWhois(iClient* sourceClient, iClient* targetClient)
-{
+void dronescan::OnWhois(iClient* sourceClient, iClient* targetClient) {
     if (!sourceClient || !targetClient) {
         return;
     }
@@ -1043,14 +1020,14 @@ void dronescan::OnWhois(iClient* sourceClient, iClient* targetClient)
         const time_t idleTime = ::time(nullptr) - signOnTime;
 
         std::stringstream s317;
-        s317 << getCharYY() << " 317 " << sourceNumeric << " " << targetNick << " "
-             << idleTime << " " << signOnTime << " :seconds idle, signon time" << std::ends;
+        s317 << getCharYY() << " 317 " << sourceNumeric << " " << targetNick << " " << idleTime
+             << " " << signOnTime << " :seconds idle, signon time" << std::ends;
         Write(s317);
     }
 
     std::stringstream s318;
-    s318 << getCharYY() << " 318 " << sourceNumeric << " " << targetNick
-         << " :End of /WHOIS list." << std::ends;
+    s318 << getCharYY() << " 318 " << sourceNumeric << " " << targetNick << " :End of /WHOIS list."
+         << std::ends;
     Write(s318);
 }
 
@@ -1141,8 +1118,8 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
     {
         pendingJoinTimersType::iterator pit = pendingJoinTimers.find(theTimer);
         if (pit != pendingJoinTimers.end()) {
-            bool forcejoin       = pit->second.first;
-            string chanName      = pit->second.second;
+            bool forcejoin = pit->second.first;
+            string chanName = pit->second.second;
             pendingJoinTimers.erase(pit);
             doSpyClientJoin(chanName, forcejoin);
             return;
@@ -1217,7 +1194,7 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
         // Reclaim expired TEXT_REPEAT tracking entries
         time_t nowGC = ::time(0);
         for (repeatTrackMapType::iterator rit = repeatTrackMap.begin();
-             rit != repeatTrackMap.end(); ) {
+             rit != repeatTrackMap.end();) {
             if (nowGC > rit->second.expires_at)
                 rit = repeatTrackMap.erase(rit);
             else
@@ -1555,9 +1532,9 @@ void dronescan::processGlineQueue() {
             userCount = clientsIPMap[st[1]];
             us[0] = '\0';
             sprintf(us, "%d", userCount);
-            std::string glineReason = (curGline->getPrefixAuto() ? string("AUTO [") : string("["))
-                                     + us + string("] ") + curGline->getReason()
-                                     + " - ID: " + generateGlineId('E');
+            std::string glineReason = (curGline->getPrefixAuto() ? string("AUTO [") : string("[")) +
+                                      us + string("] ") + curGline->getReason() +
+                                      " - ID: " + generateGlineId('E');
             MyUplink->setGline(nickName, curGline->getHost(), glineReason, curGline->getExpires(),
                                ::time(0), this);
 
@@ -1587,8 +1564,7 @@ void dronescan::logCommandMessage(const iClient* theClient, const string& Messag
 
     std::stringstream insertQ;
     insertQ << "INSERT into comlog (ts, username, command) VALUES (" << ::time(0) << ", '"
-            << escapeSQLChars(username) << "', '" << escapeSQLChars(Message) << "')"
-            << std::ends;
+            << escapeSQLChars(username) << "', '" << escapeSQLChars(Message) << "')" << std::ends;
 
     if (!SQLDb->Exec(insertQ.str())) {
         doSqlError(insertQ.str(), SQLDb->ErrorMessage());
@@ -2329,11 +2305,10 @@ bool dronescan::preloadExceptionalChannels() {
 }
 
 /** Reload all spam detection caches. */
-void dronescan::refreshSpamCaches()
-{
+void dronescan::refreshSpamCaches() {
     // Free compiled PCRE2 regexes before reloading events
-    for (spamRegexCacheType::iterator it = spamRegexCache.begin();
-         it != spamRegexCache.end(); ++it) {
+    for (spamRegexCacheType::iterator it = spamRegexCache.begin(); it != spamRegexCache.end();
+         ++it) {
         if (it->second)
             pcre2_code_free(it->second);
     }
@@ -2388,14 +2363,13 @@ void dronescan::refreshSpamCaches()
  * callers of getRules()/getEvents()/getActions(), so toggling it needs no
  * relink.
  */
-void dronescan::relinkSpamGraph()
-{
-    for (spamEventsMapType::const_iterator it = spamEventsMap.begin();
-         it != spamEventsMap.end(); ++it)
+void dronescan::relinkSpamGraph() {
+    for (spamEventsMapType::const_iterator it = spamEventsMap.begin(); it != spamEventsMap.end();
+         ++it)
         it->second->clearRules();
 
-    for (spamRulesMapType::const_iterator it = spamRulesMap.begin();
-         it != spamRulesMap.end(); ++it) {
+    for (spamRulesMapType::const_iterator it = spamRulesMap.begin(); it != spamRulesMap.end();
+         ++it) {
         it->second->clearEvents();
         it->second->clearActions();
     }
@@ -2409,9 +2383,9 @@ void dronescan::relinkSpamGraph()
             continue;
         sqlSpamRule* rule = ruleIt->second;
 
-        const std::vector<std::pair<int,int>>& bindings = rit->second;
+        const std::vector<std::pair<int, int>>& bindings = rit->second;
         for (size_t i = 0; i < bindings.size(); ++i) {
-            const int event_id       = bindings[i].first;
+            const int event_id = bindings[i].first;
             const int points_override = bindings[i].second;
 
             spamEventsMapType::const_iterator eventIt = spamEventsMap.find(event_id);
@@ -2450,8 +2424,8 @@ void dronescan::relinkSpamGraph()
     // Flat vector of every loaded event, for hot-path iteration.
     spamEventsList.clear();
     spamEventsList.reserve(spamEventsMap.size());
-    for (spamEventsMapType::const_iterator it = spamEventsMap.begin();
-         it != spamEventsMap.end(); ++it)
+    for (spamEventsMapType::const_iterator it = spamEventsMap.begin(); it != spamEventsMap.end();
+         ++it)
         spamEventsList.push_back(it->second);
 }
 
@@ -2465,8 +2439,7 @@ void dronescan::relinkSpamGraph()
  * Case-sensitivity is not a compile flag here: prefix the pattern itself
  * with "(?i)" (native PCRE2 syntax) for case-insensitive matching.
  */
-void dronescan::compileEventRegex(sqlSpamEvent* ev)
-{
+void dronescan::compileEventRegex(sqlSpamEvent* ev) {
     spamRegexCacheType::iterator ci = spamRegexCache.find(ev->getId());
     if (ci != spamRegexCache.end()) {
         pcre2_code_free(ci->second);
@@ -2478,22 +2451,20 @@ void dronescan::compileEventRegex(sqlSpamEvent* ev)
 
     int errcode;
     PCRE2_SIZE erroffset;
-    pcre2_code* re = pcre2_compile(
-        reinterpret_cast<PCRE2_SPTR>(ev->getParam().c_str()),
-        PCRE2_ZERO_TERMINATED, 0, &errcode, &erroffset, nullptr);
+    pcre2_code* re = pcre2_compile(reinterpret_cast<PCRE2_SPTR>(ev->getParam().c_str()),
+                                   PCRE2_ZERO_TERMINATED, 0, &errcode, &erroffset, nullptr);
     if (re)
         spamRegexCache[ev->getId()] = re;
     else
-        elog << "dronescan::compileEventRegex> PCRE2 compile failed for event "
-             << ev->getId() << " at offset " << erroffset << std::endl;
+        elog << "dronescan::compileEventRegex> PCRE2 compile failed for event " << ev->getId()
+             << " at offset " << erroffset << std::endl;
 }
 
 /**
  * compileRepeatExclusionRegex: same as compileEventRegex, but for the
  * TEXT_REPEAT repeat_exclusion_regex / spamRepeatExclusionCache pair.
  */
-void dronescan::compileRepeatExclusionRegex(sqlSpamEvent* ev)
-{
+void dronescan::compileRepeatExclusionRegex(sqlSpamEvent* ev) {
     spamRegexCacheType::iterator ci = spamRepeatExclusionCache.find(ev->getId());
     if (ci != spamRepeatExclusionCache.end()) {
         pcre2_code_free(ci->second);
@@ -2506,22 +2477,22 @@ void dronescan::compileRepeatExclusionRegex(sqlSpamEvent* ev)
     int errcode;
     PCRE2_SIZE erroffset;
     uint32_t flags = ev->isCaseSensitive() ? 0 : PCRE2_CASELESS;
-    pcre2_code* re = pcre2_compile(
-        reinterpret_cast<PCRE2_SPTR>(ev->getRepeatExclusionRegex().c_str()),
-        PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
+    pcre2_code* re =
+        pcre2_compile(reinterpret_cast<PCRE2_SPTR>(ev->getRepeatExclusionRegex().c_str()),
+                      PCRE2_ZERO_TERMINATED, flags, &errcode, &erroffset, nullptr);
     if (re)
         spamRepeatExclusionCache[ev->getId()] = re;
     else
         elog << "dronescan::compileRepeatExclusionRegex> repeat_exclusion_regex compile "
-                "failed for event " << ev->getId() << " at offset " << erroffset << std::endl;
+                "failed for event "
+             << ev->getId() << " at offset " << erroffset << std::endl;
 }
 
 /**
  * freeEventRegexes: free and erase any compiled regex cache entries for
  * event_id. Called on EVENT DEL so deleted events don't leak pcre2_code*.
  */
-void dronescan::freeEventRegexes(int event_id)
-{
+void dronescan::freeEventRegexes(int event_id) {
     spamRegexCacheType::iterator ci = spamRegexCache.find(event_id);
     if (ci != spamRegexCache.end()) {
         pcre2_code_free(ci->second);
@@ -2535,8 +2506,7 @@ void dronescan::freeEventRegexes(int event_id)
     }
 }
 
-void dronescan::preloadSpamEvents()
-{
+void dronescan::preloadSpamEvents() {
     for (spamEventsMapType::iterator it = spamEventsMap.begin(); it != spamEventsMap.end(); ++it)
         delete it->second;
     spamEventsMap.clear();
@@ -2561,12 +2531,11 @@ void dronescan::preloadSpamEvents()
         compileEventRegex(ev);
         compileRepeatExclusionRegex(ev);
     }
-    elog << "dronescan::preloadSpamEvents> Loaded " << spamEventsMap.size()
-         << " spam events." << std::endl;
+    elog << "dronescan::preloadSpamEvents> Loaded " << spamEventsMap.size() << " spam events."
+         << std::endl;
 }
 
-void dronescan::preloadSpamRules()
-{
+void dronescan::preloadSpamRules() {
     for (spamRulesMapType::iterator it = spamRulesMap.begin(); it != spamRulesMap.end(); ++it)
         delete it->second;
     spamRulesMap.clear();
@@ -2586,12 +2555,11 @@ void dronescan::preloadSpamRules()
         rule->setAllMembers(i);
         spamRulesMap[rule->getId()] = rule;
     }
-    elog << "dronescan::preloadSpamRules> Loaded " << spamRulesMap.size()
-         << " spam rules." << std::endl;
+    elog << "dronescan::preloadSpamRules> Loaded " << spamRulesMap.size() << " spam rules."
+         << std::endl;
 }
 
-void dronescan::preloadSpamActions()
-{
+void dronescan::preloadSpamActions() {
     for (spamActionsMapType::iterator it = spamActionsMap.begin(); it != spamActionsMap.end(); ++it)
         delete it->second;
     spamActionsMap.clear();
@@ -2610,12 +2578,11 @@ void dronescan::preloadSpamActions()
         act->setAllMembers(i);
         spamActionsMap[act->getId()] = act;
     }
-    elog << "dronescan::preloadSpamActions> Loaded " << spamActionsMap.size()
-         << " spam actions." << std::endl;
+    elog << "dronescan::preloadSpamActions> Loaded " << spamActionsMap.size() << " spam actions."
+         << std::endl;
 }
 
-void dronescan::preloadSpamRuleEvents()
-{
+void dronescan::preloadSpamRuleEvents() {
     spamRuleEventsMap.clear();
 
     std::stringstream q;
@@ -2628,19 +2595,18 @@ void dronescan::preloadSpamRuleEvents()
     }
     unsigned int total = 0;
     for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
-        int rule_id  = atoi(SQLDb->GetValue(i, 0));
+        int rule_id = atoi(SQLDb->GetValue(i, 0));
         int event_id = atoi(SQLDb->GetValue(i, 1));
         const string po = SQLDb->GetValue(i, 2);
         int points_override = !po.empty() ? atoi(po.c_str()) : -1;
         spamRuleEventsMap[rule_id].push_back(std::make_pair(event_id, points_override));
         ++total;
     }
-    elog << "dronescan::preloadSpamRuleEvents> Loaded " << total
-         << " rule-event links." << std::endl;
+    elog << "dronescan::preloadSpamRuleEvents> Loaded " << total << " rule-event links."
+         << std::endl;
 }
 
-void dronescan::preloadSpamRuleActions()
-{
+void dronescan::preloadSpamRuleActions() {
     for (spamRuleActionsMapType::iterator it = spamRuleActionsMap.begin();
          it != spamRuleActionsMap.end(); ++it) {
         for (size_t i = 0; i < it->second.size(); ++i)
@@ -2664,12 +2630,11 @@ void dronescan::preloadSpamRuleActions()
         spamRuleActionsMap[ra->getRuleId()].push_back(ra);
         ++total;
     }
-    elog << "dronescan::preloadSpamRuleActions> Loaded " << total
-         << " rule-action links." << std::endl;
+    elog << "dronescan::preloadSpamRuleActions> Loaded " << total << " rule-action links."
+         << std::endl;
 }
 
-void dronescan::preloadSpamExclusions()
-{
+void dronescan::preloadSpamExclusions() {
     for (spamExclusionsListType::iterator it = spamExclusionsList.begin();
          it != spamExclusionsList.end(); ++it)
         delete *it;
@@ -2692,10 +2657,8 @@ void dronescan::preloadSpamExclusions()
          << " spam exclusions." << std::endl;
 }
 
-void dronescan::preloadSpyClients()
-{
-    for (spyClientsMapType::iterator it = spyClientsMap.begin();
-         it != spyClientsMap.end(); ++it)
+void dronescan::preloadSpyClients() {
+    for (spyClientsMapType::iterator it = spyClientsMap.begin(); it != spyClientsMap.end(); ++it)
         delete it->second;
     spyClientsMap.clear();
 
@@ -2714,12 +2677,11 @@ void dronescan::preloadSpyClients()
         sc->setAllMembers(i);
         spyClientsMap[sc->getId()] = sc;
     }
-    elog << "dronescan::preloadSpyClients> Loaded " << spyClientsMap.size()
-         << " spy clients." << std::endl;
+    elog << "dronescan::preloadSpyClients> Loaded " << spyClientsMap.size() << " spy clients."
+         << std::endl;
 }
 
-void dronescan::preloadMonitoredChannels()
-{
+void dronescan::preloadMonitoredChannels() {
     for (monitoredChannelsMapType::iterator it = monitoredChannelsMap.begin();
          it != monitoredChannelsMap.end(); ++it)
         delete it->second;
@@ -2746,8 +2708,7 @@ void dronescan::preloadMonitoredChannels()
          << " monitored channels." << std::endl;
 }
 
-void dronescan::preloadSpamRuleChannels()
-{
+void dronescan::preloadSpamRuleChannels() {
     spamRuleChannelsMap.clear();
 
     std::stringstream q;
@@ -2759,17 +2720,16 @@ void dronescan::preloadSpamRuleChannels()
     }
     unsigned int total = 0;
     for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
-        int rule_id           = atoi(SQLDb->GetValue(i, 0).c_str());
-        string channel_name   = SQLDb->GetValue(i, 1);
+        int rule_id = atoi(SQLDb->GetValue(i, 0).c_str());
+        string channel_name = SQLDb->GetValue(i, 1);
         spamRuleChannelsMap[rule_id].push_back(channel_name);
         ++total;
     }
-    elog << "dronescan::preloadSpamRuleChannels> Loaded " << total
-         << " rule-channel entries." << std::endl;
+    elog << "dronescan::preloadSpamRuleChannels> Loaded " << total << " rule-channel entries."
+         << std::endl;
 }
 
-void dronescan::preloadMonitoredChannelSpyClients()
-{
+void dronescan::preloadMonitoredChannelSpyClients() {
     monitoredChannelSpyClientsMap.clear();
 
     std::stringstream q;
@@ -2782,7 +2742,7 @@ void dronescan::preloadMonitoredChannelSpyClients()
     }
     unsigned int total = 0;
     for (unsigned int i = 0; i < SQLDb->Tuples(); ++i) {
-        int channel_id   = atoi(SQLDb->GetValue(i, 0).c_str());
+        int channel_id = atoi(SQLDb->GetValue(i, 0).c_str());
         int spyclient_id = atoi(SQLDb->GetValue(i, 1).c_str());
         monitoredChannelSpyClientsMap[channel_id].push_back(spyclient_id);
         ++total;
@@ -2800,14 +2760,13 @@ void dronescan::preloadMonitoredChannelSpyClients()
  * if the client later quits (needed for crossuser TEXT_REPEAT). host is the
  * real host, not the +x hidden host.
  */
-dronescan::SpamActor dronescan::makeActor(iClient* theClient) const
-{
+dronescan::SpamActor dronescan::makeActor(iClient* theClient) const {
     SpamActor a;
     a.numeric = theClient->getCharYYXXX();
-    a.ip      = xIP(theClient->getIP()).GetNumericIP();
-    a.nick    = theClient->getNickName();
-    a.user    = theClient->getUserName();
-    a.host    = theClient->getRealInsecureHost();
+    a.ip = xIP(theClient->getIP()).GetNumericIP();
+    a.nick = theClient->getNickName();
+    a.user = theClient->getUserName();
+    a.host = theClient->getRealInsecureHost();
     return a;
 }
 
@@ -2816,9 +2775,7 @@ dronescan::SpamActor dronescan::makeActor(iClient* theClient) const
  * the per-rule scoring buckets. Shared by TEXT and TEXT_REPEAT.
  */
 void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
-                           const std::string& channel_name, time_t now,
-                           const std::string& text)
-{
+                           const std::string& channel_name, time_t now, const std::string& text) {
     const std::vector<sqlSpamRule*>& rules = ev->getRules();
     for (size_t i = 0; i < rules.size(); ++i) {
         sqlSpamRule* rule = rules[i];
@@ -2828,18 +2785,17 @@ void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
         const string key = buildScoringKey(rule, actor, channel_name);
         SpamScore& score = spamScoreMap[key][ev->getId()];
         if (now - score.window_start > ev->getPointExpiry()) {
-            score.count        = 0;
+            score.count = 0;
             score.window_start = now;
         }
-        elog << "dronescan::scoreEvent> Updating score for event " << ev->getId()
-             << "[" << ev->getName() << "] for actor " << actor.numeric
-             << " rule " << rule->getId()
+        elog << "dronescan::scoreEvent> Updating score for event " << ev->getId() << "["
+             << ev->getName() << "] for actor " << actor.numeric << " rule " << rule->getId()
              << " (count=" << score.count << ", window_start=" << score.window_start
              << ", point_expiry=" << ev->getPointExpiry() << ")" << std::endl;
         int maxOcc = ev->getMaxOccurrence();
         if (maxOcc < 0 || score.count < maxOcc)
             ++score.count;
-        score.last_text    = text;
+        score.last_text = text;
         score.last_text_ts = now;
     }
 }
@@ -2855,24 +2811,21 @@ void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
  */
 void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
                                    const std::string& text, const std::string& channel_name,
-                                   time_t now, std::map<std::string, SpamActor>& actorsToEvaluate)
-{
+                                   time_t now, std::map<std::string, SpamActor>& actorsToEvaluate) {
     // repeat_exclusion_regex: never track text matching this pattern
     spamRegexCacheType::const_iterator xit = spamRepeatExclusionCache.find(ev->getId());
     if (xit != spamRepeatExclusionCache.end() && xit->second) {
         pcre2_match_data* mdata = pcre2_match_data_create_from_pattern(xit->second, nullptr);
-        int rc = pcre2_match(xit->second,
-                             reinterpret_cast<PCRE2_SPTR>(text.c_str()),
-                             text.size(), 0, 0, mdata, nullptr);
+        int rc = pcre2_match(xit->second, reinterpret_cast<PCRE2_SPTR>(text.c_str()), text.size(),
+                             0, 0, mdata, nullptr);
         pcre2_match_data_free(mdata);
         if (rc >= 0)
-            return;  // excluded from repeat tracking
+            return; // excluded from repeat tracking
     }
 
-    const bool   crossuser = ev->isRepeatCrossUser();
-    const string cmp       = ev->isCaseSensitive() ? text : string_lower(text);
-    const string scope     = channel_name.empty() ? string("privmsg")
-                                                   : string_lower(channel_name);
+    const bool crossuser = ev->isRepeatCrossUser();
+    const string cmp = ev->isCaseSensitive() ? text : string_lower(text);
+    const string scope = channel_name.empty() ? string("privmsg") : string_lower(channel_name);
 
     const char SEP = '\x1f';
     string key = std::to_string(ev->getId()) + SEP + scope + SEP;
@@ -2882,7 +2835,7 @@ void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
 
     RepeatEntry& e = repeatTrackMap[key];
     if (e.window_start == 0 || (now - e.window_start) > ev->getPointExpiry()) {
-        e.count        = 0;
+        e.count = 0;
         e.window_start = now;
         e.participants.clear();
     }
@@ -2892,7 +2845,7 @@ void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
         e.participants[actor.numeric] = actor;
 
     if (e.count < ev->getRepeatMinCount())
-        return;  // not enough repeats yet
+        return; // not enough repeats yet
 
     // Fire: award points, but leave the entry in place for further repeats.
     if (crossuser) {
@@ -2912,12 +2865,11 @@ void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
  * this actor/channel. Returns true if detection should be bypassed entirely.
  */
 bool dronescan::isSpamExcluded(const SpamActor& actor, const std::string& channel_name,
-                               bool isOper) const
-{
+                               bool isOper) const {
     for (spamExclusionsListType::const_iterator it = spamExclusionsList.begin();
          it != spamExclusionsList.end(); ++it) {
         sqlSpamExclusion* ex = *it;
-        const string& type  = ex->getExclusionType();
+        const string& type = ex->getExclusionType();
         const string& value = ex->getValue();
 
         if (type == "CHAN") {
@@ -2943,8 +2895,7 @@ bool dronescan::isSpamExcluded(const SpamActor& actor, const std::string& channe
  * CIDR blocks (IPv4/IPv6), so a GATEWAYIP value may be a single IP or a
  * CIDR range.
  */
-bool dronescan::glineNeedsIdent(const std::string& ip) const
-{
+bool dronescan::glineNeedsIdent(const std::string& ip) const {
     for (spamExclusionsListType::const_iterator it = spamExclusionsList.begin();
          it != spamExclusionsList.end(); ++it) {
         sqlSpamExclusion* ex = *it;
@@ -2960,13 +2911,12 @@ bool dronescan::glineNeedsIdent(const std::string& ip) const
  * (e.g. spam_target::CHAN_PRIV). Handles TEXT (regex) and TEXT_REPEAT
  * (repetition) events; other event types are silently skipped.
  */
-void dronescan::processSpamText(iClient* theClient, const std::string& text,
-                                int target_bit, const std::string& channel_name)
-{
+void dronescan::processSpamText(iClient* theClient, const std::string& text, int target_bit,
+                                const std::string& channel_name) {
     if (!theClient || currentState != RUN)
         return;
 
-    //elog << "dronescan::processSpamText> Checking text for spam events: " << text << std::endl;
+    // elog << "dronescan::processSpamText> Checking text for spam events: " << text << std::endl;
     const time_t now = ::time(0);
 
     const SpamActor actor = makeActor(theClient);
@@ -2982,12 +2932,10 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
     // For events with no channel context of their own (direct PRIVMSG to the
     // bot/spy client), report the monitored channels the sender is on instead
     // of "(no channel)". Channel-origin events keep their own channel name.
-    const std::string displayChannels = channel_name.empty()
-        ? monitoredChannelNamesForClient(theClient)
-        : channel_name;
+    const std::string displayChannels =
+        channel_name.empty() ? monitoredChannelNamesForClient(theClient) : channel_name;
 
-    for (size_t i = 0; i < spamEventsList.size(); ++i)
-    {
+    for (size_t i = 0; i < spamEventsList.size(); ++i) {
         sqlSpamEvent* ev = spamEventsList[i];
         if (!ev->isEnabled())
             continue;
@@ -2999,21 +2947,20 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
             continue;
         }
         if (ev->getEventType() != "TEXT")
-            continue;  // other event types implemented in later phases
+            continue; // other event types implemented in later phases
 
-        //elog << "dronescan::processSpamText> Checking cache" << std::endl;
+        // elog << "dronescan::processSpamText> Checking cache" << std::endl;
         spamRegexCacheType::const_iterator rit = spamRegexCache.find(ev->getId());
         if (rit == spamRegexCache.end() || !rit->second)
             continue;
 
         pcre2_match_data* mdata = pcre2_match_data_create_from_pattern(rit->second, nullptr);
-        int rc = pcre2_match(rit->second,
-                             reinterpret_cast<PCRE2_SPTR>(text.c_str()),
-                             text.size(), 0, 0, mdata, nullptr);
+        int rc = pcre2_match(rit->second, reinterpret_cast<PCRE2_SPTR>(text.c_str()), text.size(),
+                             0, 0, mdata, nullptr);
         pcre2_match_data_free(mdata);
 
         if (rc < 0)
-            continue;  // no match (or error)
+            continue; // no match (or error)
 
         scoreEvent(ev, actor, channel_name, now, text);
     }
@@ -3030,8 +2977,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text,
  * numeric nick, unless the rule's points_per is "IP".
  */
 std::string dronescan::buildScoringKey(sqlSpamRule* rule, const SpamActor& actor,
-                                       const std::string& channel_name) const
-{
+                                       const std::string& channel_name) const {
     const string unit = (rule->getPointsPer() == "IP") ? actor.ip : actor.numeric;
 
     string key = std::to_string(rule->getId()) + ".";
@@ -3046,15 +2992,13 @@ std::string dronescan::buildScoringKey(sqlSpamRule* rule, const SpamActor& actor
  * theClient currently sits in, for use in reports about events with no
  * channel context of their own.
  */
-std::string dronescan::monitoredChannelNamesForClient(iClient* theClient) const
-{
+std::string dronescan::monitoredChannelNamesForClient(iClient* theClient) const {
     if (!theClient)
         return std::string();
 
     std::string out;
     for (iClient::const_channelIterator it = theClient->channels_begin();
-         it != theClient->channels_end(); ++it)
-    {
+         it != theClient->channels_end(); ++it) {
         Channel* theChannel = *it;
         if (monitoredChannelsMap.find(string_lower(theChannel->getName())) ==
             monitoredChannelsMap.end())
@@ -3071,10 +3015,9 @@ std::string dronescan::monitoredChannelNamesForClient(iClient* theClient) const
  * whether any enabled rule has crossed its threshold.
  */
 void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
-                                  const std::string& displayChannels)
-{
-    const string lcChan     = string_lower(channel_name);
-    const time_t now        = ::time(0);
+                                  const std::string& displayChannels) {
+    const string lcChan = string_lower(channel_name);
+    const time_t now = ::time(0);
 
     // Only process channels we are actually monitoring
     monitoredChannelsMapType::const_iterator mcit = monitoredChannelsMap.end();
@@ -3084,17 +3027,15 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
             return;
     }
 
-    for (spamRulesMapType::const_iterator rit = spamRulesMap.begin();
-         rit != spamRulesMap.end(); ++rit)
-    {
+    for (spamRulesMapType::const_iterator rit = spamRulesMap.begin(); rit != spamRulesMap.end();
+         ++rit) {
         sqlSpamRule* rule = rit->second;
         if (!rule->isEnabled())
             continue;
 
         // Channel scope check based on allchans flag
         if (!channel_name.empty()) {
-            spamRuleChannelsMapType::const_iterator rcit =
-                spamRuleChannelsMap.find(rule->getId());
+            spamRuleChannelsMapType::const_iterator rcit = spamRuleChannelsMap.find(rule->getId());
             bool inList = false;
             if (rcit != spamRuleChannelsMap.end()) {
                 const std::vector<string>& chans = rcit->second;
@@ -3123,7 +3064,7 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
 
         int totalScore = 0;
         std::string triggerText;
-        time_t      triggerTs = 0;
+        time_t triggerTs = 0;
         for (size_t i = 0; i < links.size(); ++i) {
             sqlSpamEvent* ev = links[i].event;
             int points_override = links[i].pointsOverride;
@@ -3147,7 +3088,7 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
             // Track the most recently matched text among contributing
             // events, to report the line that likely tipped the threshold.
             if (sc.count > 0 && sc.last_text_ts >= triggerTs) {
-                triggerTs   = sc.last_text_ts;
+                triggerTs = sc.last_text_ts;
                 triggerText = sc.last_text;
             }
         }
@@ -3180,8 +3121,7 @@ namespace {
 // Strip control bytes (including IRC formatting codes, all below 0x20) and
 // cap length before embedding matched text in the "[S]" console report
 // line. ISO-8859-1 is single-byte, so no multi-byte handling is required.
-std::string sanitizeSpamTextForReport(const std::string& text)
-{
+std::string sanitizeSpamTextForReport(const std::string& text) {
     const size_t kMaxLen = 200;
     std::string out;
     out.reserve(std::min(text.size(), kMaxLen));
@@ -3197,8 +3137,7 @@ std::string sanitizeSpamTextForReport(const std::string& text)
 // Same control-byte stripping as sanitizeSpamTextForReport() (so an
 // embedded CR/LF can't split a log line), but with no length cap and no
 // "..." - the SPAM action log must hold the complete, untruncated text.
-std::string sanitizeSpamTextForLog(const std::string& text)
-{
+std::string sanitizeSpamTextForLog(const std::string& text) {
     std::string out;
     out.reserve(text.size());
     for (size_t i = 0; i < text.size(); ++i) {
@@ -3215,9 +3154,9 @@ std::string sanitizeSpamTextForLog(const std::string& text)
 struct ResolvedSpamAction {
     std::string actionType;
     std::string reason;
-    int         duration;
-    int         delay;
-    bool        prefixAuto;
+    int duration;
+    int delay;
+    bool prefixAuto;
 };
 
 // Build the single "[S] <rule>: nick!user@host ip in <chans> -> <actions> -
@@ -3229,16 +3168,14 @@ struct ResolvedSpamAction {
 // is empty (no enabled GLINE/KILL actions), the arrow clause reads
 // "report only". Trigger text is omitted (no " - ..." suffix) when empty,
 // matching the old REPORT behavior for empty text.
-std::string buildSpamReportLine(const std::string& ruleName,
-                                const std::string& nick, const std::string& user,
-                                const std::string& host, const std::string& ip,
-                                const std::string& displayChannels,
+std::string buildSpamReportLine(const std::string& ruleName, const std::string& nick,
+                                const std::string& user, const std::string& host,
+                                const std::string& ip, const std::string& displayChannels,
                                 const std::string& triggerText,
-                                const std::vector<ResolvedSpamAction>& resolved)
-{
+                                const std::vector<ResolvedSpamAction>& resolved) {
     std::ostringstream line;
-    line << "[S] " << ruleName << ": " << nick << '!' << user << '@' << host << ' ' << ip
-         << " in " << (displayChannels.empty() ? "(no channel)" : displayChannels) << " -> ";
+    line << "[S] " << ruleName << ": " << nick << '!' << user << '@' << host << ' ' << ip << " in "
+         << (displayChannels.empty() ? "(no channel)" : displayChannels) << " -> ";
 
     if (resolved.empty()) {
         line << "report only";
@@ -3278,10 +3215,8 @@ std::string buildSpamReportLine(const std::string& ruleName,
  * pattern used for delayed spy-client joins (see scheduleSpyClientJoin).
  */
 void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
-                                const std::string& channel_name,
-                                const std::string& displayChannels,
-                                const std::string& triggerText)
-{
+                                const std::string& channel_name, const std::string& displayChannels,
+                                const std::string& triggerText) {
     if (!rule)
         return;
 
@@ -3303,25 +3238,21 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         r.actionType = ra->getActionType();
 
         // Determine effective reason
-        r.reason = ra->getActionReasonOverride().empty()
-                    ? act->getReason()
-                    : ra->getActionReasonOverride();
+        r.reason = ra->getActionReasonOverride().empty() ? act->getReason()
+                                                         : ra->getActionReasonOverride();
         if (r.reason.empty())
             r.reason = "Spam detected";
 
         // Determine effective duration (GLINE only; harmless for KILL)
-        r.duration = (ra->getActionDurationOverride() >= 0)
-                       ? ra->getActionDurationOverride()
-                       : act->getDuration();
+        r.duration = (ra->getActionDurationOverride() >= 0) ? ra->getActionDurationOverride()
+                                                            : act->getDuration();
         if (r.duration < 0)
             r.duration = 3600;
 
         // Determine effective delay: base delay (rule-action override, or
         // the action template's own delay) plus optional jitter in
         // [rand_min, rand_max], both from the action template.
-        r.delay = (ra->getDelayOverride() >= 0)
-                       ? ra->getDelayOverride()
-                       : act->getDelay();
+        r.delay = (ra->getDelayOverride() >= 0) ? ra->getDelayOverride() : act->getDelay();
         if (r.delay < 0)
             r.delay = 0;
 
@@ -3342,9 +3273,9 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
     // exists), so "resolved is non-empty" IS "at least one GLINE/KILL is
     // about to run" - silent can only ever suppress the report-only case.
     if (!rule->isSilent() || !resolved.empty()) {
-        const std::string line = buildSpamReportLine(
-            rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
-            displayChannels, triggerText, resolved);
+        const std::string line =
+            buildSpamReportLine(rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
+                                displayChannels, triggerText, resolved);
 
         // report_source == "SPYCLIENT": send the line as the spy client
         // currently covering the triggering channel, if one can be
@@ -3356,8 +3287,7 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
             chanActiveSpyMapType::const_iterator scit =
                 chanActiveSpyMap.find(string_lower(channel_name));
             if (scit != chanActiveSpyMap.end()) {
-                liveSpyClientsMapType::const_iterator lit =
-                    liveSpyClientsMap.find(scit->second);
+                liveSpyClientsMapType::const_iterator lit = liveSpyClientsMap.find(scit->second);
                 if (lit != liveSpyClientsMap.end())
                     reportAs = lit->second;
             }
@@ -3378,18 +3308,18 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         const ResolvedSpamAction& r = resolved[i];
 
         if (r.delay <= 0) {
-            executeSpamAction(r.actionType, r.reason, r.duration, r.prefixAuto,
-                              actor, rule->getName());
+            executeSpamAction(r.actionType, r.reason, r.duration, r.prefixAuto, actor,
+                              rule->getName());
             continue;
         }
 
         PendingSpamAction pending;
         pending.actionType = r.actionType;
-        pending.reason     = r.reason;
-        pending.duration   = r.duration;
+        pending.reason = r.reason;
+        pending.duration = r.duration;
         pending.prefixAuto = r.prefixAuto;
-        pending.actor      = actor;
-        pending.ruleName   = rule->getName();
+        pending.actor = actor;
+        pending.ruleName = rule->getName();
 
         time_t fireAt = ::time(nullptr) + static_cast<time_t>(r.delay);
         xServer::timerID tid = MyUplink->RegisterTimer(fireAt, this, nullptr);
@@ -3410,17 +3340,15 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
  */
 void dronescan::executeSpamAction(const std::string& actionType, const std::string& reason,
                                   int duration, bool prefixAuto, const SpamActor& actor,
-                                  const std::string& ruleName)
-{
+                                  const std::string& ruleName) {
     const string& nick = actor.nick;
     const string& user = actor.user;
     const string& host = actor.host;
-    const string& ip   = actor.ip;
+    const string& ip = actor.ip;
 
     if (actionType == "GLINE") {
         const string mask = glineNeedsIdent(ip) ? (user + "@" + ip) : ("*@" + ip);
-        glineData* gd = new (std::nothrow)
-            glineData(mask, reason, duration, prefixAuto);
+        glineData* gd = new (std::nothrow) glineData(mask, reason, duration, prefixAuto);
         assert(gd != 0);
         glineQueue.push_back(gd);
 
@@ -3460,8 +3388,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 // ---------------------------------------------------------------------------
 
 /** Returns true if the given iClient is one of our live spy clients. */
-bool dronescan::isSpyClient(const iClient* ic) const
-{
+bool dronescan::isSpyClient(const iClient* ic) const {
     for (liveSpyClientsMapType::const_iterator it = liveSpyClientsMap.begin();
          it != liveSpyClientsMap.end(); ++it) {
         if (it->second == ic)
@@ -3471,8 +3398,7 @@ bool dronescan::isSpyClient(const iClient* ic) const
 }
 
 /** Returns the spy client id for the given iClient, or -1. */
-int dronescan::getSpyClientId(const iClient* ic) const
-{
+int dronescan::getSpyClientId(const iClient* ic) const {
     for (liveSpyClientsMapType::const_iterator it = liveSpyClientsMap.begin();
          it != liveSpyClientsMap.end(); ++it) {
         if (it->second == ic)
@@ -3482,8 +3408,7 @@ int dronescan::getSpyClientId(const iClient* ic) const
 }
 
 /** Voice a spy client in the console channel. */
-void dronescan::voiceSpyClientInConsole(iClient* ic)
-{
+void dronescan::voiceSpyClientInConsole(iClient* ic) {
     Channel* consoleChan = Network->findChannel(consoleChannel);
     if (!consoleChan)
         return;
@@ -3491,8 +3416,7 @@ void dronescan::voiceSpyClientInConsole(iClient* ic)
 }
 
 /** Op a client in the console channel. */
-void dronescan::opInConsole(iClient* ic)
-{
+void dronescan::opInConsole(iClient* ic) {
     Channel* consoleChan = Network->findChannel(consoleChannel);
     if (!consoleChan)
         return;
@@ -3504,8 +3428,7 @@ void dronescan::opInConsole(iClient* ic)
  * Handles nick conflicts by trying a random numeric suffix.
  * Returns the iClient* on success, nullptr on failure.
  */
-iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
-{
+iClient* dronescan::introduceSpyClient(sqlSpyClient* sc) {
     if (!sc || !sc->isEnabled())
         return nullptr;
 
@@ -3520,9 +3443,10 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
         bool found = false;
         for (spyClientsMapType::const_iterator it = spyClientsMap.begin();
              it != spyClientsMap.end(); ++it) {
-            if (it->second == sc) continue;
-            if (it->second->isEnabled() && !liveSpyClientsMap.count(it->second->getId())
-                && Network->findClient(it->second->getNickname()) == nullptr) {
+            if (it->second == sc)
+                continue;
+            if (it->second->isEnabled() && !liveSpyClientsMap.count(it->second->getId()) &&
+                Network->findClient(it->second->getNickname()) == nullptr) {
                 // Prefer the other client; the caller (introduceAllSpyClients) will
                 // reach it in turn. Skip this one for now.
                 found = true;
@@ -3539,13 +3463,13 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
         }
         if (attempts >= 200) {
             Message(consoleChannel,
-                    "[SpyClient] Could not find a free nick for spy client id %d (%s) after 200 attempts.",
+                    "[SpyClient] Could not find a free nick for spy client id %d (%s) after 200 "
+                    "attempts.",
                     sc->getId(), sc->getNickname().c_str());
             return nullptr;
         }
         if (!found)
-            Message(consoleChannel,
-                    "[SpyClient] Nick collision for %s - using %s instead.",
+            Message(consoleChannel, "[SpyClient] Nick collision for %s - using %s instead.",
                     sc->getNickname().c_str(), nick.c_str());
     }
 
@@ -3558,39 +3482,31 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
     } else {
         // Not a valid IP - use a deterministic fallback
         base64ip = "AAAAAA";
-        elog << "dronescan::introduceSpyClient> Invalid IP string '"
-             << sc->getIp() << "' for spy client " << sc->getId() << endl;
+        elog << "dronescan::introduceSpyClient> Invalid IP string '" << sc->getIp()
+             << "' for spy client " << sc->getId() << endl;
     }
 
     // YYXXX: the core reassigns the numeric via AttachClient
     string yyxxx(MyUplink->getCharYY() + "]]]");
 
-    iClient* ic = new iClient(
-        MyUplink->getIntYY(),
-        yyxxx,
-        nick,
-        sc->getUsername(),
-        base64ip,
-        sc->getHostname(),
-        sc->getHostname(),
-        sc->getModes(),
-        string(),       // account - set via UserLogin() if needed
-        0,              // account_id - set via UserLogin() if needed
-        0,              // account_flags
-        string(),       // tls_fingerprint
-        sc->getRealname(),
-        ::time(nullptr));
+    iClient* ic = new iClient(MyUplink->getIntYY(), yyxxx, nick, sc->getUsername(), base64ip,
+                              sc->getHostname(), sc->getHostname(), sc->getModes(),
+                              string(), // account - set via UserLogin() if needed
+                              0,        // account_id - set via UserLogin() if needed
+                              0,        // account_flags
+                              string(), // tls_fingerprint
+                              sc->getRealname(), ::time(nullptr));
 
     if (!MyUplink->AttachClient(ic, this)) {
         delete ic;
-        elog << "dronescan::introduceSpyClient> AttachClient failed for spy client "
-             << sc->getId() << endl;
+        elog << "dronescan::introduceSpyClient> AttachClient failed for spy client " << sc->getId()
+             << endl;
         return nullptr;
     }
 
     if (!sc->getAccount().empty()) {
-        MyUplink->UserLogin(ic, sc->getAccount(),
-                            static_cast<unsigned int>(sc->getAccountId()), 0, this);
+        MyUplink->UserLogin(ic, sc->getAccount(), static_cast<unsigned int>(sc->getAccountId()), 0,
+                            this);
     }
 
     liveSpyClientsMap[sc->getId()] = ic;
@@ -3599,27 +3515,27 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc)
     if (!spyClientsChannel.empty())
         MyUplink->JoinChannel(ic, spyClientsChannel);
 
-    elog << "dronescan::introduceSpyClient> Introduced " << nick
-         << " (id=" << sc->getId() << ") to the network." << endl;
+    elog << "dronescan::introduceSpyClient> Introduced " << nick << " (id=" << sc->getId()
+         << ") to the network." << endl;
     return ic;
 }
 
 /** Introduce all enabled spy clients that are not yet live. */
-void dronescan::introduceAllSpyClients()
-{
+void dronescan::introduceAllSpyClients() {
     srand(static_cast<unsigned int>(::time(nullptr)));
-    for (spyClientsMapType::const_iterator it = spyClientsMap.begin();
-         it != spyClientsMap.end(); ++it) {
+    for (spyClientsMapType::const_iterator it = spyClientsMap.begin(); it != spyClientsMap.end();
+         ++it) {
         sqlSpyClient* sc = it->second;
-        if (!sc->isEnabled()) continue;
-        if (liveSpyClientsMap.count(sc->getId())) continue;
+        if (!sc->isEnabled())
+            continue;
+        if (liveSpyClientsMap.count(sc->getId()))
+            continue;
         introduceSpyClient(sc);
     }
 }
 
 /** Part a spy client from a monitored channel and update tracking maps. */
-void dronescan::partSpyClientFromChannel(int scId, const std::string& chanName)
-{
+void dronescan::partSpyClientFromChannel(int scId, const std::string& chanName) {
     liveSpyClientsMapType::iterator lit = liveSpyClientsMap.find(scId);
     if (lit == liveSpyClientsMap.end())
         return;
@@ -3643,8 +3559,7 @@ void dronescan::partSpyClientFromChannel(int scId, const std::string& chanName)
 }
 
 /** Detach a live spy client from the network and clean up all maps. */
-void dronescan::detachSpyClient(int scId)
-{
+void dronescan::detachSpyClient(int scId) {
     liveSpyClientsMapType::iterator lit = liveSpyClientsMap.find(scId);
     if (lit == liveSpyClientsMap.end())
         return;
@@ -3654,8 +3569,8 @@ void dronescan::detachSpyClient(int scId)
     // Part it from every channel it is monitoring
     spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
     if (sit != spyClientChanMap.end()) {
-        for (std::set<string>::const_iterator cit = sit->second.begin();
-             cit != sit->second.end(); ++cit) {
+        for (std::set<string>::const_iterator cit = sit->second.begin(); cit != sit->second.end();
+             ++cit) {
             const string& chanName = *cit;
             Channel* theChan = Network->findChannel(chanName);
             if (theChan && theChan->findUser(ic))
@@ -3685,8 +3600,7 @@ void dronescan::detachSpyClient(int scId)
  * Returns spy client id, or -1 only if there is no eligible live spy client
  * at all.
  */
-int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
-{
+int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin) {
     Channel* theChan = Network->findChannel(chanName);
 
     std::vector<int> candidateIds;
@@ -3708,33 +3622,40 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
             candidateIds.push_back(it->first);
     }
 
-    int    bestBusyId    = -1;
+    int bestBusyId = -1;
     size_t bestBusyCount = 0;
 
     for (size_t ci = 0; ci < candidateIds.size(); ++ci) {
         spyClientsMapType::const_iterator it = spyClientsMap.find(candidateIds[ci]);
-        if (it == spyClientsMap.end()) continue;  // stale id, skip
+        if (it == spyClientsMap.end())
+            continue; // stale id, skip
         sqlSpyClient* sc = it->second;
-        if (!sc->isEnabled()) continue;
+        if (!sc->isEnabled())
+            continue;
 
         // Must be live
         liveSpyClientsMapType::const_iterator lit = liveSpyClientsMap.find(sc->getId());
-        if (lit == liveSpyClientsMap.end()) continue;
+        if (lit == liveSpyClientsMap.end())
+            continue;
         iClient* ic = lit->second;
 
         if (!forcejoin && theChan) {
             // Skip +i (invite-only)
-            if (theChan->getMode(Channel::MODE_I)) continue;
+            if (theChan->getMode(Channel::MODE_I))
+                continue;
             // Skip +k (keyed)
-            if (theChan->getMode(Channel::MODE_K)) continue;
+            if (theChan->getMode(Channel::MODE_K))
+                continue;
             // Skip +l if channel is at capacity
-            if (theChan->getMode(Channel::MODE_L) &&
-                theChan->size() >= theChan->getLimit()) continue;
+            if (theChan->getMode(Channel::MODE_L) && theChan->size() >= theChan->getLimit())
+                continue;
             // Skip +r (channel requires an identified user) if this spy
             // client has no services account
-            if (theChan->getMode(Channel::MODE_R) && sc->getAccount().empty()) continue;
+            if (theChan->getMode(Channel::MODE_R) && sc->getAccount().empty())
+                continue;
             // Skip if spy client host is banned
-            if (theChan->matchBan(ic->getNickUserHost())) continue;
+            if (theChan->matchBan(ic->getNickUserHost()))
+                continue;
         }
 
         spyClientChanMapType::const_iterator cit = spyClientChanMap.find(sc->getId());
@@ -3746,7 +3667,7 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
 
         // Otherwise remember the least-loaded busy candidate as a fallback
         if (bestBusyId < 0 || chanCount < bestBusyCount) {
-            bestBusyId    = sc->getId();
+            bestBusyId = sc->getId();
             bestBusyCount = chanCount;
         }
     }
@@ -3761,8 +3682,7 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin)
  * immediately. Selection happens here (not at schedule time) so it always
  * sees up-to-date per-client channel load.
  */
-void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin)
-{
+void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin) {
     // Respect kick-stopped channels
     const string chanKey = string_lower(chanName);
     if (kickStoppedChannels.count(chanKey))
@@ -3777,8 +3697,7 @@ void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin)
 
     int scId = findBestSpyClient(chanName, forcejoin);
     if (scId < 0) {
-        Message(consoleChannel,
-                "[SpyClient] No available spy client for %s.", chanName.c_str());
+        Message(consoleChannel, "[SpyClient] No available spy client for %s.", chanName.c_str());
         return;
     }
 
@@ -3801,9 +3720,8 @@ void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin)
 /**
  * Schedule a spy client join with a random delay in [minDelay, maxDelay] seconds.
  */
-void dronescan::scheduleSpyClientJoin(const std::string& chanName, bool forcejoin,
-                                      int minDelay, int maxDelay)
-{
+void dronescan::scheduleSpyClientJoin(const std::string& chanName, bool forcejoin, int minDelay,
+                                      int maxDelay) {
     if (kickStoppedChannels.count(string_lower(chanName)))
         return;
 
@@ -3817,11 +3735,10 @@ void dronescan::scheduleSpyClientJoin(const std::string& chanName, bool forcejoi
 }
 
 /** Cancel any pending spy-client-join timer(s) scheduled for the given channel. */
-void dronescan::cancelPendingJoinTimers(const std::string& chanName)
-{
+void dronescan::cancelPendingJoinTimers(const std::string& chanName) {
     const string chanKey = string_lower(chanName);
     for (pendingJoinTimersType::iterator it = pendingJoinTimers.begin();
-         it != pendingJoinTimers.end(); ) {
+         it != pendingJoinTimers.end();) {
         if (it->second.second == chanKey) {
             MyUplink->UnRegisterTimer(it->first, nullptr);
             pendingJoinTimers.erase(it++);
@@ -3837,8 +3754,7 @@ void dronescan::cancelPendingJoinTimers(const std::string& chanName)
  * - Introduce newly added / re-enabled clients.
  * - If a removed/disabled client was monitoring a channel, schedule a replacement.
  */
-void dronescan::resyncSpyClients()
-{
+void dronescan::resyncSpyClients() {
     // Step 1: find live clients that are gone or disabled in DB
     std::vector<int> toDetach;
     std::vector<string> orphanedChans; // channels that lost their spy client
@@ -3865,28 +3781,35 @@ void dronescan::resyncSpyClients()
 
     for (std::vector<int>::iterator it = toDetach.begin(); it != toDetach.end(); ++it) {
         detachSpyClient(*it);
-        Message(consoleChannel, "[SpyClient] Detached spy client id %d (removed or disabled in DB).", *it);
+        Message(consoleChannel,
+                "[SpyClient] Detached spy client id %d (removed or disabled in DB).", *it);
     }
 
     // Step 2: introduce clients that exist in DB but are not live yet
-    for (spyClientsMapType::const_iterator it = spyClientsMap.begin();
-         it != spyClientsMap.end(); ++it) {
-        if (!it->second->isEnabled()) continue;
-        if (liveSpyClientsMap.count(it->first)) continue;
+    for (spyClientsMapType::const_iterator it = spyClientsMap.begin(); it != spyClientsMap.end();
+         ++it) {
+        if (!it->second->isEnabled())
+            continue;
+        if (liveSpyClientsMap.count(it->first))
+            continue;
         introduceSpyClient(it->second);
     }
 
     // Step 3: schedule replacement joins for orphaned channels
-    for (std::vector<string>::iterator it = orphanedChans.begin();
-         it != orphanedChans.end(); ++it) {
+    for (std::vector<string>::iterator it = orphanedChans.begin(); it != orphanedChans.end();
+         ++it) {
         const string& chanName = *it;
-        if (kickStoppedChannels.count(chanName)) continue;
+        if (kickStoppedChannels.count(chanName))
+            continue;
 
         // Find the monitored channel config
         monitoredChannelsMapType::const_iterator mc = monitoredChannelsMap.find(chanName);
-        if (mc == monitoredChannelsMap.end()) continue;
-        if (!mc->second->isEnabled()) continue;
-        if (mc->second->isJoinAsService()) continue;
+        if (mc == monitoredChannelsMap.end())
+            continue;
+        if (!mc->second->isEnabled())
+            continue;
+        if (mc->second->isJoinAsService())
+            continue;
 
         if (findBestSpyClient(chanName, mc->second->isForceJoin()) >= 0)
             scheduleSpyClientJoin(chanName, mc->second->isForceJoin(), 0, 10);

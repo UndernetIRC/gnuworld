@@ -78,8 +78,8 @@ void LASTCOMCommand::Exec(const iClient* theClient, const string& Message, const
 
     for (unsigned int i = 0; i < cacheCon->Tuples(); ++i) {
         bot->Reply(theClient, "[ %s ago - %s ] %s",
-                   bot->Ago(atol(cacheCon->GetValue(i, 0).c_str())), cacheCon->GetValue(i, 1).c_str(),
-                   cacheCon->GetValue(i, 2).c_str());
+                   bot->Ago(atol(cacheCon->GetValue(i, 0).c_str())),
+                   cacheCon->GetValue(i, 1).c_str(), cacheCon->GetValue(i, 2).c_str());
     }
 
     bot->Reply(theClient, "End of LASTCOM report.");

@@ -20,35 +20,31 @@ using std::endl;
 using std::stringstream;
 
 sqlSpamExclusion::sqlSpamExclusion(dbHandle* _SQLDb)
-    : id(0), exclusion_type(), value(),
-      created_ts(0), modified_ts(0), modified_by(0),
-      SQLDb(_SQLDb)
-{}
+    : id(0), exclusion_type(), value(), created_ts(0), modified_ts(0), modified_by(0),
+      SQLDb(_SQLDb) {}
 
 sqlSpamExclusion::~sqlSpamExclusion() {}
 
 // Column order matches the SELECT in preloadSpamExclusions():
 // id, exclusion_type, value, created_ts, modified_ts, modified_by
-void sqlSpamExclusion::setAllMembers(int row)
-{
-    id             = atoi(SQLDb->GetValue(row, 0).c_str());
+void sqlSpamExclusion::setAllMembers(int row) {
+    id = atoi(SQLDb->GetValue(row, 0).c_str());
     exclusion_type = SQLDb->GetValue(row, 1);
-    value          = SQLDb->GetValue(row, 2);
-    created_ts     = atoi(SQLDb->GetValue(row, 3).c_str());
-    modified_ts    = atoi(SQLDb->GetValue(row, 4).c_str());
+    value = SQLDb->GetValue(row, 2);
+    created_ts = atoi(SQLDb->GetValue(row, 3).c_str());
+    modified_ts = atoi(SQLDb->GetValue(row, 4).c_str());
     const string modBy = SQLDb->GetValue(row, 5);
-    modified_by    = !modBy.empty() ? atoi(modBy.c_str()) : 0;
+    modified_by = !modBy.empty() ? atoi(modBy.c_str()) : 0;
 }
 
-bool sqlSpamExclusion::commit()
-{
+bool sqlSpamExclusion::commit() {
     stringstream q;
     q << "UPDATE spam_exclusions SET "
       << "exclusion_type = '" << escapeSQLChars(exclusion_type) << "', "
-      << "value = '"          << escapeSQLChars(value)          << "', "
-      << "modified_ts = "     << modified_ts                    << ", "
-      << "modified_by = "     << (modified_by > 0 ? std::to_string(modified_by) : "NULL")
-      << " WHERE id = "       << id;
+      << "value = '" << escapeSQLChars(value) << "', "
+      << "modified_ts = " << modified_ts << ", "
+      << "modified_by = " << (modified_by > 0 ? std::to_string(modified_by) : "NULL")
+      << " WHERE id = " << id;
 
     if (!SQLDb->Exec(q)) {
         elog << "sqlSpamExclusion::commit> " << SQLDb->ErrorMessage() << endl;
@@ -57,17 +53,13 @@ bool sqlSpamExclusion::commit()
     return true;
 }
 
-bool sqlSpamExclusion::insert()
-{
+bool sqlSpamExclusion::insert() {
     stringstream q;
     q << "INSERT INTO spam_exclusions "
       << "(exclusion_type, value, created_ts, modified_ts, modified_by) VALUES ("
       << "'" << escapeSQLChars(exclusion_type) << "', "
-      << "'" << escapeSQLChars(value)          << "', "
-      << created_ts  << ", "
-      << modified_ts << ", "
-      << (modified_by > 0 ? std::to_string(modified_by) : "NULL")
-      << ") RETURNING id";
+      << "'" << escapeSQLChars(value) << "', " << created_ts << ", " << modified_ts << ", "
+      << (modified_by > 0 ? std::to_string(modified_by) : "NULL") << ") RETURNING id";
 
     if (!SQLDb->Exec(q, true)) {
         elog << "sqlSpamExclusion::insert> " << SQLDb->ErrorMessage() << endl;
@@ -78,8 +70,7 @@ bool sqlSpamExclusion::insert()
     return true;
 }
 
-bool sqlSpamExclusion::remove()
-{
+bool sqlSpamExclusion::remove() {
     stringstream q;
     q << "DELETE FROM spam_exclusions WHERE id = " << id;
     if (!SQLDb->Exec(q)) {
