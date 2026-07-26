@@ -1,5 +1,9 @@
 // $Id: ChangeLog,v 1.173 2010/04/10 18:56:06 danielaustin Exp $ //
 
+2026-03-16 	MrIron
+		* gnuworld/mod.cservice:
+			- Respect RFC1459 casemapping.
+
 2026-01-09  MrIron
 		* Major update: TLS support (based on Compy's initial implementation), SASL/SCRAM authentication, fingerprint features, and expanded user/channel modes.
 		* configure.ac:

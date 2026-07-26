@@ -224,7 +224,7 @@ class cservice : public xClient {
     typedef map<string, sqlUser*, noCaseCompare> sqlUserHashType;
 
     // Channel hash, Key is channelname.
-    typedef map<string, sqlChannel*, noCaseCompare> sqlChannelHashType;
+    typedef map<string, sqlChannel*, rfc1459Compare> sqlChannelHashType;
     typedef map<int, sqlChannel*> sqlChannelIDHashType;
 
     // Accesslevel cache, key is pair(userid, chanid).
@@ -622,7 +622,7 @@ class cservice : public xClient {
     /* Remove a sqlChannel* from cache. */
     inline void removeChannelCache(sqlChannel* theChan) {
         if (theChan) {
-            sqlChannelCache.erase(theChan->getName());
+            sqlChannelCache.erase(theChan->getCanonicalName());
             sqlChannelIDCache.erase(theChan->getID());
         }
     }
@@ -804,7 +804,7 @@ class cservice : public xClient {
     typedef vector<ValidUserData> ValidUserDataListType;
 
     /* List of channels in 'pending' registration state. */
-    typedef map<string, sqlPendingChannel*, noCaseCompare> pendingChannelListType;
+    typedef map<string, sqlPendingChannel*, rfc1459Compare> pendingChannelListType;
     pendingChannelListType pendingChannelList;
 
     struct AppData {
