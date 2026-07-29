@@ -345,15 +345,21 @@ class dronescan : public xClient {
         PendingSpamAction() : duration(-1), prefixAuto(true) {}
     };
 
+    // spyTarget: the spy client iClient* that directly received this event
+    // (set only by the OnFake* handlers, when a client messaged/CTCP'd a spy
+    // client rather than the real bot), used so report_source=SPYCLIENT can
+    // attribute the report to it even when channel_name is empty (direct
+    // PRIVMSG/NOTICE/CTCP). Null when the event has no such direct spy
+    // client (e.g. the real bot itself received it).
     void processSpamText(iClient* theClient, const std::string& text, int target_bit,
-                         const std::string& channel_name);
+                         const std::string& channel_name, iClient* spyTarget);
     void scoreEvent(sqlSpamEvent* ev, const SpamActor& actor, const std::string& channel_name,
                     time_t now, const std::string& text);
     void processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor, const std::string& text,
                             const std::string& channel_name, time_t now,
                             std::map<std::string, SpamActor>& actorsToEvaluate);
     void evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
-                           const std::string& displayChannels);
+                           const std::string& displayChannels, iClient* spyTarget);
     // Resolves each linked action's reason/duration/delay, builds and (unless
     // the rule is silent with no GLINE/KILL actions) prints the single
     // combined "[S] ..." console report line synchronously, then either runs
@@ -362,7 +368,8 @@ class dronescan : public xClient {
     // later. Delayed actions are reported here, at schedule time - not when
     // their timer actually fires.
     void fireRuleActions(sqlSpamRule* rule, const SpamActor& actor, const std::string& channel_name,
-                         const std::string& displayChannels, const std::string& triggerText);
+                         const std::string& displayChannels, const std::string& triggerText,
+                         iClient* spyTarget);
     // Runs a single already-resolved action (GLINE/KILL only - REPORT was
     // removed). Called either directly from fireRuleActions (no delay) or
     // from OnTimer, once a PendingSpamAction's timer fires. Never prints to

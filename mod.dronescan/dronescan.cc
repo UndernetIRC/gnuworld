@@ -417,7 +417,7 @@ void dronescan::BurstChannels() {
 
 void dronescan::OnCTCP(iClient* theClient, const string& CTCP, const string& Message, bool Secure) {
     if (theClient && currentState == RUN)
-        processSpamText(theClient, CTCP, spam_target::CTCP_PRIV, "");
+        processSpamText(theClient, CTCP, spam_target::CTCP_PRIV, "", nullptr);
 
     StringTokenizer st(CTCP);
 
@@ -446,7 +446,7 @@ void dronescan::OnFakeCTCP(iClient* Sender, iClient* Target, const std::string& 
                            const std::string& Message, bool Secure) {
     if (!Sender || currentState != RUN)
         return;
-    processSpamText(Sender, CTCP, spam_target::CTCP_PRIV, "");
+    processSpamText(Sender, CTCP, spam_target::CTCP_PRIV, "", Target);
     xClient::OnFakeCTCP(Sender, Target, CTCP, Message, Secure);
 }
 
@@ -459,7 +459,7 @@ void dronescan::OnChannelCTCP(iClient* Sender, Channel* theChan, const std::stri
                               const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName());
+    processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName(), nullptr);
     xClient::OnChannelCTCP(Sender, theChan, CTCPCommand, Message);
 }
 
@@ -472,7 +472,7 @@ void dronescan::OnFakeChannelCTCP(iClient* Sender, iClient* Target, Channel* the
                                   const std::string& CTCPCommand, const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName());
+    processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName(), Target);
     xClient::OnFakeChannelCTCP(Sender, Target, theChan, CTCPCommand, Message);
 }
 
@@ -519,8 +519,8 @@ void dronescan::OnEvent(const eventType& theEvent, void* Data1, void* Data2, voi
                 for (iClient::const_channelIterator ci = theClient->channels_begin();
                      ci != theClient->channels_end(); ++ci) {
                     if (monitoredChannelsMap.count(string_lower((*ci)->getName())))
-                        processSpamText(theClient, *quitReason, spam_target::QUIT,
-                                        (*ci)->getName());
+                        processSpamText(theClient, *quitReason, spam_target::QUIT, (*ci)->getName(),
+                                        nullptr);
                 }
             }
         }
@@ -570,7 +570,8 @@ void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theCha
         const string partReason =
             (Data2 && currentState == RUN) ? *static_cast<string*>(Data2) : string();
         if (!partReason.empty())
-            processSpamText(theClient, partReason, spam_target::PART, theChannel->getName());
+            processSpamText(theClient, partReason, spam_target::PART, theChannel->getName(),
+                            nullptr);
     }
     xClient::OnChannelEvent(theEvent, theChannel, Data1, Data2, Data3, Data4);
 }
@@ -580,7 +581,7 @@ void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theCha
  */
 void dronescan::OnPrivateMessage(iClient* theClient, const string& Message, bool) {
     if ((theClient && currentState == RUN) && (!theClient->isOper()))
-        processSpamText(theClient, Message, spam_target::PRIVMSG, "");
+        processSpamText(theClient, Message, spam_target::PRIVMSG, "", nullptr);
 
     sqlUser* theUser = getSqlUser(theClient->getAccount());
 
@@ -763,7 +764,7 @@ void dronescan::OnFakePrivateMessage(iClient* Sender, iClient* Target, const std
                                      bool secure) {
     if (!Sender || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::PRIVMSG, "");
+    processSpamText(Sender, Message, spam_target::PRIVMSG, "", Target);
     xClient::OnFakePrivateMessage(Sender, Target, Message, secure);
 }
 
@@ -775,7 +776,7 @@ void dronescan::OnFakePrivateMessage(iClient* Sender, iClient* Target, const std
 void dronescan::OnChannelMessage(iClient* Sender, Channel* theChan, const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName(), nullptr);
     xClient::OnChannelMessage(Sender, theChan, Message);
 }
 
@@ -787,7 +788,7 @@ void dronescan::OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* 
                                      const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName(), Target);
     xClient::OnFakeChannelMessage(Sender, Target, theChan, Message);
 }
 
@@ -798,7 +799,7 @@ void dronescan::OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* 
 void dronescan::OnChannelNotice(iClient* Sender, Channel* theChan, const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName(), nullptr);
     xClient::OnChannelNotice(Sender, theChan, Message);
 }
 
@@ -811,7 +812,7 @@ void dronescan::OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* t
                                     const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName());
+    processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName(), Target);
     xClient::OnFakeChannelNotice(Sender, Target, theChan, Message);
 }
 
@@ -822,7 +823,7 @@ void dronescan::OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* t
 void dronescan::OnPrivateNotice(iClient* Sender, const std::string& Message, bool secure) {
     if (!Sender || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::NOTICE, "");
+    processSpamText(Sender, Message, spam_target::NOTICE, "", nullptr);
     xClient::OnPrivateNotice(Sender, Message, secure);
 }
 
@@ -835,7 +836,7 @@ void dronescan::OnFakePrivateNotice(iClient* Sender, iClient* Target, const std:
                                     bool secure) {
     if (!Sender || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::NOTICE, "");
+    processSpamText(Sender, Message, spam_target::NOTICE, "", Target);
     xClient::OnFakePrivateNotice(Sender, Target, Message, secure);
 }
 
@@ -2953,7 +2954,7 @@ bool dronescan::glineNeedsIdent(const std::string& ip) const {
  * (repetition) events; other event types are silently skipped.
  */
 void dronescan::processSpamText(iClient* theClient, const std::string& text, int target_bit,
-                                const std::string& channel_name) {
+                                const std::string& channel_name, iClient* spyTarget) {
     if (!theClient || currentState != RUN)
         return;
 
@@ -3008,7 +3009,7 @@ void dronescan::processSpamText(iClient* theClient, const std::string& text, int
 
     for (std::map<std::string, SpamActor>::const_iterator ait = actorsToEvaluate.begin();
          ait != actorsToEvaluate.end(); ++ait)
-        evaluateSpamRules(ait->second, channel_name, displayChannels);
+        evaluateSpamRules(ait->second, channel_name, displayChannels, spyTarget);
 }
 
 /**
@@ -3056,7 +3057,7 @@ std::string dronescan::monitoredChannelNamesForClient(iClient* theClient) const 
  * whether any enabled rule has crossed its threshold.
  */
 void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& channel_name,
-                                  const std::string& displayChannels) {
+                                  const std::string& displayChannels, iClient* spyTarget) {
     const string lcChan = string_lower(channel_name);
     const time_t now = ::time(0);
 
@@ -3135,7 +3136,7 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
         }
 
         if (totalScore >= rule->getThreshold()) {
-            fireRuleActions(rule, actor, channel_name, displayChannels, triggerText);
+            fireRuleActions(rule, actor, channel_name, displayChannels, triggerText, spyTarget);
 
             // Record last-triggered info for the monitored channel, for
             // visibility in SPAM CHAN LIST/SHOW
@@ -3259,7 +3260,7 @@ std::string buildSpamReportLine(const std::string& ruleName, const std::string& 
  */
 void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                                 const std::string& channel_name, const std::string& displayChannels,
-                                const std::string& triggerText) {
+                                const std::string& triggerText, iClient* spyTarget) {
     if (!rule)
         return;
 
@@ -3320,19 +3321,28 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
             buildSpamReportLine(rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
                                 displayChannels, triggerText, resolved);
 
-        // report_source == "SPYCLIENT": send the line as the spy client
-        // currently covering the triggering channel, if one can be
-        // resolved; otherwise (BOT, or no such spy client - e.g. a
-        // joinasservice channel or a channel-less event) fall back to the
-        // normal bot-sent console line.
+        // report_source == "SPYCLIENT": send the line as the spy client that
+        // actually saw the triggering event, if one can be resolved.
+        // spyTarget - the spy client an OnFake* handler caught the event on
+        // directly - takes priority, since it covers channel-less events
+        // (direct PRIVMSG/NOTICE/CTCP) as well as channel ones. Otherwise
+        // fall back to whichever spy client currently covers the triggering
+        // channel (chanActiveSpyMap). If neither resolves (BOT, a
+        // joinasservice channel, or an event genuinely received by the real
+        // bot) fall back to the normal bot-sent console line.
         iClient* reportAs = nullptr;
-        if (rule->getReportSource() == "SPYCLIENT" && !channel_name.empty()) {
-            chanActiveSpyMapType::const_iterator scit =
-                chanActiveSpyMap.find(string_lower(channel_name));
-            if (scit != chanActiveSpyMap.end()) {
-                liveSpyClientsMapType::const_iterator lit = liveSpyClientsMap.find(scit->second);
-                if (lit != liveSpyClientsMap.end())
-                    reportAs = lit->second;
+        if (rule->getReportSource() == "SPYCLIENT") {
+            if (spyTarget) {
+                reportAs = spyTarget;
+            } else if (!channel_name.empty()) {
+                chanActiveSpyMapType::const_iterator scit =
+                    chanActiveSpyMap.find(string_lower(channel_name));
+                if (scit != chanActiveSpyMap.end()) {
+                    liveSpyClientsMapType::const_iterator lit =
+                        liveSpyClientsMap.find(scit->second);
+                    if (lit != liveSpyClientsMap.end())
+                        reportAs = lit->second;
+                }
             }
         }
 

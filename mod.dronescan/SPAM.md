@@ -210,14 +210,17 @@ at least one enabled GLINE/KILL action **always** reports, regardless of
 `spam_rules.report_source`: who the `[S]` line appears to be sent by, still
 always posted in `consoleChannel`. `BOT` (default) sends it from the bot
 itself (E), same as before this field existed. `SPYCLIENT` instead sends it
-as the spy client currently covering the channel the triggering event
-happened in (`dronescan::chanActiveSpyMap`, kept up to date as spy clients
-join/part monitored channels) via `FakeMessage()`, without requiring that
-spy client to be a member of `consoleChannel`. If no spy client covers that
-channel - e.g. the channel is watched via `joinasservice` instead of a spy
-client, or the triggering event was a channel-less direct PRIVMSG/NOTICE -
-it silently falls back to `BOT`, so a firing rule always produces its
-report line.
+via `FakeMessage()` as a spy client, without requiring that spy client to be
+a member of `consoleChannel`. Which spy client is used depends on how the
+triggering event was caught: for a direct PRIVMSG/NOTICE/CTCP sent straight
+to a spy client, it reports as that same spy client; for a channel event, it
+reports as whichever spy client currently covers that channel
+(`dronescan::chanActiveSpyMap`, kept up to date as spy clients join/part
+monitored channels). If neither applies - e.g. the event was genuinely
+received by the bot itself (not any spy client), or the channel is watched
+via `joinasservice` instead of a spy client, or no spy client currently
+covers that channel - it silently falls back to `BOT`, so a firing rule
+always produces its report line.
 
 ### Logging
 
