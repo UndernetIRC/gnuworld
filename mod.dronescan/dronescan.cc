@@ -2815,6 +2815,11 @@ dronescan::SpamActor dronescan::makeActor(iClient* theClient) const {
 /**
  * scoreEvent: award one occurrence of a matched event to an actor, updating
  * the per-rule scoring buckets. Shared by TEXT and TEXT_REPEAT.
+ *
+ * score.occurrences is a true sliding window: entries older than
+ * point_expiry are evicted from the front before adding the new one, so a
+ * burst that straddles an arbitrary epoch boundary is never discarded
+ * wholesale (unlike a tumbling window reset on a single "window_start").
  */
 void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
                            const std::string& channel_name, time_t now, const std::string& text) {
@@ -2826,17 +2831,17 @@ void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
 
         const string key = buildScoringKey(rule, actor, channel_name);
         SpamScore& score = spamScoreMap[key][ev->getId()];
-        if (now - score.window_start > ev->getPointExpiry()) {
-            score.count = 0;
-            score.window_start = now;
-        }
+        while (!score.occurrences.empty() &&
+               (now - score.occurrences.front()) >= ev->getPointExpiry())
+            score.occurrences.pop_front();
+
         elog << "dronescan::scoreEvent> Updating score for event " << ev->getId() << "["
              << ev->getName() << "] for actor " << actor.numeric << " rule " << rule->getId()
-             << " (count=" << score.count << ", window_start=" << score.window_start
-             << ", point_expiry=" << ev->getPointExpiry() << ")" << std::endl;
+             << " (count=" << score.occurrences.size() << ", point_expiry=" << ev->getPointExpiry()
+             << ")" << std::endl;
         int maxOcc = ev->getMaxOccurrence();
-        if (maxOcc < 0 || score.count < maxOcc)
-            ++score.count;
+        if (maxOcc < 0 || static_cast<int>(score.occurrences.size()) < maxOcc)
+            score.occurrences.push_back(now);
         score.last_text = text;
         score.last_text_ts = now;
     }
@@ -2847,9 +2852,17 @@ void dronescan::scoreEvent(sqlSpamEvent* ev, const SpamActor& actor,
  * channel/target scope; fires (scores) once repeat_min_count is reached and
  * keeps firing for every subsequent repeat within the window. The tracking
  * entry is NOT erased on fire, so later repeaters keep being caught.
- * For crossuser events, every involved participant is awarded on each fire,
- * and each participant's identity is retained so actions still work after a
- * participant quits.
+ *
+ * e.occurrences is a true sliding window (oldest first): entries older than
+ * point_expiry are evicted from the front on every call before the new
+ * message is pushed, so the window always reflects exactly which messages
+ * are within point_expiry seconds of "now" - not which messages happened to
+ * arrive since some earlier reset point. For crossuser events, the set of
+ * participants to score/action on each fire is rebuilt from whichever
+ * actors currently have a message in that live window, so a participant who
+ * has aged out is no longer re-scored, and each participant's identity is
+ * retained (as a value, not a pointer) so actions still work after they
+ * quit.
  */
 void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
                                    const std::string& text, const std::string& channel_name,
@@ -2876,23 +2889,27 @@ void dronescan::processRepeatEvent(sqlSpamEvent* ev, const SpamActor& actor,
     key += cmp;
 
     RepeatEntry& e = repeatTrackMap[key];
-    if (e.window_start == 0 || (now - e.window_start) > ev->getPointExpiry()) {
-        e.count = 0;
-        e.window_start = now;
-        e.participants.clear();
-    }
-    e.expires_at = now + ev->getPointExpiry();
-    ++e.count;
-    if (crossuser)
-        e.participants[actor.numeric] = actor;
+    while (!e.occurrences.empty() && (now - e.occurrences.front().ts) >= ev->getPointExpiry())
+        e.occurrences.pop_front();
 
-    if (e.count < ev->getRepeatMinCount())
-        return; // not enough repeats yet
+    RepeatEntry::Occurrence occ;
+    occ.ts = now;
+    occ.actor = actor;
+    e.occurrences.push_back(occ);
+    e.expires_at = now + ev->getPointExpiry();
+
+    if (static_cast<int>(e.occurrences.size()) < ev->getRepeatMinCount())
+        return; // not enough repeats yet within the live window
 
     // Fire: award points, but leave the entry in place for further repeats.
     if (crossuser) {
-        for (std::map<std::string, SpamActor>::const_iterator pit = e.participants.begin();
-             pit != e.participants.end(); ++pit) {
+        std::map<std::string, SpamActor> windowParticipants;
+        for (std::deque<RepeatEntry::Occurrence>::const_iterator oit = e.occurrences.begin();
+             oit != e.occurrences.end(); ++oit)
+            windowParticipants[oit->actor.numeric] = oit->actor;
+
+        for (std::map<std::string, SpamActor>::const_iterator pit = windowParticipants.begin();
+             pit != windowParticipants.end(); ++pit) {
             scoreEvent(ev, pit->second, channel_name, now, text);
             actorsToEvaluate[pit->first] = pit->second;
         }
@@ -3120,16 +3137,25 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
                 continue;
 
             const SpamScore& sc = sii->second;
-            // Check if the scoring window has expired
-            if ((now - sc.window_start) > ev->getPointExpiry())
+            // Count occurrences still within the live sliding window
+            // (read-only: scoreEvent() already evicts stale entries on
+            // write, so this just re-derives the count as of "now").
+            int windowCount = 0;
+            for (std::deque<time_t>::const_reverse_iterator ti = sc.occurrences.rbegin();
+                 ti != sc.occurrences.rend(); ++ti) {
+                if (now - *ti >= ev->getPointExpiry())
+                    break;
+                ++windowCount;
+            }
+            if (windowCount == 0)
                 continue;
 
             int pts = (points_override >= 0) ? points_override : ev->getPoints();
-            totalScore += sc.count * pts;
+            totalScore += windowCount * pts;
 
             // Track the most recently matched text among contributing
             // events, to report the line that likely tipped the threshold.
-            if (sc.count > 0 && sc.last_text_ts >= triggerTs) {
+            if (sc.last_text_ts >= triggerTs) {
                 triggerTs = sc.last_text_ts;
                 triggerText = sc.last_text;
             }

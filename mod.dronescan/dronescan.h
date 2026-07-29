@@ -20,6 +20,7 @@
 #ifndef DRONESCAN_H
 #define DRONESCAN_H "$Id: dronescan.h,v 1.38 2009/05/28 10:37:31 hidden1 Exp $"
 
+#include <deque>
 #include <list>
 #include <map>
 #include <set>
@@ -637,14 +638,15 @@ class dronescan : public xClient {
      * (TEXT_REPEAT events only). Text matching this is never tracked. */
     spamRegexCacheType spamRepeatExclusionCache;
 
-    /* In-memory spam scoring: scoringKey -> (event_id -> SpamScore) */
+    /* In-memory spam scoring: scoringKey -> (event_id -> SpamScore).
+     * occurrences holds a true sliding window: match timestamps, oldest
+     * first, evicted once they age out of the event's point_expiry. */
     struct SpamScore {
-        int count;             // occurrences within the current window
-        time_t window_start;   // when the current window began
-        std::string last_text; // text of the most recent match that
-                               // contributed to this event's count
-        time_t last_text_ts;   // wall-clock time last_text was set
-        SpamScore() : count(0), window_start(0), last_text_ts(0) {}
+        std::deque<time_t> occurrences; // timestamps of matches still in-window
+        std::string last_text;          // text of the most recent match that
+                                        // contributed to this event's count
+        time_t last_text_ts;            // wall-clock time last_text was set
+        SpamScore() : last_text_ts(0) {}
     };
     typedef std::map<std::string, std::map<int, SpamScore>> spamScoreMapType;
     spamScoreMapType spamScoreMap;
@@ -656,13 +658,17 @@ class dronescan : public xClient {
      *   self-only : eventId + scope + numeric + cmpText
      * where scope = lower(channel) or "privmsg", cmpText = text lowercased
      * unless the event is case_sensitive. An entry is NOT erased when it
-     * fires; it persists for its window so later repeaters keep matching. */
+     * fires; it persists for its window so later repeaters keep matching.
+     * occurrences is a true sliding window: one entry per matching message,
+     * oldest first, evicted once it ages out of point_expiry. */
     struct RepeatEntry {
-        int count;                                     // total occurrences in the current window
-        time_t window_start;                           // when the current window began
-        time_t expires_at;                             // window_start + event point_expiry; for GC
-        std::map<std::string, SpamActor> participants; // by numeric (crossuser)
-        RepeatEntry() : count(0), window_start(0), expires_at(0) {}
+        struct Occurrence {
+            time_t ts;
+            SpamActor actor;
+        };
+        std::deque<Occurrence> occurrences;
+        time_t expires_at; // most recent occurrence + event point_expiry; for GC
+        RepeatEntry() : expires_at(0) {}
     };
     typedef std::map<std::string, RepeatEntry> repeatTrackMapType;
     repeatTrackMapType repeatTrackMap;
