@@ -473,6 +473,17 @@ class dronescan : public xClient {
     /** Returns the spy client id for the given iClient, or -1. */
     int getSpyClientId(const iClient* ic) const;
 
+    /**
+     * Returns true if Target is the primary spy client covering chanName
+     * (chanActiveSpyMap), or if no primary is on record (fails open so a
+     * bookkeeping gap doesn't silently suppress detection). Used to make
+     * sure that when a channel has temporary dual spy coverage, only the
+     * primary spy's witnessed copy of a channel broadcast feeds spam
+     * detection - the 2nd spy sees the exact same broadcast and would
+     * otherwise double-count it.
+     */
+    bool isPrimarySpyClient(const iClient* Target, const std::string& chanName) const;
+
     /** Part a spy client from a monitored channel and update tracking maps. */
     void partSpyClientFromChannel(int scId, const std::string& chanName);
 

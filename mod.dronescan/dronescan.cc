@@ -472,7 +472,8 @@ void dronescan::OnFakeChannelCTCP(iClient* Sender, iClient* Target, Channel* the
                                   const std::string& CTCPCommand, const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName(), Target);
+    if (isPrimarySpyClient(Target, theChan->getName()))
+        processSpamText(Sender, CTCPCommand, spam_target::CTCP_CHAN, theChan->getName(), Target);
     xClient::OnFakeChannelCTCP(Sender, Target, theChan, CTCPCommand, Message);
 }
 
@@ -788,7 +789,8 @@ void dronescan::OnFakeChannelMessage(iClient* Sender, iClient* Target, Channel* 
                                      const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName(), Target);
+    if (isPrimarySpyClient(Target, theChan->getName()))
+        processSpamText(Sender, Message, spam_target::CHAN_PRIV, theChan->getName(), Target);
     xClient::OnFakeChannelMessage(Sender, Target, theChan, Message);
 }
 
@@ -812,7 +814,8 @@ void dronescan::OnFakeChannelNotice(iClient* Sender, iClient* Target, Channel* t
                                     const std::string& Message) {
     if (!Sender || !theChan || currentState != RUN)
         return;
-    processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName(), Target);
+    if (isPrimarySpyClient(Target, theChan->getName()))
+        processSpamText(Sender, Message, spam_target::CHAN_NOT, theChan->getName(), Target);
     xClient::OnFakeChannelNotice(Sender, Target, theChan, Message);
 }
 
@@ -3510,6 +3513,22 @@ int dronescan::getSpyClientId(const iClient* ic) const {
             return it->first;
     }
     return -1;
+}
+
+/**
+ * isPrimarySpyClient: true if Target is chanActiveSpyMap's registered
+ * primary for chanName, or if no primary is on record (fails open so a
+ * bookkeeping gap doesn't silently suppress detection).
+ */
+bool dronescan::isPrimarySpyClient(const iClient* Target, const std::string& chanName) const {
+    const string chanKey = string_lower(chanName);
+    chanActiveSpyMapType::const_iterator ait = chanActiveSpyMap.find(chanKey);
+    if (ait == chanActiveSpyMap.end())
+        return true;
+    liveSpyClientsMapType::const_iterator lit = liveSpyClientsMap.find(ait->second);
+    if (lit == liveSpyClientsMap.end())
+        return true;
+    return lit->second == Target;
 }
 
 /** Voice a spy client in the console channel. */

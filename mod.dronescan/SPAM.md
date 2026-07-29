@@ -263,6 +263,18 @@ silently skipped if the module was built without it.
   may be picked from the full pool.
 - `forcejoin` forces the join past `+i`/`+k`/`+l` or bans via a
   server-level protocol override.
+- A monitored channel can temporarily carry a 2nd spy client alongside the
+  primary (`checkSecondSpyJoins()`, periodic double-coverage sweep) so a
+  replacement is already present when the primary needs to rotate out.
+  Because the IRCd fans a single channel PRIVMSG/NOTICE/CTCP out to every
+  member, both spies otherwise witness the exact same message. To avoid
+  double-counting it, `OnFakeChannelMessage`/`OnFakeChannelNotice`/
+  `OnFakeChannelCTCP` only feed `processSpamText()` when the witnessing spy
+  is the channel's registered primary (`dronescan::isPrimarySpyClient()`);
+  the 2nd spy's copy of the same broadcast is ignored for detection
+  purposes. Direct PRIVMSG/NOTICE/CTCP sent straight at a spy client (not
+  via the channel) are never fanned out, so the 2nd spy still detects and
+  scores those normally.
 
 ## Admin command: `SPAM`
 
