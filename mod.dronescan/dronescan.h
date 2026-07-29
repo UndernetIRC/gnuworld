@@ -167,6 +167,9 @@ class dronescan : public xClient {
     /** When we are being detached by the xServer */
     virtual void OnDetach(const std::string& = std::string("Server Shutdown"));
 
+    /** When the xServer is processing a real shutdown */
+    virtual void OnShutdown(const std::string& reason);
+
     /** Receive our own timed events. */
     virtual void OnTimer(const xServer::timerID&, void*);
 
@@ -523,6 +526,12 @@ class dronescan : public xClient {
      * random reason - instead of silently vanishing.
      */
     void partAllSpyClientsForShutdown();
+
+    /**
+     * Called on real process shutdown: every live spy client QUITs
+     * directly with a random realistic reason, with no PART first.
+     */
+    void quitAllSpyClientsForShutdown();
 
     /* Allow commands access to the database pointer */
     inline dbHandle* getSqlDb() { return SQLDb; }

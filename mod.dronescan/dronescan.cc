@@ -1133,6 +1133,18 @@ void dronescan::OnDetach(const std::string& message) {
     xClient::OnDetach(message);
 }
 
+/**
+ * Called synchronously by xServer::Shutdown(), before the main loop sends
+ * the server's own SQUIT. Quit spy clients here (not in OnDetach(), which
+ * for a real process shutdown only runs after doShutdown() - i.e. after
+ * the SQUIT has already gone out, too late to look like anything but a
+ * netsplit).
+ */
+void dronescan::OnShutdown(const std::string& message) {
+    quitAllSpyClientsForShutdown();
+    xClient::OnShutdown(message);
+}
+
 /** Receive our own timed events. */
 void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
     time_t theTime;
@@ -3623,10 +3635,13 @@ void dronescan::introduceAllSpyClients() {
  * the primary or as a temporary 2nd visitor (see chanActiveSpyMap /
  * chanSecondSpyMap). If it was the primary and a 2nd visitor is present,
  * the visitor is promoted to primary and no cooldown/replacement is
- * needed. Otherwise a per-(channel, spyclient) rejoin cooldown is
- * recorded and, if scheduleReplacement is true, a replacement join is
- * scheduled via scheduleSpyClientJoin() using randRejoinMinSec/Max.
- * Returns true if a promotion happened.
+ * needed. If it was the primary and nobody is available to promote, a
+ * per-(channel, spyclient) rejoin cooldown is recorded and, if
+ * scheduleReplacement is true, a replacement join is scheduled via
+ * scheduleSpyClientJoin() using randRejoinMinSec/Max. If it was only the
+ * temporary 2nd visitor, the channel still has its primary and needs no
+ * replacement join - checkSecondSpyJoins() brings in a fresh 2nd visitor
+ * on its own schedule. Returns true if a promotion happened.
  */
 bool dronescan::removeSpyClientFromChannelTracking(int scId, const std::string& chanKey,
                                                    bool scheduleReplacement, bool forcejoin) {
@@ -3668,12 +3683,19 @@ bool dronescan::removeSpyClientFromChannelTracking(int scId, const std::string& 
     }
 
     if (!promoted) {
+        // Throttle scId from being immediately reselected for this
+        // channel, whichever role it just left.
         int delay = randRejoinMinSec;
         if (randRejoinMaxSec > randRejoinMinSec)
             delay += rand() % (randRejoinMaxSec - randRejoinMinSec + 1);
         spyClientChanCooldown[std::make_pair(scId, chanKey)] = ::time(nullptr) + delay;
 
-        if (scheduleReplacement)
+        // Losing the temporary 2nd visitor doesn't leave the channel
+        // short a spy client - the primary is untouched, and
+        // checkSecondSpyJoins() refills the 2nd-visitor slot on its own
+        // interval. Only a lost primary with nobody to promote needs a
+        // replacement join.
+        if (wasPrimary && scheduleReplacement)
             scheduleSpyClientJoin(chanKey, forcejoin, randRejoinMinSec, randRejoinMaxSec);
     }
 
@@ -3879,6 +3901,12 @@ void dronescan::doSpyClientJoin(const std::string& chanName, bool forcejoin) {
     if (mcit == monitoredChannelsMap.end() || !mcit->second->isEnabled())
         return;
 
+    // The channel may already have a live primary (e.g. a stale/duplicate
+    // scheduled join) - don't stack another client on top of it.
+    chanActiveSpyMapType::const_iterator ait = chanActiveSpyMap.find(chanKey);
+    if (ait != chanActiveSpyMap.end() && liveSpyClientsMap.count(ait->second))
+        return;
+
     int scId = findBestSpyClient(chanName, forcejoin);
     if (scId < 0) {
         Message(consoleChannel, "[SpyClient] No available spy client for %s.", chanName.c_str());
@@ -4079,6 +4107,23 @@ void dronescan::partAllSpyClientsForShutdown() {
 
         MyUplink->DetachClient(ic, randomQuitReason());
     }
+    liveSpyClientsMap.clear();
+    chanActiveSpyMap.clear();
+    spyClientChanMap.clear();
+    chanSecondSpyMap.clear();
+}
+
+/**
+ * Called on real process shutdown: every live spy client QUITs directly
+ * with a random realistic reason, with no PART first - a real client
+ * dropping with e.g. a ping timeout or read error never PARTs, it just
+ * QUITs and the server fans that out to every channel it was in.
+ */
+void dronescan::quitAllSpyClientsForShutdown() {
+    for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();
+         it != liveSpyClientsMap.end(); ++it)
+        MyUplink->DetachClient(it->second, randomQuitReason());
+
     liveSpyClientsMap.clear();
     chanActiveSpyMap.clear();
     spyClientChanMap.clear();
