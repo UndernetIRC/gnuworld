@@ -411,6 +411,19 @@ class dronescan : public xClient {
     void detachSpyClient(int scId);
 
     /**
+     * Core spy client selection. If forcejoin is false, skips channels that
+     * are +i, +k, +l(full), +r (with no spy client account), or where the
+     * spy client host matches a ban. If requireIdle is true, only a spy
+     * client covering no channels at all is accepted (no busy fallback).
+     * excludeId (or -1) is never returned - used to keep a 2nd spy client
+     * distinct from the channel's primary. Also skips any candidate still
+     * under its per-(channel, spyclient) rejoin cooldown for this channel.
+     * Returns spy client id or -1 if none eligible.
+     */
+    int selectSpyClient(const std::string& chanName, bool forcejoin, bool requireIdle,
+                        int excludeId);
+
+    /**
      * Find the best available spy client for the given channel.
      * If forcejoin is false, skips channels that are +i, +k, +l(full),
      * +r (with no spy client account), or where the spy client host
@@ -459,6 +472,49 @@ class dronescan : public xClient {
      *   schedule another client to take over
      */
     void resyncSpyClients();
+
+    /**
+     * Removes scId's association with chanKey, whether it was covering it
+     * as the primary or as a temporary 2nd visitor. If it was the primary
+     * and a 2nd visitor is present, the visitor is promoted to primary
+     * (returns true). Otherwise a per-(channel, spyclient) rejoin cooldown
+     * is recorded and, if scheduleReplacement is true, a replacement join
+     * is scheduled via scheduleSpyClientJoin() using randRejoinMinSec/Max.
+     */
+    bool removeSpyClientFromChannelTracking(int scId, const std::string& chanKey,
+                                            bool scheduleReplacement, bool forcejoin);
+
+    /** Returns a random realistic quit/part reason from a fixed pool. */
+    std::string randomQuitReason() const;
+
+    /** Arms scId's next spontaneous QUIT, in [spyClientQuitMinSec, spyClientQuitMaxSec]. */
+    void scheduleSpyClientPersonalQuit(int scId);
+
+    /** Cancels scId's pending spontaneous-quit timer, if any. */
+    void cancelSpyClientPersonalQuit(int scId);
+
+    /**
+     * Fired when a spy client's personal quit timer expires: QUITs it from
+     * the network with a random reason, frees/reschedules the channels it
+     * covered, then reconnects it (idle) and re-arms its next quit cycle.
+     */
+    void handleSpyClientPersonalQuit(int scId);
+
+    /**
+     * Periodic sweep (every 60s): for monitored channels with a primary
+     * spy client but no 2nd visitor yet, checks whether the channel's
+     * (per-channel or global default) 2nd-join interval has elapsed and,
+     * if so, brings in another idle spy client for temporary double
+     * coverage.
+     */
+    void checkSecondSpyJoins();
+
+    /**
+     * Called on module shutdown/reload: every live spy client visibly
+     * PARTs each channel it's on with a random reason, then QUITs with a
+     * random reason - instead of silently vanishing.
+     */
+    void partAllSpyClientsForShutdown();
 
     /* Allow commands access to the database pointer */
     inline dbHandle* getSqlDb() { return SQLDb; }
@@ -541,6 +597,25 @@ class dronescan : public xClient {
     // Pending join timers: timerID -> {forcejoin, channel name}
     typedef std::map<xServer::timerID, std::pair<bool, std::string>> pendingJoinTimersType;
     pendingJoinTimersType pendingJoinTimers;
+
+    // Pending spy client personal-quit timers: timerID -> spy client id
+    typedef std::map<xServer::timerID, int> pendingSpyQuitTimersType;
+    pendingSpyQuitTimersType pendingSpyQuitTimers;
+
+    // (spy client id, lowercase channel) -> earliest time it may cover that
+    // channel again; set when it voluntarily quits/leaves it.
+    typedef std::map<std::pair<int, std::string>, time_t> spyClientChanCooldownType;
+    spyClientChanCooldownType spyClientChanCooldown;
+
+    // lowercase channel name -> id of the temporary "2nd visitor" spy
+    // client currently covering it in addition to the primary, if any.
+    typedef std::map<std::string, int> chanSecondSpyMapType;
+    chanSecondSpyMapType chanSecondSpyMap;
+
+    // lowercase channel name -> last time a 2nd-join attempt was made,
+    // used to pace checkSecondSpyJoins() to roughly once per interval.
+    typedef std::map<std::string, time_t> chanSecondJoinLastMapType;
+    chanSecondJoinLastMapType chanSecondJoinLastMap;
 
     // Spam actions waiting for their delay/jitter timer to fire; see
     // fireRuleActions()/executeSpamAction()/PendingSpamAction.
@@ -676,6 +751,13 @@ class dronescan : public xClient {
     // the config) means spy clients don't join any channel at introduction.
     std::string spyClientsChannel;
 
+    /** Spy client periodic quit / rejoin cooldown / 2nd-client join config. */
+    int spyClientQuitMinSec;
+    int spyClientQuitMaxSec;
+    int randRejoinMinSec;
+    int randRejoinMaxSec;
+    int secondSpyJoinIntervalMinDefault; // minutes; <= 0 disables globally
+
     /** State variable. */
     DS_STATE currentState;
 
@@ -708,7 +790,8 @@ class dronescan : public xClient {
     xServer::timerID tidClearJoinCounter;
     xServer::timerID tidClearNickCounter;
     xServer::timerID tidGlineQueue;
-    xServer::timerID tidRepeatGC; // periodic sweep of expired repeat entries
+    xServer::timerID tidRepeatGC;       // periodic sweep of expired repeat entries
+    xServer::timerID tidSecondSpyCheck; // periodic sweep for 2nd-spy-client joins
 
     /** Command map type. */
     typedef std::map<std::string, Command*, noCaseCompare> commandMapType;

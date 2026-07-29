@@ -153,6 +153,15 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     jcGlineLength = atoi(dronescanConfig->Require("jcGlineLength")->second.c_str());
     gbCount = atoi(dronescanConfig->Require("gbCount")->second.c_str());
     gbInterval = atoi(dronescanConfig->Require("gbInterval")->second.c_str());
+
+    /* Spy client periodic quit / rejoin cooldown / 2nd-client join defaults */
+    spyClientQuitMinSec = atoi(dronescanConfig->Require("spyClientQuitMinSec")->second.c_str());
+    spyClientQuitMaxSec = atoi(dronescanConfig->Require("spyClientQuitMaxSec")->second.c_str());
+    randRejoinMinSec = atoi(dronescanConfig->Require("randRejoinMinSec")->second.c_str());
+    randRejoinMaxSec = atoi(dronescanConfig->Require("randRejoinMaxSec")->second.c_str());
+    secondSpyJoinIntervalMinDefault =
+        atoi(dronescanConfig->Require("secondSpyJoinIntervalMin")->second.c_str());
+
     /* Set up variables that our tests will need */
     typedef std::vector<string> testVarsType;
     testVarsType testVars;
@@ -349,6 +358,10 @@ void dronescan::OnAttach() {
     theTime = time(0) + 60;
     tidRepeatGC = MyUplink->RegisterTimer(theTime, this, 0);
 
+    /* Periodic sweep for 2nd-spy-client joins (fixed 60s) */
+    theTime = time(0) + 60;
+    tidSecondSpyCheck = MyUplink->RegisterTimer(theTime, this, 0);
+
     xClient::OnAttach();
 } // dronescan::OnAttach()
 
@@ -500,7 +513,7 @@ void dronescan::OnEvent(const eventType& theEvent, void* Data1, void* Data2, voi
         // every monitored channel the user was on. msg_Q.cc posts this event
         // before removing the client from the network, so theClient is still
         // attached to its channels here.
-        if (theEvent == EVT_QUIT && currentState == RUN) {
+        if (theEvent == EVT_QUIT && currentState == RUN && !isSpyClient(theClient)) {
             const std::string* quitReason = static_cast<const std::string*>(Data2);
             if (quitReason && !quitReason->empty()) {
                 for (iClient::const_channelIterator ci = theClient->channels_begin();
@@ -849,18 +862,13 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient, iClient* des
     MyUplink->Write(partMsg);
 
     const string chanKey = string_lower(theChan->getName());
+    monitoredChannelsMapType::const_iterator mc = monitoredChannelsMap.find(chanKey);
+    bool forcejoin = (mc != monitoredChannelsMap.end()) ? mc->second->isForceJoin() : false;
 
     // Update our tracking maps - only this channel; the spy client may
-    // still be covering others.
-    chanActiveSpyMap.erase(chanKey);
-    {
-        spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
-        if (sit != spyClientChanMap.end()) {
-            sit->second.erase(chanKey);
-            if (sit->second.empty())
-                spyClientChanMap.erase(sit);
-        }
-    }
+    // still be covering others. May promote a 2nd visitor to primary.
+    bool promoted =
+        removeSpyClientFromChannelTracking(scId, chanKey, /*scheduleReplacement=*/false, forcejoin);
 
     // Report to console
     const string kickerStr = srcClient ? srcClient->getNickName() : "<server>";
@@ -881,6 +889,13 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient, iClient* des
 
     if (track.count >= 2) {
         kickStoppedChannels.insert(chanKey);
+        // If a 2nd visitor was promoted to primary above, part it too -
+        // we're stopping monitoring of this channel entirely.
+        if (promoted) {
+            chanActiveSpyMapType::const_iterator ait = chanActiveSpyMap.find(chanKey);
+            if (ait != chanActiveSpyMap.end())
+                partSpyClientFromChannel(ait->second, theChan->getName());
+        }
         Message(consoleChannel,
                 "[SpyClient] Stopping monitoring of %s after %d spy client kicks in 24h.",
                 theChan->getName().c_str(), track.count);
@@ -888,15 +903,15 @@ void dronescan::OnNetworkKick(Channel* theChan, iClient* srcClient, iClient* des
         return;
     }
 
-    // Schedule a replacement - use a different spy client if possible
-    monitoredChannelsMapType::const_iterator mc = monitoredChannelsMap.find(chanKey);
-    bool forcejoin = (mc != monitoredChannelsMap.end()) ? mc->second->isForceJoin() : false;
-
-    if (findBestSpyClient(theChan->getName(), forcejoin) >= 0) {
-        scheduleSpyClientJoin(theChan->getName(), forcejoin, 300, 1500);
-    } else {
-        Message(consoleChannel, "[SpyClient] No available spy client to replace %s in %s.",
-                destClient->getNickName().c_str(), theChan->getName().c_str());
+    // Schedule a replacement - use a different spy client if possible, unless
+    // a 2nd visitor was already promoted to primary above.
+    if (!promoted) {
+        if (findBestSpyClient(theChan->getName(), forcejoin) >= 0) {
+            scheduleSpyClientJoin(theChan->getName(), forcejoin, 300, 1500);
+        } else {
+            Message(consoleChannel, "[SpyClient] No available spy client to replace %s in %s.",
+                    destClient->getNickName().c_str(), theChan->getName().c_str());
+        }
     }
 
     xClient::OnNetworkKick(theChan, srcClient, destClient, kickMessage, authoritative);
@@ -1093,18 +1108,25 @@ void dronescan::OnDetach(const std::string& message) {
     }
     pendingSpamActionTimers.clear();
 
-    /* Detach all live spy clients */
-    for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();
-         it != liveSpyClientsMap.end(); ++it) {
-        MyUplink->DetachClient(it->second, "Leaving");
+    /* Cancel pending spy client personal-quit timers */
+    for (pendingSpyQuitTimersType::iterator it = pendingSpyQuitTimers.begin();
+         it != pendingSpyQuitTimers.end(); ++it) {
+        MyUplink->UnRegisterTimer(it->first, nullptr);
     }
-    liveSpyClientsMap.clear();
-    chanActiveSpyMap.clear();
-    spyClientChanMap.clear();
+    pendingSpyQuitTimers.clear();
+
+    /* Part every live spy client from its channels with a random realistic
+     * reason, then quit it with a random realistic reason. */
+    partAllSpyClientsForShutdown();
+    spyClientChanCooldown.clear();
+    chanSecondJoinLastMap.clear();
 
     /* Stop the repeat-tracking GC timer and drop tracking state */
     MyUplink->UnRegisterTimer(tidRepeatGC, nullptr);
     repeatTrackMap.clear();
+
+    /* Stop the 2nd-spy-client-join sweep timer */
+    MyUplink->UnRegisterTimer(tidSecondSpyCheck, nullptr);
 
     /* Done! */
     xClient::OnDetach(message);
@@ -1136,6 +1158,24 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
                               pending.prefixAuto, pending.actor, pending.ruleName);
             return;
         }
+    }
+
+    /* Handle pending spy client personal-quit timers */
+    {
+        pendingSpyQuitTimersType::iterator qit = pendingSpyQuitTimers.find(theTimer);
+        if (qit != pendingSpyQuitTimers.end()) {
+            int scId = qit->second;
+            pendingSpyQuitTimers.erase(qit);
+            handleSpyClientPersonalQuit(scId);
+            return;
+        }
+    }
+
+    if (theTimer == tidSecondSpyCheck) {
+        checkSecondSpyJoins();
+        theTime = time(0) + 60;
+        tidSecondSpyCheck = MyUplink->RegisterTimer(theTime, this, 0);
+        return;
     }
 
     if (theTimer == tidClearActiveList) {
@@ -2690,7 +2730,8 @@ void dronescan::preloadMonitoredChannels() {
     std::stringstream q;
     q << "SELECT id, name, forcejoin, joinasservice, enabled, "
       << "created_ts, modified_ts, modified_by, "
-      << "last_triggered_ts, last_triggered_rule "
+      << "last_triggered_ts, last_triggered_rule, "
+      << "second_spy_join_interval_min "
       << "FROM monitored_channels ORDER BY id";
 
     if (!SQLDb->Exec(q, true)) {
@@ -3347,16 +3388,18 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
     (void)ruleName;
 #endif
     if (actionType == "GLINE") {
-        const string mask = glineNeedsIdent(actor.ip) ? (actor.user + "@" + actor.ip) : ("*@" + actor.ip);
+        const string mask =
+            glineNeedsIdent(actor.ip) ? (actor.user + "@" + actor.ip) : ("*@" + actor.ip);
         glineData* gd = new (std::nothrow) glineData(mask, reason, duration, prefixAuto);
         assert(gd != 0);
         glineQueue.push_back(gd);
 
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
-        logMsg << "SPAM[GLINE] Queued GLINE for " << actor.nick << '!' << actor.user << '@' << actor.host
-               << " (" << actor.ip << ") - mask: " << mask << " - duration: " << duration << "s - rule '"
-               << ruleName << "' - reason: " << sanitizeSpamTextForLog(reason);
+        logMsg << "SPAM[GLINE] Queued GLINE for " << actor.nick << '!' << actor.user << '@'
+               << actor.host << " (" << actor.ip << ") - mask: " << mask
+               << " - duration: " << duration << "s - rule '" << ruleName
+               << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
 #endif
 
@@ -3366,8 +3409,9 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         if (!target) {
 #ifdef ENABLE_LOG4CPLUS
             std::ostringstream logMsg;
-            logMsg << "SPAM[KILL] " << actor.nick << '!' << actor.user << '@' << actor.host << " (" << actor.ip
-                   << ") - rule '" << ruleName << "' - client no longer connected, skipped";
+            logMsg << "SPAM[KILL] " << actor.nick << '!' << actor.user << '@' << actor.host << " ("
+                   << actor.ip << ") - rule '" << ruleName
+                   << "' - client no longer connected, skipped";
             log(SPAM_ACTION, logMsg.str());
 #endif
             return;
@@ -3376,8 +3420,8 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
         Kill(target, reason);
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
-        logMsg << "SPAM[KILL] Killed " << actor.nick << '!' << actor.user << '@' << actor.host << " ("
-               << actor.ip << ") - rule '" << ruleName
+        logMsg << "SPAM[KILL] Killed " << actor.nick << '!' << actor.user << '@' << actor.host
+               << " (" << actor.ip << ") - rule '" << ruleName
                << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
 #endif
@@ -3516,6 +3560,9 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc) {
     if (!spyClientsChannel.empty())
         MyUplink->JoinChannel(ic, spyClientsChannel);
 
+    // Arm this client's next spontaneous QUIT cycle.
+    scheduleSpyClientPersonalQuit(sc->getId());
+
     elog << "dronescan::introduceSpyClient> Introduced " << nick << " (id=" << sc->getId()
          << ") to the network." << endl;
     return ic;
@@ -3535,6 +3582,68 @@ void dronescan::introduceAllSpyClients() {
     }
 }
 
+/**
+ * Removes scId's association with chanKey, whether it was covering it as
+ * the primary or as a temporary 2nd visitor (see chanActiveSpyMap /
+ * chanSecondSpyMap). If it was the primary and a 2nd visitor is present,
+ * the visitor is promoted to primary and no cooldown/replacement is
+ * needed. Otherwise a per-(channel, spyclient) rejoin cooldown is
+ * recorded and, if scheduleReplacement is true, a replacement join is
+ * scheduled via scheduleSpyClientJoin() using randRejoinMinSec/Max.
+ * Returns true if a promotion happened.
+ */
+bool dronescan::removeSpyClientFromChannelTracking(int scId, const std::string& chanKey,
+                                                   bool scheduleReplacement, bool forcejoin) {
+    spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
+    if (sit != spyClientChanMap.end()) {
+        sit->second.erase(chanKey);
+        if (sit->second.empty())
+            spyClientChanMap.erase(sit);
+    }
+
+    bool wasPrimary = false;
+    bool wasSecondary = false;
+
+    chanActiveSpyMapType::iterator ait = chanActiveSpyMap.find(chanKey);
+    if (ait != chanActiveSpyMap.end() && ait->second == scId) {
+        chanActiveSpyMap.erase(ait);
+        wasPrimary = true;
+    }
+
+    if (!wasPrimary) {
+        chanSecondSpyMapType::iterator sit2 = chanSecondSpyMap.find(chanKey);
+        if (sit2 != chanSecondSpyMap.end() && sit2->second == scId) {
+            chanSecondSpyMap.erase(sit2);
+            wasSecondary = true;
+        }
+    }
+
+    if (!wasPrimary && !wasSecondary)
+        return false; // scId had no tracked role for this channel
+
+    bool promoted = false;
+    if (wasPrimary) {
+        chanSecondSpyMapType::iterator promIt = chanSecondSpyMap.find(chanKey);
+        if (promIt != chanSecondSpyMap.end()) {
+            chanActiveSpyMap[chanKey] = promIt->second;
+            chanSecondSpyMap.erase(promIt);
+            promoted = true;
+        }
+    }
+
+    if (!promoted) {
+        int delay = randRejoinMinSec;
+        if (randRejoinMaxSec > randRejoinMinSec)
+            delay += rand() % (randRejoinMaxSec - randRejoinMinSec + 1);
+        spyClientChanCooldown[std::make_pair(scId, chanKey)] = ::time(nullptr) + delay;
+
+        if (scheduleReplacement)
+            scheduleSpyClientJoin(chanKey, forcejoin, randRejoinMinSec, randRejoinMaxSec);
+    }
+
+    return promoted;
+}
+
 /** Part a spy client from a monitored channel and update tracking maps. */
 void dronescan::partSpyClientFromChannel(int scId, const std::string& chanName) {
     liveSpyClientsMapType::iterator lit = liveSpyClientsMap.find(scId);
@@ -3548,15 +3657,8 @@ void dronescan::partSpyClientFromChannel(int scId, const std::string& chanName) 
     if (theChan && theChan->findUser(ic))
         MyUplink->PartChannel(ic, chanName, "");
 
-    // Clean up tracking - only this channel; the spy client may still be
-    // covering others.
-    chanActiveSpyMap.erase(chanKey);
-    spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
-    if (sit != spyClientChanMap.end()) {
-        sit->second.erase(chanKey);
-        if (sit->second.empty())
-            spyClientChanMap.erase(sit);
-    }
+    // Admin-triggered path - no auto-replacement.
+    removeSpyClientFromChannelTracking(scId, chanKey, /*scheduleReplacement=*/false, false);
 }
 
 /** Detach a live spy client from the network and clean up all maps. */
@@ -3567,18 +3669,23 @@ void dronescan::detachSpyClient(int scId) {
 
     iClient* ic = lit->second;
 
-    // Part it from every channel it is monitoring
+    // It's leaving the pool for good, unlike a voluntary periodic quit.
+    cancelSpyClientPersonalQuit(scId);
+
+    // Part it from every channel it is monitoring (copy first - the
+    // tracking helper mutates spyClientChanMap[scId] as it goes).
     spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
     if (sit != spyClientChanMap.end()) {
-        for (std::set<string>::const_iterator cit = sit->second.begin(); cit != sit->second.end();
-             ++cit) {
+        std::set<string> chans = sit->second;
+        for (std::set<string>::const_iterator cit = chans.begin(); cit != chans.end(); ++cit) {
             const string& chanName = *cit;
             Channel* theChan = Network->findChannel(chanName);
             if (theChan && theChan->findUser(ic))
                 MyUplink->PartChannel(ic, chanName, "");
-            chanActiveSpyMap.erase(chanName);
+            // Admin-triggered path - no auto-replacement.
+            removeSpyClientFromChannelTracking(scId, chanName, /*scheduleReplacement=*/false,
+                                               false);
         }
-        spyClientChanMap.erase(sit);
     }
 
     MyUplink->DetachClient(ic, "Spy client disabled");
@@ -3586,11 +3693,20 @@ void dronescan::detachSpyClient(int scId) {
 }
 
 /**
- * Find the best available spy client for the given channel.
- * Prefers an idle spy client (covering no channels yet). If none is idle,
- * falls back to the live spy client already covering the fewest channels,
- * so a spy client can end up covering more than one channel once the pool
- * is exhausted rather than leaving the channel unmonitored.
+ * Core spy client selection for the given channel.
+ * Prefers an idle spy client (covering no channels yet). If none is idle
+ * and requireIdle is false, falls back to the live spy client already
+ * covering the fewest channels, so a spy client can end up covering more
+ * than one channel once the pool is exhausted rather than leaving the
+ * channel unmonitored. If requireIdle is true, only a truly idle candidate
+ * is ever returned (used for temporary 2nd-client visits).
+ *
+ * excludeId, if >= 0, is never returned - used to keep a 2nd spy client
+ * distinct from the channel's current primary.
+ *
+ * Any candidate still under its per-(channel, spyclient) rejoin cooldown
+ * for this channel (spyClientChanCooldown) is skipped; expired cooldown
+ * entries encountered along the way are pruned.
  *
  * If the channel has a restricted spy-client list (monitored_channel_spyclients
  * via monitoredChannelSpyClientsMap), only those ids are considered, starting
@@ -3598,15 +3714,15 @@ void dronescan::detachSpyClient(int scId) {
  * instead of the full pool. Channels with no restriction keep the original
  * full-pool iteration order - fully backward compatible.
  *
- * Returns spy client id, or -1 only if there is no eligible live spy client
- * at all.
+ * Returns spy client id, or -1 if there is no eligible live spy client.
  */
-int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin) {
+int dronescan::selectSpyClient(const std::string& chanName, bool forcejoin, bool requireIdle,
+                               int excludeId) {
     Channel* theChan = Network->findChannel(chanName);
+    const string chanKey = string_lower(chanName);
 
     std::vector<int> candidateIds;
-    monitoredChannelsMapType::const_iterator mcit =
-        monitoredChannelsMap.find(string_lower(chanName));
+    monitoredChannelsMapType::const_iterator mcit = monitoredChannelsMap.find(chanKey);
     if (mcit != monitoredChannelsMap.end()) {
         monitoredChannelSpyClientsMapType::const_iterator ridit =
             monitoredChannelSpyClientsMap.find(mcit->second->getId());
@@ -3625,9 +3741,14 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin) {
 
     int bestBusyId = -1;
     size_t bestBusyCount = 0;
+    time_t now = ::time(nullptr);
 
     for (size_t ci = 0; ci < candidateIds.size(); ++ci) {
-        spyClientsMapType::const_iterator it = spyClientsMap.find(candidateIds[ci]);
+        int candId = candidateIds[ci];
+        if (candId == excludeId)
+            continue;
+
+        spyClientsMapType::const_iterator it = spyClientsMap.find(candId);
         if (it == spyClientsMap.end())
             continue; // stale id, skip
         sqlSpyClient* sc = it->second;
@@ -3639,6 +3760,16 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin) {
         if (lit == liveSpyClientsMap.end())
             continue;
         iClient* ic = lit->second;
+
+        // Skip candidates still under their rejoin cooldown for this
+        // channel; opportunistically prune expired entries.
+        spyClientChanCooldownType::iterator coolIt =
+            spyClientChanCooldown.find(std::make_pair(sc->getId(), chanKey));
+        if (coolIt != spyClientChanCooldown.end()) {
+            if (now < coolIt->second)
+                continue;
+            spyClientChanCooldown.erase(coolIt);
+        }
 
         if (!forcejoin && theChan) {
             // Skip +i (invite-only)
@@ -3666,6 +3797,9 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin) {
         if (chanCount == 0)
             return sc->getId();
 
+        if (requireIdle)
+            continue;
+
         // Otherwise remember the least-loaded busy candidate as a fallback
         if (bestBusyId < 0 || chanCount < bestBusyCount) {
             bestBusyId = sc->getId();
@@ -3674,8 +3808,21 @@ int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin) {
     }
 
     // No idle spy client - reuse the least-loaded one already assigned
-    // elsewhere, or -1 if there is no eligible live spy client at all.
+    // elsewhere (unless requireIdle), or -1 if none eligible at all.
     return bestBusyId;
+}
+
+/**
+ * Find the best available spy client for the given channel.
+ * Prefers an idle spy client (covering no channels yet). If none is idle,
+ * falls back to the live spy client already covering the fewest channels,
+ * so a spy client can end up covering more than one channel once the pool
+ * is exhausted rather than leaving the channel unmonitored.
+ * Returns spy client id, or -1 only if there is no eligible live spy client
+ * at all.
+ */
+int dronescan::findBestSpyClient(const std::string& chanName, bool forcejoin) {
+    return selectSpyClient(chanName, forcejoin, /*requireIdle=*/false, /*excludeId=*/-1);
 }
 
 /**
@@ -3749,6 +3896,159 @@ void dronescan::cancelPendingJoinTimers(const std::string& chanName) {
     }
 }
 
+/** Returns a random realistic quit/part reason from a fixed pool. */
+std::string dronescan::randomQuitReason() const {
+    static const char* reasons[] = {
+        "Ping timeout",
+        "Quit: Client closed",
+        "Read error: Operation timed out",
+        "Quit",
+        "Signed off",
+        "Read error: Connection reset by peer",
+        "Quit: Client closed",
+        "EOF from client",
+    };
+    static const size_t numReasons = sizeof(reasons) / sizeof(reasons[0]);
+    return reasons[rand() % numReasons];
+}
+
+/** Arms scId's next spontaneous QUIT, in [spyClientQuitMinSec, spyClientQuitMaxSec]. */
+void dronescan::scheduleSpyClientPersonalQuit(int scId) {
+    int delay = spyClientQuitMinSec;
+    if (spyClientQuitMaxSec > spyClientQuitMinSec)
+        delay += rand() % (spyClientQuitMaxSec - spyClientQuitMinSec + 1);
+
+    time_t fireAt = ::time(nullptr) + static_cast<time_t>(delay);
+    xServer::timerID tid = MyUplink->RegisterTimer(fireAt, this, nullptr);
+    pendingSpyQuitTimers[tid] = scId;
+}
+
+/** Cancels scId's pending spontaneous-quit timer, if any. */
+void dronescan::cancelSpyClientPersonalQuit(int scId) {
+    for (pendingSpyQuitTimersType::iterator it = pendingSpyQuitTimers.begin();
+         it != pendingSpyQuitTimers.end();) {
+        if (it->second == scId) {
+            MyUplink->UnRegisterTimer(it->first, nullptr);
+            pendingSpyQuitTimers.erase(it++);
+        } else {
+            ++it;
+        }
+    }
+}
+
+/**
+ * Fired when a spy client's personal quit timer expires: QUITs it from the
+ * network with a random reason, frees/reschedules the channels it covered
+ * (promoting a 2nd visitor to primary where one is present), then
+ * reconnects it (idle) and re-arms its next quit cycle.
+ */
+void dronescan::handleSpyClientPersonalQuit(int scId) {
+    liveSpyClientsMapType::iterator lit = liveSpyClientsMap.find(scId);
+    if (lit == liveSpyClientsMap.end())
+        return; // stale timer - client already gone via another path
+
+    iClient* ic = lit->second;
+
+    spyClientChanMapType::iterator sit = spyClientChanMap.find(scId);
+    if (sit != spyClientChanMap.end()) {
+        std::set<string> chans = sit->second; // copy - helper mutates spyClientChanMap
+        for (std::set<string>::const_iterator cit = chans.begin(); cit != chans.end(); ++cit) {
+            const string& chanKey = *cit;
+            monitoredChannelsMapType::const_iterator mc = monitoredChannelsMap.find(chanKey);
+            bool forcejoin = (mc != monitoredChannelsMap.end()) ? mc->second->isForceJoin() : false;
+            removeSpyClientFromChannelTracking(scId, chanKey, /*scheduleReplacement=*/true,
+                                               forcejoin);
+        }
+    }
+
+    liveSpyClientsMap.erase(lit);
+    MyUplink->DetachClient(ic, randomQuitReason());
+
+    // Reconnect right away; it sits idle until picked up by normal selection.
+    spyClientsMapType::const_iterator scit = spyClientsMap.find(scId);
+    if (scit != spyClientsMap.end())
+        introduceSpyClient(scit->second);
+}
+
+/**
+ * Periodic sweep: for monitored channels with a primary spy client but no
+ * 2nd visitor yet, checks whether the channel's (per-channel or global
+ * default) 2nd-join interval has elapsed and, if so, brings in another
+ * idle spy client for temporary double coverage.
+ */
+void dronescan::checkSecondSpyJoins() {
+    time_t now = ::time(nullptr);
+
+    for (monitoredChannelsMapType::const_iterator it = monitoredChannelsMap.begin();
+         it != monitoredChannelsMap.end(); ++it) {
+        const string& chanKey = it->first;
+        sqlMonitoredChannel* mc = it->second;
+
+        if (!mc->isEnabled() || mc->isJoinAsService())
+            continue;
+        if (kickStoppedChannels.count(chanKey))
+            continue;
+
+        chanActiveSpyMapType::const_iterator ait = chanActiveSpyMap.find(chanKey);
+        if (ait == chanActiveSpyMap.end())
+            continue; // no primary yet, nothing to double up
+        if (chanSecondSpyMap.count(chanKey))
+            continue; // already has a 2nd visitor
+
+        int overrideMin = mc->getSecondSpyJoinIntervalMin();
+        int effectiveMin = (overrideMin >= 0) ? overrideMin : secondSpyJoinIntervalMinDefault;
+        if (effectiveMin <= 0)
+            continue; // disabled
+
+        time_t& last = chanSecondJoinLastMap[chanKey];
+        if (now - last < static_cast<time_t>(effectiveMin) * 60)
+            continue;
+        last = now; // pace attempts every interval regardless of hit/miss
+
+        int primaryId = ait->second;
+        int scId2 =
+            selectSpyClient(mc->getName(), /*forcejoin=*/false, /*requireIdle=*/true, primaryId);
+        if (scId2 < 0)
+            continue; // no idle client available this time
+
+        liveSpyClientsMapType::const_iterator lit = liveSpyClientsMap.find(scId2);
+        if (lit == liveSpyClientsMap.end())
+            continue;
+
+        MyUplink->JoinChannel(lit->second, mc->getName());
+        chanSecondSpyMap[chanKey] = scId2;
+        spyClientChanMap[scId2].insert(chanKey);
+    }
+}
+
+/**
+ * Called on module shutdown/reload: every live spy client visibly PARTs
+ * each channel it's on with a random reason, then QUITs with a random
+ * reason - instead of silently vanishing.
+ */
+void dronescan::partAllSpyClientsForShutdown() {
+    for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();
+         it != liveSpyClientsMap.end(); ++it) {
+        iClient* ic = it->second;
+
+        spyClientChanMapType::const_iterator cit = spyClientChanMap.find(it->first);
+        if (cit != spyClientChanMap.end()) {
+            for (std::set<string>::const_iterator chanIt = cit->second.begin();
+                 chanIt != cit->second.end(); ++chanIt) {
+                Channel* theChan = Network->findChannel(*chanIt);
+                if (theChan && theChan->findUser(ic))
+                    MyUplink->PartChannel(ic, *chanIt, randomQuitReason());
+            }
+        }
+
+        MyUplink->DetachClient(ic, randomQuitReason());
+    }
+    liveSpyClientsMap.clear();
+    chanActiveSpyMap.clear();
+    spyClientChanMap.clear();
+    chanSecondSpyMap.clear();
+}
+
 /**
  * Resync live spy clients against the DB caches after a refresh.
  * - Detach clients that no longer exist in the DB or are disabled.
@@ -3801,6 +4101,10 @@ void dronescan::resyncSpyClients() {
          ++it) {
         const string& chanName = *it;
         if (kickStoppedChannels.count(chanName))
+            continue;
+        // A 2nd visitor may already have been promoted to primary when the
+        // stale client was detached above - nothing to do in that case.
+        if (chanActiveSpyMap.count(chanName))
             continue;
 
         // Find the monitored channel config

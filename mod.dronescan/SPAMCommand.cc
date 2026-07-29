@@ -2161,8 +2161,22 @@ static void handleChan(dronescan* bot, const iClient* theClient, const sqlUser* 
             mc->setJoinAsService(value == "1" || value == "yes" || value == "true");
         } else if (field == "enabled") {
             mc->setEnabled(value == "1" || value == "yes" || value == "true");
+        } else if (field == "secondspyintervalmin") {
+            if (value.empty() || value == "default" || value == "-1") {
+                mc->setSecondSpyJoinIntervalMin(-1);
+            } else {
+                int v = atoi(value.c_str());
+                if (v < 0) {
+                    bot->Reply(theClient, "secondspyintervalmin must be >= 0 (minutes), or "
+                                          "'default' to clear the per-channel override.");
+                    return;
+                }
+                mc->setSecondSpyJoinIntervalMin(v);
+            }
         } else {
-            bot->Reply(theClient, "Unknown field '%s'. Valid: forcejoin, joinasservice, enabled",
+            bot->Reply(theClient,
+                       "Unknown field '%s'. Valid: forcejoin, joinasservice, enabled, "
+                       "secondspyintervalmin",
                        field.c_str());
             return;
         }

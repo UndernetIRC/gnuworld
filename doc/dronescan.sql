@@ -367,6 +367,11 @@ CREATE TABLE spam_exclusions (
 -- last_triggered_ts / last_triggered_rule: updated by
 --   dronescan::evaluateSpamRules() whenever a rule's threshold is crossed
 --   for this channel. NULL = no rule has ever fired here.
+--
+-- second_spy_join_interval_min: how often (in minutes) a second,
+--   otherwise-idle spy client may temporarily join this channel for extra
+--   coverage. NULL = use the module's global secondSpyJoinIntervalMin
+--   config default. 0 = disabled for this channel.
 -- -----------------------------------------------------------------------------
 CREATE TABLE monitored_channels (
 	id                  serial       PRIMARY KEY,
@@ -381,7 +386,8 @@ CREATE TABLE monitored_channels (
 	created_ts          int4         NOT NULL DEFAULT 0,
 	modified_ts         int4         NOT NULL DEFAULT 0,
 	modified_by         int                   DEFAULT NULL
-		REFERENCES users(id) ON DELETE SET NULL
+		REFERENCES users(id) ON DELETE SET NULL,
+	second_spy_join_interval_min int4          DEFAULT NULL
 );
 
 -- -----------------------------------------------------------------------------

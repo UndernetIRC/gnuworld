@@ -23,13 +23,15 @@ using std::stringstream;
 
 sqlMonitoredChannel::sqlMonitoredChannel(dbHandle* _SQLDb)
     : id(0), name(), forcejoin(false), joinasservice(false), enabled(true), created_ts(0),
-      modified_ts(0), modified_by(0), last_triggered_ts(0), last_triggered_rule(), SQLDb(_SQLDb) {}
+      modified_ts(0), modified_by(0), last_triggered_ts(0), last_triggered_rule(),
+      second_spy_join_interval_min(-1), SQLDb(_SQLDb) {}
 
 sqlMonitoredChannel::~sqlMonitoredChannel() {}
 
 // Column order matches the SELECT in preloadMonitoredChannels():
 // id, name, forcejoin, joinasservice, enabled,
-// created_ts, modified_ts, modified_by, last_triggered_ts, last_triggered_rule
+// created_ts, modified_ts, modified_by, last_triggered_ts, last_triggered_rule,
+// second_spy_join_interval_min
 void sqlMonitoredChannel::setAllMembers(int row) {
     id = atoi(SQLDb->GetValue(row, 0).c_str());
     name = SQLDb->GetValue(row, 1);
@@ -43,6 +45,9 @@ void sqlMonitoredChannel::setAllMembers(int row) {
     const string lastTrigTs = SQLDb->GetValue(row, 8);
     last_triggered_ts = !lastTrigTs.empty() ? atoi(lastTrigTs.c_str()) : 0;
     last_triggered_rule = SQLDb->GetValue(row, 9);
+    const string secondSpyInterval = SQLDb->GetValue(row, 10);
+    second_spy_join_interval_min =
+        !secondSpyInterval.empty() ? atoi(secondSpyInterval.c_str()) : -1;
 }
 
 bool sqlMonitoredChannel::commit() {
@@ -58,6 +63,9 @@ bool sqlMonitoredChannel::commit() {
       << (last_triggered_ts > 0 ? std::to_string(last_triggered_ts) : "NULL") << ", "
       << "last_triggered_rule = "
       << (last_triggered_rule.empty() ? "NULL" : ("'" + escapeSQLChars(last_triggered_rule) + "'"))
+      << ", "
+      << "second_spy_join_interval_min = "
+      << (second_spy_join_interval_min >= 0 ? std::to_string(second_spy_join_interval_min) : "NULL")
       << " WHERE id = " << id;
 
     if (!SQLDb->Exec(q)) {

@@ -41,6 +41,9 @@ class sqlMonitoredChannel {
     // 0 means never triggered
     inline int getLastTriggeredTs() const { return last_triggered_ts; }
     inline const string& getLastTriggeredRule() const { return last_triggered_rule; }
+    // -1 means no override (use the module's global secondSpyJoinIntervalMin
+    // default); 0 means disabled for this channel; >0 is minutes.
+    inline int getSecondSpyJoinIntervalMin() const { return second_spy_join_interval_min; }
 
     /* Mutators */
     inline void setId(int v) { id = v; }
@@ -53,6 +56,7 @@ class sqlMonitoredChannel {
     inline void setModifiedBy(int v) { modified_by = v; }
     inline void setLastTriggeredTs(int v) { last_triggered_ts = v; }
     inline void setLastTriggeredRule(const string& v) { last_triggered_rule = v; }
+    inline void setSecondSpyJoinIntervalMin(int v) { second_spy_join_interval_min = v; }
 
     void setAllMembers(int row);
     bool commit();
@@ -70,6 +74,7 @@ class sqlMonitoredChannel {
     int modified_by;       // 0 means NULL
     int last_triggered_ts; // 0 means NULL (never triggered)
     string last_triggered_rule;
+    int second_spy_join_interval_min; // -1 means NULL (no override)
 
     dbHandle* SQLDb;
 };
