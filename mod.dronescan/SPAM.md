@@ -158,10 +158,13 @@ same window keep scoring.
      mask is `*@ip`, unless `ip` matches a `GATEWAYIP` exclusion entry, in
      which case it's `user@ip` instead (see [EXCLUSION](#exclusion)). Every
      queued gline (SPAM-triggered or not) gets a `[N] ` prefix from
-     `processGlineQueue()` - `N` is the number of clients currently
-     connected from that IP - and, when the action's `prefix_auto` is true
-     (the default), an additional `AUTO ` ahead of that:
-     `AUTO [N] reason` vs `[N] reason`.
+     `processGlineQueue()`, and, when the action's `prefix_auto` is true
+     (the default), an additional `AUTO ` ahead of that: `AUTO [N] reason`
+     vs `[N] reason`. For a `*@ip` mask, `N` is the number of clients
+     currently connected from that IP; for a `user@ip` mask (GATEWAYIP
+     case), `N` is instead the number of currently connected clients whose
+     ident *and* IP both match the mask, since a `user@ip` gline doesn't
+     affect every client on that IP.
    - `KILL`: looks up the offender's still-connected `iClient` by numeric
      (`Network->findClient`) and kills it with the resolved reason; silently
      skipped (logged only, no console line) if the client has since quit.

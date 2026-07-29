@@ -1567,7 +1567,6 @@ void dronescan::processGlineQueue() {
         for (; count < gbCount && glineQueue.size() > 0;) {
             curGline = glineQueue.front();
             glineQueue.pop_front();
-            // userCount = Network->countMatchingRealUserHost(curGline->getHost());
             StringTokenizer st(curGline->getHost(), '@');
 
             recentlyGlinedIpsType::iterator rItr = recentlyGlinedIps.begin();
@@ -1582,7 +1581,16 @@ void dronescan::processGlineQueue() {
                 continue;
             }
 
-            userCount = clientsIPMap[st[1]];
+            // A "*@ip" mask affects every client on that IP, so the cheap
+            // per-IP connect count is accurate. A "user@ip" mask (GATEWAYIP
+            // exclusion) only affects clients whose ident also matches, so
+            // clientsIPMap (keyed by IP only) would overcount there.
+            if (st[0] == "*") {
+                userCount = clientsIPMap[st[1]];
+            } else {
+                userCount =
+                    static_cast<int>(Network->countMatchingRealUserHost(curGline->getHost()));
+            }
             us[0] = '\0';
             sprintf(us, "%d", userCount);
             std::string glineReason = (curGline->getPrefixAuto() ? string("AUTO [") : string("[")) +
