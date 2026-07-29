@@ -1119,9 +1119,10 @@ void dronescan::OnDetach(const std::string& message) {
     }
     pendingSpyQuitTimers.clear();
 
-    /* Part every live spy client from its channels with a random realistic
-     * reason, then quit it with a random realistic reason. */
-    partAllSpyClientsForShutdown();
+    /* Quit every live spy client directly, with no PART first - a module
+     * reload should look like the client dropping off the network, not a
+     * deliberate, one-by-one channel exit. */
+    quitAllSpyClientsForShutdown();
     spyClientChanCooldown.clear();
     chanSecondJoinLastMap.clear();
 
@@ -4117,38 +4118,11 @@ void dronescan::checkSecondSpyJoins() {
 }
 
 /**
- * Called on module shutdown/reload: every live spy client visibly PARTs
- * each channel it's on with a random reason, then QUITs with a random
- * reason - instead of silently vanishing.
- */
-void dronescan::partAllSpyClientsForShutdown() {
-    for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();
-         it != liveSpyClientsMap.end(); ++it) {
-        iClient* ic = it->second;
-
-        spyClientChanMapType::const_iterator cit = spyClientChanMap.find(it->first);
-        if (cit != spyClientChanMap.end()) {
-            for (std::set<string>::const_iterator chanIt = cit->second.begin();
-                 chanIt != cit->second.end(); ++chanIt) {
-                Channel* theChan = Network->findChannel(*chanIt);
-                if (theChan && theChan->findUser(ic))
-                    MyUplink->PartChannel(ic, *chanIt, randomQuitReason());
-            }
-        }
-
-        MyUplink->DetachClient(ic, randomQuitReason());
-    }
-    liveSpyClientsMap.clear();
-    chanActiveSpyMap.clear();
-    spyClientChanMap.clear();
-    chanSecondSpyMap.clear();
-}
-
-/**
- * Called on real process shutdown: every live spy client QUITs directly
- * with a random realistic reason, with no PART first - a real client
- * dropping with e.g. a ping timeout or read error never PARTs, it just
- * QUITs and the server fans that out to every channel it was in.
+ * Called on module shutdown/reload and on real process shutdown: every
+ * live spy client QUITs directly with a random realistic reason, with no
+ * PART first - a real client dropping with e.g. a ping timeout or read
+ * error never PARTs, it just QUITs and the server fans that out to every
+ * channel it was in.
  */
 void dronescan::quitAllSpyClientsForShutdown() {
     for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();

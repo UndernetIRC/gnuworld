@@ -533,15 +533,9 @@ class dronescan : public xClient {
     void checkSecondSpyJoins();
 
     /**
-     * Called on module shutdown/reload: every live spy client visibly
-     * PARTs each channel it's on with a random reason, then QUITs with a
-     * random reason - instead of silently vanishing.
-     */
-    void partAllSpyClientsForShutdown();
-
-    /**
-     * Called on real process shutdown: every live spy client QUITs
-     * directly with a random realistic reason, with no PART first.
+     * Called on module shutdown/reload and on real process shutdown:
+     * every live spy client QUITs directly with a random realistic
+     * reason, with no PART first.
      */
     void quitAllSpyClientsForShutdown();
 
