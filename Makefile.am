@@ -21,7 +21,7 @@ install-data-local: install-ccontrol-migrations
 endif
 
 if COND_MODDRONESCAN
-install-data-local: install-dronescan-migrations
+install-data-local: install-dronescan-migrations install-logging-properties
 endif
 
 if COND_MODOPENCHANFIX
@@ -44,7 +44,12 @@ install-openchanfix-migrations:
 	$(MKDIR_P) $(DESTDIR)$(prefix)/migrations/openchanfix
 	cp -r mod.openchanfix/migrations/* $(DESTDIR)$(prefix)/migrations/openchanfix/
 
-EXTRA_DIST = bin/ccontrol.example.conf \
+install-logging-properties:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/bin
+	cp $(srcdir)/bin/logging.properties $(DESTDIR)$(prefix)/bin/logging.properties
+
+EXTRA_DIST = bin/logging.properties \
+	bin/ccontrol.example.conf \
 	bin/chanfix.example.conf \
 	bin/clientExample.example.conf \
 	bin/cloner.example.conf \

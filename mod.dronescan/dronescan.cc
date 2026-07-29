@@ -3367,6 +3367,10 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
             buildSpamReportLine(rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
                                 displayChannels, triggerText, resolved);
 
+#ifdef ENABLE_LOG4CPLUS
+        log(DS_EVENT, line);
+#endif
+
         // report_source == "SPYCLIENT": send the line as the spy client that
         // actually saw the triggering event, if one can be resolved.
         // spyTarget - the spy client an OnFake* handler caught the event on

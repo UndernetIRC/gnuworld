@@ -54,6 +54,7 @@
 #define JF_GLINED "gnuworld.ds.jf.glined"
 #define JF_CSERVICE "gnuworld.ds.jf.cservice"
 #define SPAM_ACTION "gnuworld.ds.spam.action"
+#define DS_EVENT "gnuworld.ds.event"
 
 #endif
 #define RecentlyGlinedIpsSize 150

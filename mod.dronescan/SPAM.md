@@ -227,21 +227,26 @@ always produces its report line.
 
 ### Logging
 
-Every `executeSpamAction()` outcome (GLINE, KILL) is written to a persistent
-`spam-action.log` file via the `gnuworld.ds.spam.action` log4cplus category
-(`bin/logging.properties`, same `DailyRollingFileAppender` mechanism as the
-existing `jf-glined.log`/`jf-cservice.log` join-flood logs). This is
-independent of, and timed differently from, the `[S]` console line: the
-console line is printed once by `fireRuleActions()`, at the moment the rule
-fires - for a delayed action, that's at schedule time, showing the planned
-delay - while the log4cplus line is written by `executeSpamAction()` at
-actual execution time (immediately, or whenever the delay timer fires),
-recording what really happened and when. The log file also holds the
-complete actor identity (nick!user@host/ip), rule name, and
-reason/trigger text run through `sanitizeSpamTextForLog()` (same
-control-byte stripping as `sanitizeSpamTextForReport()`, but no length cap
-and no `"..."`) - unlike the console line, which truncates trigger text to
-200 bytes. Requires `--with-log4cplus` (see `CLAUDE.md`); logging is
+Two separate log4cplus files persist SPAM engine activity, both configured
+in `bin/logging.properties` with the same `DailyRollingFileAppender`
+mechanism as the existing `jf-glined.log`/`jf-cservice.log` join-flood logs:
+
+- `dronescan-event.log`, via the `gnuworld.ds.event` category, holds the
+  `[S]` detection line itself - the exact same text sent to the console
+  channel by `fireRuleActions()`, written once at the moment the rule
+  fires (for a delayed action, that's at schedule time, showing the
+  planned delay).
+- `spam-action.log`, via the `gnuworld.ds.spam.action` category, holds
+  every `executeSpamAction()` outcome (GLINE, KILL), written later at
+  actual execution time (immediately, or whenever the delay timer fires),
+  recording what really happened and when.
+
+`spam-action.log` also holds the complete actor identity
+(nick!user@host/ip), rule name, and reason/trigger text run through
+`sanitizeSpamTextForLog()` (same control-byte stripping as
+`sanitizeSpamTextForReport()`, but no length cap and no `"..."`) - unlike
+the console line (and `dronescan-event.log`), which truncates trigger text
+to 200 bytes. Both require `--with-log4cplus` (see `CLAUDE.md`); logging is
 silently skipped if the module was built without it.
 
 ## Spy clients and monitored channels
