@@ -25,12 +25,6 @@
 #include "gnuworld_config.h"
 
 /**
- * Define this if you wish for general debugging information
- * be logged.
- */
-#define LOG_DEBUG
-
-/**
  * The maximum number of results to return to the user on
  * an LBANLIST query.
  */

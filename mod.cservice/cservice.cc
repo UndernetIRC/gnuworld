@@ -922,7 +922,7 @@ void cservice::OnPrivateMessage(iClient* theClient, const string& Message, bool 
                     jsonParams += ",\"user_id\":" + std::to_string(theClient->getAccountID()) +
                                   ",\"user_name\":\"" + theClient->getAccount() + "\"";
 
-                jsonParams += "\"client_nick\":\"" + escapeJsonString(theClient->getNickName()) +
+                jsonParams += ",\"client_nick\":\"" + escapeJsonString(theClient->getNickName()) +
                               "\",\"client_userhost\":\"" +
                               escapeJsonString(theClient->getRealUserHost()) + "\"";
 
@@ -2424,7 +2424,7 @@ void cservice::expireBans() {
  * (Ie: those currently logged in).
  */
 void cservice::cacheExpireUsers() {
-    LOG(INFO, "Beginning User cache cleanup:");
+    LOG(DEBUG, "Beginning User cache cleanup:");
     sqlUserHashType::iterator ptr = sqlUserCache.begin();
     sqlUser* tmpUser;
     const auto startTime = std::chrono::high_resolution_clock::now();
@@ -2484,14 +2484,14 @@ void cservice::cacheExpireUsers() {
             ++ptr;
         }
     }
-    LOG(INFO, "User cache cleanup complete; Removed {} user records in {} ms.", purgeCount,
+    LOG(DEBUG, "User cache cleanup complete; Removed {} user records in {} ms.", purgeCount,
         elapsedMs(startTime));
-    LOG(INFO, "I also updated {} last_seen records for people logged in for >24 hours.",
+    LOG(DEBUG, "I also updated {} last_seen records for people logged in for >24 hours.",
         updateCount);
 }
 
 void cservice::cacheExpireLevels() {
-    LOG(INFO, "Beginning Channel Level-cache cleanup:");
+    LOG(DEBUG, "Beginning Channel Level-cache cleanup:");
 
     /*
      *  While we are at this, we'll clear out any FORCE'd access's
@@ -2508,7 +2508,7 @@ void cservice::cacheExpireLevels() {
             continue;
         }
         if (theChan->forceMap.size() > 0) {
-            LOG(INFO, "Clearing out {} FORCE(s) from channel {}", theChan->forceMap.size(),
+            LOG(DEBUG, "Clearing out {} FORCE(s) from channel {}", theChan->forceMap.size(),
                 theChan->getName());
             theChan->forceMap.clear();
         }
@@ -2536,7 +2536,7 @@ void cservice::cacheExpireLevels() {
 
         ++ptr;
     }
-    LOG(INFO, "Channel Level cache-cleanup complete.");
+    LOG(DEBUG, "Channel Level cache-cleanup complete.");
 }
 
 void cservice::performReops() {
@@ -2677,7 +2677,7 @@ void cservice::ExpireUsers() {
  * TODO: Lots.
  */
 void cservice::processDBUpdates() {
-    LOG(INFO, "[DB-UPDATE]: Looking for changes:");
+    LOG(DEBUG, "[DB-UPDATE]: Looking for changes:");
     UpdatePendingOpLists();
     checkTrafficPass();
     updateChannels();
@@ -2685,7 +2685,7 @@ void cservice::processDBUpdates() {
     updateLevels();
     updateBans();
     updateFingerprints();
-    LOG(INFO, "[DB-UPDATE]: Complete.");
+    LOG(DEBUG, "[DB-UPDATE]: Complete.");
 }
 
 struct newChanData {
@@ -2752,7 +2752,7 @@ void cservice::updateChannels() {
             newChan->mngr_userId = mngr_id;
             newChanList.push_back(newChan);
 
-            LOG_MSG(INFO, "[DB-UPDATE]: Found new channel: {chan_name}")
+            LOG_MSG(DEBUG, "[DB-UPDATE]: Found new channel: {chan_name}")
                 .with("chan_name", newChan->chanName)
                 .logStructured();
             newchans++;
@@ -2771,7 +2771,7 @@ void cservice::updateChannels() {
         newChanList.clear();
     }
 
-    LOG(INFO, "[DB-UPDATE]: Refreshed {} channel records, loaded {} new channel(s).", updates,
+    LOG(DEBUG, "[DB-UPDATE]: Refreshed {} channel records, loaded {} new channel(s).", updates,
         newchans);
 
     /* Set the "Last refreshed from channels table" timestamp. */
@@ -2890,7 +2890,7 @@ void cservice::updateLevels(int channelId) {
         }
     }
 
-    LOG(INFO, "[DB-UPDATE]: Refreshed {} level record(s), loaded {} new level record(s).", updates,
+    LOG(DEBUG, "[DB-UPDATE]: Refreshed {} level record(s), loaded {} new level record(s).", updates,
         newlevs);
 
     /* Set the "Last refreshed from levels table" timestamp. */
@@ -2949,7 +2949,7 @@ void cservice::updateUsers() {
         }
     }
 
-    LOG(INFO, "[DB-UPDATE]: Refreshed {} user record(s).", updates);
+    LOG(DEBUG, "[DB-UPDATE]: Refreshed {} user record(s).", updates);
 
     /* Set the "Last refreshed from Users table" timestamp. */
     lastUserRefresh = atoi(SQLDb->GetValue(0, "db_unixtime").c_str());
@@ -2978,7 +2978,7 @@ void cservice::updateFingerprints() {
     for (unsigned int i = 0; i < SQLDb->Tuples(); i++)
         fingerprintMap.emplace(SQLDb->GetValue(i, 0), std::stoul(SQLDb->GetValue(i, 1)));
 
-    LOG(INFO, "[DB-UPDATE]: Refreshed fingerprint(s).");
+    LOG(DEBUG, "[DB-UPDATE]: Refreshed fingerprint(s).");
 }
 
 void cservice::updateBans() { /* Todo */ }
@@ -3753,7 +3753,7 @@ void cservice::checkValidUsersAndChannelsState() {
         }
     }
     if (!chanList.empty()) {
-        LOG(INFO, "Checking all pending channels validity ...");
+        LOG(DEBUG, "Checking all pending channels validity ...");
         for (size_t i = 0; i < chanList.size(); ++i) {
             // logDebugMessage("Checking channel %s's validity ...",chanList[i].second.c_str());
             if (!isValidChannel(chanList.at(i).second)) {
@@ -3792,7 +3792,7 @@ void cservice::checkValidUsersAndChannelsState() {
         LOGSQL_ERROR(SQLDb);
         return;
     } else if (SQLDb->Tuples() != 0) {
-        LOG(INFO, "Checking all supporters validity ...");
+        LOG(DEBUG, "Checking all supporters validity ...");
         // logDebugMessage("Found %i supporters,",SQLDb->Tuples());
         unsigned int suppUserId, chanId;
         string suppUserName, chanName;
@@ -5007,8 +5007,8 @@ void cservice::OnChannelEvent(const channelEventType& whichEvent, Channel* theCh
 
                         ptr->second->trafficList.insert(
                             sqlPendingChannel::trafficListType::value_type(NumericIP, trafRecord));
-                        LOG_MSG(INFO, "Created a new IP traffic record for IP#{ip} "
-                                      "({client_userhost}) on {chan_name}")
+                        LOG_MSG(DEBUG, "Created a new IP traffic record for IP#{ip} "
+                                       "({client_userhost}) on {chan_name}")
                             .with("ip", NumericIP)
                             .with("client", theClient)
                             .with("chan", theChan)
@@ -5048,10 +5048,13 @@ void cservice::OnChannelEvent(const channelEventType& whichEvent, Channel* theCh
                 if (Supptr != ptr->second->supporterList.end()) {
                     Supptr->second++;
                     ptr->second->commitSupporter(Supptr->first, Supptr->second);
-#ifdef LOG_DEBUG
-                    LOG(INFO, "New total for Supporter #{} ({}) on {} is {}.", theUser->getID(),
-                        theUser->getUserName(), theChan->getName(), Supptr->second);
-#endif
+                    LOG_MSG(DEBUG, "New total for Supporter #{user_id} ({user_name}) on "
+                                   "{chan_name} is {supporters}.")
+                        .with("user_id", theUser->getID())
+                        .with("user_name", theUser->getUserName())
+                        .with("chan", theChan)
+                        .with("supporters", Supptr->second)
+                        .logStructured();
                 }
 
                 xClient::OnChannelEvent(whichEvent, theChan, data1, data2, data3, data4);
@@ -6438,7 +6441,7 @@ void cservice::initialiseSupport(const string& chanName,
                 Supptr->second = 1;
             }
             LOG_MSG(
-                INFO,
+                DEBUG,
                 "New total for Supporter #{user_id} ({user_name}) on {chan_name} is {supporters}.")
                 .with("user_id", loggedUser->getID())
                 .with("user_name", loggedUser->getUserName())
