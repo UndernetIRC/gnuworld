@@ -130,7 +130,8 @@ bool STATUSCommand::Exec(iClient* theClient, const string& Message) {
     }
 
 #ifdef THERETURN_ENABLED
-    if (theChan->hasW()) {
+    if (theChan->hasW() &&
+        (bot->getConfigVar("THERETURN_INTEGRATION")->asInt() != 0 || admLevel >= 750)) {
         bot->Notice(theClient, "The channel is also registered with %s.",
                     bot->getConfwNickName().c_str());
     }
