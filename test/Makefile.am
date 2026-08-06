@@ -13,7 +13,8 @@ noinst_PROGRAMS = test_burst \
 	test_match \
 	test_bot \
 	test_kick_transaction \
-	test_xparameters_tags
+	test_xparameters_tags \
+	test_stringtokenizer_trailing
 
 if COND_PCRE
 noinst_PROGRAMS += test_regex
@@ -66,6 +67,11 @@ test_xparameters_tags_SOURCES = test/xparameters_tags.cc
 test_xparameters_tags_CXXFLAGS = -I${top_srcdir}/include \
 	-I${top_srcdir}/libgnuworld
 test_xparameters_tags_LDADD = libgnuworld.la
+
+test_stringtokenizer_trailing_SOURCES = test/stringtokenizer_trailing.cc
+test_stringtokenizer_trailing_CXXFLAGS = -I${top_srcdir}/include \
+	-I${top_srcdir}/libgnuworld
+test_stringtokenizer_trailing_LDADD = libgnuworld.la
 
 test_regex_SOURCES = test/test_regex.cc
 test_regex_LDADD = libgnuworld.la -lpcre

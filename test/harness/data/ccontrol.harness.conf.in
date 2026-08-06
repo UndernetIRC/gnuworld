@@ -1,0 +1,40 @@
+# Minimal ccontrol config for the pytest harness (Docker Postgres).
+
+sql_host = @SQL_HOST@
+sql_port = @SQL_PORT@
+sql_db = @SQL_DB@
+sql_user = @SQL_USER@
+sql_pass = @SQL_PASS@
+
+username = euworld
+nickname = euworld
+hostname = undernet.org
+userdescription = UWorld
+
+operchanmodes = +isn
+mode = +iodkw
+operchan = #valhalla
+msgchan = #gnuworld.message
+limitschan = ''
+
+glength = 3600
+operchanreason = Oper channel
+abuse_mail = abuse@testnet
+ccemail = uworld@testnet
+SendMail = /bin/true
+sendmail = /bin/true
+mail_report = 0
+gline_interval = 3600
+max_connection = 5
+max_GLen = 86400
+max_threads = 100
+check_gates = 0
+check_clones = 0
+Expired_interval = 60
+dbinterval = 60
+excess_conn_report_interval = 28800
+showCGIpsInLogs = 0
+AnnounceNick = A
+iauthTimeout = 30
+url_excessive_conn = ''
+url_install_identd = ''

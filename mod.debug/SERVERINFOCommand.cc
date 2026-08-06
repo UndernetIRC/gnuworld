@@ -47,10 +47,11 @@ void dumpServerInfo(debug* bot, const iClient* theClient, iServer* theServer) {
                 prettyDuration(theServer->getStartTime()));
     bot->Notice(theClient, "Lag: {} seconds (last update: {})", theServer->getLag(),
                 theServer->getLastLagTS());
-    bot->Notice(theClient, "Flags: {:#x}  hub={} service={} ipv6={} jupe={} bursting={}",
+    bot->Notice(theClient, "Flags: {:#x}  hub={} service={} ipv6={} tls={} jupe={} bursting={}",
                 theServer->getFlags(), theServer->isHub() ? "yes" : "no",
                 theServer->isService() ? "yes" : "no", theServer->isIPv6() ? "yes" : "no",
-                theServer->isJupe() ? "yes" : "no", theServer->isBursting() ? "yes" : "no");
+                theServer->isTLS() ? "yes" : "no", theServer->isJupe() ? "yes" : "no",
+                theServer->isBursting() ? "yes" : "no");
 }
 
 } // namespace

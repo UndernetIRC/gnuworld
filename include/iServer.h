@@ -61,13 +61,15 @@ class iServer : public NetworkTarget {
      * Flags that iServers may have.
      */
     /* Set if this iServer is juped, false otherwise */
-    static const flagType FLAG_JUPE;
+    static constexpr flagType FLAG_JUPE = 0x01;
     /* Set if this iServer is a hub (+h) */
-    static const flagType FLAG_HUB;
+    static constexpr flagType FLAG_HUB = 0x02;
     /* Set if this iServer is a service (+s) */
-    static const flagType FLAG_SERVICE;
+    static constexpr flagType FLAG_SERVICE = 0x04;
     /* Set if this iServer is IPv6-compatible (+6) */
-    static const flagType FLAG_IPV6;
+    static constexpr flagType FLAG_IPV6 = 0x08;
+    /* Set if this iServer is connected over TLS (+z) */
+    static constexpr flagType FLAG_TLS = 0x10;
 
     /**
      * Construct an iServer given its vital state variables
@@ -91,19 +93,17 @@ class iServer : public NetworkTarget {
     /**
      * Return true if a particular flag is set, false otherwise.
      */
-    inline bool getFlag(const flagType& whichFlag) const {
-        return ((flags & whichFlag) == whichFlag);
-    }
+    inline bool getFlag(flagType whichFlag) const { return ((flags & whichFlag) == whichFlag); }
 
     /**
      * Set a particular flags.
      */
-    inline void setFlag(const flagType& whichFlag) { flags |= whichFlag; }
+    inline void setFlag(flagType whichFlag) { flags |= whichFlag; }
 
     /**
      * Remove a particular flag.
      */
-    inline void removeFlag(const flagType& whichFlag) { flags &= ~whichFlag; }
+    inline void removeFlag(flagType whichFlag) { flags &= ~whichFlag; }
 
     /**
      * Return true if this server is a jupe.
@@ -144,6 +144,16 @@ class iServer : public NetworkTarget {
      * Set this iServer as IPv6-compatible
      */
     inline void setIPv6() { setFlag(FLAG_IPV6); }
+
+    /**
+     * Return true if this server is connected over TLS
+     */
+    inline bool isTLS() const { return getFlag(FLAG_TLS); }
+
+    /**
+     * Set this iServer as connected over TLS
+     */
+    inline void setTLS() { setFlag(FLAG_TLS); }
 
     /**
      * Return the server numeric of this server's uplink.

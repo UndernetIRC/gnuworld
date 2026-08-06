@@ -788,8 +788,15 @@ class xServer : public ConnectionManager, public ConnectionHandler, public Netwo
      * Set this server's uplink.
      * This method should ONLY be called by the server command
      * handlers.
+     * When our link to the uplink is TLS, mark the uplink iServer
+     * as TLS regardless of whether its SERVER line advertised +z.
      */
-    inline void setUplink(iServer* newUplink) { Uplink = newUplink; }
+    inline void setUplink(iServer* newUplink) {
+        Uplink = newUplink;
+        if (Uplink != nullptr && serverConnection != nullptr && serverConnection->isTLS()) {
+            Uplink->setTLS();
+        }
+    }
 
     /**
      * Enable or disable the burstBuffer.
