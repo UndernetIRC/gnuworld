@@ -46,7 +46,9 @@ install-openchanfix-migrations:
 
 install-logging-properties:
 	$(MKDIR_P) $(DESTDIR)$(prefix)/bin
-	cp $(srcdir)/bin/logging.properties $(DESTDIR)$(prefix)/bin/logging.properties
+	@if ! cmp -s "$(srcdir)/bin/logging.properties" "$(DESTDIR)$(prefix)/bin/logging.properties"; then \
+		cp "$(srcdir)/bin/logging.properties" "$(DESTDIR)$(prefix)/bin/logging.properties"; \
+	fi
 
 EXTRA_DIST = bin/logging.properties \
 	bin/ccontrol.example.conf \

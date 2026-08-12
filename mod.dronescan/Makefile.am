@@ -14,7 +14,7 @@ lib_LTLIBRARIES += libdronescan.la
 # so a RELOAD after `git pull && make install` is guaranteed to load
 # the new code regardless of whether the old handle was ever
 # properly released.
-DRONESCAN_BUILD_TAG := $(shell git -C $(top_srcdir) rev-list --count HEAD 2>/dev/null || echo 0)
+DRONESCAN_BUILD_TAG != git -C . rev-list --count HEAD 2>/dev/null || echo 0
 libdronescan_la_LDFLAGS = -module -export-dynamic -version-info $(DRONESCAN_BUILD_TAG):0:0
 libdronescan_la_LIBADD = libgnuworldDB.la -lpcre2-8
 libdronescan_la_CXXFLAGS = -I$(top_srcdir)/db \
