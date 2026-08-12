@@ -210,7 +210,13 @@ int main(int argc, char** argv) {
         delete theServer;
         theServer = 0;
 
-        ::sleep(10);
+        // Only pause before reconnecting; skip the delay when the
+        // server is shutting down for good (autoConnect is false),
+        // otherwise the process lingers for up to 10 seconds after an
+        // already-completed shutdown.
+        if (autoConnect) {
+            ::sleep(10);
+        }
     } // while( autoConnect )
 
     return 0;
@@ -326,6 +332,13 @@ void xServer::mainLoop() {
         // Give this loop a chance to run at least once every 2 minutes
         if (seconds > 120)
             seconds = 120;
+
+        // Once shutting down, never block in select() waiting on a timer
+        // or new network activity: FlushData() above already pushed the
+        // final SQ out synchronously, and keepRunning is already false,
+        // so this is the last iteration of the loop regardless.
+        if (isLastLoop())
+            seconds = 0;
 
         // Process all available data
         ConnectionManager::Poll(seconds);
