@@ -162,13 +162,22 @@ int main(int argc, char** argv) {
 
     /* fork into background only if not in verbose mode */
     if (!verbose) {
+        // liblog4cplus starts a background thread as part of its
+        // load-time static initialization, before main() ever runs.
+        // fork() only duplicates the calling thread, so these
+        // intermediate daemonizing parents carry a reference to a
+        // thread that doesn't actually exist in them; a normal
+        // exit()/atexit run would deadlock forever inside log4cplus's
+        // static destructor waiting on it (via __cxa_finalize). These
+        // parents have nothing to flush or clean up, so bypass that
+        // entirely with _exit().
         if (fork()) {
             clog << argv[0] << ": forked into background";
-            ::exit(0);
+            _exit(0);
         }
         setsid();
         if (fork())
-            ::exit(0);
+            _exit(0);
     }
 
     {
@@ -219,7 +228,14 @@ int main(int argc, char** argv) {
         }
     } // while( autoConnect )
 
-    return 0;
+    // xServer::doShutdown() has already performed all real cleanup
+    // (DB disconnects, socket teardown, SQL sync) synchronously. This
+    // process is itself downstream of the daemonizing fork() above
+    // (or has otherwise loaded log4cplus's background thread before
+    // any fork in its ancestry), so a normal return/exit() would risk
+    // the same log4cplus static-destructor deadlock worked around
+    // above. Terminate directly instead.
+    _exit(0);
 }
 
 xServer::xServer(bool verbose_arg, bool doDebug_arg, bool logSocket_arg,
