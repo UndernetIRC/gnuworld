@@ -203,7 +203,7 @@ bool WCommand::Exec(iClient* theClient, const string& Message) {
         /* Is W on the channel? */
         if (!wChanUser) {
             bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(),
-                        wClient->getNickName().c_str());
+                        wClient->getNickName().c_str(), theChan->getName().c_str());
             return false;
         }
 
