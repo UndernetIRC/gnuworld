@@ -198,11 +198,13 @@ Multiple actions are comma-joined in `rule->getActions()` order; each GLINE
 fragment includes its resolved duration, KILL does not; each fragment shows
 `(now)` for a zero/negative resolved delay or `(in Ns)` otherwise - the
 *planned* delay, not the actual fire time. Trigger text is sanitized and
-capped the same way as before (`sanitizeSpamTextForReport()`, 200 bytes +
-`"..."`) and the ` - "..."` suffix is omitted entirely when there's no
-trigger text. Action reason strings are intentionally not shown here (they
-remain in the log4cplus audit trail and on the real gline/kill itself) to
-keep the line short.
+capped for this IRC line (`sanitizeSpamTextForReport()`, 200 bytes + `"..."`,
+to stay within IRC line-length limits) and the ` - "..."` suffix is omitted
+entirely when there's no trigger text. Action reason strings are
+intentionally not shown here (they remain in the log4cplus audit trail and
+on the real gline/kill itself) to keep the line short. `dronescan-event.log`
+gets the same line rebuilt with the full, untruncated trigger text instead -
+see [Logging](#logging).
 
 `spam_rules.silent`: when a rule has **zero** enabled GLINE/KILL actions
 linked, it would otherwise print a "report only" line with no real action
@@ -232,10 +234,13 @@ in `bin/logging.properties` with the same `DailyRollingFileAppender`
 mechanism as the existing `jf-glined.log`/`jf-cservice.log` join-flood logs:
 
 - `dronescan-event.log`, via the `gnuworld.ds.event` category, holds the
-  `[S]` detection line itself - the exact same text sent to the console
-  channel by `fireRuleActions()`, written once at the moment the rule
-  fires (for a delayed action, that's at schedule time, showing the
-  planned delay).
+  `[S]` detection line, written once at the moment the rule fires (for a
+  delayed action, that's at schedule time, showing the planned delay).
+  Everything but the trigger text is identical to the console line; the
+  trigger text itself is rebuilt with `sanitizeSpamTextForLog()` (no length
+  cap, no `"..."`) instead of the console's `sanitizeSpamTextForReport()`,
+  so the file holds the complete text even when the console line had to
+  truncate it.
 - `spam-action.log`, via the `gnuworld.ds.spam.action` category, holds
   every `executeSpamAction()` outcome (GLINE, KILL), written later at
   actual execution time (immediately, or whenever the delay timer fires),
@@ -245,9 +250,10 @@ mechanism as the existing `jf-glined.log`/`jf-cservice.log` join-flood logs:
 (nick!user@host/ip), rule name, and reason/trigger text run through
 `sanitizeSpamTextForLog()` (same control-byte stripping as
 `sanitizeSpamTextForReport()`, but no length cap and no `"..."`) - unlike
-the console line (and `dronescan-event.log`), which truncates trigger text
-to 200 bytes. Both require `--with-log4cplus` (see `CLAUDE.md`); logging is
-silently skipped if the module was built without it.
+the IRC console line, which truncates trigger text to 200 bytes. Both
+`dronescan-event.log` and `spam-action.log` require `--with-log4cplus` (see
+`CLAUDE.md`); logging is silently skipped if the module was built without
+it.
 
 ## Spy clients and monitored channels
 

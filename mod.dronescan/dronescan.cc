@@ -3211,8 +3211,10 @@ void dronescan::evaluateSpamRules(const SpamActor& actor, const std::string& cha
 namespace {
 
 // Strip control bytes (including IRC formatting codes, all below 0x20) and
-// cap length before embedding matched text in the "[S]" console report
-// line. ISO-8859-1 is single-byte, so no multi-byte handling is required.
+// cap length before embedding matched text in the "[S]" IRC console report
+// line (kept short for IRC line-length limits). ISO-8859-1 is single-byte,
+// so no multi-byte handling is required. dronescan-event.log gets the
+// untruncated text instead - see sanitizeSpamTextForLog().
 std::string sanitizeSpamTextForReport(const std::string& text) {
     const size_t kMaxLen = 200;
     std::string out;
@@ -3254,18 +3256,20 @@ struct ResolvedSpamAction {
 };
 
 // Build the single "[S] <rule>: nick!user@host ip in <chans> -> <actions> -
-// "<text>"" console line for a rule that just crossed its threshold, given
-// every enabled action already resolved from it (before any is
-// dispatched). Each GLINE fragment includes its duration; KILL does not.
-// Each fragment shows "(now)" for a zero/negative delay or "(in Ns)"
-// otherwise - the *planned* delay, not the actual fire time. If resolved
-// is empty (no enabled GLINE/KILL actions), the arrow clause reads
-// "report only". Trigger text is omitted (no " - ..." suffix) when empty,
-// matching the old REPORT behavior for empty text.
+// "<text>"" line for a rule that just crossed its threshold, given every
+// enabled action already resolved from it (before any is dispatched). Each
+// GLINE fragment includes its duration; KILL does not. Each fragment shows
+// "(now)" for a zero/negative delay or "(in Ns)" otherwise - the *planned*
+// delay, not the actual fire time. If resolved is empty (no enabled
+// GLINE/KILL actions), the arrow clause reads "report only". sanitizedText
+// is embedded verbatim (no " - ..." suffix when empty) - the caller decides
+// how it was sanitized/capped, so this same builder produces both the
+// length-capped IRC console line and the untruncated dronescan-event.log
+// line from one shared prefix/action-list format.
 std::string buildSpamReportLine(const std::string& ruleName, const std::string& nick,
                                 const std::string& user, const std::string& host,
                                 const std::string& ip, const std::string& displayChannels,
-                                const std::string& triggerText,
+                                const std::string& sanitizedText,
                                 const std::vector<ResolvedSpamAction>& resolved) {
     std::ostringstream line;
     line << "[S] " << ruleName << ": " << nick << '!' << user << '@' << host << ' ' << ip << " in "
@@ -3287,7 +3291,6 @@ std::string buildSpamReportLine(const std::string& ruleName, const std::string& 
         }
     }
 
-    const std::string sanitizedText = sanitizeSpamTextForReport(triggerText);
     if (!sanitizedText.empty())
         line << " - \"" << sanitizedText << '"';
 
@@ -3299,14 +3302,18 @@ std::string buildSpamReportLine(const std::string& ruleName, const std::string& 
 /**
  * fireRuleActions: resolve every action linked to the given rule (reason,
  * duration, and delay+jitter, applying any spam_rule_actions overrides) for
- * the offending actor, then emit the single combined "[S]" console report
- * line synchronously (unless the rule is silent and none of its actions
+ * the offending actor, then emit the combined "[S]" report line
+ * synchronously (unless the rule is silent and none of its actions
  * resolved) BEFORE dispatching anything - a delayed action's line is
  * printed at schedule time, showing its planned delay, not at the later
- * moment it actually fires. An action whose effective delay resolves to
- * <= 0 then runs immediately via executeSpamAction(); otherwise it is
- * scheduled on a one-shot timer (pendingSpamActionTimers), the same
- * pattern used for delayed spy-client joins (see scheduleSpyClientJoin).
+ * moment it actually fires. The report is built twice from the same
+ * prefix/action-list format: once with trigger text capped at 200 bytes
+ * for the IRC console line (IRC line-length limits), and once with the
+ * full untruncated trigger text for dronescan-event.log. An action whose
+ * effective delay resolves to <= 0 then runs immediately via
+ * executeSpamAction(); otherwise it is scheduled on a one-shot timer
+ * (pendingSpamActionTimers), the same pattern used for delayed spy-client
+ * joins (see scheduleSpyClientJoin).
  */
 void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
                                 const std::string& channel_name, const std::string& displayChannels,
@@ -3367,12 +3374,18 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
     // exists), so "resolved is non-empty" IS "at least one GLINE/KILL is
     // about to run" - silent can only ever suppress the report-only case.
     if (!rule->isSilent() || !resolved.empty()) {
-        const std::string line =
+        const std::string consoleLine =
             buildSpamReportLine(rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
-                                displayChannels, triggerText, resolved);
+                                displayChannels, sanitizeSpamTextForReport(triggerText), resolved);
 
 #ifdef ENABLE_LOG4CPLUS
-        log(DS_EVENT, line);
+        // dronescan-event.log must hold the complete trigger text, unlike
+        // the IRC console line above which is capped for IRC line-length
+        // limits - so this is built separately with the uncapped sanitizer.
+        const std::string logLine =
+            buildSpamReportLine(rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
+                                displayChannels, sanitizeSpamTextForLog(triggerText), resolved);
+        log(DS_EVENT, logLine);
 #endif
 
         // report_source == "SPYCLIENT": send the line as the spy client that
@@ -3403,11 +3416,11 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         if (reportAs) {
             Channel* consoleChan = Network->findChannel(consoleChannel);
             if (consoleChan)
-                FakeMessage(consoleChan, reportAs, line);
+                FakeMessage(consoleChan, reportAs, consoleLine);
             else
-                Message(consoleChannel, "%s", line.c_str());
+                Message(consoleChannel, "%s", consoleLine.c_str());
         } else {
-            Message(consoleChannel, "%s", line.c_str());
+            Message(consoleChannel, "%s", consoleLine.c_str());
         }
     }
 
