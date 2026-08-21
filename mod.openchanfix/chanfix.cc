@@ -137,6 +137,8 @@ chanfix::chanfix(const std::string& configFileName) : xClient(configFileName) {
                                        0 /* Set to 0 to allow all opers to access it, otherwise this
                                             should be sqlcfUser::F_COMMENT */
                                        ));
+    RegisterCommand(
+        new DELSCORECommand(this, "DELSCORE", "<#channel> <account>", 3, sqlcfUser::F_OWNER));
     RegisterCommand(new DELUSERCommand(this, "DELUSER", "<username>", 2,
                                        sqlcfUser::F_USERMANAGER | sqlcfUser::F_SERVERADMIN));
     RegisterCommand(new HELPCommand(this, "HELP", "[command]", 1, 0));
@@ -1479,6 +1481,23 @@ sqlChanOp* chanfix::newChanOp(const std::string& channel, const std::string& acc
 
 sqlChanOp* chanfix::findChanOp(Channel* theChan, iClient* theClient) {
     return findChanOp(theChan->getName(), theClient->getAccount());
+}
+
+bool chanfix::deleteChanOp(const std::string& channel, const std::string& account) {
+    sqlChanOpsType::iterator ptr = sqlChanOps.find(channel);
+    if (ptr == sqlChanOps.end())
+        return false;
+
+    sqlChanOpsType::mapped_type::iterator chanOp = ptr->second.find(account);
+    if (chanOp == ptr->second.end())
+        return false;
+
+    sqlChanOp* curOp = chanOp->second;
+    pendingDeletes.push_back(std::make_pair(channel, account));
+    ptr->second.erase(chanOp);
+    delete curOp;
+
+    return true;
 }
 
 sqlChanOp* chanfix::newChanOp(Channel* theChan, iClient* theClient) {

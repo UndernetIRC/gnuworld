@@ -19,6 +19,7 @@ libchanfix_la_SOURCES = \
 	mod.openchanfix/DELFLAGCommand.cc \
 	mod.openchanfix/DELHOSTCommand.cc \
 	mod.openchanfix/DELNOTECommand.cc \
+	mod.openchanfix/DELSCORECommand.cc \
 	mod.openchanfix/DELUSERCommand.cc \
 	mod.openchanfix/HELPCommand.cc \
 	mod.openchanfix/HISTORYCommand.cc \

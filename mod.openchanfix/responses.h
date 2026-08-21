@@ -124,6 +124,10 @@ const int note_not_added_by_you = 55;
 const int note_not_manually_added = 56;
 const int note_deleted = 57;
 
+/* DELSCORE */
+const int score_deleted = 227;
+const int error_deleting_score = 228;
+
 /* DELUSER */
 const int cant_delete_an_owner = 58;
 const int cant_delete_manager = 59;

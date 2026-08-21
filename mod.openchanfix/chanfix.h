@@ -186,6 +186,8 @@ class chanfix : public xClient {
     sqlChanOp* findChanOp(const std::string&, const std::string&);
     sqlChanOp* findChanOp(Channel*, iClient*);
 
+    bool deleteChanOp(const std::string&, const std::string&);
+
     dbHandle* getLocalDBHandle() { return localDBHandle; }
 
     size_t countMyOps(const std::string&);

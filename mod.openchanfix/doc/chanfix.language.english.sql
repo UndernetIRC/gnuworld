@@ -222,4 +222,6 @@ COPY "translations" FROM stdin;
 1	224	Simulate for %s (%s) starting at next fixing round (Current C time %s).	31337	0
 1	225	NOTE: This is only an estimate, if ops with points join or part it could affect who gets opped.	31337	0
 1	226	You may only WHOFLAG one flag.	31337	0
+1	227	Deleted score for account %s in channel %s (was %u points).	31337	0
+1	228	Error deleting score for account %s on channel %s.	31337	0
 \.
