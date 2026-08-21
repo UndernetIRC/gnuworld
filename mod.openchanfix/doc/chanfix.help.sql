@@ -18,6 +18,7 @@ CHANFIX	1	Performs a manual fix on the specified channel. Append OVERRIDE, YES, 
 DELFLAG	1	Removes the specified flag from a user. See /msg C HELP ADDFLAG.
 DELHOST	1	Deletes the specified hostmask from a user's list of hostmasks.
 DELNOTE	1	Deletes a note matching the specified id from the specified channel. You can only delete the notes you have added.
+DELSCORE	1	Deletes the chanfix score of the specified account in the specified channel.
 DELUSER	1	Deletes the specified user.
 QUOTE	1	This command should never be used.\nUsing it would be bad.\nHow bad?\nTry to imagine all life stopping instantaneously, and every molecule in your body exploding at the speed of light.
 HELP	1	Shows help about the specified command. With no command specified, all commands that you have access to use are listed.
@@ -54,7 +55,7 @@ WHOGROUP	1	Shows all users in the specified group along with their flags. If no 
 <INDEXBLOCK>	1	\002Blocker (+b)\002: BLOCK UNBLOCK LISTBLOCKED
 <INDEXCOMMENT>	1	\002Commenter (+c)\002: ADDNOTE DELNOTE ALERT UNALERT (those 4 commands are oper level since 2024-05-04)
 <INDEXCHANFIX>	1	\002Chanfixer (+f)\002: CHANFIX SIMULATE (those 2 commands are oper level since 2011-09-11)
-<INDEXOWNER>	1	\002Owner (+o)\002: DUMPSQL LASTCOM REHASH RELOAD SET SHUTDOWN
+<INDEXOWNER>	1	\002Owner (+o)\002: DELSCORE DUMPSQL LASTCOM REHASH RELOAD SET SHUTDOWN
 DUMPSQL	1	Dumps all in-memory chanOp data as SQL UPSERT statements to a timestamped file on disk. Use as emergency data recovery when the database is unreachable.
 <INDEXSERVERADMIN>	1	\002Server Admin (+a)\002: ADDUSER DELUSER ADDHOST DELHOST ADDFLAG DELFLAG WHOGROUP SUSPEND UNSUSPEND
 <INDEXUSERADMIN>	1	\002User Manager (+u)\002: ADDUSER DELUSER ADDHOST DELHOST ADDFLAG DELFLAG SETGROUP WHOGROUP SUSPEND UNSUSPEND
