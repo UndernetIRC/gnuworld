@@ -506,6 +506,12 @@ class cservice : public xClient {
     const string getLastChannelEvent(sqlChannel* theChannel, unsigned short eventType,
                                      time_t eventTime);
 
+    /* Builds a "(access)username[user_id], ..." snapshot of everyone who
+     * currently has access on theChannel, line-wrapped so it displays
+     * cleanly via Notice(). Used to record who had access before a
+     * destructive operation (PURGE, REMOVEALL) wipes it out. */
+    const string buildChannelAccessSnapshot(sqlChannel* theChannel);
+
     /* Returns the access sqlUser has in channel sqlChan. */
     short getAccessLevel(sqlUser*, sqlChannel*);
 

@@ -6187,6 +6187,52 @@ const string cservice::getLastChannelEvent(sqlChannel* theChannel, unsigned shor
     return "";
 }
 
+/**
+ * Builds a "(access)username[user_id], ..." snapshot of everyone who
+ * currently has access on theChannel, ordered by access level descending
+ * (matching ACCESSCommand's ordering). The result is wrapped with '\n'
+ * every ~400 bytes so that Notice() - which only starts a new IRC line on
+ * an embedded '\n' - displays it across multiple lines instead of silently
+ * truncating a single long line.
+ */
+const string cservice::buildChannelAccessSnapshot(sqlChannel* theChannel) {
+    static const size_t maxLineLength = 400;
+
+    stringstream queryString;
+    queryString << "SELECT users.user_name, users.id, levels.access "
+                << "FROM levels, users WHERE levels.channel_id = " << theChannel->getID()
+                << " AND levels.user_id = users.id ORDER BY levels.access DESC" << ends;
+
+    if (!SQLDb->Exec(queryString, true)) {
+        LOG(ERROR, "buildChannelAccessSnapshot SQL Error:");
+        LOGSQL_ERROR(SQLDb);
+        return "(error retrieving access list)";
+    }
+
+    if (SQLDb->Tuples() == 0)
+        return "(none)";
+
+    string snapshot;
+    string currentLine;
+    for (unsigned int i = 0; i < SQLDb->Tuples(); i++) {
+        stringstream entry;
+        entry << "(" << SQLDb->GetValue(i, 2) << ")" << SQLDb->GetValue(i, 0) << "["
+              << SQLDb->GetValue(i, 1) << "]";
+
+        if (!currentLine.empty() && (currentLine.size() + entry.str().size() > maxLineLength)) {
+            snapshot += currentLine + ",\n";
+            currentLine.clear();
+        }
+
+        if (!currentLine.empty())
+            currentLine += ", ";
+        currentLine += entry.str();
+    }
+    snapshot += currentLine;
+
+    return snapshot;
+}
+
 time_t cservice::currentTime() const {
     /* Returns the current time according to the postgres server. */
     return dbTimeOffset + ::time(NULL);

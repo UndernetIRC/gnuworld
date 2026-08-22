@@ -84,6 +84,13 @@ bool REMOVEALLCommand::Exec(iClient* theClient, const string& Message) {
     }
 
     /*
+     * Record who had access on this channel before we wipe it, for future
+     * investigation.
+     */
+
+    string accessSnapshot = bot->buildChannelAccessSnapshot(theChan);
+
+    /*
      *  Now, perform a fast query on the levels table for this channel.
      */
 
@@ -133,7 +140,8 @@ bool REMOVEALLCommand::Exec(iClient* theClient, const string& Message) {
     if (bot->SQLDb->Exec(deleteAllQuery)) {
         bot->Notice(theClient, "Done. Zapped %i access records from %s", delCounter,
                     theChan->getName().c_str());
-        bot->writeChannelLog(theChan, theClient, sqlChannel::EV_REMOVEALL, "");
+        bot->writeChannelLog(theChan, theClient, sqlChannel::EV_REMOVEALL,
+                             "\nAccess list at time of REMOVEALL:\n" + accessSnapshot);
     } else {
         LOG(ERROR, "REMOVEALLCommand SQL Error:");
         LOGSQL_ERROR(bot->SQLDb);

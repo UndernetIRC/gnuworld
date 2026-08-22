@@ -143,6 +143,13 @@ bool PURGECommand::Exec(iClient* theClient, const string& Message) {
         }
     }
 
+    /*
+     * Record who had access on this channel before we purge it, for
+     * future investigation.
+     */
+
+    string accessSnapshot = bot->buildChannelAccessSnapshot(theChan);
+
     /* If we need to reop, do it here */
     if (reop) {
         /* iterate over the channel userlist */
@@ -224,7 +231,8 @@ bool PURGECommand::Exec(iClient* theClient, const string& Message) {
 
     bot->writeChannelLog(theChan, theClient, sqlChannel::EV_PURGE,
                          "has purged " + theChan->getName() + " (" + reason + "), " +
-                             "Manager was " + manager + " (" + managerEmail + ")");
+                             "Manager was " + manager + " (" + managerEmail + ")" +
+                             "\nAccess list at time of purge:\n" + accessSnapshot);
 
     /* Notify services - currently disabled. */
     // bot->doXQToAllServices("AnyCServiceRouting", "REMCHAN " + theChan->getName());
