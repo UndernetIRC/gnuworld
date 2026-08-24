@@ -41,11 +41,19 @@ using std::string;
 /**
  * Converts a character to its RFC1459 lowercase equivalent.
  * In addition to standard ASCII A-Z -> a-z, RFC1459 defines:
- *   [ -> {, ] -> }, \\ -> |, ^ -> ~
+ *   [ -> {, ] -> }, \\ -> |, ~ -> ^
  * @param c The character to convert.
  * @return The RFC1459-lowercased character.
  */
 unsigned char rfc1459_tolower(unsigned char c);
+
+/**
+ * Converts a string to its RFC1459 lowercase equivalent.
+ * Applies rfc1459_tolower to each character.
+ * @param s The string to convert.
+ * @return The RFC1459-lowercased string.
+ */
+std::string rfc1459_tolower(const std::string& s);
 
 /**
  * Compares two strings using RFC1459 case-insensitive rules.

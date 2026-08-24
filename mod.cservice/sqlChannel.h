@@ -179,6 +179,8 @@ class sqlChannel {
 
     inline const string& getName() const { return name; }
 
+    inline const string& getCanonicalName() const { return canon_name; }
+
     inline const flagType& getFlags() const { return flags; }
 
 #ifdef THERETURN_ENABLED
@@ -296,7 +298,10 @@ class sqlChannel {
 
     inline void setID(const unsigned int& _id) { id = _id; }
 
-    inline void setName(const string& _name) { name = _name; }
+    inline void setName(const string& _name) {
+        name = _name;
+        canon_name = rfc1459_tolower(_name);
+    }
 
     inline void setFlag(const flagType& whichFlag) { flags |= whichFlag; }
 
@@ -468,6 +473,7 @@ class sqlChannel {
   protected:
     unsigned int id;
     string name;
+    string canon_name;
     flagType flags;
     unsigned short mass_deop_pro;
     unsigned int flood_pro;
