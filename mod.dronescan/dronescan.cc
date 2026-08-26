@@ -4305,9 +4305,19 @@ void dronescan::checkMissingSpyJoins() {
  * channel it was in.
  */
 void dronescan::quitAllSpyClientsForShutdown() {
-    for (liveSpyClientsMapType::iterator it = liveSpyClientsMap.begin();
+    // Snapshot first: DetachClient() below synchronously re-enters via
+    // OnEvent(EVT_QUIT) -> retireAndReplaceSpyClient(), which erases from
+    // liveSpyClientsMap - iterating that map directly while detaching would
+    // invalidate the very iterator in use.
+    std::vector<iClient*> spyClients;
+    spyClients.reserve(liveSpyClientsMap.size());
+    for (liveSpyClientsMapType::const_iterator it = liveSpyClientsMap.begin();
          it != liveSpyClientsMap.end(); ++it)
-        MyUplink->DetachClient(it->second, randomQuitReason());
+        spyClients.push_back(it->second);
+
+    for (std::vector<iClient*>::const_iterator it = spyClients.begin(); it != spyClients.end();
+         ++it)
+        MyUplink->DetachClient(*it, randomQuitReason());
 
     liveSpyClientsMap.clear();
     chanActiveSpyMap.clear();
