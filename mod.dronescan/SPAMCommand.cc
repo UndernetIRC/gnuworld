@@ -217,6 +217,26 @@ static string spyClientNickListForChannel(dronescan* bot, int channelId) {
     return out;
 }
 
+// Nickname of the spy client actually joined to chanKey right now ("-" if
+// none), with a "+<nick>" suffix if a temporary 2nd visitor is also
+// present. chanKey must already be lowercased.
+static string liveSpyStatusForChannel(dronescan* bot, const string& chanKey) {
+    dronescan::chanActiveSpyMapType::const_iterator ait = bot->chanActiveSpyMap.find(chanKey);
+    if (ait == bot->chanActiveSpyMap.end())
+        return "-";
+
+    dronescan::spyClientsMapType::const_iterator scit = bot->spyClientsMap.find(ait->second);
+    string status = (scit != bot->spyClientsMap.end()) ? scit->second->getNickname() : "-";
+
+    dronescan::chanSecondSpyMapType::const_iterator sit = bot->chanSecondSpyMap.find(chanKey);
+    if (sit != bot->chanSecondSpyMap.end()) {
+        dronescan::spyClientsMapType::const_iterator sc2it = bot->spyClientsMap.find(sit->second);
+        if (sc2it != bot->spyClientsMap.end())
+            status += "+" + sc2it->second->getNickname();
+    }
+    return status;
+}
+
 // Link an event to a rule via spam_rule_events (INSERT + in-memory map
 // update). Shared by "RULE ADDEVENT" and the "-rule" flag on "EVENT ADD".
 // Caller is responsible for calling bot->relinkSpamGraph() afterward.
@@ -1951,8 +1971,8 @@ static void handleChan(dronescan* bot, const iClient* theClient, const sqlUser* 
             return;
         }
         bot->Reply(theClient, "=== Monitored Channels (%zu) ===", bot->monitoredChannelsMap.size());
-        bot->Reply(theClient, "%-4s %-32s %-8s %-11s %-7s %-10s %s", "ID", "Channel", "ForceJoin",
-                   "JoinAsSvc", "Enabled", "SpyClnts", "LastTrig");
+        bot->Reply(theClient, "%-4s %-32s %-8s %-11s %-7s %-10s %-14s %s", "ID", "Channel",
+                   "ForceJoin", "JoinAsSvc", "Enabled", "SpyClnts", "Live", "LastTrig");
         for (dronescan::monitoredChannelsMapType::const_iterator it =
                  bot->monitoredChannelsMap.begin();
              it != bot->monitoredChannelsMap.end(); ++it) {
@@ -1963,12 +1983,13 @@ static void handleChan(dronescan* bot, const iClient* theClient, const sqlUser* 
                 (sit != bot->monitoredChannelSpyClientsMap.end() && !sit->second.empty())
                     ? std::to_string(sit->second.size())
                     : "any";
+            const string liveStatus = liveSpyStatusForChannel(bot, it->first);
             const char* lastTrig =
                 (mc->getLastTriggeredTs() > 0) ? bot->Ago(mc->getLastTriggeredTs()) : "never";
-            bot->Reply(theClient, "%-4d %-32s %-8s %-11s %-7s %-10s %s", mc->getId(),
+            bot->Reply(theClient, "%-4d %-32s %-8s %-11s %-7s %-10s %-14s %s", mc->getId(),
                        mc->getName().c_str(), mc->isForceJoin() ? "yes" : "no",
                        mc->isJoinAsService() ? "yes" : "no", mc->isEnabled() ? "yes" : "no",
-                       spySummary.c_str(), lastTrig);
+                       spySummary.c_str(), liveStatus.c_str(), lastTrig);
         }
         bot->Reply(theClient, "--- %zu channel(s) ---", bot->monitoredChannelsMap.size());
         return;
@@ -1997,6 +2018,7 @@ static void handleChan(dronescan* bot, const iClient* theClient, const sqlUser* 
         bot->Reply(theClient, "JoinAsService: %s", found->isJoinAsService() ? "yes" : "no");
         bot->Reply(theClient, "Enabled     : %s", found->isEnabled() ? "yes" : "no");
         bot->Reply(theClient, "SpyClients  : %s", spyList.empty() ? "any" : spyList.c_str());
+        bot->Reply(theClient, "Live        : %s", liveSpyStatusForChannel(bot, it->first).c_str());
         if (found->getLastTriggeredTs() > 0)
             bot->Reply(theClient, "LastTriggered: %s ago (rule '%s')",
                        bot->Ago(found->getLastTriggeredTs()),

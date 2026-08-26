@@ -430,10 +430,48 @@ class dronescan : public xClient {
      * excludeId (or -1) is never returned - used to keep a 2nd spy client
      * distinct from the channel's primary. Also skips any candidate still
      * under its per-(channel, spyclient) rejoin cooldown for this channel.
+     *
+     * If the channel has a dedicated spy-client list
+     * (monitored_channel_spyclients via monitoredChannelSpyClientsMap),
+     * those id(s) are tried first (starting at a random position, same as
+     * before). If none of them are eligible right now, selection falls
+     * back to the general pool - excluding every id that is some (any)
+     * channel's dedicated assignment, so a client someone else depends on
+     * exclusively is never soaked up by a fallback/unrestricted selection.
+     *
+     * On failure (-1), lastSpyClientSelectionDiagnostic is set to a short
+     * breakdown of why every candidate in the pool that was actually
+     * consulted was rejected (disabled / not live / on cooldown / blocked
+     * by channel mode or ban), for callers to log.
+     *
      * Returns spy client id or -1 if none eligible.
      */
     int selectSpyClient(const std::string& chanName, bool forcejoin, bool requireIdle,
                         int excludeId);
+
+    // Tally of why selectFromCandidates() rejected each candidate it
+    // walked past, used to build lastSpyClientSelectionDiagnostic.
+    struct SpyClientRejectionTally {
+        int disabled;
+        int notLive;
+        int cooldown;
+        int modeOrBan;
+        SpyClientRejectionTally() : disabled(0), notLive(0), cooldown(0), modeOrBan(0) {}
+    };
+
+    /**
+     * Runs the eligibility loop (stale-id/disabled/not-live/cooldown/
+     * channel-mode-or-ban checks, then idle-or-least-busy selection) against
+     * exactly the given candidate id list. Shared by selectSpyClient()'s
+     * own-dedicated-list pass and its general-pool fallback pass. Tallies
+     * rejection reasons into *tally if non-null.
+     */
+    int selectFromCandidates(const std::vector<int>& candidateIds, const std::string& chanKey,
+                             Channel* theChan, bool forcejoin, bool requireIdle, int excludeId,
+                             SpyClientRejectionTally* tally);
+
+    // Diagnostic set by selectSpyClient() on failure - see its doc comment.
+    std::string lastSpyClientSelectionDiagnostic;
 
     /**
      * Find the best available spy client for the given channel.
@@ -524,6 +562,21 @@ class dronescan : public xClient {
     void handleSpyClientPersonalQuit(int scId);
 
     /**
+     * Common cleanup for a live spy client that is no longer on the
+     * network, whether it left voluntarily (handleSpyClientPersonalQuit())
+     * or involuntarily (killed/G-lined/K-lined/timed out - see OnEvent()'s
+     * EVT_KILL/EVT_QUIT handling). Drops scId from every live-tracking map,
+     * scheduling a replacement join for each channel it was covering, then
+     * schedules it to be reintroduced on the next tick (see
+     * pendingSpyReintroduceTimers) rather than calling introduceSpyClient()
+     * inline - this can run nested inside in-progress EVT_KILL/EVT_QUIT
+     * processing, before the departing client is fully removed from the
+     * network's own tables, so introducing a replacement synchronously
+     * here is not safe.
+     */
+    void retireAndReplaceSpyClient(int scId);
+
+    /**
      * Periodic sweep (every 60s): for monitored channels with a primary
      * spy client but no 2nd visitor yet, checks whether the channel's
      * (per-channel or global default) 2nd-join interval has elapsed and,
@@ -531,6 +584,17 @@ class dronescan : public xClient {
      * coverage.
      */
     void checkSecondSpyJoins();
+
+    /**
+     * Periodic sweep (every 60s, paced per-channel): retries
+     * doSpyClientJoin() for any enabled, non-joinAsService monitored
+     * channel that currently has no live primary spy client. Catches any
+     * channel whose join was never attempted or never retried by one of
+     * the event-driven triggers (burst, kick replacement, resync, personal
+     * quit) - e.g. a channel added/enabled while its only eligible spy
+     * client happened to be briefly unavailable.
+     */
+    void checkMissingSpyJoins();
 
     /**
      * Called on module shutdown/reload and on real process shutdown:
@@ -625,6 +689,16 @@ class dronescan : public xClient {
     typedef std::map<xServer::timerID, int> pendingSpyQuitTimersType;
     pendingSpyQuitTimersType pendingSpyQuitTimers;
 
+    // Pending deferred spy client reintroductions: timerID -> spy client
+    // id. retireAndReplaceSpyClient() schedules these instead of calling
+    // introduceSpyClient() inline, since it can run nested inside
+    // in-progress network event processing (EVT_KILL/EVT_QUIT) where the
+    // departing client isn't fully removed from the network's own tables
+    // yet - reintroducing synchronously there risks corrupting our own
+    // tracking maps. See OnTimer()'s handling of this map.
+    typedef std::map<xServer::timerID, int> pendingSpyReintroduceTimersType;
+    pendingSpyReintroduceTimersType pendingSpyReintroduceTimers;
+
     // (spy client id, lowercase channel) -> earliest time it may cover that
     // channel again; set when it voluntarily quits/leaves it.
     typedef std::map<std::pair<int, std::string>, time_t> spyClientChanCooldownType;
@@ -639,6 +713,11 @@ class dronescan : public xClient {
     // used to pace checkSecondSpyJoins() to roughly once per interval.
     typedef std::map<std::string, time_t> chanSecondJoinLastMapType;
     chanSecondJoinLastMapType chanSecondJoinLastMap;
+
+    // lowercase channel name -> last time checkMissingSpyJoins() retried a
+    // join for it, used to pace retries to roughly once per interval.
+    typedef std::map<std::string, time_t> chanSpyJoinRetryLastMapType;
+    chanSpyJoinRetryLastMapType chanSpyJoinRetryLastMap;
 
     // Spam actions waiting for their delay/jitter timer to fire; see
     // fireRuleActions()/executeSpamAction()/PendingSpamAction.
@@ -820,6 +899,7 @@ class dronescan : public xClient {
     xServer::timerID tidGlineQueue;
     xServer::timerID tidRepeatGC;       // periodic sweep of expired repeat entries
     xServer::timerID tidSecondSpyCheck; // periodic sweep for 2nd-spy-client joins
+    xServer::timerID tidSpyJoinRetry;   // periodic sweep for missing primary spy-client joins
 
     /** Command map type. */
     typedef std::map<std::string, Command*, noCaseCompare> commandMapType;
