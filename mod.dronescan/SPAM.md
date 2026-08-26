@@ -263,12 +263,29 @@ it.
   optional services account, user modes) that join monitored channels to
   observe traffic dronescan itself isn't in.
 - `dronescan::findBestSpyClient(chanName, forcejoin)` picks which spy
-  client covers a channel. If `monitored_channel_spyclients` has rows for
-  that channel, selection is restricted to that list (starting at a random
-  entry and walking down it); otherwise any configured, enabled spy client
-  may be picked from the full pool.
+  client covers a channel, via `selectSpyClient()`. If
+  `monitored_channel_spyclients` has rows for that channel, those id(s) are
+  tried first (starting at a random entry and walking down it). If none of
+  them are currently eligible (disabled, offline, on cooldown, or blocked
+  by channel mode/ban), selection falls back to the general pool instead of
+  leaving the channel uncovered - a dedicated assignment is a *preference*,
+  not a hard lock. The general pool always excludes every spy client id
+  that is some (any) channel's dedicated assignment, so a client another
+  channel depends on exclusively is never picked up by an unrestricted or
+  fallback selection elsewhere.
 - `forcejoin` forces the join past `+i`/`+k`/`+l` or bans via a
   server-level protocol override.
+- When selection finds no eligible spy client at all, the console-channel
+  `[SpyClient] No available spy client ...` warning includes a
+  rejection-reason breakdown (counts of disabled / not live / on cooldown /
+  blocked by channel mode-or-ban candidates) so the cause is visible from
+  IRC without DB/log access.
+- A periodic sweep (`checkMissingSpyJoins()`, every 60s, paced per channel
+  to roughly once every 5 minutes) retries any enabled, non-`joinasservice`
+  monitored channel that currently has no live primary spy client - a
+  catch-all for a channel whose join was never attempted or never retried
+  by burst, a kick replacement, a resync, or a spy client's own
+  quit/reconnect cycle.
 - A monitored channel can temporarily carry a 2nd spy client alongside the
   primary (`checkSecondSpyJoins()`, periodic double-coverage sweep) so a
   replacement is already present when the primary needs to rotate out.
@@ -375,10 +392,17 @@ equivalent.
 
 ### CHAN
 
-Keyed by channel name. `ADDSPY`/`REMSPY` restrict which spy clients may
-cover a given channel (see [Spy clients](#spy-clients-and-monitored-channels)
-above). `LIST`/`SHOW` surface `last_triggered_ts`/`last_triggered_rule` so
-operators can see what fired most recently in a channel.
+Keyed by channel name. `ADDSPY`/`REMSPY` set/clear a channel's *preferred*
+spy-client list in `monitored_channel_spyclients` (see
+[Spy clients](#spy-clients-and-monitored-channels) above for the fallback
+behavior when none of them are eligible) - they only update the
+restriction list itself, they don't trigger a rejoin. `LIST`/`SHOW` surface
+`last_triggered_ts`/`last_triggered_rule` so operators can see what fired
+most recently in a channel, and a `Live` column/line showing the spy client
+(if any) actually joined to the channel right now - `SpyClients`/
+`SpyClnts` only reflects the configured restriction list (or `any`), not
+live join state, so `Live` is the way to see from IRC whether a channel has
+actually lost coverage.
 
 ### Command-line abbreviations
 
