@@ -1197,7 +1197,8 @@ void dronescan::OnTimer(const xServer::timerID& theTimer, void*) {
             PendingSpamAction pending = sit->second;
             pendingSpamActionTimers.erase(sit);
             executeSpamAction(pending.actionType, pending.reason, pending.duration,
-                              pending.prefixAuto, pending.actor, pending.ruleName);
+                              pending.prefixAuto, pending.actor, pending.ruleName,
+                              pending.detectorNick);
             return;
         }
     }
@@ -3300,25 +3301,29 @@ struct ResolvedSpamAction {
     bool prefixAuto;
 };
 
-// Build the single "[S] <rule>: nick!user@host ip in <chans> -> <actions> -
-// "<text>"" line for a rule that just crossed its threshold, given every
-// enabled action already resolved from it (before any is dispatched). Each
-// GLINE fragment includes its duration; KILL does not. Each fragment shows
-// "(now)" for a zero/negative delay or "(in Ns)" otherwise - the *planned*
-// delay, not the actual fire time. If resolved is empty (no enabled
-// GLINE/KILL actions), the arrow clause reads "report only". sanitizedText
-// is embedded verbatim (no " - ..." suffix when empty) - the caller decides
-// how it was sanitized/capped, so this same builder produces both the
-// length-capped IRC console line and the untruncated dronescan-event.log
-// line from one shared prefix/action-list format.
+// Build the single "[S] <rule>: nick!user@host ip in <chans> by <detector> ->
+// <actions> - "<text>"" line for a rule that just crossed its threshold,
+// given every enabled action already resolved from it (before any is
+// dispatched). detectedBy is the nick of whichever client (a spy client, or
+// the bot itself) actually witnessed the trigger - independent of which
+// identity the report is signed/posted as. Each GLINE fragment includes its
+// duration; KILL does not. Each fragment shows "(now)" for a zero/negative
+// delay or "(in Ns)" otherwise - the *planned* delay, not the actual fire
+// time. If resolved is empty (no enabled GLINE/KILL actions), the arrow
+// clause reads "report only". sanitizedText is embedded verbatim (no " - ..."
+// suffix when empty) - the caller decides how it was sanitized/capped, so
+// this same builder produces both the length-capped IRC console line and the
+// untruncated dronescan-event.log line from one shared prefix/action-list
+// format.
 std::string buildSpamReportLine(const std::string& ruleName, const std::string& nick,
                                 const std::string& user, const std::string& host,
                                 const std::string& ip, const std::string& displayChannels,
-                                const std::string& sanitizedText,
+                                const std::string& detectedBy, const std::string& sanitizedText,
                                 const std::vector<ResolvedSpamAction>& resolved) {
     std::ostringstream line;
     line << "[S] " << ruleName << ": " << nick << '!' << user << '@' << host << ' ' << ip << " in "
-         << (displayChannels.empty() ? "(no channel)" : displayChannels) << " -> ";
+         << (displayChannels.empty() ? "(no channel)" : displayChannels) << " by " << detectedBy
+         << " -> ";
 
     if (resolved.empty()) {
         line << "report only";
@@ -3415,48 +3420,51 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         resolved.push_back(r);
     }
 
+    // witness: the client that actually saw the triggering event, used both
+    // to attribute the report ("by <nick>") and, for report_source ==
+    // "SPYCLIENT", to decide who signs it. spyTarget - the spy client an
+    // OnFake* handler caught the event on directly - takes priority, since
+    // it covers channel-less events (direct PRIVMSG/NOTICE/CTCP) as well as
+    // channel ones. Otherwise fall back to whichever spy client currently
+    // covers the triggering channel (chanActiveSpyMap). Null means the real
+    // bot itself was the witness (e.g. a joinasservice channel, or an event
+    // genuinely received by the bot directly) - leave that case exactly as
+    // it behaves today.
+    iClient* witness = spyTarget;
+    if (!witness && !channel_name.empty()) {
+        chanActiveSpyMapType::const_iterator scit =
+            chanActiveSpyMap.find(string_lower(channel_name));
+        if (scit != chanActiveSpyMap.end()) {
+            liveSpyClientsMapType::const_iterator lit = liveSpyClientsMap.find(scit->second);
+            if (lit != liveSpyClientsMap.end())
+                witness = lit->second;
+        }
+    }
+    const std::string detectorNick =
+        witness ? witness->getNickName() : getInstance()->getNickName();
+
     // resolved contains only enabled GLINE/KILL actions (REPORT no longer
     // exists), so "resolved is non-empty" IS "at least one GLINE/KILL is
     // about to run" - silent can only ever suppress the report-only case.
     if (!rule->isSilent() || !resolved.empty()) {
-        const std::string consoleLine =
-            buildSpamReportLine(rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
-                                displayChannels, sanitizeSpamTextForReport(triggerText), resolved);
+        const std::string consoleLine = buildSpamReportLine(
+            rule->getName(), actor.nick, actor.user, actor.host, actor.ip, displayChannels,
+            detectorNick, sanitizeSpamTextForReport(triggerText), resolved);
 
 #ifdef ENABLE_LOG4CPLUS
         // dronescan-event.log must hold the complete trigger text, unlike
         // the IRC console line above which is capped for IRC line-length
         // limits - so this is built separately with the uncapped sanitizer.
-        const std::string logLine =
-            buildSpamReportLine(rule->getName(), actor.nick, actor.user, actor.host, actor.ip,
-                                displayChannels, sanitizeSpamTextForLog(triggerText), resolved);
+        const std::string logLine = buildSpamReportLine(
+            rule->getName(), actor.nick, actor.user, actor.host, actor.ip, displayChannels,
+            detectorNick, sanitizeSpamTextForLog(triggerText), resolved);
         log(DS_EVENT, logLine);
 #endif
 
-        // report_source == "SPYCLIENT": send the line as the spy client that
-        // actually saw the triggering event, if one can be resolved.
-        // spyTarget - the spy client an OnFake* handler caught the event on
-        // directly - takes priority, since it covers channel-less events
-        // (direct PRIVMSG/NOTICE/CTCP) as well as channel ones. Otherwise
-        // fall back to whichever spy client currently covers the triggering
-        // channel (chanActiveSpyMap). If neither resolves (BOT, a
-        // joinasservice channel, or an event genuinely received by the real
-        // bot) fall back to the normal bot-sent console line.
-        iClient* reportAs = nullptr;
-        if (rule->getReportSource() == "SPYCLIENT") {
-            if (spyTarget) {
-                reportAs = spyTarget;
-            } else if (!channel_name.empty()) {
-                chanActiveSpyMapType::const_iterator scit =
-                    chanActiveSpyMap.find(string_lower(channel_name));
-                if (scit != chanActiveSpyMap.end()) {
-                    liveSpyClientsMapType::const_iterator lit =
-                        liveSpyClientsMap.find(scit->second);
-                    if (lit != liveSpyClientsMap.end())
-                        reportAs = lit->second;
-                }
-            }
-        }
+        // report_source == "SPYCLIENT": sign the line as the witnessing spy
+        // client, if one was resolved above. Otherwise (BOT, or no spy
+        // client witnessed it) send it as the bot itself.
+        iClient* reportAs = (rule->getReportSource() == "SPYCLIENT") ? witness : nullptr;
 
         if (reportAs) {
             Channel* consoleChan = Network->findChannel(consoleChannel);
@@ -3474,7 +3482,7 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
 
         if (r.delay <= 0) {
             executeSpamAction(r.actionType, r.reason, r.duration, r.prefixAuto, actor,
-                              rule->getName());
+                              rule->getName(), detectorNick);
             continue;
         }
 
@@ -3485,6 +3493,7 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
         pending.prefixAuto = r.prefixAuto;
         pending.actor = actor;
         pending.ruleName = rule->getName();
+        pending.detectorNick = detectorNick;
 
         time_t fireAt = ::time(nullptr) + static_cast<time_t>(r.delay);
         xServer::timerID tid = MyUplink->RegisterTimer(fireAt, this, nullptr);
@@ -3505,9 +3514,10 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
  */
 void dronescan::executeSpamAction(const std::string& actionType, const std::string& reason,
                                   int duration, bool prefixAuto, const SpamActor& actor,
-                                  const std::string& ruleName) {
+                                  const std::string& ruleName, const std::string& detectorNick) {
 #ifndef ENABLE_LOG4CPLUS
     (void)ruleName;
+    (void)detectorNick;
 #endif
     if (actionType == "GLINE") {
         const string mask =
@@ -3519,7 +3529,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
         logMsg << "SPAM[GLINE] Queued GLINE for " << actor.nick << '!' << actor.user << '@'
-               << actor.host << " (" << actor.ip << ") - mask: " << mask
+               << actor.host << " (" << actor.ip << ") by " << detectorNick << " - mask: " << mask
                << " - duration: " << duration << "s - rule '" << ruleName
                << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
@@ -3532,7 +3542,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 #ifdef ENABLE_LOG4CPLUS
             std::ostringstream logMsg;
             logMsg << "SPAM[KILL] " << actor.nick << '!' << actor.user << '@' << actor.host << " ("
-                   << actor.ip << ") - rule '" << ruleName
+                   << actor.ip << ") by " << detectorNick << " - rule '" << ruleName
                    << "' - client no longer connected, skipped";
             log(SPAM_ACTION, logMsg.str());
 #endif
@@ -3543,7 +3553,7 @@ void dronescan::executeSpamAction(const std::string& actionType, const std::stri
 #ifdef ENABLE_LOG4CPLUS
         std::ostringstream logMsg;
         logMsg << "SPAM[KILL] Killed " << actor.nick << '!' << actor.user << '@' << actor.host
-               << " (" << actor.ip << ") - rule '" << ruleName
+               << " (" << actor.ip << ") by " << detectorNick << " - rule '" << ruleName
                << "' - reason: " << sanitizeSpamTextForLog(reason);
         log(SPAM_ACTION, logMsg.str());
 #endif
@@ -3693,6 +3703,14 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc) {
     }
 
     liveSpyClientsMap[sc->getId()] = ic;
+
+    // Join the console channel so a report_source=SPYCLIENT report signed as
+    // this client (FakeMessage() in fireRuleActions()) can actually be
+    // delivered - the console channel is typically +n (no external
+    // messages), so a spoofed PRIVMSG from a non-member is silently
+    // rejected by the ircd. OnChannelEvent() auto-voices spy clients that
+    // join the console channel.
+    MyUplink->JoinChannel(ic, consoleChannel);
 
     // Join the configured spy clients channel, if any
     if (!spyClientsChannel.empty())

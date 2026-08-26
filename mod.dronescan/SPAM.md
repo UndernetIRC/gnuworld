@@ -189,9 +189,9 @@ Whenever a rule fires, `fireRuleActions()` prints a single combined line to
 the console channel, prefixed `[S]`:
 
 ```
-[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1,#chan2 -> GLINE 3600s (now), KILL (now) - "spam text here"
-[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1 -> GLINE 3600s (in 30s) - "spam text"
-[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1 -> report only - "spam text"
+[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1,#chan2 by NetGuy -> GLINE 3600s (now), KILL (now) - "spam text here"
+[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1 by NetGuy -> GLINE 3600s (in 30s) - "spam text"
+[S] flood-repeat: nick!user@host 1.2.3.4 in #chan1 by E -> report only - "spam text"
 ```
 
 Multiple actions are comma-joined in `rule->getActions()` order; each GLINE
@@ -206,26 +206,37 @@ on the real gline/kill itself) to keep the line short. `dronescan-event.log`
 gets the same line rebuilt with the full, untruncated trigger text instead -
 see [Logging](#logging).
 
+The `by <nick>` segment names whichever client actually *witnessed* the
+trigger - a spy client's nick, or the bot's own nick (`E`) when the bot
+itself was the sole witness (e.g. a `joinasservice` channel, or an event
+genuinely received by the bot directly) - independent of which identity the
+line is signed/posted as (see `report_source` below). Resolution order:
+`spyTarget` (the spy client an `OnFake*` handler caught a direct
+PRIVMSG/NOTICE/CTCP on) takes priority; otherwise, for a channel event,
+whichever spy client currently covers that channel
+(`dronescan::chanActiveSpyMap`); otherwise the bot itself.
+
 `spam_rules.silent`: when a rule has **zero** enabled GLINE/KILL actions
 linked, it would otherwise print a "report only" line with no real action
 taken; if `silent` is true, that line is suppressed entirely. A rule with
 at least one enabled GLINE/KILL action **always** reports, regardless of
 `silent` - silent can never hide a real gline/kill.
 
-`spam_rules.report_source`: who the `[S]` line appears to be sent by, still
-always posted in `consoleChannel`. `BOT` (default) sends it from the bot
-itself (E), same as before this field existed. `SPYCLIENT` instead sends it
-via `FakeMessage()` as a spy client, without requiring that spy client to be
-a member of `consoleChannel`. Which spy client is used depends on how the
-triggering event was caught: for a direct PRIVMSG/NOTICE/CTCP sent straight
-to a spy client, it reports as that same spy client; for a channel event, it
-reports as whichever spy client currently covers that channel
-(`dronescan::chanActiveSpyMap`, kept up to date as spy clients join/part
-monitored channels). If neither applies - e.g. the event was genuinely
-received by the bot itself (not any spy client), or the channel is watched
-via `joinasservice` instead of a spy client, or no spy client currently
-covers that channel - it silently falls back to `BOT`, so a firing rule
-always produces its report line.
+`spam_rules.report_source`: who the `[S]` line is *sent as* (its P10 source),
+still always posted in `consoleChannel`. `BOT` (default) sends it from the
+bot itself (E), same as before this field existed. `SPYCLIENT` instead sends
+it via `FakeMessage()` as the witnessing spy client (the same one named in
+`by <nick>` above) - if none witnessed it (the bot itself was the sole
+witness), it falls back to `BOT` for that report, so a firing rule always
+produces its report line. Every live spy client is a member of
+`consoleChannel` (see [Spy clients and monitored
+channels](#spy-clients-and-monitored-channels)), which `FakeMessage()`
+requires: `consoleChannel` is typically `+n` (no external messages), so a
+spoofed PRIVMSG from a non-member is silently rejected by the ircd
+(`ERR_CANNOTSENDTOCHAN`) and never reaches anyone - this used to make
+`SPYCLIENT`-signed reports vanish from IRC entirely whenever the witnessing
+spy client wasn't already sitting in the console channel, even though
+`dronescan-event.log` still recorded the detection correctly.
 
 ### Logging
 
@@ -255,6 +266,13 @@ the IRC console line, which truncates trigger text to 200 bytes. Both
 `CLAUDE.md`); logging is silently skipped if the module was built without
 it.
 
+Both files also record `by <nick>` - the same witnessing-client attribution
+described in [Console reporting](#console-reporting) - for `spam-action.log`
+threaded through as `detectorNick` (via `PendingSpamAction` for a delayed
+action, so the log entry written at actual execution time still names the
+client that witnessed the original trigger, not anything about the moment
+the timer fired).
+
 ## Spy clients and monitored channels
 
 - `monitored_channels` lists the channels dronescan watches. Each can be
@@ -262,6 +280,12 @@ it.
 - `spyclients` are P10-introduced fake clients (nick/user/host/ip/realname,
   optional services account, user modes) that join monitored channels to
   observe traffic dronescan itself isn't in.
+- Every spy client also joins `consoleChannel` as soon as it's introduced to
+  the network (`introduceSpyClient()`), in addition to whatever channel(s)
+  it's assigned to monitor, and is auto-voiced there (`OnChannelEvent()` ->
+  `voiceSpyClientInConsole()`). This is what makes `report_source=SPYCLIENT`
+  reporting actually deliverable - see [Console
+  reporting](#console-reporting).
 - `dronescan::findBestSpyClient(chanName, forcejoin)` picks which spy
   client covers a channel, via `selectSpyClient()`. If
   `monitored_channel_spyclients` has rows for that channel, those id(s) are

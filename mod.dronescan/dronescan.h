@@ -347,6 +347,7 @@ class dronescan : public xClient {
         bool prefixAuto;
         SpamActor actor;
         std::string ruleName;
+        std::string detectorNick;
         PendingSpamAction() : duration(-1), prefixAuto(true) {}
     };
 
@@ -381,7 +382,8 @@ class dronescan : public xClient {
     // console (that happens once, up front, in fireRuleActions); only queues
     // the GLINE / calls Kill() and writes the log4cplus audit line.
     void executeSpamAction(const std::string& actionType, const std::string& reason, int duration,
-                           bool prefixAuto, const SpamActor& actor, const std::string& ruleName);
+                           bool prefixAuto, const SpamActor& actor, const std::string& ruleName,
+                           const std::string& detectorNick);
     // Scoring key: rule_id.channel_or_privmsg.unit, or rule_id.unit when
     // rule->isScoreGlobally() is true (channel segment omitted). unit is the
     // client's numeric nick, or its IP when rule->getPointsPer() == "IP".
