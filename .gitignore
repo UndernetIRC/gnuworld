@@ -15,6 +15,7 @@ Makefile
 stamp-h1
 .DS_Store
 ddd/
+CLAUDE.md
 
 # Autotools generated files (run ./autogen.sh)
 /configure
