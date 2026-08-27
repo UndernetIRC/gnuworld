@@ -226,17 +226,21 @@ at least one enabled GLINE/KILL action **always** reports, regardless of
 still always posted in `consoleChannel`. `BOT` (default) sends it from the
 bot itself (E), same as before this field existed. `SPYCLIENT` instead sends
 it via `FakeMessage()` as the witnessing spy client (the same one named in
-`by <nick>` above) - if none witnessed it (the bot itself was the sole
-witness), it falls back to `BOT` for that report, so a firing rule always
-produces its report line. Every live spy client is a member of
-`consoleChannel` (see [Spy clients and monitored
-channels](#spy-clients-and-monitored-channels)), which `FakeMessage()`
-requires: `consoleChannel` is typically `+n` (no external messages), so a
-spoofed PRIVMSG from a non-member is silently rejected by the ircd
-(`ERR_CANNOTSENDTOCHAN`) and never reaches anyone - this used to make
-`SPYCLIENT`-signed reports vanish from IRC entirely whenever the witnessing
-spy client wasn't already sitting in the console channel, even though
-`dronescan-event.log` still recorded the detection correctly.
+`by <nick>` above) - but only if that spy client is actually a member of
+`consoleChannel` at report time (checked via `Channel::findUser()`); spy
+clients don't join `consoleChannel` by default (see [Spy clients and
+monitored channels](#spy-clients-and-monitored-channels)), so in the default
+configuration this always falls back to sending as `BOT`. This fallback also
+applies whenever no spy client witnessed the trigger (the bot itself was the
+sole witness). Falling back never loses attribution: the `by <nick>` segment
+already names the real detector in the line's text regardless of which
+identity sends it. Sending unconditionally as the spy client without this
+membership check used to make `SPYCLIENT`-signed reports vanish from IRC
+entirely whenever the witnessing spy client wasn't a member of
+`consoleChannel` (`consoleChannel` is typically `+n`, so a spoofed PRIVMSG
+from a non-member is silently rejected by the ircd,
+`ERR_CANNOTSENDTOCHAN`) - `dronescan-event.log` still recorded the detection
+correctly, but the console line never reached anyone.
 
 ### Logging
 
@@ -280,12 +284,14 @@ the timer fired).
 - `spyclients` are P10-introduced fake clients (nick/user/host/ip/realname,
   optional services account, user modes) that join monitored channels to
   observe traffic dronescan itself isn't in.
-- Every spy client also joins `consoleChannel` as soon as it's introduced to
-  the network (`introduceSpyClient()`), in addition to whatever channel(s)
-  it's assigned to monitor, and is auto-voiced there (`OnChannelEvent()` ->
-  `voiceSpyClientInConsole()`). This is what makes `report_source=SPYCLIENT`
-  reporting actually deliverable - see [Console
-  reporting](#console-reporting).
+- Spy clients do **not** join `consoleChannel` by default. Setting
+  `spyClientsJoinConsole = 1` in the config makes every spy client also join
+  `consoleChannel` as soon as it's introduced to the network
+  (`introduceSpyClient()`), in addition to whatever channel(s) it's assigned
+  to monitor - this is off by default, and isn't required for
+  `report_source=SPYCLIENT` reporting to work; see [Console
+  reporting](#console-reporting) for the membership-aware fallback that
+  covers the default (off) case.
 - `dronescan::findBestSpyClient(chanName, forcejoin)` picks which spy
   client covers a channel, via `selectSpyClient()`. If
   `monitored_channel_spyclients` has rows for that channel, those id(s) are
@@ -383,8 +389,9 @@ SPAM SPYCLIENT ADD SpyBot spy spy.host.com 1.2.3.4 "Observer"
   [Console reporting](#console-reporting).
 - `RULE report_source`: `BOT` (default) or `SPYCLIENT` - who the `[S]`
   console line is sent as. `SPYCLIENT` reports as the spy client currently
-  covering the triggering channel, falling back to `BOT` when none does -
-  see [Console reporting](#console-reporting).
+  covering the triggering channel, but only if that spy client is actually a
+  member of `consoleChannel` (off by default - see `spyClientsJoinConsole`),
+  falling back to `BOT` otherwise - see [Console reporting](#console-reporting).
 
 ### EXCLUSION
 

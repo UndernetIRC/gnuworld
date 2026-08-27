@@ -256,6 +256,12 @@ dronescan::dronescan(const string& configFileName) : xClient(configFileName) {
     if (spyChanIt != dronescanConfig->end())
         spyClientsChannel = spyChanIt->second;
 
+    /* Load optional spyClientsJoinConsole configuration. Defaults to off -
+     * spy clients don't join the console channel unless explicitly enabled. */
+    EConfig::const_iterator spyJoinConsoleIt = dronescanConfig->Find("spyClientsJoinConsole");
+    spyClientsJoinConsole =
+        (spyJoinConsoleIt != dronescanConfig->end() && atoi(spyJoinConsoleIt->second.c_str()) == 1);
+
     /* Set up our timer. */
     theTimer = new Timer();
 
@@ -562,7 +568,17 @@ void dronescan::OnEvent(const eventType& theEvent, void* Data1, void* Data2, voi
 /** Receive channel events. */
 void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theChannel, void* Data1,
                                void* Data2, void* Data3, void* Data4) {
-    /* If we are bursting, we don't want to be checking joins. */
+    iClient* theClient = static_cast<iClient*>(Data1);
+
+    if (theEvent == EVT_JOIN && theClient && theClient->isOper() &&
+        !strcasecmp(theChannel->getName().c_str(), consoleChannel.c_str())) {
+        // Auto-op opers joining the console channel. Must run even during
+        // burst (see BurstChannels()/introduceSpyClient(), which run while
+        // currentState is still BURST).
+        opInConsole(theClient);
+    }
+
+    /* If we are bursting, we don't want to be checking joins/parts for spam detection. */
     if (currentState == BURST)
         return;
 
@@ -570,15 +586,7 @@ void dronescan::OnChannelEvent(const channelEventType& theEvent, Channel* theCha
     if (theEvent != EVT_JOIN && theEvent != EVT_PART)
         return;
 
-    iClient* theClient = static_cast<iClient*>(Data1);
     if (theEvent == EVT_JOIN) {
-        // Auto-voice spy clients and auto-op opers in the console channel
-        if (!strcasecmp(theChannel->getName().c_str(), consoleChannel.c_str())) {
-            if (isSpyClient(theClient))
-                voiceSpyClientInConsole(theClient);
-            else if (theClient->isOper())
-                opInConsole(theClient);
-        }
         handleChannelJoin(theChannel, theClient);
     } else if (theEvent == EVT_PART) {
         handleChannelPart(theChannel, theClient);
@@ -3462,16 +3470,17 @@ void dronescan::fireRuleActions(sqlSpamRule* rule, const SpamActor& actor,
 #endif
 
         // report_source == "SPYCLIENT": sign the line as the witnessing spy
-        // client, if one was resolved above. Otherwise (BOT, or no spy
-        // client witnessed it) send it as the bot itself.
+        // client, if one was resolved above AND it's actually a member of
+        // the console channel (spyClientsJoinConsole is off by default, so
+        // this is usually not the case). Otherwise (BOT, no spy client
+        // witnessed it, or the witness isn't in the console channel) send
+        // it as the bot itself - the "by <nick>" attribution is already
+        // embedded in consoleLine regardless of which identity sends it.
         iClient* reportAs = (rule->getReportSource() == "SPYCLIENT") ? witness : nullptr;
+        Channel* consoleChan = Network->findChannel(consoleChannel);
 
-        if (reportAs) {
-            Channel* consoleChan = Network->findChannel(consoleChannel);
-            if (consoleChan)
-                FakeMessage(consoleChan, reportAs, consoleLine);
-            else
-                Message(consoleChannel, "%s", consoleLine.c_str());
+        if (reportAs && consoleChan && consoleChan->findUser(reportAs)) {
+            FakeMessage(consoleChan, reportAs, consoleLine);
         } else {
             Message(consoleChannel, "%s", consoleLine.c_str());
         }
@@ -3600,20 +3609,17 @@ bool dronescan::isPrimarySpyClient(const iClient* Target, const std::string& cha
     return lit->second == Target;
 }
 
-/** Voice a spy client in the console channel. */
-void dronescan::voiceSpyClientInConsole(iClient* ic) {
-    Channel* consoleChan = Network->findChannel(consoleChannel);
-    if (!consoleChan)
-        return;
-    Mode(consoleChan, "+v", ic->getCharYYXXX());
-}
-
 /** Op a client in the console channel. */
 void dronescan::opInConsole(iClient* ic) {
     Channel* consoleChan = Network->findChannel(consoleChannel);
-    if (!consoleChan)
+    if (!consoleChan) {
+        elog << "dronescan::opInConsole> Console channel " << consoleChannel << " not found."
+             << endl;
         return;
-    Mode(consoleChan, "+o", ic->getCharYYXXX());
+    }
+    if (!Mode(consoleChan, "+o", ic->getNickName()))
+        elog << "dronescan::opInConsole> Mode +o failed for " << ic->getNickName() << " in "
+             << consoleChannel << endl;
 }
 
 /**
@@ -3704,13 +3710,14 @@ iClient* dronescan::introduceSpyClient(sqlSpyClient* sc) {
 
     liveSpyClientsMap[sc->getId()] = ic;
 
-    // Join the console channel so a report_source=SPYCLIENT report signed as
-    // this client (FakeMessage() in fireRuleActions()) can actually be
-    // delivered - the console channel is typically +n (no external
-    // messages), so a spoofed PRIVMSG from a non-member is silently
-    // rejected by the ircd. OnChannelEvent() auto-voices spy clients that
-    // join the console channel.
-    MyUplink->JoinChannel(ic, consoleChannel);
+    if (spyClientsJoinConsole) {
+        // Optional: only if explicitly enabled. report_source=SPYCLIENT
+        // reports still work without this - fireRuleActions() falls back to
+        // sending as the bot whenever the witnessing spy client isn't a
+        // member of the console channel (the "by <nick>" attribution in the
+        // report text doesn't depend on the message's actual P10 source).
+        MyUplink->JoinChannel(ic, consoleChannel);
+    }
 
     // Join the configured spy clients channel, if any
     if (!spyClientsChannel.empty())

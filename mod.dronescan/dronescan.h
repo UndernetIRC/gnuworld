@@ -501,9 +501,6 @@ class dronescan : public xClient {
     /** Cancel any pending spy-client-join timer(s) scheduled for the given channel. */
     void cancelPendingJoinTimers(const std::string& chanName);
 
-    /** Voice a spy client in the console channel. */
-    void voiceSpyClientInConsole(iClient* ic);
-
     /** Op a client in the console channel. */
     void opInConsole(iClient* ic);
 
@@ -859,6 +856,9 @@ class dronescan : public xClient {
     // Optional: channel spy clients join on introduction. Empty (unset in
     // the config) means spy clients don't join any channel at introduction.
     std::string spyClientsChannel;
+    // Optional: if true, spy clients also join consoleChannel on
+    // introduction. Off by default (unset in the config).
+    bool spyClientsJoinConsole;
 
     /** Spy client periodic quit / rejoin cooldown / 2nd-client join config. */
     int spyClientQuitMinSec;
