@@ -7962,9 +7962,11 @@ bool cservice::doXQSASL(iServer* theServer, const string& Routing, const string&
                 for (size_t i = 0; i < st2.size(); ++i) {
                     if (st2[i].rfind("n=", 0) == 0) {
                         StringTokenizer st3(st2[i].substr(2));
-                        it->username = st3[0];
-                        if (st3.size() > 1)
-                            it->password = st3[1];
+                        if (!st3.empty()) {
+                            it->username = st3[0];
+                            if (st3.size() > 1)
+                                it->password = st3[1];
+                        }
                     } else if (st2[i].rfind("r=", 0) == 0)
                         it->client_nonce = st2[i].substr(2);
                 }
@@ -8631,12 +8633,19 @@ bool cservice::doXROplist(iServer* /*theServer*/, const string& Routing, const s
     LOG(TRACE, "XQ-OPLIST: Routing: {} Message: {}", Routing, Message);
     StringTokenizer st(Message);
 
+    /* Need at least "OPLIST <chan> <field>" before inspecting st[1]/st[2]. */
+    if (st.size() < 3) {
+        LOG(ERROR, "OPLIST insufficient response parameters");
+        return false;
+    }
+
     if (st[2] == "NO") {
         LOG(TRACE, "NO oplist reported for channel {}", st[1]);
         return true;
     }
 
-    if (st.size() < 6) {
+    /* A full OPLIST reply is accessed up to st[8] below. */
+    if (st.size() < 9) {
         LOG(ERROR, "OPLIST insufficient response parameters");
         return false;
     }
