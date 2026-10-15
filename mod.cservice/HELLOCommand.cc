@@ -131,7 +131,8 @@ bool HELLOCommand::Exec(iClient* theClient, const string& Message) {
      * Ensure this e-mail address is not already used
      */
     stringstream theQuery;
-    theQuery << "SELECT id FROM users WHERE lower(email) = '" << st[2] << "'" << ends;
+    theQuery << "SELECT id FROM users WHERE lower(email) = '" << escapeSQLChars(st[2]) << "'"
+             << ends;
     if (!bot->SQLDb->Exec(theQuery, true)) {
         LOG(ERROR, "SQL error on HELLOCommand, matching e-mail address");
         LOGSQL_ERROR(bot->SQLDb);

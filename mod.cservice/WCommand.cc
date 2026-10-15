@@ -203,7 +203,7 @@ bool WCommand::Exec(iClient* theClient, const string& Message) {
         /* Is W on the channel? */
         if (!wChanUser) {
             bot->Notice(theClient, bot->getResponse(theUser, language::cant_find_on_chan).c_str(),
-                        wClient->getNickName().c_str());
+                        wClient->getNickName().c_str(), theChan->getName().c_str());
             return false;
         }
 
@@ -223,7 +223,7 @@ bool WCommand::Exec(iClient* theClient, const string& Message) {
         bot->Write(xQuery);
 
         return true;
-    } else if (Command == "PURGE") {
+    } else if (Command == "XPURGE") {
         /* Admin? */
         if (admLevel < 750) {
             bot->Notice(
@@ -251,7 +251,7 @@ bool WCommand::Exec(iClient* theClient, const string& Message) {
         } else {
             bot->Notice(theClient,
                         "%s is flagged as registered with %s in my records. To manually update my "
-                        "records, use /msg X W PURGE %s -f to force unregistration. This should "
+                        "records, use /msg X W XPURGE %s -f to force unregistration. This should "
                         "ONLY be used if %s is already purged with %s",
                         theChan->getName().c_str(), wClient->getNickName().c_str(),
                         theChan->getName().c_str(), theChan->getName().c_str(),

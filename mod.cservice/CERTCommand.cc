@@ -160,9 +160,10 @@ bool CERTCommand::Exec([[maybe_unused]] iClient* theClient,
         std::stringstream theQuery;
         theQuery << "INSERT INTO users_fingerprints (user_id, fingerprint, added_ts, added_by, "
                     "note) VALUES ("
-                 << theClient->getAccountID() << ", '" << fingerPrint
+                 << theClient->getAccountID() << ", '" << escapeSQLChars(fingerPrint)
                  << "', date_part('epoch', CURRENT_TIMESTAMP)::int, '"
-                 << theClient->getRealNickUserHost() << "', '" << note << "')" << std::endl;
+                 << escapeSQLChars(theClient->getRealNickUserHost()) << "', '"
+                 << escapeSQLChars(note) << "')" << std::endl;
 
         if (!bot->SQLDb->Exec(theQuery, true)) {
             LOGSQL_ERROR(bot->SQLDb);
